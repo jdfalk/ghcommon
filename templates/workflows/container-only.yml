@@ -1,0 +1,68 @@
+# file: templates/workflows/container-only.yml
+# Container-Only Pipeline Template
+# This template is for projects that only need container building and releasing
+# Copy this to .github/workflows/ in your repository and customize as needed
+
+name: Container Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Version calculation for container tags
+  versioning:
+    name: Calculate Version
+    uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
+    with:
+      dry-run: ${{ github.event_name == 'pull_request' }}
+      update-pr-title: true
+    secrets: inherit
+
+  # Multi-architecture container build
+  container:
+    name: Build Container
+    uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
+    needs: [versioning]
+    with:
+      image-name: ${{ github.event.repository.name }}
+      registry: ghcr.io
+      dockerfile: ./Dockerfile
+      context: .
+      platforms: linux/amd64,linux/arm64,linux/arm/v7
+      build-args: |
+        {
+          "VERSION": "${{ needs.versioning.outputs.version }}",
+          "BUILD_TIME": "${{ github.event.head_commit.timestamp }}",
+          "COMMIT_SHA": "${{ github.sha }}"
+        }
+      push: ${{ github.event_name != 'pull_request' }}
+      generate-sbom: true
+      generate-attestation: true
+      scan-vulnerability: true
+      tag-suffix: ${{ github.ref_name != 'main' && github.ref_type == 'branch' && format('-{0}', github.ref_name) || '' }}
+    secrets: inherit
+
+  # Create release for tagged versions
+  release:
+    name: Create Release
+    uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
+    needs: [versioning, container]
+    if: |
+      github.ref_type == 'tag' ||
+      (github.ref == 'refs/heads/main' && needs.versioning.outputs.should-release == 'true')
+    with:
+      release-type: auto
+      prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+      generate-notes: true
+      include-artifacts: true
+      artifact-patterns: '["*.sbom.json", "vulnerability-report.json"]'
+      container-image: ${{ needs.container.outputs.image-url }}
+    secrets: inherit
