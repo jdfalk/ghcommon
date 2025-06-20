@@ -1,0 +1,76 @@
+# file: .github/workflows/issue-management.yml
+name: Reusable Issue Management
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        description: "Issue management command to run"
+        required: true
+        type: string
+        default: "update-issues"
+      dry-run:
+        description: "Run in dry-run mode (no actual changes)"
+        required: false
+        type: boolean
+        default: false
+      working-directory:
+        description: "Working directory for the script"
+        required: false
+        type: string
+        default: "."
+    secrets:
+      gh-token:
+        description: "GitHub token with repo access"
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  issue-management:
+    name: Issue Management
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Checkout ghcommon
+        uses: actions/checkout@v4
+        with:
+          repository: jdfalk/ghcommon
+          path: .ghcommon
+          token: ${{ secrets.gh-token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run issue management
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          GH_TOKEN: ${{ secrets.gh-token }}
+          REPO: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          python .ghcommon/scripts/issue_manager.py ${{ inputs.command }} \
+            ${{ inputs.dry-run && '--dry-run' || '' }}
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "Issue management command '${{ inputs.command }}' completed"
+          echo "Repository: ${{ github.repository }}"
+          echo "Dry run: ${{ inputs.dry-run }}"
