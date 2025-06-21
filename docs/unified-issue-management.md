@@ -287,6 +287,73 @@ If you're currently using separate workflows for issue management:
 - [ ] Remove old workflow files
 - [ ] Update documentation and team processes
 
+## Workflow Outcomes
+
+### Automatic Pull Request Creation
+
+The workflow automatically creates pull requests for file management operations:
+
+#### Processed Files Archive PR
+When distributed issue update files are processed, they are automatically moved to a `processed/` subdirectory and a PR is created:
+
+```
+📦 Archive processed issue update files
+
+Summary:
+- Moved X processed issue update files from .github/issue-updates/ to .github/issue-updates/processed/
+- Files processed by workflow run: 123456789
+- Operation: update-issues
+```
+
+#### Legacy File Updates PR
+When using legacy `issue_updates.json` files, a separate PR is created with permalinks:
+
+```
+🔗 Update issue tracking with permalinks
+
+Summary:
+- Updated issue_updates.json with permalinks to processed issues
+- Allows tracking which issues have been processed
+```
+
+### Workflow Summary Reports
+
+Each workflow run generates comprehensive summary reports including:
+
+- **Operation Status**: Success/failure status for each operation
+- **File Processing**: Count of processed files and archive status
+- **Pull Request Links**: Direct links to created PRs for review
+- **Timestamp and Context**: When and how the workflow was triggered
+
+Example summary:
+```
+🎯 Operation Summary: update-issues
+
+Status: ✅ Completed successfully
+Event: push
+Repository: owner/repo
+Timestamp: 2025-06-21 12:00:00 UTC
+Details: Processed issue updates from issue_updates.json and .github/issue-updates/
+Processed Files: 3 files moved to archive
+
+📋 Pull Request Summary:
+📦 Processed Files PR: #42
+   - URL: https://github.com/owner/repo/pull/42
+   - Branch: archive-processed-files-123456789
+```
+
+### File Management
+
+#### Distributed Files
+- Original files: `.github/issue-updates/*.json`
+- Processed files: `.github/issue-updates/processed/*.json`
+- Archive tracking: Automatic via PR creation
+
+#### Legacy Files
+- Original file: `issue_updates.json`
+- Updated file: Contains permalinks to created issues
+- Change tracking: Via separate PR with link updates
+
 ## Support
 
 For issues, questions, or contributions:

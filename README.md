@@ -76,6 +76,8 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 - **Automated ticket creation** from PRs and commits
 - **Duplicate issue detection** and closure
 - **Security vulnerability alerts** integration
+- **Distributed file processing** with automatic archival
+- **Conflict-free parallel development** using GUID-based updates
 
 ## 📖 Usage Examples
 
@@ -146,6 +148,8 @@ jobs:
 - CodeQL security alert integration
 - GUID-based duplicate prevention
 - Parallel development with no merge conflicts
+- **Automatic PR creation** for processed file archival
+- **Workflow summary reports** with detailed operation status
 
 **Helper Script**: Copy the issue creation helper to your repository:
 ```bash
