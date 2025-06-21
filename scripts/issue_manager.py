@@ -415,15 +415,36 @@ class IssueUpdateProcessor:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         update_data = json.load(f)
 
-                    # Validate that it has an action field
-                    if not isinstance(update_data, dict) or 'action' not in update_data:
-                        print(f"⚠️  Skipping {file_path}: missing 'action' field")
+                    # Handle both single objects and arrays of operations
+                    file_updates = []
+
+                    if isinstance(update_data, list):
+                        # Array format - each item should have an action
+                        for i, item in enumerate(update_data):
+                            if isinstance(item, dict) and 'action' in item:
+                                item["_source_file"] = f"{os.path.basename(file_path)}[{i}]"
+                                file_updates.append(item)
+                            else:
+                                print(f"⚠️  Skipping item {i} in {file_path}: missing 'action' field or not an object")
+
+                    elif isinstance(update_data, dict):
+                        # Single object format
+                        if 'action' in update_data:
+                            update_data["_source_file"] = os.path.basename(file_path)
+                            file_updates.append(update_data)
+                        else:
+                            print(f"⚠️  Skipping {file_path}: missing 'action' field")
+
+                    else:
+                        print(f"⚠️  Skipping {file_path}: invalid format (must be object or array)")
                         continue
 
-                    # Add source file information for tracking
-                    update_data["_source_file"] = os.path.basename(file_path)
-                    updates.append(update_data)
-                    processed_files.append(file_path)
+                    # Add all valid updates from this file
+                    if file_updates:
+                        updates.extend(file_updates)
+                        processed_files.append(file_path)
+                    else:
+                        print(f"⚠️  No valid updates found in {file_path}")
 
                 except (json.JSONDecodeError, IOError) as e:
                     print(f"⚠️  Error reading {file_path}: {e}", file=sys.stderr)
