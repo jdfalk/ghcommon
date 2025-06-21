@@ -119,7 +119,9 @@ name: Issue Management
 on:
   push:
     branches: [main]
-    paths: [issue_updates.json]
+    paths:
+      - 'issue_updates.json'
+      - '.github/issue-updates/*.json'
   pull_request_review_comment:
     types: [created, edited, deleted]
   schedule:
@@ -131,11 +133,30 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
     with:
       operations: "auto"  # Auto-detect based on event
+      issue_updates_file: "issue_updates.json"
+      issue_updates_directory: ".github/issue-updates"
       cleanup_issue_updates: true
     secrets: inherit
 ```
 
-**Features**: JSON-driven issue updates, Copilot review tickets, duplicate closure, CodeQL security alerts
+**Features**:
+- JSON-driven issue updates (legacy and distributed formats)
+- Copilot review comment tickets
+- Duplicate issue detection and closure
+- CodeQL security alert integration
+- GUID-based duplicate prevention
+- Parallel development with no merge conflicts
+
+**Helper Script**: Copy the issue creation helper to your repository:
+```bash
+curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/create-issue-update.sh -o scripts/create-issue-update.sh
+chmod +x scripts/create-issue-update.sh
+
+# Usage examples:
+./scripts/create-issue-update.sh create "Add dark mode" "Implement dark theme" "enhancement,ui"
+./scripts/create-issue-update.sh comment 123 "Testing completed successfully"
+```
+
 **Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
 **Examples**: [examples/workflows/](examples/workflows/)
 
