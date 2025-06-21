@@ -328,15 +328,17 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" != "" ]]; then
-            echo "📦 **Processed Files PR:** #${{ steps.processed-files-pr.outputs.pull-request-number }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "📦 **Distributed Files Archive PR:** #${{ steps.processed-files-pr.outputs.pull-request-number }}" >> "$GITHUB_STEP_SUMMARY"
             echo "   - URL: ${{ steps.processed-files-pr.outputs.pull-request-url }}" >> "$GITHUB_STEP_SUMMARY"
             echo "   - Branch: \`${{ steps.processed-files-pr.outputs.pull-request-head-sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "   - Purpose: Archive processed individual JSON files" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [[ "${{ steps.legacy-file-pr.outputs.pull-request-number }}" != "" ]]; then
-            echo "🔗 **Legacy File PR:** #${{ steps.legacy-file-pr.outputs.pull-request-number }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "🔗 **Legacy File Update PR:** #${{ steps.legacy-file-pr.outputs.pull-request-number }}" >> "$GITHUB_STEP_SUMMARY"
             echo "   - URL: ${{ steps.legacy-file-pr.outputs.pull-request-url }}" >> "$GITHUB_STEP_SUMMARY"
             echo "   - Branch: \`${{ steps.legacy-file-pr.outputs.pull-request-head-sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "   - Purpose: Add permalinks to legacy issue_updates.json" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
