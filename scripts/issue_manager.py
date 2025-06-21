@@ -753,11 +753,11 @@ class IssueUpdateProcessor:
         """
         Update issue files with permalinks to processed issues.
 
-        This method searches for processed issues and updates the source files
-        with permalinks to track what was accomplished.
+        This method searches for processed issues and updates the individual JSON files
+        with permalink fields directly in each action object that has a GUID.
 
         Args:
-            updates_file: Path to legacy issue updates file
+            updates_file: Path to legacy issue updates file (not used for permalink updates)
             updates_directory: Path to directory containing individual update files
 
         Returns:
@@ -767,44 +767,41 @@ class IssueUpdateProcessor:
 
         updated_count = 0
 
-        # Process legacy file if it exists
-        if os.path.exists(updates_file):
-            try:
-                with open(updates_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-
-                # Check if already has processed section
-                if isinstance(data, dict) and "processed" in data:
-                    print(f"📄 Legacy file {updates_file} already has permalinks")
-                else:
-                    # Look for matching issues and add permalinks
-                    permalinks = self._find_permalinks_for_updates(data if isinstance(data, list) else [])
-                    if permalinks:
-                        self._update_file_with_permalinks(updates_file, data, permalinks,
-                                                        "flat" if isinstance(data, list) else "grouped")
-                        updated_count += len(permalinks)
-
-            except Exception as e:
-                print(f"⚠️  Error processing legacy file {updates_file}: {e}")
-
-        # Process distributed files
+        # Process distributed files in processed directory
         if os.path.exists(updates_directory):
             processed_dir = os.path.join(updates_directory, "processed")
             if os.path.exists(processed_dir):
                 try:
-                    for filename in os.listdir(processed_dir):
-                        if filename.endswith('.json') and filename != 'README.json':
-                            file_path = os.path.join(processed_dir, filename)
+                    json_files = [f for f in os.listdir(processed_dir)
+                                if f.endswith('.json') and f != 'README.json']
 
-                            with open(file_path, 'r', encoding='utf-8') as f:
-                                file_data = json.load(f)
+                    print(f"� Found {len(json_files)} processed files to update")
 
-                            # Add permalink metadata if not present
-                            if not self._has_permalink_metadata(file_data):
-                                permalinks = self._find_permalinks_for_file_updates(file_data)
-                                if permalinks:
-                                    self._add_permalink_metadata(file_path, file_data, permalinks)
-                                    updated_count += len(permalinks)
+                    for filename in json_files:
+                        file_path = os.path.join(processed_dir, filename)
+
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            file_data = json.load(f)
+
+                        # Track if this file was modified
+                        file_modified = False
+
+                        # Handle both single objects and arrays of operations
+                        if isinstance(file_data, list):
+                            for action in file_data:
+                                if self._update_action_permalink(action):
+                                    file_modified = True
+                                    updated_count += 1
+                        elif isinstance(file_data, dict) and 'action' in file_data:
+                            if self._update_action_permalink(file_data):
+                                file_modified = True
+                                updated_count += 1
+
+                        # Write back the file if it was modified
+                        if file_modified:
+                            with open(file_path, 'w', encoding='utf-8') as f:
+                                json.dump(file_data, f, indent=2)
+                            print(f"📝 Updated permalinks in {filename}")
 
                 except Exception as e:
                     print(f"⚠️  Error processing processed files: {e}")
@@ -815,6 +812,40 @@ class IssueUpdateProcessor:
         else:
             print("📝 No permalink updates needed")
             return False
+
+    def _update_action_permalink(self, action: Dict[str, Any]) -> bool:
+        """
+        Update a single action with permalink information if it has a GUID and no existing permalink.
+
+        Args:
+            action: The action object to potentially update
+
+        Returns:
+            True if the action was modified, False otherwise
+        """
+        # Skip if no GUID or already has permalink
+        guid = action.get("guid")
+        if not guid or "permalink" in action:
+            return False
+
+        # Try to find the issue for this action
+        issue = self._find_issue_by_guid(guid)
+        if issue:
+            action["permalink"] = issue["html_url"]
+            print(f"🔗 Added permalink for GUID {guid}: {issue['html_url']}")
+            return True
+
+        # For actions that reference an issue number, try to construct permalink
+        issue_number = action.get("number")
+        if issue_number:
+            # Construct the permalink directly since we know the issue number
+            permalink = f"https://github.com/{self.api.repo}/issues/{issue_number}"
+            action["permalink"] = permalink
+            print(f"🔗 Added constructed permalink for issue #{issue_number}: {permalink}")
+            return True
+
+        print(f"⚠️  Could not find issue for GUID {guid}")
+        return False
 
     def _find_permalinks_for_updates(self, updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
