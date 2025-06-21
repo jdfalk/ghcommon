@@ -1,0 +1,131 @@
+# file: examples/workflows/issue-management-advanced.yml
+#
+# Advanced Issue Management Workflow Example
+#
+# This example shows advanced configuration options including
+# scheduled operations, custom file paths, and fine-grained control.
+#
+# Copy this file to .github/workflows/ in your repository and customize as needed.
+
+name: Advanced Issue Management
+
+on:
+  # Issue updates from custom JSON file
+  push:
+    branches: [main, master, develop]
+    paths:
+      - issue_updates.json
+      - .github/issue_updates.json
+      - docs/issue_updates.json
+
+  # Copilot review ticket management
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  pull_request:
+    types: [closed]
+
+  # Scheduled operations
+  schedule:
+    # Close duplicates daily at 2 AM UTC
+    - cron: "0 2 * * *"
+    # CodeQL alert tickets twice daily at 9 AM and 9 PM UTC
+    - cron: "0 9,21 * * *"
+
+  # Manual triggers with advanced options
+  workflow_dispatch:
+    inputs:
+      operations:
+        description: "Operations to run (comma-separated or 'auto')"
+        required: false
+        type: choice
+        options:
+          - auto
+          - update-issues
+          - copilot-tickets
+          - close-duplicates
+          - codeql-alerts
+          - update-issues,copilot-tickets
+          - close-duplicates,codeql-alerts
+          - update-issues,copilot-tickets,close-duplicates,codeql-alerts
+        default: "auto"
+      dry_run:
+        description: "Run in dry-run mode (no changes)"
+        required: false
+        type: boolean
+        default: false
+      force_update:
+        description: "Force update existing tickets"
+        required: false
+        type: boolean
+        default: false
+      issue_updates_file:
+        description: "Path to issue updates JSON file"
+        required: false
+        type: string
+        default: "issue_updates.json"
+      cleanup_after_processing:
+        description: "Clean up issue updates file after processing"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  # Determine which issue updates file to use
+  detect-issue-updates:
+    runs-on: ubuntu-latest
+    outputs:
+      issue_updates_file: ${{ steps.detect.outputs.file }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect issue updates file
+        id: detect
+        run: |
+          # Priority order for issue updates files
+          files=(
+            "${{ github.event.inputs.issue_updates_file || 'issue_updates.json' }}"
+            ".github/issue_updates.json"
+            "docs/issue_updates.json"
+            "issue_updates.json"
+          )
+
+          for file in "${files[@]}"; do
+            if [[ -f "$file" ]]; then
+              echo "file=$file" >> "$GITHUB_OUTPUT"
+              echo "📄 Using issue updates file: $file"
+              exit 0
+            fi
+          done
+
+          echo "file=issue_updates.json" >> "$GITHUB_OUTPUT"
+          echo "📄 No issue updates file found, using default: issue_updates.json"
+
+  # Main issue management workflow
+  issue-management:
+    needs: detect-issue-updates
+    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    with:
+      operations: ${{ github.event.inputs.operations || 'auto' }}
+      dry_run: ${{ github.event.inputs.dry_run == 'true' }}
+      force_update: ${{ github.event.inputs.force_update == 'true' }}
+      issue_updates_file: ${{ needs.detect-issue-updates.outputs.issue_updates_file }}
+      cleanup_issue_updates: ${{ github.event.inputs.cleanup_after_processing != 'false' }}
+      python_version: "3.11"
+    secrets: inherit
+
+  # Post-processing notifications (optional)
+  notify-completion:
+    runs-on: ubuntu-latest
+    needs: [detect-issue-updates, issue-management]
+    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Notify completion
+        run: |
+          echo "🎉 Issue management workflow completed"
+          echo "📊 Status: ${{ needs.issue-management.result }}"
+          echo "📄 File processed: ${{ needs.detect-issue-updates.outputs.issue_updates_file }}"
+
+          # Here you could add Slack/Discord/email notifications
+          # or create GitHub issues/discussions about the results

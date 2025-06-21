@@ -1,0 +1,46 @@
+# file: examples/workflows/issue-management-basic.yml
+#
+# Basic Issue Management Workflow Example
+#
+# This example shows the minimal configuration needed to use the
+# unified issue management reusable workflow from ghcommon.
+#
+# Copy this file to .github/workflows/ in your repository and customize as needed.
+
+name: Issue Management
+
+on:
+  # Trigger on issue updates file changes
+  push:
+    branches: [main, master]
+    paths: [issue_updates.json]
+
+  # Trigger on Copilot review comments
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  pull_request:
+    types: [closed]
+
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      operations:
+        description: "Operations to run (update-issues, copilot-tickets, close-duplicates, codeql-alerts, or auto)"
+        required: false
+        type: string
+        default: "auto"
+      dry_run:
+        description: "Run in dry-run mode"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  issue-management:
+    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    with:
+      operations: ${{ github.event.inputs.operations || 'auto' }}
+      dry_run: ${{ github.event.inputs.dry_run == 'true' }}
+    secrets: inherit
