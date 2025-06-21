@@ -538,19 +538,19 @@ jobs:
             if [[ "${{ needs.issue-management.result }}" == "success" ]]; then
               echo "✅ **Status:** Completed successfully" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo "📋 **Operations executed:** \`$(echo '$operations' | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "📋 **Operations executed:** \`$(echo "$operations" | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
               echo "ℹ️  Detailed operation results are shown above in individual job summaries." >> "$GITHUB_STEP_SUMMARY"
             elif [[ "${{ needs.issue-management.result }}" == "failure" ]]; then
               echo "❌ **Status:** Failed" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo "📋 **Operations attempted:** \`$(echo '$operations' | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "📋 **Operations attempted:** \`$(echo "$operations" | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
               echo "🔍 Check the job logs above for detailed error information." >> "$GITHUB_STEP_SUMMARY"
             else
               echo "⏭️ **Status:** Skipped" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo "📋 **Operations requested:** \`$(echo '$operations' | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "📋 **Operations requested:** \`$(echo "$operations" | jq -r 'join(", ")')\`" >> "$GITHUB_STEP_SUMMARY"
             fi
           fi
 
