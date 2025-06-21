@@ -33,7 +33,20 @@ import sys
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-import requests
+try:
+    import requests
+except ImportError:
+    print("Error: 'requests' module not found. Installing it now...", file=sys.stderr)
+    import subprocess
+    try:
+        # Use --user flag to install in user directory (avoids externally-managed-environment error)
+        subprocess.check_call(["uv", "pip", "install", "requests", "--quiet"])
+        import requests
+        print("✓ Successfully installed and imported 'requests' module")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to install 'requests' module: {e}", file=sys.stderr)
+        print("Please install it manually: pip install --user requests", file=sys.stderr)
+        sys.exit(1)
 
 # Configuration constants
 API_VERSION = "2022-11-28"
@@ -672,8 +685,8 @@ class IssueUpdateProcessor:
             print("❌ Update action missing issue number", file=sys.stderr)
             return False
 
-        # Build update payload, excluding action, number, and guid
-        update_data = {k: v for k, v in update.items() if k not in ["action", "number", "guid"]}
+        # Build update payload, excluding action, number, guid, and permalink
+        update_data = {k: v for k, v in update.items() if k not in ["action", "number", "guid", "permalink"]}
 
         # Add GUID to body if provided
         if guid and "body" in update_data:
