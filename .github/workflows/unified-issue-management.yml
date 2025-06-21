@@ -263,6 +263,11 @@ jobs:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
 
+      - name: Generate timestamp
+        id: timestamp
+        run: |
+          echo "current=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+
       - name: Check for existing archive PRs
         if: ${{ matrix.operation == 'update-issues' && inputs.dry_run != true }}
         id: check-prs
@@ -306,7 +311,7 @@ jobs:
             **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             **Event:** ${{ needs.determine-operations.outputs.event_name }}
             **Triggered by:** ${{ needs.determine-operations.outputs.triggered_by }}
-            **Updated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            **Updated:** ${{ steps.timestamp.outputs.current }}
 
             ### Changes
             - Moved processed distributed issue update files from `${{ inputs.issue_updates_directory }}/` to `${{ inputs.issue_updates_directory }}/processed/`
@@ -343,7 +348,7 @@ jobs:
             **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             **Event:** ${{ needs.determine-operations.outputs.event_name }}
             **Triggered by:** ${{ needs.determine-operations.outputs.triggered_by }}
-            **Updated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            **Updated:** ${{ steps.timestamp.outputs.current }}
 
             This allows tracking which issues have been processed and provides direct links to the GitHub issues.
 
