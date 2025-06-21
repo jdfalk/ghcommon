@@ -25,11 +25,12 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 
 ### Reusable Workflows
 
-| Workflow                                                               | Purpose                       | Key Features                                                  |
-| ---------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------- |
-| [`semantic-versioning.yml`](.github/workflows/semantic-versioning.yml) | Automatic version calculation | Conventional commits, PR title updates, version file updates  |
-| [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)     | Multi-arch container builds   | SBOM generation, vulnerability scanning, attestation, signing |
-| [`automatic-release.yml`](.github/workflows/automatic-release.yml)     | Automated GitHub releases     | Release notes, artifact management, notifications             |
+| Workflow                                                                         | Purpose                        | Key Features                                                             |
+| -------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| [`semantic-versioning.yml`](.github/workflows/semantic-versioning.yml)           | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
+| [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)               | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
+| [`automatic-release.yml`](.github/workflows/automatic-release.yml)               | Automated GitHub releases      | Release notes, artifact management, notifications                        |
+| [`unified-issue-management.yml`](.github/workflows/unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
 
 ### Templates
 
@@ -70,6 +71,12 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 - **Slack/Teams notifications**
 - **Container image integration**
 
+### Issue Management
+- **Comprehensive issue tracking** with GitHub Issues
+- **Automated ticket creation** from PRs and commits
+- **Duplicate issue detection** and closure
+- **Security vulnerability alerts** integration
+
 ## 📖 Usage Examples
 
 ### Basic Semantic Versioning
@@ -103,6 +110,34 @@ release:
     include-artifacts: true
     container-image: ${{ needs.container.outputs.image-url }}
 ```
+
+### Issue Management Workflow
+
+```yaml
+name: Issue Management
+
+on:
+  push:
+    branches: [main]
+    paths: [issue_updates.json]
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+  schedule:
+    - cron: "0 2 * * *"  # Daily maintenance
+  workflow_dispatch:
+
+jobs:
+  issue-management:
+    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    with:
+      operations: "auto"  # Auto-detect based on event
+      cleanup_issue_updates: true
+    secrets: inherit
+```
+
+**Features**: JSON-driven issue updates, Copilot review tickets, duplicate closure, CodeQL security alerts
+**Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
+**Examples**: [examples/workflows/](examples/workflows/)
 
 ## 🛡️ Security Features
 

@@ -14,6 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Semantic versioning workflow with conventional commits support
 - Multi-architecture container build workflow with Buildah
 - Automatic release workflow with comprehensive artifact management
+- **Unified Issue Management System**: Comprehensive reusable workflow for automated issue management
+  - Advanced Python script (963 lines) with full GitHub API integration
+  - Support for JSON-driven issue updates (create, update, comment, close, delete)
+  - Copilot review comment ticket management
+  - Automatic duplicate issue closure
+  - CodeQL security alert ticket generation
+  - GUID-based duplicate prevention system
+  - Matrix-based parallel execution
+  - Auto-detection of operations based on event context
+  - Comprehensive documentation and migration guides
+  - Example workflows for basic and advanced usage
 - Complete CI/CD pipeline template
 - Container-only pipeline template
 - Library/package release pipeline template
