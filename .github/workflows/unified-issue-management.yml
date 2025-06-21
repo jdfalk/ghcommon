@@ -268,6 +268,7 @@ jobs:
         id: processed-files-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          base: ${{ github.event.repository.default_branch }}
           branch: archive-processed-files-${{ github.run_id }}
           commit-message: "📦 Archive processed issue update files"
           title: "📦 Archive processed distributed issue update files"
@@ -300,6 +301,7 @@ jobs:
         id: legacy-file-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          base: ${{ github.event.repository.default_branch }}
           branch: update-issue-permalinks-${{ github.run_id }}
           commit-message: "🔗 Update ${{ inputs.issue_updates_file }} with issue permalinks"
           title: "🔗 Update issue tracking with permalinks"
