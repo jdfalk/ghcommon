@@ -749,6 +749,212 @@ class IssueUpdateProcessor:
             print(f"❌ Error closing issue #{issue_number}: {e}")
             return False
 
+    def update_permalinks(self, updates_file: str = "issue_updates.json", updates_directory: str = ".github/issue-updates") -> bool:
+        """
+        Update issue files with permalinks to processed issues.
+
+        This method searches for processed issues and updates the source files
+        with permalinks to track what was accomplished.
+
+        Args:
+            updates_file: Path to legacy issue updates file
+            updates_directory: Path to directory containing individual update files
+
+        Returns:
+            True if any permalinks were updated, False otherwise
+        """
+        print("🔗 Updating permalinks for processed issues...")
+
+        updated_count = 0
+
+        # Process legacy file if it exists
+        if os.path.exists(updates_file):
+            try:
+                with open(updates_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                # Check if already has processed section
+                if isinstance(data, dict) and "processed" in data:
+                    print(f"📄 Legacy file {updates_file} already has permalinks")
+                else:
+                    # Look for matching issues and add permalinks
+                    permalinks = self._find_permalinks_for_updates(data if isinstance(data, list) else [])
+                    if permalinks:
+                        self._update_file_with_permalinks(updates_file, data, permalinks,
+                                                        "flat" if isinstance(data, list) else "grouped")
+                        updated_count += len(permalinks)
+
+            except Exception as e:
+                print(f"⚠️  Error processing legacy file {updates_file}: {e}")
+
+        # Process distributed files
+        if os.path.exists(updates_directory):
+            processed_dir = os.path.join(updates_directory, "processed")
+            if os.path.exists(processed_dir):
+                try:
+                    for filename in os.listdir(processed_dir):
+                        if filename.endswith('.json') and filename != 'README.json':
+                            file_path = os.path.join(processed_dir, filename)
+
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                file_data = json.load(f)
+
+                            # Add permalink metadata if not present
+                            if not self._has_permalink_metadata(file_data):
+                                permalinks = self._find_permalinks_for_file_updates(file_data)
+                                if permalinks:
+                                    self._add_permalink_metadata(file_path, file_data, permalinks)
+                                    updated_count += len(permalinks)
+
+                except Exception as e:
+                    print(f"⚠️  Error processing processed files: {e}")
+
+        if updated_count > 0:
+            print(f"✅ Updated {updated_count} permalink entries")
+            return True
+        else:
+            print("📝 No permalink updates needed")
+            return False
+
+    def _find_permalinks_for_updates(self, updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Find permalinks for a list of updates by searching for matching issues.
+
+        Args:
+            updates: List of update operations
+
+        Returns:
+            List of permalink information dictionaries
+        """
+        permalinks = []
+
+        for update in updates:
+            action = update.get("action", "unknown")
+            guid = update.get("guid")
+            title = update.get("title", "")
+
+            # Try to find the corresponding issue
+            issue = None
+
+            if guid:
+                # Search by GUID first
+                issue = self._find_issue_by_guid(guid)
+
+            if not issue and title and action == "create":
+                # Fall back to title search for create operations
+                issues = self.api.search_issues(f'is:issue in:title "{title}"')
+                if issues:
+                    issue = issues[0]
+
+            if issue:
+                permalink_info = {
+                    "timestamp": issue.get("created_at"),
+                    "action": action,
+                    "guid": guid,
+                    "issue_number": issue["number"],
+                    "permalink": issue["html_url"],
+                    "title": issue["title"]
+                }
+                permalinks.append(permalink_info)
+                print(f"🔍 Found issue #{issue['number']} for {action} operation")
+
+        return permalinks
+
+    def _find_permalinks_for_file_updates(self, file_data: Any) -> List[Dict[str, Any]]:
+        """
+        Find permalinks for updates in a single file.
+
+        Args:
+            file_data: The JSON data from a processed update file
+
+        Returns:
+            List of permalink information dictionaries
+        """
+        updates = []
+
+        if isinstance(file_data, list):
+            updates = file_data
+        elif isinstance(file_data, dict) and "action" in file_data:
+            updates = [file_data]
+
+        return self._find_permalinks_for_updates(updates)
+
+    def _find_issue_by_guid(self, guid: str) -> Optional[Dict[str, Any]]:
+        """
+        Find an issue by its GUID marker in the body.
+
+        Args:
+            guid: The GUID to search for
+
+        Returns:
+            Issue data if found, None otherwise
+        """
+        if not guid:
+            return None
+
+        try:
+            # Search all issues for the GUID marker
+            all_issues = self.api.get_all_issues(state="all")
+            guid_marker = f"<!-- guid:{guid} -->"
+
+            for issue in all_issues:
+                if guid_marker in issue.get("body", ""):
+                    return issue
+
+            return None
+        except Exception as e:
+            print(f"⚠️  Error searching for GUID {guid}: {e}")
+            return None
+
+    def _has_permalink_metadata(self, file_data: Any) -> bool:
+        """
+        Check if a file already has permalink metadata.
+
+        Args:
+            file_data: The JSON data from a file
+
+        Returns:
+            True if permalink metadata is present
+        """
+        if isinstance(file_data, dict):
+            return "permalink" in file_data or "processed_at" in file_data
+        return False
+
+    def _add_permalink_metadata(self, file_path: str, file_data: Any, permalinks: List[Dict[str, Any]]) -> None:
+        """
+        Add permalink metadata to a processed file.
+
+        Args:
+            file_path: Path to the file to update
+            file_data: Current file data
+            permalinks: List of permalink information
+        """
+        try:
+            # Add metadata to the file
+            if isinstance(file_data, dict):
+                file_data["_permalink_metadata"] = {
+                    "processed_at": os.environ.get("GITHUB_RUN_ID", "manual"),
+                    "permalinks": permalinks
+                }
+            elif isinstance(file_data, list) and len(file_data) == 1:
+                # Single item array, convert to object with metadata
+                file_data = {
+                    "update": file_data[0],
+                    "_permalink_metadata": {
+                        "processed_at": os.environ.get("GITHUB_RUN_ID", "manual"),
+                        "permalinks": permalinks
+                    }
+                }
+
+            # Write updated file
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(file_data, f, indent=2)
+
+            print(f"🔗 Added permalink metadata to {os.path.basename(file_path)}")
+
+        except Exception as e:
+            print(f"⚠️  Failed to add permalink metadata to {file_path}: {e}")
+
     def _delete_issue(self, update: Dict[str, Any]) -> bool:
         """Delete an issue (requires GraphQL API)."""
         issue_number = update.get("number")
@@ -1142,13 +1348,14 @@ Examples:
   python issue_manager.py copilot-tickets
   python issue_manager.py close-duplicates --dry-run
   python issue_manager.py codeql-alerts
+  python issue_manager.py update-permalinks
   python issue_manager.py event-handler
         """
     )
 
     parser.add_argument(
         "command",
-        choices=["update-issues", "copilot-tickets", "close-duplicates", "codeql-alerts", "event-handler"],
+        choices=["update-issues", "copilot-tickets", "close-duplicates", "codeql-alerts", "update-permalinks", "event-handler"],
         help="Command to execute"
     )
     parser.add_argument(
@@ -1210,6 +1417,19 @@ Examples:
             manager = CodeQLAlertManager(github_api)
             created_count = manager.generate_tickets()
             print(f"Created {created_count} tickets for CodeQL alerts")
+
+        elif args.command == "update-permalinks":
+            processor = IssueUpdateProcessor(github_api)
+
+            # Get file and directory paths from environment or use defaults
+            updates_file = os.environ.get("ISSUE_UPDATES_FILE", "issue_updates.json")
+            updates_directory = os.environ.get("ISSUE_UPDATES_DIRECTORY", ".github/issue-updates")
+
+            updated = processor.update_permalinks(updates_file, updates_directory)
+            if updated:
+                print("Permalinks updated successfully")
+            else:
+                print("No permalink updates needed")
 
         elif args.command == "event-handler":
             event_name = os.environ.get("GITHUB_EVENT_NAME")

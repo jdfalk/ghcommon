@@ -28,7 +28,7 @@ on:
   workflow_call:
     inputs:
       operations:
-        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, or 'auto' to auto-detect)"
+        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, or 'auto' to auto-detect)"
         required: false
         type: string
         default: "auto"
@@ -355,6 +355,9 @@ jobs:
               ;;
             "codeql-alerts")
               echo "**Details:** Generated tickets for CodeQL security alerts" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            "update-permalinks")
+              echo "**Details:** Updated permalinks for processed issue files" >> "$GITHUB_STEP_SUMMARY"
               ;;
           esac
 
