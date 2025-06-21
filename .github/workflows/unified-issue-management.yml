@@ -444,12 +444,6 @@ jobs:
               if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
                 echo "- ℹ️  No pull requests created or updated (no file changes detected)" >> "$GITHUB_STEP_SUMMARY"
               fi
-                echo "- 🔗 **Legacy File PR:** [#${{ steps.legacy-file-pr.outputs.pull-request-number }}](${{ steps.legacy-file-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
-              fi
-
-              if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
-                echo "- ℹ️  No pull requests created (no file changes detected)" >> "$GITHUB_STEP_SUMMARY"
-              fi
               ;;
 
             "copilot-tickets")
