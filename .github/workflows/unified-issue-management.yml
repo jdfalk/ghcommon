@@ -228,7 +228,7 @@ jobs:
           # Run the operation
           python issue_manager.py ${{ matrix.operation }}
 
-          # Set outputs for summary
+          # Capture execution results for summary
           echo "operation=${{ matrix.operation }}" >> "$GITHUB_OUTPUT"
           echo "status=completed" >> "$GITHUB_OUTPUT"
 
@@ -240,20 +240,37 @@ jobs:
           else
             echo "processed_files_count=0" >> "$GITHUB_OUTPUT"
           fi
+
+          # Check if any changes were made to tracked files for PR creation
+          if [[ "${{ matrix.operation }}" == "update-issues" ]]; then
+            # Check for changes in the issue updates directory
+            if git diff --quiet HEAD -- "${{ inputs.issue_updates_directory }}/"; then
+              echo "files_changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "files_changed=true" >> "$GITHUB_OUTPUT"
+            fi
+
+            # Check for changes in the legacy file
+            if [[ -f "${{ inputs.issue_updates_file }}" ]] && ! git diff --quiet HEAD -- "${{ inputs.issue_updates_file }}"; then
+              echo "legacy_file_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "legacy_file_changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
 
-      - name: Create PR for processed files
-        if: ${{ matrix.operation == 'update-issues' && inputs.dry_run != true }}
+      - name: Create PR for processed distributed files
+        if: ${{ matrix.operation == 'update-issues' && inputs.dry_run != true && steps.execute.outputs.files_changed == 'true' }}
         id: processed-files-pr
         uses: peter-evans/create-pull-request@v7
         with:
           branch: archive-processed-files-${{ github.run_id }}
           commit-message: "📦 Archive processed issue update files"
-          title: "📦 Archive processed issue update files"
+          title: "📦 Archive processed distributed issue update files"
           body: |
             ## Summary
             Automatically archiving processed issue update files to the `processed/` directory.
@@ -277,7 +294,7 @@ jobs:
             ${{ inputs.issue_updates_directory }}/
 
       - name: Create PR for updated legacy issue file
-        if: ${{ matrix.operation == 'update-issues' && needs.determine-operations.outputs.has_issue_updates == 'true' && inputs.dry_run != true }}
+        if: ${{ matrix.operation == 'update-issues' && needs.determine-operations.outputs.has_issue_updates == 'true' && inputs.dry_run != true && steps.execute.outputs.legacy_file_changed == 'true' }}
         id: legacy-file-pr
         uses: peter-evans/create-pull-request@v7
         with:
@@ -322,7 +339,7 @@ jobs:
             echo "ℹ️  No pull requests created (no file changes detected)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Generate operation summary
+      - name: Generate detailed operation summary
         run: |
           echo "## 🎯 Operation Summary: ${{ matrix.operation }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -339,41 +356,105 @@ jobs:
             "update-issues")
               echo "**Details:** Processed issue updates from \`${{ inputs.issue_updates_file }}\` and \`${{ inputs.issue_updates_directory }}/\`" >> "$GITHUB_STEP_SUMMARY"
 
-              # Check for processed files
-              if [[ -d "${{ inputs.issue_updates_directory }}/processed" ]]; then
-                processed_count=$(find "${{ inputs.issue_updates_directory }}/processed" -name "*.json" -type f | wc -l)
-                if [[ $processed_count -gt 0 ]]; then
-                  echo "**Processed Files:** $processed_count files moved to archive" >> "$GITHUB_STEP_SUMMARY"
-                fi
+              # Show files processed
+              if [[ "${{ steps.execute.outputs.processed_files_count }}" != "0" ]]; then
+                echo "**Files Processed:** ${{ steps.execute.outputs.processed_files_count }} files moved to archive" >> "$GITHUB_STEP_SUMMARY"
+              fi
+
+              # Show PR information
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "### 📋 Pull Requests Created" >> "$GITHUB_STEP_SUMMARY"
+
+              if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" != "" ]]; then
+                echo "- 📦 **Processed Files PR:** [#${{ steps.processed-files-pr.outputs.pull-request-number }}](${{ steps.processed-files-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
+              fi
+
+              if [[ "${{ steps.legacy-file-pr.outputs.pull-request-number }}" != "" ]]; then
+                echo "- 🔗 **Legacy File PR:** [#${{ steps.legacy-file-pr.outputs.pull-request-number }}](${{ steps.legacy-file-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
+              fi
+
+              if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
+                echo "- ℹ️  No pull requests created (no file changes detected)" >> "$GITHUB_STEP_SUMMARY"
               fi
               ;;
+
             "copilot-tickets")
-              echo "**Details:** Managed Copilot review comment tickets" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Details:** Managed Copilot review comment tickets based on ${{ needs.determine-operations.outputs.event_name }} event" >> "$GITHUB_STEP_SUMMARY"
               ;;
+
             "close-duplicates")
-              echo "**Details:** Closed duplicate issues by title" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Details:** Scanned for and closed duplicate issues by title" >> "$GITHUB_STEP_SUMMARY"
+              if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+                echo "**Note:** Dry run mode - no actual changes were made" >> "$GITHUB_STEP_SUMMARY"
+              fi
               ;;
+
             "codeql-alerts")
-              echo "**Details:** Generated tickets for CodeQL security alerts" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Details:** Generated tickets for open CodeQL security alerts without existing issues" >> "$GITHUB_STEP_SUMMARY"
               ;;
+
             "update-permalinks")
-              echo "**Details:** Updated permalinks for processed issue files" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Details:** Updated permalink fields in processed issue files" >> "$GITHUB_STEP_SUMMARY"
               ;;
           esac
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # Note: Detailed operation results are included above via the Python script's GitHub summary export
 
   workflow-summary:
     runs-on: ubuntu-latest
     needs: [determine-operations, issue-management]
     if: always()
     steps:
-      - name: Generate workflow summary
+      - uses: actions/checkout@v4
+
+      - name: Collect operation results and changed files
+        id: collect
+        run: |
+          echo "Collecting operation results and file changes..."
+
+          # Initialize arrays for tracking changes
+          changed_files=()
+          created_prs=()
+
+          # Check for any file changes in the repository
+          if ! git diff --quiet HEAD~1 HEAD 2>/dev/null; then
+            echo "Repository has changes since last commit"
+
+            # Get list of changed files
+            mapfile -t changed_files < <(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+
+            # Format changed files for output
+            if [[ ${#changed_files[@]} -gt 0 ]]; then
+              printf -v changed_files_list "%s," "${changed_files[@]}"
+              echo "changed_files=${changed_files_list%,}" >> "$GITHUB_OUTPUT"
+              echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "has_changes=false" >> "$GITHUB_OUTPUT"
+              echo "changed_files=" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "No changes detected in repository"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "changed_files=" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Get recent PRs that might have been created by this workflow
+          # Note: This is a simple check - in practice, you might want to use the GitHub API
+          echo "Checking for recent PRs..."
+          echo "recent_prs=" >> "$GITHUB_OUTPUT"
+
+      - name: Generate comprehensive workflow summary
         run: |
           echo "# 🚀 Unified Issue Management Workflow Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Workflow:** Reusable Issue Management" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Run ID:** \`${{ github.run_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Run ID:** [\`${{ github.run_id }}\`](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> "$GITHUB_STEP_SUMMARY"
           echo "**Triggered by:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Repository:** [\`${{ github.repository }}\`](https://github.com/${{ github.repository }})" >> "$GITHUB_STEP_SUMMARY"
           echo "**Actor:** ${{ needs.determine-operations.outputs.triggered_by }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -398,9 +479,28 @@ jobs:
             done
           fi
 
+          # Show changed files if any
+          if [[ "${{ steps.collect.outputs.has_changes }}" == "true" ]]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## 📁 Files Modified in This Workflow" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+
+            IFS=',' read -ra files <<< "${{ steps.collect.outputs.changed_files }}"
+            for file in "${files[@]}"; do
+              if [[ -n "$file" ]]; then
+                # Create link to the file in the repository
+                echo "- [\`$file\`](https://github.com/${{ github.repository }}/blob/${{ github.sha }}/$file)" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            done
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## 📁 Files Modified" >> "$GITHUB_STEP_SUMMARY"
+            echo "No files were modified during this workflow run." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "## 📖 Configuration" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Operations mode:** ${{ inputs.operations }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Operations mode:** \`${{ inputs.operations }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Dry run:** ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Force update:** ${{ inputs.force_update }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Issue updates file:** \`${{ inputs.issue_updates_file }}\`" >> "$GITHUB_STEP_SUMMARY"
@@ -409,7 +509,12 @@ jobs:
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "## 🔗 Quick Links" >> "$GITHUB_STEP_SUMMARY"
-          echo "- [Workflow runs](https://github.com/${{ github.repository }}/actions)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- [Issues](https://github.com/${{ github.repository }}/issues)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- [Security alerts](https://github.com/${{ github.repository }}/security)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- [ghcommon repository](https://github.com/jdfalk/ghcommon)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [🔄 Workflow runs](https://github.com/${{ github.repository }}/actions)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [🐛 Issues](https://github.com/${{ github.repository }}/issues)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [🔒 Security alerts](https://github.com/${{ github.repository }}/security)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [📋 Pull requests](https://github.com/${{ github.repository }}/pulls)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [🏠 ghcommon repository](https://github.com/jdfalk/ghcommon)" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "*This summary was generated by the [Unified Issue Management Workflow](https://github.com/jdfalk/ghcommon/.github/workflows/unified-issue-management.yml) from ghcommon.*" >> "$GITHUB_STEP_SUMMARY"

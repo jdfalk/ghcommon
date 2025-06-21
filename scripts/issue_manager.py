@@ -25,10 +25,8 @@ Command Line Usage:
 """
 
 import argparse
-import glob
 import json
 import os
-import shutil
 import sys
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,6 +55,302 @@ DUPLICATE_CHECK_LABEL = "duplicate-check"
 
 # CodeQL alert configuration
 AUTO_CLOSE_ON_FILE_CHANGE = False  # Set to True to automatically close CodeQL issues when their files are modified
+
+
+class OperationSummary:
+    """Track and format operation summaries for workflow reporting."""
+
+    def __init__(self, operation: str):
+        """Initialize operation summary tracker.
+
+        Args:
+            operation: The operation being performed (e.g., 'update-issues', 'copilot-tickets')
+        """
+        self.operation = operation
+        self.issues_created = []
+        self.issues_updated = []
+        self.issues_closed = []
+        self.issues_deleted = []
+        self.comments_added = []
+        self.duplicates_closed = []
+        self.alerts_processed = []
+        self.files_processed = []
+        self.files_archived = []
+        self.permalinks_updated = []
+        self.errors = []
+        self.warnings = []
+
+    def add_issue_created(self, issue_number: int, title: str, url: str):
+        """Record an issue creation."""
+        self.issues_created.append({
+            'number': issue_number,
+            'title': title,
+            'url': url
+        })
+
+    def add_issue_updated(self, issue_number: int, title: str, url: str):
+        """Record an issue update."""
+        self.issues_updated.append({
+            'number': issue_number,
+            'title': title,
+            'url': url
+        })
+
+    def add_issue_closed(self, issue_number: int, title: str, url: str):
+        """Record an issue closure."""
+        self.issues_closed.append({
+            'number': issue_number,
+            'title': title,
+            'url': url
+        })
+
+    def add_issue_deleted(self, issue_number: int, title: str):
+        """Record an issue deletion."""
+        self.issues_deleted.append({
+            'number': issue_number,
+            'title': title
+        })
+
+    def add_comment(self, issue_number: int, comment_url: str):
+        """Record a comment addition."""
+        self.comments_added.append({
+            'issue_number': issue_number,
+            'url': comment_url
+        })
+
+    def add_duplicate_closed(self, issue_number: int, title: str, url: str):
+        """Record a duplicate issue closure."""
+        self.duplicates_closed.append({
+            'number': issue_number,
+            'title': title,
+            'url': url
+        })
+
+    def add_alert_processed(self, alert_id: str, title: str, issue_number: int = None, issue_url: str = None):
+        """Record a CodeQL alert processing."""
+        self.alerts_processed.append({
+            'alert_id': alert_id,
+            'title': title,
+            'issue_number': issue_number,
+            'issue_url': issue_url
+        })
+
+    def add_file_processed(self, file_path: str):
+        """Record a file processing."""
+        self.files_processed.append(file_path)
+
+    def add_file_archived(self, file_path: str):
+        """Record a file archival."""
+        self.files_archived.append(file_path)
+
+    def add_permalink_updated(self, file_path: str):
+        """Record a permalink update."""
+        self.permalinks_updated.append(file_path)
+
+    def add_error(self, message: str):
+        """Record an error."""
+        self.errors.append(message)
+
+    def add_warning(self, message: str):
+        """Record a warning."""
+        self.warnings.append(message)
+
+    def get_total_changes(self) -> int:
+        """Get total number of changes made."""
+        return (len(self.issues_created) + len(self.issues_updated) +
+                len(self.issues_closed) + len(self.issues_deleted) +
+                len(self.comments_added) + len(self.duplicates_closed) +
+                len(self.alerts_processed))
+
+    def print_summary(self):
+        """Print a formatted summary of the operation."""
+        print(f"\n🎯 {self.operation.upper()} OPERATION SUMMARY")
+        print("=" * 50)
+
+        total_changes = self.get_total_changes()
+        if total_changes == 0:
+            print("ℹ️  No changes made")
+        else:
+            print(f"✅ Total changes: {total_changes}")
+
+        # Issues created
+        if self.issues_created:
+            print(f"\n📝 Issues Created ({len(self.issues_created)}):")
+            for issue in self.issues_created:
+                print(f"  • #{issue['number']}: {issue['title']}")
+                print(f"    🔗 {issue['url']}")
+
+        # Issues updated
+        if self.issues_updated:
+            print(f"\n🔄 Issues Updated ({len(self.issues_updated)}):")
+            for issue in self.issues_updated:
+                print(f"  • #{issue['number']}: {issue['title']}")
+                print(f"    🔗 {issue['url']}")
+
+        # Issues closed
+        if self.issues_closed:
+            print(f"\n✅ Issues Closed ({len(self.issues_closed)}):")
+            for issue in self.issues_closed:
+                print(f"  • #{issue['number']}: {issue['title']}")
+                print(f"    🔗 {issue['url']}")
+
+        # Issues deleted
+        if self.issues_deleted:
+            print(f"\n🗑️  Issues Deleted ({len(self.issues_deleted)}):")
+            for issue in self.issues_deleted:
+                print(f"  • #{issue['number']}: {issue['title']}")
+
+        # Comments added
+        if self.comments_added:
+            print(f"\n💬 Comments Added ({len(self.comments_added)}):")
+            for comment in self.comments_added:
+                print(f"  • Issue #{comment['issue_number']}")
+                print(f"    🔗 {comment['url']}")
+
+        # Duplicates closed
+        if self.duplicates_closed:
+            print(f"\n🔁 Duplicates Closed ({len(self.duplicates_closed)}):")
+            for issue in self.duplicates_closed:
+                print(f"  • #{issue['number']}: {issue['title']}")
+                print(f"    🔗 {issue['url']}")
+
+        # Alerts processed
+        if self.alerts_processed:
+            print(f"\n🔒 CodeQL Alerts Processed ({len(self.alerts_processed)}):")
+            for alert in self.alerts_processed:
+                print(f"  • Alert {alert['alert_id']}: {alert['title']}")
+                if alert['issue_number']:
+                    print(f"    📝 Created issue #{alert['issue_number']}")
+                    print(f"    🔗 {alert['issue_url']}")
+
+        # Files processed
+        if self.files_processed:
+            print(f"\n📄 Files Processed ({len(self.files_processed)}):")
+            for file_path in self.files_processed:
+                print(f"  • {file_path}")
+
+        # Files archived
+        if self.files_archived:
+            print(f"\n📦 Files Archived ({len(self.files_archived)}):")
+            for file_path in self.files_archived:
+                print(f"  • {file_path}")
+
+        # Permalinks updated
+        if self.permalinks_updated:
+            print(f"\n🔗 Permalink Files Updated ({len(self.permalinks_updated)}):")
+            for file_path in self.permalinks_updated:
+                print(f"  • {file_path}")
+
+        # Warnings
+        if self.warnings:
+            print(f"\n⚠️  Warnings ({len(self.warnings)}):")
+            for warning in self.warnings:
+                print(f"  • {warning}")
+
+        # Errors
+        if self.errors:
+            print(f"\n❌ Errors ({len(self.errors)}):")
+            for error in self.errors:
+                print(f"  • {error}")
+
+        print("=" * 50)
+
+    def export_github_summary(self) -> str:
+        """Export summary in GitHub Actions format for step summary."""
+        lines = [
+            f"## 🎯 {self.operation.upper()} Operation Results",
+            ""
+        ]
+
+        total_changes = self.get_total_changes()
+        if total_changes == 0:
+            lines.extend([
+                "ℹ️ **No changes made**",
+                ""
+            ])
+        else:
+            lines.extend([
+                f"✅ **Total changes: {total_changes}**",
+                ""
+            ])
+
+        # Add details for each type of change
+        if self.issues_created:
+            lines.append(f"### 📝 Issues Created ({len(self.issues_created)})")
+            for issue in self.issues_created:
+                lines.append(f"- [#{issue['number']}: {issue['title']}]({issue['url']})")
+            lines.append("")
+
+        if self.issues_updated:
+            lines.append(f"### 🔄 Issues Updated ({len(self.issues_updated)})")
+            for issue in self.issues_updated:
+                lines.append(f"- [#{issue['number']}: {issue['title']}]({issue['url']})")
+            lines.append("")
+
+        if self.issues_closed:
+            lines.append(f"### ✅ Issues Closed ({len(self.issues_closed)})")
+            for issue in self.issues_closed:
+                lines.append(f"- [#{issue['number']}: {issue['title']}]({issue['url']})")
+            lines.append("")
+
+        if self.issues_deleted:
+            lines.append(f"### 🗑️ Issues Deleted ({len(self.issues_deleted)})")
+            for issue in self.issues_deleted:
+                lines.append(f"- #{issue['number']}: {issue['title']}")
+            lines.append("")
+
+        if self.comments_added:
+            lines.append(f"### 💬 Comments Added ({len(self.comments_added)})")
+            for comment in self.comments_added:
+                lines.append(f"- [Comment on issue #{comment['issue_number']}]({comment['url']})")
+            lines.append("")
+
+        if self.duplicates_closed:
+            lines.append(f"### 🔁 Duplicates Closed ({len(self.duplicates_closed)})")
+            for issue in self.duplicates_closed:
+                lines.append(f"- [#{issue['number']}: {issue['title']}]({issue['url']})")
+            lines.append("")
+
+        if self.alerts_processed:
+            lines.append(f"### 🔒 CodeQL Alerts Processed ({len(self.alerts_processed)})")
+            for alert in self.alerts_processed:
+                if alert['issue_number']:
+                    lines.append(f"- Alert {alert['alert_id']}: [#{alert['issue_number']} {alert['title']}]({alert['issue_url']})")
+                else:
+                    lines.append(f"- Alert {alert['alert_id']}: {alert['title']}")
+            lines.append("")
+
+        if self.files_processed:
+            lines.append(f"### 📄 Files Processed ({len(self.files_processed)})")
+            for file_path in self.files_processed:
+                lines.append(f"- `{file_path}`")
+            lines.append("")
+
+        if self.files_archived:
+            lines.append(f"### 📦 Files Archived ({len(self.files_archived)})")
+            for file_path in self.files_archived:
+                lines.append(f"- `{file_path}`")
+            lines.append("")
+
+        if self.permalinks_updated:
+            lines.append(f"### 🔗 Files with Updated Permalinks ({len(self.permalinks_updated)})")
+            for file_path in self.permalinks_updated:
+                lines.append(f"- `{file_path}`")
+            lines.append("")
+
+        if self.warnings:
+            lines.append(f"### ⚠️ Warnings ({len(self.warnings)})")
+            for warning in self.warnings:
+                lines.append(f"- {warning}")
+            lines.append("")
+
+        if self.errors:
+            lines.append(f"### ❌ Errors ({len(self.errors)})")
+            for error in self.errors:
+                lines.append(f"- {error}")
+            lines.append("")
+
+        return "\n".join(lines)
 
 
 class GitHubAPI:
@@ -257,6 +551,7 @@ class IssueUpdateProcessor:
 
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
+        self.summary = OperationSummary("update-issues")
 
     def process_updates(self, updates_file: str = "issue_updates.json", updates_directory: str = ".github/issue-updates") -> bool:
         """
@@ -323,6 +618,24 @@ class IssueUpdateProcessor:
             legacy_updates = self._load_legacy_file(updates_file)
             if legacy_updates:
                 self._mark_legacy_file_processed(updates_file)
+
+        # Add file tracking to summary
+        if processed_files:
+            for file_path in processed_files:
+                self.summary.add_file_processed(file_path)
+
+        # Print operation summary
+        self.summary.print_summary()
+
+        # Export summary for GitHub Actions
+        github_summary = self.summary.export_github_summary()
+        summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary_file:
+            try:
+                with open(summary_file, 'a', encoding='utf-8') as f:
+                    f.write(github_summary + '\n')
+            except Exception as e:
+                print(f"⚠️  Failed to write to GitHub step summary: {e}")
 
         return success_count > 0
 
@@ -657,6 +970,7 @@ class IssueUpdateProcessor:
             result = self.api.create_issue(title, body, labels)
             if result:
                 print(f"✅ Created issue #{result['number']}: {title}")
+                self.summary.add_issue_created(result['number'], title, result['html_url'])
 
                 # Add assignees and milestone if specified
                 if assignees or milestone:
@@ -670,10 +984,12 @@ class IssueUpdateProcessor:
                 return True
             else:
                 print(f"❌ Failed to create issue: {title}")
+                self.summary.add_error(f"Failed to create issue: {title}")
                 return False
 
         except Exception as e:
             print(f"❌ Error creating issue: {e}")
+            self.summary.add_error(f"Error creating issue: {e}")
             return False
 
     def _update_issue(self, update: Dict[str, Any]) -> bool:
@@ -695,13 +1011,23 @@ class IssueUpdateProcessor:
         try:
             success = self.api.update_issue(issue_number, **update_data)
             if success:
-                print(f"✅ Updated issue #{issue_number}")
+                issue_data = self.api.get_issue(issue_number)
+                if issue_data:
+                    title = issue_data.get('title', f'Issue {issue_number}')
+                    url = issue_data.get('html_url', '')
+                    print(f"✅ Updated issue #{issue_number}")
+                    self.summary.add_issue_updated(issue_number, title, url)
+                else:
+                    print(f"✅ Updated issue #{issue_number}")
+                    self.summary.add_issue_updated(issue_number, f'Issue {issue_number}', '')
                 return True
             else:
                 print(f"❌ Failed to update issue #{issue_number}")
+                self.summary.add_error(f"Failed to update issue #{issue_number}")
                 return False
         except Exception as e:
             print(f"❌ Error updating issue #{issue_number}: {e}")
+            self.summary.add_error(f"Error updating issue #{issue_number}: {e}")
             return False
 
     def _add_comment(self, update: Dict[str, Any]) -> bool:
@@ -723,15 +1049,20 @@ class IssueUpdateProcessor:
             body = f"<!-- guid:{guid} -->\n{body}"
 
         try:
-            success = self.api.add_comment(issue_number, body)
-            if success:
+            result = self.api.add_comment(issue_number, body)
+            if result:
                 print(f"✅ Added comment to issue #{issue_number}")
+                # Extract comment URL if available
+                comment_url = result.get('html_url', '') if isinstance(result, dict) else ''
+                self.summary.add_comment(issue_number, comment_url)
                 return True
             else:
                 print(f"❌ Failed to add comment to issue #{issue_number}")
+                self.summary.add_error(f"Failed to add comment to issue #{issue_number}")
                 return False
         except Exception as e:
             print(f"❌ Error adding comment to issue #{issue_number}: {e}")
+            self.summary.add_error(f"Error adding comment to issue #{issue_number}: {e}")
             return False
 
     def _close_issue(self, update: Dict[str, Any]) -> bool:
@@ -747,7 +1078,16 @@ class IssueUpdateProcessor:
         try:
             success = self.api.close_issue(issue_number, state_reason)
             if success:
+                issue_data = self.api.get_issue(issue_number)
+                if issue_data:
+                    title = issue_data.get('title', f'Issue {issue_number}')
+                    url = issue_data.get('html_url', '')
+                else:
+                    title = f'Issue {issue_number}'
+                    url = ''
+
                 print(f"✅ Closed issue #{issue_number} (reason: {state_reason})")
+                self.summary.add_issue_closed(issue_number, title, url)
 
                 # Add a tracking comment with GUID if provided
                 if guid:
@@ -757,9 +1097,11 @@ class IssueUpdateProcessor:
                 return True
             else:
                 print(f"❌ Failed to close issue #{issue_number}")
+                self.summary.add_error(f"Failed to close issue #{issue_number}")
                 return False
         except Exception as e:
             print(f"❌ Error closing issue #{issue_number}: {e}")
+            self.summary.add_error(f"Error closing issue #{issue_number}: {e}")
             return False
 
     def update_permalinks(self, updates_file: str = "issue_updates.json", updates_directory: str = ".github/issue-updates") -> bool:
@@ -1005,7 +1347,15 @@ class IssueUpdateProcessor:
 
         if not issue_number:
             print("Delete action missing issue number", file=sys.stderr)
+            self.summary.add_error("Delete action missing issue number")
             return False
+
+        # Get issue data before deletion for summary
+        try:
+            issue_data = self.api.get_issue(issue_number)
+            title = issue_data.get('title', f'Issue {issue_number}') if issue_data else f'Issue {issue_number}'
+        except Exception:
+            title = f'Issue {issue_number}'
 
         # Get node_id for GraphQL deletion
         try:
@@ -1028,13 +1378,18 @@ class IssueUpdateProcessor:
 
             if response.status_code == 200:
                 print(f"Deleted issue #{issue_number}")
+                self.summary.add_issue_deleted(issue_number, title)
                 return True
             else:
-                print(f"Failed to delete issue #{issue_number}: {response.status_code}", file=sys.stderr)
+                error_msg = f"Failed to delete issue #{issue_number}: {response.status_code}"
+                print(error_msg, file=sys.stderr)
+                self.summary.add_error(error_msg)
                 return False
 
         except requests.RequestException as e:
-            print(f"Error deleting issue #{issue_number}: {e}", file=sys.stderr)
+            error_msg = f"Error deleting issue #{issue_number}: {e}"
+            print(error_msg, file=sys.stderr)
+            self.summary.add_error(error_msg)
             return False
 
 
@@ -1043,6 +1398,7 @@ class CopilotTicketManager:
 
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
+        self.summary = OperationSummary("copilot-tickets")
 
     def handle_event(self, event_name: str, event_data: Dict[str, Any]) -> None:
         """Handle GitHub webhook events related to Copilot comments."""
@@ -1062,6 +1418,24 @@ class CopilotTicketManager:
                 print(f"Unhandled event: {event_name} with action: {action}")
         except Exception as e:
             print(f"Error handling {event_name} event: {e}", file=sys.stderr)
+            self.summary.add_error(f"Error handling {event_name} event: {e}")
+        finally:
+            # Always print summary at the end
+            self._print_summary()
+
+    def _print_summary(self):
+        """Print the operation summary."""
+        self.summary.print_summary()
+
+        # Export summary for GitHub Actions
+        github_summary = self.summary.export_github_summary()
+        summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary_file:
+            try:
+                with open(summary_file, 'a', encoding='utf-8') as f:
+                    f.write(github_summary + '\n')
+            except Exception as e:
+                print(f"⚠️  Failed to write to GitHub step summary: {e}")
 
     def _handle_review_comment(self, action: str, event_data: Dict[str, Any]) -> None:
         """Handle review comment events."""
@@ -1140,11 +1514,16 @@ class CopilotTicketManager:
             issue = existing[0]
             print(f"Updating existing Copilot issue #{issue['number']}")
             # Implementation would parse existing body and update it
+            self.summary.add_issue_updated(issue['number'], issue['title'], issue['html_url'])
         else:
             # Create new issue
             title = f"Copilot Review: {key[:50]}..."
             body = self._build_ticket_body(comment, [line_info])
-            self.api.create_issue(title, body, [COPILOT_LABEL])
+            result = self.api.create_issue(title, body, [COPILOT_LABEL])
+            if result:
+                self.summary.add_issue_created(result['number'], title, result['html_url'])
+            else:
+                self.summary.add_error(f"Failed to create Copilot ticket: {title}")
 
     def _handle_comment_deleted(self, comment: Dict[str, Any]) -> None:
         """Handle deletion of a Copilot comment."""
@@ -1183,6 +1562,7 @@ class DuplicateIssueManager:
 
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
+        self.summary = OperationSummary("close-duplicates")
 
     def close_duplicates(self, dry_run: bool = False) -> int:
         """
@@ -1218,6 +1598,19 @@ class DuplicateIssueManager:
         if not duplicates_found:
             print("No duplicate issues found")
 
+        # Print operation summary
+        self.summary.print_summary()
+
+        # Export summary for GitHub Actions
+        github_summary = self.summary.export_github_summary()
+        summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary_file:
+            try:
+                with open(summary_file, 'a', encoding='utf-8') as f:
+                    f.write(github_summary + '\n')
+            except Exception as e:
+                print(f"⚠️  Failed to write to GitHub step summary: {e}")
+
         return closed_count
 
     def _group_by_title(self, issues: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
@@ -1250,6 +1643,8 @@ class DuplicateIssueManager:
                 # Add duplicate comment
                 comment_body = f"Duplicate of #{canonical['number']}"
                 self.api.add_comment(duplicate['number'], comment_body)
+                # Record in summary
+                self.summary.add_duplicate_closed(duplicate['number'], duplicate['title'], duplicate['url'])
                 closed_count += 1
 
         return closed_count
@@ -1270,6 +1665,7 @@ class CodeQLAlertManager:
 
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
+        self.summary = OperationSummary("codeql-alerts")
 
     def generate_tickets(self) -> int:
         """
@@ -1294,6 +1690,20 @@ class CodeQLAlertManager:
                     created_count += 1
 
         print(f"Created {created_count} tickets for CodeQL alerts")
+
+        # Print operation summary
+        self.summary.print_summary()
+
+        # Export summary for GitHub Actions
+        github_summary = self.summary.export_github_summary()
+        summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary_file:
+            try:
+                with open(summary_file, 'a', encoding='utf-8') as f:
+                    f.write(github_summary + '\n')
+            except Exception as e:
+                print(f"⚠️  Failed to write to GitHub step summary: {e}")
+
         return created_count
 
     def _should_create_ticket(self, alert: Dict[str, Any]) -> bool:
@@ -1315,14 +1725,26 @@ class CodeQLAlertManager:
         """Create a ticket for a CodeQL alert."""
         rule = alert.get("rule", {})
         rule_description = rule.get("description", "No description available")
+        alert_number = alert.get("number")
 
         # Build title and body
-        title = f"CodeQL Alert #{alert.get('number')}: {rule_description}"
+        title = f"CodeQL Alert #{alert_number}: {rule_description}"
         body = self._build_alert_body(alert)
 
         # Create issue with security label
         result = self.api.create_issue(title, body, [CODEQL_LABEL])
-        return result is not None
+        if result:
+            # Record in summary
+            self.summary.add_alert_processed(
+                str(alert_number),
+                title,
+                result.get('number'),
+                result.get('html_url')
+            )
+            return True
+        else:
+            self.summary.add_error(f"Failed to create ticket for CodeQL alert #{alert_number}")
+            return False
 
     def _build_alert_body(self, alert: Dict[str, Any]) -> str:
         """Build the issue body for a CodeQL alert."""
@@ -1448,22 +1870,23 @@ Examples:
                 manager.handle_event(event_name, event_data)
             else:
                 print("No GitHub event to process")
+                # Still print summary even if no event
+                manager._print_summary()
 
         elif args.command == "close-duplicates":
             manager = DuplicateIssueManager(github_api)
-            closed_count = manager.close_duplicates(dry_run=args.dry_run)
-            if args.dry_run:
-                print(f"Would close {closed_count} duplicate issues")
-            else:
-                print(f"Closed {closed_count} duplicate issues")
+            manager.close_duplicates(dry_run=args.dry_run)
+            # Summary is automatically printed by the manager
 
         elif args.command == "codeql-alerts":
             manager = CodeQLAlertManager(github_api)
-            created_count = manager.generate_tickets()
-            print(f"Created {created_count} tickets for CodeQL alerts")
+            manager.generate_tickets()
+            # Summary is automatically printed by the manager
 
         elif args.command == "update-permalinks":
             processor = IssueUpdateProcessor(github_api)
+            # Reset the summary operation type for this specific operation
+            processor.summary = OperationSummary("update-permalinks")
 
             # Get file and directory paths from environment or use defaults
             updates_file = os.environ.get("ISSUE_UPDATES_FILE", "issue_updates.json")
@@ -1471,9 +1894,23 @@ Examples:
 
             updated = processor.update_permalinks(updates_file, updates_directory)
             if updated:
+                processor.summary.add_permalink_updated(updates_file)
                 print("Permalinks updated successfully")
             else:
                 print("No permalink updates needed")
+
+            # Print summary
+            processor.summary.print_summary()
+
+            # Export summary for GitHub Actions
+            github_summary = processor.summary.export_github_summary()
+            summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
+            if summary_file:
+                try:
+                    with open(summary_file, 'a', encoding='utf-8') as f:
+                        f.write(github_summary + '\n')
+                except Exception as e:
+                    print(f"⚠️  Failed to write to GitHub step summary: {e}")
 
         elif args.command == "event-handler":
             event_name = os.environ.get("GITHUB_EVENT_NAME")
