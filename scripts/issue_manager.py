@@ -532,6 +532,32 @@ class GitHubAPI:
 
         return all_issues
 
+    def get_issue(self, issue_number: int) -> Optional[Dict[str, Any]]:
+        """
+        Fetch a single issue by its number.
+
+        Args:
+            issue_number: The issue number to fetch
+
+        Returns:
+            Issue data as a dictionary, or None if not found or error occurred
+        """
+        url = f"https://api.github.com/repos/{self.repo}/issues/{issue_number}"
+        try:
+            response = requests.get(url, headers=self.headers, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Issue #{issue_number} not found", file=sys.stderr)
+                return None
+            else:
+                print(f"Failed to fetch issue #{issue_number}: {response.status_code}", file=sys.stderr)
+                print(response.text, file=sys.stderr)
+                return None
+        except requests.RequestException as e:
+            print(f"Network error fetching issue #{issue_number}: {e}", file=sys.stderr)
+            return None
+
     def get_codeql_alerts(self, state: str = "open") -> List[Dict[str, Any]]:
         """Fetch CodeQL security alerts."""
         url = f"https://api.github.com/repos/{self.repo}/code-scanning/alerts"
