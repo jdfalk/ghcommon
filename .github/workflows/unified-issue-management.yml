@@ -1,0 +1,314 @@
+# file: .github/workflows/unified-issue-management.yml
+#
+# Unified Issue Management Reusable Workflow
+#
+# This reusable workflow provides comprehensive issue management functionality
+# that can be shared across multiple repositories.
+#
+# Features:
+# - Process issue updates from issue_updates.json (create, update, comment, close, delete)
+# - Manage Copilot review comment tickets
+# - Close duplicate issues by title
+# - Generate tickets for CodeQL security alerts
+# - Comprehensive logging and summary generation
+# - GUID-based duplicate prevention
+# - Matrix-based parallel execution
+#
+# Usage:
+#   Call this workflow from your repository's workflow with:
+#   uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+#
+# For examples, see:
+# - examples/workflows/issue-management-basic.yml
+# - examples/workflows/issue-management-advanced.yml
+
+name: Unified Issue Management (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      operations:
+        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, or 'auto' to auto-detect)"
+        required: false
+        type: string
+        default: "auto"
+      dry_run:
+        description: "Run in dry-run mode (no changes)"
+        required: false
+        type: boolean
+        default: false
+      force_update:
+        description: "Force update existing tickets"
+        required: false
+        type: boolean
+        default: false
+      issue_updates_file:
+        description: "Path to issue updates JSON file"
+        required: false
+        type: string
+        default: "issue_updates.json"
+      cleanup_issue_updates:
+        description: "Whether to clean up the issue updates file after processing"
+        required: false
+        type: boolean
+        default: true
+      python_version:
+        description: "Python version to use"
+        required: false
+        type: string
+        default: "3.11"
+
+jobs:
+  determine-operations:
+    runs-on: ubuntu-latest
+    outputs:
+      operations: ${{ steps.determine.outputs.operations }}
+      has_issue_updates: ${{ steps.check-files.outputs.has_issue_updates }}
+      event_name: ${{ steps.context.outputs.event_name }}
+      triggered_by: ${{ steps.context.outputs.triggered_by }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set workflow context
+        id: context
+        run: |
+          echo "event_name=${{ github.event_name }}" >> "$GITHUB_OUTPUT"
+          echo "triggered_by=${{ github.triggering_actor }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check for files
+        id: check-files
+        run: |
+          if [[ -f "${{ inputs.issue_updates_file }}" ]]; then
+            echo "has_issue_updates=true" >> "$GITHUB_OUTPUT"
+            echo "📄 Found issue updates file: ${{ inputs.issue_updates_file }}"
+          else
+            echo "has_issue_updates=false" >> "$GITHUB_OUTPUT"
+            echo "📄 No issue updates file found: ${{ inputs.issue_updates_file }}"
+          fi
+
+      - name: Determine operations to run
+        id: determine
+        run: |
+          operations=()
+
+          # If operations explicitly provided and not 'auto'
+          if [[ "${{ inputs.operations }}" != "auto" ]]; then
+            echo "🎯 Using explicit operations: ${{ inputs.operations }}"
+            IFS=',' read -ra ops <<< "${{ inputs.operations }}"
+            operations=("${ops[@]}")
+
+          # Auto-detect based on event and context
+          else
+            echo "🔍 Auto-detecting operations based on event: ${{ github.event_name }}"
+
+            # Issue updates file exists
+            if [[ "${{ steps.check-files.outputs.has_issue_updates }}" == "true" ]]; then
+              operations+=("update-issues")
+              echo "  ✓ Added update-issues (issue updates file found)"
+            fi
+
+            # Copilot events
+            if [[ "${{ github.event_name }}" =~ ^pull_request ]]; then
+              operations+=("copilot-tickets")
+              echo "  ✓ Added copilot-tickets (PR event detected)"
+            fi
+
+            # Scheduled events
+            if [[ "${{ github.event_name }}" == "schedule" ]]; then
+              # This would need to be customized based on the calling workflow's schedule
+              operations+=("close-duplicates" "codeql-alerts")
+              echo "  ✓ Added close-duplicates and codeql-alerts (scheduled event)"
+            fi
+
+            # Push to main (multiple operations)
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              operations+=("copilot-tickets")
+              echo "  ✓ Added copilot-tickets (push event)"
+            fi
+
+            # Default fallback if no operations determined
+            if [[ ${#operations[@]} -eq 0 ]]; then
+              echo "  ⚠️  No operations auto-detected, using default set"
+              operations+=("copilot-tickets")
+            fi
+          fi
+
+          # Convert array to JSON for matrix
+          if [[ ${#operations[@]} -eq 0 ]]; then
+            ops_json="[]"
+          else
+            ops_json=$(printf '%s\n' "${operations[@]}" | jq -R . | jq -s . | tr -d '\n')
+          fi
+          echo "operations=${ops_json}" >> "$GITHUB_OUTPUT"
+          echo "🎯 Final operations to run: ${operations[*]}"
+
+  issue-management:
+    runs-on: ubuntu-latest
+    needs: determine-operations
+    if: ${{ needs.determine-operations.outputs.operations != '[]' }}
+    permissions:
+      issues: write
+      contents: write
+      pull-requests: write
+      security-events: read
+      repository-projects: read
+    strategy:
+      matrix:
+        operation: ${{ fromJson(needs.determine-operations.outputs.operations) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Download issue manager script
+        run: |
+          echo "📥 Downloading issue manager script from ghcommon..."
+          curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/issue_manager.py -o issue_manager.py
+          chmod +x issue_manager.py
+          echo "✅ Downloaded issue_manager.py"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Debug operation info
+        run: |
+          echo "🔧 Operation: ${{ matrix.operation }}"
+          echo "📅 Event: ${{ needs.determine-operations.outputs.event_name }}"
+          echo "🏃 Triggered by: ${{ needs.determine-operations.outputs.triggered_by }}"
+          echo "📁 Repository: ${{ github.repository }}"
+          echo "🔍 Dry run: ${{ inputs.dry_run }}"
+          echo "⚡ Force update: ${{ inputs.force_update }}"
+          echo "📄 Issue updates file: ${{ inputs.issue_updates_file }}"
+
+      - name: Execute operation
+        id: execute
+        run: |
+          echo "🚀 Executing: ${{ matrix.operation }}"
+
+          # Set environment variables
+          export DRY_RUN="${{ inputs.dry_run }}"
+          export FORCE_UPDATE="${{ inputs.force_update }}"
+
+          # Run the operation
+          python issue_manager.py ${{ matrix.operation }}
+
+          # Set outputs for summary
+          echo "operation=${{ matrix.operation }}" >> "$GITHUB_OUTPUT"
+          echo "status=completed" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+
+      - name: Update issue updates file with permalinks
+        if: ${{ matrix.operation == 'update-issues' && needs.determine-operations.outputs.has_issue_updates == 'true' && inputs.dry_run != true }}
+        run: |
+          echo "🔗 Updating ${{ inputs.issue_updates_file }} with permalinks for processed issues"
+          # The issue manager script will update the file with permalinks automatically
+          
+      - name: Commit updated issue file with permalinks  
+        if: ${{ matrix.operation == 'update-issues' && needs.determine-operations.outputs.has_issue_updates == 'true' && inputs.dry_run != true }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update-issue-permalinks-${{ github.run_id }}
+          commit-message: "🔗 Update ${{ inputs.issue_updates_file }} with issue permalinks"
+          title: "🔗 Update issue tracking with permalinks"
+          body: |
+            ## Summary
+            Automatically updating `${{ inputs.issue_updates_file }}` with permalinks to processed issues.
+
+            **Operation:** ${{ matrix.operation }}
+            **Workflow run:** ${{ github.run_id }}
+            **Event:** ${{ needs.determine-operations.outputs.event_name }}
+            **Triggered by:** ${{ needs.determine-operations.outputs.triggered_by }}
+
+            This allows tracking which issues have been processed and provides direct links to the GitHub issues.
+
+            This PR is auto-generated by the unified issue management workflow.
+
+      - name: Generate operation summary
+        run: |
+          echo "## 🎯 Operation Summary: ${{ matrix.operation }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Status:** ✅ Completed successfully" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Event:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            echo "**Mode:** 🔍 Dry run (no changes made)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          case "${{ matrix.operation }}" in
+            "update-issues")
+              echo "**Details:** Processed issue updates from \`${{ inputs.issue_updates_file }}\`" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            "copilot-tickets")
+              echo "**Details:** Managed Copilot review comment tickets" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            "close-duplicates")
+              echo "**Details:** Closed duplicate issues by title" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            "codeql-alerts")
+              echo "**Details:** Generated tickets for CodeQL security alerts" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+          esac
+
+  workflow-summary:
+    runs-on: ubuntu-latest
+    needs: [determine-operations, issue-management]
+    if: always()
+    steps:
+      - name: Generate workflow summary
+        run: |
+          echo "# 🚀 Unified Issue Management Workflow Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Workflow:** Reusable Issue Management" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Run ID:** \`${{ github.run_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Triggered by:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Actor:** ${{ needs.determine-operations.outputs.triggered_by }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          operations="${{ needs.determine-operations.outputs.operations }}"
+          if [[ "$operations" == "[]" ]]; then
+            echo "## 📝 Result" >> "$GITHUB_STEP_SUMMARY"
+            echo "No operations were required for this event." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## 📊 Operations Executed" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+
+            # Parse operations and show status
+            echo "$operations" | jq -r '.[]' | while read -r op; do
+              if [[ "${{ needs.issue-management.result }}" == "success" ]]; then
+                echo "- ✅ \`$op\` - Completed successfully" >> "$GITHUB_STEP_SUMMARY"
+              elif [[ "${{ needs.issue-management.result }}" == "failure" ]]; then
+                echo "- ❌ \`$op\` - Failed" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "- ⏭️ \`$op\` - Skipped" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            done
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## 📖 Configuration" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Operations mode:** ${{ inputs.operations }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Dry run:** ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Force update:** ${{ inputs.force_update }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Issue updates file:** \`${{ inputs.issue_updates_file }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Cleanup issue updates:** ${{ inputs.cleanup_issue_updates }}" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## 🔗 Quick Links" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [Workflow runs](https://github.com/${{ github.repository }}/actions)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [Issues](https://github.com/${{ github.repository }}/issues)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [Security alerts](https://github.com/${{ github.repository }}/security)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [ghcommon repository](https://github.com/jdfalk/ghcommon)" >> "$GITHUB_STEP_SUMMARY"
