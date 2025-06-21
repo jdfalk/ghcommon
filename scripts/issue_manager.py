@@ -29,7 +29,7 @@ import json
 import os
 import sys
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
@@ -214,53 +214,46 @@ class IssueUpdateProcessor:
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
 
-    def process_updates(self, updates_file: str = "issue_updates.json") -> bool:
+    def process_updates(self, updates_file: str = "issue_updates.json", updates_directory: str = ".github/issue-updates") -> bool:
         """
-        Process issue updates from JSON file supporting both legacy flat format
-        and new grouped format with GUID tracking. Updates the file with permalinks
-        to processed issues for tracking purposes.
+        Process issue updates from both legacy JSON file and new distributed directory format
+        with GUID tracking. Updates files with permalinks to processed issues for tracking purposes.
+
+        Args:
+            updates_file: Path to legacy issue updates file
+            updates_directory: Path to directory containing individual update files
 
         Returns:
             True if any updates were processed, False otherwise
         """
-        if not os.path.exists(updates_file):
-            print(f"❌ No {updates_file} found")
-            return False
+        all_updates = []
+        processed_files = []
 
-        try:
-            with open(updates_file, 'r', encoding='utf-8') as f:
-                updates_data = json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
-            print(f"❌ Error reading {updates_file}: {e}", file=sys.stderr)
-            return False
+        # Load legacy file if it exists
+        legacy_updates = self._load_legacy_file(updates_file)
+        if legacy_updates:
+            all_updates.extend(legacy_updates)
+            print(f"📄 Loaded {len(legacy_updates)} updates from legacy file: {updates_file}")
 
-        # Handle both old flat format and new grouped format
-        if isinstance(updates_data, list):
-            # Old flat format - convert to new format
-            print("⚠️  Using legacy flat format. Consider upgrading to grouped format.")
-            updates = updates_data
-            original_format = "flat"
-        else:
-            # New grouped format - process in order: create, update, comment, close, delete
-            updates = []
-            for action_type in ["create", "update", "comment", "close", "delete"]:
-                if action_type in updates_data and updates_data[action_type]:
-                    for item in updates_data[action_type]:
-                        item["action"] = action_type
-                        updates.append(item)
-            original_format = "grouped"
+        # Load distributed files from directory
+        distributed_updates, update_files = self._load_distributed_files(updates_directory)
+        if distributed_updates:
+            all_updates.extend(distributed_updates)
+            processed_files.extend(update_files)
+            print(f"📁 Loaded {len(distributed_updates)} updates from {len(update_files)} files in: {updates_directory}")
 
-        if not updates:
+        if not all_updates:
             print("📝 No updates to process")
             return True
 
-        print(f"🚀 Processing {len(updates)} updates...")
+        print(f"🚀 Processing {len(all_updates)} total updates...")
         success_count = 0
         processed_permalinks = []
 
-        for i, update in enumerate(updates, 1):
+        for i, update in enumerate(all_updates, 1):
             action = update.get('action', 'unknown')
-            print(f"\n📋 Update {i}/{len(updates)}: {action}")
+            source = update.get('_source_file', 'unknown')
+            print(f"\n📋 Update {i}/{len(all_updates)}: {action} (from {source})")
 
             result = self._process_single_update(update)
             if result:
@@ -271,15 +264,15 @@ class IssueUpdateProcessor:
             else:
                 print(f"❌ Failed to process update {i}")
 
-        print(f"\n✅ Successfully processed {success_count}/{len(updates)} updates")
-        
-        # Update the file with permalinks for processed issues
-        if processed_permalinks:
-            self._update_file_with_permalinks(updates_file, updates_data, processed_permalinks, original_format)
-            
+        print(f"\n✅ Successfully processed {success_count}/{len(all_updates)} updates")
+
+        # Move processed distributed files to processed subdirectory
+        if processed_files and success_count > 0:
+            self._archive_processed_files(processed_files, updates_directory)
+
         return success_count > 0
 
-    def _update_file_with_permalinks(self, updates_file: str, original_data: Dict[str, Any], 
+    def _update_file_with_permalinks(self, updates_file: str, original_data: Dict[str, Any],
                                    permalinks: List[Dict[str, Any]], format_type: str) -> None:
         """Update the issue updates file with permalinks to processed issues."""
         try:
@@ -288,7 +281,7 @@ class IssueUpdateProcessor:
                 # Add a processed section to track what was done
                 if "processed" not in original_data:
                     original_data["processed"] = []
-                
+
                 # Add new processed items
                 for permalink_info in permalinks:
                     original_data["processed"].append({
@@ -303,21 +296,133 @@ class IssueUpdateProcessor:
                 # For flat format, add a simple processed list
                 if not isinstance(original_data, dict):
                     original_data = {"updates": original_data, "processed": []}
-                
+
                 if "processed" not in original_data:
                     original_data["processed"] = []
-                    
+
                 for permalink_info in permalinks:
                     original_data["processed"].append(permalink_info)
 
             # Write updated file
             with open(updates_file, 'w', encoding='utf-8') as f:
                 json.dump(original_data, f, indent=2)
-                
+
             print(f"🔗 Updated {updates_file} with {len(permalinks)} permalinks")
-            
+
         except Exception as e:
             print(f"⚠️  Failed to update {updates_file} with permalinks: {e}", file=sys.stderr)
+
+    def _load_legacy_file(self, updates_file: str) -> List[Dict[str, Any]]:
+        """Load updates from the legacy issue_updates.json file."""
+        if not os.path.exists(updates_file):
+            return []
+
+        try:
+            with open(updates_file, 'r', encoding='utf-8') as f:
+                updates_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"❌ Error reading {updates_file}: {e}", file=sys.stderr)
+            return []
+
+        updates = []
+
+        # Handle both old flat format and new grouped format
+        if isinstance(updates_data, list):
+            # Old flat format - items already have action property
+            print("⚠️  Using legacy flat format. Consider upgrading to grouped format.")
+            updates = updates_data
+        else:
+            # New grouped format - process in order: create, update, comment, close, delete
+            for action_type in ["create", "update", "comment", "close", "delete"]:
+                if action_type in updates_data and updates_data[action_type]:
+                    for item in updates_data[action_type]:
+                        item["action"] = action_type
+                        updates.append(item)
+
+        # Add source file information for tracking
+        for update in updates:
+            update["_source_file"] = updates_file
+
+        return updates
+
+    def _load_distributed_files(self, updates_directory: str) -> Tuple[List[Dict[str, Any]], List[str]]:
+        """
+        Load updates from individual JSON files in the updates directory.
+
+        Returns:
+            Tuple of (updates_list, processed_files_list)
+        """
+        if not os.path.exists(updates_directory):
+            return [], []
+
+        updates = []
+        processed_files = []
+
+        try:
+            # Find all JSON files except README.json
+            json_files = []
+            for filename in os.listdir(updates_directory):
+                if filename.endswith('.json') and filename != 'README.json':
+                    file_path = os.path.join(updates_directory, filename)
+                    if os.path.isfile(file_path):
+                        json_files.append(file_path)
+
+            json_files.sort()  # Process in consistent order
+
+            for file_path in json_files:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        update_data = json.load(f)
+
+                    # Validate that it has an action field
+                    if not isinstance(update_data, dict) or 'action' not in update_data:
+                        print(f"⚠️  Skipping {file_path}: missing 'action' field")
+                        continue
+
+                    # Add source file information for tracking
+                    update_data["_source_file"] = os.path.basename(file_path)
+                    updates.append(update_data)
+                    processed_files.append(file_path)
+
+                except (json.JSONDecodeError, IOError) as e:
+                    print(f"⚠️  Error reading {file_path}: {e}", file=sys.stderr)
+                    continue
+
+        except OSError as e:
+            print(f"⚠️  Error accessing directory {updates_directory}: {e}", file=sys.stderr)
+            return [], []
+
+        return updates, processed_files
+
+    def _archive_processed_files(self, processed_files: List[str], updates_directory: str) -> None:
+        """Move processed files to a 'processed' subdirectory."""
+        if not processed_files:
+            return
+
+        processed_dir = os.path.join(updates_directory, "processed")
+
+        try:
+            # Create processed directory if it doesn't exist
+            os.makedirs(processed_dir, exist_ok=True)
+
+            # Move each processed file
+            for file_path in processed_files:
+                if os.path.exists(file_path):
+                    filename = os.path.basename(file_path)
+                    destination = os.path.join(processed_dir, filename)
+
+                    # If destination exists, add timestamp to avoid conflicts
+                    if os.path.exists(destination):
+                        import time
+                        timestamp = int(time.time())
+                        name, ext = os.path.splitext(filename)
+                        destination = os.path.join(processed_dir, f"{name}_{timestamp}{ext}")
+
+                    os.rename(file_path, destination)
+                    print(f"📦 Moved {filename} to processed/")
+
+        except OSError as e:
+            print(f"⚠️  Error archiving processed files: {e}", file=sys.stderr)
 
     def _process_single_update(self, update: Dict[str, Any]) -> bool:
         """Process a single update action with GUID tracking."""
@@ -962,7 +1067,12 @@ Examples:
     try:
         if args.command == "update-issues":
             processor = IssueUpdateProcessor(github_api)
-            processed = processor.process_updates()
+
+            # Get file and directory paths from environment or use defaults
+            updates_file = os.environ.get("ISSUE_UPDATES_FILE", "issue_updates.json")
+            updates_directory = os.environ.get("ISSUE_UPDATES_DIRECTORY", ".github/issue-updates")
+
+            processed = processor.process_updates(updates_file, updates_directory)
             if processed:
                 print("Issue updates processed successfully")
             else:

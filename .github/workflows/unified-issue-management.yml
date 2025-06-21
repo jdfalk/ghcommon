@@ -47,6 +47,11 @@ on:
         required: false
         type: string
         default: "issue_updates.json"
+      issue_updates_directory:
+        description: "Path to directory containing individual issue update files"
+        required: false
+        type: string
+        default: ".github/issue-updates"
       cleanup_issue_updates:
         description: "Whether to clean up the issue updates file after processing"
         required: false
@@ -78,13 +83,35 @@ jobs:
       - name: Check for files
         id: check-files
         run: |
+          has_legacy_file=false
+          has_update_files=false
+
+          # Check for legacy issue_updates.json
           if [[ -f "${{ inputs.issue_updates_file }}" ]]; then
+            has_legacy_file=true
+            echo "📄 Found legacy issue updates file: ${{ inputs.issue_updates_file }}"
+          fi
+
+          # Check for new directory with individual files
+          if [[ -d "${{ inputs.issue_updates_directory }}" ]]; then
+            json_files=$(find "${{ inputs.issue_updates_directory }}" -name "*.json" -not -name "README.json" | wc -l)
+            if [[ $json_files -gt 0 ]]; then
+              has_update_files=true
+              echo "� Found $json_files issue update files in ${{ inputs.issue_updates_directory }}"
+            fi
+          fi
+
+          # Set outputs
+          if [[ "$has_legacy_file" == "true" || "$has_update_files" == "true" ]]; then
             echo "has_issue_updates=true" >> "$GITHUB_OUTPUT"
-            echo "📄 Found issue updates file: ${{ inputs.issue_updates_file }}"
+            echo "✅ Issue updates found"
           else
             echo "has_issue_updates=false" >> "$GITHUB_OUTPUT"
-            echo "📄 No issue updates file found: ${{ inputs.issue_updates_file }}"
+            echo "❌ No issue updates found"
           fi
+
+          echo "has_legacy_file=$has_legacy_file" >> "$GITHUB_OUTPUT"
+          echo "has_update_files=$has_update_files" >> "$GITHUB_OUTPUT"
 
       - name: Determine operations to run
         id: determine
@@ -184,7 +211,8 @@ jobs:
           echo "📁 Repository: ${{ github.repository }}"
           echo "🔍 Dry run: ${{ inputs.dry_run }}"
           echo "⚡ Force update: ${{ inputs.force_update }}"
-          echo "📄 Issue updates file: ${{ inputs.issue_updates_file }}"
+          echo "📄 Legacy issue updates file: ${{ inputs.issue_updates_file }}"
+          echo "📁 Issue updates directory: ${{ inputs.issue_updates_directory }}"
 
       - name: Execute operation
         id: execute
@@ -194,6 +222,8 @@ jobs:
           # Set environment variables
           export DRY_RUN="${{ inputs.dry_run }}"
           export FORCE_UPDATE="${{ inputs.force_update }}"
+          export ISSUE_UPDATES_FILE="${{ inputs.issue_updates_file }}"
+          export ISSUE_UPDATES_DIRECTORY="${{ inputs.issue_updates_directory }}"
 
           # Run the operation
           python issue_manager.py ${{ matrix.operation }}
@@ -212,8 +242,8 @@ jobs:
         run: |
           echo "🔗 Updating ${{ inputs.issue_updates_file }} with permalinks for processed issues"
           # The issue manager script will update the file with permalinks automatically
-          
-      - name: Commit updated issue file with permalinks  
+
+      - name: Commit updated issue file with permalinks
         if: ${{ matrix.operation == 'update-issues' && needs.determine-operations.outputs.has_issue_updates == 'true' && inputs.dry_run != true }}
         uses: peter-evans/create-pull-request@v7
         with:
@@ -304,6 +334,7 @@ jobs:
           echo "- **Dry run:** ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Force update:** ${{ inputs.force_update }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Issue updates file:** \`${{ inputs.issue_updates_file }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Issue updates directory:** \`${{ inputs.issue_updates_directory }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Cleanup issue updates:** ${{ inputs.cleanup_issue_updates }}" >> "$GITHUB_STEP_SUMMARY"
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
