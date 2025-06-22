@@ -28,7 +28,7 @@ on:
   workflow_call:
     inputs:
       operations:
-        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, or 'auto' to auto-detect)"
+        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, or 'auto' to auto-detect). Example: 'update-issues,copilot-tickets'"
         required: false
         type: string
         default: "auto"
@@ -122,7 +122,61 @@ jobs:
           if [[ "${{ inputs.operations }}" != "auto" ]]; then
             echo "🎯 Using explicit operations: ${{ inputs.operations }}"
             IFS=',' read -ra ops <<< "${{ inputs.operations }}"
-            operations=("${ops[@]}")
+
+            # Validate each operation
+            valid_operations=("update-issues" "copilot-tickets" "close-duplicates" "codeql-alerts" "update-permalinks")
+            validated_operations=()
+
+            for op in "${ops[@]}"; do
+              # Trim whitespace
+              op=$(echo "$op" | xargs)
+
+              # Special handling for common typos
+              case "$op" in
+                "comma-separated"|"comma,separated"|"comma separated")
+                  echo "❌ Error: Found '$op' instead of actual operation names"
+                  echo "Valid operations are: ${valid_operations[*]}"
+                  echo "Example: 'update-issues,copilot-tickets'"
+                  exit 1
+                  ;;
+                "update-issue"|"update_issues")
+                  echo "⚠️  Auto-correcting '$op' to 'update-issues'"
+                  op="update-issues"
+                  ;;
+                "copilot-ticket"|"copilot_tickets")
+                  echo "⚠️  Auto-correcting '$op' to 'copilot-tickets'"
+                  op="copilot-tickets"
+                  ;;
+                "close-duplicate"|"close_duplicates")
+                  echo "⚠️  Auto-correcting '$op' to 'close-duplicates'"
+                  op="close-duplicates"
+                  ;;
+                "codeql-alert"|"codeql_alerts")
+                  echo "⚠️  Auto-correcting '$op' to 'codeql-alerts'"
+                  op="codeql-alerts"
+                  ;;
+                "update-permalink"|"update_permalinks")
+                  echo "⚠️  Auto-correcting '$op' to 'update-permalinks'"
+                  op="update-permalinks"
+                  ;;
+              esac
+
+              # Check if operation is valid
+              if [[ " ${valid_operations[@]} " =~ " ${op} " ]]; then
+                validated_operations+=("$op")
+                echo "  ✓ Valid operation: $op"
+              else
+                echo "❌ Error: Invalid operation '$op'"
+                echo "Valid operations are: ${valid_operations[*]}"
+                echo "Did you mean one of these?"
+                for valid_op in "${valid_operations[@]}"; do
+                  echo "  - $valid_op"
+                done
+                exit 1
+              fi
+            done
+
+            operations=("${validated_operations[@]}")
 
           # Auto-detect based on event and context
           else
