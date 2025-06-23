@@ -1,4 +1,5 @@
 # file: copilot/code-style-swift.md
+
 <!-- Google Swift Style Guide Summary -->
 <!-- Source: https://google.github.io/swift/ -->
 

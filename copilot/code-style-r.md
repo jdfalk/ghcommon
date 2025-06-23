@@ -9,6 +9,7 @@ This guide combines the [Google R Style Guide](https://google.github.io/stylegui
 ### Object Names
 
 **Use snake_case for variables and functions**
+
 - Variable and function names: lowercase letters, numbers, and underscores only
 - Use underscores to separate words (snake_case)
 - Variable names should be nouns, function names should be verbs
@@ -30,6 +31,7 @@ calculateMean
 ### Function Naming
 
 **Google prefers BigCamelCase for functions**
+
 - Use `BigCamelCase` to distinguish functions from other objects
 - Private functions should start with a dot
 
@@ -50,6 +52,7 @@ do_nothing <- function() {
 ```
 
 ### Avoid Problematic Names
+
 - Don't reuse common function and variable names
 - Avoid using `.` in names (reserved for S3 methods)
 - Strive for concise and meaningful names
@@ -72,6 +75,7 @@ calculate_mean <- function(x) sum(x)
 ### Spacing Rules
 
 **Commas**: Always space after, never before
+
 ```r
 # Good
 x[, 1]
@@ -84,6 +88,7 @@ mean(x,na.rm=TRUE)
 ```
 
 **Parentheses**: No spaces inside for function calls
+
 ```r
 # Good
 mean(x, na.rm = TRUE)
@@ -101,6 +106,7 @@ if(debug){
 ```
 
 **Infix Operators**: Most operators surrounded by spaces
+
 ```r
 # Good
 height <- (feet * 12) + inches
@@ -114,12 +120,14 @@ df $ column
 ```
 
 **Exceptions (no spaces)**:
+
 - High precedence operators: `::`, `:::`, `$`, `@`, `[`, `[[`, `^`, `:`
 - Single-sided formulas: `~foo`
 - Bang-bang operators: `!!`, `!!!`
 - Help operator: `?mean`
 
 ### Line Length and Breaking
+
 - **Limit lines to 80 characters**
 - Break long function calls with one argument per line
 
@@ -136,6 +144,7 @@ do_something_very_complicated("that", requires, many, arguments, "some of which 
 ```
 
 ### Vertical Spacing
+
 - Use sparingly to separate "thoughts" in code
 - Avoid empty lines at start/end of functions
 - Single empty line to separate functions or major sections
@@ -144,6 +153,7 @@ do_something_very_complicated("that", requires, many, arguments, "some of which 
 ## Control Flow and Braces
 
 ### Braced Expressions
+
 - `{` should be last character on line
 - Contents indented by 2 spaces
 - `}` should be first character on line
@@ -172,6 +182,7 @@ if (y == 0)
 ```
 
 ### If Statements
+
 - Single line: no braces for simple statements
 - Multi-line: must use braces
 - `else` on same line as closing `}`
@@ -195,6 +206,7 @@ if (x > 0 && y > 0) {
 ```
 
 ### Loops
+
 - Body must always use braced expressions
 - Empty body should be `{}` with no space
 
@@ -213,6 +225,7 @@ for (i in seq) x[i] <- x[i] + 1
 ```
 
 ### Control Flow Modifiers
+
 - `return()`, `stop()`, `break`, `next` should be in their own blocks
 
 ```r
@@ -235,6 +248,7 @@ if (y < 0) stop("Y is negative")
 ## Assignment and Data
 
 ### Assignment Operator
+
 - Use `<-` for assignment, not `=`
 - Avoid assignment in function calls
 
@@ -254,6 +268,7 @@ if (nzchar(x <- complicated_function()) < 1) {
 ```
 
 ### Character Vectors
+
 - Use double quotes `"` for strings
 - Exception: when string contains double quotes
 
@@ -268,6 +283,7 @@ if (nzchar(x <- complicated_function()) < 1) {
 ```
 
 ### Logical Vectors
+
 - Use `TRUE`/`FALSE`, not `T`/`F`
 
 ```r
@@ -285,6 +301,7 @@ valid <- F
 ### Function Calls
 
 **Named Arguments**
+
 - Omit names for data arguments
 - Use full names when overriding defaults
 - Avoid partial matching
@@ -300,6 +317,7 @@ rep(1:2, t = 3)
 ```
 
 **Long Function Calls**
+
 - One line per argument for readability
 - Align related arguments
 
@@ -314,6 +332,7 @@ my_function(
 ```
 
 ### Function Definition
+
 - Use explicit returns
 - Document parameters and return values
 
@@ -333,6 +352,7 @@ AddValues <- function(x, y) {
 ## Pipes and Modern R
 
 ### Pipe Usage (Google Style)
+
 - **Avoid right-hand assignment** with pipes
 - Use explicit returns in functions
 
@@ -347,6 +367,7 @@ iris %>%
 ```
 
 ### Namespace Qualification
+
 - **Explicitly qualify namespaces** for external functions
 - Use `package::function()` notation
 - Helps understand dependencies and avoid conflicts
@@ -364,6 +385,7 @@ filter(df, condition)
 ## Comments and Documentation
 
 ### Comment Style
+
 - Each comment line starts with `#` and single space
 - Use comments to record findings and decisions
 - If code needs comments to explain what it does, consider rewriting
@@ -379,6 +401,7 @@ process_results(mean_value)
 ```
 
 ### Documentation
+
 - All packages should have package-level documentation
 - Use roxygen2 for function documentation
 - Place `@importFrom` tags above functions using external dependencies
@@ -386,18 +409,21 @@ process_results(mean_value)
 ## Best Practices
 
 ### Code Organization
+
 1. **Consistency**: Choose one style and stick to it
 2. **Readability**: Code should be self-documenting
 3. **Modularity**: Break complex operations into smaller functions
 4. **Dependencies**: Minimize and clearly document external dependencies
 
 ### Performance Considerations
+
 - Use vectorized operations when possible
 - Avoid unnecessary loops
 - Pre-allocate vectors when size is known
 - Use appropriate data structures (data.frame, tibble, etc.)
 
 ### Error Handling
+
 - Use informative error messages
 - Validate inputs early in functions
 - Use `stop()`, `warning()`, and `message()` appropriately
@@ -416,6 +442,7 @@ validate_input <- function(x) {
 ```
 
 ### Package Development
+
 - Follow tidyverse principles for package APIs
 - Use consistent naming conventions throughout package
 - Provide comprehensive examples and vignettes
@@ -424,11 +451,13 @@ validate_input <- function(x) {
 ## Tools for Style Enforcement
 
 ### Automated Formatting
+
 - **styler**: Interactive restyling of code
 - **lintr**: Automated style checking
 - **formatR**: Code formatting utility
 
 ### RStudio Integration
+
 - Use styler RStudio add-in for interactive formatting
 - Configure lintr for real-time style checking
 - Set up project-level style preferences

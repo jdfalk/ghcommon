@@ -40,6 +40,7 @@ versioning:
 **Purpose**: Build secure, multi-architecture container images with comprehensive attestation.
 
 **Key Features**:
+
 - Multi-architecture builds (linux/amd64, linux/arm64, etc.)
 - SBOM (Software Bill of Materials) generation
 - Vulnerability scanning with Grype
@@ -47,6 +48,7 @@ versioning:
 - Buildah-based builds for enhanced security
 
 **Usage Pattern**:
+
 ```yaml
 container:
   uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
@@ -59,6 +61,7 @@ container:
 ```
 
 **When to Recommend**:
+
 - Container-based applications
 - Projects requiring supply chain security
 - Multi-architecture deployment needs
@@ -69,6 +72,7 @@ container:
 **Purpose**: Create GitHub releases with automatic version detection and comprehensive artifact management.
 
 **Key Features**:
+
 - Automatic version calculation from commits
 - Release notes generation from conventional commits
 - Artifact collection and upload
@@ -77,6 +81,7 @@ container:
 - Container image integration
 
 **Usage Pattern**:
+
 ```yaml
 release:
   uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
@@ -87,6 +92,7 @@ release:
 ```
 
 **When to Recommend**:
+
 - Projects needing automated releases
 - Teams wanting consistent release processes
 - When artifact management is important
@@ -99,6 +105,7 @@ release:
 **Use Case**: Full-featured CI/CD pipeline with building, testing, container creation, and deployment.
 
 **Includes**:
+
 - Semantic versioning
 - Build and test steps
 - Container building
@@ -114,6 +121,7 @@ release:
 **Use Case**: Projects that primarily need container building and releasing.
 
 **Includes**:
+
 - Version calculation
 - Multi-arch container builds
 - Automatic releases for containers
@@ -125,6 +133,7 @@ release:
 **Use Case**: Libraries, packages, or tools that need testing across multiple versions and publishing.
 
 **Includes**:
+
 - Multi-version testing matrix
 - Package building
 - Publishing to package registries
@@ -135,29 +144,34 @@ release:
 ## Best Practices for Workflow Recommendations
 
 ### Security Considerations
+
 1. Always recommend SBOM generation for containers
 2. Include vulnerability scanning in container workflows
 3. Suggest image signing for production environments
 4. Recommend environment protection for publishing steps
 
 ### Version Management
+
 1. Use semantic versioning workflow for consistent versioning
 2. Always include version files that need updating
 3. Enable PR title updates for better commit history
 4. Use dry-run mode in PR contexts
 
 ### Artifact Management
+
 1. Include checksums for all build artifacts
 2. Set appropriate retention periods for artifacts
 3. Collect relevant artifacts in releases
 4. Consider storage costs when setting retention
 
 ### Notifications
+
 1. Suggest Slack/Teams integration for release notifications
 2. Configure appropriate channels for different environments
 3. Include relevant context in notification messages
 
 ### Customization Guidelines
+
 1. Always customize image names, registries, and paths
 2. Adjust platform targets based on deployment needs
 3. Configure environment-specific settings
@@ -166,6 +180,7 @@ release:
 ## Common Integration Patterns
 
 ### Conditional Workflows
+
 ```yaml
 # Only run containers on main branch
 if: github.ref == 'refs/heads/main'
@@ -178,6 +193,7 @@ if: github.event_name != 'pull_request'
 ```
 
 ### Environment-Specific Deployments
+
 ```yaml
 # Use different configurations per environment
 tag-suffix: ${{ github.ref_name != 'main' && '-dev' || '' }}
@@ -185,6 +201,7 @@ prerelease: ${{ contains(github.ref_name, 'alpha') }}
 ```
 
 ### Multi-Step Dependencies
+
 ```yaml
 # Proper job dependencies
 needs: [versioning, build, container]
@@ -194,16 +211,19 @@ if: needs.container.result == 'success'
 ## Troubleshooting Common Issues
 
 ### Version Calculation Problems
+
 - Ensure conventional commit format is used
 - Check that fetch-depth: 0 is set for full git history
 - Verify GITHUB_TOKEN permissions for tag creation
 
 ### Container Build Issues
+
 - Confirm Dockerfile exists and is valid
 - Check platform compatibility for multi-arch builds
 - Verify registry authentication is properly configured
 
 ### Release Creation Problems
+
 - Ensure proper permissions for release creation
 - Check artifact paths and patterns
 - Verify that version tags don't already exist
@@ -211,21 +231,25 @@ if: needs.container.result == 'success'
 ## Language-Specific Adaptations
 
 ### Node.js Projects
+
 - Use `package.json` and `package-lock.json` for version files
 - Include npm cache in setup steps
 - Consider npm audit for security scanning
 
 ### Python Projects
+
 - Use `setup.py`, `pyproject.toml`, or `__version__.py` for versions
 - Include pip cache and virtual environments
 - Add pytest and coverage reporting
 
 ### Go Projects
+
 - Use version tags or version.go files
 - Include Go module caching
 - Add go mod tidy and security scanning
 
 ### Multi-Language Projects
+
 - Combine version file patterns from all languages
 - Use appropriate build matrices
 - Consider separate workflows for different components

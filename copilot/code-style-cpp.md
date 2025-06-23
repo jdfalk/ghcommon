@@ -1,4 +1,5 @@
 # file: copilot/code-style-cpp.md
+
 <!-- Google C++ Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/cppguide.html -->
 

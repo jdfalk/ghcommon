@@ -1,4 +1,5 @@
 # file: copilot/code-style-html-css.md
+
 <!-- Google HTML/CSS Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/htmlcssguide.html -->
 
@@ -45,7 +46,7 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 - Specify encoding in HTML documents
 
 ```html
-<meta charset="utf-8">
+<meta charset="utf-8" />
 ```
 
 ### Semantics
@@ -84,10 +85,10 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```html
 <!-- Good -->
-<img src="google.png" alt="Google">
+<img src="google.png" alt="Google" />
 
 <!-- Avoid -->
-<IMG SRC="google.png" ALT="Google">
+<img src="google.png" alt="Google" />
 ```
 
 #### Trailing Whitespace
@@ -101,9 +102,7 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```html
 <!-- Good -->
-<button class="btn btn-primary"
-        data-toggle="modal"
-        data-target="#myModal">
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal">
   Click me
 </button>
 ```
@@ -117,7 +116,7 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 <a class="maia-button maia-button-secondary">Sign in</a>
 
 <!-- Avoid -->
-<a class='maia-button maia-button-secondary'>Sign in</a>
+<a class="maia-button maia-button-secondary">Sign in</a>
 ```
 
 ### Multimedia Fallback
@@ -126,10 +125,13 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```html
 <!-- Good -->
-<img src="spreadsheet.png" alt="Spreadsheet screenshot">
+<img src="spreadsheet.png" alt="Spreadsheet screenshot" />
 <video controls>
-  <source src="movie.mp4" type="video/mp4">
-  <p>Your browser doesn't support video. <a href="movie.mp4">Download the video</a>.</p>
+  <source src="movie.mp4" type="video/mp4" />
+  <p>
+    Your browser doesn't support video.
+    <a href="movie.mp4">Download the video</a>.
+  </p>
 </video>
 ```
 
@@ -144,10 +146,10 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
   <fieldset>
     <legend>Personal Information</legend>
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
+    <input type="text" id="name" name="name" required />
 
     <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
+    <input type="email" id="email" name="email" required />
   </fieldset>
 
   <button type="submit">Submit</button>
@@ -169,14 +171,20 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```css
 /* Good - functional names */
-.navigation {}
-.author {}
-.error-message {}
+.navigation {
+}
+.author {
+}
+.error-message {
+}
 
 /* Avoid - presentational names */
-.red {}
-.left {}
-.big {}
+.red {
+}
+.left {
+}
+.big {
+}
 ```
 
 ### ID and Class Name Style
@@ -187,12 +195,16 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```css
 /* Good */
-.video-id {}
-.ads-sample {}
+.video-id {
+}
+.ads-sample {
+}
 
 /* Avoid */
-.videoId {}
-.ads_sample {}
+.videoId {
+}
+.ads_sample {
+}
 ```
 
 ### Type Selectors
@@ -202,12 +214,16 @@ This document summarizes Google's HTML and CSS style guides for use in code gene
 
 ```css
 /* Good */
-.example {}
-.error {}
+.example {
+}
+.error {
+}
 
 /* Avoid */
-ul.example {}
-div.error {}
+ul.example {
+}
+div.error {
+}
 ```
 
 ### Shorthand Properties
@@ -218,7 +234,10 @@ div.error {}
 ```css
 /* Good */
 border-top: 0;
-font: 100%/1.6 palatino, georgia, serif;
+font:
+  100%/1.6 palatino,
+  georgia,
+  serif;
 padding: 0 1em 2em;
 
 /* Avoid when shorthand is available */
@@ -241,7 +260,7 @@ padding-top: 0;
 /* Good */
 margin: 0;
 padding: 0;
-font-size: .8em;
+font-size: 0.8em;
 
 /* Avoid */
 margin: 0px;
@@ -261,7 +280,7 @@ color: #fff;
 
 /* Avoid */
 color: #eebbcc;
-color: #FFF;
+color: #fff;
 ```
 
 ### Formatting Rules
@@ -375,10 +394,10 @@ body {
 
 ```css
 /* Good */
-@import url('//www.google.com/css/maia.css');
+@import url("//www.google.com/css/maia.css");
 
 html {
-  font-family: 'open sans', arial, sans-serif;
+  font-family: "open sans", arial, sans-serif;
 }
 
 /* When spaces are present */
@@ -395,11 +414,14 @@ font-family: "Helvetica Neue", Arial, sans-serif;
 
 ```css
 /* Good - low specificity */
-.nav-item {}
-.nav-item.active {}
+.nav-item {
+}
+.nav-item.active {
+}
 
 /* Avoid - high specificity */
-nav ul li a.nav-link.active {}
+nav ul li a.nav-link.active {
+}
 ```
 
 ### CSS Architecture
@@ -494,11 +516,14 @@ nav ul li a.nav-link.active {}
 
 ```css
 /* Good - efficient */
-.button {}
-.button:hover {}
+.button {
+}
+.button:hover {
+}
 
 /* Avoid - inefficient */
-div.container ul.nav li.nav-item a.nav-link:hover {}
+div.container ul.nav li.nav-item a.nav-link:hover {
+}
 ```
 
 #### Critical CSS
@@ -535,7 +560,7 @@ div.container ul.nav li.nav-item a.nav-link:hover {}
 :root {
   --primary-color: #007cba;
   --secondary-color: #6c757d;
-  --font-family: 'Helvetica Neue', Arial, sans-serif;
+  --font-family: "Helvetica Neue", Arial, sans-serif;
   --border-radius: 4px;
 }
 

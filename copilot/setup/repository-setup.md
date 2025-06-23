@@ -1,4 +1,5 @@
 # file: copilot/setup/repository-setup.md
+
 # Repository Setup Guide
 
 This guide provides step-by-step instructions for setting up a repository to use the reusable workflows from this common repository.
@@ -23,19 +24,24 @@ curl -o .github/workflows/release.yml https://raw.githubusercontent.com/jdfalk/g
 ### 2. Required Repository Settings
 
 #### Permissions
+
 Ensure your repository has the following permissions configured:
 
 **Actions Permissions** (Settings → Actions → General):
+
 - ✅ Allow all actions and reusable workflows
 - ✅ Allow actions created by GitHub
 - ✅ Allow actions by Marketplace verified creators
 
 **Workflow Permissions** (Settings → Actions → General → Workflow permissions):
+
 - ✅ Read and write permissions
 - ✅ Allow GitHub Actions to create and approve pull requests
 
 #### Branch Protection Rules
+
 For the main branch (Settings → Branches):
+
 - ✅ Require a pull request before merging
 - ✅ Require status checks to pass before merging
 - ✅ Require branches to be up to date before merging
@@ -44,19 +50,23 @@ For the main branch (Settings → Branches):
 ### 3. Required Secrets
 
 #### For Container Workflows
+
 No additional secrets required when using GitHub Container Registry (ghcr.io). The `GITHUB_TOKEN` is automatically available.
 
 #### For External Registries
+
 - `DOCKER_USERNAME` - Docker Hub username
 - `DOCKER_PASSWORD` - Docker Hub password or access token
 - `AWS_ACCESS_KEY_ID` - For ECR
 - `AWS_SECRET_ACCESS_KEY` - For ECR
 
 #### For Notifications (Optional)
+
 - `SLACK_WEBHOOK_URL` - Slack webhook for release notifications
 - `TEAMS_WEBHOOK_URL` - Microsoft Teams webhook for notifications
 
 #### For Package Publishing
+
 - `NPM_TOKEN` - For publishing to npm
 - `PYPI_TOKEN` - For publishing to PyPI
 - `NUGET_TOKEN` - For publishing to NuGet
@@ -64,6 +74,7 @@ No additional secrets required when using GitHub Container Registry (ghcr.io). T
 ### 4. Required Files
 
 #### Dockerfile (for container workflows)
+
 Create a `Dockerfile` in your repository root:
 
 ```dockerfile
@@ -84,9 +95,11 @@ CMD ["npm", "start"]
 ```
 
 #### Version Files (for semantic versioning)
+
 Ensure you have version files that the workflow can update:
 
 **package.json** (Node.js):
+
 ```json
 {
   "name": "my-app",
@@ -95,11 +108,13 @@ Ensure you have version files that the workflow can update:
 ```
 
 **version.txt** (Generic):
+
 ```
 1.0.0
 ```
 
-**__init__.py** (Python):
+****init**.py** (Python):
+
 ```python
 __version__ = "1.0.0"
 ```
@@ -107,6 +122,7 @@ __version__ = "1.0.0"
 ## Conventional Commits Setup
 
 ### Commit Message Format
+
 Use conventional commit format for automatic versioning:
 
 ```
@@ -118,6 +134,7 @@ Use conventional commit format for automatic versioning:
 ```
 
 **Types**:
+
 - `feat:` - New feature (minor version bump)
 - `fix:` - Bug fix (patch version bump)
 - `feat!:` or `fix!:` - Breaking change (major version bump)
@@ -128,6 +145,7 @@ Use conventional commit format for automatic versioning:
 - `chore:` - Maintenance tasks
 
 **Examples**:
+
 ```
 feat: add user authentication
 fix: resolve memory leak in data processing
@@ -136,6 +154,7 @@ docs: update installation instructions
 ```
 
 ### Git Hooks (Optional)
+
 Add a commit message linter to ensure conventional commit format:
 
 ```bash
@@ -150,6 +169,7 @@ git cz
 ## Environment-Specific Configuration
 
 ### Development Environment
+
 ```yaml
 # Use in pull requests
 dry-run: true
@@ -159,6 +179,7 @@ tag-suffix: -dev
 ```
 
 ### Staging Environment
+
 ```yaml
 # Use for staging branch
 prerelease: true
@@ -167,6 +188,7 @@ scan-vulnerability: true
 ```
 
 ### Production Environment
+
 ```yaml
 # Use for main branch
 prerelease: false
@@ -180,33 +202,40 @@ scan-vulnerability: true
 ### Common Issues
 
 #### Permission Denied Errors
+
 - Check workflow permissions in repository settings
 - Ensure `GITHUB_TOKEN` has required permissions
 - Verify branch protection rules don't block the action
 
 #### Version Calculation Issues
+
 - Ensure commits follow conventional commit format
 - Check that repository has git history (not a fresh repo)
 - Verify fetch-depth: 0 in checkout action
 
 #### Container Build Failures
+
 - Verify Dockerfile exists and is valid
 - Check that all required build contexts are available
 - Ensure base images are accessible
 
 #### Release Creation Failures
+
 - Check that tag doesn't already exist
 - Verify GitHub token has release creation permissions
 - Ensure artifact paths are correct
 
 ### Debug Mode
+
 Enable debug logging by adding this secret to your repository:
+
 - `ACTIONS_RUNNER_DEBUG` = `true`
 - `ACTIONS_STEP_DEBUG` = `true`
 
 ## Customization Examples
 
 ### Multi-Language Repository
+
 ```yaml
 versioning:
   uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
@@ -215,6 +244,7 @@ versioning:
 ```
 
 ### Multiple Container Images
+
 ```yaml
 container-api:
   uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
@@ -232,6 +262,7 @@ container-web:
 ```
 
 ### Conditional Workflows
+
 ```yaml
 container:
   if: contains(github.event.head_commit.message, '[build-container]') || github.ref == 'refs/heads/main'
@@ -241,12 +272,14 @@ container:
 ## Migration Guide
 
 ### From GitHub Actions Starter Workflows
+
 1. Replace existing workflow files with templates
 2. Add conventional commit format to your development process
 3. Update branch protection rules
 4. Test with a pull request
 
 ### From Other CI/CD Systems
+
 1. Export environment variables and secrets
 2. Convert build scripts to GitHub Actions format
 3. Update deployment targets to use new artifact URLs
@@ -255,17 +288,20 @@ container:
 ## Best Practices
 
 ### Repository Organization
+
 - Keep workflows in `.github/workflows/`
 - Store reusable scripts in `.github/scripts/`
 - Document workflow customizations in `README.md`
 
 ### Security
+
 - Use environment protection for production deployments
 - Rotate secrets regularly
 - Enable vulnerability scanning
 - Review workflow changes carefully
 
 ### Performance
+
 - Use caching for dependencies
 - Optimize Docker builds with multi-stage builds
 - Set appropriate artifact retention periods

@@ -40,6 +40,7 @@ Files changed:
 **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
 **Rules:**
+
 - Use imperative, present tense ("add" not "added")
 - Keep description under 50 characters
 - **ALWAYS include "Files changed:" section** with summaries and links
@@ -109,23 +110,29 @@ Use the `issue_updates.json` file with grouped format:
 
 ```markdown
 ## Description
+
 [Concise overview of changes - what and why]
 
 ## Motivation
+
 [Why these changes were necessary - business context]
 
 ## Changes
+
 - Specific change 1
 - Specific change 2
 - Architectural decisions made
 
 ## Testing
+
 [How changes were tested - unit, integration, manual]
 
 ## Screenshots
+
 [For UI changes - before/after, mobile views]
 
 ## Related Issues
+
 Closes #123
 Fixes #456
 Related to #789
@@ -183,16 +190,16 @@ async function convertSubtitles(inputPath, outputPath, options = {}) {
 ```javascript
 /**
  * Manages subtitle provider integrations and download operations
- * 
+ *
  * This class handles authentication, rate limiting, and retry logic
  * for various subtitle providers like OpenSubtitles, Subscene, etc.
- * 
+ *
  * @example
  * const manager = new SubtitleProviderManager({
  *   apiKey: 'your-key',
  *   retryAttempts: 3
  * });
- * 
+ *
  * const subtitles = await manager.search('Movie Title', 'en');
  */
 class SubtitleProviderManager {
@@ -257,13 +264,13 @@ Always include file identification in the first line:
 ### Test Documentation
 
 ```javascript
-describe('SubtitleConverter', () => {
-  describe('convertToSRT', () => {
-    it('should convert VTT subtitle format to SRT with proper timing adjustment', async () => {
+describe("SubtitleConverter", () => {
+  describe("convertToSRT", () => {
+    it("should convert VTT subtitle format to SRT with proper timing adjustment", async () => {
       // Test implementation...
     });
-    
-    it('should handle malformed timestamp formats gracefully', async () => {
+
+    it("should handle malformed timestamp formats gracefully", async () => {
       // Test implementation...
     });
   });
@@ -297,15 +304,15 @@ try {
   const result = await riskyOperation();
   return { success: true, data: result };
 } catch (error) {
-  logger.error('Operation failed', { 
-    operation: 'riskyOperation',
+  logger.error("Operation failed", {
+    operation: "riskyOperation",
     error: error.message,
-    stack: error.stack 
+    stack: error.stack,
   });
-  
-  return { 
-    success: false, 
-    error: 'Operation failed. Please try again.' 
+
+  return {
+    success: false,
+    error: "Operation failed. Please try again.",
   };
 }
 ```

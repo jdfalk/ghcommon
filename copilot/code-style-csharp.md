@@ -7,6 +7,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 ## Naming Conventions
 
 ### Code Elements
+
 - **Classes, methods, enumerations, public fields, public properties, namespaces**: `PascalCase`
 - **Local variables, parameters**: `camelCase`
 - **Private, protected, internal fields and properties**: `_camelCase` (underscore prefix)
@@ -14,6 +15,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 - **Constants**: Naming convention unaffected by `const`, `static`, `readonly` modifiers
 
 ### Files and Directories
+
 - **Filenames and directory names**: `PascalCase`, e.g., `MyFile.cs`
 - **File naming**: Prefer file name matches main class name, e.g., `MyClass.cs`
 - **Class organization**: Generally prefer one core class per file
@@ -21,6 +23,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 ## Formatting Guidelines
 
 ### Whitespace Rules
+
 - **Indentation**: 2 spaces, no tabs
 - **Column limit**: 100 characters
 - **Statement structure**: Maximum one statement per line
@@ -36,6 +39,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
   - One space between operator and each operand for binary operators
 
 ### Line Wrapping
+
 - **Continuations**: Generally indented 4 spaces
 - **Function arguments**:
   - If arguments don't fit on one line, align with first argument
@@ -43,6 +47,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 - **Braces**: Line breaks with braces (list initializers, lambdas, object initializers) don't count as continuations
 
 ### Code Organization
+
 - **Modifier order**: `public protected internal private new abstract virtual override sealed static readonly extern unsafe volatile async`
 - **Using statements**:
   - Go at the top, before namespaces
@@ -59,12 +64,14 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 ## C# Coding Guidelines
 
 ### Variables and Fields
+
 - **Constants**: Variables and fields that can be `const` should always be `const`
 - **Readonly**: Use `readonly` when `const` isn't possible
 - **Named constants**: Prefer named constants over magic numbers
 - **Field initializers**: Generally encouraged
 
 ### Collections and Containers
+
 - **Input parameters**: Use most restrictive collection type (`IReadOnlyCollection`/`IReadOnlyList`/`IEnumerable`)
 - **Output parameters**: Prefer `IList` when transferring ownership, most restrictive option otherwise
 - **Arrays vs List**:
@@ -74,6 +81,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
   - Use arrays for multidimensional arrays
 
 ### Properties and Methods
+
 - **Property styles**:
   - Single-line read-only properties: prefer expression body (`=>`)
   - Everything else: use `{ get; set; }` syntax
@@ -83,6 +91,7 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
   - Align closing with first character of opening brace line
 
 ### Classes and Structs
+
 - **Default choice**: Almost always use a class
 - **Struct usage**: Consider when type can be treated like value types (small, short-lived, or embedded)
 - **Good struct examples**: Vector3, Quaternion, Bounds
@@ -90,33 +99,39 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
 ### Advanced Features
 
 #### Extension Methods
+
 - Only use when source of original class unavailable or changing source not feasible
 - Only for 'core' general features appropriate for original class
 - Only in core libraries available everywhere
 - Be aware they obfuscate code - err on side of not adding
 
 #### LINQ
+
 - Prefer single-line LINQ calls and imperative code over long chains
 - Prefer member extension methods over SQL-style keywords
 - Avoid `Container.ForEach(...)` for anything longer than single statement
 
 #### ref and out Parameters
+
 - Use `out` for returns that aren't also inputs
 - Place `out` parameters after all other parameters
 - Use `ref` rarely, only when mutating input is necessary
 - Don't use `ref` for optimization or passing modifiable containers
 
 ### String Handling
+
 - **String operations**: Use whatever is easiest to read
 - **Performance**: Be aware chained `operator+` is slower and causes memory churn
 - **Multiple concatenations**: Use `StringBuilder` when performance matters
 - **String interpolation**: Generally preferred for readability
 
 ### Variable Declaration
+
 - **var keyword usage**:
   - **Encouraged**: When type is obvious or for transient variables
   - **Discouraged**: With basic types or when users benefit from knowing type
 - **Examples**:
+
   ```csharp
   var apple = new Apple();           // Good - obvious type
   var request = Factory.Create();    // Good - obvious from method
@@ -127,16 +142,19 @@ This guide is based on the [Google C# Style Guide](https://google.github.io/styl
   ```
 
 ### Object Construction
+
 - **Object initializer syntax**: Fine for 'plain old data' types
 - **Avoid with constructors**: Don't use for classes/structs with constructors
 - **Multi-line formatting**: Indent one block level when splitting across lines
 
 ### Error Handling and Null Values
+
 - **Struct returns**: Prefer returning success boolean and struct `out` value
 - **Nullable structs**: Acceptable when performance isn't concern and improves readability
 - **Delegate calls**: Use `Invoke()` with null conditional operator: `SomeDelegate?.Invoke()`
 
 ### Code Documentation
+
 - **Attributes**: Appear on line above associated member, separated by newline
 - **Multiple attributes**: Separate by newlines for easier maintenance
 - **Argument clarity**: Use named constants, enums, named variables, or Named Arguments for unclear parameters
@@ -203,7 +221,7 @@ namespace MyNamespace {                             // Namespaces are PascalCase
 
 ## Best Practices Summary
 
-1. **Follow naming conventions** consistently (PascalCase for public, _camelCase for private)
+1. **Follow naming conventions** consistently (PascalCase for public, \_camelCase for private)
 2. **Use 2-space indentation** and 100-character line limit
 3. **Prefer explicit types** except when `var` improves readability
 4. **Use `const` and `readonly`** appropriately

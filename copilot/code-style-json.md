@@ -1,4 +1,5 @@
 # file: copilot/code-style-json.md
+
 <!-- Google JSON Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/jsoncstyleguide.xml -->
 
@@ -136,7 +137,7 @@ This document summarizes Google's JSON style guide for use in code generation an
 {
   "userIds": [1, 2, 3, 4, 5],
   "tags": ["json", "style", "guide"],
-  "coordinates": [40.7128, -74.0060],
+  "coordinates": [40.7128, -74.006],
   "mixedArray": ["text", 42, true, null]
 }
 ```
@@ -300,7 +301,7 @@ This document summarizes Google's JSON style guide for use in code generation an
 
 ```json
 {
-  "coordinates": [40.7128, -74.0060],
+  "coordinates": [40.7128, -74.006],
   "colors": ["red", "green", "blue"],
   "flags": [true, false, true]
 }
@@ -325,12 +326,7 @@ This document summarizes Google's JSON style guide for use in code generation an
       "email": "jane@example.com"
     }
   ],
-  "simpleList": [
-    "item1",
-    "item2",
-    "item3",
-    "item4"
-  ]
+  "simpleList": ["item1", "item2", "item3", "item4"]
 }
 ```
 
@@ -360,9 +356,9 @@ This document summarizes Google's JSON style guide for use in code generation an
      */
     "notifications": {
       "email": true,
-      "push": false // Push notifications require mobile app
-    }
-  }
+      "push": false, // Push notifications require mobile app
+    },
+  },
 }
 ```
 
@@ -420,9 +416,9 @@ This document summarizes Google's JSON style guide for use in code generation an
 ```json
 {
   "data": [
-    {"id": 1, "name": "Item 1"},
-    {"id": 2, "name": "Item 2"},
-    {"id": 3, "name": "Item 3"}
+    { "id": 1, "name": "Item 1" },
+    { "id": 2, "name": "Item 2" },
+    { "id": 3, "name": "Item 3" }
   ],
   "pagination": {
     "currentPage": 2,

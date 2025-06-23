@@ -9,28 +9,32 @@ This document provides security guidelines that GitHub Copilot should follow whe
 ### 1. Least Privilege Access
 
 **Always recommend**:
+
 - Minimal required permissions for workflows
 - Environment-specific access controls
 - Time-limited tokens when possible
 
 **Implementation**:
+
 ```yaml
 permissions:
   contents: read
   packages: write
-  id-token: write  # For OIDC authentication
-  attestations: write  # For build attestations
+  id-token: write # For OIDC authentication
+  attestations: write # For build attestations
 ```
 
 ### 2. Secret Management
 
 **Best Practices**:
+
 - Never hardcode secrets in workflow files
 - Use GitHub secrets for sensitive data
 - Prefer OIDC over long-lived credentials
 - Rotate secrets regularly
 
 **Recommended Secrets**:
+
 ```yaml
 # Container registries
 DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -47,23 +51,25 @@ SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ### 3. Input Validation
 
 **Always validate**:
+
 - User inputs in reusable workflows
 - Environment variables
 - File paths and patterns
 - External URLs and references
 
 **Example Validation**:
+
 ```yaml
 inputs:
   image-name:
-    description: 'Container image name'
+    description: "Container image name"
     required: true
     type: string
     # Validate format
   platforms:
-    description: 'Target platforms'
+    description: "Target platforms"
     required: false
-    default: 'linux/amd64,linux/arm64'
+    default: "linux/amd64,linux/arm64"
     type: string
     # Validate platform list
 ```
@@ -73,29 +79,33 @@ inputs:
 ### 1. Dependency Pinning
 
 **Always pin**:
+
 - Action versions to specific commits or tags
 - Base container images to specific digests
 - Tool versions in installation scripts
 
 **Example**:
+
 ```yaml
 - name: Checkout code
-  uses: actions/checkout@v4  # Pinned to major version
+  uses: actions/checkout@v4 # Pinned to major version
 
 - name: Setup Node.js
   uses: actions/setup-node@v4
   with:
-    node-version: '20'  # Specific version
+    node-version: "20" # Specific version
 ```
 
 ### 2. Software Bill of Materials (SBOM)
 
 **Always generate SBOMs for**:
+
 - Container images
 - Application packages
 - Binary releases
 
 **Tools to use**:
+
 - Syft for SBOM generation
 - Grype for vulnerability scanning
 - Cosign for signing and attestation
@@ -103,6 +113,7 @@ inputs:
 ### 3. Container Security
 
 **Best Practices**:
+
 - Use minimal base images (Alpine, distroless)
 - Run as non-root user
 - Scan for vulnerabilities
@@ -110,6 +121,7 @@ inputs:
 - Use multi-stage builds
 
 **Example Dockerfile**:
+
 ```dockerfile
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -130,23 +142,25 @@ USER nextjs
 ### 1. Event Triggers
 
 **Secure trigger patterns**:
+
 ```yaml
 on:
   push:
-    branches: [ main ]  # Limit to specific branches
+    branches: [main] # Limit to specific branches
   pull_request:
-    branches: [ main ]
-    types: [ opened, synchronize, reopened ]
-  workflow_dispatch:  # Manual trigger with approval
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: # Manual trigger with approval
     inputs:
       environment:
-        description: 'Deployment environment'
+        description: "Deployment environment"
         required: true
         type: choice
-        options: ['staging', 'production']
+        options: ["staging", "production"]
 ```
 
 **Avoid**:
+
 - `pull_request_target` without careful review
 - Unrestricted `workflow_dispatch`
 - Triggers on all branches/tags
@@ -154,11 +168,13 @@ on:
 ### 2. Environment Protection
 
 **Always use environments for**:
+
 - Production deployments
 - Package publishing
 - External integrations
 
 **Configuration**:
+
 ```yaml
 environment: production
 # Requires manual approval and/or specific reviewers
@@ -167,13 +183,14 @@ environment: production
 ### 3. Token Scoping
 
 **Use specific permissions**:
+
 ```yaml
 permissions:
-  contents: read        # Repository content
-  packages: write       # Container registry
-  id-token: write       # OIDC authentication
-  actions: read         # Action metadata
-  attestations: write   # Build attestations
+  contents: read # Repository content
+  packages: write # Container registry
+  id-token: write # OIDC authentication
+  actions: read # Action metadata
+  attestations: write # Build attestations
   security-events: write # Security alerts
 ```
 
@@ -182,12 +199,14 @@ permissions:
 ### 1. Static Analysis
 
 **Always include**:
+
 - SAST (Static Application Security Testing)
 - Dependency vulnerability scanning
 - Secret scanning
 - Code quality checks
 
 **Recommended Actions**:
+
 - CodeQL for code analysis
 - Trivy for vulnerability scanning
 - GitLeaks for secret detection
@@ -195,6 +214,7 @@ permissions:
 ### 2. Dynamic Analysis
 
 **For container workflows**:
+
 - Runtime vulnerability scanning
 - Image composition analysis
 - Behavioral analysis
@@ -202,6 +222,7 @@ permissions:
 ### 3. Compliance Scanning
 
 **Industry Standards**:
+
 - CIS benchmarks for containers
 - NIST guidelines
 - GDPR compliance for data handling
@@ -212,6 +233,7 @@ permissions:
 ### 1. Security Monitoring
 
 **Monitor for**:
+
 - Failed authentication attempts
 - Unusual access patterns
 - Privilege escalation attempts
@@ -220,6 +242,7 @@ permissions:
 ### 2. Alerting
 
 **Set up alerts for**:
+
 - Security scan failures
 - High/critical vulnerabilities
 - Authentication failures
@@ -228,6 +251,7 @@ permissions:
 ### 3. Response Procedures
 
 **When security issues are detected**:
+
 1. Immediate containment
 2. Impact assessment
 3. Stakeholder notification
@@ -239,6 +263,7 @@ permissions:
 ### 1. Network Security
 
 **Best Practices**:
+
 - Use HTTPS for all communications
 - Validate TLS certificates
 - Restrict egress traffic where possible
@@ -247,6 +272,7 @@ permissions:
 ### 2. Data Protection
 
 **Data handling**:
+
 - Encrypt data in transit and at rest
 - Minimize data collection
 - Implement data retention policies
@@ -255,6 +281,7 @@ permissions:
 ### 3. Infrastructure Security
 
 **Cloud Security**:
+
 - Use managed services when possible
 - Implement proper IAM roles
 - Enable audit logging
@@ -265,6 +292,7 @@ permissions:
 ### 1. Regulatory Compliance
 
 **Consider requirements for**:
+
 - GDPR (data protection)
 - SOX (financial reporting)
 - HIPAA (healthcare data)
@@ -273,6 +301,7 @@ permissions:
 ### 2. Industry Standards
 
 **Follow standards**:
+
 - NIST Cybersecurity Framework
 - ISO 27001/27002
 - CIS Controls
@@ -281,6 +310,7 @@ permissions:
 ### 3. Documentation
 
 **Maintain documentation for**:
+
 - Security controls
 - Risk assessments
 - Incident response procedures
@@ -291,6 +321,7 @@ permissions:
 ### 1. Automated Testing
 
 **Include in workflows**:
+
 - Vulnerability scanning
 - Dependency checks
 - Configuration validation
@@ -299,6 +330,7 @@ permissions:
 ### 2. Manual Testing
 
 **Regular activities**:
+
 - Penetration testing
 - Security code reviews
 - Architecture reviews
@@ -307,6 +339,7 @@ permissions:
 ### 3. Third-Party Assessment
 
 **Consider**:
+
 - External security audits
 - Bug bounty programs
 - Red team exercises
@@ -317,6 +350,7 @@ permissions:
 ### Open Source Projects
 
 **Additional Considerations**:
+
 - Public vulnerability disclosure
 - Community security review
 - Transparent security practices
@@ -325,6 +359,7 @@ permissions:
 ### Enterprise Projects
 
 **Enhanced Security**:
+
 - Private vulnerability scanning
 - Enhanced monitoring
 - Stricter access controls
@@ -333,6 +368,7 @@ permissions:
 ### Cloud-Native Applications
 
 **Specific Concerns**:
+
 - Service mesh security
 - Secrets management
 - Network policies
@@ -341,24 +377,28 @@ permissions:
 ## Security Checklist
 
 ### Pre-Implementation
+
 - [ ] Security requirements identified
 - [ ] Threat model created
 - [ ] Security controls designed
 - [ ] Compliance requirements mapped
 
 ### Implementation
+
 - [ ] Secure coding practices followed
 - [ ] Security tools integrated
 - [ ] Access controls implemented
 - [ ] Monitoring configured
 
 ### Post-Implementation
+
 - [ ] Security testing completed
 - [ ] Vulnerability scanning performed
 - [ ] Documentation updated
 - [ ] Team training provided
 
 ### Ongoing
+
 - [ ] Regular security reviews
 - [ ] Dependency updates
 - [ ] Security metrics tracked

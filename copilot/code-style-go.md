@@ -1,4 +1,5 @@
 # file: copilot/code-style-go.md
+
 <!-- Google Go Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/go/ -->
 
@@ -16,12 +17,14 @@ This document summarizes Google's Go style guide for use in code generation and 
 ## Naming Conventions
 
 ### Packages
+
 - Use short, concise, evocative names
 - Use lowercase, single words when possible
 - Avoid abbreviations unless they're well-known
 - Examples: `time`, `http`, `json`
 
 ### Functions and Variables
+
 - Use camelCase for unexported names
 - Use PascalCase for exported names
 - Use short names for short-lived variables
@@ -29,17 +32,20 @@ This document summarizes Google's Go style guide for use in code generation and 
 - Examples: `userID`, `ParseURL`, `count`, `maxRetries`
 
 ### Constants
+
 - Use PascalCase for exported constants
 - Use camelCase for unexported constants
 - Group related constants with `iota` when appropriate
 
 ### Interfaces
+
 - Single-method interfaces should end in "-er"
 - Examples: `Reader`, `Writer`, `Handler`
 
 ## Code Organization
 
 ### Import Formatting
+
 - Use `goimports` to format imports automatically
 - Group imports: standard library, third-party, local
 - No blank lines within groups, one blank line between groups
@@ -56,6 +62,7 @@ import (
 ```
 
 ### Function Declaration
+
 - Keep functions short and focused
 - Use blank lines to separate logical sections
 - Order: receiver, name, parameters, return values
@@ -69,15 +76,18 @@ func (r *receiver) FunctionName(param1 type1, param2 type2) (returnType, error) 
 ## Formatting
 
 ### Line Length
+
 - No strict limit, but aim for readability
 - Break long lines at logical points
 - Prefer shorter lines when possible
 
 ### Indentation
+
 - Use tabs for indentation
 - Use spaces for alignment
 
 ### Braces
+
 - Opening brace on same line as declaration
 - Closing brace on its own line
 
@@ -92,11 +102,13 @@ if condition {
 ## Comments
 
 ### Package Comments
+
 - Every package should have a package comment
 - Start with "Package packagename"
 - Explain the package's purpose
 
 ### Function Comments
+
 - Public functions must have comments
 - Start with the function name
 - Explain what the function does, not how
@@ -109,12 +121,14 @@ func ParseURL(rawurl string) (*URL, error) {
 ```
 
 ### Variable Comments
+
 - Comment exported variables
 - Explain the purpose and any constraints
 
 ## Error Handling
 
 ### Error Messages
+
 - Use lowercase for error messages
 - Don't end with punctuation
 - Be specific about what failed
@@ -124,12 +138,14 @@ return fmt.Errorf("failed to parse URL %q: %w", url, err)
 ```
 
 ### Error Types
+
 - Create custom error types for specific error conditions
 - Use `errors.Is` and `errors.As` for error checking
 
 ## Best Practices
 
 ### Variable Declaration
+
 - Use short variable declarations (`:=`) when possible
 - Use `var` for zero values or when type is important
 
@@ -143,6 +159,7 @@ var timeout time.Duration = 30 * time.Second
 ```
 
 ### Slices and Maps
+
 - Use `make()` for slices and maps with known capacity
 - Check for nil before using
 
@@ -152,16 +169,19 @@ cache := make(map[string]Value, expectedSize)
 ```
 
 ### Interfaces
+
 - Accept interfaces, return concrete types
 - Keep interfaces small and focused
 - Define interfaces in the consuming package
 
 ### Concurrency
+
 - Use channels for communication between goroutines
 - Use sync package primitives for protecting shared state
 - Don't communicate by sharing memory; share memory by communicating
 
 ### Testing
+
 - Test file names end with `_test.go`
 - Test function names start with `Test`
 - Use table-driven tests for multiple scenarios
@@ -188,16 +208,19 @@ func TestParseURL(t *testing.T) {
 ## Code Quality
 
 ### Linting
+
 - Use `golangci-lint` with Google-style configuration
 - Address all linter warnings
 - Use `gofmt` and `goimports` for formatting
 
 ### Documentation
+
 - Write clear, concise documentation
 - Include examples for public APIs
 - Use godoc conventions
 
 ### Performance
+
 - Profile before optimizing
 - Prefer clarity over premature optimization
 - Use appropriate data structures
@@ -205,6 +228,7 @@ func TestParseURL(t *testing.T) {
 ## Common Patterns
 
 ### Option Pattern
+
 ```go
 type Config struct {
     timeout time.Duration
@@ -232,6 +256,7 @@ func NewClient(opts ...Option) *Client {
 ```
 
 ### Builder Pattern
+
 - Use when constructing complex objects
 - Provide sensible defaults
 - Make the zero value useful when possible
@@ -248,12 +273,14 @@ func NewClient(opts ...Option) *Client {
 ## Tools and Configuration
 
 ### Required Tools
+
 - `gofmt`: Format Go source code
 - `goimports`: Format imports
 - `golangci-lint`: Comprehensive linting
 - `go vet`: Static analysis
 
 ### IDE Configuration
+
 - Configure editor to run `gofmt` on save
 - Enable import organization
 - Configure linter integration

@@ -1,4 +1,5 @@
 # file: copilot/code-style-typescript.md
+
 <!-- Google TypeScript/JavaScript Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/tsguide.html -->
 <!-- Source: https://google.github.io/styleguide/jsguide.html -->
@@ -17,6 +18,7 @@ This document summarizes Google's TypeScript and JavaScript style guides for use
 ## File Organization
 
 ### File Extensions
+
 - Use `.ts` for TypeScript files
 - Use `.js` for JavaScript files
 - Use `.tsx` for TypeScript files with JSX
@@ -26,21 +28,22 @@ This document summarizes Google's TypeScript and JavaScript style guides for use
 
 ```typescript
 // Named imports (preferred)
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 // Default imports
-import React from 'react';
+import React from "react";
 
 // Namespace imports (when many symbols are used)
-import * as fs from 'fs';
+import * as fs from "fs";
 
 // Export syntax
 export class MyComponent {}
-export {MyFunction, MyVariable};
+export { MyFunction, MyVariable };
 export default MyClass;
 ```
 
 ### File Structure
+
 - License header (if required)
 - ES6 imports
 - File's primary export
@@ -52,7 +55,7 @@ export default MyClass;
 
 ```typescript
 // Use camelCase for variables and functions
-const userName = 'john';
+const userName = "john";
 const maxRetryCount = 3;
 
 function calculateTotal(items: Item[]): number {
@@ -85,7 +88,7 @@ interface ApiResponse<T> {
 // Prefix interfaces with 'I' is discouraged in TypeScript
 // Use descriptive names instead
 interface UserSettings {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   notifications: boolean;
 }
 ```
@@ -95,7 +98,7 @@ interface UserSettings {
 ```typescript
 // Use SCREAMING_SNAKE_CASE for module-level constants
 const MAX_RETRY_ATTEMPTS = 3;
-const API_BASE_URL = 'https://api.example.com';
+const API_BASE_URL = "https://api.example.com";
 
 // Use camelCase for local constants
 const defaultTimeout = 5000;
@@ -115,9 +118,9 @@ enum HttpStatus {
 
 // Prefer string enums for better debugging
 enum Theme {
-  Light = 'light',
-  Dark = 'dark',
-  Auto = 'auto',
+  Light = "light",
+  Dark = "dark",
+  Auto = "auto",
 }
 ```
 
@@ -144,7 +147,7 @@ function identity<T>(arg: T): T {
 
 ```typescript
 // Let TypeScript infer simple types
-const message = 'Hello, world!'; // string inferred
+const message = "Hello, world!"; // string inferred
 const count = 42; // number inferred
 
 // Annotate when inference isn't clear
@@ -155,51 +158,56 @@ const config: Partial<Config> = {};
 const apiResponse: ApiResponse<User[]> = {
   data: users,
   status: 200,
-  message: 'Success'
+  message: "Success",
 };
 ```
 
 ## Code Formatting
 
 ### Line Length
+
 - Maximum 80 characters per line
 - Break long lines at logical points
 
 ### Indentation
+
 - Use 2 spaces for indentation
 - No tabs
 
 ### Semicolons
+
 - Always use semicolons to terminate statements
 
 ```typescript
-const message = 'Hello, world!';
+const message = "Hello, world!";
 doSomething();
 ```
 
 ### Quotes
+
 - Use single quotes for strings
 - Use template literals for string interpolation
 
 ```typescript
-const name = 'John';
+const name = "John";
 const greeting = `Hello, ${name}!`;
 ```
 
 ### Trailing Commas
+
 - Use trailing commas in multiline structures
 
 ```typescript
 const config = {
-  apiUrl: 'https://api.example.com',
+  apiUrl: "https://api.example.com",
   timeout: 5000,
   retries: 3, // trailing comma
 };
 
 const items = [
-  'apple',
-  'banana',
-  'cherry', // trailing comma
+  "apple",
+  "banana",
+  "cherry", // trailing comma
 ];
 ```
 
@@ -220,7 +228,7 @@ interface AdminUser extends User {
 }
 
 // Use type aliases for unions, primitives, or computed types
-type Status = 'pending' | 'approved' | 'rejected';
+type Status = "pending" | "approved" | "rejected";
 type EventHandler<T> = (event: T) => void;
 type UserKeys = keyof User;
 ```
@@ -233,7 +241,10 @@ interface Identifiable {
   id: string;
 }
 
-function updateEntity<T extends Identifiable>(entity: T, updates: Partial<T>): T {
+function updateEntity<T extends Identifiable>(
+  entity: T,
+  updates: Partial<T>,
+): T {
   return { ...entity, ...updates };
 }
 ```
@@ -244,8 +255,8 @@ function updateEntity<T extends Identifiable>(entity: T, updates: Partial<T>): T
 // Use built-in utility types
 type PartialUser = Partial<User>;
 type RequiredUser = Required<User>;
-type UserEmail = Pick<User, 'email'>;
-type UserWithoutId = Omit<User, 'id'>;
+type UserEmail = Pick<User, "email">;
+type UserWithoutId = Omit<User, "id">;
 ```
 
 ## Error Handling
@@ -260,7 +271,7 @@ class ValidationError extends Error {
     public readonly field: string,
   ) {
     super(message);
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
   }
 }
 
@@ -287,19 +298,19 @@ async function fetchUser(id: string): Promise<Result<User>> {
 // Use strict null checks
 // Prefer undefined over null
 function findUser(id: string): User | undefined {
-  return users.find(user => user.id === id);
+  return users.find((user) => user.id === id);
 }
 
 // Use optional chaining and nullish coalescing
-const userName = user?.profile?.name ?? 'Anonymous';
+const userName = user?.profile?.name ?? "Anonymous";
 ```
 
 ### Array and Object Manipulation
 
 ```typescript
 // Use array methods instead of loops
-const activeUsers = users.filter(user => user.isActive);
-const userNames = users.map(user => user.name);
+const activeUsers = users.filter((user) => user.isActive);
+const userNames = users.map((user) => user.name);
 const totalAge = users.reduce((sum, user) => sum + user.age, 0);
 
 // Use object spread for copying
@@ -317,19 +328,16 @@ const [first, second, ...rest] = items;
 async function processUsers(): Promise<void> {
   try {
     const users = await fetchUsers();
-    await Promise.all(users.map(user => processUser(user)));
+    await Promise.all(users.map((user) => processUser(user)));
   } catch (error) {
-    logger.error('Failed to process users:', error);
+    logger.error("Failed to process users:", error);
     throw error;
   }
 }
 
 // Handle multiple async operations
 async function loadData(): Promise<[User[], Post[]]> {
-  const [users, posts] = await Promise.all([
-    fetchUsers(),
-    fetchPosts(),
-  ]);
+  const [users, posts] = await Promise.all([fetchUsers(), fetchPosts()]);
   return [users, posts];
 }
 ```
@@ -349,8 +357,8 @@ function calculateTax(amount: number, rate: number): number {
 }
 
 // Use function overloads for different signatures
-function createElement(tag: 'div'): HTMLDivElement;
-function createElement(tag: 'span'): HTMLSpanElement;
+function createElement(tag: "div"): HTMLDivElement;
+function createElement(tag: "span"): HTMLSpanElement;
 function createElement(tag: string): HTMLElement {
   return document.createElement(tag);
 }
@@ -361,21 +369,21 @@ function createElement(tag: string): HTMLElement {
 ### Test Structure
 
 ```typescript
-describe('UserService', () => {
+describe("UserService", () => {
   let userService: UserService;
 
   beforeEach(() => {
     userService = new UserService();
   });
 
-  describe('validateUser', () => {
-    it('should return true for valid user', () => {
-      const user = { id: '1', name: 'John', email: 'john@example.com' };
+  describe("validateUser", () => {
+    it("should return true for valid user", () => {
+      const user = { id: "1", name: "John", email: "john@example.com" };
       expect(userService.validateUser(user)).toBe(true);
     });
 
-    it('should return false for invalid email', () => {
-      const user = { id: '1', name: 'John', email: 'invalid-email' };
+    it("should return false for invalid email", () => {
+      const user = { id: "1", name: "John", email: "invalid-email" };
       expect(userService.validateUser(user)).toBe(false);
     });
   });
@@ -396,7 +404,7 @@ describe('UserService', () => {
  */
 function calculateTotalPrice(basePrice: number, taxRate: number): number {
   if (basePrice < 0 || taxRate < 0) {
-    throw new ValidationError('Price and tax rate must be non-negative');
+    throw new ValidationError("Price and tax rate must be non-negative");
   }
   return basePrice * (1 + taxRate);
 }
@@ -418,11 +426,13 @@ if (user.lastLogin && Date.now() - user.lastLogin.getTime() > SESSION_TIMEOUT) {
 ## Tools and Configuration
 
 ### ESLint Configuration
+
 - Use `@typescript-eslint/parser`
 - Enable strict type checking rules
 - Configure for Google style preferences
 
 ### Prettier Configuration
+
 - Single quotes
 - No semicolons (if preferred)
 - Trailing commas
