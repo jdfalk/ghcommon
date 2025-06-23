@@ -1,4 +1,6 @@
-# file: README.md
+<!-- file: .github/copilot-instructions.md -->
+<!-- version: 1.1.0 -->
+<!-- guid: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d -->
 
 # Copilot Instructions
 
@@ -18,6 +20,15 @@
 - Always escape triple backticks with a backslash in documentation
 - Use consistent documentation style (JSDoc, docstrings, etc.) based on the codebase
 
+## Markdown Formatting Guidelines
+
+- **Before manually fixing markdown issues, always use Prettier first**
+- Check for a VS Code task or run `prettier --write *.md` to format markdown files
+- If a Prettier task exists in `.vscode/tasks.json`, use it instead of manual formatting
+- After running Prettier, only manually fix remaining issues that Prettier cannot resolve
+- If no Prettier setup exists, ask the user to run Prettier formatting first, then fix remaining issues
+- Focus manual fixes on content structure, not formatting that automated tools can handle
+
 ## Documentation Organization Policy
 
 ### File Responsibilities
@@ -26,7 +37,7 @@
 - **TODO.md**: Project roadmap, planning, implementation status, architectural decisions, reasoning behind choices, diagrams, and detailed technical plans.
 - **CHANGELOG.md**: All version information, release notes, major breaking changes, feature additions, bug fixes, and consolidated technical documentation that would otherwise be scattered across multiple files.
 
-## Go Code Style
+## Go Code Style (Primary Language)
 
 - Use `gofmt` or `go fmt` to automatically format code
 - Use tabs for indentation (not spaces), line length under 100 characters
@@ -42,6 +53,9 @@
 - Use early returns to reduce nesting
 - Defer file and resource closing
 - Use context for cancellation and deadlines
+- Keep functions short and focused
+- Prefer methods with value receivers unless you need to modify the receiver
+- Use channels to communicate, avoid sharing memory
 
 ## Python Code Style
 
@@ -67,6 +81,27 @@
 - Prefer interfaces over types for object shapes
 - Use async/await over promises where possible
 
+## TypeScript/JavaScript Code Style
+
+- Use 2 spaces for indentation
+- Use semicolons consistently
+- Prefer `const` over `let`, avoid `var`
+- Use meaningful variable names, prefer descriptive over short
+- Use PascalCase for classes, camelCase for functions/variables
+- Use UPPER_SNAKE_CASE for constants
+- Always use explicit type annotations in TypeScript
+- Prefer interfaces over types for object shapes
+- Use async/await over promises where possible
+
+## Markdown Code Style
+
+- Use consistent heading hierarchy (don't skip levels)
+- Use fenced code blocks with language specification
+- Keep line length reasonable (80-100 characters)
+- Use meaningful link text (not "click here")
+- Use consistent bullet point style (-, not \*)
+- Add blank lines around code blocks and headers
+
 ## Commit Message Standards (REQUIRED)
 
 Format: `<type>[optional scope]: <description>`
@@ -74,6 +109,7 @@ Format: `<type>[optional scope]: <description>`
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
 **REQUIRED**: Always include "Files changed:" section in commit body with summary and links:
+
 ```
 Files changed:
 - Added feature implementation: [src/feature.js](src/feature.js)
@@ -85,6 +121,7 @@ Files changed:
 - No period at end of description
 - Keep descriptions under 50 characters
 - Include motivation and contrast with previous behavior in body
+- Reference real issues only: `Fixes #123` or `Closes #456`
 
 ## Testing Standards
 
@@ -123,15 +160,16 @@ Review Process:
 
 ## Security & Best Practices
 
-- Avoid hardcoding sensitive information
+- Avoid hardcoding sensitive information (API keys, passwords, tokens)
 - Follow secure coding practices
 - Use proper error handling with meaningful messages
-- Validate inputs appropriately
+- Validate inputs appropriately (sanitize file paths, validate formats)
 - Consider performance implications of code changes
-- Look for injection vulnerabilities (SQL, XSS, CSRF)
-- Review authentication and authorization checks
+- Look for injection vulnerabilities (command injection in file processing)
+- Review file handling security (path traversal, file size limits)
 - Verify secure handling of sensitive data
 - Check input validation and output encoding
+- Use secure defaults for file permissions and temporary files
 
 ## Version Control Standards
 
@@ -140,6 +178,8 @@ Review Process:
 - Reference issue numbers in commits and PRs when applicable (only real issues)
 - Use conventional commit format consistently
 - Include comprehensive file change documentation in all commits
+- Use semantic versioning for releases
+- Tag releases appropriately
 
 ## Project-Specific Guidelines
 
@@ -155,6 +195,7 @@ Review Process:
 For additional detailed guidelines, refer to these comprehensive style and process documents:
 
 ### Code Style Guidelines
+
 - [Go Code Style](code-style-go.md)
 - [Python Code Style](code-style-python.md)
 - [TypeScript Code Style](code-style-typescript.md)
@@ -164,6 +205,7 @@ For additional detailed guidelines, refer to these comprehensive style and proce
 - [GitHub Actions Code Style](code-style-github-actions.md)
 
 ### Development Process Guidelines
+
 - [Commit Message Standards](commit-messages.md)
 - [Pull Request Descriptions](pull-request-descriptions.md)
 - [Code Review Guidelines](review-selection.md)
