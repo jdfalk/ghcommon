@@ -7,6 +7,7 @@ This guide shows how to migrate the subtitle-manager repository from its custom 
 ## Overview
 
 The subtitle-manager repository currently has a sophisticated issue management system with:
+
 - Advanced Python script (962 lines) with comprehensive functionality
 - Full workflow with matrix strategy and parallel execution
 - GUID-based duplicate prevention
@@ -113,6 +114,7 @@ rm -f .github/scripts/issue_manager.py
 ### Step 4: Test the Migration
 
 1. **Test with a dry run**:
+
    ```bash
    # Go to Actions tab in GitHub
    # Click "Unified Issue Management"
@@ -123,6 +125,7 @@ rm -f .github/scripts/issue_manager.py
 
 2. **Test with issue updates**:
    Create a test `issue_updates.json`:
+
    ```json
    {
      "comment": [
@@ -151,16 +154,19 @@ Update any repository documentation that references the old workflow:
 ## Benefits of Migration
 
 ### Centralized Maintenance
+
 - **Single source of truth**: All improvements benefit all repositories
 - **Consistent behavior**: Same functionality across all repos
 - **Easier updates**: No need to sync changes manually
 
 ### Reduced Repository Complexity
+
 - **Smaller repo size**: Remove 962-line script
 - **Simpler workflow**: Focus on configuration, not implementation
 - **Less maintenance**: No local script to maintain
 
 ### Enhanced Features
+
 - **Always up-to-date**: Automatically get latest improvements
 - **Better documentation**: Centralized docs and examples
 - **Community contributions**: Benefits from broader usage
@@ -168,7 +174,9 @@ Update any repository documentation that references the old workflow:
 ## Compatibility
 
 ### Preserved Features
+
 ✅ All current functionality is preserved:
+
 - JSON-based issue updates (both flat and grouped formats)
 - GUID-based duplicate prevention
 - Copilot review ticket management
@@ -178,14 +186,18 @@ Update any repository documentation that references the old workflow:
 - Comprehensive logging and summaries
 
 ### Enhanced Features
+
 ✅ Additional features available:
+
 - Auto-detection of operations based on event context
 - More flexible configuration options
 - Better error handling and reporting
 - Standardized across repositories
 
 ### Breaking Changes
+
 ❌ No breaking changes:
+
 - Same trigger events supported
 - Same input parameters
 - Same environment variables
