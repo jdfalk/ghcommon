@@ -42,6 +42,7 @@ This project adheres to a code of conduct that we expect all contributors to fol
 #### Development Process
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -49,6 +50,7 @@ This project adheres to a code of conduct that we expect all contributors to fol
 2. **Make your changes** following the style guidelines
 
 3. **Test your changes**:
+
    ```bash
    # Validate workflow syntax
    ./copilot/scripts/validate-setup.sh
@@ -79,12 +81,14 @@ This project adheres to a code of conduct that we expect all contributors to fol
 ### Workflow Development
 
 #### Security First
+
 - Always follow the security guidelines in `/copilot/instructions/security-guidelines.md`
 - Use least privilege permissions
 - Validate all inputs
 - Pin action versions to specific commits or tags
 
 #### Best Practices
+
 - Make workflows reusable and configurable
 - Provide comprehensive input validation
 - Include proper error handling
@@ -92,6 +96,7 @@ This project adheres to a code of conduct that we expect all contributors to fol
 - Use meaningful job and step names
 
 #### Example Workflow Structure
+
 ```yaml
 name: Descriptive Workflow Name
 
@@ -99,12 +104,12 @@ on:
   workflow_call:
     inputs:
       input-name:
-        description: 'Clear description of the input'
+        description: "Clear description of the input"
         required: true
         type: string
     outputs:
       output-name:
-        description: 'Clear description of the output'
+        description: "Clear description of the output"
         value: ${{ jobs.job-name.outputs.output-name }}
 
 jobs:
@@ -123,12 +128,15 @@ jobs:
 ### Documentation Standards
 
 #### File Headers
+
 All documentation files should include the file path comment:
+
 ```markdown
 # file: path/to/file.md
 ```
 
 #### Structure
+
 - Use clear, descriptive headings
 - Include code examples where appropriate
 - Provide both basic and advanced usage examples
@@ -136,6 +144,7 @@ All documentation files should include the file path comment:
 - Link to related documentation
 
 #### Code Examples
+
 - Use realistic, working examples
 - Include necessary context and setup
 - Explain non-obvious parts
@@ -144,12 +153,14 @@ All documentation files should include the file path comment:
 ### Testing
 
 #### Workflow Testing
+
 1. **Syntax validation** with GitHub CLI or yaml parsers
 2. **Integration testing** with sample repositories
 3. **Security scanning** of workflow files
 4. **Manual testing** across different scenarios
 
 #### Script Testing
+
 1. **Unit tests** for individual functions
 2. **Integration tests** with real repositories
 3. **Error condition testing**
@@ -158,6 +169,7 @@ All documentation files should include the file path comment:
 ## Style Guidelines
 
 ### YAML Workflows
+
 - Use 2-space indentation
 - Quote string values that might be ambiguous
 - Use descriptive names for jobs, steps, and IDs
@@ -165,6 +177,7 @@ All documentation files should include the file path comment:
 - Include comments for complex logic
 
 ### Shell Scripts
+
 - Follow shellcheck recommendations
 - Use strict error handling (`set -euo pipefail`)
 - Include help text and usage examples
@@ -172,6 +185,7 @@ All documentation files should include the file path comment:
 - Validate inputs and provide meaningful error messages
 
 ### Markdown Documentation
+
 - Follow markdown linting rules
 - Use consistent heading structure
 - Include proper code formatting
@@ -183,11 +197,13 @@ All documentation files should include the file path comment:
 ### Before Submitting
 
 1. **Run validation scripts**:
+
    ```bash
    ./copilot/scripts/validate-setup.sh
    ```
 
 2. **Test with multiple project types**:
+
    ```bash
    # Test each template
    ./copilot/scripts/setup-repository.sh complete
@@ -217,12 +233,14 @@ All documentation files should include the file path comment:
 ## Release Process
 
 ### Version Strategy
+
 - Follow [Semantic Versioning](https://semver.org/)
 - Use conventional commits for automatic versioning
 - Create releases for significant changes
 - Maintain backwards compatibility when possible
 
 ### Release Steps
+
 1. **Update CHANGELOG.md**
 2. **Create release PR**
 3. **Tag the release** after merge
@@ -232,12 +250,14 @@ All documentation files should include the file path comment:
 ## Getting Help
 
 ### Resources
+
 - **Documentation**: `/copilot/` directory
 - **Examples**: `/templates/` directory
 - **Issues**: GitHub Issues for bug reports and feature requests
 - **Discussions**: GitHub Discussions for general questions
 
 ### Maintainer Contact
+
 - Create an issue for bugs or feature requests
 - Use discussions for general questions
 - Tag maintainers (@jdfalk) for urgent security issues
@@ -245,6 +265,7 @@ All documentation files should include the file path comment:
 ## Recognition
 
 Contributors are recognized in several ways:
+
 - Listed in release notes for significant contributions
 - Mentioned in repository contributors
 - Invited to review related PRs

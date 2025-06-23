@@ -9,42 +9,54 @@ Successfully migrated and centralized the advanced issue management system from 
 ## Components Created
 
 ### 1. Advanced Issue Management Script
+
 **Location**: `scripts/issue_manager.py`
+
 - **Size**: 963 lines (migrated from subtitle-manager)
 - **Features**: Complete issue management suite with GUID tracking, multi-operation support
 - **Operations**: update-issues, copilot-tickets, close-duplicates, codeql-alerts
 
 ### 2. Reusable Workflow
+
 **Location**: `.github/workflows/unified-issue-management.yml`
+
 - **Type**: Reusable GitHub Actions workflow
 - **Features**: Matrix strategy, auto-detection, comprehensive configuration
 - **Usage**: Can be called from any repository
 
 ### 3. Documentation
+
 **Location**: `docs/unified-issue-management.md`
+
 - **Content**: Complete usage guide, configuration options, examples
 - **Audience**: Developers implementing the workflow
 
 ### 4. Example Workflows
+
 **Locations**:
+
 - `examples/workflows/issue-management-basic.yml`
 - `examples/workflows/issue-management-advanced.yml`
 - **Purpose**: Copy-paste ready examples for different use cases
 
 ### 5. Migration Guide
+
 **Location**: `examples/migration-guides/subtitle-manager-migration.md`
+
 - **Purpose**: Step-by-step guide for migrating subtitle-manager
 - **Includes**: Backup procedures, testing steps, rollback plan
 
 ## Key Features
 
 ### Core Operations
+
 1. **Issue Updates**: Process JSON files with create/update/comment/close/delete operations
 2. **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
 3. **Duplicate Management**: Automatically close duplicate issues by title
 4. **Security Alerts**: Generate tickets for CodeQL security alerts
 
 ### Advanced Features
+
 1. **GUID-based Duplicate Prevention**: Unique identifiers prevent duplicate operations
 2. **Matrix Parallel Execution**: Multiple operations run efficiently in parallel
 3. **Auto-detection**: Automatically determines which operations to run
@@ -54,6 +66,7 @@ Successfully migrated and centralized the advanced issue management system from 
 ## Usage Patterns
 
 ### Basic Usage
+
 ```yaml
 jobs:
   issue-management:
@@ -62,6 +75,7 @@ jobs:
 ```
 
 ### Advanced Usage
+
 ```yaml
 jobs:
   issue-management:
@@ -79,16 +93,19 @@ jobs:
 ## Benefits
 
 ### For ghcommon
+
 - **Centralized maintenance**: Single source of truth for issue management
 - **Reusability**: Can be used across multiple repositories
 - **Community benefit**: Shared improvements benefit all users
 
 ### For subtitle-manager
+
 - **Reduced complexity**: Remove 963-line script from repository
 - **Automatic updates**: Always get latest improvements
 - **Simplified maintenance**: Focus on configuration, not implementation
 
 ### For Other Repositories
+
 - **Proven solution**: Battle-tested comprehensive issue management
 - **Easy adoption**: Copy-paste workflow examples
 - **Flexible configuration**: Adapt to different repository needs
@@ -115,12 +132,14 @@ ghcommon/
 ## Next Steps
 
 ### For ghcommon Repository
+
 1. **Commit and push** all new files to the main branch
 2. **Test the reusable workflow** in a test repository
 3. **Create documentation PR** for any additional improvements
 4. **Set up automated testing** for the workflow
 
 ### For subtitle-manager Repository
+
 1. **Wait for ghcommon changes** to be merged and available
 2. **Follow migration guide** to switch to reusable workflow
 3. **Test thoroughly** with dry-run mode first
@@ -128,6 +147,7 @@ ghcommon/
 5. **Update repository documentation**
 
 ### For Other Repositories
+
 1. **Review examples** to understand usage patterns
 2. **Copy appropriate workflow** (basic or advanced)
 3. **Customize configuration** as needed
@@ -136,12 +156,14 @@ ghcommon/
 ## Quality Assurance
 
 ### Testing Strategy
+
 - **Dry-run mode**: Test without making changes
 - **Matrix testing**: Verify all operations work correctly
 - **Event testing**: Test all trigger conditions
 - **Error handling**: Verify graceful failure handling
 
 ### Monitoring
+
 - **Workflow logs**: Comprehensive logging for debugging
 - **GitHub summaries**: Rich summary output for each run
 - **Error reporting**: Clear error messages for troubleshooting
@@ -149,12 +171,14 @@ ghcommon/
 ## Success Metrics
 
 ### Technical Metrics
+
 - ✅ **962-line script** successfully migrated and centralized
 - ✅ **Full feature parity** maintained during migration
 - ✅ **Reusable workflow** created with comprehensive configuration
 - ✅ **Complete documentation** with examples and migration guides
 
 ### Operational Metrics
+
 - ✅ **Zero breaking changes** for existing subtitle-manager workflow
 - ✅ **Backwards compatibility** with existing `issue_updates.json` format
 - ✅ **Easy adoption** with copy-paste workflow examples

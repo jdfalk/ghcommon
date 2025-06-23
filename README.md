@@ -7,16 +7,19 @@ A comprehensive repository of reusable GitHub Actions workflows and templates fo
 Choose the setup that matches your project type:
 
 ### For Complete CI/CD Pipeline
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s complete
 ```
 
 ### For Container-Only Projects
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s container
 ```
 
 ### For Library/Package Projects
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s library
 ```
@@ -50,12 +53,14 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 ## 🔧 Core Features
 
 ### Semantic Versioning
+
 - **Automatic version calculation** based on conventional commits
 - **Multi-file version updates** (package.json, version.txt, etc.)
 - **PR title enhancement** with conventional commit prefixes
 - **Dry-run support** for testing
 
 ### Multi-Architecture Container Builds
+
 - **Cross-platform builds** (linux/amd64, linux/arm64, linux/arm/v7)
 - **Security-first approach** with Buildah
 - **SBOM generation** with Syft
@@ -64,6 +69,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 - **Comprehensive artifact management**
 
 ### Automated Releases
+
 - **Smart version detection** from commit messages
 - **Automated release notes** from conventional commits
 - **Artifact collection** and attachment
@@ -72,6 +78,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 - **Container image integration**
 
 ### Issue Management
+
 - **Comprehensive issue tracking** with GitHub Issues
 - **Automated ticket creation** from PRs and commits
 - **Duplicate issue detection** and closure
@@ -82,6 +89,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 ## 📖 Usage Examples
 
 ### Basic Semantic Versioning
+
 ```yaml
 versioning:
   uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
@@ -92,6 +100,7 @@ versioning:
 ```
 
 ### Multi-Arch Container Build
+
 ```yaml
 container:
   uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
@@ -104,6 +113,7 @@ container:
 ```
 
 ### Automatic Release
+
 ```yaml
 release:
   uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
@@ -122,19 +132,19 @@ on:
   push:
     branches: [main]
     paths:
-      - 'issue_updates.json'
-      - '.github/issue-updates/*.json'
+      - "issue_updates.json"
+      - ".github/issue-updates/*.json"
   pull_request_review_comment:
     types: [created, edited, deleted]
   schedule:
-    - cron: "0 2 * * *"  # Daily maintenance
+    - cron: "0 2 * * *" # Daily maintenance
   workflow_dispatch:
 
 jobs:
   issue-management:
     uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
     with:
-      operations: "auto"  # Auto-detect based on event
+      operations: "auto" # Auto-detect based on event
       issue_updates_file: "issue_updates.json"
       issue_updates_directory: ".github/issue-updates"
       cleanup_issue_updates: true
@@ -142,6 +152,7 @@ jobs:
 ```
 
 **Features**:
+
 - JSON-driven issue updates (legacy and distributed formats)
 - Copilot review comment tickets
 - Duplicate issue detection and closure
@@ -152,6 +163,7 @@ jobs:
 - **Workflow summary reports** with detailed operation status
 
 **Helper Script**: Copy the issue creation helper to your repository:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/create-issue-update.sh -o scripts/create-issue-update.sh
 chmod +x scripts/create-issue-update.sh
@@ -176,12 +188,14 @@ chmod +x scripts/create-issue-update.sh
 ## 🔒 Requirements
 
 ### Repository Permissions
+
 - **Actions**: Read and write permissions
 - **Packages**: Write permissions (for container registries)
 - **Contents**: Write permissions (for releases and tags)
 - **Pull Requests**: Write permissions (for PR updates)
 
 ### Required Secrets (Optional)
+
 - `SLACK_WEBHOOK_URL` - For release notifications
 - `TEAMS_WEBHOOK_URL` - For Teams notifications
 - External registry credentials (if not using GitHub Container Registry)
@@ -189,11 +203,13 @@ chmod +x scripts/create-issue-update.sh
 ## 📚 Documentation
 
 ### Setup Guides
+
 - [Repository Setup Guide](copilot/setup/repository-setup.md) - Complete setup instructions
 - [Security Guidelines](copilot/instructions/security-guidelines.md) - Security best practices
 - [Workflow Usage](copilot/instructions/workflow-usage.md) - Detailed workflow documentation
 
 ### Templates
+
 - [Complete CI/CD](templates/workflows/complete-ci-cd.yml) - Full pipeline template
 - [Container Only](templates/workflows/container-only.yml) - Container-focused template
 - [Library Release](templates/workflows/library-release.yml) - Package release template
@@ -207,6 +223,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 ```
 
 This will check:
+
 - ✅ Workflow file syntax
 - ✅ Required files and structure
 - ✅ Git configuration
@@ -218,6 +235,7 @@ This will check:
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### Development Setup
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes

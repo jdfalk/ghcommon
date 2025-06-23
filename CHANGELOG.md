@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Initial reusable workflow repository setup
 - Semantic versioning workflow with conventional commits support
 - Multi-architecture container build workflow with Buildah
@@ -35,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub issue and PR templates
 
 ### Security
+
 - SBOM generation for all container builds
 - Vulnerability scanning with Grype
 - Container image signing with Cosign
@@ -45,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-06-14
 
 ### Added
+
 - Initial release of GitHub Common Workflows repository
 - Three core reusable workflows:
   - Semantic versioning with conventional commits
