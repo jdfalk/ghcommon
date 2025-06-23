@@ -5,10 +5,12 @@ This directory contains reusable scripts for GitHub automation and issue managem
 ## Available Scripts
 
 ### [`issue_manager.py`](issue_manager.py)
+
 **Version**: 2.0.0
 **Last Updated**: 2025-06-21
 
 Unified GitHub issue management script with comprehensive functionality:
+
 - Process issue updates from JSON files (legacy and distributed formats)
 - Manage Copilot review comment tickets
 - Close duplicate issues by title
@@ -19,12 +21,14 @@ Unified GitHub issue management script with comprehensive functionality:
 Used by the [`unified-issue-management.yml`](../.github/workflows/unified-issue-management.yml) reusable workflow.
 
 ### [`create-issue-update.sh`](create-issue-update.sh)
+
 **Version**: 1.0.0
 **Last Updated**: 2025-06-21
 
 Helper script to create new issue update files with proper UUIDs in the distributed format.
 
 **Usage**:
+
 ```bash
 # Create a new issue
 ./scripts/create-issue-update.sh create "Issue Title" "Description" "label1,label2"
@@ -40,6 +44,7 @@ Helper script to create new issue update files with proper UUIDs in the distribu
 ```
 
 **Features**:
+
 - Automatic UUID generation for file names
 - GUID generation for duplicate prevention
 - Creates files in `.github/issue-updates/` directory
@@ -81,6 +86,7 @@ These scripts are designed to work with the unified issue management reusable wo
 ## Contributing
 
 When updating scripts:
+
 1. Increment the version number
 2. Update the last-updated date
 3. Document changes in the script header
@@ -90,6 +96,7 @@ When updating scripts:
 ## Support
 
 For issues or questions:
+
 - Check the [examples directory](../examples/) for usage patterns
 - Review the [migration guide](../examples/migration-guides/subtitle-manager-migration.md)
 - Open an issue in the ghcommon repository
