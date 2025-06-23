@@ -6,12 +6,13 @@
 # that can be shared across multiple repositories.
 #
 # Features:
-# - Process issue updates from issue_updates.json (create, update, comment, close, delete)
+# - Process issue updates from both legacy and distributed JSON formats
+# - Support dual-GUID format for enhanced duplicate prevention
 # - Manage Copilot review comment tickets
 # - Close duplicate issues by title
 # - Generate tickets for CodeQL security alerts
 # - Comprehensive logging and summary generation
-# - GUID-based duplicate prevention
+# - Automatic file archiving with processed file tracking
 # - Matrix-based parallel execution
 #
 # Usage:
@@ -629,4 +630,3 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "---" >> "$GITHUB_STEP_SUMMARY"
           echo "*This workflow uses the [Unified Issue Management Workflow](https://github.com/jdfalk/ghcommon/.github/workflows/unified-issue-management.yml) from ghcommon.*" >> "$GITHUB_STEP_SUMMARY"
-

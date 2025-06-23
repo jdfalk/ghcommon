@@ -8,9 +8,48 @@ A comprehensive, reusable GitHub Actions workflow for automated issue management
 
 The Unified Issue Management workflow provides centralized, automated issue management capabilities that can be shared across multiple repositories. It consolidates multiple issue management operations into a single, efficient workflow.
 
-## Features
+## Fea### File Management
 
-### Core Operations
+#### Distributed Files
+
+- **Original files**: `.github/issue-updates/*.json`
+- **Processed files**: `.github/issue-updates/processed/*.json`
+- **Archive tracking**: Automatic via PR creation
+- **Format**: Both files support dual-GUID format for enhanced duplicate prevention
+
+When distributed files are processed, they are automatically moved to the `processed/` subdirectory to prevent reprocessing. Both pending and processed files support the dual-GUID format:
+
+**Pending file example** (`.github/issue-updates/feature-123.json`):
+
+```json
+{
+  "action": "create",
+  "title": "Feature: Add user profiles",
+  "body": "Implement user profile management...",
+  "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
+  "legacy_guid": "feature-user-profiles-2024-001"
+}
+```
+
+**Processed file example** (`.github/issue-updates/processed/feature-123.json`):
+
+```json
+{
+  "action": "create",
+  "title": "Feature: Add user profiles",
+  "body": "Implement user profile management...",
+  "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
+  "legacy_guid": "feature-user-profiles-2024-001",
+  "issue_url": "https://github.com/owner/repo/issues/123",
+  "processed_at": "2024-06-23T10:30:00Z"
+}
+```
+
+#### Legacy Files
+
+- **Original file**: `issue_updates.json`
+- **Updated file**: Contains permalinks to created issues
+- **Change tracking**: Via separate PR with link updatesre Operations
 
 - **Issue Updates**: Process issue updates from JSON files (create, update, comment, close, delete)
 - **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
@@ -19,9 +58,10 @@ The Unified Issue Management workflow provides centralized, automated issue mana
 
 ### Advanced Features
 
-- **GUID-based Duplicate Prevention**: Prevent duplicate operations with unique identifiers
+- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both UUID and legacy GUID identifiers
 - **Matrix-based Parallel Execution**: Run multiple operations efficiently
 - **Auto-detection**: Automatically determine which operations to run based on context
+- **Distributed File Support**: Process both legacy single-file and modern distributed formats
 - **Comprehensive Logging**: Detailed summaries and progress tracking
 - **Flexible Configuration**: Extensive customization options
 
@@ -49,12 +89,44 @@ jobs:
 ```
 
 1. **Commit the workflow** and it will automatically handle:
-
    - Processing `issue_updates.json` files when they're pushed
    - Managing Copilot review comment tickets
    - Manual execution via workflow dispatch
 
 ### Issue Updates Format
+
+The workflow supports both legacy single-file and modern distributed file formats:
+
+#### Distributed Format (Recommended)
+
+Store individual issue updates in `.github/issue-updates/` directory:
+
+**File**: `.github/issue-updates/feature-request-123.json`
+
+```json
+{
+  "action": "create",
+  "title": "Feature: Add dark mode support",
+  "body": "Users have requested dark mode support...",
+  "labels": ["enhancement", "ui"],
+  "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
+  "legacy_guid": "feat-dark-mode-2024-001"
+}
+```
+
+**File**: `.github/issue-updates/bug-fix-456.json`
+
+```json
+{
+  "action": "comment",
+  "number": 123,
+  "body": "Progress update: 50% complete",
+  "guid": "8c237a09-3dbf-4bb6-b992-4674bb07c3f3",
+  "legacy_guid": "progress-update-2024-001"
+}
+```
+
+#### Legacy Single-File Format (Still Supported)
 
 Create an `issue_updates.json` file in your repository root:
 
@@ -147,18 +219,21 @@ When `operations: "auto"` (default), the workflow automatically determines which
 ## Examples
 
 ### Example 1: Basic Issue Management
+
 See [`examples/workflows/issue-management-basic.yml`](../examples/workflows/issue-management-basic.yml)
 
 ### Example 2: Advanced Configuration
+
 See [`examples/workflows/issue-management-advanced.yml`](../examples/workflows/issue-management-advanced.yml)
 
 ### Example 3: Scheduled Maintenance
+
 ```yaml
 name: Scheduled Issue Maintenance
 
 on:
   schedule:
-    - cron: "0 2 * * *"  # Daily at 2 AM UTC
+    - cron: "0 2 * * *" # Daily at 2 AM UTC
 
 jobs:
   maintenance:
@@ -169,6 +244,7 @@ jobs:
 ```
 
 ### Example 4: Manual Operations
+
 ```yaml
 name: Manual Issue Operations
 
@@ -177,7 +253,8 @@ on:
     inputs:
       operation:
         type: choice
-        options: [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
+        options:
+          [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
         required: true
       dry_run:
         type: boolean
@@ -192,9 +269,34 @@ jobs:
     secrets: inherit
 ```
 
-## GUID-Based Duplicate Prevention
+## Dual-GUID Duplicate Prevention
 
-The workflow supports GUID (Globally Unique Identifier) tracking to prevent duplicate operations:
+The workflow supports dual-GUID tracking for enhanced duplicate prevention and migration compatibility:
+
+### Modern Format (Dual-GUID)
+
+```json
+{
+  "create": [
+    {
+      "title": "Bug: Memory leak in parser",
+      "body": "Detailed description...",
+      "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
+      "legacy_guid": "bug-memory-leak-2024-06-20-001"
+    }
+  ],
+  "comment": [
+    {
+      "number": 123,
+      "body": "Update: Fix is ready for testing",
+      "guid": "8c237a09-3dbf-4bb6-b992-4674bb07c3f3",
+      "legacy_guid": "status-update-2024-06-20-001"
+    }
+  ]
+}
+```
+
+### Legacy Format (Still Supported)
 
 ```json
 {
@@ -204,22 +306,58 @@ The workflow supports GUID (Globally Unique Identifier) tracking to prevent dupl
       "body": "Detailed description...",
       "guid": "bug-memory-leak-2024-06-20-001"
     }
-  ],
-  "comment": [
-    {
-      "number": 123,
-      "body": "Update: Fix is ready for testing",
-      "guid": "status-update-2024-06-20-001"
-    }
   ]
 }
 ```
 
-### GUID Best Practices
+### GUID Format Details
 
-1. **Use descriptive GUIDs**: Include operation type, date, and sequence
-2. **Format consistently**: `{type}-{description}-{date}-{sequence}`
-3. **Keep them unique**: Never reuse GUIDs across different operations
+#### Primary GUID (`guid`)
+
+- **Format**: UUID v4 (e.g., `a4d7a2e2-f643-466f-84c7-dcd476ec287f`)
+- **Purpose**: Primary unique identifier for robust duplicate prevention
+- **Generation**: Automatically generated UUID or manually specified
+- **Recommendation**: Use auto-generated UUIDs for new entries
+
+#### Legacy GUID (`legacy_guid`)
+
+- **Format**: Descriptive string (e.g., `bug-memory-leak-2024-06-20-001`)
+- **Purpose**: Backward compatibility and human-readable identification
+- **Migration**: Automatically populated when migrating from legacy format
+- **Optional**: Can be omitted for new entries
+
+### Duplicate Prevention Logic
+
+The workflow uses both GUIDs for comprehensive duplicate detection:
+
+1. **Primary Check**: Compares `guid` field (UUID-based)
+2. **Fallback Check**: Compares `legacy_guid` field if primary GUID not found
+3. **Content Check**: Compares title and action type for additional safety
+4. **Migration Support**: Handles files being migrated from legacy to dual-GUID format
+
+### Dual-GUID Best Practices
+
+1. **Use UUIDs for new entries**: Generate UUID v4 for the `guid` field
+2. **Keep legacy GUIDs descriptive**: When migrating, preserve human-readable legacy GUIDs
+3. **Migration strategy**: Use migration tools to convert legacy single-GUID to dual-GUID format
+4. **Unique identifiers**: Never reuse either GUID across different operations
+5. **Backward compatibility**: Support both formats during transition periods
+
+### GUID Migration
+
+For repositories transitioning from legacy GUID format:
+
+```bash
+# Use the smart migration script to convert to dual-GUID format
+python scripts/smart-issue-migration.py migrate-dual-guid
+```
+
+This automatically:
+
+- Converts existing `guid` to `legacy_guid`
+- Generates new UUID for `guid` field
+- Preserves all content and metadata
+- Handles both pending and processed files
 
 ## Required Permissions
 
@@ -227,11 +365,11 @@ The workflow requires the following GitHub token permissions:
 
 ```yaml
 permissions:
-  issues: write          # Create, update, close issues
-  contents: write        # Read repository files, create PRs
-  pull-requests: write   # Comment on PRs, manage reviews
-  security-events: read  # Access CodeQL alerts
-  repository-projects: read  # Access project information
+  issues: write # Create, update, close issues
+  contents: write # Read repository files, create PRs
+  pull-requests: write # Comment on PRs, manage reviews
+  security-events: read # Access CodeQL alerts
+  repository-projects: read # Access project information
 ```
 
 These are automatically inherited when using `secrets: inherit`.
@@ -294,6 +432,7 @@ If you're currently using separate workflows for issue management:
 The workflow automatically creates pull requests for file management operations:
 
 #### Processed Files Archive PR
+
 When distributed issue update files are processed, they are automatically moved to a `processed/` subdirectory and a PR is created:
 
 ```
@@ -306,6 +445,7 @@ Summary:
 ```
 
 #### Legacy File Updates PR
+
 When using legacy `issue_updates.json` files, a separate PR is created with permalinks:
 
 ```
@@ -326,6 +466,7 @@ Each workflow run generates comprehensive summary reports including:
 - **Timestamp and Context**: When and how the workflow was triggered
 
 Example summary:
+
 ```
 🎯 Operation Summary: update-issues
 
@@ -341,18 +482,6 @@ Processed Files: 3 files moved to archive
    - URL: https://github.com/owner/repo/pull/42
    - Branch: archive-processed-files-123456789
 ```
-
-### File Management
-
-#### Distributed Files
-- Original files: `.github/issue-updates/*.json`
-- Processed files: `.github/issue-updates/processed/*.json`
-- Archive tracking: Automatic via PR creation
-
-#### Legacy Files
-- Original file: `issue_updates.json`
-- Updated file: Contains permalinks to created issues
-- Change tracking: Via separate PR with link updates
 
 ## Support
 
