@@ -563,6 +563,7 @@ This style guide ensures consistency, maintainability, and future-proofing acros
 ## Message Design
 
 ### Request/Response Patterns
+
 ```protobuf
 // Standard request pattern
 message GetUserRequest {
@@ -595,6 +596,7 @@ message ListUsersResponse {
 ```
 
 ### Common Message Patterns
+
 ```protobuf
 // Use common types from gcommon.v1.common
 message UserAccount {
@@ -617,6 +619,7 @@ message UserAccount {
 ## Service Design
 
 ### Service Definition Pattern
+
 ```protobuf
 service AuthService {
   // Authentication operations
@@ -672,12 +675,14 @@ service AuthService {
 ## Field Guidelines
 
 ### Field Numbers
+
 - Use 1-15 for frequently used fields (single byte encoding)
 - Reserve 16-2047 for less frequent fields
 - Never reuse field numbers
 - Reserve field numbers for future use when removing fields
 
 ### Field Types
+
 ```protobuf
 message FieldExamples {
   // Identifiers - use string for UUIDs, int64 for auto-increment
@@ -708,6 +713,7 @@ message FieldExamples {
 ```
 
 ### Validation Rules
+
 Use protoc-gen-validate for field validation:
 
 ```protobuf
@@ -737,6 +743,7 @@ message ValidationExamples {
 ## Common Types
 
 ### Use Shared Common Types
+
 Import and use types from `pkg/common/proto/common.proto`:
 
 ```protobuf
@@ -766,6 +773,7 @@ message ServiceRequest {
 ## Hybrid API Support
 
 ### REST and gRPC Annotations
+
 All services MUST support both REST and gRPC:
 
 ```protobuf
@@ -807,6 +815,7 @@ service ExampleService {
 ```
 
 ### URL Path Conventions
+
 - Use RESTful URL patterns: `/v1/resources/{id}`
 - Use kebab-case for multi-word resources: `/v1/user-accounts/{id}`
 - Include version in path: `/v1/`, `/v2/`
@@ -815,11 +824,13 @@ service ExampleService {
 ## Code Generation
 
 ### Go Package Options
+
 ```protobuf
 option go_package = "github.com/jdfalk/gcommon/pkg/service_name/proto";
 ```
 
 ### Generated Code Organization
+
 ```
 pkg/service_name/proto/
 ├── service.pb.go           # Generated message types
@@ -831,6 +842,7 @@ pkg/service_name/proto/
 ## Documentation
 
 ### Message Documentation
+
 ```protobuf
 // UserAccount represents a user account in the system.
 // This message contains all the essential information about a user
@@ -851,6 +863,7 @@ message UserAccount {
 ```
 
 ### Service Documentation
+
 ```protobuf
 // AuthService provides authentication and user management capabilities.
 // This service handles user login, logout, registration, and profile management.
@@ -869,6 +882,7 @@ service AuthService {
 ## Examples
 
 ### Complete Service Example
+
 ```protobuf
 edition = "2023";
 

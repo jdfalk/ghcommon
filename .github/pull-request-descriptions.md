@@ -6,21 +6,27 @@ Use this template for your pull request descriptions:
 
 ```markdown
 ## Description
+
 [Concise overview of the changes]
 
 ## Motivation
+
 [Why these changes were necessary]
 
 ## Changes
+
 [Detailed list of changes made]
 
 ## Testing
+
 [How the changes were tested]
 
 ## Screenshots
+
 [If applicable]
 
 ## Related Issues
+
 [Links to related tickets/issues]
 ```
 
@@ -86,23 +92,28 @@ Use this template for your pull request descriptions:
 
 ```markdown
 ## Description
+
 Add JWT authentication to the API endpoints
 
 ## Motivation
+
 Our API currently uses basic authentication which doesn't meet security requirements for the new client portal.
 
 ## Changes
+
 - Added JWT middleware to authenticate API requests
 - Created token generation endpoint at `/api/auth/token`
 - Updated user model to store refresh tokens
 - Added environment variables for JWT secret and expiration
 
 ## Testing
+
 - Added unit tests for token generation and validation
 - Tested integration with frontend using Postman collection
 - Verified token expiration and refresh flow
 
 ## Related Issues
+
 Closes #234
 Related to #156
 ```

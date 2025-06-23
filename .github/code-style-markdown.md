@@ -75,7 +75,7 @@ This guide follows common Markdown best practices and industry standards.
 ````markdown
 ```javascript
 function example() {
-  const value = 'This is a code example';
+  const value = "This is a code example";
   return value;
 }
 ```

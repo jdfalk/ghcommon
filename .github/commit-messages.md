@@ -47,6 +47,7 @@ Use these standardized types to categorize your changes:
 
   ```markdown
   Files changed:
+
   - Added SSO provider implementation: [src/auth/SSOProvider.js](src/auth/SSOProvider.js)
   - Updated auth context to support SSO flow: [src/auth/AuthContext.js](src/auth/AuthContext.js)
   - Added SSO login button to form: [src/components/LoginForm.js](src/components/LoginForm.js)

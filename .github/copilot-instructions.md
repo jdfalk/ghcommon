@@ -135,6 +135,7 @@ Files changed:
 - Include meaningful assertion messages
 
 Test Types:
+
 - **Unit Tests**: Single function/method in isolation
 - **Integration Tests**: Component interactions
 - **Functional Tests**: Complete features from user perspective
@@ -144,6 +145,7 @@ Test Types:
 ## Code Review Guidelines
 
 Review Priority Areas:
+
 1. **Correctness**: Verify code does what it claims, check edge cases and error handling
 2. **Security**: Look for injection vulnerabilities, auth/authorization, secure data handling
 3. **Performance**: Check for N+1 queries, resource-intensive operations, scalability issues
@@ -152,6 +154,7 @@ Review Priority Areas:
 6. **Test Coverage**: Unit tests for main functionality, edge cases, meaningful tests
 
 Review Process:
+
 - Start with high-level overview before details
 - Be specific about what needs changing and why
 - Provide constructive feedback with examples

@@ -68,7 +68,7 @@ import (
 - All exported (public) declarations should have doc comments
 - Start comments with the name of the thing being described
 - Comments should be full sentences, ending with period
-- Use // for line comments, not /* */  <!-- markdownlint-disable-line MD037 -->
+- Use // for line comments, not /\* \*/ <!-- markdownlint-disable-line MD037 -->
 - Use `godoc` conventions for package documentation
 
 ```go
