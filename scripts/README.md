@@ -76,6 +76,36 @@ head -n 10 scripts/create-issue-update.sh | grep "version:"
 
 These scripts are designed to work with the unified issue management reusable workflow. See the [workflow examples](../examples/workflows/) for integration patterns.
 
+## Local Usage
+
+### Running issue_manager.py Locally
+
+For local testing or manual execution:
+
+```bash
+# Set up authentication and repository
+export GH_TOKEN=$(gh auth token)
+export REPO=owner/repository-name
+
+# Process issue updates
+python scripts/issue_manager.py update-issues
+
+# Manage Copilot tickets
+python scripts/issue_manager.py copilot-tickets
+
+# Close duplicate issues
+python scripts/issue_manager.py close-duplicates
+
+# Generate CodeQL alert tickets
+python scripts/issue_manager.py codeql-alerts
+```
+
+**Prerequisites for local usage**:
+
+- GitHub CLI (`gh`) installed and authenticated
+- Python 3.x with `requests` library
+- Proper repository permissions
+
 ## Dependencies
 
 - **Python 3.x** (for issue_manager.py)

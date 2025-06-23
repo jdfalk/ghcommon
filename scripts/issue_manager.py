@@ -16,7 +16,9 @@ Environment Variables:
   GITHUB_EVENT_NAME - webhook event name (for event-driven operations)
   GITHUB_EVENT_PATH - path to the event payload (for event-driven operations)
 
-Command Line Usage:
+Local Usage:
+  export GH_TOKEN=$(gh auth token)
+  export REPO=owner/repository-name
   python issue_manager.py update-issues    # Process issue_updates.json
   python issue_manager.py copilot-tickets  # Manage Copilot review tickets
   python issue_manager.py close-duplicates # Close duplicate issues
