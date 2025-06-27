@@ -39,6 +39,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download files from ghcommon
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           mkdir -p ${{ inputs.dest }}
