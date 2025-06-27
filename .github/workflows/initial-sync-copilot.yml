@@ -40,6 +40,13 @@ jobs:
           echo "Markdown files in .github before deletion:" && \
           find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -print
           find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -exec rm -f {} +
+          echo "Markdown files in .github after deletion:" && \
+          find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -print
+          REMAINING=$(find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' | wc -l)
+          if [ "$REMAINING" -ne 0 ]; then
+            echo "ERROR: Some markdown files were not deleted!" >&2
+            exit 1
+          fi
 
       - name: Copy copilot directory to .github/copilot
         run: |
@@ -58,6 +65,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .github/copilot .github/copilot-instructions.md AGENTS.md
+          git add .
           git diff --cached --quiet || git commit -m "chore: initial sync of copilot directory and instructions"
           git push
