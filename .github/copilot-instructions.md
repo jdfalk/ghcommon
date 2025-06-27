@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 1.1.0 -->
+<!-- version: 1.1.1 -->
 <!-- guid: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d -->
 
 # Copilot Instructions
@@ -10,6 +10,13 @@
 - Use this path to determine which file you're working on and where to apply generated changes
 - If this comment is present, prioritize it over any other indications of file path
 - When generating code modifications, reference this path in your response
+- Always ensure every file begins with the standard header, using the correct comment syntax for the file type (e.g., `# file: ...` for Python, `// file: ...` for Go, `<!-- file: ... -->` for Markdown, etc.).
+- The header must include:
+  - The exact relative file path from the repository root (e.g., `# file: path/to/file.py`)
+  - The file's semantic version (e.g., `# version: 1.0.0`)
+  - The file's GUID (e.g., `# guid: 123e4567-e89b-12d3-a456-426614174000`)
+- If this header is present, always use it to determine the file's identity and where to apply changes. Prioritize this over any other indications of file path.
+- When generating code modifications, reference the file path from this header in your response.
 
 ## Code Documentation
 
@@ -81,18 +88,6 @@
 - Prefer interfaces over types for object shapes
 - Use async/await over promises where possible
 
-## TypeScript/JavaScript Code Style
-
-- Use 2 spaces for indentation
-- Use semicolons consistently
-- Prefer `const` over `let`, avoid `var`
-- Use meaningful variable names, prefer descriptive over short
-- Use PascalCase for classes, camelCase for functions/variables
-- Use UPPER_SNAKE_CASE for constants
-- Always use explicit type annotations in TypeScript
-- Prefer interfaces over types for object shapes
-- Use async/await over promises where possible
-
 ## Markdown Code Style
 
 - Use consistent heading hierarchy (don't skip levels)
@@ -112,8 +107,8 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 
 ```
 Files changed:
-- Added feature implementation: [src/feature.js](src/feature.js)
-- Updated tests: [test/feature.test.js](test/feature.test.js)
+- Added subtitle processing: [cmd/convert.go](cmd/convert.go)
+- Updated web UI handler: [webui/handlers.go](webui/handlers.go)
 ```
 
 - Use imperative present tense ("add" not "added")
@@ -133,6 +128,7 @@ Files changed:
 - Write deterministic tests with consistent results
 - Keep tests independent of each other
 - Include meaningful assertion messages
+- Use table-driven tests in Go when testing multiple scenarios
 
 Test Types:
 
@@ -160,6 +156,7 @@ Review Process:
 - Provide constructive feedback with examples
 - Differentiate between required changes and suggestions
 - Focus on critical issues first, not style issues handled by linters
+- Review tests as carefully as production code
 
 ## Security & Best Practices
 
@@ -170,9 +167,22 @@ Review Process:
 - Consider performance implications of code changes
 - Look for injection vulnerabilities (command injection in file processing)
 - Review file handling security (path traversal, file size limits)
-- Verify secure handling of sensitive data
-- Check input validation and output encoding
+- Verify secure handling of subtitle file content
+- Check input validation for subtitle formats and encodings
 - Use secure defaults for file permissions and temporary files
+
+## Subtitle Manager Specific Guidelines
+
+- Handle subtitle file encoding detection properly (UTF-8, UTF-16, etc.)
+- Validate subtitle file formats before processing
+- Use appropriate error handling for file I/O operations
+- Consider memory usage when processing large subtitle files
+- Implement proper cleanup of temporary files
+- Use streaming for large file operations when possible
+- Follow established patterns for subtitle format detection
+- Ensure thread-safety in concurrent subtitle processing
+- Validate time codes and subtitle sequence integrity
+- Handle malformed subtitle files gracefully
 
 ## Version Control Standards
 
@@ -192,6 +202,9 @@ Review Process:
 - Follow the documentation organization policy for file responsibilities
 - Use meaningful variable names that indicate purpose
 - Keep functions small and focused on a single responsibility
+- Use the existing CLI framework patterns for new commands
+- Follow established patterns for web UI handlers and templates
+- Use appropriate logging levels and structured logging
 
 ## Includes
 
@@ -213,3 +226,20 @@ For additional detailed guidelines, refer to these comprehensive style and proce
 - [Pull Request Descriptions](pull-request-descriptions.md)
 - [Code Review Guidelines](review-selection.md)
 - [Test Generation Guidelines](test-generation.md)
+
+## Code Documentation Guidelines
+
+### Development Workflow Instructions
+
+1. **Write the code first** - Focus on implementing the core functionality and logic
+2. **Complete the implementation** - Ensure all features and requirements are fully implemented
+3. **Run formatting tools** - Apply code formatters (e.g., Prettier, Black, gofmt) to standardize code style
+4. **Run linting tools** - Execute linters (e.g., ESLint, pylint, golint) to catch potential issues
+5. **Fix linting issues** - Address any warnings or errors identified by the linter
+
+### Important Notes
+
+- Prioritize getting functional code written before worrying about style and linting rules
+- Only address linting issues during development if they represent major errors that prevent further development
+- Minor style and linting issues should be resolved at the end of the development process
+- This approach allows for faster development iteration and reduces interruptions during the coding phase
