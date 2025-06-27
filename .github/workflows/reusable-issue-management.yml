@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-issue-management.yml
-name: Reusable Issue Management
+name: "Reusable - Issue Management"
 
 on:
   workflow_call:

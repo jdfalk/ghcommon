@@ -23,7 +23,7 @@
 # - examples/workflows/issue-management-basic.yml
 # - examples/workflows/issue-management-advanced.yml
 
-name: Unified Issue Management (Reusable)
+name: Reusable - Unified Issue Management
 
 on:
   workflow_call:

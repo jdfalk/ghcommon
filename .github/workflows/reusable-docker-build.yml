@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-docker-build.yml
-name: "reusable-docker-build: Multi-Arch Docker Build and Publish"
+name: "Reusable -  Multi-Arch Docker Build and Publish"
 
 on:
   workflow_call:
