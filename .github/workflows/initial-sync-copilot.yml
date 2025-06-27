@@ -16,6 +16,9 @@ name: Initial Sync Copilot Directory
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   sync-copilot:
     runs-on: ubuntu-latest
