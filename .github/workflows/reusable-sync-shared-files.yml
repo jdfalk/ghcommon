@@ -1,0 +1,68 @@
+# file: .github/workflows/reusable-sync-shared-files.yml
+# Reusable workflow to sync shared files (AGENTS.md, copilot/*, etc) from ghcommon to other repos
+#
+# Usage: Call this workflow from your repo to pull the latest shared files from ghcommon
+#
+# Example call:
+#   uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
+#   with:
+#     files: |
+#       AGENTS.md
+#       copilot/**/*.md
+#     dest: .github
+
+name: Reusable - Sync Shared Files
+
+on:
+  workflow_call:
+    inputs:
+      files:
+        description: "Newline-separated list of files/globs to sync from ghcommon"
+        required: true
+        type: string
+      dest:
+        description: "Destination directory in the target repo (default: .github)"
+        required: false
+        default: ".github"
+        type: string
+      branch:
+        description: "Branch to sync from in ghcommon (default: main)"
+        required: false
+        default: "main"
+        type: string
+
+jobs:
+  sync-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+
+      - name: Download files from ghcommon
+        run: |
+          set -e
+          mkdir -p ${{ inputs.dest }}
+          while IFS= read -r pattern; do
+            if [[ -z "$pattern" ]]; then continue; fi
+            echo "Syncing $pattern from ghcommon..."
+            gh repo clone jdfalk/ghcommon ghcommon-tmp -- --depth=1 --branch=${{ inputs.branch }}
+            rsync -av --include="$pattern" --exclude="*" ghcommon-tmp/ ${{ inputs.dest }}/
+            rm -rf ghcommon-tmp
+          done <<< "${{ inputs.files }}"
+
+      - name: Show synced files
+        run: |
+          echo "Files in ${{ inputs.dest }} after sync:"
+          find ${{ inputs.dest }}
+
+      - name: Commit and push if changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ inputs.dest }}
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync shared files from ghcommon"
+            git push
+          else
+            echo "No changes to commit."
+          fi
