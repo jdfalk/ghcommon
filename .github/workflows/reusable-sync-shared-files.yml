@@ -42,13 +42,30 @@ jobs:
         run: |
           set -e
           mkdir -p ${{ inputs.dest }}
+          rm -rf ghcommon-tmp
+          gh repo clone jdfalk/ghcommon ghcommon-tmp -- --depth=1 --branch=${{ inputs.branch }}
           while IFS= read -r pattern; do
             if [[ -z "$pattern" ]]; then continue; fi
             echo "Syncing $pattern from ghcommon..."
-            gh repo clone jdfalk/ghcommon ghcommon-tmp -- --depth=1 --branch=${{ inputs.branch }}
-            rsync -av --include="$pattern" --exclude="*" ghcommon-tmp/ ${{ inputs.dest }}/
-            rm -rf ghcommon-tmp
+            if [[ "$pattern" == "AGENTS.md" ]]; then
+              # Always copy AGENTS.md to the root of the destination
+              cp ghcommon-tmp/AGENTS.md ${{ inputs.dest }}/AGENTS.md
+            else
+              # Use rsync for globs, preserving directory structure under copilot/ or other subfolders
+              rsync -av --prune-empty-dirs --relative --include="$pattern" --exclude="*" ghcommon-tmp/ ${{ inputs.dest }}/
+            fi
           done <<< "${{ inputs.files }}"
+          rm -rf ghcommon-tmp
+
+      - name: Remove old code-style and guide files from .github
+        run: |
+          rm -f .github/code-style-*.md
+          rm -f .github/commit-messages.md
+          rm -f .github/pull-request-descriptions.md
+          rm -f .github/review-selection.md
+          rm -f .github/test-generation.md
+          rm -f .github/copilot-instructions.md.bak
+          rm -f .github/AGENTS.md.bak
 
       - name: Show synced files
         run: |
