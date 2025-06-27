@@ -1,0 +1,63 @@
+# Copilot Directory Sync Workflow
+#
+# This workflow performs an initial sync of the entire `copilot` directory from the source repository (e.g., `ghcommon`) into the target repository's `.github/copilot/` directory. The `copilot-instructions.md` file is placed directly in `.github/` to provide entry-point documentation and reference the synced files.
+#
+# - All files and subdirectories from the source `copilot/` are copied to `.github/copilot/`.
+# - `.github/copilot-instructions.md` is copied to `.github/copilot-instructions.md`.
+# - The workflow only commits if there are changes.
+# - This workflow is intended for initial setup and can be re-run to update files as needed.
+#
+# Usage:
+#   - Place this workflow in `.github/workflows/initial-sync-copilot.yml` in each target repository.
+#   - Update the `repository` and `ref` fields as needed for your source.
+
+name: Initial Sync Copilot Directory
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-copilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout source copilot repo
+        uses: actions/checkout@v4
+        with:
+          repository: jdfalk/ghcommon
+          ref: main
+          path: ghcommon-source
+
+      - name: Remove old code-style and guide files from .github
+        run: |
+          rm -f .github/code-style-*.md
+          rm -f .github/commit-messages.md
+          rm -f .github/pull-request-descriptions.md
+          rm -f .github/review-selection.md
+          rm -f .github/test-generation.md
+          rm -f .github/copilot-instructions.md.bak
+
+      - name: Copy copilot directory to .github/copilot
+        run: |
+          mkdir -p .github/copilot
+          rsync -av --delete --exclude 'copilot-instructions.md' ghcommon-source/copilot/ .github/copilot/
+
+      - name: Copy copilot-instructions.md to .github/
+        run: |
+          cp ghcommon-source/.github/copilot-instructions.md .github/copilot-instructions.md
+
+      - name: Copy AGENTS.md to repo root
+        run: |
+          cp ghcommon-source/codex/AGENTS.md ./AGENTS.md
+
+      - name: Commit and push if changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/copilot .github/copilot-instructions.md AGENTS.md
+          git diff --cached --quiet || git commit -m "chore: initial sync of copilot directory and instructions"
+          git push
