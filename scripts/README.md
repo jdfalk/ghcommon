@@ -18,7 +18,7 @@ Unified GitHub issue management script with comprehensive functionality:
 - GUID-based duplicate prevention
 - Support for both legacy `issue_updates.json` and new distributed `.github/issue-updates/` formats
 
-Used by the [`unified-issue-management.yml`](../.github/workflows/unified-issue-management.yml) reusable workflow.
+Used by the [`unified-issue-management.yml`](../.github/workflows/reusable-unified-issue-management.yml) reusable workflow.
 
 ### [`create-issue-update.sh`](create-issue-update.sh)
 

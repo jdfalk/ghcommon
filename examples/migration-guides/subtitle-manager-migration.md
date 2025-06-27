@@ -26,7 +26,7 @@ Before migrating, backup the current files:
 mkdir -p migration-backup
 
 # Backup current workflow
-cp .github/workflows/unified-issue-management.yml migration-backup/
+cp .github/workflows/reusable-unified-issue-management.yml migration-backup/
 
 # Backup current script
 cp .github/scripts/issue_manager.py migration-backup/
@@ -37,7 +37,7 @@ cp .github/scripts/issue_manager.py migration-backup/
 Replace the current workflow with the new one that calls the reusable workflow:
 
 ```yaml
-# file: .github/workflows/unified-issue-management.yml
+# file: .github/workflows/reusable-unified-issue-management.yml
 #
 # Migrated Issue Management Workflow (Using Reusable Workflow)
 #
@@ -89,7 +89,7 @@ on:
 jobs:
   # Use the centralized reusable workflow from ghcommon
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: ${{ github.event.inputs.operations || 'auto' }}
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
@@ -209,7 +209,7 @@ If you need to rollback to the original implementation:
 
 ```bash
 # Restore original files
-cp migration-backup/unified-issue-management.yml .github/workflows/
+cp migration-backup/reusable-unified-issue-management.yml .github/workflows/
 cp migration-backup/issue_manager.py .github/scripts/
 
 # Commit the changes

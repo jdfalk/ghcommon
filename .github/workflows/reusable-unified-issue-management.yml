@@ -1,4 +1,4 @@
-# file: .github/workflows/unified-issue-management.yml
+# file: .github/workflows/reusable-unified-issue-management.yml
 #
 # Unified Issue Management Reusable Workflow
 #
@@ -17,7 +17,7 @@
 #
 # Usage:
 #   Call this workflow from your repository's workflow with:
-#   uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+#   uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
 #
 # For examples, see:
 # - examples/workflows/issue-management-basic.yml

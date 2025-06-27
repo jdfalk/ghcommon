@@ -69,7 +69,7 @@ When distributed files are processed, they are automatically moved to the `proce
 
 ### Basic Setup
 
-1. **Copy the basic example** to `.github/workflows/issue-management.yml` in your repository:
+1. **Copy the basic example** to `.github/workflows/reusable-issue-management.yml` in your repository:
 
 ```yaml
 name: Issue Management
@@ -84,7 +84,7 @@ on:
 
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     secrets: inherit
 ```
 
@@ -237,7 +237,7 @@ on:
 
 jobs:
   maintenance:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: "close-duplicates,codeql-alerts"
     secrets: inherit
@@ -262,7 +262,7 @@ on:
 
 jobs:
   manual-operation:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: ${{ github.event.inputs.operation }}
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
@@ -400,7 +400,7 @@ Enable debug logging by setting the workflow to dry-run mode:
 ```yaml
 jobs:
   debug:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       dry_run: true
       operations: "update-issues"

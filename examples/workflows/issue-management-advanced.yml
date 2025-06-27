@@ -105,7 +105,7 @@ jobs:
   # Main issue management workflow
   issue-management:
     needs: detect-issue-updates
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: ${{ github.event.inputs.operations || 'auto' }}
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}

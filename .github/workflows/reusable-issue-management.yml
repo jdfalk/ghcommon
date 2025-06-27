@@ -1,4 +1,4 @@
-# file: .github/workflows/issue-management.yml
+# file: .github/workflows/reusable-issue-management.yml
 name: Reusable Issue Management
 
 on:

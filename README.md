@@ -28,12 +28,12 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts
 
 ### Reusable Workflows
 
-| Workflow                                                                         | Purpose                        | Key Features                                                             |
-| -------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
-| [`semantic-versioning.yml`](.github/workflows/semantic-versioning.yml)           | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
-| [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)               | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
-| [`automatic-release.yml`](.github/workflows/automatic-release.yml)               | Automated GitHub releases      | Release notes, artifact management, notifications                        |
-| [`unified-issue-management.yml`](.github/workflows/unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
+| Workflow                                                                                  | Purpose                        | Key Features                                                             |
+| ----------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| [`semantic-versioning.yml`](.github/workflows/semantic-versioning.yml)                    | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
+| [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
+| [`automatic-release.yml`](.github/workflows/automatic-release.yml)                        | Automated GitHub releases      | Release notes, artifact management, notifications                        |
+| [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
 
 ### Templates
 
@@ -142,7 +142,7 @@ on:
 
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: "auto" # Auto-detect based on event
       issue_updates_file: "issue_updates.json"

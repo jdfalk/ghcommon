@@ -203,7 +203,7 @@ def generate_workflow_summary() -> None:
     write_summary("")
     write_summary("---")
     write_summary(
-        "*This workflow uses the [Unified Issue Management Workflow](https://github.com/jdfalk/ghcommon/.github/workflows/unified-issue-management.yml) from ghcommon.*"
+        "*This workflow uses the [Unified Issue Management Workflow](https://github.com/jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml) from ghcommon.*"
     )
 
 

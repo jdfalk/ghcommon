@@ -18,7 +18,7 @@ Successfully migrated and centralized the advanced issue management system from 
 
 ### 2. Reusable Workflow
 
-**Location**: `.github/workflows/unified-issue-management.yml`
+**Location**: `.github/workflows/reusable-unified-issue-management.yml`
 
 - **Type**: Reusable GitHub Actions workflow
 - **Features**: Matrix strategy, auto-detection, comprehensive configuration
@@ -70,7 +70,7 @@ Successfully migrated and centralized the advanced issue management system from 
 ```yaml
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     secrets: inherit
 ```
 
@@ -79,7 +79,7 @@ jobs:
 ```yaml
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: "update-issues,copilot-tickets"
       dry_run: false
