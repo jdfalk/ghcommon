@@ -1,4 +1,6 @@
-# file: copilot/code-style-csharp.md
+<!-- file: copilot/code-style-csharp.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 123e4567-e89b-12d3-a456-426614174000 -->
 
 # C# Coding Style Guide (Google Style)
 

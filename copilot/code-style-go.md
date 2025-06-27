@@ -1,7 +1,6 @@
-# file: copilot/code-style-go.md
-
-<!-- Google Go Style Guide Summary -->
-<!-- Source: https://google.github.io/styleguide/go/ -->
+<!-- file: copilot/code-style-go.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 4c7f1a2d-5e8b-4c7f-1a2d-8b5e1a4c7f1a -->
 
 # Go Style Guide (Google)
 

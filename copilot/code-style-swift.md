@@ -1,4 +1,6 @@
-# file: copilot/code-style-swift.md
+<!-- file: copilot/code-style-swift.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 5d4c3b2a-1e0f-9d8c-7b6a-5c4d3e2f1a0b -->
 
 <!-- Google Swift Style Guide Summary -->
 <!-- Source: https://google.github.io/swift/ -->

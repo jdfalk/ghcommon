@@ -1,4 +1,6 @@
-# file: copilot/code-style-markdown.md
+<!-- file: copilot/code-style-markdown.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: e2f8a5b1-9c4d-4e2f-8a5b-4d9c8a5b1e2f -->
 
 # Markdown Coding Style Guide
 
@@ -360,4 +362,3 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 - Inconsistent file naming conventions
 
 This style guide ensures your Markdown documents are readable, accessible, and maintainable across different platforms and tools.
-```
