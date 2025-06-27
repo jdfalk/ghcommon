@@ -1,7 +1,43 @@
 <!-- file: AGENTS.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: 2e7c1a4b-5d3f-4b8c-9e1f-7a6b2c3d4e5f -->
 # AGENTS.md
+
+---
+
+## 0. Creating GitHub Issues via Script (v1.1.0)
+
+- **All new GitHub issues, comments, updates, and closes must be created by generating a JSON file using the `scripts/create-issue-update.sh` script.**
+- Do **not** create or edit `.github/issue-updates/*.json` files by hand. Always use the script to ensure GUID uniqueness and correct formatting.
+- The script generates a random GUID and legacy GUID, and places the JSON file in `.github/issue-updates/`.
+- **Usage examples:**
+
+  ```bash
+  # Create a new issue
+  ./scripts/create-issue-update.sh create "Issue Title" "Issue body" "label1,label2"
+
+  # Update an existing issue
+  ./scripts/create-issue-update.sh update 123 "Updated body" "label1,label2"
+
+  # Add a comment to an issue
+  ./scripts/create-issue-update.sh comment 123 "Comment text"
+
+  # Close an issue
+  ./scripts/create-issue-update.sh close 123 "completed"
+  ```
+
+- The script will:
+  - Ensure the `.github/issue-updates/` directory exists
+  - Generate a unique GUID and legacy GUID for each file
+  - Check for GUID collisions
+  - Output a JSON file with the correct structure for the unified issue management workflow
+- **Best practices:**
+  - Use clear, concise titles and bodies
+  - Use comma-separated labels (no spaces)
+  - Always check the script output for success and file path
+  - Do not manually edit or move generated files
+  - Let the workflow process and archive files as needed
+- For more details, see the script header in [`scripts/create-issue-update.sh`](scripts/create-issue-update.sh)
 
 ---
 
