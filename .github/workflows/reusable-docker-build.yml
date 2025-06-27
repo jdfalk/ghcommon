@@ -58,6 +58,11 @@ on:
         required: false
         default: ""
         type: string
+      builder:
+        description: "Builder to use: 'docker' (default) or 'buildah'"
+        required: false
+        default: "docker"
+        type: string
     secrets:
       gh-token:
         description: "GitHub token with repo access"
@@ -82,28 +87,123 @@ jobs:
     name: Build and Publish Docker Image
     runs-on: ubuntu-latest
     outputs:
-      digest: ${{ steps.build-and-push.outputs.digest }}
-      image-url: ${{ steps.build-and-push.outputs.image-url }}
+      digest: ${{ steps.set-outputs.outputs.digest }}
+      image-url: ${{ steps.set-outputs.outputs.image-url }}
       sbom-path: ${{ steps.sbom.outputs.sbom-path }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Set up QEMU for multi-arch builds (buildah only)
+        if: inputs.builder == 'buildah'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Install Buildah and dependencies (buildah only)
+        if: inputs.builder == 'buildah'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y buildah podman skopeo jq
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64"
+          sudo mv cosign-linux-amd64 /usr/local/bin/cosign
+          sudo chmod +x /usr/local/bin/cosign
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Log in to Container Registry (buildah)
+        if: inputs.builder == 'buildah' && inputs.push == true
+        env:
+          REGISTRY_TOKEN: ${{ secrets.gh-token }}
+        run: |
+          echo "$REGISTRY_TOKEN" | buildah login --username ${{ github.actor }} --password-stdin ${{ inputs.registry }}
+
+      - name: Generate metadata (buildah)
+        if: inputs.builder == 'buildah'
+        id: meta-buildah
+        run: |
+          IMAGE_NAME="${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}"
+          TAGS=""
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            VERSION="${{ github.ref_name }}"
+            TAGS="$IMAGE_NAME:$VERSION${{ inputs.tag-suffix }}"
+            TAGS="$TAGS,$IMAGE_NAME:latest${{ inputs.tag-suffix }}"
+          elif [ "${{ github.ref_name }}" = "main" ] || [ "${{ github.ref_name }}" = "master" ]; then
+            TAGS="$IMAGE_NAME:main${{ inputs.tag-suffix }}"
+            TAGS="$TAGS,$IMAGE_NAME:latest${{ inputs.tag-suffix }}"
+          else
+            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '/' '-')
+            TAGS="$IMAGE_NAME:$BRANCH_NAME${{ inputs.tag-suffix }}"
+          fi
+          TAGS="$TAGS,$IMAGE_NAME:sha-${{ github.sha }}${{ inputs.tag-suffix }}"
+          echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "build-timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      - name: Build multi-arch container (buildah)
+        if: inputs.builder == 'buildah'
+        id: build
+        run: |
+          IMAGE_NAME="${{ steps.meta-buildah.outputs.image-name }}"
+          TAGS="${{ steps.meta-buildah.outputs.tags }}"
+          PLATFORMS="${{ inputs.platforms }}"
+          BUILD_ARGS='${{ inputs.build-args }}'
+          BUILDAH_ARGS=""
+          if [ "$BUILD_ARGS" != "" ]; then
+            while IFS= read -r line; do
+              [ -n "$line" ] && BUILDAH_ARGS="$BUILDAH_ARGS --build-arg $line"
+            done <<< "$BUILD_ARGS"
+          fi
+          MANIFEST_NAME="$IMAGE_NAME:manifest-${{ github.sha }}"
+          buildah manifest create "$MANIFEST_NAME"
+          IFS=',' read -ra PLATFORM_ARRAY <<< "$PLATFORMS"
+          for platform in "${PLATFORM_ARRAY[@]}"; do
+            echo "Building for platform: $platform"
+            buildah build \
+              --platform="$platform" \
+              --manifest="$MANIFEST_NAME" \
+              --file="${{ inputs.dockerfile }}" \
+              --label="org.opencontainers.image.title=${{ inputs.image-name }}" \
+              --label="org.opencontainers.image.description=Built with GitHub Actions" \
+              --label="org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}" \
+              --label="org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}" \
+              --label="org.opencontainers.image.version=${{ github.ref_name }}" \
+              --label="org.opencontainers.image.created=${{ steps.meta-buildah.outputs.build-timestamp }}" \
+              --label="org.opencontainers.image.revision=${{ github.sha }}" \
+              --label="org.opencontainers.image.licenses=MIT" \
+              $BUILDAH_ARGS \
+              "${{ inputs.context }}"
+          done
+          if [ "${{ inputs.push }}" = "true" ]; then
+            IFS=',' read -ra TAG_ARRAY <<< "$TAGS"
+            for tag in "${TAG_ARRAY[@]}"; do
+              echo "Pushing $tag"
+              buildah manifest push --all "$MANIFEST_NAME" "docker://$tag"
+            done
+            DIGEST=$(buildah manifest inspect "$MANIFEST_NAME" | jq -r '.digest')
+            echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+            echo "image-url=$IMAGE_NAME@$DIGEST" >> $GITHUB_OUTPUT
+          else
+            echo "digest=local-build" >> $GITHUB_OUTPUT
+            echo "image-url=$IMAGE_NAME:local" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx (docker only)
+        if: inputs.builder != 'buildah'
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: |
             image=moby/buildkit:v0.12.0
             network=host
 
-      - name: Log in to Container Registry
+      - name: Log in to Container Registry (docker)
+        if: inputs.builder != 'buildah'
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.registry }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.gh-token }}
 
-      - name: Set version information
+      - name: Set version information (docker)
+        if: inputs.builder != 'buildah'
         id: version
         run: |
           VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -113,7 +213,8 @@ jobs:
           echo "BUILD_TIME=${BUILD_TIME}" >> $GITHUB_OUTPUT
           echo "GIT_COMMIT=${GIT_COMMIT}" >> $GITHUB_OUTPUT
 
-      - name: Extract metadata
+      - name: Extract metadata (docker)
+        if: inputs.builder != 'buildah'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -124,7 +225,8 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (docker)
+        if: inputs.builder != 'buildah'
         id: build-and-push
         uses: docker/build-push-action@v6
         with:
@@ -143,11 +245,38 @@ jobs:
             GIT_COMMIT=${{ steps.version.outputs.GIT_COMMIT }}
             ${{ inputs.build-args }}
 
+      # Set outputs for downstream steps (choose correct build output)
+      - name: Set outputs (buildah)
+        id: set-outputs-buildah
+        if: inputs.builder == 'buildah'
+        run: |
+          echo "digest=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
+          echo "image-url=${{ steps.build.outputs.image-url }}" >> $GITHUB_OUTPUT
+
+      - name: Set outputs (docker)
+        id: set-outputs-docker
+        if: inputs.builder != 'buildah'
+        run: |
+          echo "digest=${{ steps.build-and-push.outputs.digest }}" >> $GITHUB_OUTPUT
+          echo "image-url=${{ steps.build-and-push.outputs.image-url }}" >> $GITHUB_OUTPUT
+
+      - name: Set outputs (final)
+        id: set-outputs
+        run: |
+          if [ "${{ inputs.builder }}" = "buildah" ]; then
+            echo "digest=${{ steps.set-outputs-buildah.outputs.digest }}" >> $GITHUB_OUTPUT
+            echo "image-url=${{ steps.set-outputs-buildah.outputs.image-url }}" >> $GITHUB_OUTPUT
+          else
+            echo "digest=${{ steps.set-outputs-docker.outputs.digest }}" >> $GITHUB_OUTPUT
+            echo "image-url=${{ steps.set-outputs-docker.outputs.image-url }}" >> $GITHUB_OUTPUT
+          fi
+
+      # SBOM, attestation, scan, and sign steps (shared, use set-outputs)
       - name: Generate SBOM
         id: sbom
         if: inputs.generate-sbom == true
         run: |
-          IMAGE_URL="${{ steps.build-and-push.outputs.image-url }}"
+          IMAGE_URL="${{ steps.set-outputs.outputs.image-url }}"
           SBOM_PATH="./sbom.spdx.json"
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/output anchore/syft:latest "$IMAGE_URL" -o spdx-json > "$SBOM_PATH" || echo '{}' > "$SBOM_PATH"
           echo "sbom-path=$SBOM_PATH" >> $GITHUB_OUTPUT
@@ -163,7 +292,7 @@ jobs:
       - name: Vulnerability scan
         if: inputs.scan-vulnerability == true
         run: |
-          IMAGE_URL="${{ steps.build-and-push.outputs.image-url }}"
+          IMAGE_URL="${{ steps.set-outputs.outputs.image-url }}"
           docker run --rm anchore/grype:latest "$IMAGE_URL" -o json > vulnerability-report.json || true
           docker run --rm anchore/grype:latest "$IMAGE_URL" -o table || true
 
@@ -180,7 +309,7 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: 1
         run: |
-          IMAGE_URL="${{ steps.build-and-push.outputs.image-url }}"
+          IMAGE_URL="${{ steps.set-outputs.outputs.image-url }}"
           cat > attestation.json << EOF
           {
             "buildType": "https://github.com/actions/runner",
@@ -221,5 +350,10 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: 1
         run: |
-          IMAGE_URL="${{ steps.build-and-push.outputs.image-url }}"
+          IMAGE_URL="${{ steps.set-outputs.outputs.image-url }}"
           docker run --rm -v $(pwd):/workspace gcr.io/projectsigstore/cosign:v2.2.3 sign "$IMAGE_URL" --yes
+
+      - name: Cleanup (buildah only)
+        if: always() && inputs.builder == 'buildah'
+        run: |
+          buildah manifest rm "${{ steps.meta-buildah.outputs.image-name }}:manifest-${{ github.sha }}" || true
