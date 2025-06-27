@@ -1,0 +1,4 @@
+# file: requirements.txt
+# Python dependencies for ghcommon workflow scripts
+
+requests>=2.31.0
