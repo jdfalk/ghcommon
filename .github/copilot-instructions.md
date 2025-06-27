@@ -1,8 +1,18 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 1.1.2 -->
+<!-- version: 1.1.1 -->
 <!-- guid: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d -->
 
 # Copilot Instructions
+
+## Directory Structure (2025 Update)
+
+The `copilot/` directory is now organized for clarity and maintainability:
+
+- `copilot/style-guides/` — All code style guides (e.g., `code-style-go.md`, `code-style-python.md`, etc.)
+- `copilot/instructions/` — All instructions and guidelines (e.g., `copilot-instructions.md`, `security-guidelines.md`)
+- `copilot/scripts/` — All scripts (e.g., `validate-setup.sh`)
+
+**Update all references and sync workflows to use these new paths.**
 
 ## File Identification
 
