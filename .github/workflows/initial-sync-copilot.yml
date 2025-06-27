@@ -37,12 +37,7 @@ jobs:
 
       - name: Remove old code-style and guide files from .github
         run: |
-          rm -f .github/code-style-*.md
-          rm -f .github/commit-messages.md
-          rm -f .github/pull-request-descriptions.md
-          rm -f .github/review-selection.md
-          rm -f .github/test-generation.md
-          rm -f .github/copilot-instructions.md.bak
+          find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -exec rm -f {} +
 
       - name: Copy copilot directory to .github/copilot
         run: |
