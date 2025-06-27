@@ -1,0 +1,42 @@
+# file: .github/workflows/sync-shared-files.yml
+# version: 1.0.0
+# guid: 7e2b1c4d-8f3a-4b2e-9c1d-2e3f4b5a6c7d
+
+name: Sync Shared Files from ghcommon
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-agents-md:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
+    with:
+      files: |
+        AGENTS.md
+      dest: .
+      branch: main
+
+  sync-copilot-instructions:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
+    with:
+      files: |
+        copilot/copilot-instructions.md
+      dest: .github
+      branch: main
+
+  sync-copilot-all:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
+    with:
+      files: |
+        copilot/**/*.md
+        copilot/**/*.sh
+        copilot/**/*.py
+        copilot/**/*.go
+        copilot/**/*.json
+        copilot/**/*.yml
+        copilot/**/*.yaml
+      dest: copilot
+      branch: main
