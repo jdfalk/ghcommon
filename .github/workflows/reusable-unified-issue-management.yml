@@ -25,6 +25,15 @@
 
 name: Reusable - Unified Issue Management
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+  checks: write
+  security-events: read
+  repository-projects: read
+
 on:
   workflow_call:
     inputs:
