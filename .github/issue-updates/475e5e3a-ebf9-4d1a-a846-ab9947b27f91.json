@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add pre-commit config",
+  "body": "Create .pre-commit-config.yaml with Ruff for Python and Prettier for JS/MD. Update README with installation instructions.",
+  "labels": ["codex"],
+  "guid": "c8e45203-8e68-4f4e-a653-9fc9dc7b9aec",
+  "legacy_guid": "create-add-pre-commit-config-2025-06-28"
+}

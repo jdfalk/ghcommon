@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Fix unified-issue-management docs",
+  "body": "Correct formatting issues in docs/unified-issue-management.md such as broken headings and missing words.",
+  "labels": ["codex"],
+  "guid": "58c8071f-84d9-4405-851b-5d0cfa698ad5",
+  "legacy_guid": "create-fix-unified-issue-management-docs-2025-06-28"
+}
