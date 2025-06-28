@@ -81,6 +81,15 @@ jobs:
           # Use GH_SYNC_TOKEN if set, otherwise fallback to GITHUB_TOKEN
           token: ${{ secrets.GH_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
 
+      - name: Check for Python tests
+        id: check-python-tests
+        run: |
+          if ls test/**/*.py 2>/dev/null | grep -q .; then
+            echo "has_python_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_python_tests=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -322,3 +331,9 @@ jobs:
 
           # Sign the attestation
           cosign attest --predicate release-attestation.json --type custom "${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}" --yes || echo "Attestation signing failed"
+
+      # Example of a conditional pytest/coverage step (add this where your Python test step is):
+      # - name: Run Python tests with coverage
+      #   if: steps.check-python-tests.outputs.has_python_tests == 'true'
+      #   run: |
+      #     python -m pytest test/ -v --cov=scripts
