@@ -83,9 +83,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
-      actions: read
-      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -155,9 +152,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
-      actions: read
-      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -189,9 +183,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
-      actions: read
-      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
