@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create TODO.md",
+  "body": "Add roadmap and planning document per AGENTS.md guidance.",
+  "labels": ["codex"],
+  "guid": "d01a1c2d-ef5f-4c21-8224-53954fef9774",
+  "legacy_guid": "create-create-todo-md-2025-06-28"
+}

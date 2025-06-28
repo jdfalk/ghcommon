@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add SECURITY.md",
+  "body": "README references SECURITY.md but file is missing. Add security policy.",
+  "labels": ["codex"],
+  "guid": "97ffe458-2971-41f9-9eb5-b52bae4463cb",
+  "legacy_guid": "create-add-security-md-2025-06-28"
+}
