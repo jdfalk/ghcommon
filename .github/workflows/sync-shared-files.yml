@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: "0 0,6,12,18 * * *"
 
+permissions:
+  contents: write
+
 jobs:
   sync-agents-md:
     uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
