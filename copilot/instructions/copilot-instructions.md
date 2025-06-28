@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 1.1.2 -->
+<!-- version: 1.1.3 -->
 <!-- guid: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d -->
 
 # Copilot Instructions
@@ -213,13 +213,20 @@ For additional detailed guidelines, refer to these comprehensive style and proce
 
 ### Code Style Guidelines
 
-- [Go Code Style](code-style-go.md)
-- [Python Code Style](code-style-python.md)
-- [TypeScript Code Style](code-style-typescript.md)
-- [JavaScript Code Style](code-style-javascript.md)
-- [Markdown Code Style](code-style-markdown.md)
-- [Protobuf Code Style](code-style-protobuf.md)
-- [GitHub Actions Code Style](code-style-github-actions.md)
+- [Go Code Style](../style-guides/code-style-go.md)
+  -  [Go Code Style - Additional](code-style-go.md)
+- [Python Code Style](../style-guides/code-style-python.md)
+  - [Python Code Style - Additional](code-style-python.md)
+- [TypeScript Code Style](../style-guides/code-style-typescript.md)
+  - [TypeScript Code Style - Additional](code-style-typescript.md)
+- [JavaScript Code Style](../style-guides/code-style-javascript.md)
+  - [JavaScript Code Style - Additional](code-style-javascript.md)
+- [Markdown Code Style](../style-guides/code-style-markdown.md)
+  - [Markdown Code Style - Additional](code-style-markdown.md)
+- [Protobuf Code Style](../style-guides/code-style-protobuf.md)
+  - [Protobuf Code Style - Additional](code-style-protobuf.md)
+- [GitHub Actions Code Style](../style-guides/code-style-github-actions.md)
+  - [GitHub Actions Code Style - Additional](code-style-github-actions.md)
 
 ### Development Process Guidelines
 
