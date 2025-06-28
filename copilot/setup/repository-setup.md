@@ -115,7 +115,7 @@ Ensure you have version files that the workflow can update:
 1.0.0
 ```
 
-****init**.py** (Python):
+\***\*init**.py\*\* (Python):
 
 ```python
 __version__ = "1.0.0"

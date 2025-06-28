@@ -362,3 +362,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 - Inconsistent file naming conventions
 
 This style guide ensures your Markdown documents are readable, accessible, and maintainable across different platforms and tools.
+```

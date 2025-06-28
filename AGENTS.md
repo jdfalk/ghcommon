@@ -1,6 +1,7 @@
 <!-- file: AGENTS.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: 2e7c1a4b-5d3f-4b8c-9e1f-7a6b2c3d4e5f -->
+
 # AGENTS.md
 
 ---
@@ -144,6 +145,7 @@
 
   ```markdown
   Files changed:
+
   - Added feature: [src/feature.js](src/feature.js)
   - Updated tests: [test/feature.test.js](test/feature.test.js)
   ```
@@ -162,16 +164,27 @@
 
   ```markdown
   ## Description
+
   [Concise overview of the changes]
+
   ## Motivation
+
   [Why these changes were necessary]
+
   ## Changes
+
   [Detailed list of changes made]
+
   ## Testing
+
   [How the changes were tested]
+
   ## Screenshots
+
   [If applicable]
+
   ## Related Issues
+
   [Links to related tickets/issues]
   ```
 

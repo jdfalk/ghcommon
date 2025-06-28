@@ -321,4 +321,3 @@ jobs:
 
           # Sign the attestation
           cosign attest --predicate release-attestation.json --type custom "${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}" --yes || echo "Attestation signing failed"
-
