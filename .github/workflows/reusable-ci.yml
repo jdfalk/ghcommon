@@ -47,16 +47,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  pull-requests: write
-  actions: read
-  checks: write
-
 jobs:
   changes:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
@@ -85,6 +81,11 @@ jobs:
     if: inputs.enable-backend-frontend == true && (needs.changes.outputs.backend == 'true' || github.event_name == 'push')
     needs: changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,6 +153,11 @@ jobs:
     if: inputs.enable-backend-frontend == true && (needs.changes.outputs.frontend == 'true' || github.event_name == 'push')
     needs: changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -181,6 +187,11 @@ jobs:
   universal-ci:
     if: inputs.enable-backend-frontend != true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -270,6 +281,8 @@ jobs:
   ci-complete:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [backend, frontend]
     steps:
       - name: Check workflow results
