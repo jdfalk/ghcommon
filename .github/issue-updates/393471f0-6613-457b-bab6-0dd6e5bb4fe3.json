@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add unit tests",
+  "body": "Introduce pytest-based tests for workflow scripts to ensure reliability.",
+  "labels": ["codex"],
+  "guid": "712b41ca-f128-4b7d-a8fa-f9495c3941cd",
+  "legacy_guid": "create-add-unit-tests-2025-06-28"
+}
