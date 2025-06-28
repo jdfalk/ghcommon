@@ -184,12 +184,18 @@ jobs:
           export ISSUE_UPDATES_FILE="${{ inputs.issue_updates_file }}"
           export ISSUE_UPDATES_DIRECTORY="${{ inputs.issue_updates_directory }}"
 
-          # Run the operation
-          python issue_manager.py ${{ matrix.operation }}
-
-          # Capture execution results for summary
-          echo "operation=${{ matrix.operation }}" >> "$GITHUB_OUTPUT"
-          echo "status=completed" >> "$GITHUB_OUTPUT"
+          # Run the operation and capture output and errors
+          set +e
+          python issue_manager.py ${{ matrix.operation }} > op_stdout.log 2> op_stderr.log
+          status=$?
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          cat op_stdout.log > op_output.log
+          cat op_stderr.log >> op_output.log
+          # Save output for later summary
+          echo "::set-output name=op_stdout::$(cat op_stdout.log | base64 -w 0)"
+          echo "::set-output name=op_stderr::$(cat op_stderr.log | base64 -w 0)"
+          echo "::set-output name=op_status::$status"
 
           # Check if any files were processed and moved
           if [[ -d "${{ inputs.issue_updates_directory }}/processed" ]]; then
@@ -361,10 +367,11 @@ jobs:
           fi
 
       - name: Generate detailed operation summary
+        if: always()
         run: |
           echo "## 🎯 Operation Summary: ${{ matrix.operation }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Status:** ✅ Completed successfully" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Status:** $([[ \"${{ steps.execute.outputs.op_status }}\" == \"0\" ]] && echo '✅ Completed successfully' || echo '❌ Failed')" >> "$GITHUB_STEP_SUMMARY"
           echo "**Event:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
@@ -373,63 +380,52 @@ jobs:
             echo "**Mode:** 🔍 Dry run (no changes made)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          case "${{ matrix.operation }}" in
-            "update-issues")
-              echo "**Details:** Processed issue updates from \`${{ inputs.issue_updates_file }}\` and \`${{ inputs.issue_updates_directory }}/\`" >> "$GITHUB_STEP_SUMMARY"
-
-              # Show files processed
-              if [[ "${{ steps.execute.outputs.processed_files_count }}" != "0" ]]; then
-                echo "**Files Processed:** ${{ steps.execute.outputs.processed_files_count }} files moved to archive" >> "$GITHUB_STEP_SUMMARY"
-              fi              # Show PR information
-              echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo "### 📋 Pull Requests Management" >> "$GITHUB_STEP_SUMMARY"
-
-              if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" != "" ]]; then
-                if [[ "${{ steps.check-prs.outputs.existing_processed_pr }}" != "" ]]; then
-                  echo "- 📦 **Updated existing distributed files PR:** [#${{ steps.processed-files-pr.outputs.pull-request-number }}](${{ steps.processed-files-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
-                else
-                  echo "- 📦 **Created new distributed files PR:** [#${{ steps.processed-files-pr.outputs.pull-request-number }}](${{ steps.processed-files-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
-                fi
-              fi
-
-              if [[ "${{ steps.legacy-file-pr.outputs.pull-request-number }}" != "" ]]; then
-                if [[ "${{ steps.check-prs.outputs.existing_legacy_pr }}" != "" ]]; then
-                  echo "- 🔗 **Updated existing legacy file PR:** [#${{ steps.legacy-file-pr.outputs.pull-request-number }}](${{ steps.legacy-file-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
-                else
-                  echo "- 🔗 **Created new legacy file PR:** [#${{ steps.legacy-file-pr.outputs.pull-request-number }}](${{ steps.legacy-file-pr.outputs.pull-request-url }})" >> "$GITHUB_STEP_SUMMARY"
-                fi
-              fi
-
-              if [[ "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
-                echo "- ℹ️  No pull requests created or updated (no file changes detected)" >> "$GITHUB_STEP_SUMMARY"
-              fi
-              ;;
-
-            "copilot-tickets")
-              echo "**Details:** Managed Copilot review comment tickets based on ${{ needs.determine-operations.outputs.event_name }} event" >> "$GITHUB_STEP_SUMMARY"
-              ;;
-
-            "close-duplicates")
-              echo "**Details:** Scanned for and closed duplicate issues by title" >> "$GITHUB_STEP_SUMMARY"
-              if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-                echo "**Note:** Dry run mode - no actual changes were made" >> "$GITHUB_STEP_SUMMARY"
-              fi
-              ;;
-
-            "codeql-alerts")
-              echo "**Details:** Generated tickets for open CodeQL security alerts without existing issues" >> "$GITHUB_STEP_SUMMARY"
-              ;;
-
-            "update-permalinks")
-              echo "**Details:** Updated permalink fields in processed issue files" >> "$GITHUB_STEP_SUMMARY"
-              ;;
-          esac
-
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### 📝 Operation Output (stdout)" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -f op_stdout.log ]]; then
+            echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+            cat op_stdout.log >> "$GITHUB_STEP_SUMMARY"
+            echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_No stdout output captured._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "### ⚠️ Operation Errors (stderr)" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -f op_stderr.log && -s op_stderr.log ]]; then
+            echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+            cat op_stderr.log >> "$GITHUB_STEP_SUMMARY"
+            echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_No errors captured._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
           echo "---" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
 
-          # Note: Detailed operation results are included above via the Python script's GitHub summary export
+          # Show detailed error information if available
+          if [[ "${{ steps.execute.outputs.op_status }}" != "0" ]]; then
+            echo "### ❌ Error Details" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "The operation \`${{ matrix.operation }}\` encountered an error during execution." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "#### Exit Status" >> "$GITHUB_STEP_SUMMARY"
+            echo "```${{ steps.execute.outputs.op_status }}```" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+
+            if [[ -f op_stdout.log ]]; then
+              echo "#### Standard Output (stdout)" >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+              cat op_stdout.log >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+            fi
+
+            if [[ -f op_stderr.log && -s op_stderr.log ]]; then
+              echo "#### Standard Error (stderr)" >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+              cat op_stderr.log >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
 
       - name: Set job outputs for summary aggregation
         id: set-outputs
