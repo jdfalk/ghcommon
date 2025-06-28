@@ -294,6 +294,21 @@ jobs:
             echo "⚠️ Unexpected workflow states - treating as success"
             exit 0
           fi
+      - name: Summarize Go/Python/JS/TS lint/test/build output
+        if: always()
+        run: |
+          for log in lint.log test.log build.log; do
+            if [[ -f "$log" ]]; then
+              echo "### Output for $log" >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+              cat "$log" >> "$GITHUB_STEP_SUMMARY"
+              echo '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          # If any failed, show error summary
+          if grep -q 'FAIL' lint.log 2>/dev/null || grep -q 'FAIL' test.log 2>/dev/null; then
+            echo '❌ Lint or test failures detected. See above for details.' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
 # --- Insert the full universal language steps for Go, Python, Node.js, etc. in each job as appropriate ---
 # (Omitted here for brevity, but use the steps from the previous universal-ci job for each language)
