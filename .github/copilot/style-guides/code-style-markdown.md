@@ -339,23 +339,24 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
-
-
 ## Common Mistakes to Avoid
 
 ### Formatting Issues
+
 - Inconsistent heading hierarchy
 - Missing blank lines around code blocks
 - Improper list indentation
 - Mixing ordered and unordered list styles
 
 ### Content Issues
+
 - Generic or unclear link text
 - Missing alt text for images
 - Overly long lines that hurt readability
 - Inconsistent tone or style
 
 ### Technical Issues
+
 - Broken internal/external links
 - Missing language specification in code blocks
 - Improperly escaped special characters
