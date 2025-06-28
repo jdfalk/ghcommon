@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add CODE_OF_CONDUCT.md",
+  "body": "Introduce Contributor Covenant CODE_OF_CONDUCT to outline community standards.",
+  "labels": ["codex"],
+  "guid": "d8124d58-663a-4e0a-920a-3ca063869d47",
+  "legacy_guid": "create-add-code-of-conduct-md-2025-06-28"
+}
