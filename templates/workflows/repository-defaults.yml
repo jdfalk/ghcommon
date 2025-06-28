@@ -1,0 +1,11 @@
+# file: templates/workflows/repository-defaults.yml
+# Template workflow to apply repository default settings using ghcommon
+
+name: Repository Defaults
+
+on:
+  workflow_dispatch:
+
+jobs:
+  defaults:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-repo-settings.yml@main
