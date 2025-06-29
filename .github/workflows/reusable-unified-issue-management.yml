@@ -25,15 +25,6 @@
 
 name: Reusable - Unified Issue Management
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  actions: read
-  checks: write
-  security-events: read
-  repository-projects: read
-
 on:
   workflow_call:
     inputs:
@@ -130,12 +121,6 @@ jobs:
       issues_updated: ${{ steps.set-outputs.outputs.issues_updated }}
       prs_created: ${{ steps.set-outputs.outputs.prs_created }}
       errors_encountered: ${{ steps.set-outputs.outputs.errors_encountered }}
-    permissions:
-      issues: write
-      contents: write
-      pull-requests: write
-      security-events: read
-      repository-projects: read
     strategy:
       matrix:
         operation: ${{ fromJson(needs.determine-operations.outputs.operations) }}
