@@ -8,9 +8,36 @@ A comprehensive, reusable GitHub Actions workflow for automated issue management
 
 The Unified Issue Management workflow provides centralized, automated issue management capabilities that can be shared across multiple repositories. It consolidates multiple issue management operations into a single, efficient workflow.
 
-## Fea### File Management
+## Workflow Architecture
 
-#### Distributed Files
+- **Canonical Workflow**: `jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main`
+- **Documentation**: This file (`docs/unified-issue-management.md`)
+- **Examples**: `/examples/workflows/issue-management-basic.yml` and `/examples/workflows/issue-management-advanced.yml`
+- **Legacy Workflow**: `reusable-issue-management.yml` (deprecated, use unified version)
+
+**Important**: Always use the `reusable-unified-issue-management.yml` workflow, which is the canonical implementation with full feature support.
+
+## Core Operations
+
+- **Issue Updates**: Process issue updates from JSON files (create, update, comment, close, delete)
+- **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
+- **Duplicate Management**: Automatically close duplicate issues by title
+- **Security Alerts**: Generate tickets for CodeQL security alerts
+- **Permalink Updates**: Update processed issue files with GitHub issue URLs
+
+### Key Features
+
+- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both UUID and legacy GUID identifiers
+- **Matrix-based Parallel Execution**: Run multiple operations efficiently
+- **Auto-detection**: Automatically determine which operations to run based on context
+- **Distributed File Support**: Process both legacy single-file and modern distributed formats
+- **Comprehensive Logging**: Detailed summaries and progress tracking
+- **Flexible Configuration**: Extensive customization options
+- **Automatic Archiving**: Processed files are moved to archive directories with PR tracking
+
+## File Management
+
+### Distributed Files
 
 - **Original files**: `.github/issue-updates/*.json`
 - **Processed files**: `.github/issue-updates/processed/*.json`
@@ -45,7 +72,7 @@ When distributed files are processed, they are automatically moved to the `proce
 }
 ```
 
-#### Legacy Files
+### Legacy Files
 
 - **Original file**: `issue_updates.json`
 - **Updated file**: Contains permalinks to created issues
@@ -69,10 +96,20 @@ When distributed files are processed, they are automatically moved to the `proce
 
 ### Basic Setup
 
-1. **Copy the basic example** to `.github/workflows/reusable-issue-management.yml` in your repository:
+1. **Copy the basic example** to `.github/workflows/issue-management.yml` in your repository:
 
 ```yaml
 name: Issue Management
+
+# Required permissions for the reusable workflow
+permissions:
+  contents: write # For creating commits and PRs
+  issues: write # For creating and updating issues
+  pull-requests: write # For creating PRs
+  security-events: read # For reading CodeQL alerts (optional)
+  repository-projects: read # For accessing project data (optional)
+  actions: read # For workflow access
+  checks: write # For workflow status
 
 on:
   push:
@@ -379,13 +416,11 @@ These are automatically inherited when using `secrets: inherit`.
 ### Common Issues
 
 1. **"No operations were required"**
-
    - Check that your trigger events match your use case
    - Verify the `issue_updates.json` file exists and is valid JSON
    - Consider using explicit operations instead of "auto"
 
 2. **"Permission denied" errors**
-
    - Ensure `secrets: inherit` is included in your workflow
    - Check that the GitHub token has required permissions
    - Verify the repository settings allow Actions to write to issues

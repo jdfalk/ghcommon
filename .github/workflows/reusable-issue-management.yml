@@ -1,5 +1,25 @@
 # file: .github/workflows/reusable-issue-management.yml
-name: "Reusable - Issue Management"
+#
+# ⚠️  DEPRECATED: This workflow is deprecated in favor of reusable-unified-issue-management.yml
+#
+# Please migrate to the unified workflow which provides:
+# - Enhanced feature set with matrix-based parallel execution
+# - Support for distributed JSON files and dual-GUID format
+# - Comprehensive operations (copilot tickets, duplicates, CodeQL alerts)
+# - Better error handling and PR creation
+# - Full documentation in docs/unified-issue-management.md
+#
+# Migration path:
+# 1. Replace workflow call from:
+#    uses: jdfalk/ghcommon/.github/workflows/reusable-issue-management.yml@main
+# 2. To:
+#    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
+# 3. Update permissions as documented in docs/unified-issue-management.md
+# 4. See examples/workflows/ for migration templates
+#
+# This file will be removed in a future version.
+#
+name: "Reusable - Issue Management (DEPRECATED)"
 
 on:
   workflow_call:

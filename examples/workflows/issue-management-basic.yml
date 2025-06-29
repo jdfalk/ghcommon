@@ -9,6 +9,16 @@
 
 name: Issue Management
 
+# Required permissions for the reusable workflow
+permissions:
+  contents: write # For creating commits and PRs
+  issues: write # For creating and updating issues
+  pull-requests: write # For creating PRs
+  security-events: read # For reading CodeQL alerts (optional)
+  repository-projects: read # For accessing project data (optional)
+  actions: read # For workflow access
+  checks: write # For workflow status
+
 on:
   # Trigger on issue updates file changes
   push:
