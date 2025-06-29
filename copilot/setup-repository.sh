@@ -1,5 +1,7 @@
 #!/bin/bash
-# file: copilot/scripts/setup-repository.sh
+# file: copilot/setup-repository.sh
+# version: 1.0.0
+# guid: 2e8f7a1b-4c9d-5e2f-8a1b-7e4c2e8f7a1b
 
 # Repository Setup Script
 # This script helps automate the setup of a repository to use the reusable workflows
@@ -311,7 +313,7 @@ show_next_steps() {
     echo "  5. Start using conventional commit messages"
     echo
     log_info "For detailed setup instructions, see:"
-    echo "  https://github.com/jdfalk/ghcommon/blob/main/copilot/setup/repository-setup.md"
+    echo "  https://github.com/jdfalk/ghcommon/blob/main/copilot/repository-setup.md"
 }
 
 # Main function

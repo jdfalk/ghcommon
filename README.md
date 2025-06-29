@@ -9,19 +9,19 @@ Choose the setup that matches your project type:
 ### For Complete CI/CD Pipeline
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s complete
+curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/setup-repository.sh | bash -s complete
 ```
 
 ### For Container-Only Projects
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s container
+curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/setup-repository.sh | bash -s container
 ```
 
 ### For Library/Package Projects
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/setup-repository.sh | bash -s library
+curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/setup-repository.sh | bash -s library
 ```
 
 ## 📋 What's Included
@@ -204,7 +204,7 @@ chmod +x scripts/create-issue-update.sh
 
 ### Setup Guides
 
-- [Repository Setup Guide](copilot/setup/repository-setup.md) - Complete setup instructions
+- [Repository Setup Guide](copilot/repository-setup.md) - Complete setup instructions
 - [Security Guidelines](copilot/security-guidelines.md) - Security best practices
 - [Workflow Usage](copilot/workflow-usage.md) - Detailed workflow documentation
 
@@ -219,7 +219,7 @@ chmod +x scripts/create-issue-update.sh
 Validate your repository setup:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/validate-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/validate-setup.sh | bash
 ```
 
 This will check:

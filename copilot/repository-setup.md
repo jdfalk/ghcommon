@@ -1,4 +1,6 @@
-<!-- file: copilot/setup/repository-setup.md -->
+<!-- file: copilot/repository-setup.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 4e1f7b2c-8d5e-9f4e-1f7b-2c8d4e1f7b2c -->
 <!-- version: 1.0.0 -->
 <!-- guid: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f -->
 
