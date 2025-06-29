@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add Dependabot config",
+  "body": "Enable automated dependency updates for GitHub Actions, npm, and Python.",
+  "labels": ["codex"],
+  "guid": "523239a6-97ef-4dcb-939a-02dff33393db",
+  "legacy_guid": "create-add-dependabot-config-2025-06-29"
+}
