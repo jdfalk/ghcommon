@@ -16,32 +16,7 @@ permissions:
   contents: write
 
 jobs:
-  sync-agents-md:
+  sync-shared-files:
     uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
     with:
-      files: |
-        AGENTS.md
-      dest: .
-      branch: main
-
-  sync-copilot-instructions:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
-    with:
-      files: |
-        copilot/copilot-instructions.md
-      dest: .github
-      branch: main
-
-  sync-copilot-all:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
-    with:
-      files: |
-        copilot/**/*.md
-        copilot/**/*.sh
-        copilot/**/*.py
-        copilot/**/*.go
-        copilot/**/*.json
-        copilot/**/*.yml
-        copilot/**/*.yaml
-      dest: copilot
       branch: main

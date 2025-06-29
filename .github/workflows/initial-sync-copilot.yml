@@ -1,9 +1,8 @@
 # Copilot Directory Sync Workflow
 #
-# This workflow performs an initial sync of the entire `copilot` directory from the source repository (e.g., `ghcommon`) into the target repository's `.github/copilot/` directory. The `copilot-instructions.md` file is placed directly in `.github/` to provide entry-point documentation and reference the synced files.
+# This workflow performs an initial sync of the entire `copilot` directory from the source repository (e.g., `ghcommon`) into the target repository's `.github/` directory. All copilot files are placed directly in `.github/` for easy reference and to avoid path confusion.
 #
-# - All files and subdirectories from the source `copilot/` are copied to `.github/copilot/`.
-# - `.github/copilot-instructions.md` is copied to `.github/copilot-instructions.md`.
+# - All files from the source `copilot/` are copied directly to `.github/`.
 # - The workflow only commits if there are changes.
 # - This workflow is intended for initial setup and can be re-run to update files as needed.
 #
@@ -35,27 +34,23 @@ jobs:
           ref: main
           path: ghcommon-source
 
-      - name: Remove old code-style and guide files from .github
+      - name: Remove old copilot files from .github
         run: |
-          echo "Markdown files in .github before deletion:" && \
-          find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -print
-          find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -exec rm -f {} +
-          echo "Markdown files in .github after deletion:" && \
-          find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' -print
-          REMAINING=$(find .github -maxdepth 1 -type f -name '*.md' ! -name 'copilot-instructions.md' | wc -l)
-          if [ "$REMAINING" -ne 0 ]; then
-            echo "ERROR: Some markdown files were not deleted!" >&2
-            exit 1
-          fi
+          echo "Removing old copilot-related files from .github..."
+          rm -f .github/code-style-*.md
+          rm -f .github/commit-messages.md
+          rm -f .github/pull-request-descriptions.md
+          rm -f .github/review-selection.md
+          rm -f .github/test-generation.md
+          rm -f .github/security-guidelines.md
+          rm -f .github/workflow-usage.md
+          rm -f .github/copilot-instructions.md
+          rm -rf .github/copilot/
 
-      - name: Copy copilot directory to .github/copilot
+      - name: Copy all copilot files to .github
         run: |
-          mkdir -p .github/copilot
-          rsync -av --delete --exclude 'copilot-instructions.md' ghcommon-source/copilot/ .github/copilot/
-
-      - name: Copy copilot-instructions.md to .github/
-        run: |
-          cp ghcommon-source/.github/copilot-instructions.md .github/copilot-instructions.md
+          echo "Copying all copilot files to .github..."
+          cp ghcommon-source/copilot/* .github/
 
       - name: Copy AGENTS.md to repo root
         run: |
@@ -66,5 +61,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git diff --cached --quiet || git commit -m "chore: initial sync of copilot directory and instructions"
+          git diff --cached --quiet ||          git commit -m "chore: initial sync of copilot files to .github directory"
           git push
