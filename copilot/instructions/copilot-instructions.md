@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 1.1.3 -->
+<!-- version: 1.1.4 -->
 <!-- guid: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d -->
 
 # Copilot Instructions
@@ -44,6 +44,14 @@
 - **README.md**: Repository introduction, setup instructions, basic usage, and immediate critical information new users need. Include major breaking changes at the top temporarily for visibility.
 - **TODO.md**: Project roadmap, planning, implementation status, architectural decisions, reasoning behind choices, diagrams, and detailed technical plans.
 - **CHANGELOG.md**: All version information, release notes, major breaking changes, feature additions, bug fixes, and consolidated technical documentation that would otherwise be scattered across multiple files.
+
+### Task Completion Documentation
+
+- **Do NOT create separate summary documents** (e.g., `TASK_SUMMARY.md`, `MIGRATION_SUMMARY.md`, etc.)
+- **Always add task completion summaries to CHANGELOG.md** under the appropriate version or "Unreleased" section
+- Include technical details, changes made, files modified, and impact in the CHANGELOG entry
+- Use proper markdown formatting with appropriate headings and bullet points
+- Reference specific files and line numbers when relevant to the changes
 
 ## Go Code Style (Primary Language)
 
@@ -214,7 +222,7 @@ For additional detailed guidelines, refer to these comprehensive style and proce
 ### Code Style Guidelines
 
 - [Go Code Style](../style-guides/code-style-go.md)
-  -  [Go Code Style - Additional](code-style-go.md)
+  - [Go Code Style - Additional](code-style-go.md)
 - [Python Code Style](../style-guides/code-style-python.md)
   - [Python Code Style - Additional](code-style-python.md)
 - [TypeScript Code Style](../style-guides/code-style-typescript.md)
