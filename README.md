@@ -205,8 +205,8 @@ chmod +x scripts/create-issue-update.sh
 ### Setup Guides
 
 - [Repository Setup Guide](copilot/setup/repository-setup.md) - Complete setup instructions
-- [Security Guidelines](copilot/instructions/security-guidelines.md) - Security best practices
-- [Workflow Usage](copilot/instructions/workflow-usage.md) - Detailed workflow documentation
+- [Security Guidelines](copilot/security-guidelines.md) - Security best practices
+- [Workflow Usage](copilot/workflow-usage.md) - Detailed workflow documentation
 
 ### Templates
 

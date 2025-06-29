@@ -82,7 +82,7 @@ This project adheres to a code of conduct that we expect all contributors to fol
 
 #### Security First
 
-- Always follow the security guidelines in `/copilot/instructions/security-guidelines.md`
+- Always follow the security guidelines in `/copilot/security-guidelines.md`
 - Use least privilege permissions
 - Validate all inputs
 - Pin action versions to specific commits or tags

@@ -32,25 +32,28 @@ This file is deprecated and will be removed in a future version. It has been mar
 If you're currently using the legacy workflow:
 
 1. **Replace the workflow call** in your repository from:
+
    ```yaml
    uses: jdfalk/ghcommon/.github/workflows/reusable-issue-management.yml@main
    ```
-   
+
 2. **To the unified workflow**:
+
    ```yaml
    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
    ```
 
 3. **Add required permissions** to your calling workflow:
+
    ```yaml
    permissions:
-     contents: write        # For creating commits and PRs
-     issues: write          # For creating and updating issues
-     pull-requests: write   # For creating PRs
-     security-events: read  # For reading CodeQL alerts (optional)
+     contents: write # For creating commits and PRs
+     issues: write # For creating and updating issues
+     pull-requests: write # For creating PRs
+     security-events: read # For reading CodeQL alerts (optional)
      repository-projects: read # For accessing project data (optional)
-     actions: read          # For workflow access
-     checks: write          # For workflow status
+     actions: read # For workflow access
+     checks: write # For workflow status
    ```
 
 4. **Update input parameters** if needed (the unified workflow has more options)
