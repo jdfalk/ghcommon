@@ -47,6 +47,9 @@ jobs:
           echo "Copying all copilot files to .github..."
           cp ghcommon-tmp/copilot/* .github/
 
+          # Make shell scripts executable
+          chmod +x .github/*.sh
+
           echo "Copying AGENTS.md to repo root..."
           cp ghcommon-tmp/codex/AGENTS.md ./AGENTS.md
 
