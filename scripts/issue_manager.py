@@ -1536,7 +1536,13 @@ class IssueUpdateProcessor:
             print(f"⚠️  Failed to add permalink metadata to {file_path}: {e}")
 
     def _delete_issue(self, update: Dict[str, Any]) -> bool:
-        """Delete an issue (requires GraphQL API)."""
+        """
+        Delete an issue (requires GraphQL API and admin permissions).
+
+        Note: Issue deletion requires admin permissions on the repository.
+        For most GitHub tokens, this will fall back to closing the issue instead.
+        Only repository owners or users with admin collaborator permissions can delete issues.
+        """
         issue_number = update.get("number")
 
         if not issue_number:
@@ -1555,17 +1561,33 @@ class IssueUpdateProcessor:
         except Exception:
             title = f"Issue {issue_number}"
 
+        print(f"🎯 Processing delete request for issue #{issue_number}: {title}")
+        print(
+            "   Note: Issue deletion requires admin permissions. Will fallback to closing if needed."
+        )
+
         # Get node_id for GraphQL deletion
         try:
+            print(f"🔍 Getting node_id for issue #{issue_number}...")
             url = f"https://api.github.com/repos/{self.api.repo}/issues/{issue_number}"
             response = requests.get(url, headers=self.api.headers, timeout=10)
             response.raise_for_status()
-            node_id = response.json()["node_id"]
+            issue_data = response.json()
+            node_id = issue_data["node_id"]
+            print(f"📋 Found node_id: {node_id}")
+
+            # Check if issue is already closed/locked (might affect deletion)
+            issue_state = issue_data.get("state", "unknown")
+            issue_locked = issue_data.get("locked", False)
+            print(f"📋 Issue state: {issue_state}, locked: {issue_locked}")
 
             # Use GraphQL to delete
+            print(f"🗑️  Attempting to delete issue #{issue_number} via GraphQL...")
             mutation = {
                 "query": f'mutation{{deleteIssue(input:{{issueId:"{node_id}"}}){{clientMutationId}}}}'
             }
+
+            print(f"📤 GraphQL mutation: {mutation}")
 
             response = requests.post(
                 "https://api.github.com/graphql",
@@ -1574,20 +1596,110 @@ class IssueUpdateProcessor:
                 timeout=10,
             )
 
+            print(f"📥 HTTP status code: {response.status_code}")
+
             if response.status_code == 200:
-                print(f"Deleted issue #{issue_number}")
-                self.summary.add_issue_deleted(issue_number, title)
-                return True
+                # Parse the GraphQL response to check for errors
+                result = response.json()
+                print(f"📥 GraphQL response: {result}")
+
+                # Check for GraphQL errors
+                if "errors" in result:
+                    error_details = result["errors"]
+                    print(f"❌ GraphQL errors: {error_details}", file=sys.stderr)
+
+                    # Check for specific error types
+                    for error in error_details:
+                        error_message = str(error).lower()
+                        if (
+                            "permission" in error_message
+                            or "forbidden" in error_message
+                            or "unauthorized" in error_message
+                        ):
+                            print(
+                                f"⚠️  Permission denied to delete issue #{issue_number}. This is normal for most GitHub tokens."
+                            )
+                            print(
+                                "   Issues can usually only be deleted by repository owners with admin permissions."
+                            )
+                            print("   Falling back to closing the issue instead...")
+                            return self._close_issue_as_fallback(update, title)
+                        elif "not found" in error_message:
+                            print(
+                                f"⚠️  Issue #{issue_number} not found - it may have already been deleted or doesn't exist."
+                            )
+                            return True  # Consider this a success since the goal (issue removal) is achieved
+
+                    error_msg = f"GraphQL errors deleting issue #{issue_number}: {error_details}"
+                    self.summary.add_error(error_msg)
+                    return False
+
+                # Check if the mutation was successful
+                if (
+                    "data" in result
+                    and result["data"]
+                    and "deleteIssue" in result["data"]
+                ):
+                    print(f"✅ Successfully deleted issue #{issue_number}: {title}")
+                    self.summary.add_issue_deleted(issue_number, title)
+                    return True
+                else:
+                    error_msg = f"Unexpected GraphQL response deleting issue #{issue_number}: {result}"
+                    print(error_msg, file=sys.stderr)
+                    self.summary.add_error(error_msg)
+                    return False
             else:
-                error_msg = (
-                    f"Failed to delete issue #{issue_number}: {response.status_code}"
-                )
+                print(f"📥 HTTP response: {response.status_code} - {response.text}")
+
+                # Check if it's a permission error - if so, fallback to closing
+                if response.status_code in [401, 403]:
+                    print(
+                        f"⚠️  HTTP {response.status_code} - Insufficient permissions to delete issue #{issue_number}."
+                    )
+                    print(
+                        "   This usually means the token doesn't have admin rights to delete issues."
+                    )
+                    print("   Falling back to closing the issue instead...")
+                    return self._close_issue_as_fallback(update, title)
+                elif response.status_code == 404:
+                    print(
+                        f"⚠️  Issue #{issue_number} not found (HTTP 404) - it may have already been deleted."
+                    )
+                    return True  # Consider this a success since the goal is achieved
+
+                error_msg = f"HTTP error deleting issue #{issue_number}: {response.status_code} - {response.text}"
                 print(error_msg, file=sys.stderr)
                 self.summary.add_error(error_msg)
                 return False
 
         except requests.RequestException as e:
             error_msg = f"Error deleting issue #{issue_number}: {e}"
+            print(error_msg, file=sys.stderr)
+            self.summary.add_error(error_msg)
+            return False
+
+    def _close_issue_as_fallback(self, update: Dict[str, Any], title: str) -> bool:
+        """Close an issue as a fallback when deletion is not permitted."""
+        issue_number = update.get("number")
+        if not issue_number:
+            return False
+
+        try:
+            if self.api.close_issue(issue_number, "not_planned"):
+                issue_url = f"https://github.com/{self.api.repo}/issues/{issue_number}"
+                print(
+                    f"✅ Successfully closed issue #{issue_number} as fallback: {title}"
+                )
+                # Add to summary as closed rather than deleted
+                self.summary.add_issue_closed(issue_number, title, issue_url)
+                return True
+            else:
+                error_msg = f"Failed to close issue #{issue_number} as fallback"
+                print(error_msg, file=sys.stderr)
+                self.summary.add_error(error_msg)
+                return False
+        except Exception as e:
+            error_msg = f"Error closing issue #{issue_number} as fallback: {e}"
             print(error_msg, file=sys.stderr)
             self.summary.add_error(error_msg)
             return False
@@ -2026,6 +2138,7 @@ def main():
         epilog="""
 Examples:
   python issue_manager.py update-issues
+  python issue_manager.py process-distributed  # Same as update-issues
   python issue_manager.py copilot-tickets
   python issue_manager.py close-duplicates --dry-run
   python issue_manager.py codeql-alerts
@@ -2038,13 +2151,14 @@ Examples:
         "command",
         choices=[
             "update-issues",
+            "process-distributed",  # Alias for update-issues
             "copilot-tickets",
             "close-duplicates",
             "codeql-alerts",
             "update-permalinks",
             "event-handler",
         ],
-        help="Command to execute",
+        help="Command to execute (process-distributed is an alias for update-issues)",
     )
     parser.add_argument(
         "--dry-run",
@@ -2071,7 +2185,7 @@ Examples:
 
     # Execute the requested command
     try:
-        if args.command == "update-issues":
+        if args.command == "update-issues" or args.command == "process-distributed":
             processor = IssueUpdateProcessor(github_api)
 
             # Get file and directory paths from environment or use defaults
