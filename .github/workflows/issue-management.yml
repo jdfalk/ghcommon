@@ -1,0 +1,67 @@
+# file: .github/workflows/issue-management.yml
+#
+# Issue Management Workflow (calls ghcommon reusable workflow)
+#
+# This workflow delegates all issue management to the unified reusable workflow in ghcommon.
+#
+# Usage: Triggers on workflow_dispatch or manually as needed.
+
+name: Issue Management (Unified)
+
+# Permissions required by the reusable workflow
+permissions:
+  contents: write # For creating commits and PRs
+  issues: write # For creating and updating issues
+  pull-requests: write # For creating PRs
+  security-events: read # For reading CodeQL alerts
+  repository-projects: read # For accessing project data
+  actions: read # For workflow access
+  checks: write # For workflow status
+
+on:
+  workflow_dispatch:
+    inputs:
+      operations:
+        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, or 'auto'). Example: 'update-issues,copilot-tickets'"
+        required: false
+        default: "auto"
+      dry_run:
+        description: "Run in dry-run mode (no changes)"
+        required: false
+        type: boolean
+        default: false
+      force_update:
+        description: "Force update existing tickets"
+        required: false
+        type: boolean
+        default: false
+      issue_updates_file:
+        description: "Path to issue updates JSON file"
+        required: false
+        default: "issue_updates.json"
+      issue_updates_directory:
+        description: "Path to directory containing individual issue update files"
+        required: false
+        default: ".github/issue-updates"
+      cleanup_issue_updates:
+        description: "Whether to clean up the issue updates file after processing"
+        required: false
+        type: boolean
+        default: true
+      python_version:
+        description: "Python version to use"
+        required: false
+        default: "3.11"
+
+jobs:
+  issue-management:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
+    with:
+      operations: ${{ inputs.operations }}
+      dry_run: ${{ inputs.dry_run }}
+      force_update: ${{ inputs.force_update }}
+      issue_updates_file: ${{ inputs.issue_updates_file }}
+      issue_updates_directory: ${{ inputs.issue_updates_directory }}
+      cleanup_issue_updates: ${{ inputs.cleanup_issue_updates }}
+      python_version: ${{ inputs.python_version }}
+    secrets: inherit
