@@ -1,5 +1,7 @@
 #!/bin/bash
-# file: copilot/scripts/update-copilot-instructions.sh
+# file: copilot/update-copilot-instructions.sh
+# version: 1.0.0
+# guid: 3f9e8a2c-5d0e-6f3f-9a2c-8f5d3f9e8a2c
 
 # Update Copilot Instructions
 # This script updates the repository's Copilot instructions based on the common workflows
@@ -108,7 +110,7 @@ Use conventional commit format for automatic versioning:
 
 Validate your setup with:
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/scripts/validate-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/copilot/validate-setup.sh | bash
 ```
 
 For more information, see: https://github.com/jdfalk/ghcommon
