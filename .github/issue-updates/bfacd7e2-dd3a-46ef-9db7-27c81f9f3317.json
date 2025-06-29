@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add issue and PR templates",
+  "body": "Create standardized bug report and feature request templates plus a pull request template.",
+  "labels": ["codex"],
+  "guid": "49a6c438-86fe-4d5d-bd18-9c0302383029",
+  "legacy_guid": "create-add-issue-and-pr-templates-2025-06-29"
+}

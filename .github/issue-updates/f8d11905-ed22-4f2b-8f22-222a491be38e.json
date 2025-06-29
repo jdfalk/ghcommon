@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add dev container",
+  "body": "Provide Dockerfile and devcontainer.json so contributors can develop in a consistent environment.",
+  "labels": ["codex"],
+  "guid": "62c740a6-a83c-43f2-b9a9-7f1579038ada",
+  "legacy_guid": "create-add-dev-container-2025-06-29"
+}
