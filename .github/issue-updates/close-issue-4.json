@@ -1,0 +1,8 @@
+{
+  "action": "close", 
+  "number": 4,
+  "state_reason": "completed",
+  "body": "Duplicate detection has been comprehensively implemented:\n\n✅ Dual-GUID system (UUID + legacy GUID)\n✅ Title-based duplicate detection in DuplicateIssueManager\n✅ GUID uniqueness validation before creating issues\n✅ Smart migration script for GUID management\n✅ GitHub API integration to check existing issues\n\nClosing as completed.",
+  "guid": "e4f5a6b7-c8d9-0e1f-2a3b-4c5d6e7f8a9b",
+  "legacy_guid": "close-issue-4-2024-06-23"
+}
