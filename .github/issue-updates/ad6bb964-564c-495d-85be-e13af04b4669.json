@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement machine learning-powered workflow optimization",
+  "body": "Add AI/ML capabilities for intelligent workflow optimization and prediction.\n\nTasks:\n- Implement workflow pattern recognition\n- Add predictive failure detection\n- Create auto-optimization suggestions\n- Add anomaly detection for workflows\n- Implement intelligent resource allocation\n- Create ML-based workflow recommendations\n\nGoal: Use AI to automatically improve workflow efficiency and reliability.",
+  "labels": ["machine-learning", "ai", "optimization"],
+  "guid": "ad6bb964-564c-495d-85be-e13af04b4669",
+  "legacy_guid": "create-implement-machine-learning-powered-workflow-optimization-2025-06-30"
+}

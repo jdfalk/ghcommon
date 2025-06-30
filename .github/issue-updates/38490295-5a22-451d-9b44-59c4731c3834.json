@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add performance benchmarking suite",
+  "body": "Create comprehensive performance benchmarking tools for workflows and scripts.\n\nTasks:\n- Add benchmark tests for Python scripts\n- Create workflow execution time metrics\n- Implement performance regression detection\n- Add memory usage monitoring\n- Create performance reporting dashboard\n\nGoal: Track and improve system performance over time.",
+  "labels": ["performance", "testing", "benchmarking"],
+  "guid": "38490295-5a22-451d-9b44-59c4731c3834",
+  "legacy_guid": "create-add-performance-benchmarking-suite-2025-06-30"
+}

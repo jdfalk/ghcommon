@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement comprehensive compliance and audit framework",
+  "body": "Add enterprise-grade compliance features and audit trails.\n\nTasks:\n- Add GDPR compliance features\n- Implement SOX audit trails\n- Create compliance reporting dashboard\n- Add data retention policies\n- Implement access control auditing\n- Create compliance documentation\n\nGoal: Meet enterprise compliance requirements for regulated industries.",
+  "labels": ["compliance", "audit", "enterprise", "security"],
+  "guid": "4cab79b4-4111-4742-a745-f42108d814c9",
+  "legacy_guid": "create-implement-comprehensive-compliance-and-audit-framework-2025-06-30"
+}
