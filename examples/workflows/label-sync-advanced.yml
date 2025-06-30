@@ -1,0 +1,82 @@
+# file: examples/workflows/label-sync-advanced.yml
+# Advanced example with multiple repositories and custom configuration
+
+name: Advanced Label Synchronization
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Perform a dry run"
+        required: false
+        default: false
+        type: boolean
+      target-repos:
+        description: "Override default repository list"
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths: 
+      - 'labels.json'
+      - 'repo-list.txt'
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: "0 2 * * 0"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  sync-labels:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
+    with:
+      # Use local labels configuration
+      config-file: "labels.json"
+      # Use input override or default to repo list file
+      repositories: ${{ inputs.target-repos }}
+      repositories-file: "repo-list.txt"
+      # Clean up extra labels for consistency
+      delete-extra-labels: true
+      # Use dry-run input
+      dry-run: ${{ inputs.dry-run || false }}
+    secrets: inherit
+
+  notify-on-changes:
+    needs: sync-labels
+    if: always() && !inputs.dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download sync results
+        uses: actions/download-artifact@v4
+        with:
+          name: label-sync-results
+          path: ./results
+
+      - name: Create summary issue
+        if: github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Label Sync Summary - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Automated Label Synchronization Summary
+            
+            This is an automated summary of the weekly label synchronization run.
+            
+            **Workflow Run**: [${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            **Triggered**: ${context.eventName}
+            **Date**: ${new Date().toISOString()}
+            
+            Please check the workflow logs for detailed results.
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automated', 'label-sync']
+            });

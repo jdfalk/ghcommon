@@ -86,6 +86,15 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - **Distributed file processing** with automatic archival
 - **Conflict-free parallel development** using GUID-based updates
 
+### Label Synchronization
+
+- **Centralized label management** across multiple repositories
+- **Standard label configuration** with consistent colors and descriptions
+- **Automated sync scheduling** with customizable frequency
+- **Safe mode** (no deletions) and cleanup mode support
+- **Dry-run testing** before applying changes
+- **Batch repository processing** from configuration files
+
 ## 📖 Usage Examples
 
 ### Basic Semantic Versioning
@@ -149,6 +158,27 @@ jobs:
       issue_updates_directory: ".github/issue-updates"
       cleanup_issue_updates: true
     secrets: inherit
+```
+
+### Label Synchronization Workflow
+
+```yaml
+name: Sync Labels from ghcommon
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 1 * *" # Monthly on 1st at 3 AM UTC
+
+jobs:
+  sync-labels:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
+    with:
+      repositories: ${{ github.repository }}
+      source-repo: "jdfalk/ghcommon"
+      delete-extra-labels: false # Safe mode
+    secrets: inherit
+```
 ```
 
 **Features**:

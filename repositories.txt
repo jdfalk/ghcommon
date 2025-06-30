@@ -1,0 +1,10 @@
+# Repository list for label synchronization
+# Add repositories in owner/name format (one per line)
+# Lines starting with # are comments and will be ignored
+
+# Example repositories (uncomment and modify as needed):
+# jdfalk/subtitle-manager
+# jdfalk/ghcommon
+
+# Add your repositories here:
+jdfalk/ghcommon
