@@ -8,6 +8,7 @@
 # Features:
 # - Process issue updates from both legacy and distributed JSON formats
 # - Support dual-GUID format for enhanced duplicate prevention
+# - Support for sub-issues with automatic parent linking and labeling
 # - Manage Copilot review comment tickets
 # - Close duplicate issues by title
 # - Generate tickets for CodeQL security alerts
