@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Workflow test - trigger issue management processing",
+  "body": "This issue is created to test and trigger the unified issue management workflow.\n\nOnce this workflow runs successfully, it should process all 42+ pending issue update files in the `.github/issue-updates/` directory.",
+  "labels": ["test", "automation", "workflow"],
+  "guid": "test-workflow-trigger-2025-06-30",
+  "legacy_guid": "test-workflow-trigger-001"
+}
