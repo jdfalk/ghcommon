@@ -30,12 +30,14 @@ ghcommon/
 #### 1. Reusable Workflows (`.github/workflows/`)
 
 **Strengths:**
+
 - Comprehensive coverage: CI/CD, versioning, Docker builds, releases
 - Well-documented with extensive inline comments
 - Support for multiple languages (Go, Python, Node.js, etc.)
 - Modular design with workflow composition
 
 **Issues Identified:**
+
 - Duplicate copilot files exist in both `/copilot` and `/.github`
 - Deprecated workflow (`reusable-issue-management.yml`) still present
 - Some workflows have excessive complexity that could be modularized
@@ -44,12 +46,14 @@ ghcommon/
 #### 2. Issue Management System
 
 **Architecture:**
+
 - Python-based `issue_manager.py` (963 lines) handling multiple operations
 - Support for both legacy and distributed JSON formats
 - GUID-based duplicate prevention
 - Matrix-based parallel execution in workflows
 
 **Issues:**
+
 - Complex state management across multiple operations
 - Limited error recovery mechanisms
 - No comprehensive test coverage
@@ -59,12 +63,14 @@ ghcommon/
 #### 3. Scripts Directory
 
 **Components:**
+
 - `issue_manager.py` - Core issue management
 - `create-issue-update.sh` - Helper for creating issue files
 - `copilot-firewall/` - Python tool for managing firewall allowlists
 - Various utility scripts for workflow operations
 
 **Issues:**
+
 - Inconsistent error handling across scripts
 - Limited validation of inputs
 - No unified logging framework
@@ -74,11 +80,13 @@ ghcommon/
 #### 4. Documentation
 
 **Current State:**
+
 - Extensive documentation in multiple locations
 - Good examples and migration guides
 - Comprehensive style guides
 
 **Issues:**
+
 - Some documentation is duplicated (copilot files)
 - Missing TODO.md file
 - Documentation scattered across multiple directories
@@ -90,18 +98,21 @@ ghcommon/
 ### Phase 1: Infrastructure Cleanup (Week 1)
 
 #### 1.1 Resolve File Duplication
+
 - Remove duplicate copilot files from `.github/`
 - Establish single source of truth in `/copilot`
 - Update sync workflows to handle this correctly
 - Create validation script to prevent future duplication
 
 #### 1.2 Create Missing Core Files
+
 - Create comprehensive TODO.md with roadmap
 - Add missing SECURITY.md
 - Create CONTRIBUTING.md
 - Add CODE_OF_CONDUCT.md
 
 #### 1.3 Remove Deprecated Components
+
 - Remove `reusable-issue-management.yml`
 - Update all references to use unified workflow
 - Document migration path clearly
@@ -109,6 +120,7 @@ ghcommon/
 ### Phase 2: Core Functionality Fixes (Week 2)
 
 #### 2.1 Issue Management System
+
 - Add comprehensive error handling
 - Implement retry mechanisms with exponential backoff
 - Add transaction support for multi-step operations
@@ -116,12 +128,14 @@ ghcommon/
 - Implement state persistence for recovery
 
 #### 2.2 Workflow Optimization
+
 - Modularize complex workflows into smaller reusable components
 - Implement caching strategies for common operations
 - Add workflow performance metrics
 - Create workflow dependency management
 
 #### 2.3 Script Improvements
+
 - Standardize error handling across all scripts
 - Implement unified logging framework
 - Add input validation for all user-facing scripts
@@ -131,6 +145,7 @@ ghcommon/
 ### Phase 3: Testing and Quality (Week 3)
 
 #### 3.1 Test Coverage
+
 - Add pytest-based tests for Python scripts
 - Implement workflow testing using act or similar
 - Add integration tests for end-to-end scenarios
@@ -138,6 +153,7 @@ ghcommon/
 - Implement code coverage reporting
 
 #### 3.2 CI/CD for ghcommon
+
 - Self-hosting: Use ghcommon workflows on ghcommon
 - Add automated testing on PR
 - Implement release automation
@@ -147,6 +163,7 @@ ghcommon/
 ### Phase 4: Enhancements (Week 4+)
 
 #### 4.1 Performance Optimizations
+
 - Implement workflow result caching
 - Add parallel execution where possible
 - Optimize container builds with layer caching
@@ -154,6 +171,7 @@ ghcommon/
 - Add performance benchmarking
 
 #### 4.2 Advanced Features
+
 - GraphQL API integration for better performance
 - Workflow telemetry and analytics
 - Self-healing capabilities for common failures
@@ -165,9 +183,11 @@ ghcommon/
 ### Workflow Analysis
 
 #### 1. `semantic-versioning.yml`
+
 **Purpose:** Automated version calculation from conventional commits
 
 **Inputs:**
+
 - `dry_run`: Boolean for testing without creating releases
 - `version_files`: Comma-separated list of files containing version
 - `version_pattern`: Regex pattern for version extraction
@@ -177,17 +197,20 @@ ghcommon/
 - `prerelease_identifier`: Identifier for prereleases
 
 **Outputs:**
+
 - `version`: Calculated semantic version
 - `version-tag`: Full tag name
 - `release-type`: Type of release (major/minor/patch)
 - `should-release`: Whether a release should be created
 
 **Dependencies:**
+
 - Node.js 18+
 - semantic-release npm package
 - Conventional commits in repository
 
 **Enhancement Opportunities:**
+
 - Add support for monorepo versioning
 - Implement version conflict resolution
 - Add rollback capabilities
@@ -195,9 +218,11 @@ ghcommon/
 - Add changelog generation
 
 #### 2. `reusable-docker-build.yml`
+
 **Purpose:** Multi-architecture container builds with security scanning
 
 **Features:**
+
 - SBOM generation
 - Vulnerability scanning with Grype
 - Attestation support
@@ -205,6 +230,7 @@ ghcommon/
 - Registry support (Docker Hub, GHCR, custom)
 
 **Enhancement Opportunities:**
+
 - Implement build cache sharing across workflows
 - Add support for BuildKit features
 - Optimize for ARM builds
@@ -212,9 +238,11 @@ ghcommon/
 - Implement build provenance
 
 #### 3. `automatic-release.yml`
+
 **Purpose:** Automated GitHub releases with artifact management
 
 **Features:**
+
 - Artifact collection and upload
 - Release note generation
 - Security attestation
@@ -222,6 +250,7 @@ ghcommon/
 - Notification support
 
 **Enhancement Opportunities:**
+
 - Add changelog generation from commits
 - Implement release rollback
 - Add release approval workflow
@@ -229,9 +258,11 @@ ghcommon/
 - Add release metrics
 
 #### 4. `reusable-unified-issue-management.yml`
+
 **Purpose:** Comprehensive issue management with multiple operations
 
 **Features:**
+
 - Create, update, close issues
 - Manage duplicates
 - Handle Copilot tickets
@@ -239,6 +270,7 @@ ghcommon/
 - Batch operations
 
 **Critical Issues:**
+
 - Complex permission requirements
 - Large Python script dependency
 - Limited error recovery
@@ -250,6 +282,7 @@ ghcommon/
 #### `issue_manager.py` Deep Dive
 
 **Classes:**
+
 ```python
 class OperationSummary:
     """Tracks operation results and statistics"""
@@ -290,6 +323,7 @@ class CodeQLAlertManager:
 ```
 
 **Key Methods:**
+
 ```python
 def process_issue_updates():
     """Main update processing logic"""
@@ -320,6 +354,7 @@ def check_duplicate():
 ```
 
 **Enhancement Opportunities:**
+
 - Implement async operations for better performance
 - Add database backend for state management
 - Implement webhook support for real-time updates
@@ -331,12 +366,15 @@ def check_duplicate():
 ### Security Considerations
 
 #### Token Management
+
 **Current State:**
+
 - Relies on GITHUB_TOKEN
 - No token rotation mechanism
 - Limited scope validation
 
 **Improvements Needed:**
+
 - Implement token rotation
 - Add scope validation
 - Support for GitHub Apps
@@ -344,12 +382,15 @@ def check_duplicate():
 - Audit logging for token usage
 
 #### Input Validation
+
 **Current State:**
+
 - Some scripts lack proper input sanitization
 - Potential for injection in JSON processing
 - Limited schema validation
 
 **Improvements Needed:**
+
 - Add comprehensive input validation
 - Implement JSON schema validation
 - Sanitize all user inputs
@@ -357,12 +398,15 @@ def check_duplicate():
 - Implement CSRF protection where applicable
 
 #### Workflow Permissions
+
 **Current State:**
+
 - Many workflows require extensive permissions
 - No principle of least privilege implementation
 - Limited permission auditing
 
 **Improvements Needed:**
+
 - Implement least privilege principle
 - Add permission auditing
 - Create permission templates
@@ -372,7 +416,9 @@ def check_duplicate():
 ## Recommended Enhancements
 
 ### 1. Workflow Hub Dashboard
+
 **Features:**
+
 - Real-time workflow status
 - Usage statistics and metrics
 - Performance monitoring
@@ -381,6 +427,7 @@ def check_duplicate():
 - Cost analysis
 
 **Implementation:**
+
 - React-based frontend
 - GraphQL API backend
 - PostgreSQL for data storage
@@ -388,7 +435,9 @@ def check_duplicate():
 - WebSocket for real-time updates
 
 ### 2. Workflow Composition Engine
+
 **Features:**
+
 - Visual workflow builder
 - Dynamic workflow generation
 - Conditional workflow execution
@@ -397,13 +446,16 @@ def check_duplicate():
 - Rollback capabilities
 
 **Implementation:**
+
 - Workflow DSL (Domain Specific Language)
 - DAG (Directed Acyclic Graph) engine
 - State machine implementation
 - Event-driven architecture
 
 ### 3. Advanced Caching System
+
 **Features:**
+
 - Centralized cache management
 - Cross-repository cache sharing
 - Intelligent cache invalidation
@@ -412,6 +464,7 @@ def check_duplicate():
 - TTL management
 
 **Implementation:**
+
 - S3-compatible storage backend
 - Cache key generation service
 - Metadata management
@@ -419,7 +472,9 @@ def check_duplicate():
 - Monitoring and alerting
 
 ### 4. Self-Service Portal
+
 **Features:**
+
 - Workflow marketplace
 - Template library
 - Configuration wizard
@@ -428,6 +483,7 @@ def check_duplicate():
 - Rating and reviews
 
 **Implementation:**
+
 - Next.js frontend
 - Supabase backend
 - Markdown-based docs
@@ -435,7 +491,9 @@ def check_duplicate():
 - CDN for assets
 
 ### 5. Workflow Testing Framework
+
 **Features:**
+
 - Local workflow testing
 - Mocked GitHub APIs
 - Test data generation
@@ -444,6 +502,7 @@ def check_duplicate():
 - Regression testing
 
 **Implementation:**
+
 - Docker-based test environment
 - API mock server
 - Test runner CLI

@@ -1,5 +1,7 @@
 # file: scripts/copilot-firewall/README.md
+
 # version: 1.0.0
+
 # guid: a1b2c3d4-5e6f-7g8h-9i0j-1k2l3m4n5o6p
 
 # GitHub Copilot Firewall Allowlist Manager
@@ -90,7 +92,7 @@ The allowlist includes essential domains for development:
 - **Development Tools**: git-scm.com, docker.com, kubernetes.io
 - **Standards Organizations**: w3.org, ietf.org, ecma-international.org
 - **Learning Resources**: freecodecamp.org, css-tricks.com, baeldung.com
-- **And many more...
+- \*\*And many more...
 
 ## Examples
 
@@ -185,21 +187,27 @@ The GitHub CLI must be authenticated with appropriate permissions to modify repo
 ### Common Issues
 
 1. **GitHub CLI not found**
+
    ```
    GitHub CLI (gh) is not installed. Please install it first.
    ```
+
    Solution: Install GitHub CLI from https://cli.github.com/
 
 2. **Not authenticated**
+
    ```
    You are not logged in to GitHub CLI. Please run 'gh auth login' first.
    ```
+
    Solution: Run `gh auth login` and follow the prompts
 
 3. **No repositories found**
+
    ```
    No repositories found or you don't have access to the namespace.
    ```
+
    Solution: Check the organization name and your access permissions
 
 4. **Permission denied**

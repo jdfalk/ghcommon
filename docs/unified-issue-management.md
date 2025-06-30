@@ -416,11 +416,13 @@ These are automatically inherited when using `secrets: inherit`.
 ### Common Issues
 
 1. **"No operations were required"**
+
    - Check that your trigger events match your use case
    - Verify the `issue_updates.json` file exists and is valid JSON
    - Consider using explicit operations instead of "auto"
 
 2. **"Permission denied" errors**
+
    - Ensure `secrets: inherit` is included in your workflow
    - Check that the GitHub token has required permissions
    - Verify the repository settings allow Actions to write to issues
