@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unified Issue Management System**: Comprehensive reusable workflow for automated issue management
   - Advanced Python script (963 lines) with full GitHub API integration
   - Support for JSON-driven issue updates (create, update, comment, close, delete)
+  - **Sub-issue support**: Parent-child issue linking with automatic labeling and comments
   - Copilot review comment ticket management
   - Automatic duplicate issue closure
   - CodeQL security alert ticket generation
