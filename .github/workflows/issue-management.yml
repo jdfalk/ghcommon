@@ -67,7 +67,7 @@ on:
 
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
+    uses: ./.github/workflows/reusable-unified-issue-management.yml
     with:
       operations: ${{ inputs.operations }}
       dry_run: ${{ inputs.dry_run }}
