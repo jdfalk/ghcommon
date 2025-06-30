@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement automated dependency update and security scanning",
+  "body": "Goal: Ensure all dependencies in ghcommon are kept up-to-date and free of known vulnerabilities.\n\nAcceptance Criteria:\n- Automated workflows run on a schedule to check for outdated dependencies in Python, Go, and JavaScript.\n- Security scanning is performed on all dependencies using tools like Dependabot, Snyk, or GitHub Advanced Security.\n- PRs are automatically created for safe dependency updates.\n- Security alerts are surfaced in the repository and triaged.\n- Documentation is updated to describe the dependency update and security process.\n\nTechnical Notes:\n- Use Dependabot for GitHub-native automation.\n- Integrate Snyk or similar for additional scanning if needed.\n- Ensure PRs from bots trigger CI and require review.\n- Consider using a badge for dependency health in README.",
+  "labels": ["ci", "automation", "security", "dependencies"],
+  "guid": "68ffee42-7053-4d9a-9e70-c3cb8c173f47",
+  "legacy_guid": "create-implement-automated-dependency-update-and-security-scanning-2025-06-30"
+}

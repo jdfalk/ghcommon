@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement cross-repository automation and unified issue management",
+  "body": "Goal: Enable automation and issue management across multiple repositories (ghcommon, subtitle-manager, etc.) from a single workflow.\n\nAcceptance Criteria:\n- Unified workflow can create, update, and close issues across multiple repos.\n- Automation can trigger actions (e.g., PRs, labels, comments) in related repos.\n- Permissions and tokens are managed securely for cross-repo actions.\n- Documentation is updated to describe cross-repo automation patterns.\n- Example scripts and templates are provided.\n\nTechnical Notes:\n- Use GitHub Actions with 'repository_dispatch' or GitHub API.\n- Use reusable workflows and composite actions for DRY automation.\n- Ensure audit logging and traceability for all cross-repo actions.\n- See .github/workflows/reusable-unified-issue-management.yml for patterns.",
+  "labels": ["ci", "automation", "github-actions", "issues"],
+  "guid": "0cf91a1c-3643-4037-904a-7cb91ed17d4b",
+  "legacy_guid": "create-implement-cross-repository-automation-and-unified-issue-management-2025-06-30"
+}

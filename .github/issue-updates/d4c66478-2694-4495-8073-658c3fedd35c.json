@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Refactor CI/CD to use a unified, reusable workflow architecture",
+  "body": "Goal: Refactor all CI/CD workflows in ghcommon to use a single, reusable workflow template for build, test, lint, and deploy.\n\nAcceptance Criteria:\n- All major workflows (build, test, lint, deploy) are refactored to use a single reusable workflow file via 'workflow_call'.\n- All jobs use consistent environment setup, caching, and matrix strategies.\n- All secrets and environment variables are managed via repository/environment secrets.\n- Documentation is updated to describe the new workflow structure and how to add new jobs.\n- All legacy workflow files are removed or archived.\n\nTechnical Notes:\n- Use GitHub Actions 'reusable workflows' and 'workflow_call' for DRY principles.\n- Use matrix builds for OS, Python/Go versions, and dependency sets.\n- Ensure compatibility with self-hosted and GitHub-hosted runners.\n- Validate with dry-run and real PRs.\n- See .github/workflows/reusable-unified-issue-management.yml for reference.",
+  "labels": ["ci", "automation", "refactor", "github-actions"],
+  "guid": "ea97869c-5bec-42c5-9a0d-006c567e3d04",
+  "legacy_guid": "create-refactor-ci-cd-to-use-a-unified-reusable-workflow-architecture-2025-06-30"
+}

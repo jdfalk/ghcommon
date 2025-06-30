@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add end-to-end test automation for CLI and API workflows",
+  "body": "Goal: Implement comprehensive end-to-end (E2E) tests for the CLI and API features in ghcommon.\n\nAcceptance Criteria:\n- E2E tests cover all major CLI commands and API endpoints.\n- Tests run automatically on PRs and main branch.\n- Test failures block merges and are reported with clear logs.\n- Test data is isolated and cleaned up after each run.\n- Documentation is updated to describe E2E test coverage and how to run locally.\n\nTechnical Notes:\n- Use pytest, Go test, or similar for E2E orchestration.\n- Use Docker Compose or test containers for integration environments.\n- Mock external dependencies where possible.\n- Use GitHub Actions artifacts for test logs and results.",
+  "labels": ["ci", "automation", "testing", "e2e"],
+  "guid": "b1d42acf-689b-499f-b318-ac73f10cb28b",
+  "legacy_guid": "create-add-end-to-end-test-automation-for-cli-and-api-workflows-2025-06-30"
+}

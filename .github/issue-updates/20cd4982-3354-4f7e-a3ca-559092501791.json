@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Automate release process and changelog generation",
+  "body": "Goal: Streamline the release process for ghcommon by automating versioning, changelog generation, and release publishing.\n\nAcceptance Criteria:\n- Releases are triggered by tags or PR merges to main.\n- Changelog is generated automatically from conventional commits.\n- Release artifacts are built and attached to GitHub Releases.\n- Release notes are published with each release.\n- Documentation is updated to describe the release process.\n\nTechnical Notes:\n- Use semantic-release, release-please, or similar tools.\n- Integrate with GitHub Actions for end-to-end automation.\n- Ensure changelog format matches project standards.\n- Support both manual and automated release triggers.",
+  "labels": ["ci", "automation", "release", "changelog"],
+  "guid": "c6f1c02e-5d75-4797-8fdd-4d78c4e9ee08",
+  "legacy_guid": "create-automate-release-process-and-changelog-generation-2025-06-30"
+}
