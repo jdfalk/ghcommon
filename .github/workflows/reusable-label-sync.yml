@@ -1,0 +1,142 @@
+# file: .github/workflows/reusable-label-sync.yml
+# version: 1.0.0
+# guid: b9c0d1e2-f3a4-5678-9012-345678901bcd
+
+name: Reusable - Label Synchronization
+
+on:
+  workflow_call:
+    inputs:
+      config-file:
+        description: "Path to the labels configuration file"
+        required: false
+        default: "labels.json"
+        type: string
+      repositories:
+        description: "Comma-separated list of repositories to sync labels to (owner/name format)"
+        required: false
+        type: string
+      repositories-file:
+        description: "Path to file containing repositories list (one per line)"
+        required: false
+        type: string
+      delete-extra-labels:
+        description: "Whether to delete labels not in configuration"
+        required: false
+        default: false
+        type: boolean
+      dry-run:
+        description: "Show what would be done without making changes"
+        required: false
+        default: false
+        type: boolean
+      source-repo:
+        description: "Repository to fetch label configuration from (default: calling repo)"
+        required: false
+        type: string
+      source-branch:
+        description: "Branch to fetch configuration from"
+        required: false
+        default: "main"
+        type: string
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.source-repo || github.repository }}
+          ref: ${{ inputs.source-branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Download label management script
+        if: ${{ inputs.source-repo && inputs.source-repo != github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Download the script from ghcommon if we're not already in ghcommon
+          gh repo clone jdfalk/ghcommon ghcommon-tmp -- --depth=1 --branch=${{ inputs.source-branch }}
+          cp ghcommon-tmp/scripts/label_manager.py ./label_manager.py
+          rm -rf ghcommon-tmp
+
+      - name: Use local script
+        if: ${{ !inputs.source-repo || inputs.source-repo == github.repository }}
+        run: |
+          # Use the script from the current repository
+          cp scripts/label_manager.py ./label_manager.py
+
+      - name: Validate configuration file
+        run: |
+          if [ ! -f "${{ inputs.config-file }}" ]; then
+            echo "Error: Configuration file '${{ inputs.config-file }}' not found"
+            exit 1
+          fi
+          
+          # Validate JSON syntax
+          python -c "import json; json.load(open('${{ inputs.config-file }}'))"
+          echo "✓ Configuration file is valid JSON"
+
+      - name: Prepare repository list
+        id: repo-list
+        run: |
+          REPOS=""
+          
+          # Add repositories from input parameter
+          if [ -n "${{ inputs.repositories }}" ]; then
+            REPOS="${{ inputs.repositories }}"
+          fi
+          
+          # Add repositories from file
+          if [ -n "${{ inputs.repositories-file }}" ]; then
+            if [ -f "${{ inputs.repositories-file }}" ]; then
+              # Read repos from file and join with commas
+              FILE_REPOS=$(grep -v '^#' "${{ inputs.repositories-file }}" | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+              if [ -n "$FILE_REPOS" ]; then
+                if [ -n "$REPOS" ]; then
+                  REPOS="${REPOS},${FILE_REPOS}"
+                else
+                  REPOS="$FILE_REPOS"
+                fi
+              fi
+            else
+              echo "Warning: Repository file '${{ inputs.repositories-file }}' not found"
+            fi
+          fi
+          
+          if [ -z "$REPOS" ]; then
+            echo "Error: No repositories specified. Use 'repositories' or 'repositories-file' input"
+            exit 1
+          fi
+          
+          echo "repositories=$REPOS" >> $GITHUB_OUTPUT
+          echo "Repository list: $REPOS"
+
+      - name: Sync labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python label_manager.py sync-labels \
+            --config "${{ inputs.config-file }}" \
+            --repos "${{ steps.repo-list.outputs.repositories }}" \
+            ${{ inputs.delete-extra-labels && '--delete-extra' || '' }} \
+            ${{ inputs.dry-run && '--dry-run' || '' }}
+
+      - name: Upload results summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: label-sync-results
+          path: |
+            *.log
+          retention-days: 7

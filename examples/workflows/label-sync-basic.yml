@@ -1,0 +1,32 @@
+# file: examples/workflows/label-sync-basic.yml
+# Basic example for label synchronization
+
+name: Sync Labels from ghcommon
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run monthly on the 1st at 3 AM UTC
+    - cron: "0 3 1 * *"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  sync-labels:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
+    with:
+      # Use labels.json from ghcommon repository
+      config-file: "labels.json"
+      # Sync to current repository only
+      repositories: ${{ github.repository }}
+      # Don't delete extra labels (safe mode)
+      delete-extra-labels: false
+      # Not a dry run - make actual changes
+      dry-run: false
+      # Fetch configuration from ghcommon
+      source-repo: "jdfalk/ghcommon"
+      source-branch: "main"
+    secrets: inherit

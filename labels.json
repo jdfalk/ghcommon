@@ -1,0 +1,102 @@
+[
+  {
+    "name": "bug",
+    "color": "d73a49",
+    "description": "Something isn't working"
+  },
+  {
+    "name": "enhancement",
+    "color": "a2eeef",
+    "description": "New feature or request"
+  },
+  {
+    "name": "documentation",
+    "color": "0075ca",
+    "description": "Improvements or additions to documentation"
+  },
+  {
+    "name": "good first issue",
+    "color": "7057ff",
+    "description": "Good for newcomers"
+  },
+  {
+    "name": "help wanted",
+    "color": "008672",
+    "description": "Extra attention is needed"
+  },
+  {
+    "name": "duplicate",
+    "color": "cfd3d7",
+    "description": "This issue or pull request already exists"
+  },
+  {
+    "name": "invalid",
+    "color": "e4e669",
+    "description": "This doesn't seem right"
+  },
+  {
+    "name": "question",
+    "color": "d876e3",
+    "description": "Further information is requested"
+  },
+  {
+    "name": "wontfix",
+    "color": "ffffff",
+    "description": "This will not be worked on"
+  },
+  {
+    "name": "priority-high",
+    "color": "b60205",
+    "description": "High priority issue"
+  },
+  {
+    "name": "priority-medium",
+    "color": "fbca04",
+    "description": "Medium priority issue"
+  },
+  {
+    "name": "priority-low",
+    "color": "0e8a16",
+    "description": "Low priority issue"
+  },
+  {
+    "name": "security",
+    "color": "d93f0b",
+    "description": "Security-related issue"
+  },
+  {
+    "name": "breaking-change",
+    "color": "c5000b",
+    "description": "Introduces a breaking change"
+  },
+  {
+    "name": "dependencies",
+    "color": "0366d6",
+    "description": "Pull requests that update a dependency file"
+  },
+  {
+    "name": "ci/cd",
+    "color": "0052cc",
+    "description": "Continuous integration and deployment"
+  },
+  {
+    "name": "testing",
+    "color": "1d76db",
+    "description": "Related to testing"
+  },
+  {
+    "name": "refactoring",
+    "color": "f9d0c4",
+    "description": "Code refactoring"
+  },
+  {
+    "name": "performance",
+    "color": "ff9500",
+    "description": "Performance improvements"
+  },
+  {
+    "name": "ui/ux",
+    "color": "e99695",
+    "description": "User interface and user experience"
+  }
+]
