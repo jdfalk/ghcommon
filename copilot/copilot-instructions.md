@@ -174,6 +174,7 @@ Review Process:
 - Use proper error handling with meaningful messages
 - Validate inputs appropriately (sanitize file paths, validate formats)
 - Consider performance implications of code changes
+- **Always export GitHub token before running GitHub-related commands**: Use `export GITHUB_TOKEN=$(gh auth token)` or `export GH_TOKEN=$(gh auth token)` before running any scripts that interact with GitHub APIs
 - Look for injection vulnerabilities (command injection in file processing)
 - Review file handling security (path traversal, file size limits)
 - Verify secure handling of subtitle file content
