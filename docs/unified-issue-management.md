@@ -522,6 +522,66 @@ Processed Files: 3 files moved to archive
    - Branch: archive-processed-files-123456789
 ```
 
+## Sub-Issues Support
+
+The workflow supports creating sub-issues (child issues) that are linked to parent issues:
+
+### Creating a Sub-Issue
+
+**Using the create script**:
+
+```bash
+# Using the create script
+./scripts/create-issue-update.sh create "Sub-task: Implement authentication" \
+  "This implements the authentication component" \
+  "enhancement,sub-issue" \
+  123  # Parent issue number
+```
+
+**JSON format**:
+
+```json
+{
+  "action": "create",
+  "title": "Sub-task: Implement authentication",
+  "body": "This implements the authentication component",
+  "labels": ["enhancement", "sub-issue"],
+  "parent_issue": 123,
+  "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
+  "legacy_guid": "sub-task-implement-authentication-2024-06-23"
+}
+```
+
+### Sub-Issue Behavior
+
+Sub-issues will:
+
+- Automatically reference their parent issue in the body
+- Include a "sub-issue" label
+- Add a comment on the parent issue linking to the new sub-issue
+
+### Example Sub-Issue Body
+
+When a sub-issue is created, its body will be formatted like this:
+
+```markdown
+Sub-issue of #123
+
+Parent issue: https://github.com/owner/repo/issues/123
+
+---
+
+This implements the authentication component
+```
+
+### Parent Issue Comment
+
+The parent issue will receive a comment like:
+
+```markdown
+Created sub-issue #456: [Sub-task: Implement authentication](https://github.com/owner/repo/issues/456)
+```
+
 ## Support
 
 For issues, questions, or contributions:

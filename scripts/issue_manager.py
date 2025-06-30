@@ -1073,6 +1073,55 @@ class IssueUpdateProcessor:
             print(f"⚠️  Error checking for duplicate comment GUID: {e}")
             return False
 
+    def _check_guid_uniqueness(self, guid: str, legacy_guid: str, action: str, context: Dict[str, Any]) -> bool:
+        """Check if a GUID is unique across all issues.
+        
+        Args:
+            guid: Primary GUID (UUID format)
+            legacy_guid: Legacy GUID for backward compatibility
+            action: The action being performed (e.g., 'create')
+            context: Additional context (e.g., title for create action)
+        
+        Returns:
+            True if the GUID is unique (operation can proceed), False otherwise
+        """
+        # If neither GUID is provided, allow the operation (no uniqueness check)
+        if not guid and not legacy_guid:
+            return True
+        
+        try:
+            # Search for existing issues with either GUID
+            all_issues = self.api.get_all_issues(state="all")
+            
+            # Check both GUIDs
+            for issue in all_issues:
+                body = issue.get("body", "")
+                
+                # Check primary GUID
+                if guid and f"<!-- guid:{guid} -->" in body:
+                    self.summary.add_error(
+                        f"Duplicate GUID found: {guid} already exists in issue #{issue['number']}"
+                    )
+                    print(f"❌ GUID {guid} already exists in issue #{issue['number']}: {issue['title']}")
+                    return False
+                
+                # Check legacy GUID
+                if legacy_guid and f"<!-- guid:{legacy_guid} -->" in body:
+                    self.summary.add_error(
+                        f"Duplicate legacy GUID found: {legacy_guid} already exists in issue #{issue['number']}"
+                    )
+                    print(f"❌ Legacy GUID {legacy_guid} already exists in issue #{issue['number']}: {issue['title']}")
+                    return False
+            
+            # GUIDs are unique
+            return True
+            
+        except Exception as e:
+            # On error, log but allow operation to proceed
+            self.summary.add_warning(f"Could not verify GUID uniqueness: {e}")
+            print(f"⚠️  Could not verify GUID uniqueness: {e}")
+            return True
+
     def _create_guid_exists(self, guid: str, update: Dict[str, Any]) -> bool:
         """Check if an issue with the given GUID was already created."""
         title = update.get("title", "")
@@ -1116,8 +1165,13 @@ class IssueUpdateProcessor:
         if not self._check_guid_uniqueness(guid, legacy_guid, "create", {"title": title}):
             return False
 
+        # Add GUID to body for tracking (prefer primary GUID)
+        guid_to_embed = guid or legacy_guid
+        if guid_to_embed:
+            body += f"\n\n<!-- guid:{guid_to_embed} -->"
+
         print(f"Creating issue: {title}")
-        issue = self.github_api.create_issue(title, body, labels)
+        issue = self.api.create_issue(title, body, labels)
 
         if issue:
             self.summary.add_issue_created(
@@ -1127,7 +1181,7 @@ class IssueUpdateProcessor:
             # If this is a sub-issue, add a comment on the parent issue
             if parent_issue:
                 parent_comment = f"Created sub-issue #{issue['number']}: [{title}]({issue['html_url']})"
-                self.github_api.add_comment(parent_issue, parent_comment)
+                self.api.add_comment(parent_issue, parent_comment)
 
             return True
         else:
