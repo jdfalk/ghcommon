@@ -56,6 +56,39 @@ export GH_TOKEN=$(gh auth token)
 - Detailed operation reporting
 - GitHub API error handling
 
+### [`setup-label-sync.sh`](setup-label-sync.sh)
+
+**Version**: 1.0.0
+**Last Updated**: 2025-06-30
+
+Helper script to set up label synchronization workflow in repositories:
+
+- Generates workflow file with customizable options
+- Supports different sync modes (safe vs cleanup)
+- Configurable scheduling with cron expressions
+- Built-in dry-run mode for testing
+- Automatic repository detection
+
+**Usage**:
+
+```bash
+# Basic setup with monthly sync
+./scripts/setup-label-sync.sh
+
+# Weekly sync with cleanup mode (delete extra labels)
+./scripts/setup-label-sync.sh --schedule "0 2 * * 1" --mode cleanup
+
+# Setup for testing only
+./scripts/setup-label-sync.sh --dry-run
+```
+
+**Features**:
+
+- Interactive workflow generation
+- Validation of schedule and mode options
+- Git repository detection
+- Comprehensive setup instructions
+
 ### [`create-issue-update.sh`](create-issue-update.sh)
 
 **Version**: 1.2.0
