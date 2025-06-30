@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add comprehensive error handling to issue_manager.py",
+  "body": "Implement robust error handling in the issue management system.\n\nTasks:\n- Add try-catch blocks for all API calls\n- Implement exponential backoff retry logic\n- Add transaction support for multi-step operations\n- Create error recovery mechanisms\n- Add detailed error logging",
+  "labels": ["enhancement", "reliability", "python"],
+  "guid": "2f1a6a2b-d193-408b-8396-28b02bf08e05",
+  "legacy_guid": "create-add-comprehensive-error-handling-to-issue-manager-py-2025-06-30"
+}

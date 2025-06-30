@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create workflow telemetry system",
+  "body": "Add telemetry for workflow monitoring and optimization.\n\nTasks:\n- Define telemetry metrics\n- Implement data collection\n- Create analytics dashboard\n- Add performance alerts\n- Document telemetry data",
+  "labels": ["enhancement", "observability"],
+  "guid": "b9db5b8f-1b4c-4b9c-baf4-79cb229cc007",
+  "legacy_guid": "create-create-workflow-telemetry-system-2025-06-30"
+}

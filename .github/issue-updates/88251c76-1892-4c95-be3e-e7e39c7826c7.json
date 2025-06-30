@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement workflow result caching",
+  "body": "Add caching for workflow results to improve performance.\n\nTasks:\n- Design cache key strategy\n- Implement cache storage backend\n- Add cache invalidation logic\n- Create cache metrics\n- Document caching behavior",
+  "labels": ["enhancement", "performance"],
+  "guid": "74b318f0-2999-4aba-b9a3-9d474ac8a5d3",
+  "legacy_guid": "create-implement-workflow-result-caching-2025-06-30"
+}

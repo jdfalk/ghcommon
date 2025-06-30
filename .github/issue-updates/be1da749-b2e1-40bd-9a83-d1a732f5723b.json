@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement unified logging framework",
+  "body": "Create consistent logging across all scripts.\n\nTasks:\n- Define log format and levels\n- Implement Python logging configuration\n- Add structured logging support\n- Create log aggregation strategy\n- Add log rotation and retention",
+  "labels": ["enhancement", "observability"],
+  "guid": "f0dd214c-f693-4506-9958-813722a8a1f0",
+  "legacy_guid": "create-implement-unified-logging-framework-2025-06-30"
+}

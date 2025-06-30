@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add pytest-based unit tests",
+  "body": "Introduce pytest-based tests for workflow scripts to ensure reliability.\n\nTasks:\n- Set up pytest framework\n- Create test fixtures\n- Add unit tests for all Python modules\n- Implement test coverage reporting\n- Add tests to CI pipeline",
+  "labels": ["testing", "quality"],
+  "guid": "ad0bc032-1004-4924-8a8b-71549c2947a5",
+  "legacy_guid": "create-add-pytest-based-unit-tests-2025-06-30"
+}

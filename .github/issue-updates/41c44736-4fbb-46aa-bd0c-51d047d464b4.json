@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement self-healing capabilities",
+  "body": "Add automatic recovery for common failures.\n\nTasks:\n- Identify common failure patterns\n- Implement recovery strategies\n- Add failure detection\n- Create recovery metrics\n- Document self-healing behavior",
+  "labels": ["enhancement", "reliability"],
+  "guid": "519246a3-841e-45c1-87b1-fd517e60442c",
+  "legacy_guid": "create-implement-self-healing-capabilities-2025-06-30"
+}

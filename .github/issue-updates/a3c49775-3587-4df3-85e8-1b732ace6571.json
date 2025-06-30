@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Self-host ghcommon workflows",
+  "body": "Configure ghcommon to use its own workflows.\n\nTasks:\n- Add workflow files to use reusable workflows\n- Configure semantic versioning\n- Set up automated releases\n- Add issue management workflow\n- Document self-hosting setup",
+  "labels": ["enhancement", "dogfooding"],
+  "guid": "ca4c8436-5500-4d2e-8954-568d88a8f822",
+  "legacy_guid": "create-self-host-ghcommon-workflows-2025-06-30"
+}

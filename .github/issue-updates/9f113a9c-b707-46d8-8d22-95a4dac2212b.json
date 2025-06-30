@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create comprehensive TODO.md file",
+  "body": "Add TODO.md file with project roadmap, implementation status, and architectural decisions.\n\nContent to include:\n- Project roadmap with phases\n- Implementation status for each component\n- Architectural decisions and rationale\n- Dependency management strategy\n- Future enhancement plans",
+  "labels": ["documentation", "planning"],
+  "guid": "217672b7-78d0-4ecc-9b52-112c3c8a1886",
+  "legacy_guid": "create-create-comprehensive-todo-md-file-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Modularize complex workflows",
+  "body": "Break down complex workflows into reusable components.\n\nTasks:\n- Identify common workflow patterns\n- Create composite actions for repeated tasks\n- Implement workflow templates\n- Document composition patterns\n- Update existing workflows to use modules",
+  "labels": ["enhancement", "refactor", "workflows"],
+  "guid": "841dc1d6-0ddb-43c3-869b-d39150182346",
+  "legacy_guid": "create-modularize-complex-workflows-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add issue and PR templates",
+  "body": "Create standardized templates for issues and pull requests.\n\nTasks:\n- Create bug report template\n- Add feature request template\n- Create PR template\n- Add template chooser\n- Document template usage",
+  "labels": ["documentation", "community"],
+  "guid": "8f8fcca3-ad0f-4927-bdb4-fd4ed83472fe",
+  "legacy_guid": "create-add-issue-and-pr-templates-2025-06-30"
+}

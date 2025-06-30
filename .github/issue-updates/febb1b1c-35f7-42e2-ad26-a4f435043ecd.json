@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Remove duplicate copilot files from .github directory",
+  "body": "Duplicate copilot files exist in both /copilot and /.github directories. This causes confusion and maintenance issues.\n\nTasks:\n- Remove all copilot files from .github/\n- Update sync workflows to only sync from /copilot\n- Add validation to prevent future duplication\n- Update documentation to clarify file locations",
+  "labels": ["bug", "cleanup", "high-priority"],
+  "guid": "6e1dbc9a-4104-4c4a-b157-97b0c600b864",
+  "legacy_guid": "create-remove-duplicate-copilot-files-from-github-directory-2025-06-30"
+}

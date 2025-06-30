@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add SECURITY.md file",
+  "body": "README references SECURITY.md but the file is missing. Create security policy document.\n\nContent to include:\n- Security vulnerability reporting process\n- Supported versions\n- Security update policy\n- Contact information\n- Disclosure timeline",
+  "labels": ["documentation", "security"],
+  "guid": "4616e684-9c29-4db2-ae5d-d72ca6fe72ca",
+  "legacy_guid": "create-add-security-md-file-2025-06-30"
+}

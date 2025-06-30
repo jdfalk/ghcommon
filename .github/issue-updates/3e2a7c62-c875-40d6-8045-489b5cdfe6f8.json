@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create CONTRIBUTING.md file",
+  "body": "Add contribution guidelines for the project.\n\nContent to include:\n- Development setup instructions\n- Code style guidelines\n- Testing requirements\n- Pull request process\n- Issue reporting guidelines",
+  "labels": ["documentation", "community"],
+  "guid": "4719b2c0-5ad7-44aa-9bc3-9e7831f490e6",
+  "legacy_guid": "create-create-contributing-md-file-2025-06-30"
+}

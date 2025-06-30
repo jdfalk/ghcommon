@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Remove deprecated reusable-issue-management.yml",
+  "body": "Remove deprecated workflow and update all references.\n\nTasks:\n- Delete reusable-issue-management.yml\n- Update all references to use reusable-unified-issue-management.yml\n- Update migration documentation\n- Add redirect notice in old location",
+  "labels": ["cleanup", "breaking-change"],
+  "guid": "b7296fc0-2d6a-461b-8668-d9bee4265f96",
+  "legacy_guid": "create-remove-deprecated-reusable-issue-management-yml-2025-06-30"
+}

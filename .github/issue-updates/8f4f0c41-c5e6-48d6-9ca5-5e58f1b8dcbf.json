@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Configure Dependabot",
+  "body": "Enable automated dependency updates.\n\nTasks:\n- Add .github/dependabot.yml\n- Configure GitHub Actions updates\n- Configure Python dependency updates\n- Set update schedule\n- Add auto-merge rules",
+  "labels": ["security", "automation"],
+  "guid": "dbc7e64f-afa5-4897-a2ba-6e42cc8bb906",
+  "legacy_guid": "create-configure-dependabot-2025-06-30"
+}

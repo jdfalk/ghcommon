@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement workflow testing framework",
+  "body": "Create framework for testing GitHub Actions workflows.\n\nTasks:\n- Evaluate workflow testing tools (act, etc.)\n- Create test environment setup\n- Add workflow unit tests\n- Implement integration tests\n- Document testing process",
+  "labels": ["testing", "workflows"],
+  "guid": "1e08a677-3191-404a-aadd-a31820605547",
+  "legacy_guid": "create-implement-workflow-testing-framework-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create GitHub API abstraction layer",
+  "body": "Abstract GitHub API interactions for better testability and maintainability.\n\nTasks:\n- Create GitHubClient interface\n- Implement REST and GraphQL backends\n- Add caching layer\n- Implement rate limit handling\n- Add mock implementation for testing",
+  "labels": ["enhancement", "architecture", "python"],
+  "guid": "9c1cc34e-e998-4064-88ea-14aa466f3848",
+  "legacy_guid": "create-create-github-api-abstraction-layer-2025-06-30"
+}

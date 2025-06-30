@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add input validation to all scripts",
+  "body": "Implement comprehensive input validation.\n\nTasks:\n- Add argument validation to all scripts\n- Implement JSON schema validation\n- Add file path sanitization\n- Create validation error messages\n- Add --validate-only mode",
+  "labels": ["enhancement", "security", "validation"],
+  "guid": "286c9329-d9aa-4f15-8d0c-133d1be53aca",
+  "legacy_guid": "create-add-input-validation-to-all-scripts-2025-06-30"
+}

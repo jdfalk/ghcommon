@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create comprehensive example library",
+  "body": "Expand examples directory with more use cases.\n\nTasks:\n- Add language-specific CI examples\n- Create deployment workflow examples\n- Add security scanning examples\n- Create matrix build examples\n- Document example usage",
+  "labels": ["documentation", "examples"],
+  "guid": "d9c86c8d-2f1d-4527-846d-a5980fb02f0e",
+  "legacy_guid": "create-create-comprehensive-example-library-2025-06-30"
+}

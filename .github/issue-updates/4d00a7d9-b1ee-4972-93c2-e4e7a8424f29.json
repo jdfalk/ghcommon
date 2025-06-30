@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Fix unified-issue-management.md formatting",
+  "body": "Correct formatting issues in docs/unified-issue-management.md.\n\nTasks:\n- Fix broken headings\n- Correct missing words\n- Update code examples\n- Validate markdown syntax\n- Add missing sections",
+  "labels": ["documentation", "bug"],
+  "guid": "699d8447-2c16-4ee6-9951-45b4686f8a35",
+  "legacy_guid": "create-fix-unified-issue-management-md-formatting-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add GraphQL API support to issue_manager.py",
+  "body": "Implement GraphQL for better API performance.\n\nTasks:\n- Add GraphQL client library\n- Implement GraphQL queries\n- Add query optimization\n- Maintain REST compatibility\n- Add performance benchmarks",
+  "labels": ["enhancement", "performance", "python"],
+  "guid": "538f6377-38b6-4660-a86f-55095947ca0b",
+  "legacy_guid": "create-add-graphql-api-support-to-issue-manager-py-2025-06-30"
+}

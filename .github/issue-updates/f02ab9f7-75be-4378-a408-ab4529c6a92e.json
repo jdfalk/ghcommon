@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add dev container configuration",
+  "body": "Provide Dockerfile and devcontainer.json for consistent development.\n\nTasks:\n- Create development Dockerfile\n- Add devcontainer.json configuration\n- Include required tools and dependencies\n- Add VS Code extensions\n- Document dev container usage",
+  "labels": ["developer-experience", "infrastructure"],
+  "guid": "4cb21709-ba88-43a4-8005-bd47f5dbb4bc",
+  "legacy_guid": "create-add-dev-container-configuration-2025-06-30"
+}

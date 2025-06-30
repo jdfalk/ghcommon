@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add pre-commit hooks",
+  "body": "Create .pre-commit-config.yaml with linters and formatters.\n\nTasks:\n- Configure Python linting (ruff, black)\n- Add YAML validation\n- Configure shell script linting\n- Add markdown linting\n- Update contributor docs",
+  "labels": ["quality", "developer-experience"],
+  "guid": "42fe8bf2-c51e-4786-8c74-f6fdbaeaf449",
+  "legacy_guid": "create-add-pre-commit-hooks-2025-06-30"
+}

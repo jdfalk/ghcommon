@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add architecture diagrams",
+  "body": "Create visual documentation of system architecture.\n\nTasks:\n- Create workflow architecture diagram\n- Add component interaction diagram\n- Document data flow\n- Create deployment diagram\n- Add to documentation",
+  "labels": ["documentation", "architecture"],
+  "guid": "04356882-2834-4ff1-88b9-beb9e7724d12",
+  "legacy_guid": "create-add-architecture-diagrams-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add workflow composition UI",
+  "body": "Create visual interface for workflow composition.\n\nTasks:\n- Design UI mockups\n- Implement workflow builder\n- Add workflow visualization\n- Create template library\n- Add export functionality",
+  "labels": ["enhancement", "feature", "ui"],
+  "guid": "bca67ef7-4547-4689-b711-988d15ad488d",
+  "legacy_guid": "create-add-workflow-composition-ui-2025-06-30"
+}
