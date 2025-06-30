@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/create-issue-update-library.sh
-# version: 1.0.0
+# version: 1.1.0
 # guid: 4a81c3e0-5f7b-4e2a-b92d-6c8a7c1d3e5f
 #
 # Library of functions for creating GitHub issue update files
@@ -38,6 +38,41 @@ generate_uuid() {
         echo "Error: Neither uuidgen nor python3 is available for UUID generation" >&2
         exit 1
     fi
+}
+
+# Function to check if issue already exists on GitHub
+check_github_issue_exists() {
+    local title="$1"
+    local repo="${GITHUB_REPOSITORY:-$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')}"
+    local token="${GITHUB_TOKEN:-${GH_TOKEN}}"
+
+    if [[ -z "$token" ]]; then
+        echo "Warning: No GitHub token found. Skipping GitHub issue check." >&2
+        return 1
+    fi
+
+    # Search for issues with matching title
+    local search_result=$(curl -s -H "Authorization: token $token" \
+        "https://api.github.com/repos/$repo/issues?state=all" | \
+        python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+title = '''$title'''
+for issue in data:
+    if issue.get('title', '').strip() == title.strip():
+        print(f\"exists:{issue['number']}:{issue['state']}:{issue['html_url']}\")
+        sys.exit(0)
+print('not_found')
+")
+
+    if [[ "$search_result" == exists:* ]]; then
+        IFS=':' read -r _ issue_number state url <<< "$search_result"
+        echo "⚠️  Issue already exists: #$issue_number (state: $state)" >&2
+        echo "   URL: $url" >&2
+        return 0
+    fi
+
+    return 1
 }
 
 # Function to check if GUID is unique across the project
@@ -124,21 +159,38 @@ create_issue_file() {
             local title="$3"
             local body="$4"
             local labels="$5"
+            local parent_issue="$6"  # New parameter for sub-issues
             local guid
             local legacy_guid
+
+            # Check if issue already exists on GitHub
+            if check_github_issue_exists "$title"; then
+                echo "❌ Skipping creation: Issue with this title already exists on GitHub" >&2
+                return 1
+            fi
+
             guid=$(generate_unique_guid)
             legacy_guid=$(generate_legacy_guid "create" "$title")
 
-            cat > "$file_path" << EOF
-{
-  "action": "create",
-  "title": "$title",
-  "body": "$body",
-  "labels": [$(echo "$labels" | sed 's/,/", "/g' | sed 's/^/"/;s/$/"/')],
-  "guid": "$guid",
-  "legacy_guid": "$legacy_guid"
-}
-EOF
+            # Build JSON with optional parent_issue field
+            local json_content="{
+  \"action\": \"create\",
+  \"title\": \"$title\",
+  \"body\": \"$body\",
+  \"labels\": [$(echo "$labels" | sed 's/,/", "/g' | sed 's/^/"/;s/$/"/')],
+  \"guid\": \"$guid\",
+  \"legacy_guid\": \"$legacy_guid\""
+
+            # Add parent_issue if provided
+            if [[ -n "$parent_issue" ]]; then
+                json_content+=",
+  \"parent_issue\": $parent_issue"
+            fi
+
+            json_content+="
+}"
+
+            echo "$json_content" > "$file_path"
             ;;
 
         "update")
@@ -216,7 +268,7 @@ EOF
 run_issue_update() {
     if [[ $# -lt 2 ]]; then
         echo "Usage:"
-        echo "  $0 create \"Title\" \"Body\" \"label1,label2\""
+        echo "  $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue_number]"
         echo "  $0 update NUMBER \"Body\" \"label1,label2\""
         echo "  $0 comment NUMBER \"Comment text\""
         echo "  $0 close NUMBER [state_reason]"
@@ -230,9 +282,10 @@ run_issue_update() {
         "create")
             if [[ $# -lt 4 ]]; then
                 echo "Error: create requires title, body, and labels" >&2
+                echo "Usage: $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue_number]" >&2
                 return 1
             fi
-            create_issue_file "$action" "$uuid" "$2" "$3" "${4:-}"
+            create_issue_file "$action" "$uuid" "$2" "$3" "${4:-}" "${5:-}"
             ;;
         "update")
             if [[ $# -lt 4 ]]; then
@@ -257,6 +310,7 @@ run_issue_update() {
             ;;
         *)
             echo "Error: Unknown action '$action'" >&2
+            echo "Supported actions: create, update, comment, close" >&2
             return 1
             ;;
     esac

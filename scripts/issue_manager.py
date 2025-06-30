@@ -1091,71 +1091,47 @@ class IssueUpdateProcessor:
             return False
 
     def _create_issue(self, update: Dict[str, Any]) -> bool:
-        """Create a new issue with dual-GUID tracking and duplicate prevention."""
+        """Create a new issue with dual-GUID tracking and sub-issue support."""
         title = update.get("title", "")
         body = update.get("body", "")
         labels = update.get("labels", [])
-        assignees = update.get("assignees", [])
-        milestone = update.get("milestone")
-        primary_guid, legacy_guid = self._extract_guids(update)
+        guid = update.get("guid")
+        legacy_guid = update.get("legacy_guid")
+        parent_issue = update.get("parent_issue")  # New field for sub-issues
 
         if not title:
-            print("❌ Missing title for create operation")
+            self.summary.add_error("Missing title for create action")
             return False
 
-        # Check if issue with this title already exists
-        existing = self.api.search_issues(f'is:issue in:title "{title}"')
+        # Format body with parent issue reference if provided
+        if parent_issue:
+            parent_url = f"https://github.com/{self.github_api.repo}/issues/{parent_issue}"
+            body = f"Sub-issue of #{parent_issue}\n\nParent issue: {parent_url}\n\n---\n\n{body}"
 
-        # Check for duplicates using either GUID
-        if existing and (primary_guid or legacy_guid):
-            duplicate_issue = self._check_duplicate_by_guids(
-                primary_guid, legacy_guid, existing
+            # Add sub-issue label if not already present
+            if "sub-issue" not in labels:
+                labels.append("sub-issue")
+
+        # Check for duplicate by GUID
+        if not self._check_guid_uniqueness(guid, legacy_guid, "create", {"title": title}):
+            return False
+
+        print(f"Creating issue: {title}")
+        issue = self.github_api.create_issue(title, body, labels)
+
+        if issue:
+            self.summary.add_issue_created(
+                issue["number"], issue["title"], issue["html_url"]
             )
-            if duplicate_issue:
-                guid_info = (
-                    f"UUID '{primary_guid}'"
-                    if primary_guid
-                    else f"legacy GUID '{legacy_guid}'"
-                )
-                print(
-                    f"⏭️  Issue '{title}' with {guid_info} already exists (#{duplicate_issue['number']}), skipping"
-                )
-                return True
-        elif existing and not (primary_guid or legacy_guid):
-            print(f"⚠️  Issue '{title}' already exists, skipping (no GUID to verify)")
-            return False
 
-        # Add primary GUID to body for tracking (prefer UUID over legacy)
-        guid_to_embed = primary_guid or legacy_guid
-        if guid_to_embed:
-            body += f"\n\n<!-- guid:{guid_to_embed} -->"
+            # If this is a sub-issue, add a comment on the parent issue
+            if parent_issue:
+                parent_comment = f"Created sub-issue #{issue['number']}: [{title}]({issue['html_url']})"
+                self.github_api.add_comment(parent_issue, parent_comment)
 
-        try:
-            result = self.api.create_issue(title, body, labels)
-            if result:
-                print(f"✅ Created issue #{result['number']}: {title}")
-                self.summary.add_issue_created(
-                    result["number"], title, result["html_url"]
-                )
-
-                # Add assignees and milestone if specified
-                if assignees or milestone:
-                    update_data = {}
-                    if assignees:
-                        update_data["assignees"] = assignees
-                    if milestone:
-                        update_data["milestone"] = milestone
-                    self.api.update_issue(result["number"], **update_data)
-
-                return True
-            else:
-                print(f"❌ Failed to create issue: {title}")
-                self.summary.add_error(f"Failed to create issue: {title}")
-                return False
-
-        except Exception as e:
-            print(f"❌ Error creating issue: {e}")
-            self.summary.add_error(f"Error creating issue: {e}")
+            return True
+        else:
+            self.summary.add_error(f"Failed to create issue: {title}")
             return False
 
     def _update_issue(self, update: Dict[str, Any]) -> bool:
