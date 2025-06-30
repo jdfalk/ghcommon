@@ -56,13 +56,35 @@ check_github_issue_exists() {
         "https://api.github.com/repos/$repo/issues?state=all" | \
         python3 -c "
 import sys, json
-data = json.load(sys.stdin)
-title = '''$title'''
-for issue in data:
-    if issue.get('title', '').strip() == title.strip():
-        print(f\"exists:{issue['number']}:{issue['state']}:{issue['html_url']}\")
-        sys.exit(0)
-print('not_found')
+try:
+    data = json.load(sys.stdin)
+    title = '''$title'''
+
+    # Check if data is a list (successful API call) or dict (error response)
+    if isinstance(data, dict):
+        if 'message' in data:
+            print(f'api_error:{data.get(\"message\", \"Unknown error\")}')
+            sys.exit(1)
+        else:
+            print('not_found')
+            sys.exit(0)
+
+    # Data should be a list of issues
+    if not isinstance(data, list):
+        print('api_error:Unexpected response format')
+        sys.exit(1)
+
+    for issue in data:
+        if isinstance(issue, dict) and issue.get('title', '').strip() == title.strip():
+            print(f\"exists:{issue['number']}:{issue['state']}:{issue['html_url']}\")
+            sys.exit(0)
+    print('not_found')
+except json.JSONDecodeError as e:
+    print(f'json_error:{str(e)}')
+    sys.exit(1)
+except Exception as e:
+    print(f'error:{str(e)}')
+    sys.exit(1)
 ")
 
     if [[ "$search_result" == exists:* ]]; then
@@ -70,6 +92,15 @@ print('not_found')
         echo "⚠️  Issue already exists: #$issue_number (state: $state)" >&2
         echo "   URL: $url" >&2
         return 0
+    elif [[ "$search_result" == api_error:* ]]; then
+        echo "⚠️  GitHub API error: ${search_result#api_error:}" >&2
+        return 1
+    elif [[ "$search_result" == json_error:* ]]; then
+        echo "⚠️  JSON parsing error: ${search_result#json_error:}" >&2
+        return 1
+    elif [[ "$search_result" == error:* ]]; then
+        echo "⚠️  General error: ${search_result#error:}" >&2
+        return 1
     fi
 
     return 1
@@ -160,7 +191,7 @@ create_issue_file() {
             local body="$4"
             local labels="$5"
             local parent_issue="$6"  # New parameter for sub-issues
-            local guid
+            local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
 
             # Check if issue already exists on GitHub
@@ -169,7 +200,6 @@ create_issue_file() {
                 return 1
             fi
 
-            guid=$(generate_unique_guid)
             legacy_guid=$(generate_legacy_guid "create" "$title")
 
             # Build JSON with optional parent_issue field
@@ -197,9 +227,8 @@ create_issue_file() {
             local number="$3"
             local body="$4"
             local labels="$5"
-            local guid
+            local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
-            guid=$(generate_unique_guid)
             legacy_guid=$(generate_legacy_guid "update" "$number")
 
             cat > "$file_path" << EOF
@@ -217,9 +246,8 @@ EOF
         "comment")
             local number="$3"
             local body="$4"
-            local guid
+            local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
-            guid=$(generate_unique_guid)
             legacy_guid=$(generate_legacy_guid "comment" "$number")
 
             cat > "$file_path" << EOF
@@ -236,9 +264,8 @@ EOF
         "close")
             local number="$3"
             local state_reason="${4:-completed}"
-            local guid
+            local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
-            guid=$(generate_unique_guid)
             legacy_guid=$(generate_legacy_guid "close" "$number")
 
             cat > "$file_path" << EOF
