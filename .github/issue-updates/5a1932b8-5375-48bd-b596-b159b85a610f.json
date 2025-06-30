@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add comprehensive integration testing framework",
+  "body": "Create end-to-end integration testing for all workflow combinations.\n\nTasks:\n- Create integration test matrix\n- Add cross-workflow dependency testing\n- Implement API integration tests\n- Add third-party service integration tests\n- Create test environment management\n- Add automated regression testing\n\nGoal: Ensure all integrations work correctly and catch integration issues early.",
+  "labels": ["integration-testing", "quality-assurance", "automation"],
+  "guid": "5a1932b8-5375-48bd-b596-b159b85a610f",
+  "legacy_guid": "create-add-comprehensive-integration-testing-framework-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add workflow marketplace and template sharing",
+  "body": "Create a marketplace for sharing and discovering workflow templates.\n\nTasks:\n- Design template marketplace structure\n- Create template validation system\n- Add template versioning and tagging\n- Implement template search and discovery\n- Add user ratings and reviews\n- Create template contribution guidelines\n\nGoal: Build a community-driven ecosystem of reusable workflow templates.",
+  "labels": ["marketplace", "templates", "community"],
+  "guid": "81db55b0-e7ff-4150-a0f7-162ef9cc77e5",
+  "legacy_guid": "create-add-workflow-marketplace-and-template-sharing-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add containerization and Docker support",
+  "body": "Implement Docker containers for development and deployment consistency.\n\nTasks:\n- Create Dockerfile for development environment\n- Add docker-compose for local testing\n- Create container-based CI/CD pipeline\n- Add container security scanning\n- Document container deployment patterns\n\nGoal: Improve development environment consistency and deployment reliability.",
+  "labels": ["docker", "containerization", "devops"],
+  "guid": "e5ec9a9e-4b4a-4b77-a225-d38a102f9ec5",
+  "legacy_guid": "create-add-containerization-and-docker-support-2025-06-30"
+}

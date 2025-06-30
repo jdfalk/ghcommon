@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add comprehensive API versioning and compatibility layer",
+  "body": "Implement robust API versioning to maintain backward compatibility.\n\nTasks:\n- Add semantic versioning for all APIs\n- Implement API compatibility testing\n- Create migration guides for API changes\n- Add deprecation warnings and timelines\n- Create API documentation with version history\n- Implement automatic compatibility checks\n\nGoal: Ensure smooth upgrades and maintain API stability for users.",
+  "labels": ["api", "versioning", "compatibility"],
+  "guid": "185f60d8-1b4d-4c44-989f-bb38d1e24cfc",
+  "legacy_guid": "create-add-comprehensive-api-versioning-and-compatibility-layer-2025-06-30"
+}

@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add workflow analytics and business intelligence",
+  "body": "Implement comprehensive analytics and BI dashboard for workflow insights.\n\nTasks:\n- Create workflow execution analytics\n- Add team productivity metrics\n- Implement cost analysis for workflow runs\n- Create custom dashboard builder\n- Add predictive analytics for workflow optimization\n- Implement data export and reporting features\n\nGoal: Provide actionable insights for workflow optimization and team performance.",
+  "labels": ["analytics", "business-intelligence", "metrics"],
+  "guid": "ddf00045-6c2f-4c65-9cd2-cee5afb66886",
+  "legacy_guid": "create-add-workflow-analytics-and-business-intelligence-2025-06-30"
+}

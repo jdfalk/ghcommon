@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement mobile application for workflow management",
+  "body": "Create mobile apps for managing workflows and issues on-the-go.\n\nTasks:\n- Design mobile app architecture\n- Implement iOS and Android apps\n- Add push notifications for workflow events\n- Create mobile-optimized UI/UX\n- Add offline capability\n- Implement mobile authentication\n\nGoal: Enable workflow management from mobile devices.",
+  "labels": ["mobile", "apps", "cross-platform"],
+  "guid": "d7fa253b-f8de-4475-a6f8-2a580b8c30c4",
+  "legacy_guid": "create-implement-mobile-application-for-workflow-management-2025-06-30"
+}
