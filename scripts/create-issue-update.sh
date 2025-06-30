@@ -13,61 +13,19 @@
 
 set -euo pipefail
 
-# Try to locate the library in common locations
-LIBRARY_LOCATIONS=(
-  # Relative path from current script
-  "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/create-issue-update-library.sh"
-  # Common checkout locations
-  "$HOME/repos/github.com/jdfalk/gcommon/scripts/create-issue-update-library.sh"
-  "/Users/jdfalk/repos/github.com/jdfalk/gcommon/scripts/create-issue-update-library.sh"
-  # Add other common locations here
-)
+# Source the library (this is the ghcommon repository, so library is local)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIBRARY_PATH="${SCRIPT_DIR}/create-issue-update-library.sh"
 
 # Try to download from GitHub if not found locally
-GITHUB_RAW_URL="https://raw.githubusercontent.com/jdfalk/gcommon/main/scripts/create-issue-update-library.sh"
+GITHUB_RAW_URL="https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/create-issue-update-library.sh"
 TEMP_LIBRARY_PATH="/tmp/create-issue-update-library-$$.sh"
 
-# Function to try sourcing from each location
-source_library() {
-  for location in "${LIBRARY_LOCATIONS[@]}"; do
-    if [[ -f "$location" ]]; then
-      echo "Sourcing library from: $location" >&2
-      source "$location"
-      return 0
-    fi
-  done
-
-  # If we get here, try downloading from GitHub
-  echo "Library not found locally, attempting to download..." >&2
-  if command -v curl >/dev/null 2>&1; then
-    if curl -s -o "$TEMP_LIBRARY_PATH" "$GITHUB_RAW_URL"; then
-      echo "Downloaded library from GitHub" >&2
-      source "$TEMP_LIBRARY_PATH"
-      rm -f "$TEMP_LIBRARY_PATH"
-      return 0
-    fi
-  elif command -v wget >/dev/null 2>&1; then
-    if wget -q -O "$TEMP_LIBRARY_PATH" "$GITHUB_RAW_URL"; then
-      echo "Downloaded library from GitHub" >&2
-      source "$TEMP_LIBRARY_PATH"
-      rm -f "$TEMP_LIBRARY_PATH"
-      return 0
-    fi
-  fi
-
-  echo "Failed to locate or download the library" >&2
-  return 1
-}
-
-# Try to source the library
-if ! source_library; then
-  echo "ERROR: Could not locate the create-issue-update-library.sh file." >&2
-  echo "Please ensure it exists in one of these locations:" >&2
-  for location in "${LIBRARY_LOCATIONS[@]}"; do
-    echo "  - $location" >&2
-  done
-  echo "Or that the script can download it from:" >&2
-  echo "  - $GITHUB_RAW_URL" >&2
+# Source the library directly since we're in the ghcommon repository
+if [[ -f "$LIBRARY_PATH" ]]; then
+  source "$LIBRARY_PATH"
+else
+  echo "ERROR: Could not locate the create-issue-update-library.sh file at: $LIBRARY_PATH" >&2
   exit 1
 fi
 
