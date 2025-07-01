@@ -1,0 +1,17 @@
+{
+  "action": "close",
+  "number": 6,
+  "state_reason": "completed",
+  "body": "Documentation has been comprehensively created:
+
+✅ docs/unified-issue-management.md - Complete guide
+✅ examples/workflows/ - Basic and advanced examples  
+✅ examples/migration-guides/subtitle-manager-migration.md
+✅ scripts/README.md - Script documentation
+✅ Inline documentation in all workflows
+✅ WORKFLOW_ARCHITECTURE.md for clarity
+
+Closing as completed.",
+  "guid": "1bbc3da6-a6cc-4e68-91f4-6922fef59e06",
+  "legacy_guid": "close-issue-6-2025-07-01"
+}

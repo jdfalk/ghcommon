@@ -1,0 +1,13 @@
+{
+  "action": "comment",
+  "number": 3,
+  "body": "Testing infrastructure is still needed. Current status:
+
+❌ No pytest-based unit tests for issue_manager.py
+❌ No workflow testing framework
+❌ No integration tests
+
+This aligns with TODO.md Phase 3: Testing and Quality. Should remain open.",
+  "guid": "db78ec0e-da7b-4819-9cec-ec3e87790e7f",
+  "legacy_guid": "comment-issue-3-2025-07-01"
+}

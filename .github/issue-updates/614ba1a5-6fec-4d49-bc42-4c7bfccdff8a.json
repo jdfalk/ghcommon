@@ -1,0 +1,19 @@
+{
+  "action": "comment",
+  "number": 7,
+  "body": "Rollback mechanisms need further investigation:
+
+🔄 Partial support:
+- Dry-run mode for testing
+- Failed operations don't affect successful ones (matrix strategy)
+- Files remain in place if processing fails
+
+❌ Still needed:
+- Transaction support for multi-step operations
+- Explicit rollback for partially completed operations
+- State persistence for recovery
+
+This aligns with TODO.md Phase 2 improvements. Should remain open.",
+  "guid": "ee6d3df4-baa4-4ca3-972d-c0573037eec7",
+  "legacy_guid": "comment-issue-7-2025-07-01"
+}

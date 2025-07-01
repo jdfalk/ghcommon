@@ -1,0 +1,16 @@
+{
+  "action": "close",
+  "number": 5,
+  "state_reason": "completed",
+  "body": "Batch operations are fully supported:
+
+✅ Matrix-based parallel execution in workflows
+✅ Process multiple operations: update-issues, copilot-tickets, close-duplicates, codeql-alerts
+✅ Distributed file processing (.github/issue-updates/*.json)
+✅ Legacy file support (issue_updates.json) with grouped operations
+✅ Automatic file archiving after processing
+
+Closing as completed.",
+  "guid": "367fd320-d094-4979-bb3b-248b2de73695",
+  "legacy_guid": "close-issue-5-2025-07-01"
+}
