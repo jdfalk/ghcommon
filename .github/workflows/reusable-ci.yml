@@ -178,7 +178,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          cache: "npm"
+          cache: ${{ hashFiles(format('{0}/package-lock.json', inputs.frontend-path)) != '' && 'npm' || (hashFiles(format('{0}/yarn.lock', inputs.frontend-path)) != '' && 'yarn' || '') }}
+          cache-dependency-path: |
+            ${{ inputs.frontend-path }}/package-lock.json
+            ${{ inputs.frontend-path }}/yarn.lock
 
       - name: Install Node.js dependencies
         if: hashFiles(format('{0}/package.json', inputs.frontend-path)) != ''
@@ -269,7 +272,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          cache: "npm"
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || (hashFiles('yarn.lock') != '' && 'yarn' || '') }}
 
       - name: Install Node.js dependencies
         if: hashFiles('package.json') != ''
