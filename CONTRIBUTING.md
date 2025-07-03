@@ -53,10 +53,10 @@ This project adheres to a code of conduct that we expect all contributors to fol
 
    ```bash
    # Validate workflow syntax
-   ./copilot/scripts/validate-setup.sh
+   ./scripts/validate-setup.sh
 
    # Test with a sample repository
-   ./copilot/scripts/setup-repository.sh complete
+   ./scripts/setup-repository.sh complete
    ```
 
 4. **Update documentation** as needed
@@ -82,7 +82,7 @@ This project adheres to a code of conduct that we expect all contributors to fol
 
 #### Security First
 
-- Always follow the security guidelines in `/copilot/security-guidelines.md`
+- Always follow the security guidelines in `.github/security-guidelines.md`
 - Use least privilege permissions
 - Validate all inputs
 - Pin action versions to specific commits or tags
@@ -199,16 +199,16 @@ All documentation files should include the file path comment:
 1. **Run validation scripts**:
 
    ```bash
-   ./copilot/scripts/validate-setup.sh
+   ./scripts/validate-setup.sh
    ```
 
 2. **Test with multiple project types**:
 
    ```bash
    # Test each template
-   ./copilot/scripts/setup-repository.sh complete
-   ./copilot/scripts/setup-repository.sh container
-   ./copilot/scripts/setup-repository.sh library
+   ./scripts/setup-repository.sh complete
+   ./scripts/setup-repository.sh container
+   ./scripts/setup-repository.sh library
    ```
 
 3. **Review security implications**
@@ -251,7 +251,7 @@ All documentation files should include the file path comment:
 
 ### Resources
 
-- **Documentation**: `/copilot/` directory
+- **Documentation**: `.github/` directory
 - **Examples**: `/templates/` directory
 - **Issues**: GitHub Issues for bug reports and feature requests
 - **Discussions**: GitHub Discussions for general questions

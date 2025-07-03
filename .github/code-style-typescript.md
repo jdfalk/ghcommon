@@ -1,4 +1,4 @@
-# file: copilot/code-style-typescript.md
+# file: .github/code-style-typescript.md
 
 <!-- Google TypeScript/JavaScript Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/tsguide.html -->

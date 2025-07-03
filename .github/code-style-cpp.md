@@ -1,6 +1,4 @@
-<!-- file: copilot/code-style-cpp.md -->
-<!-- version: 1.0.0 -->
-<!-- guid: 6c5d4e3f-2b1a-0c9d-8e7f-6a5b4c3d2e1f -->
+<!-- file: .github/code-style-cpp.md -->
 
 <!-- Google C++ Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/cppguide.html -->

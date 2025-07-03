@@ -1,4 +1,4 @@
-<!-- file: copilot/code-style-angular.md -->
+<!-- file: .github/code-style-angular.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f -->
 

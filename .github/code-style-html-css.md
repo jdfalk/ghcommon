@@ -1,8 +1,6 @@
-<!-- file: copilot/code-style-html-css.md -->
-<!-- version: 1.0.0 -->
-<!-- guid: 9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d -->
+<!-- file: .github/code-style-html-css.md -->
 
-# file: copilot/code-style-html-css.md
+# file: .github/code-style-html-css.md
 
 <!-- Google HTML/CSS Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/htmlcssguide.html -->

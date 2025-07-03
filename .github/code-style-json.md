@@ -1,6 +1,4 @@
-<!-- file: copilot/code-style-json.md -->
-<!-- version: 1.0.0 -->
-<!-- guid: 7b2e1c3d-4f5a-6b7c-8d9e-0a1b2c3d4e5f -->
+<!-- file: .github/code-style-json.md -->
 
 <!-- Google JSON Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/jsoncstyleguide.xml -->

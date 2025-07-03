@@ -1,4 +1,4 @@
-<!-- file: copilot/code-style-markdown.md -->
+<!-- file: .github/code-style-markdown.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: e2f8a5b1-9c4d-4e2f-8a5b-4d9c8a5b1e2f -->
 

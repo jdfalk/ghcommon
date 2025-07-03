@@ -1,4 +1,4 @@
-# file: copilot/code-style-shell.md
+# file: .github/code-style-shell.md
 
 <!-- Google Shell Style Guide Summary -->
 <!-- Source: https://google.github.io/styleguide/shellguide.html -->

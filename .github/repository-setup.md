@@ -1,4 +1,4 @@
-<!-- file: copilot/repository-setup.md -->
+<!-- file: .github/repository-setup.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 4e1f7b2c-8d5e-9f4e-1f7b-2c8d4e1f7b2c -->
 <!-- version: 1.0.0 -->
