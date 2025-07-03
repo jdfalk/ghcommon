@@ -251,104 +251,134 @@ class OperationSummary:
         print("=" * 50)
 
     def export_github_summary(self) -> str:
-        """Export summary in GitHub Actions format for step summary."""
+        """Export a concise, deduplicated summary in Markdown for GitHub Actions step summary."""
         lines = [f"## 🎯 {self.operation.upper()} Operation Results", ""]
-
         total_changes = self.get_total_changes()
         if total_changes == 0:
-            lines.extend(["ℹ️ **No changes made**", ""])
+            lines.append("ℹ️ **No changes made**\n")
         else:
-            lines.extend([f"✅ **Total changes: {total_changes}**", ""])
+            lines.append(f"✅ **Total changes: {total_changes}**\n")
 
-        # Add details for each type of change
+        # Helper for Markdown tables
+        def table(headers, rows):
+            out = [
+                "| " + " | ".join(headers) + " |",
+                "| " + " | ".join(["---"] * len(headers)) + " |",
+            ]
+            for row in rows:
+                out.append("| " + " | ".join(row) + " |")
+            return "\n".join(out)
+
+        # Issues Created
         if self.issues_created:
             lines.append(f"### 📝 Issues Created ({len(self.issues_created)})")
-            for issue in self.issues_created:
-                lines.append(
-                    f"- [#{issue['number']}: {issue['title']}]({issue['url']})"
-                )
+            rows = [
+                [f"#{i['number']}", i["title"], f"[Link]({i['url']})"]
+                for i in {i["number"]: i for i in self.issues_created}.values()
+            ]
+            lines.append(table(["Number", "Title", "Link"], rows))
             lines.append("")
 
+        # Issues Updated
         if self.issues_updated:
             lines.append(f"### 🔄 Issues Updated ({len(self.issues_updated)})")
-            for issue in self.issues_updated:
-                lines.append(
-                    f"- [#{issue['number']}: {issue['title']}]({issue['url']})"
-                )
+            rows = [
+                [f"#{i['number']}", i["title"], f"[Link]({i['url']})"]
+                for i in {i["number"]: i for i in self.issues_updated}.values()
+            ]
+            lines.append(table(["Number", "Title", "Link"], rows))
             lines.append("")
 
+        # Issues Closed
         if self.issues_closed:
             lines.append(f"### ✅ Issues Closed ({len(self.issues_closed)})")
-            for issue in self.issues_closed:
-                lines.append(
-                    f"- [#{issue['number']}: {issue['title']}]({issue['url']})"
-                )
+            rows = [
+                [f"#{i['number']}", i["title"], f"[Link]({i['url']})"]
+                for i in {i["number"]: i for i in self.issues_closed}.values()
+            ]
+            lines.append(table(["Number", "Title", "Link"], rows))
             lines.append("")
 
+        # Issues Deleted
         if self.issues_deleted:
             lines.append(f"### 🗑️ Issues Deleted ({len(self.issues_deleted)})")
-            for issue in self.issues_deleted:
-                lines.append(f"- #{issue['number']}: {issue['title']}")
+            rows = [
+                [f"#{i['number']}", i["title"]]
+                for i in {i["number"]: i for i in self.issues_deleted}.values()
+            ]
+            lines.append(table(["Number", "Title"], rows))
             lines.append("")
 
+        # Comments Added
         if self.comments_added:
             lines.append(f"### 💬 Comments Added ({len(self.comments_added)})")
-            for comment in self.comments_added:
-                lines.append(
-                    f"- [Comment on issue #{comment['issue_number']}]({comment['url']})"
-                )
+            # Deduplicate by (issue_number, url)
+            seen = set()
+            rows = []
+            for c in self.comments_added:
+                key = (c["issue_number"], c["url"])
+                if key not in seen:
+                    seen.add(key)
+                    rows.append(
+                        [f"#{c['issue_number']}", f"[Comment Link]({c['url']})"]
+                    )
+            lines.append(table(["Issue", "Comment"], rows))
             lines.append("")
 
+        # Duplicates Closed
         if self.duplicates_closed:
             lines.append(f"### 🔁 Duplicates Closed ({len(self.duplicates_closed)})")
-            for issue in self.duplicates_closed:
-                lines.append(
-                    f"- [#{issue['number']}: {issue['title']}]({issue['url']})"
-                )
+            rows = [
+                [f"#{i['number']}", i["title"], f"[Link]({i['url']})"]
+                for i in {i["number"]: i for i in self.duplicates_closed}.values()
+            ]
+            lines.append(table(["Number", "Title", "Link"], rows))
             lines.append("")
 
+        # Alerts Processed
         if self.alerts_processed:
             lines.append(
                 f"### 🔒 CodeQL Alerts Processed ({len(self.alerts_processed)})"
             )
-            for alert in self.alerts_processed:
-                if alert["issue_number"]:
-                    lines.append(
-                        f"- Alert {alert['alert_id']}: [#{alert['issue_number']} {alert['title']}]({alert['issue_url']})"
+            rows = []
+            for a in {a["alert_id"]: a for a in self.alerts_processed}.values():
+                if a.get("issue_number"):
+                    rows.append(
+                        [
+                            a["alert_id"],
+                            a["title"],
+                            f"#{a['issue_number']}",
+                            f"[Link]({a['issue_url']})",
+                        ]
                     )
                 else:
-                    lines.append(f"- Alert {alert['alert_id']}: {alert['title']}")
+                    rows.append([a["alert_id"], a["title"], "", ""])
+            lines.append(table(["Alert ID", "Title", "Issue", "Link"], rows))
             lines.append("")
 
+        # Files Processed (summarize count, not full list)
         if self.files_processed:
-            lines.append(f"### 📄 Files Processed ({len(self.files_processed)})")
-            for file_path in self.files_processed:
-                lines.append(f"- `{file_path}`")
-            lines.append("")
-
+            lines.append(f"### 📄 Files Processed: {len(set(self.files_processed))}")
+        # Files Archived
         if self.files_archived:
-            lines.append(f"### 📦 Files Archived ({len(self.files_archived)})")
-            for file_path in self.files_archived:
-                lines.append(f"- `{file_path}`")
-            lines.append("")
-
+            lines.append(f"### 📦 Files Archived: {len(set(self.files_archived))}")
+        # Permalinks Updated
         if self.permalinks_updated:
             lines.append(
-                f"### 🔗 Files with Updated Permalinks ({len(self.permalinks_updated)})"
+                f"### 🔗 Files with Updated Permalinks: {len(set(self.permalinks_updated))}"
             )
-            for file_path in self.permalinks_updated:
-                lines.append(f"- `{file_path}`")
-            lines.append("")
 
+        # Warnings
         if self.warnings:
             lines.append(f"### ⚠️ Warnings ({len(self.warnings)})")
-            for warning in self.warnings:
+            for warning in set(self.warnings):
                 lines.append(f"- {warning}")
             lines.append("")
 
+        # Errors
         if self.errors:
             lines.append(f"### ❌ Errors ({len(self.errors)})")
-            for error in self.errors:
+            for error in set(self.errors):
                 lines.append(f"- {error}")
             lines.append("")
 
@@ -2020,6 +2050,7 @@ class DuplicateIssueManager:
         duplicates = issue_list[1:]
 
         print(f"  📌 Would keep issue #{canonical['number']} as canonical")
+
         for duplicate in duplicates:
             print(f"  🚫 Would close issue #{duplicate['number']} as duplicate")
 
