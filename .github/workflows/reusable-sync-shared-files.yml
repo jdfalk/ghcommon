@@ -1,13 +1,8 @@
 # file: .github/workflows/reusable-sync-shared-files.yml
-# Reusable workflow to sync shared files (AGENTS.md, copilot files) from ghcommon to other repos
-#
-# Usage: Call this workflow from your repo to pull the latest shared files from ghcommon
-# All copilot files are synced directly to .github/ for simplicity and to avoid path issues.
-#
-# Example call:
-#   uses: jdfalk/ghcommon/.github/workflows/reusable-sync-shared-files.yml@main
+# DEPRECATED: This workflow is now a NOOP. Use sync-to-repos.yml in ghcommon instead.
+# This file remains for compatibility but does nothing and will be removed in a future release.
 
-name: Reusable - Sync Shared Files
+name: DEPRECATED - Reusable Sync Shared Files (NOOP)
 
 on:
   workflow_call:
@@ -19,55 +14,9 @@ on:
         type: string
 
 jobs:
-  sync-files:
+  noop:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout target repo
-        uses: actions/checkout@v4
-
-      - name: Download and sync files from ghcommon
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: No-op
         run: |
-          set -e
-          rm -rf ghcommon-tmp
-          gh repo clone jdfalk/ghcommon ghcommon-tmp -- --depth=1 --branch=${{ inputs.branch }}
-
-          echo "Removing old copilot files from .github..."
-          rm -f .github/code-style-*.md
-          rm -f .github/commit-messages.md
-          rm -f .github/pull-request-descriptions.md
-          rm -f .github/review-selection.md
-          rm -f .github/test-generation.md
-          rm -f .github/security-guidelines.md
-          rm -f .github/workflow-usage.md
-          rm -f .github/copilot-instructions.md
-          rm -rf .github/copilot/
-
-          echo "Copying all copilot files to .github..."
-          cp ghcommon-tmp/copilot/* .github/
-
-          # Make shell scripts executable
-          chmod +x .github/*.sh
-
-          echo "Copying AGENTS.md to repo root..."
-          cp ghcommon-tmp/codex/AGENTS.md ./AGENTS.md
-
-          rm -rf ghcommon-tmp
-
-      - name: Show synced files
-        run: |
-          echo "Files in .github after sync:"
-          find .github -name "*.md" | sort
-
-      - name: Commit and push if changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .github AGENTS.md
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: sync shared files from ghcommon"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+          echo "This workflow is deprecated and does nothing. Use sync-to-repos.yml in ghcommon."
