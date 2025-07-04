@@ -644,6 +644,7 @@ class IssueUpdateProcessor:
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
         self.summary = OperationSummary("update-issues")
+        self.guid_issue_map: Dict[str, int] = {}
 
     def process_updates(
         self,
@@ -693,15 +694,20 @@ class IssueUpdateProcessor:
             print("📝 No new updates to process")
             return True
 
+        # Process create actions first so later updates can reference issue numbers
+        create_updates = [u for u in all_updates if u.get("action") == "create"]
+        other_updates = [u for u in all_updates if u.get("action") != "create"]
+        ordered_updates = create_updates + other_updates
+
         print(f"🚀 Processing {len(all_updates)} total updates...")
         success_count = 0
 
-        for i, update in enumerate(all_updates, 1):
+        for i, update in enumerate(ordered_updates, 1):
             action = update.get("action", "unknown")
             source = update.get("_source_file", "unknown")
             guid = update.get("guid", "no-guid")
             print(
-                f"\n📋 Update {i}/{len(all_updates)}: {action} (from {source}, guid: {guid})"
+                f"\n📋 Update {i}/{len(ordered_updates)}: {action} (from {source}, guid: {guid})"
             )
 
             result = self._process_single_update(update)
@@ -714,6 +720,8 @@ class IssueUpdateProcessor:
 
         # Move processed distributed files to processed subdirectory
         if processed_files and success_count > 0:
+            for file_path in processed_files:
+                self._fill_numbers_in_file(file_path)
             self._archive_processed_files(processed_files, updates_directory)
 
         # Mark legacy file as processed if we processed it successfully
@@ -941,6 +949,53 @@ class IssueUpdateProcessor:
 
         except OSError as e:
             print(f"⚠️  Error archiving processed files: {e}", file=sys.stderr)
+
+    def _fill_numbers_in_file(self, file_path: str) -> None:
+        """Update actions with parent GUIDs using resolved issue numbers."""
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"⚠️  Failed to read {file_path}: {e}")
+            return
+
+        modified = False
+
+        def update_action(action: Dict[str, Any]) -> None:
+            nonlocal modified
+            if isinstance(action, dict):
+                parent_guid = action.get("parent")
+                if parent_guid:
+                    if not action.get("number"):
+                        number = self.guid_issue_map.get(parent_guid)
+                        if number:
+                            action["number"] = number
+                            action["issue_url"] = f"https://github.com/{self.api.repo}/issues/{number}"
+                            modified = True
+                    elif not action.get("issue_url"):
+                        number = action.get("number")
+                        action["issue_url"] = f"https://github.com/{self.api.repo}/issues/{number}"
+                        modified = True
+
+        if isinstance(data, list):
+            for item in data:
+                update_action(item)
+        elif isinstance(data, dict):
+            if "action" in data:
+                update_action(data)
+            else:
+                for val in data.values():
+                    if isinstance(val, list):
+                        for item in val:
+                            update_action(item)
+
+        if modified:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                print(f"📝 Updated {os.path.basename(file_path)} with issue numbers")
+            except Exception as e:
+                print(f"⚠️  Failed to write {file_path}: {e}")
 
     def _is_legacy_file_processed(self, updates_file: str) -> bool:
         """Check if legacy file has been processed before."""
@@ -1216,6 +1271,11 @@ class IssueUpdateProcessor:
                 issue["number"], issue["title"], issue["html_url"]
             )
 
+            if guid:
+                self.guid_issue_map[guid] = issue["number"]
+            if legacy_guid:
+                self.guid_issue_map[legacy_guid] = issue["number"]
+
             # If this is a sub-issue, add a comment on the parent issue
             if parent_issue:
                 parent_comment = f"Created sub-issue #{issue['number']}: [{title}]({issue['html_url']})"
@@ -1230,6 +1290,13 @@ class IssueUpdateProcessor:
         """Update an existing issue with dual-GUID tracking."""
         issue_number = update.get("number")
         primary_guid, legacy_guid = self._extract_guids(update)
+
+        if not issue_number:
+            parent_guid = update.get("parent")
+            if parent_guid:
+                issue_number = self.guid_issue_map.get(parent_guid)
+                if issue_number:
+                    update["number"] = issue_number
 
         if not issue_number:
             print("❌ Update action missing issue number", file=sys.stderr)
@@ -1278,6 +1345,13 @@ class IssueUpdateProcessor:
         primary_guid, legacy_guid = self._extract_guids(update)
 
         if not issue_number:
+            parent_guid = update.get("parent")
+            if parent_guid:
+                issue_number = self.guid_issue_map.get(parent_guid)
+                if issue_number:
+                    update["number"] = issue_number
+
+        if not issue_number:
             print("❌ Comment action missing issue number", file=sys.stderr)
             return False
 
@@ -1318,6 +1392,13 @@ class IssueUpdateProcessor:
         issue_number = update.get("number")
         state_reason = update.get("state_reason", "completed")
         primary_guid, legacy_guid = self._extract_guids(update)
+
+        if not issue_number:
+            parent_guid = update.get("parent")
+            if parent_guid:
+                issue_number = self.guid_issue_map.get(parent_guid)
+                if issue_number:
+                    update["number"] = issue_number
 
         if not issue_number:
             print("❌ Close action missing issue number", file=sys.stderr)
