@@ -1,4 +1,7 @@
 # Scripts Directory
+<!-- file: scripts/README.md -->
+<!-- version: 1.1.0 -->
+<!-- guid: a6ce4820-bcf8-482e-b2ca-234024d5d77f -->
 
 This directory contains reusable scripts for GitHub automation and issue management.
 
@@ -22,7 +25,7 @@ Used by the [`unified-issue-management.yml`](../.github/workflows/reusable-unifi
 
 ### [`create-issue-update.sh`](create-issue-update.sh)
 
-**Version**: 1.0.0
+**Version**: 1.2.0
 **Last Updated**: 2025-06-21
 
 Helper script to create new issue update files with proper UUIDs in the distributed format.
@@ -34,13 +37,17 @@ Helper script to create new issue update files with proper UUIDs in the distribu
 ./scripts/create-issue-update.sh create "Issue Title" "Description" "label1,label2"
 
 # Update an existing issue
-./scripts/create-issue-update.sh update 123 "Updated description" "label1,label2"
+./scripts/create-issue-update.sh update 123 "Updated description" "label1,label2" parent-guid
 
 # Add comment to issue
-./scripts/create-issue-update.sh comment 123 "Comment text"
+./scripts/create-issue-update.sh comment 123 "Comment text" parent-guid
+# When the issue number is unknown use "null"
+./scripts/create-issue-update.sh comment null "Comment text" parent-guid
 
 # Close an issue
-./scripts/create-issue-update.sh close 123 "completed"
+./scripts/create-issue-update.sh close 123 "completed" parent-guid
+# Or when pending number
+./scripts/create-issue-update.sh close null "completed" parent-guid
 ```
 
 **Features**:
