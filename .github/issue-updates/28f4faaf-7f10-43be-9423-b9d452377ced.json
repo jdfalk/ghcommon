@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Support placeholder numbers for parent GUID updates",
+  "body": "Update workflow: keep number field null until resolved and add issue_url",
+  "labels": ["codex", "enhancement"],
+  "guid": "28f4faaf-7f10-43be-9423-b9d452377ced",
+  "legacy_guid": "create-support-placeholder-numbers-for-parent-guid-updates-2025-07-03"
+}

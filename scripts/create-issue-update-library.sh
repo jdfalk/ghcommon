@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/create-issue-update-library.sh
-# version: 1.1.0
+# version: 1.2.0
 # guid: 4a81c3e0-5f7b-4e2a-b92d-6c8a7c1d3e5f
 #
 # Library of functions for creating GitHub issue update files
@@ -191,6 +191,7 @@ create_issue_file() {
             local body="$4"
             local labels="$5"
             local parent_issue="$6"  # New parameter for sub-issues
+            local repo="$7"
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
 
@@ -216,6 +217,10 @@ create_issue_file() {
                 json_content+=",
   \"parent_issue\": $parent_issue"
             fi
+            if [[ -n "$repo" ]]; then
+                json_content+=",
+  \"repo\": \"$repo\""
+            fi
 
             json_content+="
 }"
@@ -227,56 +232,91 @@ create_issue_file() {
             local number="$3"
             local body="$4"
             local labels="$5"
+            local parent_guid="$6"
+            local repo="$7"
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             legacy_guid=$(generate_legacy_guid "update" "$number")
 
-            cat > "$file_path" << EOF
-{
-  "action": "update",
-  "number": $number,
-  "body": "$body",
-  "labels": [$(echo "$labels" | sed 's/,/", "/g' | sed 's/^/"/;s/$/"/')],
-  "guid": "$guid",
-  "legacy_guid": "$legacy_guid"
-}
-EOF
+            local num_field
+            if [[ -z "$number" || "$number" == "null" ]]; then
+                num_field="null"
+            else
+                num_field="$number"
+            fi
+
+            local json_content="{\n  \"action\": \"update\",\n  \"number\": $num_field,\n  \"body\": \"$body\",\n  \"labels\": [$(echo "$labels" | sed 's/,/\", \"/g' | sed 's/^/\"/;s/$/\"/')],\n  \"guid\": \"$guid\",\n  \"legacy_guid\": \"$legacy_guid\""
+
+            if [[ -n "$parent_guid" ]]; then
+                json_content+=" ,\n  \"parent\": \"$parent_guid\""
+            fi
+            if [[ -n "$repo" ]]; then
+                json_content+=" ,\n  \"repo\": \"$repo\""
+            fi
+
+            json_content+="\n}"
+
+            echo -e "$json_content" > "$file_path"
             ;;
 
         "comment")
             local number="$3"
             local body="$4"
+            local parent_guid="$5"
+            local repo="$6"
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             legacy_guid=$(generate_legacy_guid "comment" "$number")
 
-            cat > "$file_path" << EOF
-{
-  "action": "comment",
-  "number": $number,
-  "body": "$body",
-  "guid": "$guid",
-  "legacy_guid": "$legacy_guid"
-}
-EOF
+            local num_field
+            if [[ -z "$number" || "$number" == "null" ]]; then
+                num_field="null"
+            else
+                num_field="$number"
+            fi
+
+            local json_content="{\n  \"action\": \"comment\",\n  \"number\": $num_field,\n  \"body\": \"$body\",\n  \"guid\": \"$guid\",\n  \"legacy_guid\": \"$legacy_guid\""
+
+            if [[ -n "$parent_guid" ]]; then
+                json_content+=" ,\n  \"parent\": \"$parent_guid\""
+            fi
+            if [[ -n "$repo" ]]; then
+                json_content+=" ,\n  \"repo\": \"$repo\""
+            fi
+
+            json_content+="\n}"
+
+            echo -e "$json_content" > "$file_path"
             ;;
 
         "close")
             local number="$3"
             local state_reason="${4:-completed}"
+            local parent_guid="$5"
+            local repo="$6"
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             legacy_guid=$(generate_legacy_guid "close" "$number")
 
-            cat > "$file_path" << EOF
-{
-  "action": "close",
-  "number": $number,
-  "state_reason": "$state_reason",
-  "guid": "$guid",
-  "legacy_guid": "$legacy_guid"
-}
-EOF
+            local num_field
+            if [[ -z "$number" || "$number" == "null" ]]; then
+                num_field="null"
+            else
+                num_field="$number"
+            fi
+
+            local json_content="{\n  \"action\": \"close\",\n  \"number\": $num_field,\n  \"state_reason\": \"$state_reason\",\n  \"guid\": \"$guid\",\n  \"legacy_guid\": \"$legacy_guid\""
+
+            if [[ -n "$parent_guid" ]]; then
+                json_content+=" ,\n  \"parent\": \"$parent_guid\""
+            fi
+            if [[ -n "$repo" ]]; then
+                json_content+=" ,\n  \"repo\": \"$repo\""
+            fi
+
+            json_content+="\n}"
+
+            echo -e "$json_content" > "$file_path"
             ;;
 
         *)
@@ -295,10 +335,10 @@ EOF
 run_issue_update() {
     if [[ $# -lt 2 ]]; then
         echo "Usage:"
-        echo "  $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue_number]"
-        echo "  $0 update NUMBER \"Body\" \"label1,label2\""
-        echo "  $0 comment NUMBER \"Comment text\""
-        echo "  $0 close NUMBER [state_reason]"
+        echo "  $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue] [repo]"
+        echo "  $0 update NUMBER \"Body\" \"label1,label2\" [parent_guid] [repo]"
+        echo "  $0 comment NUMBER \"Comment text\" [parent_guid] [repo]"
+        echo "  $0 close NUMBER [state_reason] [parent_guid] [repo]"
         return 1
     fi
 
@@ -309,31 +349,31 @@ run_issue_update() {
         "create")
             if [[ $# -lt 4 ]]; then
                 echo "Error: create requires title, body, and labels" >&2
-                echo "Usage: $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue_number]" >&2
+                echo "Usage: $0 create \"Title\" \"Body\" \"label1,label2\" [parent_issue] [repo]" >&2
                 return 1
             fi
-            create_issue_file "$action" "$uuid" "$2" "$3" "${4:-}" "${5:-}"
+            create_issue_file "$action" "$uuid" "$2" "$3" "$4" "${5:-}" "${6:-}"
             ;;
         "update")
             if [[ $# -lt 4 ]]; then
                 echo "Error: update requires number, body, and labels" >&2
                 return 1
             fi
-            create_issue_file "$action" "$uuid" "$2" "$3" "${4:-}"
+            create_issue_file "$action" "$uuid" "$2" "$3" "$4" "${5:-}" "${6:-}"
             ;;
         "comment")
             if [[ $# -lt 3 ]]; then
                 echo "Error: comment requires number and body" >&2
                 return 1
             fi
-            create_issue_file "$action" "$uuid" "$2" "$3"
+            create_issue_file "$action" "$uuid" "$2" "$3" "${4:-}" "${5:-}"
             ;;
         "close")
             if [[ $# -lt 2 ]]; then
                 echo "Error: close requires number" >&2
                 return 1
             fi
-            create_issue_file "$action" "$uuid" "$2" "${3:-completed}"
+            create_issue_file "$action" "$uuid" "$2" "${3:-completed}" "${4:-}" "${5:-}"
             ;;
         *)
             echo "Error: Unknown action '$action'" >&2

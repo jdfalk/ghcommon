@@ -146,6 +146,7 @@ Store individual issue updates in `.github/issue-updates/` directory:
   "title": "Feature: Add dark mode support",
   "body": "Users have requested dark mode support...",
   "labels": ["enhancement", "ui"],
+  "repo": "jdfalk/example-repo",
   "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
   "legacy_guid": "feat-dark-mode-2024-001"
 }
@@ -156,12 +157,21 @@ Store individual issue updates in `.github/issue-updates/` directory:
 ```json
 {
   "action": "comment",
-  "number": 123,
+  "number": null,
+  "parent": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
   "body": "Progress update: 50% complete",
+  "repo": "jdfalk/example-repo",
   "guid": "8c237a09-3dbf-4bb6-b992-4674bb07c3f3",
   "legacy_guid": "progress-update-2024-001"
 }
 ```
+
+Use the `parent` field when the issue number is unknown. Keep the `number`
+field set to `null` so it can be filled in later. The workflow resolves the
+parent GUID to the created issue number and updates the file during processing.
+
+Add a `repo` field to target another repository under the `jdfalk` account. Each
+repository should include the same workflows to process its updates.
 
 #### Legacy Single-File Format (Still Supported)
 

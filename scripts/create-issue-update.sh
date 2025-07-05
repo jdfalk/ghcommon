@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/create-issue-update.sh
-# version: 1.1.0
+# version: 1.2.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 #
 # Helper script to create new issue update files with proper UUIDs
