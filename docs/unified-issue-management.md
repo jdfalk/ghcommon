@@ -76,12 +76,7 @@ When distributed files are processed, they are automatically moved to the `proce
 
 - **Original file**: `issue_updates.json`
 - **Updated file**: Contains permalinks to created issues
-- **Change tracking**: Via separate PR with link updatesre Operations
-
-- **Issue Updates**: Process issue updates from JSON files (create, update, comment, close, delete)
-- **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
-- **Duplicate Management**: Automatically close duplicate issues by title
-- **Security Alerts**: Generate tickets for CodeQL security alerts
+- **Change tracking**: Via separate PR with link updates
 
 ### Advanced Features
 
@@ -146,6 +141,7 @@ Store individual issue updates in `.github/issue-updates/` directory:
   "title": "Feature: Add dark mode support",
   "body": "Users have requested dark mode support...",
   "labels": ["enhancement", "ui"],
+  "repo": "jdfalk/example-repo",
   "guid": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
   "legacy_guid": "feat-dark-mode-2024-001"
 }
@@ -159,6 +155,7 @@ Store individual issue updates in `.github/issue-updates/` directory:
   "number": null,
   "parent": "a4d7a2e2-f643-466f-84c7-dcd476ec287f",
   "body": "Progress update: 50% complete",
+  "repo": "jdfalk/example-repo",
   "guid": "8c237a09-3dbf-4bb6-b992-4674bb07c3f3",
   "legacy_guid": "progress-update-2024-001"
 }
@@ -167,6 +164,9 @@ Store individual issue updates in `.github/issue-updates/` directory:
 Use the `parent` field when the issue number is unknown. Keep the `number`
 field set to `null` so it can be filled in later. The workflow resolves the
 parent GUID to the created issue number and updates the file during processing.
+
+Add a `repo` field to target another repository under the `jdfalk` account. Each
+repository should include the same workflows to process its updates.
 
 #### Legacy Single-File Format (Still Supported)
 
