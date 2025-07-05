@@ -1,5 +1,7 @@
 #!/bin/bash
 # file: scripts/rebase
+# version: 1.2.0
+# guid: e542f3f2-f992-4f03-a755-a2f8b9fc2790
 
 # Smart Git Rebase Launcher
 # This script detects the best available rebase implementation and uses it
@@ -150,6 +152,104 @@ test_shell_script() {
     return 0
 }
 
+# Detect runtime environment (codex, github, or local)
+detect_environment() {
+    if [[ -n "${CODEX_API_KEY:-${OPENAI_API_KEY:-}}" || -n "${CODEX_ENV:-}" ]]; then
+        echo "codex"
+    elif [[ -n "${GITHUB_ACTIONS:-}" || -n "${GITHUB_TOKEN:-}" ]]; then
+        echo "github"
+    else
+        echo "local"
+    fi
+}
+
+# Attempt to install Codex CLI if missing
+install_codex_cli() {
+    if command -v codex >/dev/null 2>&1; then
+        return 0
+    fi
+
+    if command -v npm >/dev/null 2>&1; then
+        npm install -g @githubnext/codex >/dev/null 2>&1 && return 0
+    fi
+
+    if command -v pip >/dev/null 2>&1; then
+        pip install --user codex-cli >/dev/null 2>&1 && return 0
+    fi
+
+    return 1
+}
+
+# Attempt to install gh CLI if missing
+install_gh_cli() {
+    if command -v gh >/dev/null 2>&1; then
+        gh extension install github/gh-copilot >/dev/null 2>&1 || true
+        return 0
+    fi
+
+    if command -v apt-get >/dev/null 2>&1; then
+        apt-get update -y >/dev/null 2>&1 && apt-get install -y gh >/dev/null 2>&1 && \
+            gh extension install github/gh-copilot >/dev/null 2>&1 && return 0
+    fi
+
+    return 1
+}
+
+# Detect available AI CLI for resolving conflicts and install if needed
+detect_ai_cli() {
+    if command -v codex >/dev/null 2>&1; then
+        echo "codex"
+        return 0
+    fi
+
+    if command -v gh >/dev/null 2>&1 && gh help copilot >/dev/null 2>&1; then
+        echo "gh"
+        return 0
+    fi
+
+    local env
+    env=$(detect_environment)
+    case "$env" in
+        codex)
+            install_codex_cli && { echo "codex"; return 0; } || true
+            ;;
+        github)
+            install_gh_cli && { echo "gh"; return 0; } || true
+            ;;
+    esac
+
+    echo "none"
+}
+
+# Attempt to resolve conflicts using Codex CLI or gh Copilot plugin
+attempt_ai_resolution() {
+    local cli
+    cli=$(detect_ai_cli)
+
+    case "$cli" in
+        codex)
+            log_info "Attempting conflict resolution with Codex CLI"
+            if [[ -z "${CODEX_API_KEY:-${OPENAI_API_KEY:-}}" ]]; then
+                log_warning "Codex CLI requires CODEX_API_KEY or OPENAI_API_KEY"
+                return 1
+            fi
+            codex ask "Resolve git rebase conflicts in $(pwd)" || true
+            ;;
+        gh)
+            log_info "Attempting conflict resolution with gh copilot"
+            if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+                log_warning "gh CLI requires GITHUB_TOKEN"
+                return 1
+            fi
+            gh copilot suggest --shell "git rebase --continue" || true
+            ;;
+        *)
+            log_warning "No AI CLI found for automatic conflict resolution"
+            return 1
+            ;;
+    esac
+}
+
 # Determine which implementation to use
 select_implementation() {
     local use_python=false
@@ -288,18 +388,21 @@ main() {
         fi
     fi
 
-    # Execute the selected implementation
+    # Execute the selected implementation and capture exit code
+    local exit_code=0
     case "$selected_impl" in
         python)
             log_success "Using Python implementation (full-featured)"
             if [[ ! -x "$PYTHON_SCRIPT" ]]; then
                 chmod +x "$PYTHON_SCRIPT"
             fi
-            exec python3 "$PYTHON_SCRIPT" "${script_args[@]}"
+            python3 "$PYTHON_SCRIPT" "${script_args[@]}"
+            exit_code=$?
             ;;
         shell)
             log_success "Using Shell implementation (fallback)"
-            exec "$SHELL_SCRIPT" "${script_args[@]}"
+            "$SHELL_SCRIPT" "${script_args[@]}"
+            exit_code=$?
             ;;
         none)
             log_error "No suitable implementation found"
@@ -310,6 +413,12 @@ main() {
             exit 1
             ;;
     esac
+
+    if [[ $exit_code -ne 0 ]]; then
+        log_warning "Rebase failed with exit code $exit_code"
+        attempt_ai_resolution "${script_args[@]}" || true
+        return $exit_code
+    fi
 }
 
 # Make scripts executable if needed
