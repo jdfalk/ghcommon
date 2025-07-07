@@ -22,6 +22,11 @@ on:
         required: false
         default: "1.22"
         type: string
+      enable-dependency-submission:
+        description: "Enable dependency submission to GitHub (true/false)"
+        required: false
+        default: true
+        type: boolean
       run-lint:
         description: "Run linters (true/false)"
         required: false
@@ -329,5 +334,32 @@ jobs:
             echo '❌ Lint or test failures detected. See above for details.' >> "$GITHUB_STEP_SUMMARY"
           fi
 
+  dependency-submission:
+    if: inputs.enable-dependency-submission == true && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Go-specific dependency submission (if Go files detected)
+      - name: Set up Go for dependency submission
+        if: hashFiles('**/*.go') != '' || hashFiles('**/go.mod') != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Go Dependency Submission
+        if: hashFiles('**/*.go') != '' || hashFiles('**/go.mod') != ''
+        uses: actions/go-dependency-submission@v1
+        with:
+          # Path to go.mod file
+          go-mod-path: ./go.mod
+          # Build target (all dependencies by default)
+          go-build-target: all
 # --- Insert the full universal language steps for Go, Python, Node.js, etc. in each job as appropriate ---
 # (Omitted here for brevity, but use the steps from the previous universal-ci job for each language)
