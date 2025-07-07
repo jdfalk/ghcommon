@@ -27,6 +27,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Auto-detection of operations based on event context
   - Comprehensive documentation and migration guides
   - Example workflows for basic and advanced usage
+- **Enhanced CI/CD with Dependency Submission**: Updated reusable CI workflow with automatic dependency submission
+  - Go dependency submission using `actions/go-dependency-submission@v1`
+  - Automatic detection of Go modules and dependencies
+  - Integration with GitHub's dependency graph for security insights
+  - Dependabot alerts and updates for vulnerable dependencies
+  - Configurable dependency submission with `enable-dependency-submission` input
+- **Automatic Pull Request Labeling**: New reusable workflow for intelligent PR labeling
+  - File-based labeling using glob patterns (documentation, backend, frontend, tests, etc.)
+  - Branch-based labeling using regex patterns (feature, bugfix, release, etc.)
+  - Support for complex matching logic with v5.0.0 labeler action
+  - Comprehensive default configuration with 15+ label categories
+  - Label synchronization to remove labels when files are reverted
+  - Security-conscious implementation using `pull_request_target` event
 - Complete CI/CD pipeline template
 - Container-only pipeline template
 - Library/package release pipeline template
@@ -35,6 +48,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive security guidelines
 - Copilot instructions for AI-assisted development
 - GitHub issue and PR templates
+
+### Changed
+
+- **Updated reusable-ci.yml**: Enhanced with dependency submission capabilities
+  - Added `enable-dependency-submission` input parameter
+  - Integrated Go dependency submission for projects with Go modules
+  - Improved permissions configuration for dependency graph access
+
+### Files Added
+
+- `.github/workflows/reusable-labeler.yml`: New reusable workflow for automatic PR labeling
+- `.github/labeler.yml`: Comprehensive labeler configuration with 15+ label categories
+- `.github/workflows/example-usage.yml`: Example demonstrating both CI and labeler workflows
+- `docs/dependency-submission-and-labeling.md`: Complete documentation for new features
 
 ### Security
 
