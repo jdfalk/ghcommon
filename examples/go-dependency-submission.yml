@@ -1,0 +1,38 @@
+# Simple Go Dependency Submission Example
+# This workflow only does dependency submission for Go projects
+
+name: Go Dependency Submission
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Run weekly to catch new vulnerabilities
+    - cron: "0 2 * * 1"
+
+# Required permissions for dependency submission
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    # Only run if Go files are present
+    if: hashFiles('**/*.go') != '' || hashFiles('**/go.mod') != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Submit Go dependencies
+        uses: actions/go-dependency-submission@v1
+        with:
+          go-mod-path: ./go.mod
+          go-build-target: all
