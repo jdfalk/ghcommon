@@ -26,6 +26,24 @@ The reusable CI workflow now includes automatic dependency submission to GitHub'
 ### Usage
 
 ```yaml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+  checks: write
+  security-events: write
+  id-token: write
+  # Additional permissions for dependency submission
+  repository-projects: write
+
 jobs:
   ci:
     uses: jdfalk/ghcommon/.github/workflows/reusable-ci.yml@main
@@ -33,12 +51,18 @@ jobs:
       enable-dependency-submission: true # Enable dependency submission
       go-version: "1.22"
       # ... other inputs
+    secrets: inherit
 ```
 
 ### Requirements
 
 - Must run on `main` branch (configurable in the workflow)
-- Requires `contents: read` and `id-token: write` permissions
+- Requires enhanced permissions for dependency submission:
+  - `contents: read`
+  - `id-token: write`
+  - `security-events: write`
+  - `repository-projects: write`
+  - `pull-requests: write`
 - Go projects need `go.mod` file in repository root
 
 ## Pull Request Labeling
