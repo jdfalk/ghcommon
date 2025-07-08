@@ -80,8 +80,7 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: changes
         with:
-          # Use the base SHA for comparison if available
-          base: ${{ github.event.before || github.event.pull_request.base.sha || 'HEAD~1' }}
+          # Let paths-filter automatically determine the base reference
           filters: |
             backend:
               - '**/*.go'
@@ -365,8 +364,8 @@ jobs:
         if: hashFiles('**/build.gradle', '**/build.gradle.kts') != ''
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Gradle Dependency Submission
         if: hashFiles('**/build.gradle', '**/build.gradle.kts') != ''
@@ -378,8 +377,8 @@ jobs:
         if: hashFiles('**/pom.xml') != ''
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Maven Dependency Tree Submission
         if: hashFiles('**/pom.xml') != ''
@@ -391,8 +390,8 @@ jobs:
         if: hashFiles('**/build.sc') != ''
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Mill Dependency Submission
         if: hashFiles('**/build.sc') != ''
@@ -404,8 +403,8 @@ jobs:
         if: hashFiles('**/mix.exs') != ''
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.15'
-          otp-version: '26'
+          elixir-version: "1.15"
+          otp-version: "26"
 
       - name: Mix Dependency Submission
         if: hashFiles('**/mix.exs') != ''
@@ -417,8 +416,8 @@ jobs:
         if: hashFiles('**/build.sbt') != ''
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: SBT Dependency Submission
         if: hashFiles('**/build.sbt') != ''
