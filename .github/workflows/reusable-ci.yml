@@ -345,19 +345,17 @@ jobs:
       id-token: write
       actions: read
       security-events: write
+      # Add explicit permissions for dependency submission
+      repository-projects: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Go dependency submission
-      - name: Go Dependency Submission
-        if: hashFiles('**/go.mod') != ''
-        uses: actions/go-dependency-submission@v2.0.3
-        continue-on-error: true
-        with:
-          go-mod-path: go.mod
+      # Skip Go dependency submission due to cache conflicts
+      # The component detection action will handle Go dependencies
 
       # Gradle dependency submission
       - name: Set up Java for Gradle
@@ -424,15 +422,45 @@ jobs:
         uses: scalacenter/sbt-dependency-submission@v2
         continue-on-error: true
 
-      # Component Detection for NuGet and other languages
+      # Build Docker image for scanning if Dockerfile exists
+      - name: Set up Docker Buildx
+        if: hashFiles('**/Dockerfile') != ''
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for dependency scanning
+        if: hashFiles('**/Dockerfile') != ''
+        run: |
+          # Try to pull from GHCR first, fallback to local build
+          IMAGE_NAME="ghcr.io/${{ github.repository }}:latest"
+          if docker pull "$IMAGE_NAME" 2>/dev/null; then
+            echo "Using pre-built image from GHCR: $IMAGE_NAME"
+            docker tag "$IMAGE_NAME" "local-scan-image:latest"
+          else
+            echo "Building image locally for dependency scanning"
+            docker build -t "local-scan-image:latest" .
+          fi
+        continue-on-error: true
+
+      - name: Check repository settings
+        run: |
+          echo "🔍 Checking repository configuration for dependency submission..."
+          echo "Repository: ${{ github.repository }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          echo ""
+          echo "⚠️ If dependency submission fails, ensure:"
+          echo "1. Dependency graph is enabled in repository settings"
+          echo "2. Repository has GitHub Advanced Security (for private repos)"
+          echo "3. Workflow has proper permissions"
+
+      # Component Detection for all languages including Docker
       - name: Component Detection Dependency Submission
-        if: hashFiles('**/*.csproj', '**/*.fsproj', '**/*.vbproj', '**/packages.config', '**/package.json', '**/requirements.txt', '**/Gemfile', '**/composer.json') != ''
         uses: advanced-security/component-detection-dependency-submission-action@v0.0.7
         continue-on-error: true
         with:
           detectorArgs: "Verbosity=Verbose"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          token: ${{ github.token }}
 
       - name: Log dependency submission result
         if: always()
@@ -440,13 +468,15 @@ jobs:
           echo "✅ Dependency submission step completed"
           echo ""
           echo "📝 Language-specific dependency submission actions used:"
-          echo "  - Go: actions/go-dependency-submission@v2.0.3"
           echo "  - Gradle: gradle/actions/dependency-submission@v3"
           echo "  - Maven: advanced-security/maven-dependency-submission-action@v4"
           echo "  - Mill: ckipp01/mill-dependency-submission@v1"
           echo "  - Mix (Elixir): erlef/mix-dependency-submission@v1"
           echo "  - SBT (Scala): scalacenter/sbt-dependency-submission@v2"
-          echo "  - Component Detection: For .NET, Node.js, Python, Ruby, PHP, etc."
+          echo "  - Component Detection: For Go, .NET, Node.js, Python, Ruby, PHP, Docker, etc."
+          echo ""
+          echo "📝 Note: Go dependencies handled by Component Detection due to cache conflicts"
+          echo "📝 Docker images scanned when Dockerfile is present"
           echo ""
           echo "📝 Note: Permission errors (403) may occur if:"
           echo "  - Repository is private and dependency graph is not enabled"
