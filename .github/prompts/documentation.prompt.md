@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/documentation.prompt.md -->
+
 # Documentation Generation Prompt
 
 Generate or update documentation for the code in this workspace. Use the following guidelines:

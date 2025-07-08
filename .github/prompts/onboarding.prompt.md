@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/onboarding.prompt.md -->
+
 # Onboarding Prompt
 
 Generate onboarding documentation or guidance for new contributors. Use the following guidelines:

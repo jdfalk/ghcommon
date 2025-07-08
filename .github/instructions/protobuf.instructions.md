@@ -1,10 +1,12 @@
 <!-- file: .github/instructions/protobuf.instructions.md -->
 <!-- version: 1.0.0 -->
-<!-- guid: 7d6c5b4a-3c2d-1e0f-9a8b-7c6d5e4f3a2b -->
----
-applyTo: "**/*.proto"
+
+## <!-- guid: 7d6c5b4a-3c2d-1e0f-9a8b-7c6d5e4f3a2b -->
+
+applyTo: "\*_/_.proto"
 description: |
-  Protocol Buffers (protobuf) style and documentation rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google Protobuf Style Guide.
+Protocol Buffers (protobuf) style and documentation rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google Protobuf Style Guide.
+
 ---
 
 # Protobuf Coding Instructions

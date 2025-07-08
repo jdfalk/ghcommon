@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/feature-request.prompt.md -->
+
 # Feature Request Prompt
 
 Generate a feature request for this project. Use the following guidelines:

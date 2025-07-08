@@ -53,7 +53,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -82,7 +82,7 @@ jobs:
             echo "Error: Configuration file '${{ inputs.config-file }}' not found"
             exit 1
           fi
-          
+
           # Validate JSON syntax
           python -c "import json; json.load(open('${{ inputs.config-file }}'))"
           echo "✓ Configuration file is valid JSON"
@@ -91,12 +91,12 @@ jobs:
         id: repo-list
         run: |
           REPOS=""
-          
+
           # Add repositories from input parameter
           if [ -n "${{ inputs.repositories }}" ]; then
             REPOS="${{ inputs.repositories }}"
           fi
-          
+
           # Add repositories from file
           if [ -n "${{ inputs.repositories-file }}" ]; then
             if [ -f "${{ inputs.repositories-file }}" ]; then
@@ -113,12 +113,12 @@ jobs:
               echo "Warning: Repository file '${{ inputs.repositories-file }}' not found"
             fi
           fi
-          
+
           if [ -z "$REPOS" ]; then
             echo "Error: No repositories specified. Use 'repositories' or 'repositories-file' input"
             exit 1
           fi
-          
+
           echo "repositories=$REPOS" >> $GITHUB_OUTPUT
           echo "Repository list: $REPOS"
 

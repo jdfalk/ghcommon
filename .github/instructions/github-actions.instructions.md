@@ -1,10 +1,12 @@
 <!-- file: .github/instructions/github-actions.instructions.md -->
 <!-- version: 1.0.0 -->
-<!-- guid: 9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f -->
----
-applyTo: ".github/workflows/*.{yml,yaml}"
+
+## <!-- guid: 9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f -->
+
+applyTo: ".github/workflows/\*.{yml,yaml}"
 description: |
-  Coding, documentation, and workflow rules for GitHub Actions workflow files, following Google and project-specific style guides. Reference the general instructions for all Copilot/AI agents and VS Code Copilot customization. For details, see the main documentation in `.github/copilot-instructions.md`.
+Coding, documentation, and workflow rules for GitHub Actions workflow files, following Google and project-specific style guides. Reference the general instructions for all Copilot/AI agents and VS Code Copilot customization. For details, see the main documentation in `.github/copilot-instructions.md`.
+
 ---
 
 # GitHub Actions Workflow Coding Instructions

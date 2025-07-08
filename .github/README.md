@@ -1,4 +1,5 @@
 <!-- file: .github/README.md -->
+
 # Copilot/AI Agent Coding Instructions System
 
 This repository uses a centralized, modular system for Copilot/AI agent coding, documentation, and workflow instructions, following the latest VS Code Copilot customization best practices.

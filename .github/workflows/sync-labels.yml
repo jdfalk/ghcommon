@@ -1,5 +1,5 @@
 # file: .github/workflows/sync-labels.yml
-# version: 1.0.0 
+# version: 1.0.0
 # guid: c0d1e2f3-a4b5-6789-0123-456789012cde
 
 name: Sync Labels to Repositories

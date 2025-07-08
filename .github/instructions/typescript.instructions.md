@@ -1,10 +1,12 @@
 <!-- file: .github/instructions/typescript.instructions.md -->
 <!-- version: 1.0.0 -->
-<!-- guid: 8f4g3c5d-6e7b-5d9f-0a1b-2c3d4e5f6g7h -->
----
-applyTo: "**/*.ts"
+
+## <!-- guid: 8f4g3c5d-6e7b-5d9f-0a1b-2c3d4e5f6g7h -->
+
+applyTo: "\*_/_.ts"
 description: |
-  TypeScript language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google TypeScript Style Guide.
+TypeScript language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google TypeScript Style Guide.
+
 ---
 
 # TypeScript Coding Instructions

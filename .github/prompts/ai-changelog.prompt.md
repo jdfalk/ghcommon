@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-changelog.prompt.md -->
+
 # AI Changelog Generation Prompt
 
 Generate a changelog entry for the latest release. Use the following guidelines:

@@ -1,8 +1,9 @@
-<!-- file: .github/instructions/general-coding.instructions.md -->
----
-applyTo: "**"
+## <!-- file: .github/instructions/general-coding.instructions.md -->
+
+applyTo: "\*\*"
 description: |
-  General coding, documentation, and workflow rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all files and languages unless overridden by a more specific instructions file. For details, see the main documentation in `.github/copilot-instructions.md`.
+General coding, documentation, and workflow rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all files and languages unless overridden by a more specific instructions file. For details, see the main documentation in `.github/copilot-instructions.md`.
+
 ---
 
 # General Coding Instructions
@@ -22,6 +23,7 @@ For more details and the full system, see [copilot-instructions.md](../copilot-i
 ## Required File Header (File Identification)
 
 All source, script, and documentation files MUST begin with a standard header containing:
+
 - The exact relative file path from the repository root (e.g., `# file: path/to/file.py`)
 - The file's semantic version (e.g., `# version: 1.0.0`)
 - The file's GUID (e.g., `# guid: 123e4567-e89b-12d3-a456-426614174000`)

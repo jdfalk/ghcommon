@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/pull-request.prompt.md -->
+
 # Pull Request Description Generation Prompt
 
 Generate a pull request description for the proposed changes. Use the following guidelines:

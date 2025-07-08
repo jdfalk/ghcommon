@@ -1,10 +1,12 @@
 <!-- file: .github/instructions/r.instructions.md -->
 <!-- version: 1.0.0 -->
-<!-- guid: 6c5b4a3c-2d1e-0f9a-8b7c-6d5e4f3a2b1c -->
----
-applyTo: "**/*.R"
+
+## <!-- guid: 6c5b4a3c-2d1e-0f9a-8b7c-6d5e4f3a2b1c -->
+
+applyTo: "\*_/_.R"
 description: |
-  Coding, documentation, and workflow rules for R files, following Google/Tidyverse R style guide and general project rules. Reference this for all R code, documentation, and formatting in this repository. All unique content from the Google/Tidyverse R Style Guide is merged here.
+Coding, documentation, and workflow rules for R files, following Google/Tidyverse R style guide and general project rules. Reference this for all R code, documentation, and formatting in this repository. All unique content from the Google/Tidyverse R Style Guide is merged here.
+
 ---
 
 # R Coding Instructions

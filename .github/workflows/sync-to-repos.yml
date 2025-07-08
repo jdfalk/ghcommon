@@ -11,17 +11,17 @@ on:
   workflow_dispatch:
     inputs:
       target_repos:
-        description: 'Comma-separated list of target repos (e.g. jdfalk/subtitle-manager,jdfalk/auto-formatter)'
+        description: "Comma-separated list of target repos (e.g. jdfalk/subtitle-manager,jdfalk/auto-formatter)"
         required: false
-        default: 'jdfalk/subtitle-manager,jdfalk/auto-formatter'
+        default: "jdfalk/subtitle-manager,jdfalk/auto-formatter"
       files_to_sync:
-        description: 'Comma-separated list of files or directories to sync (e.g. .github/workflows,docs)'
+        description: "Comma-separated list of files or directories to sync (e.g. .github/workflows,docs)"
         required: false
-        default: '.github/workflows'
+        default: ".github/workflows"
       branch_name:
-        description: 'Branch name to push changes to in target repos'
+        description: "Branch name to push changes to in target repos"
         required: false
-        default: 'sync-from-ghcommon'
+        default: "sync-from-ghcommon"
 
 jobs:
   sync:
@@ -36,7 +36,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install requirements
         run: |

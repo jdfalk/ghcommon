@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/bug-report.prompt.md -->
+
 # Bug Report Prompt
 
 Generate a bug report for an issue found in this workspace. Use the following guidelines:

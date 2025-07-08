@@ -1,10 +1,12 @@
 <!-- file: .github/instructions/shell.instructions.md -->
 <!-- version: 1.0.0 -->
-<!-- guid: 5b4a3c2d-1e0f-9a8b-7c6d-5e4f3a2b1c0d -->
----
-applyTo: "**/*.sh"
+
+## <!-- guid: 5b4a3c2d-1e0f-9a8b-7c6d-5e4f3a2b1c0d -->
+
+applyTo: "\*_/_.sh"
 description: |
-  Coding, documentation, and workflow rules for shell scripts, following Google Shell style guide and general project rules. Reference this for all shell scripts, documentation, and formatting in this repository. All unique content from the Google Shell Style Guide is merged here.
+Coding, documentation, and workflow rules for shell scripts, following Google Shell style guide and general project rules. Reference this for all shell scripts, documentation, and formatting in this repository. All unique content from the Google Shell Style Guide is merged here.
+
 ---
 
 # Shell Script Coding Instructions

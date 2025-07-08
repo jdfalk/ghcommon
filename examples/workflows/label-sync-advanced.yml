@@ -17,9 +17,9 @@ on:
         type: string
   push:
     branches: [main]
-    paths: 
-      - 'labels.json'
-      - 'repo-list.txt'
+    paths:
+      - "labels.json"
+      - "repo-list.txt"
   schedule:
     # Run weekly on Sundays at 2 AM UTC
     - cron: "0 2 * * 0"
@@ -63,16 +63,16 @@ jobs:
             const title = `Label Sync Summary - ${new Date().toISOString().split('T')[0]}`;
             const body = `
             ## Automated Label Synchronization Summary
-            
+
             This is an automated summary of the weekly label synchronization run.
-            
+
             **Workflow Run**: [${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})
             **Triggered**: ${context.eventName}
             **Date**: ${new Date().toISOString()}
-            
+
             Please check the workflow logs for detailed results.
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/commit-message.prompt.md -->
+
 # Commit Message Generation Prompt
 
 Generate a conventional commit message for the staged changes. Use the following guidelines:

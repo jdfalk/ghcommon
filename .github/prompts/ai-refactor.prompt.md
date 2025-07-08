@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-refactor.prompt.md -->
+
 # AI Refactor Prompt
 
 Refactor the code in this workspace for clarity, maintainability, and performance. Use the following guidelines:

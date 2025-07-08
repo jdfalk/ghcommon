@@ -179,7 +179,8 @@ jobs:
       delete-extra-labels: false # Safe mode
     secrets: inherit
 ```
-```
+
+````
 
 **Features**:
 
@@ -201,7 +202,7 @@ chmod +x scripts/create-issue-update.sh
 # Usage examples:
 ./scripts/create-issue-update.sh create "Add dark mode" "Implement dark theme" "enhancement,ui"
 ./scripts/create-issue-update.sh comment 123 "Testing completed successfully"
-```
+````
 
 **Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
 **Examples**: [examples/workflows/](examples/workflows/)

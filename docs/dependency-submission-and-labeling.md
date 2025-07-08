@@ -210,6 +210,7 @@ jobs:
 ### Dependency Submission Issues
 
 1. **No Dependencies Detected**
+
    - Ensure `go.mod` exists in repository root
    - Check that Go files are present in the repository
    - Verify the workflow runs on the main branch
@@ -221,6 +222,7 @@ jobs:
 ### Labeling Issues
 
 1. **Labels Not Applied**
+
    - Verify the labeler configuration syntax
    - Check that the labels exist in the repository
    - Ensure the workflow has `pull-requests: write` permission

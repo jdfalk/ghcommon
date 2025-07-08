@@ -348,6 +348,7 @@ This document tracks the implementation roadmap and status for the GitHub Common
 
 **Status**: 🟢 Completed
 **Components**:
+
 - **Script**: `label_manager.py` - Comprehensive label management with dry-run mode
 - **Workflows**: Reusable and local workflows for automated label sync
 - **Configuration**: Standard 20-label set in `labels.json`
@@ -355,6 +356,7 @@ This document tracks the implementation roadmap and status for the GitHub Common
 - **Documentation**: Complete usage guide in `docs/label-synchronization.md`
 
 **Features**:
+
 - Centralized label standardization across repositories
 - Safe mode (preserve existing labels) and cleanup mode options
 - Scheduled sync with customizable frequency

@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-migration.prompt.md -->
+
 # AI Migration Prompt
 
 Generate a migration plan for updating or refactoring AI/agent instructions, prompts, or workflows. Use the following guidelines:

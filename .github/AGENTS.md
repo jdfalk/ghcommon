@@ -1,4 +1,5 @@
 <!-- file: .github/AGENTS.md -->
+
 # AGENTS.md
 
 > **NOTE:** This file is a pointer. All Copilot/AI agent and workflow instructions are now centralized in the `.github/instructions/` and `.github/prompts/` directories.

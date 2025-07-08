@@ -25,7 +25,7 @@ name: Sync Labels from ghcommon
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 1 * *"  # Monthly
+    - cron: "0 3 1 * *" # Monthly
 
 permissions:
   contents: read
@@ -57,7 +57,7 @@ The `labels.json` file defines the standard labels in JSON format:
     "description": "Something isn't working"
   },
   {
-    "name": "enhancement", 
+    "name": "enhancement",
     "color": "a2eeef",
     "description": "New feature or request"
   }
@@ -65,36 +65,40 @@ The `labels.json` file defines the standard labels in JSON format:
 ```
 
 **Required fields:**
+
 - `name`: Label name (string)
 - `color`: Hex color code without # (string)
 
 **Optional fields:**
+
 - `description`: Label description (string, defaults to empty)
 
 ## Configuration Options
 
 ### Input Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `config-file` | string | `labels.json` | Path to labels configuration file |
-| `repositories` | string | - | Comma-separated list of repos (owner/name) |
-| `repositories-file` | string | - | File containing repository list |
-| `delete-extra-labels` | boolean | `false` | Delete labels not in configuration |
-| `dry-run` | boolean | `false` | Show changes without applying them |
-| `source-repo` | string | current repo | Repository to fetch config from |
-| `source-branch` | string | `main` | Branch to fetch config from |
+| Parameter             | Type    | Default       | Description                                |
+| --------------------- | ------- | ------------- | ------------------------------------------ |
+| `config-file`         | string  | `labels.json` | Path to labels configuration file          |
+| `repositories`        | string  | -             | Comma-separated list of repos (owner/name) |
+| `repositories-file`   | string  | -             | File containing repository list            |
+| `delete-extra-labels` | boolean | `false`       | Delete labels not in configuration         |
+| `dry-run`             | boolean | `false`       | Show changes without applying them         |
+| `source-repo`         | string  | current repo  | Repository to fetch config from            |
+| `source-branch`       | string  | `main`        | Branch to fetch config from                |
 
 ### Repository List Options
 
 You can specify target repositories in three ways:
 
 1. **Inline list** via `repositories` parameter:
+
    ```yaml
    repositories: "owner/repo1,owner/repo2,owner/repo3"
    ```
 
 2. **File-based list** via `repositories-file` parameter:
+
    ```yaml
    repositories-file: "repositories.txt"
    ```
@@ -129,7 +133,7 @@ name: Monthly Label Sync
 
 on:
   schedule:
-    - cron: "0 2 1 * *"  # 1st of month at 2 AM UTC
+    - cron: "0 2 1 * *" # 1st of month at 2 AM UTC
 
 jobs:
   sync:
@@ -150,7 +154,7 @@ name: Organization Label Sync
 on:
   workflow_dispatch:
   push:
-    paths: ['labels.json']
+    paths: ["labels.json"]
 
 jobs:
   sync:
@@ -171,7 +175,7 @@ name: Test Label Changes
 
 on:
   pull_request:
-    paths: ['labels.json']
+    paths: ["labels.json"]
 
 jobs:
   test-sync:
@@ -188,8 +192,8 @@ The workflow requires these permissions:
 
 ```yaml
 permissions:
-  contents: read      # To read configuration files
-  issues: read        # For API access validation
+  contents: read # To read configuration files
+  issues: read # For API access validation
   pull-requests: read # For API access validation
 ```
 
@@ -207,6 +211,7 @@ permissions:
 ### Cleanup Mode
 
 Add `delete-extra-labels: true` to:
+
 - Remove labels not defined in configuration
 - Ensures exact match with configuration
 - **Use with caution** - will delete custom labels
@@ -214,6 +219,7 @@ Add `delete-extra-labels: true` to:
 ### Dry Run Mode
 
 Add `dry-run: true` to:
+
 - Show what changes would be made
 - No actual modifications
 - Perfect for testing configuration changes
@@ -223,31 +229,39 @@ Add `dry-run: true` to:
 ### Common Issues
 
 **Configuration file not found:**
+
 ```
 Error: Configuration file 'labels.json' not found
 ```
+
 - Ensure the file exists in the specified path
 - Check file name spelling and case sensitivity
 
 **Invalid JSON format:**
+
 ```
 Expecting ',' delimiter: line 5 column 10 (char 123)
 ```
+
 - Validate JSON syntax using a JSON validator
 - Check for missing commas, quotes, or brackets
 
 **Repository access denied:**
+
 ```
 Error: Repository 'owner/repo' not found or not accessible
 ```
+
 - Verify repository names are correct (owner/name format)
 - Ensure GITHUB_TOKEN has access to target repositories
 - Check if repositories are private and accessible
 
 **API rate limiting:**
+
 ```
 Error: API rate limit exceeded
 ```
+
 - Wait for rate limit reset (usually 1 hour)
 - Reduce number of repositories processed simultaneously
 - Consider using GitHub App tokens for higher limits

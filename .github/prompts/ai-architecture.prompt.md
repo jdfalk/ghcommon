@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-architecture.prompt.md -->
+
 # AI Architecture Review Prompt
 
 Perform an architecture review for the AI/agent system in this repository. Use the following guidelines:

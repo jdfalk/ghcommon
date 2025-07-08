@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-contribution.prompt.md -->
+
 # AI Contribution Guidelines Prompt
 
 Generate or update contribution guidelines for this project. Use the following guidelines:

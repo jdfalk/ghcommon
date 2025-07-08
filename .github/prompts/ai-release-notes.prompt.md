@@ -1,4 +1,5 @@
 <!-- file: .github/prompts/ai-release-notes.prompt.md -->
+
 # AI Release Notes Prompt
 
 Generate release notes for the latest changes in this project. Use the following guidelines:

@@ -1,4 +1,5 @@
 <!-- file: .github/CLAUDE.md -->
+
 # CLAUDE.md
 
 > **NOTE:** This file is a pointer. All Claude/AI agent and workflow instructions are now centralized in the `.github/instructions/` and `.github/prompts/` directories.
