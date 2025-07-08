@@ -348,6 +348,8 @@ jobs:
       # Add explicit permissions for dependency submission
       repository-projects: write
       pull-requests: write
+      packages: write
+      attestations: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -429,15 +431,26 @@ jobs:
 
       - name: Build Docker image for dependency scanning
         if: hashFiles('**/Dockerfile') != ''
+        id: docker-build
         run: |
           # Try to pull from GHCR first, fallback to local build
           IMAGE_NAME="ghcr.io/${{ github.repository }}:latest"
+          LOCAL_IMAGE="local-scan-image:latest"
+
           if docker pull "$IMAGE_NAME" 2>/dev/null; then
             echo "Using pre-built image from GHCR: $IMAGE_NAME"
-            docker tag "$IMAGE_NAME" "local-scan-image:latest"
+            docker tag "$IMAGE_NAME" "$LOCAL_IMAGE"
+            echo "docker_image_available=true" >> $GITHUB_OUTPUT
+            echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
           else
             echo "Building image locally for dependency scanning"
-            docker build -t "local-scan-image:latest" .
+            if docker build -t "$LOCAL_IMAGE" .; then
+              echo "docker_image_available=true" >> $GITHUB_OUTPUT
+              echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
+            else
+              echo "docker_image_available=false" >> $GITHUB_OUTPUT
+              echo "Failed to build Docker image"
+            fi
           fi
         continue-on-error: true
 
@@ -448,6 +461,10 @@ jobs:
           echo "Event: ${{ github.event_name }}"
           echo "Ref: ${{ github.ref }}"
           echo "Actor: ${{ github.actor }}"
+          echo "Docker image available: ${{ steps.docker-build.outputs.docker_image_available }}"
+          if [[ "${{ steps.docker-build.outputs.docker_image_available }}" == "true" ]]; then
+            echo "Docker image: ${{ steps.docker-build.outputs.docker_image_name }}"
+          fi
           echo ""
           echo "⚠️ If dependency submission fails, ensure:"
           echo "1. Dependency graph is enabled in repository settings"
@@ -459,7 +476,7 @@ jobs:
         uses: advanced-security/component-detection-dependency-submission-action@v0.0.7
         continue-on-error: true
         with:
-          detectorArgs: "Verbosity=Verbose"
+          detectorArgs: ${{ steps.docker-build.outputs.docker_image_available == 'true' && format('Verbosity=Verbose --DockerImagesToScan {0}', steps.docker-build.outputs.docker_image_name) || 'Verbosity=Verbose' }}
           token: ${{ github.token }}
 
       - name: Log dependency submission result
@@ -476,7 +493,11 @@ jobs:
           echo "  - Component Detection: For Go, .NET, Node.js, Python, Ruby, PHP, Docker, etc."
           echo ""
           echo "📝 Note: Go dependencies handled by Component Detection due to cache conflicts"
-          echo "📝 Docker images scanned when Dockerfile is present"
+          if [[ "${{ steps.docker-build.outputs.docker_image_available }}" == "true" ]]; then
+            echo "📝 Docker image scanned: ${{ steps.docker-build.outputs.docker_image_name }}"
+          else
+            echo "📝 No Docker image scanned (Dockerfile not found or build failed)"
+          fi
           echo ""
           echo "📝 Note: Permission errors (403) may occur if:"
           echo "  - Repository is private and dependency graph is not enabled"
