@@ -1,0 +1,35 @@
+# Universal Dependency Submission Example
+# This workflow uses Microsoft Component Detection for comprehensive dependency submission
+# Supports Go, NPM, Pip, Rust, Maven, NuGet, Ruby, and more ecosystems
+
+name: Universal Dependency Submission
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Run weekly to catch new vulnerabilities
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+
+# Required permissions for dependency submission
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Component Detection Dependency Submission
+        uses: advanced-security/component-detection-dependency-submission-action@v0.0.3
+        with:
+          # Optional: Exclude specific directories from scanning
+          directoryExclusionList: "test,tests,__tests__,node_modules,.git,.vscode"
+          # Optional: Specify which detectors to use (removes this line to auto-detect all)
+          # detectorsFilter: "Go,Npm,Pip,Rust,Maven"

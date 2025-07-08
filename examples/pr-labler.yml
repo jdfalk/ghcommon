@@ -5,7 +5,7 @@
 name: Pull Request Labeler
 
 # Automatically label pull requests based on changed files and branch names
-# This workflow is designed for the ghcommon repository
+# This workflow is designed for the ghcommon, gcommon, and subtitle-manager repositories
 
 on:
   pull_request_target:
