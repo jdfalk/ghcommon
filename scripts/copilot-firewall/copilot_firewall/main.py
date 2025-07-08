@@ -9,14 +9,14 @@ import argparse
 import json
 import subprocess
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 try:
     import inquirer
+    from rich import box
     from rich.console import Console
     from rich.table import Table
     from rich.text import Text
-    from rich import box
 except ImportError as e:
     print(f"Required dependency missing: {e}")
     print("Please install with: pip install inquirer rich")
@@ -405,7 +405,7 @@ def main() -> None:
             failed_repos.append(repo)
 
     # Summary
-    console.print(f"\n[bold]Operation completed![/bold]")
+    console.print("\n[bold]Operation completed![/bold]")
     console.print(
         f"[green]✅ Successfully set variable for {success_count} repositories[/green]"
     )

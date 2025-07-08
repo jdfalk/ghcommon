@@ -2,7 +2,6 @@
 # file: scripts/copilot-firewall/test_fix.py
 # Quick test script to verify the bug fix
 
-import json
 from copilot_firewall.main import GitHubManager
 
 # Test that we can properly extract repo names

@@ -25,7 +25,7 @@ import argparse
 import json
 import os
 import sys
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
 try:
@@ -519,7 +519,7 @@ Examples:
                 if result.skipped:
                     print(f"   Skipped: {len(result.skipped)} labels")
         
-        print(f"\n📈 Overall Summary:")
+        print("\n📈 Overall Summary:")
         print(f"   Repositories processed: {len(results)}")
         print(f"   Labels created: {total_created}")
         print(f"   Labels updated: {total_updated}")

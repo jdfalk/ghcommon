@@ -29,7 +29,7 @@ import sys
 import uuid
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
 
 # Add the scripts directory to the path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -319,7 +319,7 @@ class DuplicateCleanupManager:
                 print(f"        URL: {dup['html_url']}")
 
         if dry_run:
-            print(f"\n💡 To generate delete files, run with --generate-deletes")
+            print("\n💡 To generate delete files, run with --generate-deletes")
 
         print("=" * 60)
 
@@ -429,7 +429,7 @@ class DuplicateCleanupManager:
         Returns:
             Number of comment files generated
         """
-        print(f"\n💬 Generating comment files for duplicate references...")
+        print("\n💬 Generating comment files for duplicate references...")
 
         # Create output directory if it doesn't exist
         os.makedirs(output_directory, exist_ok=True)
@@ -610,7 +610,7 @@ Environment Variables:
                 print("💡 Comment generation would be implemented here")
 
             # Print final summary
-            print(f"\n🎯 DUPLICATE CLEANUP RESULTS")
+            print("\n🎯 DUPLICATE CLEANUP RESULTS")
             print("=" * 40)
             print(f"📊 Total duplicate groups: {results['total_groups']}")
             print(f"🧹 Cleanup candidates: {results['cleanup_candidates']}")
@@ -618,8 +618,8 @@ Environment Variables:
             print(f"🧪 Dry run mode: {results['dry_run']}")
 
             if results['cleanup_candidates'] > 0 and results['dry_run']:
-                print(f"\n💡 To generate action files, run:")
-                print(f"   python scripts/duplicate_cleanup.py scan --generate-deletes")
+                print("\n💡 To generate action files, run:")
+                print("   python scripts/duplicate_cleanup.py scan --generate-deletes")
 
         except Exception as e:
             print(f"Error during duplicate cleanup: {e}", file=sys.stderr)
