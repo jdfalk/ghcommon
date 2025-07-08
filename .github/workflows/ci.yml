@@ -20,6 +20,8 @@ permissions:
   id-token: write
   # Additional permissions for dependency submission
   repository-projects: write
+  packages: write
+  attestations: write
 
 jobs:
   ci:

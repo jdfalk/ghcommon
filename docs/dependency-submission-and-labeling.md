@@ -43,6 +43,8 @@ permissions:
   id-token: write
   # Additional permissions for dependency submission
   repository-projects: write
+  packages: write
+  attestations: write
 
 jobs:
   ci:
@@ -63,7 +65,10 @@ jobs:
   - `security-events: write`
   - `repository-projects: write`
   - `pull-requests: write`
+  - `packages: write`
+  - `attestations: write`
 - Go projects need `go.mod` file in repository root
+- Docker projects: Dockerfile will be built and scanned for dependencies
 
 ## Pull Request Labeling
 
