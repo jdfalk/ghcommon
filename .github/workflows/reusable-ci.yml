@@ -433,48 +433,68 @@ jobs:
         if: hashFiles('**/Dockerfile') != ''
         id: docker-build
         run: |
-          # Try to pull from GHCR first, fallback to local build
-          IMAGE_NAME="ghcr.io/${{ github.repository }}:latest"
+          # Build from repository's Dockerfile with proper annotations for dependency scanning
           LOCAL_IMAGE="local-scan-image:latest"
-          
-          if docker pull "$IMAGE_NAME" 2>/dev/null; then
-            echo "Using pre-built image from GHCR: $IMAGE_NAME"
-            docker tag "$IMAGE_NAME" "$LOCAL_IMAGE"
+          DOCKERFILE_PATH="."
+
+          # Find the Dockerfile location
+          if [[ -f "Dockerfile" ]]; then
+            DOCKERFILE_PATH="."
+            echo "🐳 Found Dockerfile in repository root"
+          elif [[ -f "docker/Dockerfile" ]]; then
+            DOCKERFILE_PATH="docker"
+            echo "🐳 Found Dockerfile in docker/ directory"
+          elif [[ -f "build/Dockerfile" ]]; then
+            DOCKERFILE_PATH="build"
+            echo "🐳 Found Dockerfile in build/ directory"
+          else
+            # Find any Dockerfile in the repository
+            DOCKERFILE_LOCATION=$(find . -name "Dockerfile" -type f | head -1)
+            if [[ -n "$DOCKERFILE_LOCATION" ]]; then
+              DOCKERFILE_PATH=$(dirname "$DOCKERFILE_LOCATION")
+              echo "🐳 Found Dockerfile at: $DOCKERFILE_LOCATION"
+            else
+              echo "❌ No Dockerfile found"
+              echo "docker_image_available=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          echo "🔨 Building Docker image from repository with enhanced OCI annotations..."
+
+          # Build with proper OCI annotations for better dependency scanning and layer mapping
+          if docker buildx build \
+            --platform linux/amd64 \
+            --load \
+            --tag "$LOCAL_IMAGE" \
+            --file "$DOCKERFILE_PATH/Dockerfile" \
+            --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+            --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --annotation "org.opencontainers.image.title=${{ github.repository }}" \
+            --annotation "org.opencontainers.image.description=Built for dependency scanning from $DOCKERFILE_PATH/Dockerfile" \
+            --annotation "org.opencontainers.image.url=https://github.com/${{ github.repository }}" \
+            --annotation "org.opencontainers.image.version=${{ github.sha }}" \
+            --annotation "org.opencontainers.image.vendor=${{ github.repository_owner }}" \
+            --annotation "org.opencontainers.image.licenses=Unknown" \
+            --annotation "org.opencontainers.image.base.name=Unknown" \
+            --provenance=true \
+            --sbom=true \
+            "$DOCKERFILE_PATH"; then
             echo "docker_image_available=true" >> $GITHUB_OUTPUT
             echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
+            echo "✅ Docker image built successfully with OCI annotations and SBOM"
+            echo "📦 Image tagged as: $LOCAL_IMAGE"
           else
-            echo "Building image locally for dependency scanning with proper annotations"
-            
-            # Build with proper OCI annotations for better layer mapping
-            if docker buildx build \
-              --platform linux/amd64 \
-              --load \
-              --tag "$LOCAL_IMAGE" \
-              --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
-              --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
-              --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-              --annotation "org.opencontainers.image.title=${{ github.repository }}" \
-              --annotation "org.opencontainers.image.description=Built for dependency scanning" \
-              --annotation "org.opencontainers.image.url=https://github.com/${{ github.repository }}" \
-              --annotation "org.opencontainers.image.version=${{ github.sha }}" \
-              --annotation "org.opencontainers.image.vendor=${{ github.repository_owner }}" \
-              --annotation "org.opencontainers.image.licenses=Unknown" \
-              --provenance=true \
-              --sbom=true \
-              .; then
+            echo "❌ Failed to build Docker image with buildx, trying standard build..."
+            if docker build -t "$LOCAL_IMAGE" -f "$DOCKERFILE_PATH/Dockerfile" "$DOCKERFILE_PATH"; then
               echo "docker_image_available=true" >> $GITHUB_OUTPUT
               echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
-              echo "✅ Docker image built with OCI annotations and SBOM"
+              echo "⚠️ Docker image built with standard build (limited annotations)"
+              echo "📦 Image tagged as: $LOCAL_IMAGE"
             else
-              echo "❌ Failed to build Docker image with buildx, trying basic build"
-              if docker build -t "$LOCAL_IMAGE" .; then
-                echo "docker_image_available=true" >> $GITHUB_OUTPUT
-                echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
-                echo "⚠️ Docker image built with basic build (no annotations)"
-              else
-                echo "docker_image_available=false" >> $GITHUB_OUTPUT
-                echo "❌ Failed to build Docker image"
-              fi
+              echo "docker_image_available=false" >> $GITHUB_OUTPUT
+              echo "❌ Failed to build Docker image with both buildx and standard build"
             fi
           fi
         continue-on-error: true
@@ -520,6 +540,7 @@ jobs:
           echo "📝 Note: Go dependencies handled by Component Detection due to cache conflicts"
           if [[ "${{ steps.docker-build.outputs.docker_image_available }}" == "true" ]]; then
             echo "📝 Docker image scanned: ${{ steps.docker-build.outputs.docker_image_name }}"
+            echo "📝 Docker image built from repository's Dockerfile with OCI annotations and SBOM"
           else
             echo "📝 No Docker image scanned (Dockerfile not found or build failed)"
           fi
