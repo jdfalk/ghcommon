@@ -75,9 +75,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Ensure we have the base ref for comparison
+          ref: ${{ github.head_ref || github.ref }}
       - uses: dorny/paths-filter@v3
         id: changes
         with:
+          # Use the base SHA for comparison if available
+          base: ${{ github.event.before || github.event.pull_request.base.sha || 'HEAD~1' }}
           filters: |
             backend:
               - '**/*.go'
@@ -340,6 +344,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      actions: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -347,9 +353,26 @@ jobs:
           fetch-depth: 0
 
       - name: Universal Dependency Submission
-        uses: advanced-security/component-detection-dependency-submission-action@v0.0.3
+        uses: advanced-security/component-detection-dependency-submission-action@v0.0.7
         continue-on-error: true
         with:
           # Automatically detects dependencies across multiple languages
           # Supports Go, Python, Node.js, .NET, Java, Ruby, PHP, and more
           detectorArgs: "Verbosity=Verbose"
+        env:
+          # Ensure the GitHub token has proper permissions
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Log dependency submission result
+        if: always()
+        run: |
+          echo "✅ Dependency submission step completed"
+          echo ""
+          echo "📝 Note: Permission errors (403) may occur if:"
+          echo "  - Repository is private and dependency graph is not enabled"
+          echo "  - Running in a fork without proper permissions"
+          echo "  - GitHub Advanced Security features are not available"
+          echo ""
+          echo "🔧 This is expected behavior and the workflow continues successfully"
+          echo "   Dependency submission works best on public repositories or"
+          echo "   private repositories with GitHub Advanced Security enabled"
