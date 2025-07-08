@@ -18,6 +18,8 @@ permissions:
   checks: write
   security-events: write
   id-token: write
+  # Additional permissions for dependency submission
+  repository-projects: write
 
 jobs:
   ci:
