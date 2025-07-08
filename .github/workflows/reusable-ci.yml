@@ -352,21 +352,102 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Universal Dependency Submission
+      # Go dependency submission
+      - name: Go Dependency Submission
+        if: hashFiles('**/go.mod') != ''
+        uses: actions/go-dependency-submission@v2.0.3
+        continue-on-error: true
+        with:
+          go-mod-path: go.mod
+
+      # Gradle dependency submission
+      - name: Set up Java for Gradle
+        if: hashFiles('**/build.gradle', '**/build.gradle.kts') != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle Dependency Submission
+        if: hashFiles('**/build.gradle', '**/build.gradle.kts') != ''
+        uses: gradle/actions/dependency-submission@v3
+        continue-on-error: true
+
+      # Maven dependency submission
+      - name: Set up Java for Maven
+        if: hashFiles('**/pom.xml') != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Maven Dependency Tree Submission
+        if: hashFiles('**/pom.xml') != ''
+        uses: advanced-security/maven-dependency-submission-action@v4
+        continue-on-error: true
+
+      # Mill dependency submission
+      - name: Set up Java for Mill
+        if: hashFiles('**/build.sc') != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Mill Dependency Submission
+        if: hashFiles('**/build.sc') != ''
+        uses: ckipp01/mill-dependency-submission@v1
+        continue-on-error: true
+
+      # Mix (Elixir) dependency submission
+      - name: Set up Elixir
+        if: hashFiles('**/mix.exs') != ''
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15'
+          otp-version: '26'
+
+      - name: Mix Dependency Submission
+        if: hashFiles('**/mix.exs') != ''
+        uses: erlef/mix-dependency-submission@v1
+        continue-on-error: true
+
+      # SBT (Scala) dependency submission
+      - name: Set up Java for SBT
+        if: hashFiles('**/build.sbt') != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: SBT Dependency Submission
+        if: hashFiles('**/build.sbt') != ''
+        uses: scalacenter/sbt-dependency-submission@v2
+        continue-on-error: true
+
+      # Component Detection for NuGet and other languages
+      - name: Component Detection Dependency Submission
+        if: hashFiles('**/*.csproj', '**/*.fsproj', '**/*.vbproj', '**/packages.config', '**/package.json', '**/requirements.txt', '**/Gemfile', '**/composer.json') != ''
         uses: advanced-security/component-detection-dependency-submission-action@v0.0.7
         continue-on-error: true
         with:
-          # Automatically detects dependencies across multiple languages
-          # Supports Go, Python, Node.js, .NET, Java, Ruby, PHP, and more
           detectorArgs: "Verbosity=Verbose"
         env:
-          # Ensure the GitHub token has proper permissions
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Log dependency submission result
         if: always()
         run: |
           echo "✅ Dependency submission step completed"
+          echo ""
+          echo "📝 Language-specific dependency submission actions used:"
+          echo "  - Go: actions/go-dependency-submission@v2.0.3"
+          echo "  - Gradle: gradle/actions/dependency-submission@v3"
+          echo "  - Maven: advanced-security/maven-dependency-submission-action@v4"
+          echo "  - Mill: ckipp01/mill-dependency-submission@v1"
+          echo "  - Mix (Elixir): erlef/mix-dependency-submission@v1"
+          echo "  - SBT (Scala): scalacenter/sbt-dependency-submission@v2"
+          echo "  - Component Detection: For .NET, Node.js, Python, Ruby, PHP, etc."
           echo ""
           echo "📝 Note: Permission errors (403) may occur if:"
           echo "  - Repository is private and dependency graph is not enabled"
