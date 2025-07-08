@@ -436,20 +436,45 @@ jobs:
           # Try to pull from GHCR first, fallback to local build
           IMAGE_NAME="ghcr.io/${{ github.repository }}:latest"
           LOCAL_IMAGE="local-scan-image:latest"
-
+          
           if docker pull "$IMAGE_NAME" 2>/dev/null; then
             echo "Using pre-built image from GHCR: $IMAGE_NAME"
             docker tag "$IMAGE_NAME" "$LOCAL_IMAGE"
             echo "docker_image_available=true" >> $GITHUB_OUTPUT
             echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
           else
-            echo "Building image locally for dependency scanning"
-            if docker build -t "$LOCAL_IMAGE" .; then
+            echo "Building image locally for dependency scanning with proper annotations"
+            
+            # Build with proper OCI annotations for better layer mapping
+            if docker buildx build \
+              --platform linux/amd64 \
+              --load \
+              --tag "$LOCAL_IMAGE" \
+              --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+              --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+              --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+              --annotation "org.opencontainers.image.title=${{ github.repository }}" \
+              --annotation "org.opencontainers.image.description=Built for dependency scanning" \
+              --annotation "org.opencontainers.image.url=https://github.com/${{ github.repository }}" \
+              --annotation "org.opencontainers.image.version=${{ github.sha }}" \
+              --annotation "org.opencontainers.image.vendor=${{ github.repository_owner }}" \
+              --annotation "org.opencontainers.image.licenses=Unknown" \
+              --provenance=true \
+              --sbom=true \
+              .; then
               echo "docker_image_available=true" >> $GITHUB_OUTPUT
               echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
+              echo "✅ Docker image built with OCI annotations and SBOM"
             else
-              echo "docker_image_available=false" >> $GITHUB_OUTPUT
-              echo "Failed to build Docker image"
+              echo "❌ Failed to build Docker image with buildx, trying basic build"
+              if docker build -t "$LOCAL_IMAGE" .; then
+                echo "docker_image_available=true" >> $GITHUB_OUTPUT
+                echo "docker_image_name=$LOCAL_IMAGE" >> $GITHUB_OUTPUT
+                echo "⚠️ Docker image built with basic build (no annotations)"
+              else
+                echo "docker_image_available=false" >> $GITHUB_OUTPUT
+                echo "❌ Failed to build Docker image"
+              fi
             fi
           fi
         continue-on-error: true
