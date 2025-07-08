@@ -506,6 +506,7 @@ jobs:
           echo "Event: ${{ github.event_name }}"
           echo "Ref: ${{ github.ref }}"
           echo "Actor: ${{ github.actor }}"
+          echo "Auth token: ${{ secrets.JF_CI_GH_PAT && 'Using JF_CI_GH_PAT (Personal Access Token)' || 'Using github.token (default)' }}"
           echo "Docker image available: ${{ steps.docker-build.outputs.docker_image_available }}"
           if [[ "${{ steps.docker-build.outputs.docker_image_available }}" == "true" ]]; then
             echo "Docker image: ${{ steps.docker-build.outputs.docker_image_name }}"
@@ -522,7 +523,7 @@ jobs:
         continue-on-error: true
         with:
           detectorArgs: ${{ steps.docker-build.outputs.docker_image_available == 'true' && format('Verbosity=Verbose --DockerImagesToScan {0}', steps.docker-build.outputs.docker_image_name) || 'Verbosity=Verbose' }}
-          token: ${{ github.token }}
+          token: ${{ secrets.JF_CI_GH_PAT || github.token }}
 
       - name: Log dependency submission result
         if: always()
@@ -545,10 +546,12 @@ jobs:
             echo "📝 No Docker image scanned (Dockerfile not found or build failed)"
           fi
           echo ""
+          echo "📝 Authentication: ${{ secrets.JF_CI_GH_PAT && 'Using JF_CI_GH_PAT for enhanced permissions' || 'Using default github.token' }}"
           echo "📝 Note: Permission errors (403) may occur if:"
           echo "  - Repository is private and dependency graph is not enabled"
           echo "  - Running in a fork without proper permissions"
           echo "  - GitHub Advanced Security features are not available"
+          echo "  - PAT token lacks required permissions (if using JF_CI_GH_PAT)"
           echo ""
           echo "🔧 This is expected behavior and the workflow continues successfully"
           echo "   Dependency submission works best on public repositories or"

@@ -68,6 +68,27 @@ jobs:
   - `packages: write`
   - `attestations: write`
 - Go projects need `go.mod` file in repository root
+
+### Authentication
+
+The workflow supports enhanced authentication via Personal Access Token (PAT):
+
+- **Default**: Uses `github.token` (standard GitHub Actions token)
+- **Enhanced**: Uses `JF_CI_GH_PAT` repository secret if available
+- **Fallback**: Automatically falls back to `github.token` if PAT is not configured
+
+To use enhanced authentication:
+
+1. Create a Personal Access Token with appropriate permissions
+2. Add it as a repository secret named `JF_CI_GH_PAT`
+3. The workflow will automatically detect and use it
+
+Benefits of using PAT:
+
+- Higher rate limits for GitHub API calls
+- Enhanced permissions for dependency submission
+- Better support for private repositories
+- Reduced 403 permission errors
 - Docker projects: Dockerfile will be built and scanned for dependencies
 
 ## Pull Request Labeling
