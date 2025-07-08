@@ -1301,6 +1301,7 @@ class IssueUpdateProcessor:
         """Update an existing issue with dual-GUID tracking."""
         issue_number = update.get("number")
         repo = update.get("repo", self.api.repo)
+        primary_guid, legacy_guid = self._extract_guids(update)
         parent_guid = update.get("parent_guid")
         if not issue_number and parent_guid:
             mapping = self.guid_issue_map.get(parent_guid)
@@ -1710,6 +1711,8 @@ class IssueUpdateProcessor:
         Only repository owners or users with admin collaborator permissions can delete issues.
         """
         issue_number = update.get("number")
+        repo = update.get("repo", self.api.repo)
+        api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
 
         if not issue_number:
             print("Delete action missing issue number", file=sys.stderr)
@@ -2012,7 +2015,7 @@ class CopilotTicketManager:
     def _handle_comment_deleted(self, comment: Dict[str, Any]) -> None:
         """Handle deletion of a Copilot comment."""
         comment_id = comment["id"]
-        search_key = f"id:{comment_id"
+        search_key = f"id:{comment_id}"
 
         issues = self.api.search_issues(
             f"label:{COPILOT_LABEL} state:open {search_key}"
@@ -2153,3 +2156,320 @@ class DuplicateIssueManager:
 
         for duplicate in duplicates:
             print(f"  🚫 Would close issue #{duplicate['number']} as duplicate")
+
+
+class CodeQLAlertManager:
+    """Manages CodeQL security alert tickets."""
+
+    def __init__(self, github_api: GitHubAPI):
+        """
+        Initialize CodeQL alert manager.
+
+        Args:
+            github_api: GitHubAPI instance for repository operations
+        """
+        self.api = github_api
+        self.summary = OperationSummary("codeql-alerts")
+
+    def process_codeql_alerts(self, dry_run: bool = False) -> int:
+        """
+        Process CodeQL security alerts and create issues for new alerts.
+
+        Args:
+            dry_run: If True, only print what would be done
+
+        Returns:
+            Number of alerts processed
+        """
+        print("Fetching CodeQL security alerts...")
+        alerts = self.api.get_codeql_alerts(state="open")
+        print(f"Found {len(alerts)} open CodeQL alerts")
+
+        if not alerts:
+            print("No open CodeQL alerts found")
+            return 0
+
+        processed_count = 0
+
+        for alert in alerts:
+            alert_id = str(alert.get("number", alert.get("id", "unknown")))
+
+            if self._should_process_alert(alert):
+                if dry_run:
+                    self._print_alert_plan(alert)
+                    processed_count += 1
+                else:
+                    if self._create_issue_for_alert(alert):
+                        processed_count += 1
+
+        print(f"Processed {processed_count} CodeQL alerts")
+
+        # Print operation summary
+        self.summary.print_summary()
+
+        # Export summary for GitHub Actions
+        github_summary = self.summary.export_github_summary()
+        summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_file:
+            try:
+                with open(summary_file, "a", encoding="utf-8") as f:
+                    f.write(github_summary + "\n")
+            except Exception as e:
+                print(f"⚠️  Failed to write to GitHub step summary: {e}")
+
+        return processed_count
+
+    def _should_process_alert(self, alert: Dict[str, Any]) -> bool:
+        """
+        Determine if an alert should be processed based on existing issues.
+
+        Args:
+            alert: CodeQL alert data
+
+        Returns:
+            True if alert should be processed
+        """
+        alert_id = str(alert.get("number", alert.get("id", "unknown")))
+
+        # Check if issue already exists for this alert
+        search_query = f"label:{CODEQL_LABEL} CodeQL Alert #{alert_id}"
+        existing_issues = self.api.search_issues(search_query)
+
+        if existing_issues:
+            print(f"⏭️  Skipping alert #{alert_id} - issue already exists: #{existing_issues[0]['number']}")
+            return False
+
+        return True
+
+    def _create_issue_for_alert(self, alert: Dict[str, Any]) -> bool:
+        """
+        Create a GitHub issue for a CodeQL security alert.
+
+        Args:
+            alert: CodeQL alert data
+
+        Returns:
+            True if issue was created successfully
+        """
+        alert_id = str(alert.get("number", alert.get("id", "unknown")))
+        rule_id = alert.get("rule", {}).get("id", "unknown-rule")
+        severity = alert.get("rule", {}).get("severity", "unknown")
+
+        title = f"CodeQL Security Alert #{alert_id}: {rule_id}"
+        body = self._build_alert_body(alert)
+        labels = [CODEQL_LABEL, f"severity-{severity.lower()}"]
+
+        try:
+            issue = self.api.create_issue(title, body, labels)
+            if issue:
+                print(f"✅ Created issue #{issue['number']} for CodeQL alert #{alert_id}")
+                self.summary.add_alert_processed(
+                    alert_id, title, issue["number"], issue["html_url"]
+                )
+                return True
+            else:
+                print(f"❌ Failed to create issue for CodeQL alert #{alert_id}")
+                self.summary.add_error(f"Failed to create issue for alert #{alert_id}")
+                return False
+        except Exception as e:
+            print(f"❌ Error creating issue for alert #{alert_id}: {e}")
+            self.summary.add_error(f"Error creating issue for alert #{alert_id}: {e}")
+            return False
+
+    def _build_alert_body(self, alert: Dict[str, Any]) -> str:
+        """
+        Build the issue body from CodeQL alert data.
+
+        Args:
+            alert: CodeQL alert data
+
+        Returns:
+            Formatted issue body
+        """
+        alert_id = str(alert.get("number", alert.get("id", "unknown")))
+        rule = alert.get("rule", {})
+        rule_id = rule.get("id", "unknown-rule")
+        rule_name = rule.get("name", "Unknown Rule")
+        severity = rule.get("severity", "unknown")
+        description = rule.get("description", "No description available")
+
+        # Get the most recent instance for location info
+        instances = alert.get("instances", [])
+        location_info = ""
+        if instances:
+            instance = instances[0]  # Most recent instance
+            location = instance.get("location", {})
+            path = location.get("path", "unknown")
+            start_line = location.get("start_line", "unknown")
+            location_info = f"\n\n**Location**: `{path}` (line {start_line})"
+
+        body_parts = [
+            f"## CodeQL Security Alert #{alert_id}",
+            "",
+            f"**Rule**: {rule_id}",
+            f"**Name**: {rule_name}",
+            f"**Severity**: {severity.upper()}",
+            "",
+            f"**Description**: {description}",
+            location_info,
+            "",
+            f"**Alert URL**: {alert.get('html_url', 'Not available')}",
+            "",
+            "---",
+            "",
+            "This issue was automatically created from a CodeQL security alert.",
+            "Please review the alert and take appropriate action to resolve the security vulnerability.",
+            "",
+            f"<!-- codeql-alert-id:{alert_id} -->",
+        ]
+
+        return "\n".join(body_parts)
+
+    def _print_alert_plan(self, alert: Dict[str, Any]) -> None:
+        """Print what would be done for an alert in dry-run mode."""
+        alert_id = str(alert.get("number", alert.get("id", "unknown")))
+        rule_id = alert.get("rule", {}).get("id", "unknown-rule")
+        severity = alert.get("rule", {}).get("severity", "unknown")
+
+        print(f"  🔒 Would create issue for CodeQL alert #{alert_id}")
+        print(f"     Rule: {rule_id} (Severity: {severity})")
+
+
+def main():
+    """Main entry point for the issue manager script."""
+    parser = argparse.ArgumentParser(
+        description="Unified GitHub issue management script",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python issue_manager.py update-issues     # Process issue_updates.json
+  python issue_manager.py copilot-tickets   # Manage Copilot review tickets
+  python issue_manager.py close-duplicates  # Close duplicate issues
+  python issue_manager.py codeql-alerts     # Generate CodeQL alert tickets
+  python issue_manager.py event-handler     # Handle GitHub webhook events
+
+Environment Variables:
+  GH_TOKEN or GITHUB_TOKEN - GitHub token with repo access
+  REPO or GITHUB_REPOSITORY - repository in owner/name format
+  GITHUB_EVENT_NAME - webhook event name (for event-driven operations)
+  GITHUB_EVENT_PATH - path to the event payload (for event-driven operations)
+        """,
+    )
+
+    parser.add_argument(
+        "operation",
+        choices=[
+            "update-issues",
+            "copilot-tickets",
+            "close-duplicates",
+            "codeql-alerts",
+            "event-handler",
+            "update-permalinks"
+        ],
+        help="Operation to perform"
+    )
+
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without making changes"
+    )
+
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force update existing tickets (for copilot-tickets)"
+    )
+
+    args = parser.parse_args()
+
+    # Get GitHub token
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if not token:
+        print("Error: GitHub token not found. Set GH_TOKEN or GITHUB_TOKEN environment variable.", file=sys.stderr)
+        return 1
+
+    # Get repository
+    repo = os.environ.get("REPO") or os.environ.get("GITHUB_REPOSITORY")
+    if not repo:
+        print("Error: Repository not specified. Set REPO or GITHUB_REPOSITORY environment variable.", file=sys.stderr)
+        return 1
+
+    try:
+        # Initialize GitHub API
+        api = GitHubAPI(token, repo)
+
+        if args.operation == "update-issues":
+            processor = IssueUpdateProcessor(api, repo)
+            success = processor.process_updates()
+            return 0 if success else 1
+
+        elif args.operation == "copilot-tickets":
+            manager = CopilotTicketManager(api)
+
+            # Check if this is event-driven
+            event_name = os.environ.get("GITHUB_EVENT_NAME")
+            event_path = os.environ.get("GITHUB_EVENT_PATH")
+
+            if event_name and event_path:
+                # Load event data
+                try:
+                    with open(event_path, "r") as f:
+                        event_data = json.load(f)
+                    manager.handle_event(event_name, event_data)
+                except Exception as e:
+                    print(f"Error processing event: {e}", file=sys.stderr)
+                    return 1
+            else:
+                print("No event data provided for copilot-tickets operation")
+
+            return 0
+
+        elif args.operation == "close-duplicates":
+            manager = DuplicateIssueManager(api)
+            manager.close_duplicates(dry_run=args.dry_run)
+            return 0
+
+        elif args.operation == "codeql-alerts":
+            manager = CodeQLAlertManager(api)
+            manager.process_codeql_alerts(dry_run=args.dry_run)
+            return 0
+
+        elif args.operation == "event-handler":
+            # Generic event handler
+            event_name = os.environ.get("GITHUB_EVENT_NAME")
+            event_path = os.environ.get("GITHUB_EVENT_PATH")
+
+            if not event_name or not event_path:
+                print("Error: GITHUB_EVENT_NAME and GITHUB_EVENT_PATH must be set for event-handler", file=sys.stderr)
+                return 1
+
+            try:
+                with open(event_path, "r") as f:
+                    event_data = json.load(f)
+
+                # Route to appropriate handler based on event type
+                if event_name in ["pull_request_review_comment", "pull_request_review", "pull_request", "push"]:
+                    manager = CopilotTicketManager(api)
+                    manager.handle_event(event_name, event_data)
+                else:
+                    print(f"Unhandled event type: {event_name}")
+
+            except Exception as e:
+                print(f"Error handling event: {e}", file=sys.stderr)
+                return 1
+
+            return 0
+
+        elif args.operation == "update-permalinks":
+            processor = IssueUpdateProcessor(api, repo)
+            processor.update_permalinks()
+            return 0
+
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
