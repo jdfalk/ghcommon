@@ -346,20 +346,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Go-specific dependency submission (if Go files detected)
-      - name: Set up Go for dependency submission
-        if: hashFiles('**/*.go') != '' || hashFiles('**/go.mod') != ''
-        uses: actions/setup-go@v5
+      - name: Universal Dependency Submission
+        uses: advanced-security/component-detection-dependency-submission-action@v0.0.3
+        continue-on-error: true
         with:
-          go-version: ${{ inputs.go-version }}
-
-      - name: Go Dependency Submission
-        if: hashFiles('**/*.go') != '' || hashFiles('**/go.mod') != ''
-        uses: actions/go-dependency-submission@v1
-        with:
-          # Path to go.mod file
-          go-mod-path: ./go.mod
-          # Build target (all dependencies by default)
-          go-build-target: all
-# --- Insert the full universal language steps for Go, Python, Node.js, etc. in each job as appropriate ---
-# (Omitted here for brevity, but use the steps from the previous universal-ci job for each language)
+          # Automatically detects dependencies across multiple languages
+          # Supports Go, Python, Node.js, .NET, Java, Ruby, PHP, and more
+          detectorArgs: "Verbosity=Verbose"
