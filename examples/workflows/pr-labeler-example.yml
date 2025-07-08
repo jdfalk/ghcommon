@@ -1,0 +1,22 @@
+# file: examples/workflows/pr-labeler-example.yml
+# version: 1.0.0
+# guid: f6a7b8c9-d0e1-42f3-a4b5-c6d7e8f9a0b1
+
+name: Pull Request Labeler
+
+# Example workflow showing how to use the reusable labeler workflow
+# Copy this to your repository's .github/workflows/ directory
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  labeler:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@main
+    with:
+      configuration-path: ".github/labeler.yml"
+      sync-labels: true
+      dot: true
+    secrets:
+      github-token: ${{ secrets.JF_CI_GH_PAT }}

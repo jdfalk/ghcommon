@@ -5,7 +5,7 @@
 name: Pull Request Labeler
 
 # Automatically label pull requests based on changed files and branch names
-# This workflow is designed for the ghcommon repository
+# Uses the reusable labeler workflow from this repository
 
 on:
   pull_request_target:
@@ -13,20 +13,9 @@ on:
 
 jobs:
   labeler:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/reusable-pr-labeler.yml
     permissions:
       contents: read
       pull-requests: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Apply labels to pull request
-        uses: actions/labeler@v5
-        with:
-          repo-token: ${{ github.token }}
-          configuration-path: ".github/labeler.yml"
-          sync-labels: true
-          dot: true
+    secrets:
+      github_pat: ${{ secrets.JF_CI_GH_PAT }}

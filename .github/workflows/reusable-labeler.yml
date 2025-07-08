@@ -27,6 +27,10 @@ on:
         required: false
         default: ""
         type: string
+    secrets:
+      github-token:
+        description: "GitHub token with necessary permissions for labeling"
+        required: true
 
 jobs:
   labeler:
@@ -43,7 +47,7 @@ jobs:
       - name: Apply labels to pull request
         uses: actions/labeler@v5
         with:
-          repo-token: ${{ github.token }}
+          repo-token: ${{ secrets.github-token }}
           configuration-path: ${{ inputs.configuration-path }}
           sync-labels: ${{ inputs.sync-labels }}
           dot: ${{ inputs.dot }}
