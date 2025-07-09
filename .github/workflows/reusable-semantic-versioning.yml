@@ -1,5 +1,8 @@
-# file: .github/workflows/semantic-versioning.yml
-name: Semantic Versioning
+# file: .github/workflows/reusable-semantic-versioning.yml
+# version: 1.1.0
+# guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
+
+name: Reusable - Semantic Versioning
 
 on:
   workflow_call:
