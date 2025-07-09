@@ -136,8 +136,12 @@ jobs:
           VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
           VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
           VALIDATE_PYTHON_PYINK: false
+          VALIDATE_PYTHON_FLAKE8: false
+          VALIDATE_PYTHON_ISORT: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_BASH: ${{ inputs.run-shell }}
           VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
+          VALIDATE_SHELL_SHFMT: false
           VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
           VALIDATE_JSON: ${{ inputs.run-json }}
           VALIDATE_YAML: ${{ inputs.run-yaml }}
@@ -151,6 +155,10 @@ jobs:
           VALIDATE_GIT_COMMITLINT: true
           VALIDATE_SECRETS: ${{ inputs.run-security }}
           VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
+          VALIDATE_CHECKOV: false
+          VALIDATE_ENV: false
+          VALIDATE_JSCPD: false
+          VALIDATE_NATURAL_LANGUAGE: false
 
           # Auto-fix settings (enable fix mode for supported linters)
           FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
@@ -182,8 +190,6 @@ jobs:
           # Performance and behavior settings
           MULTI_STATUS: true
           PARALLEL: true
-          VALIDATE_JSCPD: false
-          VALIDATE_NATURAL_LANGUAGE: false
         run: |
           # Environment variables are now set securely above
           echo "Super Linter environment configured"
@@ -215,8 +221,12 @@ jobs:
           VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
           VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
           VALIDATE_PYTHON_PYINK: false
+          VALIDATE_PYTHON_FLAKE8: false
+          VALIDATE_PYTHON_ISORT: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_BASH: ${{ inputs.run-shell }}
           VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
+          VALIDATE_SHELL_SHFMT: false
           VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
           VALIDATE_JSON: ${{ inputs.run-json }}
           VALIDATE_YAML: ${{ inputs.run-yaml }}
@@ -230,6 +240,10 @@ jobs:
           VALIDATE_GIT_COMMITLINT: true
           VALIDATE_SECRETS: ${{ inputs.run-security }}
           VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
+          VALIDATE_CHECKOV: false
+          VALIDATE_ENV: false
+          VALIDATE_JSCPD: false
+          VALIDATE_NATURAL_LANGUAGE: false
 
           # Auto-fix settings (enable fix mode for supported linters)
           FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
@@ -261,8 +275,6 @@ jobs:
           # Performance and behavior settings
           MULTI_STATUS: true
           PARALLEL: true
-          VALIDATE_JSCPD: false
-          VALIDATE_NATURAL_LANGUAGE: false
 
           GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
@@ -387,12 +399,31 @@ jobs:
             }
 
             try {
-              if (fs.existsSync('super-linter.report')) {
-                const report = fs.readFileSync('super-linter.report', 'utf8');
-                if (report.includes('ERROR') || report.includes('FATAL')) {
+              // Try different locations for the report file
+              let reportContent = '';
+              let reportFound = false;
+              
+              if (fs.existsSync('super-linter-reports/super-linter.report')) {
+                reportContent = fs.readFileSync('super-linter-reports/super-linter.report', 'utf8');
+                reportFound = true;
+              } else if (fs.existsSync('super-linter.report')) {
+                reportContent = fs.readFileSync('super-linter.report', 'utf8');
+                reportFound = true;
+              } else if (fs.existsSync('super-linter-reports/super-linter.log')) {
+                // Use log file as fallback
+                reportContent = fs.readFileSync('super-linter-reports/super-linter.log', 'utf8');
+                reportFound = true;
+              }
+              
+              if (reportFound) {
+                if (reportContent.includes('ERROR') || reportContent.includes('FATAL')) {
                   hasErrors = true;
                   summary += '❌ **Linting failed** - Please fix the issues below:\n\n';
-                  summary += '```\n' + report + '\n```\n\n';
+                  // Truncate very long reports
+                  if (reportContent.length > 4000) {
+                    reportContent = reportContent.substring(0, 4000) + '\n... (truncated)';
+                  }
+                  summary += '```\n' + reportContent + '\n```\n\n';
                 } else {
                   summary += '✅ **All linting checks passed!**\n\n';
                 }
@@ -400,7 +431,7 @@ jobs:
                 summary += '⚠️ **No linting report found**\n\n';
               }
             } catch (error) {
-              summary += '⚠️ **Error reading linting results**\n\n';
+              summary += '⚠️ **Error reading linting results**: ' + error.message + '\n\n';
             }
 
             if (autoFixEnabled) {
