@@ -40,6 +40,10 @@ on:
         default: "main"
         type: string
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   sync-labels:
     runs-on: ubuntu-latest
