@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive security guidelines
 - Copilot instructions for AI-assisted development
 - GitHub issue and PR templates
+- **Add To Project Workflow**: Reusable automation to add issues and pull requests to GitHub Projects
 
 ### Changed
 
@@ -62,6 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/labeler.yml`: Comprehensive labeler configuration with 15+ label categories
 - `.github/workflows/example-usage.yml`: Example demonstrating both CI and labeler workflows
 - `docs/dependency-submission-and-labeling.md`: Complete documentation for new features
+- `.github/workflows/reusable-add-to-project.yml`: Reusable workflow for adding items to projects
+- `.github/workflows/add-to-project.yml`: Workflow using the reusable version
+- `examples/workflows/add-to-project.yml`: Example workflow for other repositories
 
 ### Security
 
