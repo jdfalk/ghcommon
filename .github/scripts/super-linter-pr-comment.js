@@ -39,7 +39,7 @@ module.exports = async ({ github, context, core }) => {
     // Try different locations for the report file
     let reportContent = '';
     let reportFound = false;
-    
+
     const reportPaths = [
       'super-linter-reports/super-linter.report',
       'super-linter.report',
@@ -54,7 +54,7 @@ module.exports = async ({ github, context, core }) => {
         break;
       }
     }
-    
+
     if (reportFound) {
       if (reportContent.includes('ERROR') || reportContent.includes('FATAL')) {
         hasErrors = true;
