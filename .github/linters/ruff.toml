@@ -1,8 +1,7 @@
+[tool.ruff]
 # file: .github/linters/ruff.toml
 # version: 1.0.0
 # guid: f1a2b3c4-d5e6-789f-a012-456789abcdef
-
-[tool.ruff]
 target-version = "py39"
 line-length = 80
 select = [
