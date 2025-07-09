@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Required for auto-committing linting fixes
+  contents: write # Required for auto-committing linting fixes
   pull-requests: write
   actions: read
   checks: write
