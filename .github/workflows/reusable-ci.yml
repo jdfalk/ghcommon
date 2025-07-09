@@ -69,6 +69,8 @@ jobs:
     with:
       validate-all-codebase: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       default-branch: "main"
+      enable-auto-fix: true
+      auto-commit-fixes: true
     secrets: inherit
 
   changes:
