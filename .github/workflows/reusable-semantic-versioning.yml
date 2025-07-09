@@ -78,8 +78,11 @@ jobs:
             @semantic-release/exec@^6.0.0
 
       - name: Create semantic-release config
+        env:
+          TAG_PREFIX: ${{ inputs.tag-prefix }}
+          VERSION_FILES: ${{ inputs.version-files }}
         run: |
-          cat > .releaserc.json << 'EOF'
+          cat > .releaserc.json << EOF
           {
             "branches": ["main", "master"],
             "plugins": [
@@ -94,14 +97,14 @@ jobs:
               [
                 "@semantic-release/exec",
                 {
-                  "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && echo 'TAG=${{ inputs.tag-prefix }}${nextRelease.version}' >> $GITHUB_ENV"
+                  "prepareCmd": "echo 'VERSION=\${nextRelease.version}' >> \$GITHUB_ENV && echo 'TAG=${TAG_PREFIX}\${nextRelease.version}' >> \$GITHUB_ENV"
                 }
               ],
               [
                 "@semantic-release/git",
                 {
-                  "assets": ["CHANGELOG.md", "${{ inputs.version-files }}"],
-                  "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+                  "assets": ["CHANGELOG.md", "${VERSION_FILES}"],
+                  "message": "chore(release): \${nextRelease.version} [skip ci]\\n\\n\${nextRelease.notes}"
                 }
               ],
               [
@@ -121,8 +124,9 @@ jobs:
         id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry-run }}
         run: |
-          if [ "${{ inputs.dry-run }}" = "true" ]; then
+          if [ "${DRY_RUN}" = "true" ]; then
             npx semantic-release --dry-run --no-ci
           else
             npx semantic-release --no-ci
