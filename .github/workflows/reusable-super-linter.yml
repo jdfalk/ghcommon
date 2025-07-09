@@ -104,11 +104,11 @@ on:
         type: string
 
 permissions:
-  contents: write     # Required for auto-committing fixes
-  statuses: write     # Required for status updates
-  checks: write       # Required for check runs
+  contents: write # Required for auto-committing fixes
+  statuses: write # Required for status updates
+  checks: write # Required for check runs
   pull-requests: write # Required for PR comments and updates
-  packages: read      # Required for package access
+  packages: read # Required for package access
   security-events: write # Required for security scanning
 
 jobs:
@@ -135,6 +135,7 @@ jobs:
           VALIDATE_PYTHON_BLACK: ${{ inputs.run-python }}
           VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
           VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_PYINK: false
           VALIDATE_BASH: ${{ inputs.run-shell }}
           VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
           VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
@@ -147,6 +148,7 @@ jobs:
           VALIDATE_HTML: ${{ inputs.run-html }}
           VALIDATE_GO: ${{ inputs.run-go }}
           VALIDATE_PROTOBUF: ${{ inputs.run-protobuf }}
+          VALIDATE_GIT_COMMITLINT: true
           VALIDATE_SECRETS: ${{ inputs.run-security }}
           VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
 
