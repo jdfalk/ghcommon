@@ -22,7 +22,7 @@ on:
         required: false
         default: true
         type: boolean
-      pr-number:
+      pr-numbers:
         description: "The number(s) of pull request to update, rather than detecting from workflow context"
         required: false
         default: ""
@@ -30,7 +30,7 @@ on:
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for labeling"
-        required: true
+        required: false
 
 jobs:
   labeler:
@@ -47,8 +47,8 @@ jobs:
       - name: Apply labels to pull request
         uses: actions/labeler@v5
         with:
-          repo-token: ${{ secrets.github-token }}
+          repo-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           configuration-path: ${{ inputs.configuration-path }}
           sync-labels: ${{ inputs.sync-labels }}
           dot: ${{ inputs.dot }}
-          pr-number: ${{ inputs.pr-number }}
+          pr-number: ${{ inputs.pr-numbers }}
