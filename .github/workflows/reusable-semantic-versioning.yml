@@ -48,11 +48,11 @@ on:
 
 # Explicit permissions required for this reusable workflow
 permissions:
-  contents: write          # For creating commits, tags, and releases
-  issues: write            # For updating issues referenced in commits
-  pull-requests: write     # For updating PR titles and descriptions
-  actions: read            # For workflow access
-  checks: write            # For workflow status
+  contents: write # For creating commits, tags, and releases
+  issues: write # For updating issues referenced in commits
+  pull-requests: write # For updating PR titles and descriptions
+  actions: read # For workflow access
+  checks: write # For workflow status
 
 jobs:
   version:

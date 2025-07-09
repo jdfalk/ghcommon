@@ -1,10 +1,6 @@
 {
   "files_processed": 4,
   "changes_made": true,
-  "files_updated": [
-    "CHANGELOG.md",
-    "README.md",
-    "TODO.md"
-  ],
+  "files_updated": ["CHANGELOG.md", "README.md", "TODO.md"],
   "errors": []
 }

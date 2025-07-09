@@ -19,11 +19,13 @@ npm install
 ### Manual Validation
 
 Check the last commit:
+
 ```bash
 npm run commitlint
 ```
 
 Check commits in a range (CI):
+
 ```bash
 npm run commitlint-ci
 ```

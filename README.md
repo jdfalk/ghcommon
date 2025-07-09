@@ -45,7 +45,8 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 | [`library-release.yml`](templates/workflows/library-release.yml) | Package release pipeline   | NPM packages, Python libraries, Go modules |
 
 ### Supporting Tools
-- **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow with templates, automation, and conflict resolution\n  - Advanced Python script with multiple update modes and templates\n  - Automated workflow processing with PR creation and archival\n  - Support for changelogs, TODO lists, README sections, and badge updates\n  - Interactive mode and dry-run capabilities for safe operations\n  - Complete documentation and usage examples in [docs/documentation-updates.md](docs/documentation-updates.md)
+
+- **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow with templates, automation, and conflict resolution\n - Advanced Python script with multiple update modes and templates\n - Automated workflow processing with PR creation and archival\n - Support for changelogs, TODO lists, README sections, and badge updates\n - Interactive mode and dry-run capabilities for safe operations\n - Complete documentation and usage examples in [docs/documentation-updates.md](docs/documentation-updates.md)
 
 - **Setup Scripts**: Automated repository configuration
 - **Validation Tools**: Repository readiness verification
