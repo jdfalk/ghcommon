@@ -87,6 +87,14 @@ All source, script, and documentation files MUST begin with a standard header co
   // version: 1.0.0
   // guid: 123e4567-e89b-12d3-a456-426614174000
   ```
+- **TOML:**
+  ```toml
+  [section]
+  # file: path/to/file.toml
+  # version: 1.0.0
+  # guid: 123e4567-e89b-12d3-a456-426614174000
+  ```
+  (Header must be inside a section as TOML doesn't support top-level comments)
 
 **All files must include this header in the correct format for their type.**
 
