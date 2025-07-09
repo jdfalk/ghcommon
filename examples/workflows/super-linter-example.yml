@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Required for auto-committing fixes
+  contents: write # Required for auto-committing fixes
   pull-requests: write
   checks: write
   statuses: write
@@ -24,8 +24,8 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
       validate-all-codebase: false # Only validate changed files in PRs
-      enable-auto-fix: true         # Enable auto-fixing
-      auto-commit-fixes: true       # Automatically commit fixes
+      enable-auto-fix: true # Enable auto-fixing
+      auto-commit-fixes: true # Automatically commit fixes
     secrets: inherit
 
   # Advanced usage - selective linting with custom auto-fix settings
@@ -61,6 +61,6 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
       validate-all-codebase: false
-      enable-auto-fix: false        # Disable auto-fixing
-      auto-commit-fixes: false      # No commits
+      enable-auto-fix: false # Disable auto-fixing
+      auto-commit-fixes: false # No commits
     secrets: inherit
