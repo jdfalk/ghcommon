@@ -16,10 +16,10 @@ try:
     from rich import box
     from rich.console import Console
     from rich.table import Table
-    from rich.text import Text
 except ImportError as e:
-    print(f"Required dependency missing: {e}")
-    print("Please install with: pip install inquirer rich")
+    console = Console()
+    console.print(f"[red]Required dependency missing: {e}[/red]")
+    console.print("[red]Please install with: pip install inquirer rich[/red]")
     sys.exit(1)
 
 # The value for the variable
@@ -48,6 +48,9 @@ ALLOW_LIST = (
     "grafana.com,elasticsearch.co,nginx.org,apache.org,grpc.io"
 )
 
+# Constants
+MAX_DESCRIPTION_LENGTH = 60
+
 console = Console()
 
 
@@ -75,8 +78,7 @@ class GitHubManager:
             subprocess.run(
                 ["gh", "--version"],
                 check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
             )
         except (subprocess.SubprocessError, FileNotFoundError):
             console.print(
@@ -90,8 +92,7 @@ class GitHubManager:
             subprocess.run(
                 ["gh", "auth", "status"],
                 check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
             )
         except subprocess.SubprocessError:
             console.print(
@@ -158,13 +159,13 @@ class GitHubManager:
                     f"{self.org}/{repo_name}",
                 ],
                 check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
             )
-            return True
         except subprocess.SubprocessError as e:
             console.print(f"[red]Error setting variable for {repo_name}: {e}[/red]")
             return False
+        else:
+            return True
 
 
 def display_repositories(repos: List[Dict[str, Any]]) -> None:
@@ -217,23 +218,8 @@ def filter_repositories(
     ]
 
 
-def select_repositories(repos: List[Dict[str, Any]]) -> List[str]:
-    """
-    Present an interactive selection interface to choose repositories.
-
-    Args:
-        repos: List of repository information dictionaries
-
-    Returns:
-        List of selected repository names
-    """
-    if not repos:
-        console.print(
-            "[yellow]No repositories found or you don't have access to the namespace.[/yellow]"
-        )
-        return []
-
-    # Options for selection
+def _get_user_action() -> str:
+    """Get the user's desired action."""
     options = [
         "🎯 Select specific repositories",
         "🌟 Select all repositories",
@@ -250,30 +236,35 @@ def select_repositories(repos: List[Dict[str, Any]]) -> List[str]:
     ]
 
     answer = inquirer.prompt(question)
-    if not answer or answer["action"] == "❌ Cancel operation":
-        return []
+    return answer["action"] if answer else "❌ Cancel operation"
 
-    if answer["action"] == "🌟 Select all repositories":
-        return [repo["name"] for repo in repos]
 
-    if answer["action"] == "🔍 Filter and select repositories":
-        filter_term = input("Enter filter term (name or description): ").strip()
-        if filter_term:
-            filtered_repos = filter_repositories(repos, filter_term)
-            console.print(
-                f"\n[green]Found {len(filtered_repos)} repositories matching '{filter_term}'[/green]"
-            )
-            if filtered_repos:
-                display_repositories(filtered_repos)
-                repos = filtered_repos
-            else:
-                console.print("[yellow]No repositories match the filter.[/yellow]")
-                return []
+def _filter_repositories_interactively(
+    repos: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Filter repositories based on user input."""
+    filter_term = input("Enter filter term (name or description): ").strip()
+    if not filter_term:
+        return repos
 
-    # Create choice list with repo info
+    filtered_repos = filter_repositories(repos, filter_term)
+    console.print(
+        f"\n[green]Found {len(filtered_repos)} repositories matching '{filter_term}'[/green]"
+    )
+
+    if filtered_repos:
+        display_repositories(filtered_repos)
+        return filtered_repos
+
+    console.print("[yellow]No repositories match the filter.[/yellow]")
+    return []
+
+
+def _select_repositories_from_choices(repos: List[Dict[str, Any]]) -> List[str]:
+    """Present repository choices and get user selection."""
     choices = [
         {
-            "name": f"{repo['name']} ({'🔒' if repo.get('isPrivate') else '🌍'}) - {repo.get('description', 'No description')[:60]}{'...' if repo.get('description', '') and len(repo.get('description', '')) > 60 else ''}",
+            "name": f"{repo['name']} ({'🔒' if repo.get('isPrivate') else '🌍'}) - {repo.get('description', 'No description')[:MAX_DESCRIPTION_LENGTH]}{'...' if repo.get('description', '') and len(repo.get('description', '')) > MAX_DESCRIPTION_LENGTH else ''}",
             "value": repo["name"],
             "checked": False,
         }
@@ -289,15 +280,14 @@ def select_repositories(repos: List[Dict[str, Any]]) -> List[str]:
     ]
 
     answers = inquirer.prompt(questions)
-    if not answers:  # User cancelled
+    if not answers:
         return []
 
-    # Ensure we return only repository names (strings), not dictionaries
     selected = answers["selected_repos"]
     if not selected:
         return []
 
-    # Handle both string values and dictionary values (in case inquirer returns dicts)
+    # Handle both string values and dictionary values
     repo_names = []
     for item in selected:
         if isinstance(item, dict):
@@ -308,8 +298,40 @@ def select_repositories(repos: List[Dict[str, Any]]) -> List[str]:
     return repo_names
 
 
-def main() -> None:
-    """Main entry point for the copilot firewall manager."""
+def select_repositories(repos: List[Dict[str, Any]]) -> List[str]:
+    """
+    Present an interactive selection interface to choose repositories.
+
+    Args:
+        repos: List of repository information dictionaries
+
+    Returns:
+        List of selected repository names
+    """
+    if not repos:
+        console.print(
+            "[yellow]No repositories found or you don't have access to the namespace.[/yellow]"
+        )
+        return []
+
+    action = _get_user_action()
+
+    if action == "❌ Cancel operation":
+        return []
+
+    if action == "🌟 Select all repositories":
+        return [repo["name"] for repo in repos]
+
+    if action == "🔍 Filter and select repositories":
+        repos = _filter_repositories_interactively(repos)
+        if not repos:
+            return []
+
+    return _select_repositories_from_choices(repos)
+
+
+def _setup_argument_parser() -> argparse.ArgumentParser:
+    """Set up the command line argument parser."""
     parser = argparse.ArgumentParser(
         description="Set COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS for GitHub repositories"
     )
@@ -334,7 +356,52 @@ def main() -> None:
         action="store_true",
         help="Only list repositories and exit",
     )
+    return parser
 
+
+def _handle_dry_run(selected_repos: List[str], org: str) -> None:
+    """Handle dry run mode."""
+    console.print("\n[yellow]DRY RUN: No variables will be set.[/yellow]")
+    console.print(
+        "The following repositories would have their COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS variable set:"
+    )
+    for repo in selected_repos:
+        console.print(f"  • [cyan]{org}/{repo}[/cyan]")
+
+
+def _set_variables(selected_repos: List[str], gh_manager: GitHubManager) -> None:
+    """Set variables for selected repositories."""
+    console.print("\n[yellow]Setting variables...[/yellow]")
+    success_count = 0
+    failed_repos = []
+
+    for repo in selected_repos:
+        console.print(f"Setting variable for [cyan]{repo}[/cyan]...", end=" ")
+
+        if gh_manager.set_variable(repo):
+            console.print("[green]✅ Success[/green]")
+            success_count += 1
+        else:
+            console.print("[red]❌ Failed[/red]")
+            failed_repos.append(repo)
+
+    # Summary
+    console.print("\n[bold]Operation completed![/bold]")
+    console.print(
+        f"[green]✅ Successfully set variable for {success_count} repositories[/green]"
+    )
+
+    if failed_repos:
+        console.print(
+            f"[red]❌ Failed to set variable for {len(failed_repos)} repositories:[/red]"
+        )
+        for repo in failed_repos:
+            console.print(f"  • {repo}")
+
+
+def main() -> None:
+    """Main entry point for the copilot firewall manager."""
+    parser = _setup_argument_parser()
     args = parser.parse_args()
 
     console.print("[bold blue]GitHub Copilot Firewall Allowlist Manager[/bold blue]")
@@ -374,12 +441,7 @@ def main() -> None:
         console.print(f"  • {repo}")
 
     if args.dry_run:
-        console.print("\n[yellow]DRY RUN: No variables will be set.[/yellow]")
-        console.print(
-            "The following repositories would have their COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS variable set:"
-        )
-        for repo in selected_repos:
-            console.print(f"  • [cyan]{args.org}/{repo}[/cyan]")
+        _handle_dry_run(selected_repos, args.org)
         return
 
     # Confirm before proceeding
@@ -390,32 +452,7 @@ def main() -> None:
         return
 
     # Set variables
-    console.print("\n[yellow]Setting variables...[/yellow]")
-    success_count = 0
-    failed_repos = []
-
-    for repo in selected_repos:
-        console.print(f"Setting variable for [cyan]{repo}[/cyan]...", end=" ")
-
-        if gh_manager.set_variable(repo):
-            console.print("[green]✅ Success[/green]")
-            success_count += 1
-        else:
-            console.print("[red]❌ Failed[/red]")
-            failed_repos.append(repo)
-
-    # Summary
-    console.print("\n[bold]Operation completed![/bold]")
-    console.print(
-        f"[green]✅ Successfully set variable for {success_count} repositories[/green]"
-    )
-
-    if failed_repos:
-        console.print(
-            f"[red]❌ Failed to set variable for {len(failed_repos)} repositories:[/red]"
-        )
-        for repo in failed_repos:
-            console.print(f"  • {repo}")
+    _set_variables(selected_repos, gh_manager)
 
 
 if __name__ == "__main__":

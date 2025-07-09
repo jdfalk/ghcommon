@@ -2,6 +2,8 @@
 # file: scripts/copilot-firewall/test_fix.py
 # Quick test script to verify the bug fix
 
+import logging
+
 from copilot_firewall.main import GitHubManager
 
 # Test that we can properly extract repo names
@@ -24,11 +26,16 @@ for item in fake_inquirer_response:
     else:
         repo_names.append(str(item))
 
-print("Extracted repo names:", repo_names)
+# Use logging instead of print for better debugging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("Extracted repo names: %s", repo_names)
 
 # Test that GitHubManager.set_variable would work correctly
 gh_manager = GitHubManager("jdfalk")
 for repo_name in repo_names:
-    print(
-        f"Would call: gh variable set COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS -b '...' -R jdfalk/{repo_name}"
+    logger.info(
+        "Would call: gh variable set COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS -b '...' -R jdfalk/%s",
+        repo_name,
     )

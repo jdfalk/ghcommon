@@ -62,6 +62,8 @@ disallow_incomplete_defs = true
 [tool.ruff]
 line-length = 88
 target-version = "py38"
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "C90", "I", "N", "UP", "B", "A", "C4", "EM", "PIE", "T20", "RET", "SIM", "ARG", "PTH", "PL", "TRY"]
 ignore = ["E501", "PLR0913", "PLR0915"]
 

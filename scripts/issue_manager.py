@@ -970,12 +970,10 @@ class IssueUpdateProcessor:
                     repo, number = mapping
                     action["number"] = number
                     action["repo"] = repo
-                    modified = True
             if action.get("number") and not action.get("issue_url"):
                 repo = action.get("repo", self.api.repo)
                 number = action.get("number")
                 action["issue_url"] = f"https://github.com/{repo}/issues/{number}"
-                modified = True
 
         if isinstance(data, list):
             for item in data:
@@ -1138,10 +1136,16 @@ class IssueUpdateProcessor:
         # For update, close, delete - assume no duplicates for now
         return False
 
-    def _comment_guid_exists(self, issue_number: int, guid: str, repo: str = None) -> bool:
+    def _comment_guid_exists(
+        self, issue_number: int, guid: str, repo: str = None
+    ) -> bool:
         """Check if a comment with the given GUID already exists on the issue."""
         try:
-            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+            api = (
+                self.api
+                if not repo or repo == self.api.repo
+                else GitHubAPI(self.api.token, repo)
+            )
             url = f"https://api.github.com/repos/{api.repo}/issues/{issue_number}/comments"
             response = requests.get(url, headers=api.headers, timeout=10)
 
@@ -1186,7 +1190,11 @@ class IssueUpdateProcessor:
             return True
 
         try:
-            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+            api = (
+                self.api
+                if not repo or repo == self.api.repo
+                else GitHubAPI(self.api.token, repo)
+            )
             # Search for existing issues with either GUID
             all_issues = api.get_all_issues(state="all")
 
@@ -1223,11 +1231,17 @@ class IssueUpdateProcessor:
             print(f"⚠️  Could not verify GUID uniqueness: {e}")
             return True
 
-    def _create_guid_exists(self, guid: str, update: Dict[str, Any], repo: str = None) -> bool:
+    def _create_guid_exists(
+        self, guid: str, update: Dict[str, Any], repo: str = None
+    ) -> bool:
         """Check if an issue with the given GUID was already created."""
         title = update.get("title", "")
         try:
-            api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+            api = (
+                self.api
+                if not repo or repo == self.repo
+                else GitHubAPI(self.api.token, repo)
+            )
             # Search for existing issues with similar title
             existing = api.search_issues(f'is:issue in:title "{title}"')
 
@@ -1322,7 +1336,11 @@ class IssueUpdateProcessor:
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
 
-        api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.repo
+            else GitHubAPI(self.api.token, repo)
+        )
 
         try:
             success = api.update_issue(issue_number, **update_data)
@@ -1375,7 +1393,11 @@ class IssueUpdateProcessor:
         if guid_to_embed:
             body = f"<!-- guid:{guid_to_embed} -->\n{body}"
 
-        api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.repo
+            else GitHubAPI(self.api.token, repo)
+        )
 
         try:
             result = api.add_comment(issue_number, body)
@@ -1418,7 +1440,11 @@ class IssueUpdateProcessor:
             self.summary.add_error(f"No issue number found for close: {update}")
             return False
 
-        api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.repo
+            else GitHubAPI(self.api.token, repo)
+        )
 
         try:
             success = api.close_issue(issue_number, state_reason)
@@ -1623,7 +1649,9 @@ class IssueUpdateProcessor:
 
         return self._find_permalinks_for_updates(updates)
 
-    def _find_issue_by_guid(self, guid: str, repo: str = None) -> Optional[Dict[str, Any]]:
+    def _find_issue_by_guid(
+        self, guid: str, repo: str = None
+    ) -> Optional[Dict[str, Any]]:
         """
         Find an issue by its GUID marker in the body.
 
@@ -1637,7 +1665,11 @@ class IssueUpdateProcessor:
             return None
 
         try:
-            api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+            api = (
+                self.api
+                if not repo or repo == self.repo
+                else GitHubAPI(self.api.token, repo)
+            )
             # Search all issues for the GUID marker
             all_issues = api.get_all_issues(state="all")
             guid_marker = f"<!-- guid:{guid} -->"
@@ -2192,8 +2224,6 @@ class CodeQLAlertManager:
         processed_count = 0
 
         for alert in alerts:
-            alert_id = str(alert.get("number", alert.get("id", "unknown")))
-
             if self._should_process_alert(alert):
                 if dry_run:
                     self._print_alert_plan(alert)
@@ -2236,7 +2266,9 @@ class CodeQLAlertManager:
         existing_issues = self.api.search_issues(search_query)
 
         if existing_issues:
-            print(f"⏭️  Skipping alert #{alert_id} - issue already exists: #{existing_issues[0]['number']}")
+            print(
+                f"⏭️  Skipping alert #{alert_id} - issue already exists: #{existing_issues[0]['number']}"
+            )
             return False
 
         return True
@@ -2262,7 +2294,9 @@ class CodeQLAlertManager:
         try:
             issue = self.api.create_issue(title, body, labels)
             if issue:
-                print(f"✅ Created issue #{issue['number']} for CodeQL alert #{alert_id}")
+                print(
+                    f"✅ Created issue #{issue['number']} for CodeQL alert #{alert_id}"
+                )
                 self.summary.add_alert_processed(
                     alert_id, title, issue["number"], issue["html_url"]
                 )
@@ -2364,21 +2398,21 @@ Environment Variables:
             "close-duplicates",
             "codeql-alerts",
             "event-handler",
-            "update-permalinks"
+            "update-permalinks",
         ],
-        help="Operation to perform"
+        help="Operation to perform",
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show what would be done without making changes"
+        help="Show what would be done without making changes",
     )
 
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Force update existing tickets (for copilot-tickets)"
+        help="Force update existing tickets (for copilot-tickets)",
     )
 
     args = parser.parse_args()
@@ -2386,13 +2420,19 @@ Environment Variables:
     # Get GitHub token
     token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if not token:
-        print("Error: GitHub token not found. Set GH_TOKEN or GITHUB_TOKEN environment variable.", file=sys.stderr)
+        print(
+            "Error: GitHub token not found. Set GH_TOKEN or GITHUB_TOKEN environment variable.",
+            file=sys.stderr,
+        )
         return 1
 
     # Get repository
     repo = os.environ.get("REPO") or os.environ.get("GITHUB_REPOSITORY")
     if not repo:
-        print("Error: Repository not specified. Set REPO or GITHUB_REPOSITORY environment variable.", file=sys.stderr)
+        print(
+            "Error: Repository not specified. Set REPO or GITHUB_REPOSITORY environment variable.",
+            file=sys.stderr,
+        )
         return 1
 
     try:
@@ -2441,7 +2481,10 @@ Environment Variables:
             event_path = os.environ.get("GITHUB_EVENT_PATH")
 
             if not event_name or not event_path:
-                print("Error: GITHUB_EVENT_NAME and GITHUB_EVENT_PATH must be set for event-handler", file=sys.stderr)
+                print(
+                    "Error: GITHUB_EVENT_NAME and GITHUB_EVENT_PATH must be set for event-handler",
+                    file=sys.stderr,
+                )
                 return 1
 
             try:
@@ -2449,7 +2492,12 @@ Environment Variables:
                     event_data = json.load(f)
 
                 # Route to appropriate handler based on event type
-                if event_name in ["pull_request_review_comment", "pull_request_review", "pull_request", "push"]:
+                if event_name in [
+                    "pull_request_review_comment",
+                    "pull_request_review",
+                    "pull_request",
+                    "push",
+                ]:
                     manager = CopilotTicketManager(api)
                     manager.handle_event(event_name, event_data)
                 else:

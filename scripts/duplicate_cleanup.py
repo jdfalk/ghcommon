@@ -37,7 +37,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     from issue_manager import GitHubAPI, OperationSummary
 except ImportError:
-    print("Error: Could not import required modules from issue_manager.py", file=sys.stderr)
+    print(
+        "Error: Could not import required modules from issue_manager.py",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 
@@ -58,7 +61,7 @@ class DuplicateCleanupManager:
         self,
         dry_run: bool = True,
         generate_deletes: bool = False,
-        output_directory: str = ".github/issue-updates"
+        output_directory: str = ".github/issue-updates",
     ) -> Dict[str, Any]:
         """
         Scan for duplicate issues and optionally generate cleanup actions.
@@ -98,7 +101,7 @@ class DuplicateCleanupManager:
                 "total_groups": len(duplicate_groups),
                 "cleanup_candidates": 0,
                 "files_generated": 0,
-                "dry_run": dry_run
+                "dry_run": dry_run,
             }
 
         # Print summary of findings
@@ -106,16 +109,20 @@ class DuplicateCleanupManager:
 
         files_generated = 0
         if generate_deletes and not dry_run:
-            files_generated = self._generate_delete_files(cleanup_candidates, output_directory)
+            files_generated = self._generate_delete_files(
+                cleanup_candidates, output_directory
+            )
 
         return {
             "total_groups": len(duplicate_groups),
             "cleanup_candidates": len(cleanup_candidates),
             "files_generated": files_generated,
-            "dry_run": dry_run
+            "dry_run": dry_run,
         }
 
-    def _find_duplicate_groups(self, issues: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    def _find_duplicate_groups(
+        self, issues: List[Dict[str, Any]]
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """
         Group issues by title to find duplicates.
 
@@ -141,12 +148,14 @@ class DuplicateCleanupManager:
                     "html_url": issue["html_url"],
                     "created_at": issue["created_at"],
                     "labels": [label["name"] for label in issue.get("labels", [])],
-                    "body": issue.get("body", "")
+                    "body": issue.get("body", ""),
                 }
                 title_groups[title].append(simplified_issue)
 
         # Filter to only groups with multiple issues
-        return {title: issues for title, issues in title_groups.items() if len(issues) > 1}
+        return {
+            title: issues for title, issues in title_groups.items() if len(issues) > 1
+        }
 
     def _normalize_title(self, title: str) -> str:
         """
@@ -165,14 +174,13 @@ class DuplicateCleanupManager:
         normalized = title.lower().strip()
 
         # Remove common punctuation and extra spaces
-        normalized = re.sub(r'[^\w\s]', ' ', normalized)
-        normalized = re.sub(r'\s+', ' ', normalized)
+        normalized = re.sub(r"[^\w\s]", " ", normalized)
+        normalized = re.sub(r"\s+", " ", normalized)
 
         return normalized.strip()
 
     def _identify_cleanup_candidates(
-        self,
-        duplicate_groups: Dict[str, List[Dict[str, Any]]]
+        self, duplicate_groups: Dict[str, List[Dict[str, Any]]]
     ) -> List[Dict[str, Any]]:
         """
         Identify closed duplicate issues that need cleanup.
@@ -198,20 +206,26 @@ class DuplicateCleanupManager:
             # Find closed duplicates that aren't properly labeled
             for issue in issues:
                 if (
-                    issue["number"] != canonical_issue["number"] and
-                    issue["state"] == "closed" and
-                    not self._has_duplicate_label(issue["labels"]) and
-                    not self._has_duplicate_comment(issue["number"], canonical_issue["number"])
+                    issue["number"] != canonical_issue["number"]
+                    and issue["state"] == "closed"
+                    and not self._has_duplicate_label(issue["labels"])
+                    and not self._has_duplicate_comment(
+                        issue["number"], canonical_issue["number"]
+                    )
                 ):
-                    cleanup_candidates.append({
-                        "duplicate_issue": issue,
-                        "canonical_issue": canonical_issue,
-                        "title": title
-                    })
+                    cleanup_candidates.append(
+                        {
+                            "duplicate_issue": issue,
+                            "canonical_issue": canonical_issue,
+                            "title": title,
+                        }
+                    )
 
         return cleanup_candidates
 
-    def _find_canonical_issue(self, issues: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _find_canonical_issue(
+        self, issues: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
         """
         Find the canonical (original) issue from a group of duplicates.
 
@@ -260,6 +274,7 @@ class DuplicateCleanupManager:
         """
         try:
             import requests
+
             url = f"https://api.github.com/repos/{self.api.repo}/issues/{issue_number}/comments"
             response = requests.get(url, headers=self.api.headers, timeout=10)
 
@@ -269,7 +284,7 @@ class DuplicateCleanupManager:
             comments = response.json()
 
             # Look for "Duplicate of #xx" pattern in comments
-            duplicate_pattern = re.compile(r'duplicate\s+of\s+#(\d+)', re.IGNORECASE)
+            duplicate_pattern = re.compile(r"duplicate\s+of\s+#(\d+)", re.IGNORECASE)
 
             for comment in comments:
                 comment_body = comment.get("body", "")
@@ -282,7 +297,9 @@ class DuplicateCleanupManager:
             print(f"⚠️  Error checking comments for issue #{issue_number}: {e}")
             return False
 
-    def _print_cleanup_summary(self, cleanup_candidates: List[Dict[str, Any]], dry_run: bool) -> None:
+    def _print_cleanup_summary(
+        self, cleanup_candidates: List[Dict[str, Any]], dry_run: bool
+    ) -> None:
         """
         Print a summary of cleanup candidates.
 
@@ -297,7 +314,9 @@ class DuplicateCleanupManager:
             print("✅ No duplicate cleanup needed")
             return
 
-        print(f"📋 Found {len(cleanup_candidates)} closed duplicates that need cleanup:")
+        print(
+            f"📋 Found {len(cleanup_candidates)} closed duplicates that need cleanup:"
+        )
 
         # Group by canonical issue for better display
         by_canonical = defaultdict(list)
@@ -307,7 +326,9 @@ class DuplicateCleanupManager:
 
         for canonical_num, candidates in by_canonical.items():
             canonical = candidates[0]["canonical_issue"]
-            print(f"\n📌 Canonical Issue #{canonical_num}: {canonical['title'][:50]}...")
+            print(
+                f"\n📌 Canonical Issue #{canonical_num}: {canonical['title'][:50]}..."
+            )
             print(f"   Status: {canonical['state'].upper()}")
             print(f"   URL: {canonical['html_url']}")
 
@@ -324,9 +345,7 @@ class DuplicateCleanupManager:
         print("=" * 60)
 
     def _generate_delete_files(
-        self,
-        cleanup_candidates: List[Dict[str, Any]],
-        output_directory: str
+        self, cleanup_candidates: List[Dict[str, Any]], output_directory: str
     ) -> int:
         """
         Generate individual delete action files for cleanup candidates.
@@ -354,7 +373,9 @@ class DuplicateCleanupManager:
 
             # Generate filename with UUID
             action_uuid = str(uuid.uuid4())
-            filename = f"delete-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
+            filename = (
+                f"delete-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
+            )
             file_path = os.path.join(output_directory, filename)
 
             try:
@@ -376,9 +397,7 @@ class DuplicateCleanupManager:
         return files_generated
 
     def _create_delete_action(
-        self,
-        duplicate_issue: Dict[str, Any],
-        canonical_issue: Dict[str, Any]
+        self, duplicate_issue: Dict[str, Any], canonical_issue: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Create a delete action object for a duplicate issue.
@@ -408,8 +427,8 @@ class DuplicateCleanupManager:
                 "duplicate_created": duplicate_issue["created_at"],
                 "canonical_created": canonical_issue["created_at"],
                 "cleanup_generated": datetime.now().isoformat(),
-                "cleanup_reason": "Closed duplicate without proper labeling"
-            }
+                "cleanup_reason": "Closed duplicate without proper labeling",
+            },
         }
 
         return delete_action
@@ -417,7 +436,7 @@ class DuplicateCleanupManager:
     def generate_comment_actions(
         self,
         cleanup_candidates: List[Dict[str, Any]],
-        output_directory: str = ".github/issue-updates"
+        output_directory: str = ".github/issue-updates",
     ) -> int:
         """
         Generate comment actions to add "Duplicate of #xx" comments before deletion.
@@ -441,11 +460,15 @@ class DuplicateCleanupManager:
             canonical_issue = candidate["canonical_issue"]
 
             # Generate comment action
-            comment_action = self._create_comment_action(duplicate_issue, canonical_issue)
+            comment_action = self._create_comment_action(
+                duplicate_issue, canonical_issue
+            )
 
             # Generate filename with UUID
             action_uuid = str(uuid.uuid4())
-            filename = f"comment-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
+            filename = (
+                f"comment-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
+            )
             file_path = os.path.join(output_directory, filename)
 
             try:
@@ -467,9 +490,7 @@ class DuplicateCleanupManager:
         return files_generated
 
     def _create_comment_action(
-        self,
-        duplicate_issue: Dict[str, Any],
-        canonical_issue: Dict[str, Any]
+        self, duplicate_issue: Dict[str, Any], canonical_issue: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Create a comment action object for a duplicate reference.
@@ -497,8 +518,8 @@ class DuplicateCleanupManager:
                 "duplicate_of": canonical_issue["number"],
                 "canonical_url": canonical_issue["html_url"],
                 "comment_purpose": "Mark as duplicate before deletion",
-                "cleanup_generated": datetime.now().isoformat()
-            }
+                "cleanup_generated": datetime.now().isoformat(),
+            },
         }
 
         return comment_action
@@ -509,7 +530,10 @@ def create_github_api() -> GitHubAPI:
     # Get GitHub token from environment
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if not token:
-        print("Error: GITHUB_TOKEN or GH_TOKEN environment variable required", file=sys.stderr)
+        print(
+            "Error: GITHUB_TOKEN or GH_TOKEN environment variable required",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # Get repository from environment or default
@@ -547,7 +571,7 @@ Examples:
 Environment Variables:
   GITHUB_TOKEN      GitHub personal access token
   GITHUB_REPOSITORY Repository in owner/name format
-        """
+        """,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -557,22 +581,22 @@ Environment Variables:
     scan_parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Only identify duplicates without generating actions (default: True)"
+        help="Only identify duplicates without generating actions (default: True)",
     )
     scan_parser.add_argument(
         "--generate-deletes",
         action="store_true",
-        help="Generate delete action files for identified duplicates"
+        help="Generate delete action files for identified duplicates",
     )
     scan_parser.add_argument(
         "--add-comments",
         action="store_true",
-        help="Also generate comment actions to mark duplicates before deletion"
+        help="Also generate comment actions to mark duplicates before deletion",
     )
     scan_parser.add_argument(
         "--output-dir",
         default=".github/issue-updates",
-        help="Directory to store generated update files (default: .github/issue-updates)"
+        help="Directory to store generated update files (default: .github/issue-updates)",
     )
 
     args = parser.parse_args()
@@ -600,12 +624,11 @@ Environment Variables:
             results = manager.scan_and_cleanup(
                 dry_run=is_dry_run,
                 generate_deletes=args.generate_deletes,
-                output_directory=args.output_dir
+                output_directory=args.output_dir,
             )
 
             # Generate comment actions if requested
             if args.add_comments and args.generate_deletes and not is_dry_run:
-                cleanup_candidates = []  # Would need to pass this from scan_and_cleanup
                 # This would require refactoring to return candidates
                 print("💡 Comment generation would be implemented here")
 
@@ -617,7 +640,7 @@ Environment Variables:
             print(f"📄 Files generated: {results['files_generated']}")
             print(f"🧪 Dry run mode: {results['dry_run']}")
 
-            if results['cleanup_candidates'] > 0 and results['dry_run']:
+            if results["cleanup_candidates"] > 0 and results["dry_run"]:
                 print("\n💡 To generate action files, run:")
                 print("   python scripts/duplicate_cleanup.py scan --generate-deletes")
 
