@@ -13,9 +13,9 @@ on:
 
 jobs:
   labeler:
-    uses: ./.github/workflows/reusable-pr-labeler.yml
+    uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@main
     permissions:
       contents: read
       pull-requests: write
     secrets:
-      github_pat: ${{ secrets.JF_CI_GH_PAT }}
+      github-token: ${{ secrets.JF_CI_GH_PAT }}
