@@ -1,7 +1,7 @@
-[tool.ruff]
 # file: .github/linters/ruff.toml
 # version: 1.0.0
 # guid: f1a2b3c4-d5e6-789f-a012-456789abcdef
+
 target-version = "py39"
 line-length = 80
 select = [
@@ -19,10 +19,10 @@ ignore = [
     "C901",  # too complex
 ]
 
-[tool.ruff.per-file-ignores]
+[per-file-ignores]
 "__init__.py" = ["F401"]
 "test_*.py" = ["S101"]
 "**/tests/**/*.py" = ["S101"]
 
-[tool.ruff.isort]
+[isort]
 known-third-party = ["fastapi", "pydantic", "starlette"]
