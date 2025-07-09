@@ -1,0 +1,114 @@
+# file: .github/workflows/reusable-ai-rebase.yml
+# version: 1.0.0
+# guid: 8baaa277-345e-4c24-8659-47c93e0f3a8d
+
+name: Reusable - AI Rebase Conflicted PRs
+
+on:
+  workflow_call:
+    inputs:
+      base-branch:
+        description: "Branch to rebase onto"
+        required: false
+        default: "main"
+        type: string
+      model:
+        description: "Model to use for inference"
+        required: false
+        default: "openai/gpt-4o"
+        type: string
+    secrets:
+      github-token:
+        description: "GitHub token with write access"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.find.outputs.list }}
+    steps:
+      - uses: actions/github-script@v7
+        id: find
+        with:
+          github-token: ${{ secrets.github-token }}
+          script: |
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+            const conflicted = [];
+            for (const pr of prs) {
+              const full = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+              });
+              if (full.data.mergeable_state === 'dirty') {
+                conflicted.push({ number: pr.number, branch: pr.head.ref });
+              }
+            }
+            core.setOutput('list', JSON.stringify(conflicted));
+
+  rebase:
+    runs-on: ubuntu-latest
+    needs: find
+    if: needs.find.outputs.list != '[]'
+    strategy:
+      matrix:
+        pr: ${{ fromJson(needs.find.outputs.list) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare branch
+        run: |
+          git fetch origin "${{ matrix.pr.branch }}"
+          git checkout -B "${{ matrix.pr.branch }}" "origin/${{ matrix.pr.branch }}"
+          git rebase "origin/${{ inputs.base-branch }}" || true
+
+      - name: Detect conflicts
+        id: conflicts
+        run: |
+          if git ls-files -u | grep -q .; then
+            echo "has_conflict=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_conflict=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate patch with AI
+        if: steps.conflicts.outputs.has_conflict == 'true'
+        id: ai
+        uses: actions/ai-inference@v1
+        with:
+          token: ${{ secrets.github-token }}
+          model: ${{ inputs.model }}
+          prompt: |
+            Resolve the merge conflicts after rebasing branch '${{ matrix.pr.branch }}' onto '${{ inputs.base-branch }}'.
+            Provide a patch that applies cleanly.
+
+      - name: Apply AI patch
+        if: steps.conflicts.outputs.has_conflict == 'true'
+        run: |
+          cat "${{ steps.ai.outputs.response-file }}" | git apply -
+          git add -A
+          git rebase --continue || true
+
+      - name: Push updated branch
+        run: git push --force-with-lease origin "${{ matrix.pr.branch }}"
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [find, rebase]
+    steps:
+      - name: Print summary
+        run: |
+          echo "Processed PRs: ${{ needs.find.outputs.list }}"
