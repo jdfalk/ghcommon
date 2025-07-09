@@ -77,14 +77,16 @@ jobs:
           cp scripts/label_manager.py ./label_manager.py
 
       - name: Validate configuration file
+        env:
+          CONFIG_FILE: ${{ inputs.config-file }}
         run: |
-          if [ ! -f "${{ inputs.config-file }}" ]; then
-            echo "Error: Configuration file '${{ inputs.config-file }}' not found"
+          if [ ! -f "${CONFIG_FILE}" ]; then
+            echo "Error: Configuration file '${CONFIG_FILE}' not found"
             exit 1
           fi
 
           # Validate JSON syntax
-          python -c "import json; json.load(open('${{ inputs.config-file }}'))"
+          python -c "import json; json.load(open('${CONFIG_FILE}'))"
           echo "✓ Configuration file is valid JSON"
 
       - name: Prepare repository list
