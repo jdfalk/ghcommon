@@ -4,9 +4,6 @@
 
 name: Sync Files to Other Repos
 
-description: |
-  This workflow allows maintainers to push selected files or directories from ghcommon to one or more target repositories. It can be triggered manually and supports custom repo selection.
-
 on:
   workflow_dispatch:
     inputs:
