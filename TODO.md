@@ -371,3 +371,5 @@ The ghcommon project has a solid foundation but requires systematic improvements
 
 **Estimated Timeline**: 4-6 weeks for core functionality, ongoing for community and advanced features.
 **Resource Requirements**: 1-2 developers for core work, community engagement for testing and feedback.
+
+- [ ] 🟡 **General**: Create examples for all documentation update templates
