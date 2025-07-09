@@ -104,7 +104,7 @@ on:
         type: string
 
 permissions:
-  contents: write  # Required for auto-committing fixes
+  contents: write # Required for auto-committing fixes
   statuses: write
   checks: write
   pull-requests: write
@@ -219,13 +219,13 @@ jobs:
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action - Super Linter Auto-fix"
-          
+
           # Add all changes
           git add .
-          
+
           # Commit changes
           git commit -m "${{ inputs.commit-message }}"
-          
+
           # Push changes
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             # For PRs, push to the PR branch
