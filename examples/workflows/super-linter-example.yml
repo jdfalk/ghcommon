@@ -12,21 +12,23 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write  # Required for auto-committing fixes
   pull-requests: write
   checks: write
   statuses: write
   security-events: write
 
 jobs:
-  # Basic usage - lint all languages with default settings
+  # Basic usage - lint all languages with auto-fix enabled
   super-linter-basic:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
       validate-all-codebase: false # Only validate changed files in PRs
+      enable-auto-fix: true         # Enable auto-fixing
+      auto-commit-fixes: true       # Automatically commit fixes
     secrets: inherit
 
-  # Advanced usage - selective linting with custom configuration
+  # Advanced usage - selective linting with custom auto-fix settings
   super-linter-advanced:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
@@ -46,14 +48,19 @@ jobs:
       run-css: false
       run-html: false
       run-protobuf: false
+      # Auto-fix configuration
+      enable-auto-fix: true
+      auto-commit-fixes: true
+      commit-message: "style: auto-fix linting issues [skip ci]"
       # Custom exclusion patterns
       filter-regex-exclude: ".*\\.git/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|vendor/.*"
     secrets: inherit
 
-  # Custom configuration usage
-  super-linter-custom:
+  # Check-only mode - no auto-fixes applied
+  super-linter-check-only:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
-      config-file: ".github/custom-super-linter.env" # Use custom config file
       validate-all-codebase: false
+      enable-auto-fix: false        # Disable auto-fixing
+      auto-commit-fixes: false      # No commits
     secrets: inherit
