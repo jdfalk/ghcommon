@@ -3,9 +3,12 @@
   "rules": {
     "no-duplicate-selectors": true,
     "selector-max-id": 0,
-    "rule-empty-line-before": ["always", {
-      "except": ["first-nested"],
-      "ignore": ["after-comment"]
-    }]
+    "rule-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested"],
+        "ignore": ["after-comment"]
+      }
+    ]
   }
 }
