@@ -113,8 +113,10 @@ jobs:
         if: inputs.builder == 'buildah' && inputs.push == true
         env:
           REGISTRY_TOKEN: ${{ secrets.gh-token }}
+          REGISTRY: ${{ inputs.registry }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          echo "$REGISTRY_TOKEN" | buildah login --username ${{ github.actor }} --password-stdin ${{ inputs.registry }}
+          echo "$REGISTRY_TOKEN" | buildah login --username "${GITHUB_ACTOR}" --password-stdin "${REGISTRY}"
 
       - name: Generate metadata (buildah)
         if: inputs.builder == 'buildah'
