@@ -201,6 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    needs: [super-linter]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -253,12 +254,6 @@ jobs:
         run: |
           python -m pytest test/ -v --cov=. || python -m pytest test/ -v
 
-      - name: Python lint
-        if: hashFiles('**/*.py') != '' && inputs.run-lint == true
-        run: |
-          pip install ruff || true
-          ruff check .
-
       # --- Node.js/TypeScript/JSX Setup & Test ---
       - name: Set up Node.js
         if: hashFiles('**/*.js') != '' || hashFiles('**/*.ts') != '' || hashFiles('**/*.jsx') != '' || hashFiles('**/*.tsx') != ''
@@ -276,29 +271,25 @@ jobs:
         run: |
           npm test || npx jest || echo "No JS/TS tests found"
 
-      - name: JS/TS lint
-        if: (hashFiles('**/*.js') != '' || hashFiles('**/*.ts') != '' || hashFiles('**/*.jsx') != '' || hashFiles('**/*.tsx') != '') && inputs.run-lint == true
-        run: |
-          npx eslint . --ext .js,.ts,.jsx,.tsx || echo "No ESLint config"
-
   ci-complete:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    needs: [backend, frontend]
+    needs: [super-linter, backend, frontend]
     steps:
       - name: Check workflow results
         run: |
+          echo "Super Linter result: ${{ needs.super-linter.result }}"
           echo "Backend result: ${{ needs.backend.result }}"
           echo "Frontend result: ${{ needs.frontend.result }}"
-          if [[ "${{ needs.backend.result }}" == "failure" ]] || [[ "${{ needs.frontend.result }}" == "failure" ]]; then
+          if [[ "${{ needs.super-linter.result }}" == "failure" ]] || [[ "${{ needs.backend.result }}" == "failure" ]] || [[ "${{ needs.frontend.result }}" == "failure" ]]; then
             echo "❌ One or more workflows failed"
             exit 1
-          elif [[ "${{ needs.backend.result }}" == "skipped" ]] && [[ "${{ needs.frontend.result }}" == "skipped" ]]; then
+          elif [[ "${{ needs.super-linter.result }}" == "skipped" ]] && [[ "${{ needs.backend.result }}" == "skipped" ]] && [[ "${{ needs.frontend.result }}" == "skipped" ]]; then
             echo "⚠️ All workflows were skipped - no changes detected"
             exit 0
-          elif [[ "${{ needs.backend.result }}" == "success" ]] || [[ "${{ needs.frontend.result }}" == "success" ]]; then
+          elif [[ "${{ needs.super-linter.result }}" == "success" ]] || [[ "${{ needs.backend.result }}" == "success" ]] || [[ "${{ needs.frontend.result }}" == "success" ]]; then
             echo "✅ All executed workflows completed successfully"
             echo "Note: Some tests may have been skipped due to missing dependencies (e.g., PostgreSQL), which is expected in CI"
             exit 0

@@ -1,0 +1,238 @@
+# file: .github/workflows/reusable-super-linter.yml
+# version: 1.0.0
+# guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
+
+name: Reusable - Super Linter
+
+on:
+  workflow_call:
+    inputs:
+      validate-all-codebase:
+        description: "Validate entire codebase instead of just changed files"
+        required: false
+        default: false
+        type: boolean
+      default-branch:
+        description: "The default branch of the repository"
+        required: false
+        default: "main"
+        type: string
+      config-file:
+        description: "Path to Super Linter configuration file"
+        required: false
+        default: ".github/super-linter.env"
+        type: string
+      filter-regex-exclude:
+        description: "Regex to exclude files from linting"
+        required: false
+        default: ".*\\.git/.*|.*\\.github/copilot/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*"
+        type: string
+      run-python:
+        description: "Enable Python linting"
+        required: false
+        default: true
+        type: boolean
+      run-shell:
+        description: "Enable shell script linting"
+        required: false
+        default: true
+        type: boolean
+      run-markdown:
+        description: "Enable Markdown linting"
+        required: false
+        default: true
+        type: boolean
+      run-yaml:
+        description: "Enable YAML linting"
+        required: false
+        default: true
+        type: boolean
+      run-json:
+        description: "Enable JSON linting"
+        required: false
+        default: true
+        type: boolean
+      run-javascript:
+        description: "Enable JavaScript/TypeScript linting"
+        required: false
+        default: true
+        type: boolean
+      run-go:
+        description: "Enable Go linting"
+        required: false
+        default: true
+        type: boolean
+      run-css:
+        description: "Enable CSS linting"
+        required: false
+        default: true
+        type: boolean
+      run-html:
+        description: "Enable HTML linting"
+        required: false
+        default: true
+        type: boolean
+      run-protobuf:
+        description: "Enable Protobuf linting"
+        required: false
+        default: true
+        type: boolean
+      run-github-actions:
+        description: "Enable GitHub Actions linting"
+        required: false
+        default: true
+        type: boolean
+      run-security:
+        description: "Enable security scanning (secrets, Dockerfile)"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  statuses: write
+  checks: write
+  pull-requests: write
+  packages: read
+  security-events: write
+
+jobs:
+  super-linter:
+    name: Super Linter
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Full git history is needed to get list of changed files
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Super Linter environment
+        run: |
+          # Create dynamic environment variables based on inputs
+          echo "DEFAULT_BRANCH=${{ inputs.default-branch }}" >> $GITHUB_ENV
+          echo "VALIDATE_ALL_CODEBASE=${{ inputs.validate-all-codebase }}" >> $GITHUB_ENV
+          echo "FILTER_REGEX_EXCLUDE=${{ inputs.filter-regex-exclude }}" >> $GITHUB_ENV
+          
+          # Language-specific settings
+          echo "VALIDATE_PYTHON_BLACK=${{ inputs.run-python }}" >> $GITHUB_ENV
+          echo "VALIDATE_PYTHON_PYLINT=${{ inputs.run-python }}" >> $GITHUB_ENV
+          echo "VALIDATE_PYTHON_RUFF=${{ inputs.run-python }}" >> $GITHUB_ENV
+          echo "VALIDATE_BASH=${{ inputs.run-shell }}" >> $GITHUB_ENV
+          echo "VALIDATE_BASH_EXEC=${{ inputs.run-shell }}" >> $GITHUB_ENV
+          echo "VALIDATE_MARKDOWN=${{ inputs.run-markdown }}" >> $GITHUB_ENV
+          echo "VALIDATE_JSON=${{ inputs.run-json }}" >> $GITHUB_ENV
+          echo "VALIDATE_YAML=${{ inputs.run-yaml }}" >> $GITHUB_ENV
+          echo "VALIDATE_GITHUB_ACTIONS=${{ inputs.run-github-actions }}" >> $GITHUB_ENV
+          echo "VALIDATE_JAVASCRIPT_ES=${{ inputs.run-javascript }}" >> $GITHUB_ENV
+          echo "VALIDATE_TYPESCRIPT_ES=${{ inputs.run-javascript }}" >> $GITHUB_ENV
+          echo "VALIDATE_CSS=${{ inputs.run-css }}" >> $GITHUB_ENV
+          echo "VALIDATE_HTML=${{ inputs.run-html }}" >> $GITHUB_ENV
+          echo "VALIDATE_GO=${{ inputs.run-go }}" >> $GITHUB_ENV
+          echo "VALIDATE_PROTOBUF=${{ inputs.run-protobuf }}" >> $GITHUB_ENV
+          echo "VALIDATE_SECRETS=${{ inputs.run-security }}" >> $GITHUB_ENV
+          echo "VALIDATE_DOCKERFILE_HADOLINT=${{ inputs.run-security }}" >> $GITHUB_ENV
+          
+          # Configuration file paths
+          echo "PYTHON_BLACK_CONFIG_FILE=.github/linters/.python-black" >> $GITHUB_ENV
+          echo "PYTHON_PYLINT_CONFIG_FILE=.github/linters/.pylintrc" >> $GITHUB_ENV
+          echo "PYTHON_RUFF_CONFIG_FILE=.github/linters/ruff.toml" >> $GITHUB_ENV
+          echo "MARKDOWN_CONFIG_FILE=.github/linters/.markdownlint.json" >> $GITHUB_ENV
+          echo "YAML_CONFIG_FILE=.github/linters/.yaml-lint.yml" >> $GITHUB_ENV
+          echo "JAVASCRIPT_ES_CONFIG_FILE=.github/linters/.eslintrc.json" >> $GITHUB_ENV
+          echo "TYPESCRIPT_ES_CONFIG_FILE=.github/linters/.eslintrc.json" >> $GITHUB_ENV
+          
+          # Performance and behavior settings
+          echo "MULTI_STATUS=true" >> $GITHUB_ENV
+          echo "PARALLEL=true" >> $GITHUB_ENV
+          echo "VALIDATE_JSCPD=false" >> $GITHUB_ENV
+          echo "VALIDATE_NATURAL_LANGUAGE=false" >> $GITHUB_ENV
+
+      - name: Load custom configuration
+        if: inputs.config-file != '.github/super-linter.env'
+        run: |
+          if [ -f "${{ inputs.config-file }}" ]; then
+            echo "Loading custom configuration from ${{ inputs.config-file }}"
+            set -a
+            source "${{ inputs.config-file }}"
+            set +a
+          else
+            echo "Warning: Custom config file ${{ inputs.config-file }} not found, using defaults"
+          fi
+
+      - name: Run Super Linter
+        uses: super-linter/super-linter@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Super Linter results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: super-linter-results
+          path: |
+            super-linter.report
+            super-linter.log
+          retention-days: 7
+
+      - name: Comment PR with linting results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            
+            // Check if there are any linting errors
+            let hasErrors = false;
+            let summary = '## 🔍 Super Linter Results\n\n';
+            
+            try {
+              if (fs.existsSync('super-linter.report')) {
+                const report = fs.readFileSync('super-linter.report', 'utf8');
+                if (report.includes('ERROR') || report.includes('FATAL')) {
+                  hasErrors = true;
+                  summary += '❌ **Linting failed** - Please fix the issues below:\n\n';
+                  summary += '```\n' + report + '\n```\n\n';
+                } else {
+                  summary += '✅ **All linting checks passed!**\n\n';
+                }
+              } else {
+                summary += '⚠️ **No linting report found**\n\n';
+              }
+            } catch (error) {
+              summary += '⚠️ **Error reading linting results**\n\n';
+            }
+            
+            summary += 'View the [workflow run](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') for detailed results.';
+            
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const existingComment = comments.data.find(comment => 
+              comment.body.includes('🔍 Super Linter Results')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: summary
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            }
