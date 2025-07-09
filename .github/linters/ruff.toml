@@ -4,6 +4,8 @@
 
 target-version = "py39"
 line-length = 80
+
+[lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -19,10 +21,10 @@ ignore = [
     "C901",  # too complex
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "test_*.py" = ["S101"]
 "**/tests/**/*.py" = ["S101"]
 
-[isort]
+[lint.isort]
 known-third-party = ["fastapi", "pydantic", "starlette"]
