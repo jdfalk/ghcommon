@@ -100,72 +100,77 @@ jobs:
   super-linter:
     name: Super Linter
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           # Full git history is needed to get list of changed files
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Setup Super Linter environment
-        run: |
-          # Create dynamic environment variables based on inputs
-          echo "DEFAULT_BRANCH=${{ inputs.default-branch }}" >> $GITHUB_ENV
-          echo "VALIDATE_ALL_CODEBASE=${{ inputs.validate-all-codebase }}" >> $GITHUB_ENV
-          echo "FILTER_REGEX_EXCLUDE=${{ inputs.filter-regex-exclude }}" >> $GITHUB_ENV
-          
+        env:
+          # Core settings
+          DEFAULT_BRANCH: ${{ inputs.default-branch }}
+          VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
+          FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
+
           # Language-specific settings
-          echo "VALIDATE_PYTHON_BLACK=${{ inputs.run-python }}" >> $GITHUB_ENV
-          echo "VALIDATE_PYTHON_PYLINT=${{ inputs.run-python }}" >> $GITHUB_ENV
-          echo "VALIDATE_PYTHON_RUFF=${{ inputs.run-python }}" >> $GITHUB_ENV
-          echo "VALIDATE_BASH=${{ inputs.run-shell }}" >> $GITHUB_ENV
-          echo "VALIDATE_BASH_EXEC=${{ inputs.run-shell }}" >> $GITHUB_ENV
-          echo "VALIDATE_MARKDOWN=${{ inputs.run-markdown }}" >> $GITHUB_ENV
-          echo "VALIDATE_JSON=${{ inputs.run-json }}" >> $GITHUB_ENV
-          echo "VALIDATE_YAML=${{ inputs.run-yaml }}" >> $GITHUB_ENV
-          echo "VALIDATE_GITHUB_ACTIONS=${{ inputs.run-github-actions }}" >> $GITHUB_ENV
-          echo "VALIDATE_JAVASCRIPT_ES=${{ inputs.run-javascript }}" >> $GITHUB_ENV
-          echo "VALIDATE_TYPESCRIPT_ES=${{ inputs.run-javascript }}" >> $GITHUB_ENV
-          echo "VALIDATE_CSS=${{ inputs.run-css }}" >> $GITHUB_ENV
-          echo "VALIDATE_HTML=${{ inputs.run-html }}" >> $GITHUB_ENV
-          echo "VALIDATE_GO=${{ inputs.run-go }}" >> $GITHUB_ENV
-          echo "VALIDATE_PROTOBUF=${{ inputs.run-protobuf }}" >> $GITHUB_ENV
-          echo "VALIDATE_SECRETS=${{ inputs.run-security }}" >> $GITHUB_ENV
-          echo "VALIDATE_DOCKERFILE_HADOLINT=${{ inputs.run-security }}" >> $GITHUB_ENV
-          
+          VALIDATE_PYTHON_BLACK: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
+          VALIDATE_BASH: ${{ inputs.run-shell }}
+          VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
+          VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
+          VALIDATE_JSON: ${{ inputs.run-json }}
+          VALIDATE_YAML: ${{ inputs.run-yaml }}
+          VALIDATE_GITHUB_ACTIONS: ${{ inputs.run-github-actions }}
+          VALIDATE_JAVASCRIPT_ES: ${{ inputs.run-javascript }}
+          VALIDATE_TYPESCRIPT_ES: ${{ inputs.run-javascript }}
+          VALIDATE_CSS: ${{ inputs.run-css }}
+          VALIDATE_HTML: ${{ inputs.run-html }}
+          VALIDATE_GO: ${{ inputs.run-go }}
+          VALIDATE_PROTOBUF: ${{ inputs.run-protobuf }}
+          VALIDATE_SECRETS: ${{ inputs.run-security }}
+          VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
+
           # Configuration file paths
-          echo "PYTHON_BLACK_CONFIG_FILE=.github/linters/.python-black" >> $GITHUB_ENV
-          echo "PYTHON_PYLINT_CONFIG_FILE=.github/linters/.pylintrc" >> $GITHUB_ENV
-          echo "PYTHON_RUFF_CONFIG_FILE=.github/linters/ruff.toml" >> $GITHUB_ENV
-          echo "MARKDOWN_CONFIG_FILE=.github/linters/.markdownlint.json" >> $GITHUB_ENV
-          echo "YAML_CONFIG_FILE=.github/linters/.yaml-lint.yml" >> $GITHUB_ENV
-          echo "JAVASCRIPT_ES_CONFIG_FILE=.github/linters/.eslintrc.json" >> $GITHUB_ENV
-          echo "TYPESCRIPT_ES_CONFIG_FILE=.github/linters/.eslintrc.json" >> $GITHUB_ENV
-          
+          PYTHON_BLACK_CONFIG_FILE: .github/linters/.python-black
+          PYTHON_PYLINT_CONFIG_FILE: .github/linters/.pylintrc
+          PYTHON_RUFF_CONFIG_FILE: .github/linters/ruff.toml
+          MARKDOWN_CONFIG_FILE: .github/linters/.markdownlint.json
+          YAML_CONFIG_FILE: .github/linters/.yaml-lint.yml
+          JAVASCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
+          TYPESCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
+
           # Performance and behavior settings
-          echo "MULTI_STATUS=true" >> $GITHUB_ENV
-          echo "PARALLEL=true" >> $GITHUB_ENV
-          echo "VALIDATE_JSCPD=false" >> $GITHUB_ENV
-          echo "VALIDATE_NATURAL_LANGUAGE=false" >> $GITHUB_ENV
+          MULTI_STATUS: true
+          PARALLEL: true
+          VALIDATE_JSCPD: false
+          VALIDATE_NATURAL_LANGUAGE: false
+        run: |
+          # Environment variables are now set securely above
+          echo "Super Linter environment configured"
 
       - name: Load custom configuration
         if: inputs.config-file != '.github/super-linter.env'
+        env:
+          CONFIG_FILE_PATH: ${{ inputs.config-file }}
         run: |
-          if [ -f "${{ inputs.config-file }}" ]; then
-            echo "Loading custom configuration from ${{ inputs.config-file }}"
+          if [ -f "${CONFIG_FILE_PATH}" ]; then
+            echo "Loading custom configuration from ${CONFIG_FILE_PATH}"
             set -a
-            source "${{ inputs.config-file }}"
+            source "${CONFIG_FILE_PATH}"
             set +a
           else
-            echo "Warning: Custom config file ${{ inputs.config-file }} not found, using defaults"
+            echo "Warning: Custom config file ${CONFIG_FILE_PATH} not found, using defaults"
           fi
 
       - name: Run Super Linter
         uses: super-linter/super-linter@v7
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Upload Super Linter results
         if: always()
@@ -181,14 +186,14 @@ jobs:
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            
+
             // Check if there are any linting errors
             let hasErrors = false;
             let summary = '## 🔍 Super Linter Results\n\n';
-            
+
             try {
               if (fs.existsSync('super-linter.report')) {
                 const report = fs.readFileSync('super-linter.report', 'utf8');
@@ -205,20 +210,20 @@ jobs:
             } catch (error) {
               summary += '⚠️ **Error reading linting results**\n\n';
             }
-            
+
             summary += 'View the [workflow run](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') for detailed results.';
-            
+
             // Find existing comment
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
-            const existingComment = comments.data.find(comment => 
+
+            const existingComment = comments.data.find(comment =>
               comment.body.includes('🔍 Super Linter Results')
             );
-            
+
             if (existingComment) {
               // Update existing comment
               await github.rest.issues.updateComment({
