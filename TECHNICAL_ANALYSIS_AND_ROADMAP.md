@@ -182,7 +182,7 @@ ghcommon/
 
 ### Workflow Analysis
 
-#### 1. `semantic-versioning.yml`
+#### 1. `reusable-semantic-versioning.yml`
 
 **Purpose:** Automated version calculation from conventional commits
 

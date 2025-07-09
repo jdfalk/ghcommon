@@ -30,7 +30,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 
 | Workflow                                                                                  | Purpose                        | Key Features                                                             |
 | ----------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
-| [`semantic-versioning.yml`](.github/workflows/semantic-versioning.yml)                    | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
+| [`reusable-semantic-versioning.yml`](.github/workflows/reusable-semantic-versioning.yml)  | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
 | [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
 | [`automatic-release.yml`](.github/workflows/automatic-release.yml)                        | Automated GitHub releases      | Release notes, artifact management, notifications                        |
 | [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
@@ -101,7 +101,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 
 ```yaml
 versioning:
-  uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
+  uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
   with:
     version-files: '["package.json", "version.txt"]'
     update-pr-title: true
