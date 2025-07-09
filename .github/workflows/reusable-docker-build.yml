@@ -119,21 +119,26 @@ jobs:
       - name: Generate metadata (buildah)
         if: inputs.builder == 'buildah'
         id: meta-buildah
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          TAG_SUFFIX: ${{ inputs.tag-suffix }}
         run: |
           IMAGE_NAME="${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}"
           TAGS=""
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            VERSION="${{ github.ref_name }}"
-            TAGS="$IMAGE_NAME:$VERSION${{ inputs.tag-suffix }}"
-            TAGS="$TAGS,$IMAGE_NAME:latest${{ inputs.tag-suffix }}"
-          elif [ "${{ github.ref_name }}" = "main" ] || [ "${{ github.ref_name }}" = "master" ]; then
-            TAGS="$IMAGE_NAME:main${{ inputs.tag-suffix }}"
-            TAGS="$TAGS,$IMAGE_NAME:latest${{ inputs.tag-suffix }}"
+          if [ "${REF_TYPE}" = "tag" ]; then
+            VERSION="${REF_NAME}"
+            TAGS="$IMAGE_NAME:$VERSION${TAG_SUFFIX}"
+            TAGS="$TAGS,$IMAGE_NAME:latest${TAG_SUFFIX}"
+          elif [ "${REF_NAME}" = "main" ] || [ "${REF_NAME}" = "master" ]; then
+            TAGS="$IMAGE_NAME:main${TAG_SUFFIX}"
+            TAGS="$TAGS,$IMAGE_NAME:latest${TAG_SUFFIX}"
           else
-            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '/' '-')
-            TAGS="$IMAGE_NAME:$BRANCH_NAME${{ inputs.tag-suffix }}"
+            BRANCH_NAME=$(echo "${REF_NAME}" | tr '/' '-')
+            TAGS="$IMAGE_NAME:$BRANCH_NAME${TAG_SUFFIX}"
           fi
-          TAGS="$TAGS,$IMAGE_NAME:sha-${{ github.sha }}${{ inputs.tag-suffix }}"
+          TAGS="$TAGS,$IMAGE_NAME:sha-${SHA}${TAG_SUFFIX}"
           echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
           echo "build-timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
