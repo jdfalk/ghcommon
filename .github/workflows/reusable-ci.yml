@@ -69,8 +69,8 @@ jobs:
     permissions:
       contents: read
     outputs:
-      backend: ${{ steps.changes.outputs.backend }}
-      frontend: ${{ steps.changes.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,7 +78,7 @@ jobs:
           # Ensure we have the base ref for comparison
           ref: ${{ github.head_ref || github.ref }}
       - uses: dorny/paths-filter@v3
-        id: changes
+        id: filter
         with:
           # Let paths-filter automatically determine the base reference
           filters: |
