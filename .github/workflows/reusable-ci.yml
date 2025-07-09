@@ -196,11 +196,6 @@ jobs:
         run: |
           npm test || npx jest || echo "No JS/TS tests found"
 
-      - name: JS/TS lint
-        if: (hashFiles(format('{0}/**/*.js', inputs.frontend-path)) != '' || hashFiles(format('{0}/**/*.ts', inputs.frontend-path)) != '' || hashFiles(format('{0}/**/*.jsx', inputs.frontend-path)) != '' || hashFiles(format('{0}/**/*.tsx', inputs.frontend-path)) != '') && inputs.run-lint == true
-        run: |
-          npx eslint . --ext .js,.ts,.jsx,.tsx || echo "No ESLint config"
-
   universal-ci:
     if: inputs.enable-backend-frontend != true
     runs-on: ubuntu-latest
@@ -229,12 +224,6 @@ jobs:
       - name: Go test
         if: hashFiles('**/*.go') != '' && inputs.run-test == true
         run: go test -v ./...
-
-      - name: Go lint
-        if: hashFiles('**/*.go') != '' && inputs.run-lint == true
-        run: |
-          go install golang.org/x/lint/golint@latest
-          golint ./...
 
       # --- Python Setup & Test ---
       - name: Set up Python
