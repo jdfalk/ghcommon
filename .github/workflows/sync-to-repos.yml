@@ -43,11 +43,14 @@ jobs:
       - name: Run sync script
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_REPOS: ${{ github.event.inputs.target_repos }}
+          FILES_TO_SYNC: ${{ github.event.inputs.files_to_sync }}
+          BRANCH_NAME: ${{ github.event.inputs.branch_name }}
         run: |
           python scripts/sync_to_repos.py \
-            --repos "${{ github.event.inputs.target_repos }}" \
-            --files "${{ github.event.inputs.files_to_sync }}" \
-            --branch "${{ github.event.inputs.branch_name }}"
+            --repos "${TARGET_REPOS}" \
+            --files "${FILES_TO_SYNC}" \
+            --branch "${BRANCH_NAME}"
 
       - name: Show sync summary
         if: always()
