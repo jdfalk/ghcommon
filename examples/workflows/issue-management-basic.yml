@@ -15,7 +15,7 @@ permissions:
   issues: write # For creating and updating issues
   pull-requests: write # For creating PRs
   security-events: read # For reading CodeQL alerts (optional)
-  repository-projects: read # For accessing project data (optional)
+  repository-projects: write # For adding items to projects (if needed)
   actions: read # For workflow access
   checks: write # For workflow status
 
