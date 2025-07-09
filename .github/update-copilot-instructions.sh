@@ -59,7 +59,7 @@ When suggesting or implementing workflows, always:
 ### Semantic Versioning
 ```yaml
 versioning:
-  uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
+  uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
   with:
     version-files: '["package.json", "version.txt"]'
     update-pr-title: true
