@@ -81,6 +81,7 @@ jobs:
           pr-number: ${{ inputs.pr-numbers }}
 
       - name: Show labeler results
+        id: labeler-summary
         if: always()
         run: |
           echo "✅ Pull Request Labeler completed"
@@ -93,3 +94,7 @@ jobs:
           else
             echo "  - Target PR: auto-detected from workflow context"
           fi
+
+          # Set outputs for calling workflows
+          echo "completed=true" >> $GITHUB_OUTPUT
+          echo "config-path=${{ inputs.configuration-path }}" >> $GITHUB_OUTPUT
