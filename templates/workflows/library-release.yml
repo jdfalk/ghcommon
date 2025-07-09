@@ -57,7 +57,7 @@ jobs:
   # Version calculation
   versioning:
     name: Calculate Version
-    uses: jdfalk/ghcommon/.github/workflows/semantic-versioning.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
     needs: [test]
     with:
       dry-run: ${{ github.event_name == 'pull_request' }}
