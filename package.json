@@ -1,0 +1,26 @@
+{
+  "name": "ghcommon",
+  "version": "1.0.0",
+  "description": "GitHub common workflows, templates, and automation tools",
+  "private": true,
+  "scripts": {
+    "commitlint": "commitlint --from=HEAD~1 --to=HEAD --verbose",
+    "commitlint-ci": "commitlint --from=origin/main --to=HEAD --verbose"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3"
+  },
+  "keywords": [
+    "github",
+    "workflows",
+    "automation",
+    "ci-cd",
+    "templates"
+  ],
+  "author": "jdfalk",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
