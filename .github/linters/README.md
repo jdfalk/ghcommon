@@ -70,11 +70,47 @@ You can use these configurations locally by:
 The Super Linter workflow integrates these configurations automatically and provides:
 
 - ✅ Comprehensive multi-language linting
-- 🔧 Consistent code style enforcement
+- 🔧 **Auto-fixing for supported languages**
 - 📊 Detailed error reporting
 - 🚀 PR comment integration
 - 🎯 Configurable language support
 - 🔒 Security scanning (secrets, Dockerfile)
+- 💾 **Automatic commit and push of fixes**
+
+## Auto-Fix Support
+
+The following linters support automatic fixing:
+
+| Language/Tool | Linter | Auto-fix Available | What Gets Fixed |
+|---------------|--------|-------------------|-----------------|
+| Python | Black | ✅ | Code formatting, line length, quotes |
+| Python | Ruff | ✅ | Import sorting, unused imports, basic style |
+| JavaScript/TypeScript | ESLint | ✅ | Syntax, formatting, import organization |
+| CSS | StyleLint | ✅ | Property ordering, formatting, syntax |
+| JSON | jq/Prettier | ✅ | Formatting, indentation |
+| Markdown | markdownlint | ✅ | Heading structure, list formatting |
+| YAML | yamllint/Prettier | ✅ | Indentation, formatting |
+| Go | gofmt/goimports | ✅ | Code formatting, import organization |
+| Shell | shfmt | ✅ | Script formatting, indentation |
+
+### Auto-fix Configuration
+
+Auto-fixing is enabled by default but can be controlled with these inputs:
+
+```yaml
+- name: Super Linter with Auto-fix
+  uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+  with:
+    enable-auto-fix: true                    # Enable auto-fixing
+    auto-commit-fixes: true                  # Commit fixes automatically
+    commit-message: "style: auto-fix [skip ci]"  # Custom commit message
+```
+
+### When Auto-fixes Are Applied
+
+- **Pull Requests**: Fixes are committed to the PR branch
+- **Main Branch**: Fixes are committed directly to main
+- **Commits include `[skip ci]`** to prevent infinite loops
 
 ## Customization
 
