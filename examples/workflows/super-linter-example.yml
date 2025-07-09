@@ -1,0 +1,59 @@
+# file: examples/workflows/super-linter-example.yml
+# version: 1.0.0
+# guid: d3e4f5a6-b7c8-90de-f012-3456789defab
+
+name: Super Linter Example
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+  security-events: write
+
+jobs:
+  # Basic usage - lint all languages with default settings
+  super-linter-basic:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    with:
+      validate-all-codebase: false # Only validate changed files in PRs
+    secrets: inherit
+
+  # Advanced usage - selective linting with custom configuration
+  super-linter-advanced:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    with:
+      validate-all-codebase: true # Validate entire codebase
+      default-branch: "main"
+      # Enable specific languages only
+      run-python: true
+      run-javascript: true
+      run-markdown: true
+      run-yaml: true
+      run-json: true
+      run-shell: true
+      run-github-actions: true
+      run-security: true
+      # Disable languages not used in this project
+      run-go: false
+      run-css: false
+      run-html: false
+      run-protobuf: false
+      # Custom exclusion patterns
+      filter-regex-exclude: ".*\\.git/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|vendor/.*"
+    secrets: inherit
+
+  # Custom configuration usage
+  super-linter-custom:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    with:
+      config-file: ".github/custom-super-linter.env" # Use custom config file
+      validate-all-codebase: false
+    secrets: inherit
