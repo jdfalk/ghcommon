@@ -21,7 +21,7 @@ The Documentation Update System provides a structured approach to updating docum
 
 ### File Structure
 
-```
+```text
 repository/
 ├── .github/
 │   ├── doc-updates/           # Pending update files
