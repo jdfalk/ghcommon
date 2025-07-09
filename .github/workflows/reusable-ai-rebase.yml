@@ -70,10 +70,13 @@ jobs:
           fetch-depth: 0
 
       - name: Prepare branch
+        env:
+          PR_BRANCH: ${{ matrix.pr.branch }}
+          BASE_BRANCH: ${{ inputs.base-branch }}
         run: |
-          git fetch origin "${{ matrix.pr.branch }}"
-          git checkout -B "${{ matrix.pr.branch }}" "origin/${{ matrix.pr.branch }}"
-          git rebase "origin/${{ inputs.base-branch }}" || true
+          git fetch origin "${PR_BRANCH}"
+          git checkout -B "${PR_BRANCH}" "origin/${PR_BRANCH}"
+          git rebase "origin/${BASE_BRANCH}" || true
 
       - name: Detect conflicts
         id: conflicts
@@ -88,22 +91,32 @@ jobs:
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: ai
         uses: actions/ai-inference@v1
+        env:
+          PR_BRANCH: ${{ matrix.pr.branch }}
+          BASE_BRANCH: ${{ inputs.base-branch }}
         with:
           token: ${{ secrets.github-token }}
           model: ${{ inputs.model }}
           prompt: |
-            Resolve the merge conflicts after rebasing branch '${{ matrix.pr.branch }}' onto '${{ inputs.base-branch }}'.
+            Resolve the merge conflicts after rebasing branch onto the base branch.
             Provide a patch that applies cleanly.
+            Branch: ${PR_BRANCH}
+            Base: ${BASE_BRANCH}
 
       - name: Apply AI patch
         if: steps.conflicts.outputs.has_conflict == 'true'
+        env:
+          RESPONSE_FILE: ${{ steps.ai.outputs.response-file }}
+          PR_BRANCH: ${{ matrix.pr.branch }}
         run: |
-          cat "${{ steps.ai.outputs.response-file }}" | git apply -
+          cat "${RESPONSE_FILE}" | git apply -
           git add -A
           git rebase --continue || true
 
       - name: Push updated branch
-        run: git push --force-with-lease origin "${{ matrix.pr.branch }}"
+        env:
+          PR_BRANCH: ${{ matrix.pr.branch }}
+        run: git push --force-with-lease origin "${PR_BRANCH}"
 
   summary:
     runs-on: ubuntu-latest
