@@ -38,6 +38,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,7 +48,7 @@ jobs:
       - name: Apply labels to pull request
         uses: actions/labeler@v5
         with:
-          repo-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
           configuration-path: ${{ inputs.configuration-path }}
           sync-labels: ${{ inputs.sync-labels }}
           dot: ${{ inputs.dot }}
