@@ -14,6 +14,10 @@ on:
 jobs:
   labeler:
     uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     with:
       configuration-path: ".github/labeler.yml"
       sync-labels: true
