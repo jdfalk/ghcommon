@@ -1,8 +1,7 @@
+[build-system]
 # file: scripts/copilot-firewall/pyproject.toml
 # version: 1.0.0
 # guid: 7f8e9d1c-2a3b-4c5d-6e7f-8a9b0c1d2e3f
-
-[build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
