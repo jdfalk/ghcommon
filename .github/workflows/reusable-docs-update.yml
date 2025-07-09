@@ -1,0 +1,44 @@
+# file: .github/workflows/reusable-docs-update.yml
+# version: 1.0.0
+# guid: 25b987e1-9e34-4618-8182-53e12c7307e0
+
+name: Reusable Docs Update
+
+on:
+  workflow_call:
+    inputs:
+      updates-directory:
+        description: "Directory with doc updates"
+        required: false
+        default: ".github/doc-updates"
+        type: string
+
+jobs:
+  docs-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply documentation updates
+        run: |
+          python scripts/doc_update_manager.py "${{ inputs.updates-directory }}"
+
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name 'github-actions'
+            git config user.email 'github-actions@users.noreply.github.com'
+            git add -A
+            git commit -m 'docs: apply documentation updates'
+            git push
+          else
+            echo 'No documentation changes to commit'
+          fi

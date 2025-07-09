@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Centralize docs update",
+  "body": "Implement reusable workflow for README, CHANGELOG, and TODO updates.",
+  "labels": ["codex", "documentation"],
+  "guid": "0fa3f7a8-8ff3-41ba-ae45-c83cb0dc7e23",
+  "legacy_guid": "create-centralize-docs-update-2025-07-09"
+}
