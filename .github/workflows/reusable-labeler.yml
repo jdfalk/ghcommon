@@ -27,6 +27,13 @@ on:
         required: false
         default: ""
         type: string
+    outputs:
+      labeler-completed:
+        description: "Whether the labeler workflow completed successfully"
+        value: ${{ jobs.labeler.outputs.completed }}
+      configuration-used:
+        description: "The configuration path that was used"
+        value: ${{ jobs.labeler.outputs.config-path }}
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for labeling"
@@ -35,6 +42,9 @@ on:
 jobs:
   labeler:
     runs-on: ubuntu-latest
+    outputs:
+      completed: ${{ steps.labeler-summary.outputs.completed }}
+      config-path: ${{ steps.labeler-summary.outputs.config-path }}
     permissions:
       contents: read
       pull-requests: write
@@ -45,7 +55,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Show labeler configuration
+        run: |
+          echo "🏷️ Pull Request Labeler Configuration:"
+          echo "  Configuration file: ${{ inputs.configuration-path }}"
+          echo "  Sync labels: ${{ inputs.sync-labels }}"
+          echo "  Include dot files: ${{ inputs.dot }}"
+          echo "  PR numbers: ${{ inputs.pr-numbers || 'auto-detect from context' }}"
+          echo ""
+          if [ -f "${{ inputs.configuration-path }}" ]; then
+            echo "📄 Labeler configuration file contents:"
+            cat "${{ inputs.configuration-path }}"
+          else
+            echo "⚠️ Configuration file not found at: ${{ inputs.configuration-path }}"
+          fi
+
       - name: Apply labels to pull request
+        id: labeler
         uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
@@ -53,3 +79,17 @@ jobs:
           sync-labels: ${{ inputs.sync-labels }}
           dot: ${{ inputs.dot }}
           pr-number: ${{ inputs.pr-numbers }}
+
+      - name: Show labeler results
+        if: always()
+        run: |
+          echo "✅ Pull Request Labeler completed"
+          echo "📋 Workflow inputs used:"
+          echo "  - Configuration path: ${{ inputs.configuration-path }}"
+          echo "  - Sync labels: ${{ inputs.sync-labels }}"
+          echo "  - Include dot files: ${{ inputs.dot }}"
+          if [ -n "${{ inputs.pr-numbers }}" ]; then
+            echo "  - Target PR(s): ${{ inputs.pr-numbers }}"
+          else
+            echo "  - Target PR: auto-detected from workflow context"
+          fi
