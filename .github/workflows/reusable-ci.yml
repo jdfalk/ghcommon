@@ -28,7 +28,7 @@ on:
         default: true
         type: boolean
       run-lint:
-        description: "Run linters (true/false)"
+        description: "Run linters (true/false) - Uses Super Linter for comprehensive code quality checks"
         required: false
         default: true
         type: boolean
@@ -63,6 +63,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  super-linter:
+    if: inputs.run-lint == true
+    uses: ./.github/workflows/reusable-super-linter.yml
+    with:
+      validate-all-codebase: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      default-branch: "main"
+    secrets: inherit
+
   changes:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
@@ -127,12 +135,6 @@ jobs:
         if: hashFiles(format('{0}/**/*.go', inputs.backend-path)) != '' && inputs.run-test == true
         run: go test -v ./...
 
-      - name: Go lint
-        if: hashFiles(format('{0}/**/*.go', inputs.backend-path)) != '' && inputs.run-lint == true
-        run: |
-          go install golang.org/x/lint/golint@latest
-          golint ./...
-
       # --- Python Setup & Test ---
       - name: Set up Python
         if: hashFiles(format('{0}/**/*.py', inputs.backend-path)) != ''
@@ -160,12 +162,6 @@ jobs:
         if: hashFiles(format('{0}/**/*.py', inputs.backend-path)) != '' && steps.check-python-tests.outputs.has_python_tests == 'true' && inputs.run-test == true
         run: |
           python -m pytest test/ -v --cov=. || python -m pytest test/ -v
-
-      - name: Python lint
-        if: hashFiles(format('{0}/**/*.py', inputs.backend-path)) != '' && inputs.run-lint == true
-        run: |
-          pip install ruff || true
-          ruff check .
 
   frontend:
     if: inputs.enable-backend-frontend == true && (needs.changes.outputs.frontend == 'true' || github.event_name == 'push')
