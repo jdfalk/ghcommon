@@ -17,6 +17,7 @@ permissions:
   repository-projects: write # For adding items to projects
   actions: read # For workflow access
   checks: write # For workflow status
+  statuses: write # For commit status updates
 
 on:
   push:
