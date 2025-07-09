@@ -49,6 +49,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow with templates, automation, and conflict resolution\n - Advanced Python script with multiple update modes and templates\n - Automated workflow processing with PR creation and archival\n - Support for changelogs, TODO lists, README sections, and badge updates\n - Interactive mode and dry-run capabilities for safe operations\n - Complete documentation and usage examples in [docs/documentation-updates.md](docs/documentation-updates.md)
 
 - **Setup Scripts**: Automated repository configuration
+- **Project Automation**: Script to create GitHub Projects via CLI
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance

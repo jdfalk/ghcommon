@@ -16,14 +16,14 @@ Usage:
     python doc_update_manager.py --dry-run --verbose
 """
 
-import json
-import sys
 import argparse
+import json
+import logging
 import re
 import shutil
+import sys
 from pathlib import Path
-from typing import Dict, Optional, Any
-import logging
+from typing import Any, Dict, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -92,9 +92,9 @@ class DocumentationUpdateManager:
         logger.debug(f"🔍 Processing: {update_file}")
 
         try:
-            with open(update_file, "r", encoding="utf-8") as f:
+            with open(update_file, encoding="utf-8") as f:
                 update_data = json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             raise Exception(f"Failed to read update file: {e}")
 
         # Validate required fields
@@ -141,11 +141,11 @@ class DocumentationUpdateManager:
 
             # Read current content
             try:
-                with open(target_file, "r", encoding="utf-8") as f:
+                with open(target_file, encoding="utf-8") as f:
                     current_content = f.read()
             except UnicodeDecodeError:
                 # Try with different encoding
-                with open(target_file, "r", encoding="latin-1") as f:
+                with open(target_file, encoding="latin-1") as f:
                     current_content = f.read()
 
             # Apply update based on mode
