@@ -88,18 +88,18 @@ jobs:
         id: validate
         run: |
           echo "🔍 Validating documentation update files..."
-          
+
           update_dir="${{ inputs.updates-directory }}"
           if [[ ! -d "$update_dir" ]]; then
             echo "📝 No update directory found: $update_dir"
             echo "files_found=0" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           files_count=$(find "$update_dir" -name "*.json" -type f | wc -l)
           echo "files_found=$files_count" >> "$GITHUB_OUTPUT"
           echo "📊 Found $files_count update files"
-          
+
           # Validate JSON format
           for file in "$update_dir"/*.json; do
             if [[ -f "$file" ]]; then
@@ -116,20 +116,20 @@ jobs:
         if: steps.validate.outputs.files_found > 0
         run: |
           echo "🔄 Processing documentation updates..."
-          
+
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             echo "🧪 Running in dry-run mode"
             dry_run_flag="--dry-run"
           else
             dry_run_flag=""
           fi
-          
+
           python doc_update_manager.py \
             --updates-dir "${{ inputs.updates-directory }}" \
             --cleanup=${{ inputs.cleanup_processed_files }} \
             $dry_run_flag \
             --verbose
-          
+
           # Capture outputs
           echo "files_processed=$(cat .doc-update-stats.json | jq -r '.files_processed // 0')" >> "$GITHUB_OUTPUT"
           echo "changes_made=$(cat .doc-update-stats.json | jq -r '.changes_made // false')" >> "$GITHUB_OUTPUT"
@@ -140,14 +140,14 @@ jobs:
           echo "📋 Documentation Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "===============================" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [[ -f .doc-update-stats.json ]]; then
             echo "📊 **Statistics:**" >> $GITHUB_STEP_SUMMARY
             echo "- Files processed: $(jq -r '.files_processed // 0' .doc-update-stats.json)" >> $GITHUB_STEP_SUMMARY
             echo "- Changes made: $(jq -r '.changes_made // false' .doc-update-stats.json)" >> $GITHUB_STEP_SUMMARY
             echo "- Dry run mode: ${{ inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             if jq -e '.files_updated | length > 0' .doc-update-stats.json >/dev/null; then
               echo "📝 **Files Updated:**" >> $GITHUB_STEP_SUMMARY
               jq -r '.files_updated[]' .doc-update-stats.json | while read file; do
@@ -155,7 +155,7 @@ jobs:
               done
               echo "" >> $GITHUB_STEP_SUMMARY
             fi
-            
+
             if jq -e '.errors | length > 0' .doc-update-stats.json >/dev/null; then
               echo "❌ **Errors:**" >> $GITHUB_STEP_SUMMARY
               jq -r '.errors[]' .doc-update-stats.json | while read error; do
@@ -184,24 +184,24 @@ jobs:
           title: "docs: apply documentation updates"
           body: |
             ## Documentation Updates
-            
+
             This PR applies automated documentation updates from JSON update files.
-            
+
             ### Changes Made
-            
+
             ${{ steps.process-updates.outputs.files_processed }} update files processed.
-            
+
             ### Files Modified
-            
+
             - See the Files Changed tab for detailed modifications
-            
+
             ### Auto-generated
-            
+
             This PR was automatically created by the documentation update workflow.
           branch: docs/automated-updates-${{ github.run_number }}
           commit-message: |
             docs: apply documentation updates
-            
+
             Files changed:
             $(git diff --name-only HEAD~1 | while read file; do echo "- Updated documentation: [$file]($file)"; done)
           delete-branch: true
@@ -221,25 +221,25 @@ jobs:
           echo "💾 Committing documentation changes directly"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          
+
           # Create detailed commit message
           commit_message="docs: apply documentation updates
 
           Files changed:"
-          
+
           git diff --name-only | while read file; do
             commit_message="$commit_message
           - Updated documentation: [$file]($file)"
           done
-          
+
           git add -A
           git commit -m "docs: apply documentation updates
 
           Automated documentation updates applied from JSON update files.
-          
+
           Files changed:
           $(git diff --name-only HEAD | while read file; do echo "- Updated documentation: [$file]($file)"; done)"
-          
+
           git push
 
       - name: Set outputs
