@@ -56,18 +56,18 @@ The `create-doc-update.sh` script provides multiple ways to create updates:
 
 ### Available Update Modes
 
-| Mode | Description | Example Use Case |
-|------|-------------|------------------|
-| `append` | Add content to end of file | Adding new sections |
-| `prepend` | Add content to beginning of file | Adding urgent notices |
-| `replace` | Replace entire file content | Complete rewrites |
-| `replace-section` | Replace specific section | Updating installation instructions |
-| `insert-after` | Insert after specific text | Adding content after a heading |
-| `insert-before` | Insert before specific text | Adding prerequisites |
-| `changelog-entry` | Add properly formatted changelog entry | Release notes |
-| `task-add` | Add task to TODO list | Project planning |
-| `task-complete` | Mark task as complete | Progress tracking |
-| `update-badge` | Update README badge | Status updates |
+| Mode              | Description                            | Example Use Case                   |
+| ----------------- | -------------------------------------- | ---------------------------------- |
+| `append`          | Add content to end of file             | Adding new sections                |
+| `prepend`         | Add content to beginning of file       | Adding urgent notices              |
+| `replace`         | Replace entire file content            | Complete rewrites                  |
+| `replace-section` | Replace specific section               | Updating installation instructions |
+| `insert-after`    | Insert after specific text             | Adding content after a heading     |
+| `insert-before`   | Insert before specific text            | Adding prerequisites               |
+| `changelog-entry` | Add properly formatted changelog entry | Release notes                      |
+| `task-add`        | Add task to TODO list                  | Project planning                   |
+| `task-complete`   | Mark task as complete                  | Progress tracking                  |
+| `update-badge`    | Update README badge                    | Status updates                     |
 
 ### Template System
 

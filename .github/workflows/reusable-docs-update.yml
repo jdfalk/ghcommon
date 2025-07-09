@@ -37,6 +37,10 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      github-token:
+        description: "GitHub token with enhanced permissions for cross-repo operations"
+        required: false
     outputs:
       files_processed:
         description: "Number of files processed"
@@ -54,6 +58,11 @@ on:
 jobs:
   docs-update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      repository-projects: write
     outputs:
       files_processed: ${{ steps.process-updates.outputs.files_processed }}
       changes_made: ${{ steps.process-updates.outputs.changes_made }}
@@ -64,8 +73,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # Use a token that can create PRs if needed
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use enhanced PAT for cross-repo operations and project management
+          token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -181,6 +190,7 @@ jobs:
         if: steps.check-changes.outputs.has_changes == 'true' && inputs.create_pr == true && inputs.dry_run == false
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
           title: "docs: apply documentation updates"
           body: |
             ## Documentation Updates
@@ -213,7 +223,7 @@ jobs:
           echo "🔄 Auto-merging PR #${{ steps.create-pr.outputs.pull-request-number }}"
           gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --auto --squash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Commit changes directly
         if: steps.check-changes.outputs.has_changes == 'true' && inputs.create_pr == false && inputs.dry_run == false

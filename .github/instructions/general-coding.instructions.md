@@ -97,7 +97,7 @@ When making documentation updates to `README.md`, `CHANGELOG.md`, `TODO.md`, or 
 ### Creating Documentation Updates
 
 1. **Use the script**: Always use `scripts/create-doc-update.sh` to create documentation updates
-2. **Available modes**: 
+2. **Available modes**:
    - `append` - Add content to end of file
    - `prepend` - Add content to beginning of file
    - `replace-section` - Replace specific section

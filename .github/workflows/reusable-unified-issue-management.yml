@@ -27,7 +27,7 @@
 #     issues: write          # For creating and updating issues
 #     pull-requests: write   # For creating PRs
 #     security-events: read  # For reading CodeQL alerts
-#     repository-projects: read # For accessing project data
+#     repository-projects: write # For adding items to projects
 #     actions: read          # For workflow access
 #     checks: write          # For workflow status
 #
@@ -132,6 +132,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: determine-operations
     if: ${{ needs.determine-operations.outputs.operations != '[]' }}
+    env:
+      # Use enhanced PAT for cross-repo operations and project management
+      GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
     outputs:
       operations_completed: ${{ steps.set-outputs.outputs.operations_completed }}
       files_processed: ${{ steps.set-outputs.outputs.files_processed }}

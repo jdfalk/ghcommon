@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "insert-after",
+  "content": "- **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow with templates, automation, and conflict resolution\\n  - Advanced Python script with multiple update modes and templates\\n  - Automated workflow processing with PR creation and archival\\n  - Support for changelogs, TODO lists, README sections, and badge updates\\n  - Interactive mode and dry-run capabilities for safe operations\\n  - Complete documentation and usage examples in [docs/documentation-updates.md](docs/documentation-updates.md)",
+  "guid": "46a9062c-476c-493e-b5e2-11e7c2e20097",
+  "created_at": "2025-07-09T17:08:28Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
