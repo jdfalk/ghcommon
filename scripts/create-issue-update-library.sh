@@ -217,7 +217,7 @@ create_issue_file() {
                 json_content+=",
   \"parent_issue\": $parent_issue"
             fi
-            if [[ -n "$repo\" ]]; then
+            if [[ -n "$repo" ]]; then
                 json_content+=",
   \"repo\": \"$repo\""
             fi
@@ -250,7 +250,7 @@ create_issue_file() {
             if [[ -n "$parent_guid" ]]; then
                 json_content+=" ,\n  \"parent\": \"$parent_guid\""
             fi
-            if [[ -n "$repo\" ]]; then
+            if [[ -n "$repo" ]]; then
                 json_content+=" ,\n  \"repo\": \"$repo\""
             fi
 
@@ -280,7 +280,7 @@ create_issue_file() {
             if [[ -n "$parent_guid" ]]; then
                 json_content+=" ,\n  \"parent\": \"$parent_guid\""
             fi
-            if [[ -n "$repo\" ]]; then
+            if [[ -n "$repo" ]]; then
                 json_content+=" ,\n  \"repo\": \"$repo\""
             fi
 
@@ -310,7 +310,7 @@ create_issue_file() {
             if [[ -n "$parent_guid" ]]; then
                 json_content+=" ,\n  \"parent\": \"$parent_guid\""
             fi
-            if [[ -n "$repo\" ]]; then
+            if [[ -n "$repo" ]]; then
                 json_content+=" ,\n  \"repo\": \"$repo\""
             fi
 

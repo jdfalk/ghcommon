@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Reusable workflow for AI merge conflict resolution",
+  "body": "Provide a reusable workflow to auto-rebase pull requests with conflicts using actions/ai-inference.",
+  "labels": ["automation", "ci", "enhancement"],
+  "guid": "9222befe-ecab-4253-8629-be0e69982473",
+  "legacy_guid": "create-reusable-workflow-for-ai-merge-conflict-resolution-2025-07-09"
+}

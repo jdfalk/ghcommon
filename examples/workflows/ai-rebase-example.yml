@@ -1,0 +1,21 @@
+# file: examples/workflows/ai-rebase-example.yml
+# version: 1.0.0
+# guid: d84dfc6e-6035-4b05-8638-3d03e2a5c7a0
+
+name: AI Rebase Example
+
+# Example workflow demonstrating use of the reusable AI rebase workflow
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ai-rebase:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@main
+    with:
+      base-branch: "main"
+      model: "openai/gpt-4o"
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
