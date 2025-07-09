@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # Enhanced Documentation Update Script
-# 
+#
 # This script creates structured JSON files for documentation updates that can be
 # processed by the reusable-docs-update.yml workflow. It supports multiple modes
 # of operation and provides templates for common documentation updates.
@@ -21,7 +21,7 @@ print_usage() {
   cat >&2 << 'EOF'
 Enhanced Documentation Update Script
 
-Usage: 
+Usage:
   $0 FILE CONTENT [MODE] [OPTIONS]
   $0 --template TEMPLATE_TYPE CONTENT [OPTIONS]
   $0 --list-templates
@@ -87,7 +87,7 @@ print_templates() {
 Available Templates:
 
 changelog-fix       - Add bug fix entry to CHANGELOG.md
-changelog-feature   - Add new feature entry to CHANGELOG.md  
+changelog-feature   - Add new feature entry to CHANGELOG.md
 changelog-breaking  - Add breaking change entry to CHANGELOG.md
 todo-task          - Add new task to TODO.md
 todo-epic          - Add new epic/section to TODO.md
@@ -115,14 +115,14 @@ create_changelog_entry() {
   local description="$2"
   local timestamp="$(get_timestamp)"
   local date_only="${timestamp:0:10}"
-  
+
   case "$type" in
     "fix")
       echo "### Fixed"
       echo ""
       echo "- $description"
       ;;
-    "feature") 
+    "feature")
       echo "### Added"
       echo ""
       echo "- $description"
@@ -144,21 +144,21 @@ create_todo_task() {
   local description="$1"
   local priority="${2:-MED}"
   local category="${3:-General}"
-  
+
   local priority_icon=""
   case "$priority" in
     "HIGH") priority_icon="🔴" ;;
     "MED") priority_icon="🟡" ;;
     "LOW") priority_icon="🟢" ;;
   esac
-  
+
   echo "- [ ] $priority_icon **$category**: $description"
 }
 
 create_readme_badge() {
   local badge_name="$1"
   local content="$2"
-  
+
   echo "Badge update for: $badge_name"
   echo "Content: $content"
 }
@@ -166,7 +166,7 @@ create_readme_badge() {
 interactive_mode() {
   echo "🔧 Interactive Documentation Update Mode"
   echo "========================================"
-  
+
   echo "Select target file:"
   select file in "README.md" "CHANGELOG.md" "TODO.md" "Custom"; do
     case $file in
@@ -182,7 +182,7 @@ interactive_mode() {
         ;;
     esac
   done
-  
+
   echo "Select update mode:"
   select mode in "append" "prepend" "changelog-entry" "task-add" "replace-section"; do
     case $mode in
@@ -194,9 +194,9 @@ interactive_mode() {
         ;;
     esac
   done
-  
+
   read -p "Enter content: " content
-  
+
   case $mode in
     "task-add")
       echo "Select priority:"
@@ -210,7 +210,7 @@ interactive_mode() {
             ;;
         esac
       done
-      
+
       read -p "Enter category (optional): " category
       content="$(create_todo_task "$content" "$priority" "${category:-General}")"
       ;;
@@ -226,18 +226,18 @@ interactive_mode() {
             ;;
         esac
       done
-      
+
       content="$(create_changelog_entry "$entry_type" "$content")"
       ;;
   esac
-  
+
   echo "Creating update for: $file"
   echo "Mode: $mode"
   echo "Content preview:"
   echo "----------------"
   echo "$content"
   echo "----------------"
-  
+
   read -p "Proceed? [y/N]: " confirm
   if [[ "$confirm" =~ ^[Yy]$ ]]; then
     create_update "$file" "$content" "$mode"
@@ -254,10 +254,10 @@ create_update() {
   local uuid="$(generate_uuid)"
   local timestamp="$(get_timestamp)"
   local dir=".github/doc-updates"
-  
+
   mkdir -p "$dir"
   local path="$dir/${uuid}.json"
-  
+
   # Create comprehensive update file
   jq -n \
     --arg file "$file" \
@@ -288,12 +288,12 @@ create_update() {
         category: (if $category != "" then $category else null end)
       }
     }' > "$path"
-  
+
   echo "✅ Created doc update: $path"
   echo "   File: $file"
   echo "   Mode: $mode"
   echo "   GUID: $uuid"
-  
+
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "   (Dry run - file would be created)"
     rm "$path"
@@ -303,7 +303,7 @@ create_update() {
 process_template() {
   local template="$1"
   local description="$2"
-  
+
   case "$template" in
     "changelog-fix")
       create_update "CHANGELOG.md" "$(create_changelog_entry "fix" "$description")" "changelog-entry"
