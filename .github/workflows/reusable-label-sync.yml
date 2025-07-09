@@ -91,19 +91,22 @@ jobs:
 
       - name: Prepare repository list
         id: repo-list
+        env:
+          REPOSITORIES_INPUT: ${{ inputs.repositories }}
+          REPOSITORIES_FILE: ${{ inputs.repositories-file }}
         run: |
           REPOS=""
 
           # Add repositories from input parameter
-          if [ -n "${{ inputs.repositories }}" ]; then
-            REPOS="${{ inputs.repositories }}"
+          if [ -n "${REPOSITORIES_INPUT}" ]; then
+            REPOS="${REPOSITORIES_INPUT}"
           fi
 
           # Add repositories from file
-          if [ -n "${{ inputs.repositories-file }}" ]; then
-            if [ -f "${{ inputs.repositories-file }}" ]; then
+          if [ -n "${REPOSITORIES_FILE}" ]; then
+            if [ -f "${REPOSITORIES_FILE}" ]; then
               # Read repos from file and join with commas
-              FILE_REPOS=$(grep -v '^#' "${{ inputs.repositories-file }}" | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+              FILE_REPOS=$(grep -v '^#' "${REPOSITORIES_FILE}" | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
               if [ -n "$FILE_REPOS" ]; then
                 if [ -n "$REPOS" ]; then
                   REPOS="${REPOS},${FILE_REPOS}"
@@ -112,7 +115,7 @@ jobs:
                 fi
               fi
             else
-              echo "Warning: Repository file '${{ inputs.repositories-file }}' not found"
+              echo "Warning: Repository file '${REPOSITORIES_FILE}' not found"
             fi
           fi
 
@@ -127,10 +130,12 @@ jobs:
       - name: Sync labels
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG_FILE: ${{ inputs.config-file }}
+          REPOSITORIES: ${{ steps.repo-list.outputs.repositories }}
         run: |
           python label_manager.py sync-labels \
-            --config "${{ inputs.config-file }}" \
-            --repos "${{ steps.repo-list.outputs.repositories }}" \
+            --config "${CONFIG_FILE}" \
+            --repos "${REPOSITORIES}" \
             ${{ inputs.delete-extra-labels && '--delete-extra' || '' }} \
             ${{ inputs.dry-run && '--dry-run' || '' }}
 
