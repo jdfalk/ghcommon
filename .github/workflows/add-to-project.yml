@@ -1,0 +1,18 @@
+# file: .github/workflows/add-to-project.yml
+# version: 1.0.0
+# guid: 52e15436-73cb-4363-8747-94b019db7626
+
+name: Add To Project
+
+on:
+  issues:
+    types: [opened, reopened, transferred, labeled]
+  pull_request:
+    types: [opened, reopened, labeled]
+
+jobs:
+  add-to-project:
+    uses: ./.github/workflows/reusable-add-to-project.yml
+    with:
+      project-url: https://github.com/orgs/<org>/projects/<number>
+    secrets: inherit
