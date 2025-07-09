@@ -46,6 +46,14 @@ on:
         description: "Whether a release should be created"
         value: ${{ jobs.version.outputs.should-release }}
 
+# Explicit permissions required for this reusable workflow
+permissions:
+  contents: write          # For creating commits, tags, and releases
+  issues: write            # For updating issues referenced in commits
+  pull-requests: write     # For updating PR titles and descriptions
+  actions: read            # For workflow access
+  checks: write            # For workflow status
+
 jobs:
   version:
     name: Calculate and Update Version
