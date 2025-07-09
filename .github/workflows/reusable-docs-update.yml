@@ -115,22 +115,23 @@ jobs:
 
       - name: Validate update files
         id: validate
+        env:
+          UPDATES_DIR: ${{ inputs.updates-directory }}
         run: |
           echo "🔍 Validating documentation update files..."
 
-          update_dir="${{ inputs.updates-directory }}"
-          if [[ ! -d "$update_dir" ]]; then
-            echo "📝 No update directory found: $update_dir"
+          if [[ ! -d "${UPDATES_DIR}" ]]; then
+            echo "📝 No update directory found: ${UPDATES_DIR}"
             echo "files_found=0" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          files_count=$(find "$update_dir" -name "*.json" -type f | wc -l)
+          files_count=$(find "${UPDATES_DIR}" -name "*.json" -type f | wc -l)
           echo "files_found=$files_count" >> "$GITHUB_OUTPUT"
           echo "📊 Found $files_count update files"
 
           # Validate JSON format
-          for file in "$update_dir"/*.json; do
+          for file in "${UPDATES_DIR}"/*.json; do
             if [[ -f "$file" ]]; then
               if ! jq empty "$file" 2>/dev/null; then
                 echo "❌ Invalid JSON in $file"
@@ -143,22 +144,26 @@ jobs:
       - name: Process documentation updates
         id: process-updates
         if: steps.validate.outputs.files_found > 0
+        env:
+          UPDATES_DIR: ${{ inputs.updates-directory }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          CLEANUP_PROCESSED: ${{ inputs.cleanup_processed_files }}
         run: |
           echo "🔄 Processing documentation updates..."
-          echo "📂 Update directory: ${{ inputs.updates-directory }}"
-          echo "🧪 Dry run mode: ${{ inputs.dry_run }}"
-          echo "🗑️ Cleanup processed files: ${{ inputs.cleanup_processed_files }}"
+          echo "📂 Update directory: ${UPDATES_DIR}"
+          echo "🧪 Dry run mode: ${DRY_RUN}"
+          echo "🗑️ Cleanup processed files: ${CLEANUP_PROCESSED}"
           echo ""
 
           # List update files to be processed
           echo "📋 Update files to process:"
-          find "${{ inputs.updates-directory }}" -name "*.json" -type f | while read file; do
+          find "${UPDATES_DIR}" -name "*.json" -type f | while read file; do
             echo "  - $(basename "$file")"
             echo "    📄 Contents preview: $(jq -r '.action // .operation // "unknown"' "$file" 2>/dev/null || echo "invalid JSON")"
           done
           echo ""
 
-          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          if [[ "${DRY_RUN}" == "true" ]]; then
             echo "🧪 Running in dry-run mode"
             dry_run_flag="--dry-run"
           else
@@ -170,8 +175,8 @@ jobs:
 
           echo "🚀 Executing doc_update_manager.py..."
           python doc_update_manager.py \
-            --updates-dir "${{ inputs.updates-directory }}" \
-            --cleanup=${{ inputs.cleanup_processed_files }} \
+            --updates-dir "${UPDATES_DIR}" \
+            --cleanup="${CLEANUP_PROCESSED}" \
             $dry_run_flag \
             --verbose || {
               echo "❌ Documentation update manager failed with exit code $?"
@@ -207,6 +212,10 @@ jobs:
 
       - name: Generate update summary
         if: steps.validate.outputs.files_found > 0
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          CREATE_PR: ${{ inputs.create_pr }}
+          UPDATES_DIR: ${{ inputs.updates-directory }}
         run: |
           echo "📋 Documentation Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "===============================" >> $GITHUB_STEP_SUMMARY
@@ -221,7 +230,7 @@ jobs:
             echo "- Changes made: $(jq -r '.changes_made // false' .doc-update-stats.json)" >> $GITHUB_STEP_SUMMARY
           fi
 
-          echo "- Dry run mode: ${{ inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dry run mode: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
           echo "- Repository: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- Workflow run: [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -262,10 +271,10 @@ jobs:
           fi
 
           # Show original update files processed with more detail
-          if [[ -d "${{ inputs.updates-directory }}" ]]; then
+          if [[ -d "${UPDATES_DIR}" ]]; then
             echo "📂 **Update Files Processed:**" >> $GITHUB_STEP_SUMMARY
             update_count=0
-            find "${{ inputs.updates-directory }}" -name "*.json" -type f 2>/dev/null | while read file; do
+            find "${UPDATES_DIR}" -name "*.json" -type f 2>/dev/null | while read file; do
               if [[ -f "$file" ]]; then
                 update_count=$((update_count + 1))
                 # Extract update details from JSON
@@ -287,14 +296,14 @@ jobs:
           fi
 
           # Enhanced next steps with actionable URLs
-          if [[ "${{ inputs.create_pr }}" == "true" ]]; then
+          if [[ "${CREATE_PR}" == "true" ]]; then
             echo "🔄 **Next Steps:** A pull request will be created with these changes" >> $GITHUB_STEP_SUMMARY
             if [[ -n "$changed_files" ]]; then
               echo "- Review the changes in the Files Changed tab above" >> $GITHUB_STEP_SUMMARY
               echo "- Check the PR once it's created for automated tests" >> $GITHUB_STEP_SUMMARY
               echo "- Merge the PR when ready to apply changes" >> $GITHUB_STEP_SUMMARY
             fi
-          elif [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          elif [[ "${DRY_RUN}" == "true" ]]; then
             echo "🧪 **Dry Run Complete:** No changes were committed (dry run mode)" >> $GITHUB_STEP_SUMMARY
             echo "- To apply these changes, re-run the workflow with \`dry_run: false\`" >> $GITHUB_STEP_SUMMARY
             echo "- Review the change preview above to verify expected updates" >> $GITHUB_STEP_SUMMARY
@@ -546,6 +555,8 @@ jobs:
 
       - name: Workflow completion summary
         if: always()
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
           echo ""
           echo "🏁 Documentation Update Workflow Complete"
@@ -566,7 +577,7 @@ jobs:
           fi
           echo "  - Repository: ${{ github.repository }}"
           echo "  - Workflow run: ${{ github.run_id }}"
-          echo "  - Dry run mode: ${{ inputs.dry_run }}"
+          echo "  - Dry run mode: ${DRY_RUN}"
           echo ""
 
           if [[ "${{ steps.capture-changes.outputs.update_summary }}" != "" ]]; then
@@ -578,7 +589,7 @@ jobs:
           echo ""
 
           # Display next steps based on workflow results
-          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          if [[ "${DRY_RUN}" == "true" ]]; then
             echo "🧪 Next Steps: This was a dry run - no changes were committed"
             echo "   To apply changes, run the workflow again with dry_run=false"
           elif [[ "${{ steps.set-outputs.outputs.pr_created }}" == "true" ]]; then
