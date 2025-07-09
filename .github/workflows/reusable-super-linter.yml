@@ -104,12 +104,12 @@ on:
         type: string
 
 permissions:
-  contents: write # Required for auto-committing fixes
-  statuses: write
-  checks: write
-  pull-requests: write
-  packages: read
-  security-events: write
+  contents: write     # Required for auto-committing fixes
+  statuses: write     # Required for status updates
+  checks: write       # Required for check runs
+  pull-requests: write # Required for PR comments and updates
+  packages: read      # Required for package access
+  security-events: write # Required for security scanning
 
 jobs:
   super-linter:
