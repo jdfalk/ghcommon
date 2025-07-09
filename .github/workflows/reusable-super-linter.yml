@@ -159,6 +159,12 @@ jobs:
           VALIDATE_ENV: false
           VALIDATE_JSCPD: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_RUST_2015: false
+          VALIDATE_RUST_2018: false
+          VALIDATE_RUST_2021: false
+          VALIDATE_CLANG_FORMAT: false
+          VALIDATE_CPPCHECK: false
+          VALIDATE_CPPLINT: false
 
           # Auto-fix settings (enable fix mode for supported linters)
           FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
@@ -244,6 +250,12 @@ jobs:
           VALIDATE_ENV: false
           VALIDATE_JSCPD: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_RUST_2015: false
+          VALIDATE_RUST_2018: false
+          VALIDATE_RUST_2021: false
+          VALIDATE_CLANG_FORMAT: false
+          VALIDATE_CPPCHECK: false
+          VALIDATE_CPPLINT: false
 
           # Auto-fix settings (enable fix mode for supported linters)
           FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
@@ -320,27 +332,27 @@ jobs:
         if: always()
         run: |
           echo "Checking for Super Linter output files..."
-          
+
           # Create a report directory
           mkdir -p super-linter-reports
-          
+
           # Look for log files in different possible locations
           if [ -f "super-linter.log" ]; then
             cp super-linter.log super-linter-reports/
             echo "Found super-linter.log"
           fi
-          
+
           if [ -f "/tmp/super-linter.log" ]; then
             cp /tmp/super-linter.log super-linter-reports/
             echo "Found /tmp/super-linter.log"
           fi
-          
+
           # Look for output directory
           if [ -d "super-linter-output" ]; then
             cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
             echo "Found super-linter-output directory"
           fi
-          
+
           # Create a summary report from any available logs
           if [ -f "super-linter-reports/super-linter.log" ]; then
             echo "Creating summary report from log..."
@@ -349,7 +361,7 @@ jobs:
             echo "No log file found, creating basic report..."
             echo "Super Linter completed - no detailed log available" > super-linter-reports/super-linter.report
           fi
-          
+
           # List what we found
           echo "Files in super-linter-reports:"
           ls -la super-linter-reports/ || echo "No files found"
@@ -402,7 +414,7 @@ jobs:
               // Try different locations for the report file
               let reportContent = '';
               let reportFound = false;
-              
+
               if (fs.existsSync('super-linter-reports/super-linter.report')) {
                 reportContent = fs.readFileSync('super-linter-reports/super-linter.report', 'utf8');
                 reportFound = true;
@@ -414,7 +426,7 @@ jobs:
                 reportContent = fs.readFileSync('super-linter-reports/super-linter.log', 'utf8');
                 reportFound = true;
               }
-              
+
               if (reportFound) {
                 if (reportContent.includes('ERROR') || reportContent.includes('FATAL')) {
                   hasErrors = true;
