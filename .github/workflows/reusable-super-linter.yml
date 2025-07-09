@@ -125,174 +125,57 @@ jobs:
           token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Setup Super Linter environment
-        env:
-          # Core settings
-          DEFAULT_BRANCH: ${{ inputs.default-branch }}
-          VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
-          FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
-
-          # Language-specific settings - only enable what we want
-          VALIDATE_PYTHON_BLACK: ${{ inputs.run-python }}
-          VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
-          VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
-          VALIDATE_BASH: ${{ inputs.run-shell }}
-          VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
-          VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
-          VALIDATE_JSON: ${{ inputs.run-json }}
-          VALIDATE_YAML: ${{ inputs.run-yaml }}
-          VALIDATE_GITHUB_ACTIONS: ${{ inputs.run-github-actions }}
-          VALIDATE_JAVASCRIPT_ES: ${{ inputs.run-javascript }}
-          VALIDATE_TYPESCRIPT_ES: ${{ inputs.run-javascript }}
-          VALIDATE_CSS: ${{ inputs.run-css }}
-          VALIDATE_HTML: ${{ inputs.run-html }}
-          VALIDATE_GO: ${{ inputs.run-go }}
-          VALIDATE_PROTOBUF: ${{ inputs.run-protobuf }}
-          VALIDATE_GIT_COMMITLINT: true
-          VALIDATE_SECRETS: ${{ inputs.run-security }}
-          VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
-
-          # Disable everything else to avoid conflicts
-          VALIDATE_PYTHON_PYINK: false
-          VALIDATE_PYTHON_FLAKE8: false
-          VALIDATE_PYTHON_ISORT: false
-          VALIDATE_PYTHON_MYPY: false
-          VALIDATE_SHELL_SHFMT: false
-          VALIDATE_CHECKOV: false
-          VALIDATE_ENV: false
-          VALIDATE_JSCPD: false
-          VALIDATE_NATURAL_LANGUAGE: false
-          VALIDATE_RUST_2015: false
-          VALIDATE_RUST_2018: false
-          VALIDATE_RUST_2021: false
-          VALIDATE_CLANG_FORMAT: false
-          VALIDATE_CPPCHECK: false
-          VALIDATE_CPPLINT: false
-
-          # Auto-fix settings (enable fix mode for supported linters)
-          FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
-          FIX_PYTHON_RUFF: ${{ inputs.enable-auto-fix && inputs.run-python }}
-          FIX_JAVASCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
-          FIX_TYPESCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
-          FIX_CSS: ${{ inputs.enable-auto-fix && inputs.run-css }}
-          FIX_JSON: ${{ inputs.enable-auto-fix && inputs.run-json }}
-          FIX_MARKDOWN: ${{ inputs.enable-auto-fix && inputs.run-markdown }}
-          FIX_YAML: ${{ inputs.enable-auto-fix && inputs.run-yaml }}
-          FIX_GO: ${{ inputs.enable-auto-fix && inputs.run-go }}
-          FIX_SHELL_SHFMT: ${{ inputs.enable-auto-fix && inputs.run-shell }}
-
-          # Output and logging settings
-          CREATE_LOG_FILE: true
-          LOG_FILE: super-linter.log
-          SAVE_SUPER_LINTER_OUTPUT: true
-          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: super-linter-output
-
-          # Configuration file paths
-          PYTHON_BLACK_CONFIG_FILE: .github/linters/.python-black
-          PYTHON_PYLINT_CONFIG_FILE: .github/linters/.pylintrc
-          PYTHON_RUFF_CONFIG_FILE: .github/linters/ruff.toml
-          MARKDOWN_CONFIG_FILE: .github/linters/.markdownlint.json
-          YAML_CONFIG_FILE: .github/linters/.yaml-lint.yml
-          JAVASCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
-          TYPESCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
-
-          # Performance and behavior settings
-          MULTI_STATUS: true
-          PARALLEL: true
         run: |
-          # Environment variables are now set securely above
-          echo "Super Linter environment configured"
+          echo "Super Linter environment will be configured in the Run Super Linter step"
 
       - name: Load custom configuration
-        if: inputs.config-file != '.github/super-linter.env'
-        env:
-          CONFIG_FILE_PATH: ${{ inputs.config-file }}
         run: |
-          if [ -f "${CONFIG_FILE_PATH}" ]; then
-            echo "Loading custom configuration from ${CONFIG_FILE_PATH}"
-            set -a
-            source "${CONFIG_FILE_PATH}"
-            set +a
+          # Check for various config file locations
+          CONFIG_FILES=(
+            ".github/super-linter.env"
+            ".super-linter.env"
+            "super-linter.env"
+          )
+
+          CONFIG_FOUND=""
+          for config_file in "${CONFIG_FILES[@]}"; do
+            if [ -f "${config_file}" ]; then
+              CONFIG_FOUND="${config_file}"
+              echo "Found configuration file: ${config_file}"
+              break
+            fi
+          done
+
+          if [ -n "${CONFIG_FOUND}" ]; then
+            echo "Loading configuration from ${CONFIG_FOUND}"
+            echo "Configuration contents:"
+            cat "${CONFIG_FOUND}"
+            echo ""
+            echo "Exporting configuration to environment..."
+            # Export variables to GITHUB_ENV so they persist to next steps
+            cat "${CONFIG_FOUND}" | grep -E '^[A-Z_].*=' >> $GITHUB_ENV || true
           else
-            echo "Warning: Custom config file ${CONFIG_FILE_PATH} not found, using defaults"
+            echo "No custom configuration file found, using workflow defaults"
           fi
 
       - name: Run Super Linter
         uses: super-linter/super-linter@v7
         env:
+          # Authentication
+          GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+
           # Core settings
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
-          FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
 
-          # Language-specific settings - only enable what we want
-          VALIDATE_PYTHON_BLACK: ${{ inputs.run-python }}
-          VALIDATE_PYTHON_PYLINT: ${{ inputs.run-python }}
-          VALIDATE_PYTHON_RUFF: ${{ inputs.run-python }}
-          VALIDATE_BASH: ${{ inputs.run-shell }}
-          VALIDATE_BASH_EXEC: ${{ inputs.run-shell }}
-          VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
-          VALIDATE_JSON: ${{ inputs.run-json }}
-          VALIDATE_YAML: ${{ inputs.run-yaml }}
-          VALIDATE_GITHUB_ACTIONS: ${{ inputs.run-github-actions }}
-          VALIDATE_JAVASCRIPT_ES: ${{ inputs.run-javascript }}
-          VALIDATE_TYPESCRIPT_ES: ${{ inputs.run-javascript }}
-          VALIDATE_CSS: ${{ inputs.run-css }}
-          VALIDATE_HTML: ${{ inputs.run-html }}
-          VALIDATE_GO: ${{ inputs.run-go }}
-          VALIDATE_PROTOBUF: ${{ inputs.run-protobuf }}
-          VALIDATE_GIT_COMMITLINT: true
-          VALIDATE_SECRETS: ${{ inputs.run-security }}
-          VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
-
-          # Disable everything else to avoid conflicts
-          VALIDATE_PYTHON_PYINK: false
-          VALIDATE_PYTHON_FLAKE8: false
-          VALIDATE_PYTHON_ISORT: false
-          VALIDATE_PYTHON_MYPY: false
-          VALIDATE_SHELL_SHFMT: false
-          VALIDATE_CHECKOV: false
-          VALIDATE_ENV: false
-          VALIDATE_JSCPD: false
-          VALIDATE_NATURAL_LANGUAGE: false
-          VALIDATE_RUST_2015: false
-          VALIDATE_RUST_2018: false
-          VALIDATE_RUST_2021: false
-          VALIDATE_CLANG_FORMAT: false
-          VALIDATE_CPPCHECK: false
-          VALIDATE_CPPLINT: false
-
-          # Auto-fix settings (enable fix mode for supported linters)
-          FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
-          FIX_PYTHON_RUFF: ${{ inputs.enable-auto-fix && inputs.run-python }}
-          FIX_JAVASCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
-          FIX_TYPESCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
-          FIX_CSS: ${{ inputs.enable-auto-fix && inputs.run-css }}
-          FIX_JSON: ${{ inputs.enable-auto-fix && inputs.run-json }}
-          FIX_MARKDOWN: ${{ inputs.enable-auto-fix && inputs.run-markdown }}
-          FIX_YAML: ${{ inputs.enable-auto-fix && inputs.run-yaml }}
-          FIX_GO: ${{ inputs.enable-auto-fix && inputs.run-go }}
-          FIX_SHELL_SHFMT: ${{ inputs.enable-auto-fix && inputs.run-shell }}
-
-          # Output and logging settings
+          # Simple configuration - let the config file handle the details
           CREATE_LOG_FILE: true
-          LOG_FILE: super-linter.log
+          LOG_FILE: /tmp/super-linter.log
           SAVE_SUPER_LINTER_OUTPUT: true
-          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: super-linter-output
+          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: /tmp/super-linter-output
 
-          # Configuration file paths
-          PYTHON_BLACK_CONFIG_FILE: .github/linters/.python-black
-          PYTHON_PYLINT_CONFIG_FILE: .github/linters/.pylintrc
-          PYTHON_RUFF_CONFIG_FILE: .github/linters/ruff.toml
-          MARKDOWN_CONFIG_FILE: .github/linters/.markdownlint.json
-          YAML_CONFIG_FILE: .github/linters/.yaml-lint.yml
-          JAVASCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
-          TYPESCRIPT_ES_CONFIG_FILE: .github/linters/.eslintrc.json
-
-          # Performance and behavior settings
+          # Performance settings
           MULTI_STATUS: true
-          PARALLEL: true
-
-          GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Check for auto-fixes
         if: inputs.enable-auto-fix == true
@@ -337,34 +220,47 @@ jobs:
         run: |
           echo "Checking for Super Linter output files..."
 
-          # Create a report directory
+          # Create a report directory with proper permissions
           mkdir -p super-linter-reports
+
+          # Set proper permissions and ownership for any created files
+          sudo chown -R $(whoami):$(whoami) . || true
+          sudo chmod -R 755 . || true
 
           # Look for log files in different possible locations
           if [ -f "super-linter.log" ]; then
-            cp super-linter.log super-linter-reports/
+            sudo cp super-linter.log super-linter-reports/ || cp super-linter.log super-linter-reports/ || true
             echo "Found super-linter.log"
           fi
 
           if [ -f "/tmp/super-linter.log" ]; then
-            cp /tmp/super-linter.log super-linter-reports/
+            sudo cp /tmp/super-linter.log super-linter-reports/super-linter.log || cp /tmp/super-linter.log super-linter-reports/super-linter.log || true
             echo "Found /tmp/super-linter.log"
           fi
 
           # Look for output directory
           if [ -d "super-linter-output" ]; then
-            cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
+            sudo cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
             echo "Found super-linter-output directory"
+          fi
+
+          if [ -d "/tmp/super-linter-output" ]; then
+            sudo cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || true
+            echo "Found /tmp/super-linter-output directory"
           fi
 
           # Create a summary report from any available logs
           if [ -f "super-linter-reports/super-linter.log" ]; then
             echo "Creating summary report from log..."
-            tail -n 100 super-linter-reports/super-linter.log > super-linter-reports/super-linter.report
+            tail -n 100 super-linter-reports/super-linter.log > super-linter-reports/super-linter.report || true
           else
             echo "No log file found, creating basic report..."
             echo "Super Linter completed - no detailed log available" > super-linter-reports/super-linter.report
           fi
+
+          # Fix permissions on all output files
+          sudo chown -R $(whoami):$(whoami) super-linter-reports/ || true
+          sudo chmod -R 644 super-linter-reports/* || true
 
           # List what we found
           echo "Files in super-linter-reports:"
@@ -375,10 +271,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: super-linter-results
-          path: |
-            super-linter-reports/
-            super-linter.log
-            super-linter-output/
+          path: super-linter-reports/
           retention-days: 7
           if-no-files-found: warn
 
