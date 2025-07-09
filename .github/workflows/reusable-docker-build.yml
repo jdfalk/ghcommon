@@ -79,8 +79,10 @@ on:
         value: ${{ jobs.build.outputs.sbom-path }}
 
 permissions:
-  contents: read
-  packages: write
+  contents: read      # Required for repository checkout
+  packages: write     # Required for pushing to container registry
+  id-token: write     # Required for signing and attestations
+  attestations: write # Required for build attestations
 
 jobs:
   build:
