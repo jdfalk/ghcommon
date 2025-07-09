@@ -31,6 +31,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 | Workflow                                                                                  | Purpose                        | Key Features                                                             |
 | ----------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
 | [`reusable-semantic-versioning.yml`](.github/workflows/reusable-semantic-versioning.yml)  | Automatic version calculation  | Conventional commits, PR title updates, version file updates             |
+| [`reusable-super-linter.yml`](.github/workflows/reusable-super-linter.yml)                | Comprehensive code linting     | Multi-language linting, style enforcement, security scanning             |
 | [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
 | [`automatic-release.yml`](.github/workflows/automatic-release.yml)                        | Automated GitHub releases      | Release notes, artifact management, notifications                        |
 | [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
