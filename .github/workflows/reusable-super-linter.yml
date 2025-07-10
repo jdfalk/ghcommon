@@ -168,14 +168,21 @@ jobs:
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
 
-          # Simple configuration - let the config file handle the details
+          # Filter settings
+          FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
+
+          # Logging and output
           CREATE_LOG_FILE: true
-          LOG_FILE: /tmp/super-linter.log
+          LOG_FILE: super-linter.log
           SAVE_SUPER_LINTER_OUTPUT: true
-          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: /tmp/super-linter-output
+          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: super-linter-output
 
           # Performance settings
           MULTI_STATUS: true
+          PARALLEL: true
+
+          # Use slim image for better performance
+          SLIM_IMAGE: true
 
       - name: Check for auto-fixes
         if: inputs.enable-auto-fix == true
@@ -229,23 +236,23 @@ jobs:
 
           # Look for log files in different possible locations
           if [ -f "super-linter.log" ]; then
-            sudo cp super-linter.log super-linter-reports/ || cp super-linter.log super-linter-reports/ || true
+            cp super-linter.log super-linter-reports/ || true
             echo "Found super-linter.log"
           fi
 
           if [ -f "/tmp/super-linter.log" ]; then
-            sudo cp /tmp/super-linter.log super-linter-reports/super-linter.log || cp /tmp/super-linter.log super-linter-reports/super-linter.log || true
+            cp /tmp/super-linter.log super-linter-reports/super-linter.log || true
             echo "Found /tmp/super-linter.log"
           fi
 
           # Look for output directory
           if [ -d "super-linter-output" ]; then
-            sudo cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
+            cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
             echo "Found super-linter-output directory"
           fi
 
           if [ -d "/tmp/super-linter-output" ]; then
-            sudo cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || true
+            cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || true
             echo "Found /tmp/super-linter-output directory"
           fi
 
@@ -259,8 +266,7 @@ jobs:
           fi
 
           # Fix permissions on all output files
-          sudo chown -R $(whoami):$(whoami) super-linter-reports/ || true
-          sudo chmod -R 644 super-linter-reports/* || true
+          chmod -R 644 super-linter-reports/* 2>/dev/null || true
 
           # List what we found
           echo "Files in super-linter-reports:"
