@@ -7,6 +7,7 @@
 This document describes the automated GitHub Projects integration setup across all repositories.
 
 ## Overview
+
 ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
 ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
 
@@ -33,6 +34,7 @@ The main reusable workflow is located at:
 ### ghcommon Repository
 
 **Projects Used:**
+
 - **Cleanup Project** (#9): `https://github.com/users/jdfalk/projects/9`
   - Triggers: `bug`, `documentation`, `infrastructure`, `cleanup` labels
 - **Core Improvements** (#10): `https://github.com/users/jdfalk/projects/10`
@@ -44,18 +46,21 @@ The main reusable workflow is located at:
 ### subtitle-manager Repository
 
 **Projects Used:**
+
 - **Subtitle Manager Development** (#5): `https://github.com/users/jdfalk/projects/5`
   - Triggers: All issues and PRs
 
 ### gcommon Repository
 
 **Projects Used:**
+
 - **gCommon Development** (#2): `https://github.com/users/jdfalk/projects/2`
   - Triggers: All issues and PRs
 
 ### codex-cli Repository
 
 **Projects Used:**
+
 - **Core Improvements** (#10): `https://github.com/users/jdfalk/projects/10`
   - Triggers: All issues and PRs (automation tooling)
 
@@ -70,6 +75,7 @@ JF_CI_GH_PAT: <GitHub Personal Access Token>
 ### PAT Requirements
 
 The Personal Access Token must have the following scopes:
+
 - `repo` - For accessing repository issues and PRs
 - `project` - For adding items to projects
 - `read:project` - For reading project information
@@ -83,6 +89,7 @@ The Personal Access Token must have the following scopes:
 ## Workflow Triggers
 
 The automation triggers on:
+
 - `issues.opened`
 - `issues.reopened`
 - `issues.labeled`
@@ -100,7 +107,7 @@ To modify which labels trigger project assignment, edit the calling workflow:
 with:
   project-url: "https://github.com/users/jdfalk/projects/9"
   labeled: "bug,documentation,urgent"
-  label-operator: "OR"  # OR means any of these labels
+  label-operator: "OR" # OR means any of these labels
 ```
 
 ### Adding New Projects
@@ -125,14 +132,17 @@ add-to-new-project:
 ### Common Issues
 
 1. **"Unable to find reusable workflow"**
+
    - Ensure the reusable workflow is committed to the main branch
    - Check the repository reference format
 
 2. **"Context access might be invalid: JF_CI_GH_PAT"**
+
    - Set up the secret in repository settings
    - Verify the secret name matches exactly
 
 3. **"Invalid project URL format"**
+
    - Use format: `https://github.com/users/USERNAME/projects/NUMBER`
    - For organizations: `https://github.com/orgs/ORGNAME/projects/NUMBER`
 
@@ -143,6 +153,7 @@ add-to-new-project:
 ### Debugging
 
 Check workflow runs in Actions tab:
+
 - Repository → Actions → Select the workflow run
 - Review logs for validation and error messages
 - Verify project URLs and label configurations
