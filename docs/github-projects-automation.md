@@ -7,6 +7,7 @@
 This document describes the automated GitHub Projects integration setup across all repositories.
 
 ## Overview
+⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
 
 ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
 ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.

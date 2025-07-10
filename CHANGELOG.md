@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
 
+### Added
+
+- AI rebase workflow now uses file-based prompts to avoid long command lines
+
+### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
+
+### Added
+
+- Added GitHub Projects automation script
+
+### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
+
 ### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
 
 ### Added
