@@ -1,5 +1,9 @@
 <!-- file: .github/instructions/json.instructions.md -->
 <!-- version: 1.0.0 -->
+<!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
+
+applyTo: "\*\*/\*.json"ile: .github/instructions/json.instructions.md -->
+<!-- version: 1.0.0 -->
 
 ## <!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
 

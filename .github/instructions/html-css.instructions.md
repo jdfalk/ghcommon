@@ -1,5 +1,9 @@
 <!-- file: .github/instructions/html-css.instructions.md -->
 <!-- version: 1.0.0 -->
+<!-- guid: 2d1e0f9a-8b7c-6d5e-4f3a-2b1c0d9e8f7a -->
+
+applyTo: "\*\*/\*.{html,css}"ile: .github/instructions/html-css.instructions.md -->
+<!-- version: 1.0.0 -->
 
 ## <!-- guid: 2d1e0f9a-8b7c-6d5e-4f3a-2b1c0d9e8f7a -->
 

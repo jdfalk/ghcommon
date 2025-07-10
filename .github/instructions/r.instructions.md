@@ -1,5 +1,9 @@
 <!-- file: .github/instructions/r.instructions.md -->
 <!-- version: 1.0.0 -->
+<!-- guid: 6c5b4a3c-2d1e-0f9a-8b7c-6d5e4f3a2b1c -->
+
+applyTo: "\*\*/\*.R"ile: .github/instructions/r.instructions.md -->
+<!-- version: 1.0.0 -->
 
 ## <!-- guid: 6c5b4a3c-2d1e-0f9a-8b7c-6d5e4f3a2b1c -->
 

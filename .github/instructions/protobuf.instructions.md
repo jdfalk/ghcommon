@@ -1,5 +1,9 @@
 <!-- file: .github/instructions/protobuf.instructions.md -->
 <!-- version: 1.0.0 -->
+<!-- guid: 7d6c5b4a-3c2d-1e0f-9a8b-7c6d5e4f3a2b -->
+
+applyTo: "\*\*/\*.proto"ile: .github/instructions/protobuf.instructions.md -->
+<!-- version: 1.0.0 -->
 
 ## <!-- guid: 7d6c5b4a-3c2d-1e0f-9a8b-7c6d5e4f3a2b -->
 

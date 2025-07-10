@@ -1,7 +1,6 @@
 <!-- file: .github/instructions/github-actions.instructions.md -->
 <!-- version: 1.0.0 -->
-
-## <!-- guid: 9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f -->
+<!-- guid: 9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f -->
 
 applyTo: ".github/workflows/\*.{yml,yaml}"
 description: |
