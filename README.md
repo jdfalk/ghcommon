@@ -57,32 +57,6 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - **Project Automation**: Script to create GitHub Projects via CLI
 - GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
 - GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance
@@ -341,8 +315,7 @@ This repository now relies on GitHub's built-in project automation.
 Final automation note
 Builtin project automation documented
 
-## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-
+Doc update manager now supports `--ignore-errors` to continue processing even if an update fails.
 Automation note added
 Document built-in automation
 This repository now relies on GitHub's built-in project automation.
