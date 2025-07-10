@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Removed\\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.",
+  "guid": "f4b851f1-5b9c-434d-8b90-edf60f835c29",
+  "created_at": "2025-07-10T01:41:12Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
