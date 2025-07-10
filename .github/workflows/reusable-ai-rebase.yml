@@ -114,9 +114,22 @@ jobs:
           echo "=== Conflict Details ===" >> conflict_info.txt
           for file in $(git ls-files -u | cut -f2 | sort -u); do
             echo "--- File: $file ---" >> conflict_info.txt
-            cat "$file" >> conflict_info.txt
+            # Limit file content to first 1000 lines to prevent env var limits
+            head -n 1000 "$file" >> conflict_info.txt
+            if [ $(wc -l < "$file") -gt 1000 ]; then
+              echo "[... file truncated after 1000 lines ...]" >> conflict_info.txt
+            fi
             echo "" >> conflict_info.txt
           done
+
+          # Ensure the total conflict info isn't too large for environment variables
+          if [ $(wc -c < conflict_info.txt) -gt 30000 ]; then
+            # If too large, create a truncated version
+            head -c 30000 conflict_info.txt > conflict_info_truncated.txt
+            echo "[... conflict info truncated ...]" >> conflict_info_truncated.txt
+            mv conflict_info_truncated.txt conflict_info.txt
+          fi
+
           echo "conflict_info<<EOF" >> "$GITHUB_OUTPUT"
           cat conflict_info.txt >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
@@ -183,6 +196,8 @@ jobs:
         with:
           token: ${{ secrets.github-token }}
           model: ${{ inputs.model }}
+          system-prompt: "Use the instructions in system_prompt.txt file"
+          prompt: "Use the prompt in prompt.txt file"
           system-prompt-file: system_prompt.txt
           prompt-file: prompt.txt
           max-tokens: 4000
