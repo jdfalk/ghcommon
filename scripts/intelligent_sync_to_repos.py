@@ -161,8 +161,34 @@ def sync_to_repo(
     logging.info(f"\n=== Syncing to {repo} ===")
 
     if dry_run:
+        # Show detailed dry-run preview
+        logging.info("  DRY RUN - Would make these changes:")
+
+        # Check what old files would be removed
+        for old_file in OLD_FILES_TO_REMOVE:
+            logging.info(f"    REMOVE: {old_file} (if exists)")
+
+        # Check what managed files would be synced
+        for managed_file in MANAGED_FILES:
+            src = os.path.abspath(managed_file)
+            if os.path.exists(src):
+                logging.info(f"    SYNC: {managed_file}")
+            else:
+                logging.info(f"    SKIP: {managed_file} (source not found)")
+
+        # Show VS Code symlinks that would be created
+        logging.info("    VS Code Copilot symlinks:")
+        for file in MANAGED_FILES:
+            if file.startswith(".github/instructions/") and file.endswith(
+                ".instructions.md"
+            ):
+                basename = os.path.basename(file)
+                logging.info(
+                    f"      CREATE: .vscode/copilot/{basename} -> ../../{file}"
+                )
+
         summary.append(
-            f"[DRY RUN] {repo}: Would sync managed files and clean up old files"
+            f"[DRY RUN] {repo}: Would sync {len(MANAGED_FILES)} files and clean up {len(OLD_FILES_TO_REMOVE)} old files"
         )
         return
 
