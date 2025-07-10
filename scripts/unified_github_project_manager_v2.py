@@ -606,6 +606,33 @@ class UnifiedGitHubProjectManager:
 
     def _get_existing_labels(self, repository: str) -> Dict[str, Dict[str, str]]:
         """Get existing labels from a repository."""
+        if self.dry_run:
+            # In dry-run mode, still fetch real labels to show accurate info
+            # but don't use the dry-run wrapper that would prevent actual execution
+            import subprocess
+            try:
+                cmd = [
+                    "gh",
+                    "label",
+                    "list",
+                    "--repo",
+                    f"{self.owner}/{repository}",
+                    "--json",
+                    "name,color,description",
+                ]
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    timeout=30,
+                )
+                labels = json.loads(result.stdout)
+                return {label["name"]: label for label in labels}
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError):
+                # If we can't fetch in dry-run mode, assume no labels exist
+                return {}
+
         success, output = self._run_gh_command(
             [
                 "label",
