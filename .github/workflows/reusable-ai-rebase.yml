@@ -121,6 +121,67 @@ jobs:
           cat conflict_info.txt >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
+      - name: Prepare AI prompts
+        if: steps.conflicts.outputs.has_conflict == 'true'
+        env:
+          PR_BRANCH: ${{ matrix.pr.branch }}
+          BASE_BRANCH: ${{ inputs.base-branch }}
+          REPOSITORY: ${{ github.repository }}
+          CONFLICT_INFO: ${{ steps.conflict_info.outputs.conflict_info }}
+        run: |
+          cat <<'EOF' > system_prompt.txt
+          You are an expert software developer and Git merge conflict resolver. You follow these coding standards:
+
+          - Follow the standard file header format with file path, version, and GUID
+          - Use proper documentation and comments
+          - Maintain code quality and consistency
+          - Preserve the intent of both branches being merged
+          - Use conventional commit message format
+          - Follow language-specific best practices
+
+          When resolving conflicts, analyze both versions carefully and create a solution that:
+          1. Maintains functionality from both branches
+          2. Follows the existing code style and patterns
+          3. Resolves conflicts intelligently rather than just picking one side
+          4. Ensures the resulting code compiles and runs correctly
+          EOF
+
+          cat <<EOF > prompt.txt
+          I need help resolving merge conflicts that occurred during a rebase operation.
+
+          **Context:**
+          - Branch: ${PR_BRANCH}
+          - Base: ${BASE_BRANCH}
+          - Repository: ${REPOSITORY}
+
+          **Conflict Information:**
+          ${CONFLICT_INFO}
+
+          **Instructions:**
+          1. Analyze the conflicts in each file
+          2. Resolve them by combining changes intelligently
+          3. Provide a unified diff patch that can be applied with \`git apply\`
+          4. Ensure the patch resolves ALL conflicts
+          5. Make sure the resulting code follows the project's coding standards
+
+          **Expected Output:**
+          Provide ONLY the git patch in unified diff format, starting with the file headers.
+          Do not include any explanatory text before or after the patch.
+
+          Example format:
+          ```
+          diff --git a/file.ext b/file.ext
+          index abc123..def456 100644
+          --- a/file.ext
+          +++ b/file.ext
+          @@ -1,5 +1,5 @@
+           line1
+          -old line
+          +new line
+           line3
+          ```
+          EOF
+
       - name: Generate patch with AI
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: ai
@@ -128,56 +189,9 @@ jobs:
         with:
           token: ${{ secrets.github-token }}
           model: ${{ inputs.model }}
-          system-prompt: |
-            You are an expert software developer and Git merge conflict resolver. You follow these coding standards:
-
-            - Follow the standard file header format with file path, version, and GUID
-            - Use proper documentation and comments
-            - Maintain code quality and consistency
-            - Preserve the intent of both branches being merged
-            - Use conventional commit message format
-            - Follow language-specific best practices
-
-            When resolving conflicts, analyze both versions carefully and create a solution that:
-            1. Maintains functionality from both branches
-            2. Follows the existing code style and patterns
-            3. Resolves conflicts intelligently rather than just picking one side
-            4. Ensures the resulting code compiles and runs correctly
+          system-prompt-file: system_prompt.txt
+          prompt-file: prompt.txt
           max-tokens: 4000
-          prompt: |
-            I need help resolving merge conflicts that occurred during a rebase operation.
-
-            **Context:**
-            - Branch: ${{ matrix.pr.branch }}
-            - Base: ${{ inputs.base-branch }}
-            - Repository: ${{ github.repository }}
-
-            **Conflict Information:**
-            ${{ steps.conflict_info.outputs.conflict_info }}
-
-            **Instructions:**
-            1. Analyze the conflicts in each file
-            2. Resolve them by combining changes intelligently
-            3. Provide a unified diff patch that can be applied with `git apply`
-            4. Ensure the patch resolves ALL conflicts
-            5. Make sure the resulting code follows the project's coding standards
-
-            **Expected Output:**
-            Provide ONLY the git patch in unified diff format, starting with the file headers.
-            Do not include any explanatory text before or after the patch.
-
-            Example format:
-            ```
-            diff --git a/file.ext b/file.ext
-            index abc123..def456 100644
-            --- a/file.ext
-            +++ b/file.ext
-            @@ -1,5 +1,5 @@
-             line1
-            -old line
-            +new line
-             line3
-            ```
 
       - name: Apply AI patch
         if: steps.conflicts.outputs.has_conflict == 'true'
