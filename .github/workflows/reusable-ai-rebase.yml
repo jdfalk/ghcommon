@@ -213,8 +213,6 @@ jobs:
         with:
           token: ${{ secrets.github-token }}
           model: ${{ inputs.model }}
-          system-prompt: "Use the instructions in system_prompt.txt file"
-          prompt: "Use the prompt in prompt.txt file"
           system-prompt-file: system_prompt.txt
           prompt-file: prompt.txt
           max-tokens: 4000
