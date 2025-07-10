@@ -31,12 +31,12 @@ This document summarizes the GitHub Projects automation setup created across all
 
 ### 3. Project Mappings
 
-| Repository | Project(s) | Strategy |
-|------------|------------|----------|
-| `ghcommon` | Multiple projects based on labels | Smart routing by label |
-| `subtitle-manager` | Subtitle Manager Development (#5) | All issues/PRs |
-| `gcommon` | gCommon Development (#2) | All issues/PRs |
-| `codex-cli` | Core Improvements (#10) | All issues/PRs |
+| Repository         | Project(s)                        | Strategy               |
+| ------------------ | --------------------------------- | ---------------------- |
+| `ghcommon`         | Multiple projects based on labels | Smart routing by label |
+| `subtitle-manager` | Subtitle Manager Development (#5) | All issues/PRs         |
+| `gcommon`          | gCommon Development (#2)          | All issues/PRs         |
+| `codex-cli`        | Core Improvements (#10)           | All issues/PRs         |
 
 ## 🔧 Technical Details
 
