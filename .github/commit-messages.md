@@ -1,5 +1,5 @@
 <!-- file: .github/commit-messages.md -->
-<!-- version: 3.0.0 -->
+<!-- version: 3.1.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 
 # Conventional Commit Message Guidelines
