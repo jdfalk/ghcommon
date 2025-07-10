@@ -424,4 +424,42 @@ if [[ $# -lt 2 ]]; then
   exit 1
 fi
 
-create_update "$1" "$2" "${3:-append}"
+FILE="$1"
+CONTENT="$2"
+MODE="${3:-append}"
+
+# Validate mode-specific required options
+case "$MODE" in
+  "insert-after")
+    if [[ -z "$AFTER" ]]; then
+      echo "❌ --after option is required for insert-after mode" >&2
+      exit 1
+    fi
+    ;;
+  "insert-before")
+    if [[ -z "$BEFORE" ]]; then
+      echo "❌ --before option is required for insert-before mode" >&2
+      exit 1
+    fi
+    ;;
+  "replace-section")
+    if [[ -z "$SECTION" ]]; then
+      echo "❌ --section option is required for replace-section mode" >&2
+      exit 1
+    fi
+    ;;
+  "task-complete")
+    if [[ -z "$TASK_ID" ]]; then
+      echo "❌ --task-id option is required for task-complete mode" >&2
+      exit 1
+    fi
+    ;;
+  "update-badge")
+    if [[ -z "$BADGE_NAME" ]]; then
+      echo "❌ --badge-name option is required for update-badge mode" >&2
+      exit 1
+    fi
+    ;;
+esac
+
+create_update "$FILE" "$CONTENT" "$MODE"

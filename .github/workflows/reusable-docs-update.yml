@@ -37,6 +37,11 @@ on:
         required: false
         type: boolean
         default: false
+      continue_on_error:
+        description: "Continue processing even if some updates fail"
+        required: false
+        type: boolean
+        default: false
     secrets:
       github-token:
         description: "GitHub token with enhanced permissions for cross-repo operations"
@@ -148,6 +153,7 @@ jobs:
           UPDATES_DIR: ${{ inputs.updates-directory }}
           DRY_RUN: ${{ inputs.dry_run }}
           CLEANUP_PROCESSED: ${{ inputs.cleanup_processed_files }}
+          CONTINUE_ON_ERROR: ${{ inputs.continue_on_error }}
         run: |
           echo "🔄 Processing documentation updates..."
           echo "📂 Update directory: ${UPDATES_DIR}"
@@ -170,6 +176,12 @@ jobs:
             dry_run_flag=""
           fi
 
+          if [[ "${CONTINUE_ON_ERROR}" == "true" ]]; then
+            ignore_errors_flag="--ignore-errors"
+          else
+            ignore_errors_flag=""
+          fi
+
           # Set environment for enhanced visibility
           export PYTHONUNBUFFERED=1
 
@@ -178,6 +190,7 @@ jobs:
             --updates-dir "${UPDATES_DIR}" \
             --cleanup="${CLEANUP_PROCESSED}" \
             $dry_run_flag \
+            $ignore_errors_flag \
             --verbose || {
               echo "❌ Documentation update manager failed with exit code $?"
               echo "📋 Checking for partial results..."

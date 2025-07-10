@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "append",
+  "content": "Doc update manager now supports `--ignore-errors` to continue processing even if an update fails.",
+  "guid": "3a0e884f-520b-45f3-924f-de56e45cd8d7",
+  "created_at": "2025-07-10T02:16:44Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

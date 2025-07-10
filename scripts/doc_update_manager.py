@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/doc_update_manager.py
-# version: 2.0.0
+# version: 2.1.0
 # guid: 9e8d7c6b-5a49-3827-1605-4f3e2d1c0b9a
 
 """
@@ -338,6 +338,7 @@ Examples:
   python doc_update_manager.py --updates-dir .github/doc-updates
   python doc_update_manager.py --dry-run --verbose
   python doc_update_manager.py --no-cleanup
+  python doc_update_manager.py --ignore-errors
         """,
     )
 
@@ -361,6 +362,11 @@ Examples:
     )
 
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--ignore-errors",
+        action="store_true",
+        help="Continue processing even if some updates fail",
+    )
 
     # Support positional argument for backwards compatibility
     parser.add_argument(
@@ -394,9 +400,11 @@ Examples:
                 for error in stats["errors"]:
                     print(f"     - {error}")
 
-        # Exit with error code if there were errors
-        if stats["errors"]:
+        # Exit with error code if there were errors unless ignoring errors
+        if stats["errors"] and not args.ignore_errors:
             sys.exit(1)
+        if stats["errors"] and args.ignore_errors:
+            logger.warning("⚠️ Completed with errors, continuing due to --ignore-errors")
 
     except KeyboardInterrupt:
         logger.info("🛑 Interrupted by user")
