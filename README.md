@@ -350,30 +350,41 @@ Final automation note
 Builtin project automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
+
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
 Automation note added
 Document built-in automation
 This repository now relies on GitHub's built-in project automation.
 Final automation note
 Builtin project automation documented
+
 - AI rebase workflow now uses file-based prompts for model inference
+
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-Automation note added
-Document built-in automation
-Added stale issue management workflow
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
-- AI rebase workflow now uses file-based prompts for model inference
-## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
 Automation note added
 Document built-in automation
 Added stale issue management workflow
 This repository now relies on GitHub's built-in project automation.
 Final automation note
 Builtin project automation documented
+
 - AI rebase workflow now uses file-based prompts for model inference
+
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
+Automation note added
+Document built-in automation
+Added stale issue management workflow
+This repository now relies on GitHub's built-in project automation.
+Final automation note
+Builtin project automation documented
+
+- AI rebase workflow now uses file-based prompts for model inference
+
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
 Automation note added
 Document built-in automation
 Added stale issue management workflow

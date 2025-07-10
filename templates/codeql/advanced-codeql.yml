@@ -10,18 +10,18 @@ queries:
   - uses: security-extended
 
 paths:
-  - '.'
+  - "."
 
 paths-ignore:
-  - '**/node_modules/**'
-  - '**/vendor/**'
-  - '**/dist/**'
-  - '**/build/**'
-  - '**/coverage/**'
-  - '**/out/**'
-  - '**/tests/**'
-  - '**/test/**'
-  - '.github/doc-updates/**'
-  - '.github/issue-updates/**'
+  - "**/node_modules/**"
+  - "**/vendor/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/coverage/**"
+  - "**/out/**"
+  - "**/tests/**"
+  - "**/test/**"
+  - ".github/doc-updates/**"
+  - ".github/issue-updates/**"
 
 build-mode: autobuild

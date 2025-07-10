@@ -44,21 +44,37 @@ Files changed:
 Closes #123
 ```
 
+For commits without a specific issue, omit the issue number:
+
+```
+type(scope): description
+
+Brief description of what was changed and why.
+
+Files changed:
+- path/to/file1.ext - Description of changes
+- path/to/file2.ext - Description of changes
+```
+
 ## Guidelines
 
 ### Commit Header
-- Use conventional commit format: `type(scope): description (#issue-number)`
+
+- Use conventional commit format: `type(scope): description`
+- Include issue number only if working on a specific issue: `type(scope): description (#issue-number)`
 - Keep the header under 72 characters
 - Use present tense ("add feature" not "added feature")
 - Be specific and descriptive
 
 ### Body Structure
+
 - **Single Issue**: Use "Files changed:" section
 - **Multiple Issues**: Use "Issues Addressed:" with subsections
 - Group files by the issue they address
 - Include brief context about the overall changes
 
 ### Conventional Commit Types
+
 - `feat`: New features
 - `fix`: Bug fixes
 - `docs`: Documentation changes
@@ -72,19 +88,23 @@ Closes #123
 - `revert`: Reverting previous commits
 
 ### File Documentation
+
 - **Always list every modified file**
 - Explain what changed in each file, not just what the file does
 - Use relative paths from repository root
 - Be specific about the nature of changes
 
 ### Issue References
+
 - Include issue numbers in the header: `(#123)`
 - Use closing keywords in footer: `Closes #123, #456`
 - For related issues: `Related to #999`
+- Omit issue references if not working on a specific issue
 
 ## Examples
 
 ### Multi-Issue Commit Example
+
 ```
 feat(auth): implement user authentication system (#123)
 
@@ -109,6 +129,7 @@ Closes #123, #456, #789
 ```
 
 ### Single-Issue Commit Example
+
 ```
 fix(search): resolve pagination bug in results (#542)
 
@@ -124,6 +145,7 @@ Closes #542
 ```
 
 ### Simple Commit Example
+
 ```
 style(ui): format search component files (#234)
 
@@ -137,6 +159,7 @@ Closes #234
 ```
 
 ### Breaking Change Example
+
 ```
 feat(api)!: restructure user authentication endpoints (#345)
 
@@ -160,6 +183,7 @@ Closes #345
 ## Best Practices
 
 ### Do:
+
 1. **Be specific** - Explain what changed and why
 2. **Group by issue** - Keep related changes together
 3. **List all files** - Don't leave any modified files undocumented
@@ -168,6 +192,7 @@ Closes #345
 6. **Be consistent** - Follow the format every time
 
 ### Don't:
+
 1. **Mix unrelated changes** - One commit per logical change set
 2. **Use vague descriptions** - "fix stuff" or "update files"
 3. **Forget file listings** - Every file should be documented

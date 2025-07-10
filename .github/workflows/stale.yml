@@ -10,7 +10,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: "0 3 * * 1"
   workflow_dispatch:
 
 jobs:
@@ -21,4 +21,3 @@ jobs:
       days-before-close: 14
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT }}
-

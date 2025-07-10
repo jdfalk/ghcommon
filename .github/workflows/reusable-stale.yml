@@ -58,5 +58,5 @@ jobs:
           stale-issue-label: ${{ inputs.stale-issue-label }}
           days-before-pr-stale: -1
           days-before-pr-close: -1
-          stale-pr-label: ''
+          stale-pr-label: ""
           operations-per-run: 30
