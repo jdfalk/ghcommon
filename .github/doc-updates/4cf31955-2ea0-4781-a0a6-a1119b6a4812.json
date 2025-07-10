@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Added reusable stale issue handler",
+  "guid": "4cf31955-2ea0-4781-a0a6-a1119b6a4812",
+  "created_at": "2025-07-10T16:27:48Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

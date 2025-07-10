@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "Document usage for stale workflow",
+  "guid": "5f5c45b5-4c04-431b-b4c9-f68325930a17",
+  "created_at": "2025-07-10T16:27:50Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

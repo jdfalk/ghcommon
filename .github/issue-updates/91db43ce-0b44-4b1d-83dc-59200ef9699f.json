@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement stale ticket workflow",
+  "body": "Use actions/stale to manage inactive issues",
+  "labels": ["automation", "workflow"],
+  "guid": "91db43ce-0b44-4b1d-83dc-59200ef9699f",
+  "legacy_guid": "create-implement-stale-ticket-workflow-2025-07-10"
+}
