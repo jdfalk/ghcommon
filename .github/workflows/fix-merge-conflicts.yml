@@ -9,6 +9,11 @@ on:
     - cron: "0 6 * * *" # Run daily at 6 AM UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
 jobs:
   ai-rebase:
     uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@main
