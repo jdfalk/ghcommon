@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Added centralized CodeQL configuration",
+  "guid": "24a5c545-9458-4458-8118-255f89eb7345",
+  "created_at": "2025-07-10T21:41:05Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

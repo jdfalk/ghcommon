@@ -1,0 +1,27 @@
+# file: templates/codeql/advanced-codeql.yml
+# version: 1.0.0
+# guid: 39345513-6299-446c-ab22-422e5af99459
+
+name: ghcommon-advanced-codeql
+
+# Languages are auto-detected by the workflow.
+# Repositories extending this config can override the languages section if needed.
+queries:
+  - uses: security-extended
+
+paths:
+  - '.'
+
+paths-ignore:
+  - '**/node_modules/**'
+  - '**/vendor/**'
+  - '**/dist/**'
+  - '**/build/**'
+  - '**/coverage/**'
+  - '**/out/**'
+  - '**/tests/**'
+  - '**/test/**'
+  - '.github/doc-updates/**'
+  - '.github/issue-updates/**'
+
+build-mode: autobuild
