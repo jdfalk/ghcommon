@@ -40,6 +40,15 @@ MANAGED_FILES = {
     ".github/instructions/r.instructions.md",
     ".github/instructions/shell.instructions.md",
     ".github/instructions/typescript.instructions.md",
+    # Linter configurations (for GitHub Actions workflows)
+    ".github/linters/.eslintrc.json",
+    ".github/linters/.markdownlint.json",
+    ".github/linters/.pylintrc",
+    ".github/linters/.python-black",
+    ".github/linters/.stylelintrc.json",
+    ".github/linters/.yaml-lint.yml",
+    ".github/linters/README.md",
+    ".github/linters/ruff.toml",
     # Prompts
     ".github/prompts/ai-architecture.prompt.md",
     ".github/prompts/ai-changelog.prompt.md",
