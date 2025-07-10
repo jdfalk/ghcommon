@@ -5,6 +5,7 @@
 # GitHub Projects Automation Setup Summary
 
 This document summarizes the GitHub Projects automation setup created across all repositories.
+⚠️ The reusable add-to-project workflows described here have been removed. Repositories now rely on GitHub's built-in project automation.
 
 ## 🎯 What Was Created
 

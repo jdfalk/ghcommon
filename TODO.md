@@ -375,3 +375,7 @@ The ghcommon project has a solid foundation but requires systematic improvements
 - [ ] 🟡 **General**: Create examples for all documentation update templates
 
 Finalize GitHub Projects automation
+
+Verify built-in project automation across repositories
+
+Finalize GitHub Projects automation
