@@ -403,3 +403,15 @@ Document usage for stale workflow
 Verify built-in project automation across repositories
 
 Finalize GitHub Projects automation
+
+Update AI rebase workflow to use file-based prompts
+
+Refactor AI rebase workflow for better resiliency
+
+Document usage for stale workflow
+
+Integrate advanced CodeQL config into setup scripts
+
+Verify built-in project automation across repositories
+
+Finalize GitHub Projects automation

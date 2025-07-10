@@ -68,9 +68,17 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
 - GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
 - GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- **Project Automation**: Script to create GitHub Projects via CLI
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 
 ## 🔧 Core Features
 
@@ -336,6 +344,14 @@ Builtin project automation documented
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 Automation note added
 Document built-in automation
+This repository now relies on GitHub's built-in project automation.
+Final automation note
+Builtin project automation documented
+- AI rebase workflow now uses file-based prompts for model inference
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+Automation note added
+Document built-in automation
+Added stale issue management workflow
 This repository now relies on GitHub's built-in project automation.
 Final automation note
 Builtin project automation documented
