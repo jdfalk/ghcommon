@@ -379,3 +379,9 @@ Finalize GitHub Projects automation
 Verify built-in project automation across repositories
 
 Finalize GitHub Projects automation
+
+Refactor AI rebase workflow for better resiliency
+
+Verify built-in project automation across repositories
+
+Finalize GitHub Projects automation
