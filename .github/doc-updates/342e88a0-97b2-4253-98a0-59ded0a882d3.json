@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "append",
+  "content": "## AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase",
+  "guid": "342e88a0-97b2-4253-98a0-59ded0a882d3",
+  "created_at": "2025-07-10T02:04:33Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

@@ -45,16 +45,30 @@ jobs:
             });
             const conflicted = [];
             for (const pr of prs) {
-              const full = await github.rest.pulls.get({
+              let full = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: pr.number,
               });
-              if (full.data.mergeable_state === 'dirty') {
+
+              // GitHub may return 'unknown' mergeable_state on first request
+              if (full.data.mergeable_state === 'unknown') {
+                await new Promise(r => setTimeout(r, 2000));
+                full = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                });
+              }
+
+              const state = full.data.mergeable_state;
+              core.info(`PR #${pr.number} state: ${state}`);
+              if (state === 'dirty' || state === 'behind') {
                 conflicted.push({ number: pr.number, branch: pr.head.ref });
               }
             }
             core.setOutput('list', JSON.stringify(conflicted));
+            core.info(`Found ${conflicted.length} conflicted PR(s)`);
 
   rebase:
     runs-on: ubuntu-latest
@@ -117,6 +131,17 @@ jobs:
         env:
           PR_BRANCH: ${{ matrix.pr.branch }}
         run: git push --force-with-lease origin "${PR_BRANCH}"
+
+      - name: Auto-merge PR
+        env:
+          GH_TOKEN: ${{ secrets.github-token }}
+        run: gh pr merge ${{ matrix.pr.number }} --auto --squash || echo "Merge failed"
+
+      - name: Comment with results
+        env:
+          GH_TOKEN: ${{ secrets.github-token }}
+        run: |
+          gh pr comment ${{ matrix.pr.number }} --body "AI rebase workflow processed this PR." || true
 
   summary:
     runs-on: ubuntu-latest
