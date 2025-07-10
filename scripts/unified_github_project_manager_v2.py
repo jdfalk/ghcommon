@@ -143,20 +143,23 @@ class UnifiedGitHubProjectManager:
             Tuple of (success, output/error_message)
         """
         try:
+            # Ensure all command arguments are strings
+            command_str = [str(arg) for arg in command]
+
             if self.dry_run:
-                self.logger.info(f"DRY-RUN: Would execute: gh {' '.join(command)}")
+                self.logger.info(f"DRY-RUN: Would execute: gh {' '.join(command_str)}")
                 # Return mock JSON for commands that expect JSON output
-                if "--json" in command or any(
-                    "--format" in cmd and "json" in cmd for cmd in command
+                if "--json" in command_str or any(
+                    "--format" in cmd and "json" in cmd for cmd in command_str
                 ):
                     return True, "[]"  # Return empty JSON array
                 return True, "DRY-RUN: Command not executed"
 
-            self.logger.debug(f"Executing: gh {' '.join(command)}")
+            self.logger.debug(f"Executing: gh {' '.join(command_str)}")
 
             if input_data:
                 result = subprocess.run(
-                    ["gh"] + command,
+                    ["gh"] + command_str,
                     input=input_data,
                     text=True,
                     capture_output=True,
@@ -164,19 +167,26 @@ class UnifiedGitHubProjectManager:
                 )
             else:
                 result = subprocess.run(
-                    ["gh"] + command, capture_output=True, text=True, check=True
+                    ["gh"] + command_str, capture_output=True, text=True, check=True
                 )
 
             return True, result.stdout.strip()
 
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr.strip() if e.stderr else str(e)
-            self.logger.error(f"Command failed: gh {' '.join(command)}")
+            command_str = [str(arg) for arg in command]  # Ensure we have command_str
+            self.logger.error(f"Command failed: gh {' '.join(command_str)}")
             self.logger.error(f"Error: {error_msg}")
             return False, error_msg
 
         except FileNotFoundError:
             error_msg = "GitHub CLI (gh) not found. Please install it first."
+            self.logger.error(error_msg)
+            return False, error_msg
+        except Exception as e:
+            command_str = [str(arg) for arg in command]  # Ensure we have command_str
+            error_msg = f"Unexpected error: {str(e)}"
+            self.logger.error(f"Command failed: gh {' '.join(command_str)}")
             self.logger.error(error_msg)
             return False, error_msg
 
@@ -772,18 +782,42 @@ class UnifiedGitHubProjectManager:
                 if label_name in existing_labels:
                     if not self.force:
                         self.logger.debug(
-                            f"✅ Label '{label_name}' already exists in {repository}"
+                            f"✅ Label '{label_name}' already exists in {repository} (skipping)"
                         )
                         continue
                     else:
                         self.logger.info(
-                            f"🔄 Updating label '{label_name}' in {repository}"
+                            f"🔄 Force updating label '{label_name}' in {repository}"
+                        )
+                        # Directly update the existing label
+                        color = self._normalize_color(label_config["color"])
+                        description = label_config.get("description", "")
+
+                        success, output = self._run_gh_command(
+                            [
+                                "label",
+                                "edit",
+                                label_name,
+                                "--repo",
+                                f"{self.owner}/{repository}",
+                                "--color",
+                                color,
+                                "--description",
+                                description,
+                            ]
                         )
 
+                        if success:
+                            self.logger.info(f"✅ Updated label '{label_name}' in {repository}")
+                        else:
+                            self.logger.error(f"❌ Failed to update label '{label_name}' in {repository}")
+                        continue
+
+                # Label doesn't exist, create it
                 success = self._create_label(repository, label_name, label_config)
                 if success:
                     self.logger.info(
-                        f"✅ Created/updated label '{label_name}' in {repository}"
+                        f"✅ Created label '{label_name}' in {repository}"
                     )
                 else:
                     self.logger.error(
@@ -793,7 +827,7 @@ class UnifiedGitHubProjectManager:
     def _create_label(
         self, repository: str, label_name: str, label_config: Dict[str, str]
     ) -> bool:
-        """Create or update a single label in a repository."""
+        """Create a single label in a repository."""
         if self.dry_run:
             self.logger.info(
                 f"DRY-RUN: Would create label '{label_name}' in {repository}"
@@ -803,7 +837,7 @@ class UnifiedGitHubProjectManager:
         color = self._normalize_color(label_config["color"])
         description = label_config.get("description", "")
 
-        # Try to create the label first
+        # Create the label
         success, output = self._run_gh_command(
             [
                 "label",
@@ -818,29 +852,10 @@ class UnifiedGitHubProjectManager:
             ]
         )
 
-        if success:
-            return True
-        elif "already exists" in output.lower():
-            # Label exists, try to update it if force is enabled
-            if self.force:
-                success, output = self._run_gh_command(
-                    [
-                        "label",
-                        "edit",
-                        label_name,
-                        "--repo",
-                        f"{self.owner}/{repository}",
-                        "--color",
-                        color,
-                        "--description",
-                        description,
-                    ]
-                )
-                return success
-            else:
-                return True  # Exists, no force update
-        else:
-            return False
+        if not success:
+            self.logger.debug(f"Failed to create label '{label_name}' in {repository}: {output}")
+
+        return success
 
     def create_all_milestones(self, repositories: List[str] = None) -> None:
         """Create milestones across all repositories."""
