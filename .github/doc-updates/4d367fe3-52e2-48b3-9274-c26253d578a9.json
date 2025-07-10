@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "insert-after",
+  "content": "- **Advanced CodeQL Configuration**: Centralized config with automatic language detection",
+  "guid": "4d367fe3-52e2-48b3-9274-c26253d578a9",
+  "created_at": "2025-07-10T21:43:06Z",
+  "options": {
+    "section": null,
+    "after": "- **Security Guidelines**: Best practices and compliance",
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

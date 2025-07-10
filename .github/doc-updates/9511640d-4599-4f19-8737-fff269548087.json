@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "Integrate advanced CodeQL config into setup scripts",
+  "guid": "9511640d-4599-4f19-8737-fff269548087",
+  "created_at": "2025-07-10T21:43:24Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": "HIGH",
+    "category": null
+  }
+}
