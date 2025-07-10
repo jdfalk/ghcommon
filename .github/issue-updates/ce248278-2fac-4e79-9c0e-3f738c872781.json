@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Improve AI rebase workflow",
+  "body": "Enhance detection and add auto-merge. Ensure resilience.",
+  "labels": ["enhancement", "workflow"],
+  "guid": "ce248278-2fac-4e79-9c0e-3f738c872781",
+  "legacy_guid": "create-improve-ai-rebase-workflow-2025-07-10"
+}
