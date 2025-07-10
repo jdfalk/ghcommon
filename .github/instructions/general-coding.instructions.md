@@ -98,6 +98,22 @@ All source, script, and documentation files MUST begin with a standard header co
 
 **All files must include this header in the correct format for their type.**
 
+## Version Update Requirements
+
+**When modifying any file with a version header, ALWAYS update the version number:**
+
+- **Patch version** (x.y.Z): Bug fixes, typos, minor formatting changes
+- **Minor version** (x.Y.z): New features, significant content additions, template changes
+- **Major version** (X.y.z): Breaking changes, structural overhauls, format changes
+
+**Examples:**
+
+- Fix typo: `1.2.3` → `1.2.4`
+- Add new section: `1.2.3` → `1.3.0`
+- Change template structure: `1.2.3` → `2.0.0`
+
+**This applies to all files with version headers including documentation, templates, and configuration files.**
+
 ## Documentation Update System
 
 When making documentation updates to `README.md`, `CHANGELOG.md`, `TODO.md`, or other documentation files, use the automated documentation update system instead of direct edits:

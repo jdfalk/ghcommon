@@ -1,5 +1,5 @@
 <!-- file: .github/pull-request-descriptions.md -->
-<!-- version: 3.0.0 -->
+<!-- version: 3.1.0 -->
 <!-- guid: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e -->
 
 # Pull Request Description Guidelines
@@ -32,6 +32,8 @@ Brief overview of the entire PR and its purpose
 
 - [`path/to/file3.ext`](./path/to/file3.ext) - Description of changes | [[diff]](../../pull/PR_NUMBER/files#diff-hash) [[repo]](../../blob/main/path/to/file3.ext)
 
+_Note: Omit issue numbers from section headers if not working on specific issues. Use `type(scope): description` format instead._
+
 ## Testing
 
 How the changes were tested (unit tests, integration tests, manual testing)
@@ -60,7 +62,8 @@ Closes #123, #456, #789
 ### Issues Addressed Section
 
 - **Group changes by issue/feature**, not by file
-- Use conventional commit format: `type(scope): description (#issue-number)`
+- Use conventional commit format: `type(scope): description (#issue-number)` when working on specific issues
+- Use `type(scope): description` format when not working on specific issues
 - Each issue gets its own subsection with:
   - Conventional commit header
   - Detailed description of what was implemented
