@@ -1,0 +1,16 @@
+{
+  "file": "GITHUB_PROJECTS_SETUP.md",
+  "mode": "insert-after",
+  "content": "⚠️ The reusable add-to-project workflows described here have been removed. Repositories now rely on GitHub's built-in project automation.",
+  "guid": "a85bdc14-4d16-47c2-aa8c-6dcc09553506",
+  "created_at": "2025-07-10T01:41:33Z",
+  "options": {
+    "section": null,
+    "after": "This document summarizes the GitHub Projects automation setup created across all repositories.",
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

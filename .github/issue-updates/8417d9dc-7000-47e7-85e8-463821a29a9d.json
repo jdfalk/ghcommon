@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Remove custom add-to-project workflow",
+  "body": "Switch to GitHub built-in project automation",
+  "labels": ["cleanup", "documentation"],
+  "guid": "8417d9dc-7000-47e7-85e8-463821a29a9d",
+  "legacy_guid": "create-remove-custom-add-to-project-workflow-2025-07-10"
+}
