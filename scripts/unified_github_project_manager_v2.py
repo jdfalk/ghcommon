@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 2.1.0
+# version: 2.4.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """
@@ -765,6 +765,18 @@ class UnifiedGitHubProjectManager:
 
             repositories = project_definitions[project_title]["repositories"]
             for repository in repositories:
+                # Check if repository is already linked
+                if self._is_repository_linked(project_number, repository):
+                    if not self.force:
+                        self.logger.debug(
+                            f"✅ Repository '{repository}' already linked to project '{project_title}' (skipping)"
+                        )
+                        continue
+                    else:
+                        self.logger.info(
+                            f"🔄 Repository '{repository}' already linked to project '{project_title}', force re-link enabled"
+                        )
+
                 success = self._link_repository(project_number, repository)
                 if success:
                     self.logger.info(
@@ -795,29 +807,86 @@ class UnifiedGitHubProjectManager:
             ]
         )
 
+        if not success:
+            # Check if the error is just that it's already linked
+            if "already linked" in output.lower() or "already exists" in output.lower():
+                self.logger.debug(
+                    f"✅ Repository {repository} is already linked to project #{project_number}"
+                )
+                return True
+            else:
+                self.logger.warning(
+                    f"Failed to link repository '{repository}' to project #{project_number}: {output}"
+                )
+                return False
+
         return success
 
-    def _labels_are_identical(self, existing_label: Dict[str, str], new_label_config: Dict[str, str]) -> bool:
+    def _is_repository_linked(self, project_number: str, repository: str) -> bool:
+        """Check if a repository is already linked to a project by viewing project repositories."""
+        if self.dry_run:
+            # In dry-run mode, assume no repositories are linked so we can see what would be linked
+            return False
+
+        # Get list of repositories linked to this project
+        success, output = self._run_gh_command(
+            [
+                "project",
+                "view",
+                project_number,
+                "--owner",
+                self.owner,
+                "--format",
+                "json",
+            ]
+        )
+
+        if not success:
+            self.logger.warning(
+                f"⚠️ Error checking repositories for project #{project_number}: {output}"
+            )
+            return False
+
+        try:
+            project_data = json.loads(output)
+            # Check if this repository is in the project's repositories list
+            linked_repos = project_data.get("repositories", [])
+            for repo in linked_repos:
+                repo_name = repo.get("name", "")
+                if repo_name == repository:
+                    self.logger.debug(
+                        f"✅ Repository '{repository}' is already linked to project #{project_number}"
+                    )
+                    return True
+            return False
+        except (json.JSONDecodeError, KeyError) as e:
+            self.logger.warning(
+                f"⚠️ Error parsing project data for #{project_number}: {e}"
+            )
+            return False
+
+    def _labels_are_identical(
+        self, existing_label: Dict[str, str], new_label_config: Dict[str, str]
+    ) -> bool:
         """
         Check if an existing label is identical to the desired label configuration.
-        
+
         Args:
             existing_label: Label data from GitHub API
             new_label_config: Desired label configuration
-            
+
         Returns:
             True if labels are identical, False otherwise
         """
         # Normalize colors for comparison
         existing_color = existing_label.get("color", "").lstrip("#").lower()
         new_color = self._normalize_color(new_label_config["color"])
-        
+
         # Compare color and description
         existing_description = existing_label.get("description", "")
         new_description = new_label_config.get("description", "")
-        
-        return (existing_color == new_color and 
-                existing_description == new_description)
+
+        return existing_color == new_color and existing_description == new_description
 
     def create_all_labels(self, repositories: List[str] = None) -> None:
         """Create labels across all repositories."""
@@ -851,7 +920,7 @@ class UnifiedGitHubProjectManager:
                             self.logger.info(
                                 f"🔄 Force updating label '{label_name}' in {repository}..."
                             )
-                        
+
                         success = self._update_label(
                             repository, label_name, label_config
                         )

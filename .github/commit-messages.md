@@ -1,39 +1,51 @@
 <!-- file: .github/commit-messages.md -->
-<!-- version: 3.1.0 -->
+<!-- version: 3.2.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 
 # Conventional Commit Message Guidelines
 
 ## Template Structure
 
+**IMPORTANT**: Only include issue numbers if you are working on a specific GitHub issue. Do not use placeholder numbers like #123.
+
 For commits that address multiple issues, use this multi-issue format:
 
-```
-type(scope): primary description (#issue-number)
+```text
+type(scope): primary description
 
 Brief description of the overall changes and their purpose.
 
 Issues Addressed:
 
-type(scope): description (#issue-number)
+type(scope): description
 - path/to/file1.ext - Description of changes
 - path/to/file2.ext - Description of changes
 - path/to/file3.ext - Description of changes
 
-type(scope): description (#issue-number)
+type(scope): description
 - path/to/file4.ext - Description of changes
 - path/to/file5.ext - Description of changes
 
-type(scope): description (#issue-number)
+type(scope): description
 - path/to/file6.ext - Description of changes
-
-Closes #123, #456, #789
 ```
 
-For single-issue commits, use the standard format:
+For single commits, use the standard format:
 
+```text
+type(scope): description
+
+Brief description of what was changed and why.
+
+Files changed:
+- path/to/file1.ext - Description of changes
+- path/to/file2.ext - Description of changes
 ```
-type(scope): description (#issue-number)
+
+Only if working on a specific issue, include the issue number:
+
+```text
+type(scope): description (#actual-issue-number)
 
 Brief description of what was changed and why.
 
@@ -41,12 +53,12 @@ Files changed:
 - path/to/file1.ext - Description of changes
 - path/to/file2.ext - Description of changes
 
-Closes #123
+Closes #actual-issue-number
 ```
 
-For commits without a specific issue, omit the issue number:
+For commits without a specific issue, omit the issue number entirely:
 
-```
+```text
 type(scope): description
 
 Brief description of what was changed and why.
@@ -105,7 +117,7 @@ Files changed:
 
 ### Multi-Issue Commit Example
 
-```
+```text
 feat(auth): implement user authentication system (#123)
 
 Added comprehensive authentication system with JWT tokens, profile management,
@@ -130,7 +142,7 @@ Closes #123, #456, #789
 
 ### Single-Issue Commit Example
 
-```
+```text
 fix(search): resolve pagination bug in results (#542)
 
 Fixed issue where search results pagination was not properly handling
@@ -146,21 +158,19 @@ Closes #542
 
 ### Simple Commit Example
 
-```
-style(ui): format search component files (#234)
+```text
+style(ui): format search component files
 
 Applied prettier formatting to search-related components.
 
 Files changed:
 - src/components/SearchBar.jsx - Code formatting only
 - src/components/SearchResults.jsx - Code formatting only
-
-Closes #234
 ```
 
 ### Breaking Change Example
 
-```
+```text
 feat(api)!: restructure user authentication endpoints (#345)
 
 BREAKING CHANGE: Authentication endpoints have been restructured.
@@ -173,30 +183,26 @@ feat(api): restructure authentication endpoints (#345)
 - src/middleware/auth.js - Updated to handle new token format
 - docs/api.md - Updated API documentation
 
-test(auth): update tests for new auth structure (#345)
-- tests/auth.test.js - Updated tests for new response format
-- tests/integration/auth.test.js - Updated integration tests
-
 Closes #345
 ```
 
 ## Best Practices
 
-### Do:
+### Do
 
 1. **Be specific** - Explain what changed and why
 2. **Group by issue** - Keep related changes together
 3. **List all files** - Don't leave any modified files undocumented
 4. **Use present tense** - "add" not "added"
-5. **Reference issues** - Always include issue numbers
+5. **Reference issues only when working on specific issues** - Don't use placeholder numbers
 6. **Be consistent** - Follow the format every time
 
-### Don't:
+### Don't
 
 1. **Mix unrelated changes** - One commit per logical change set
 2. **Use vague descriptions** - "fix stuff" or "update files"
 3. **Forget file listings** - Every file should be documented
-4. **Skip issue references** - Always connect commits to issues
+4. **Use placeholder issue numbers** - Only reference real issues you're working on
 5. **Use past tense** - Avoid "fixed" or "added"
 
 ## Integration with VS Code
