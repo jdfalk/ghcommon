@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 2.0.1
+# version: 2.1.0
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """
@@ -796,6 +796,28 @@ class UnifiedGitHubProjectManager:
         )
 
         return success
+
+    def _labels_are_identical(self, existing_label: Dict[str, str], new_label_config: Dict[str, str]) -> bool:
+        """
+        Check if an existing label is identical to the desired label configuration.
+        
+        Args:
+            existing_label: Label data from GitHub API
+            new_label_config: Desired label configuration
+            
+        Returns:
+            True if labels are identical, False otherwise
+        """
+        # Normalize colors for comparison
+        existing_color = existing_label.get("color", "").lstrip("#").lower()
+        new_color = self._normalize_color(new_label_config["color"])
+        
+        # Compare color and description
+        existing_description = existing_label.get("description", "")
+        new_description = new_label_config.get("description", "")
+        
+        return (existing_color == new_color and 
+                existing_description == new_description)
 
     def create_all_labels(self, repositories: List[str] = None) -> None:
         """Create labels across all repositories."""
