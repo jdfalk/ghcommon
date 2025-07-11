@@ -1,0 +1,19 @@
+# file: examples/workflows/add-to-project.yml
+# version: 1.0.0
+# guid: 8bc1d36c-a8b3-4387-8e85-f45214b5dda4
+
+name: Add To Project Example
+
+on:
+  issues:
+    types: [opened, reopened, transferred, labeled]
+  pull_request:
+    types: [opened, reopened, labeled]
+
+jobs:
+  add-to-project:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-add-to-project.yml@main
+    with:
+      project-url: https://github.com/orgs/<org>/projects/<number>
+    secrets:
+      github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}

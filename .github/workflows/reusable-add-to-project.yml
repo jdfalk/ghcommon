@@ -1,0 +1,39 @@
+# file: .github/workflows/reusable-add-to-project.yml
+# version: 1.0.0
+# guid: b607c139-2e4c-482a-908e-b96d228b1ee7
+
+name: Reusable - Add To Project
+
+on:
+  workflow_call:
+    inputs:
+      project-url:
+        description: "URL of the GitHub project"
+        required: true
+        type: string
+      labeled:
+        description: "Comma-separated labels to match"
+        required: false
+        default: ""
+        type: string
+      label-operator:
+        description: "Label filter behavior (AND, OR, NOT)"
+        required: false
+        default: "OR"
+        type: string
+    secrets:
+      github-token:
+        description: "PAT with project write access"
+        required: true
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add to project
+        uses: actions/add-to-project@v1
+        with:
+          project-url: ${{ inputs.project-url }}
+          labeled: ${{ inputs.labeled }}
+          label-operator: ${{ inputs.label-operator }}
+          github-token: ${{ secrets.github-token }}
