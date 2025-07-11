@@ -126,8 +126,33 @@ project:github-management:
                       - "**/project*manager*"
                       - "labels.json"
 
+# Shorter aliases for common labels
+github-actions:
+      - changed-files:
+              - any-glob-to-any-file:
+                      - ".github/workflows/**"
+                      - ".github/actions/**"
+                      - "action.yml"
+                      - "action.yaml"
+
+automation:
+      - changed-files:
+              - any-glob-to-any-file:
+                      - "scripts/**"
+                      - "**/automation/**"
+                      - "**/*automation*"
+                      - "**/auto-*"
+
 # Issue management
 project:issue-management:
+      - changed-files:
+              - any-glob-to-any-file:
+                      - "scripts/*issue*"
+                      - "**/issue*manager*"
+                      - "**/issue*update*"
+                      - "templates/issue*"
+
+issue-management:
       - changed-files:
               - any-glob-to-any-file:
                       - "scripts/*issue*"
