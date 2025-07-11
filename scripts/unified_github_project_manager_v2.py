@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 3.1.1
+# version: 3.2.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """
@@ -618,6 +618,10 @@ class UnifiedGitHubProjectManager:
                 "color": "326ce5",
                 "description": "Kubernetes orchestration",
             },
+            "tech:shell": {
+                "color": "89e051",
+                "description": "Shell scripting (bash, sh)",
+            },
             # Workflow labels - automation and processes
             "workflow:automation": {
                 "color": "1f883d",
@@ -634,6 +638,23 @@ class UnifiedGitHubProjectManager:
             "workflow:deployment": {
                 "color": "0366d6",
                 "description": "Deployment and release management",
+            },
+            # Workflow-specific labels (shorter names for common use)
+            "github-actions": {
+                "color": "2088ff",
+                "description": "GitHub Actions related work",
+            },
+            "automation": {
+                "color": "1f883d",
+                "description": "Automation scripts and tools",
+            },
+            "issue-management": {
+                "color": "e99695",
+                "description": "Issue tracking and management",
+            },
+            "gcommon-refactor": {
+                "color": "f9d0c4",
+                "description": "gcommon refactoring work",
             },
             # Project-specific labels - subtitle-manager
             "project:whisper": {
@@ -661,6 +682,15 @@ class UnifiedGitHubProjectManager:
                 "color": "c5def5",
                 "description": "Protocol buffer implementation work",
             },
+            # GitHub management labels
+            "project:github-management": {
+                "color": "6f42c1",
+                "description": "GitHub project management and workflows",
+            },
+            "project:issue-management": {
+                "color": "e99695",
+                "description": "Issue management and tracking workflows",
+            },
             # Special labels
             "good-first-issue": {
                 "color": "7057ff",
@@ -681,6 +711,11 @@ class UnifiedGitHubProjectManager:
             "external-dependency": {
                 "color": "e4b429",
                 "description": "Depends on external systems or libraries",
+            },
+            # AI/Automation labels
+            "codex": {
+                "color": "ff6b9d",
+                "description": "Created or modified by AI/automation agents",
             },
         }
 
