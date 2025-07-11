@@ -14,7 +14,6 @@ Usage:
     python doc_update_manager.py [options]
     python doc_update_manager.py --updates-dir .github/doc-updates
     python doc_update_manager.py --dry-run --verbose
-    python doc_update_manager.py --ignore-errors
 """
 
 import argparse
@@ -339,6 +338,7 @@ Examples:
   python doc_update_manager.py --updates-dir .github/doc-updates
   python doc_update_manager.py --dry-run --verbose
   python doc_update_manager.py --no-cleanup
+  python doc_update_manager.py --ignore-errors
         """,
     )
 

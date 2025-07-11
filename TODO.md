@@ -385,3 +385,13 @@ Finalize GitHub Projects automation
 Verify built-in project automation across repositories
 
 Finalize GitHub Projects automation
+
+Update AI rebase workflow to use file-based prompts
+
+Propagate shared system prompt file to all repos
+
+Refactor AI rebase workflow for better resiliency
+
+Document usage for stale workflow
+
+Integrate advanced CodeQL config into setup scripts

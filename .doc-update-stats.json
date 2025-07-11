@@ -1,12 +1,10 @@
 {
-  "files_processed": 28,
+  "files_processed": 15,
   "changes_made": true,
   "files_updated": [
-    "docs/github-projects-automation.md",
     "TODO.md",
     "CHANGELOG.md",
-    "README.md",
-    "GITHUB_PROJECTS_SETUP.md"
+    "README.md"
   ],
   "errors": []
 }

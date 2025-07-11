@@ -62,6 +62,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - **Security Guidelines**: Best practices and compliance
 - **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 - **Advanced CodeQL Configuration**: Centralized config with automatic language detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 
 ## 🔧 Core Features
 
@@ -365,3 +366,8 @@ This repository now relies on GitHub's built-in project automation.
 Final automation note
 Document shared AI rebase system prompt
 Builtin project automation documented
+
+- AI rebase workflow now uses file-based prompts for model inference
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+Added stale issue management workflow
+Document shared AI rebase system prompt
