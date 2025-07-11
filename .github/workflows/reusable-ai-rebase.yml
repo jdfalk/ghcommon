@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ai-rebase.yml
-# version: 1.0.0
+# version: 1.2.0
 # guid: 8baaa277-345e-4c24-8659-47c93e0f3a8d
 
 name: Reusable - AI Rebase Conflicted PRs
@@ -105,38 +105,106 @@ jobs:
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: conflict_info
         run: |
-          echo "=== Conflicted Files ===" > conflict_info.txt
-          git ls-files -u | cut -f2 | sort -u >> conflict_info.txt
-          echo "" >> conflict_info.txt
-          echo "=== Git Status ===" >> conflict_info.txt
-          git status --porcelain >> conflict_info.txt
-          echo "" >> conflict_info.txt
-          echo "=== Conflict Details ===" >> conflict_info.txt
-          for file in $(git ls-files -u | cut -f2 | sort -u); do
-            echo "--- File: $file ---" >> conflict_info.txt
-            # Limit file content to first 1000 lines to prevent env var limits
-            head -n 1000 "$file" >> conflict_info.txt
-            if [ $(wc -l < "$file") -gt 1000 ]; then
-              echo "[... file truncated after 1000 lines ...]" >> conflict_info.txt
+          # Create a focused conflict summary (avoiding massive env vars)
+          echo "=== Conflicted Files ===" > conflict_summary.txt
+          conflicted_files=$(git ls-files -u | cut -f2 | sort -u)
+          echo "$conflicted_files" >> conflict_summary.txt
+          echo "" >> conflict_summary.txt
+
+          echo "=== Conflict Count ===" >> conflict_summary.txt
+          echo "Total conflicted files: $(echo "$conflicted_files" | wc -l)" >> conflict_summary.txt
+          echo "" >> conflict_summary.txt
+
+          # Instead of dumping full file contents, create manageable conflict context
+          echo "=== Conflict Preview ===" >> conflict_summary.txt
+          for file in $conflicted_files; do
+            echo "--- File: $file ---" >> conflict_summary.txt
+            # Only include conflict markers and surrounding context (max 50 lines per file)
+            if [ -f "$file" ]; then
+              grep -n -A 3 -B 3 "^<<<<<<< \|^======= \|^>>>>>>> " "$file" 2>/dev/null | head -50 >> conflict_summary.txt || true
             fi
-            echo "" >> conflict_info.txt
+            echo "" >> conflict_summary.txt
           done
 
-          # Ensure the total conflict info isn't too large for environment variables
-          if [ $(wc -c < conflict_info.txt) -gt 30000 ]; then
-            # If too large, create a truncated version
-            head -c 30000 conflict_info.txt > conflict_info_truncated.txt
-            echo "[... conflict info truncated ...]" >> conflict_info_truncated.txt
-            mv conflict_info_truncated.txt conflict_info.txt
-          fi
+          # Set a simple flag for whether conflicts exist
+          echo "has_conflicts=true" >> "$GITHUB_OUTPUT"
+          echo "conflict_count=$(echo "$conflicted_files" | wc -l)" >> "$GITHUB_OUTPUT"
 
-          echo "conflict_info<<EOF" >> "$GITHUB_OUTPUT"
-          cat conflict_info.txt >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+      - name: Prepare repository context
+        if: steps.conflicts.outputs.has_conflict == 'true'
+        run: |
+          # Create repository context file by combining template with actual repo content
+          if [ -f ".github/prompts/ai-rebase-context.md" ]; then
+            echo "Using repository-specific AI rebase context"
+            cp .github/prompts/ai-rebase-context.md repo_context.txt
+          else
+            echo "Creating minimal context from repository files"
+            # Create minimal context if repo-specific file doesn't exist
+            cat <<EOF > repo_context.txt
+          # Repository Context
+
+          ## Project: ${{ github.repository }}
+
+          ## Project Overview
+          EOF
+
+            # Add project description from README
+            if [ -f "README.md" ]; then
+              echo "### README.md (excerpt)" >> repo_context.txt
+              # Extract the first paragraph after the title
+              sed -n '1,/^##/p' README.md | head -20 >> repo_context.txt
+              echo "" >> repo_context.txt
+            fi
+
+            # Add coding standards
+            if [ -f ".github/instructions/general-coding.instructions.md" ]; then
+              echo "### Coding Standards" >> repo_context.txt
+              head -30 .github/instructions/general-coding.instructions.md >> repo_context.txt
+              echo "" >> repo_context.txt
+            fi
+
+            # Add commit message guidelines
+            if [ -f ".github/commit-messages.md" ]; then
+              echo "### Commit Message Format" >> repo_context.txt
+              head -20 .github/commit-messages.md >> repo_context.txt
+              echo "" >> repo_context.txt
+            fi
+
+            # Add language-specific information
+            echo "### Project Structure" >> repo_context.txt
+            if [ -f "go.mod" ]; then
+              echo "- Go project with modules" >> repo_context.txt
+              echo "- Main module: $(head -1 go.mod)" >> repo_context.txt
+            fi
+            if [ -f "package.json" ]; then
+              echo "- Node.js/JavaScript project" >> repo_context.txt
+            fi
+            if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              echo "- Python project" >> repo_context.txt
+            fi
+            if [ -f "Dockerfile" ]; then
+              echo "- Dockerized application" >> repo_context.txt
+            fi
+            echo "" >> repo_context.txt
+
+            # Add important directories
+            echo "### Key Directories" >> repo_context.txt
+            for dir in src pkg cmd internal lib app components; do
+              if [ -d "$dir" ]; then
+                echo "- \`$dir/\` - $(find "$dir" -name "*.go" -o -name "*.js" -o -name "*.py" -o -name "*.ts" | wc -l | tr -d ' ') source files" >> repo_context.txt
+              fi
+            done
+            echo "" >> repo_context.txt
+          fi
 
       - name: Prepare system prompt
         if: steps.conflicts.outputs.has_conflict == 'true'
-        run: cp .github/prompts/ai-rebase-system.prompt.md system_prompt.txt
+        run: |
+          # Combine system prompt with repository context
+          cat .github/prompts/ai-rebase-system.prompt.md > system_prompt.txt
+          echo "" >> system_prompt.txt
+          echo "## Repository Context" >> system_prompt.txt
+          cat repo_context.txt >> system_prompt.txt
 
       - name: Prepare AI prompt
         if: steps.conflicts.outputs.has_conflict == 'true'
@@ -144,25 +212,44 @@ jobs:
           PR_BRANCH: ${{ matrix.pr.branch }}
           BASE_BRANCH: ${{ inputs.base-branch }}
           REPOSITORY: ${{ github.repository }}
-          CONFLICT_INFO: ${{ steps.conflict_info.outputs.conflict_info }}
         run: |
-          # Create prompt in multiple blocks
-          cat <<PROMPT_EOF1 > prompt.txt
+          # Create a focused prompt with file-based conflict details
+          cat <<EOF > prompt.txt
           I need help resolving merge conflicts that occurred during a rebase operation.
 
           **Context:**
           - Branch: ${PR_BRANCH}
           - Base: ${BASE_BRANCH}
           - Repository: ${REPOSITORY}
-          PROMPT_EOF1
-
-          cat <<PROMPT_EOF2 >> prompt.txt
+          - Conflicted files: ${{ steps.conflict_info.outputs.conflict_count }}
 
           **Conflict Information:**
-          ${CONFLICT_INFO}
-          PROMPT_EOF2
+          EOF
 
-          cat <<'PROMPT_EOF3' >> prompt.txt
+          # Append the conflict summary from file (not env var)
+          cat conflict_summary.txt >> prompt.txt
+
+          cat <<'EOF' >> prompt.txt
+
+          **Detailed Conflict Analysis:**
+          EOF
+
+          # Add detailed conflict content for each file (controlled size)
+          for file in $(git ls-files -u | cut -f2 | sort -u); do
+            echo "### File: $file" >> prompt.txt
+            if [ -f "$file" ]; then
+              # Show the actual conflicted content with context
+              echo '```' >> prompt.txt
+              head -200 "$file" >> prompt.txt
+              if [ $(wc -l < "$file") -gt 200 ]; then
+                echo "[... file truncated at 200 lines ...]" >> prompt.txt
+              fi
+              echo '```' >> prompt.txt
+            fi
+            echo "" >> prompt.txt
+          done
+
+          cat <<'EOF' >> prompt.txt
 
           **Instructions:**
           1. Analyze the conflicts in each file
@@ -170,9 +257,6 @@ jobs:
           3. Provide a unified diff patch that can be applied with git apply
           4. Ensure the patch resolves ALL conflicts
           5. Make sure the resulting code follows the project's coding standards
-          PROMPT_EOF3
-
-          cat <<'PROMPT_EOF4' >> prompt.txt
 
           **Expected Output:**
           Provide ONLY the git patch in unified diff format, starting with the file headers.
@@ -184,7 +268,7 @@ jobs:
           --- a/filename
           +++ b/filename
           @@ line numbers @@
-          PROMPT_EOF4
+          EOF
 
       - name: Generate patch with AI
         if: steps.conflicts.outputs.has_conflict == 'true'
