@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 2.0.0
+# version: 2.0.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """
@@ -610,6 +610,7 @@ class UnifiedGitHubProjectManager:
             # In dry-run mode, still fetch real labels to show accurate info
             # but don't use the dry-run wrapper that would prevent actual execution
             import subprocess
+
             try:
                 cmd = [
                     "gh",
@@ -629,7 +630,11 @@ class UnifiedGitHubProjectManager:
                 )
                 labels = json.loads(result.stdout)
                 return {label["name"]: label for label in labels}
-            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError):
+            except (
+                subprocess.CalledProcessError,
+                subprocess.TimeoutExpired,
+                json.JSONDecodeError,
+            ):
                 # If we can't fetch in dry-run mode, assume no labels exist
                 return {}
 
@@ -807,49 +812,80 @@ class UnifiedGitHubProjectManager:
 
             for label_name, label_config in label_definitions.items():
                 if label_name in existing_labels:
-                    if not self.force:
+                    # Check if the existing label is identical to what we want
+                    existing_label = existing_labels[label_name]
+                    if self._labels_are_identical(existing_label, label_config):
                         self.logger.debug(
-                            f"✅ Label '{label_name}' already exists in {repository} (skipping)"
+                            f"✅ Label '{label_name}' already exists in {repository} with correct properties (skipping)"
                         )
                         continue
                     else:
-                        self.logger.info(
-                            f"🔄 Force updating label '{label_name}' in {repository}"
-                        )
-                        # Directly update the existing label
-                        color = self._normalize_color(label_config["color"])
-                        description = label_config.get("description", "")
-
-                        success, output = self._run_gh_command(
-                            [
-                                "label",
-                                "edit",
-                                label_name,
-                                "--repo",
-                                f"{self.owner}/{repository}",
-                                "--color",
-                                color,
-                                "--description",
-                                description,
-                            ]
-                        )
-
-                        if success:
-                            self.logger.info(f"✅ Updated label '{label_name}' in {repository}")
+                        # Label exists but needs updating
+                        if not self.force:
+                            self.logger.info(
+                                f"🔄 Label '{label_name}' exists in {repository} but needs updating..."
+                            )
                         else:
-                            self.logger.error(f"❌ Failed to update label '{label_name}' in {repository}")
+                            self.logger.info(
+                                f"🔄 Force updating label '{label_name}' in {repository}..."
+                            )
+                        
+                        success = self._update_label(
+                            repository, label_name, label_config
+                        )
+                        if success:
+                            self.logger.info(
+                                f"✅ Updated label '{label_name}' in {repository}"
+                            )
+                        else:
+                            self.logger.error(
+                                f"❌ Failed to update label '{label_name}' in {repository}"
+                            )
                         continue
 
-                # Label doesn't exist, create it
+                # Create new label
                 success = self._create_label(repository, label_name, label_config)
                 if success:
-                    self.logger.info(
-                        f"✅ Created label '{label_name}' in {repository}"
-                    )
+                    self.logger.info(f"✅ Created label '{label_name}' in {repository}")
                 else:
                     self.logger.error(
                         f"❌ Failed to create label '{label_name}' in {repository}"
                     )
+
+    def _update_label(
+        self, repository: str, label_name: str, label_config: Dict[str, str]
+    ) -> bool:
+        """Update an existing label in a repository."""
+        if self.dry_run:
+            self.logger.info(
+                f"DRY-RUN: Would update label '{label_name}' in {repository}"
+            )
+            return True
+
+        color = self._normalize_color(label_config["color"])
+        description = label_config.get("description", "")
+
+        # Update the label using gh label edit
+        success, output = self._run_gh_command(
+            [
+                "label",
+                "edit",
+                label_name,
+                "--repo",
+                f"{self.owner}/{repository}",
+                "--color",
+                color,
+                "--description",
+                description,
+            ]
+        )
+
+        if not success:
+            self.logger.debug(
+                f"Failed to update label '{label_name}' in {repository}: {output}"
+            )
+
+        return success
 
     def _create_label(
         self, repository: str, label_name: str, label_config: Dict[str, str]
@@ -880,7 +916,9 @@ class UnifiedGitHubProjectManager:
         )
 
         if not success:
-            self.logger.debug(f"Failed to create label '{label_name}' in {repository}: {output}")
+            self.logger.debug(
+                f"Failed to create label '{label_name}' in {repository}: {output}"
+            )
 
         return success
 
