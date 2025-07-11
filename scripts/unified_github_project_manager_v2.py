@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 2.4.1
+# version: 2.8.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """
@@ -754,38 +754,159 @@ class UnifiedGitHubProjectManager:
             return None
 
     def link_all_repositories(self, project_numbers: Dict[str, str]) -> None:
-        """Link repositories to their associated projects."""
-        self.logger.info("🔗 Linking repositories to projects...")
+        """Display repositories currently linked to projects without linking anything."""
+        self.logger.info(
+            "🔍 DEBUG: Displaying current project-repository relationships..."
+        )
 
         project_definitions = self._get_project_definitions()
+
+        # Print table header
+        print("\n" + "=" * 80)
+        print("CURRENT PROJECT-REPOSITORY RELATIONSHIPS")
+        print("=" * 80)
+        print(f"{'PROJECT NAME':<40} | {'PROJECT #':<10} | {'LINKED REPOSITORIES'}")
+        print("-" * 80)
 
         for project_title, project_number in project_numbers.items():
             if project_title not in project_definitions:
                 continue
 
-            repositories = project_definitions[project_title]["repositories"]
-            for repository in repositories:
-                # Check if repository is already linked
-                if self._is_repository_linked(project_number, repository):
-                    if not self.force:
-                        self.logger.debug(
-                            f"✅ Repository '{repository}' already linked to project '{project_title}' (skipping)"
-                        )
-                        continue
-                    else:
-                        self.logger.info(
-                            f"🔄 Repository '{repository}' already linked to project '{project_title}', force re-link enabled"
-                        )
+            # Get repositories that SHOULD be linked according to config
+            should_be_linked = project_definitions[project_title]["repositories"]
 
+            # Get repositories that ARE ACTUALLY linked
+            # Ensure project_number is a string
+            project_number_str = str(project_number)
+            linked_repos = self._get_linked_repositories(project_number_str)
+
+            # Display the results
+            if linked_repos is None:
+                linked_repos_str = "ERROR: Could not retrieve linked repositories"
+            elif len(linked_repos) == 0:
+                linked_repos_str = "No repositories linked"
+            else:
+                linked_repos_str = ", ".join(linked_repos)
+
+            print(
+                f"{project_title:<40} | {project_number_str:<10} | {linked_repos_str}"
+            )
+
+            # Display which repositories need linking
+            if linked_repos is not None:
+                missing_repos = [
+                    repo for repo in should_be_linked if repo not in linked_repos
+                ]
+                if missing_repos:
+                    print(
+                        f"{'  MISSING LINKS:':<40} | {'':10} | {', '.join(missing_repos)}"
+                    )
+
+            # Add a separator between projects
+            print("-" * 80)
+
+        print(
+            "\nINSTRUCTIONS: Review the data above to see which repositories are already linked."
+        )
+        print("The linking code has been commented out to diagnose the issue.")
+        print("=" * 80 + "\n")
+
+        # Original linking code is commented out below:
+        """
+        for project_title, project_number in project_numbers.items():
+            if project_title not in project_definitions:
+                continue
+
+            repositories = project_definitions[project_title]["repositories"]
+
+            # First, get all repositories already linked to this project
+            linked_repos = self._get_linked_repositories(project_number)
+            if linked_repos is None:
+                self.logger.warning(f"⚠️ Could not retrieve linked repositories for project '{project_title}', proceeding with caution")
+                linked_repos = []
+
+            for repository in repositories:
+                # Skip if already linked (unless force is enabled)
+                if repository in linked_repos and not self.force:
+                    self.logger.info(f"✅ Repository '{repository}' already linked to project '{project_title}' (skipping)")
+                    continue
+
+                # If force is enabled and already linked, show message but still skip
+                if repository in linked_repos and self.force:
+                    self.logger.info(f"✅ Repository '{repository}' already linked to project '{project_title}' (force enabled but no action needed)")
+                    continue
+
+                # Only attempt to link if not already linked
                 success = self._link_repository(project_number, repository)
                 if success:
-                    self.logger.info(
-                        f"✅ Linked {repository} to project '{project_title}'"
-                    )
+                    self.logger.info(f"✅ Linked {repository} to project '{project_title}'")
                 else:
-                    self.logger.warning(
-                        f"⚠️ Failed to link {repository} to project '{project_title}'"
-                    )
+                    self.logger.warning(f"⚠️ Failed to link {repository} to project '{project_title}'")
+        """
+
+    def _get_linked_repositories(self, project_number: str) -> Optional[List[str]]:
+        """
+        Get list of repositories already linked to a project.
+
+        Args:
+            project_number: Project number to check
+
+        Returns:
+            List of repository names or None if error occurred
+        """
+        # Convert project_number to string if it's not already
+        project_number = str(project_number)
+
+        if self.dry_run:
+            # In dry-run mode, return empty list to simulate linking all repos
+            return []
+
+        # Add debug logging to show exactly what command is being run
+        cmd = [
+            "project",
+            "view",
+            project_number,
+            "--owner",
+            self.owner,
+            "--format",
+            "json",
+        ]
+        self.logger.debug(f"Executing repository check command: gh {' '.join(cmd)}")
+
+        success, output = self._run_gh_command(cmd)
+
+        if not success:
+            self.logger.warning(
+                f"⚠️ Error checking linked repositories for project #{project_number}: {output}"
+            )
+            return None
+
+        try:
+            # Add debug logging to show the raw JSON response
+            self.logger.debug(
+                f"Raw JSON response: {output[:200]}..."
+            )  # Show first 200 chars
+
+            data = json.loads(output)
+            linked_repos = []
+
+            # Add debug to show the structure of the data
+            self.logger.debug(f"JSON keys: {list(data.keys())}")
+
+            if "repositories" in data:
+                for repo in data["repositories"]:
+                    repo_name = repo.get("name", "")
+                    if repo_name:
+                        linked_repos.append(repo_name)
+            else:
+                self.logger.warning(f"No 'repositories' key found in project data")
+
+            return linked_repos
+        except (json.JSONDecodeError, KeyError) as e:
+            self.logger.warning(
+                f"⚠️ Error parsing project data for #{project_number}: {e}"
+            )
+            return None
 
     def _link_repository(self, project_number: str, repository: str) -> bool:
         """Link a repository to a project."""
@@ -821,49 +942,6 @@ class UnifiedGitHubProjectManager:
                 return False
 
         return success
-
-    def _is_repository_linked(self, project_number: str, repository: str) -> bool:
-        """Check if a repository is already linked to a project by viewing project repositories."""
-        if self.dry_run:
-            # In dry-run mode, assume no repositories are linked so we can see what would be linked
-            return False
-
-        # Get list of repositories linked to this project
-        success, output = self._run_gh_command(
-            [
-                "project",
-                "view",
-                project_number,
-                "--owner",
-                self.owner,
-                "--format",
-                "json",
-            ]
-        )
-
-        if not success:
-            self.logger.warning(
-                f"⚠️ Error checking repositories for project #{project_number}: {output}"
-            )
-            return False
-
-        try:
-            project_data = json.loads(output)
-            # Check if this repository is in the project's repositories list
-            linked_repos = project_data.get("repositories", [])
-            for repo in linked_repos:
-                repo_name = repo.get("name", "")
-                if repo_name == repository:
-                    self.logger.debug(
-                        f"✅ Repository '{repository}' is already linked to project #{project_number}"
-                    )
-                    return True
-            return False
-        except (json.JSONDecodeError, KeyError) as e:
-            self.logger.warning(
-                f"⚠️ Error parsing project data for #{project_number}: {e}"
-            )
-            return False
 
     def _labels_are_identical(
         self, existing_label: Dict[str, str], new_label_config: Dict[str, str]
@@ -1003,6 +1081,7 @@ class UnifiedGitHubProjectManager:
                 color,
                 "--description",
                 description,
+                "--force",
             ]
         )
 
@@ -1266,17 +1345,76 @@ Examples:
         elif args.create_milestones:
             manager.create_all_milestones()
         elif args.setup_workflows:
-            print("Workflow setup functionality coming soon...")
-            workflow_config = manager.get_auto_add_workflow_config()
-            print("Auto-add workflow configuration:")
-            for project, labels in workflow_config.items():
-                print(f"  {project}: {', '.join(labels)}")
+            display_workflow_setup_instructions(manager.get_auto_add_workflow_config())
         else:
             manager.run_full_setup()
 
     except Exception as e:
         print(f"❌ Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
+
+
+def display_workflow_setup_instructions(workflow_config: Dict[str, List[str]]) -> None:
+    """
+    Display clear, actionable instructions for setting up GitHub Project workflows.
+
+    Args:
+        workflow_config: Dictionary mapping project names to lists of labels for auto-add
+    """
+    print("\n" + "=" * 80)
+    print("GITHUB PROJECT WORKFLOW SETUP INSTRUCTIONS")
+    print("=" * 80)
+
+    print(
+        "\nThese instructions will help you configure automated workflows for your GitHub Projects."
+    )
+    print(
+        "Each project can be configured to automatically add issues when specific labels are applied."
+    )
+
+    print("\n" + "-" * 80)
+    print("WORKFLOW CONFIGURATION BY PROJECT")
+    print("-" * 80)
+
+    for project_name, labels in workflow_config.items():
+        print(f"\n📊 Project: {project_name}")
+        print(f"    Auto-add issues with these labels: {', '.join(labels)}")
+
+    print("\n" + "-" * 80)
+    print("MANUAL SETUP INSTRUCTIONS")
+    print("-" * 80)
+
+    print("\nFor each project listed above, follow these steps:")
+
+    print("\n1. Navigate to the project in GitHub:")
+    print("   - Go to https://github.com/jdfalk?tab=projects")
+    print("   - Select the project you want to configure")
+
+    print("\n2. Access project settings:")
+    print("   - Click the three dots (...) in the top-right corner")
+    print("   - Select 'Settings'")
+
+    print("\n3. Set up workflows:")
+    print("   - In the left sidebar, click 'Workflows'")
+    print("   - Click 'New workflow'")
+    print("   - Select 'Item added to project'")
+
+    print("\n4. Configure the workflow:")
+    print("   - Name your workflow (e.g., 'Auto-add labeled issues')")
+    print("   - Under 'When', select 'Issues added to repository'")
+    print(
+        "   - Under 'Filters', select 'Label' and add the labels shown above for this project"
+    )
+    print("   - Under 'Then', select 'Add item to project'")
+    print("   - Click 'Create'")
+
+    print("\n5. Repeat for each project listed above")
+
+    print("\n" + "=" * 80)
+    print("Note: This script does not currently automate the workflow setup directly.")
+    print("      The GitHub Projects API has limited support for workflow automation.")
+    print("      Follow the manual steps above to set up your workflows.")
+    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

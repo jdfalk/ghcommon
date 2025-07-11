@@ -1,5 +1,5 @@
 <!-- file: .github/commit-messages.md -->
-<!-- version: 3.2.0 -->
+<!-- version: 3.3.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 
 # Conventional Commit Message Guidelines
@@ -38,8 +38,8 @@ type(scope): description
 Brief description of what was changed and why.
 
 Files changed:
-- path/to/file1.ext - Description of changes
-- path/to/file2.ext - Description of changes
+- [path/to/file1.ext](path/to/file1.ext) - Description of changes
+- [path/to/file2.ext](path/to/file2.ext) - Description of changes
 ```
 
 Only if working on a specific issue, include the issue number:
@@ -50,8 +50,8 @@ type(scope): description (#actual-issue-number)
 Brief description of what was changed and why.
 
 Files changed:
-- path/to/file1.ext - Description of changes
-- path/to/file2.ext - Description of changes
+- [path/to/file1.ext](path/to/file1.ext) - Description of changes
+- [path/to/file2.ext](path/to/file2.ext) - Description of changes
 
 Closes #actual-issue-number
 ```
@@ -103,7 +103,7 @@ Files changed:
 
 - **Always list every modified file**
 - Explain what changed in each file, not just what the file does
-- Use relative paths from repository root
+- Use relative paths from repository root as markdown links: `[path/to/file.ext](path/to/file.ext)`
 - Be specific about the nature of changes
 
 ### Issue References
@@ -126,16 +126,16 @@ and updated documentation to support the new auth workflow.
 Issues Addressed:
 
 feat(auth): implement JWT token validation (#123)
-- src/middleware/auth.js - JWT validation logic and middleware
-- src/routes/api.js - Applied auth middleware to protected routes
-- tests/auth.test.js - Comprehensive test coverage for auth flow
+- [src/middleware/auth.js](src/middleware/auth.js) - JWT validation logic and middleware
+- [src/routes/api.js](src/routes/api.js) - Applied auth middleware to protected routes
+- [tests/auth.test.js](tests/auth.test.js) - Comprehensive test coverage for auth flow
 
 feat(ui): add user profile page (#456)
-- src/components/UserProfile.jsx - Main profile component with edit functionality
-- src/styles/profile.css - Responsive styling for profile page
+- [src/components/UserProfile.jsx](src/components/UserProfile.jsx) - Main profile component with edit functionality
+- [src/styles/profile.css](src/styles/profile.css) - Responsive styling for profile page
 
 docs(readme): update installation instructions (#789)
-- README.md - Updated installation and auth setup documentation
+- [README.md](README.md) - Updated installation and auth setup documentation
 
 Closes #123, #456, #789
 ```
@@ -149,9 +149,9 @@ Fixed issue where search results pagination was not properly handling
 empty result sets, causing infinite loading states.
 
 Files changed:
-- src/components/SearchResults.jsx - Added null check for empty results
-- src/hooks/useSearchPagination.js - Fixed pagination logic for edge cases
-- tests/search.test.js - Added test coverage for empty result pagination
+- [src/components/SearchResults.jsx](src/components/SearchResults.jsx) - Added null check for empty results
+- [src/hooks/useSearchPagination.js](src/hooks/useSearchPagination.js) - Fixed pagination logic for edge cases
+- [tests/search.test.js](tests/search.test.js) - Added test coverage for empty result pagination
 
 Closes #542
 ```
@@ -164,8 +164,8 @@ style(ui): format search component files
 Applied prettier formatting to search-related components.
 
 Files changed:
-- src/components/SearchBar.jsx - Code formatting only
-- src/components/SearchResults.jsx - Code formatting only
+- [src/components/SearchBar.jsx](src/components/SearchBar.jsx) - Code formatting only
+- [src/components/SearchResults.jsx](src/components/SearchResults.jsx) - Code formatting only
 ```
 
 ### Breaking Change Example
@@ -179,9 +179,9 @@ The /auth/login endpoint now returns different response format.
 Issues Addressed:
 
 feat(api): restructure authentication endpoints (#345)
-- src/routes/auth.js - New endpoint structure and response format
-- src/middleware/auth.js - Updated to handle new token format
-- docs/api.md - Updated API documentation
+- [src/routes/auth.js](src/routes/auth.js) - New endpoint structure and response format
+- [src/middleware/auth.js](src/middleware/auth.js) - Updated to handle new token format
+- [docs/api.md](docs/api.md) - Updated API documentation
 
 Closes #345
 ```
