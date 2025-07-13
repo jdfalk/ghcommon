@@ -1210,9 +1210,17 @@ class UnifiedGitHubProjectManager:
                     )
 
                     if needs_update:
+                        if self.dry_run:
+                            self.logger.info(
+                                f"DRY-RUN: Would update label '{label_name}' in {repo_name}"
+                            )
                         if self._update_label(repo_name, label_name, label_data):
                             success_count += 1
                     else:
+                        if self.dry_run:
+                            self.logger.info(
+                                f"DRY-RUN: Label '{label_name}' already exists and is up-to-date in {repo_name}"
+                            )
                         success_count += 1  # Already up to date
                 else:
                     # Create new label
@@ -1257,14 +1265,20 @@ class UnifiedGitHubProjectManager:
                     )
 
                     if needs_update:
+                        if self.dry_run:
+                            self.logger.info(f"DRY-RUN: Would update milestone '{milestone_name}' in {repo_name}")
                         if self._update_milestone(
                             repo_name, milestone_name, milestone_data
                         ):
                             success_count += 1
                     else:
+                        if self.dry_run:
+                            self.logger.info(f"DRY-RUN: Milestone '{milestone_name}' already exists and is up-to-date in {repo_name}")
                         success_count += 1  # Already up to date
                 else:
                     # Create new milestone
+                    if self.dry_run:
+                        self.logger.info(f"DRY-RUN: Would create milestone '{milestone_name}' in {repo_name}")
                     if self._create_milestone(
                         repo_name, milestone_name, milestone_data
                     ):
@@ -1688,7 +1702,10 @@ class UnifiedGitHubProjectManager:
             # 4. Create milestones across all repositories
             self.sync_milestones()
 
-            # 5. Display auto-add workflow configuration
+            # 5. Set up project workflows
+            self.setup_project_workflows(project_numbers)
+
+            # 6. Display auto-add workflow configuration
             self.logger.info("🔄 Auto-add workflow configuration:")
             workflow_config = self.get_auto_add_workflow_config()
 
@@ -1958,19 +1975,8 @@ def main():
             "Use --list-projects to just list projects, or other flags for specific actions\n"
         )
 
-        # Always update config first
-        manager._update_config_with_existing_data()
-
-        # Then run full setup
-        manager.create_all_projects()
-        manager.sync_labels()
-        manager.sync_milestones()
-        existing_projects = manager._get_existing_projects()
-        project_numbers = {
-            title: str(project_data.get("number", ""))
-            for title, project_data in existing_projects.items()
-        }
-        manager.setup_project_workflows(project_numbers)
+        # Run full setup (which handles config updates internally)
+        manager.run_full_setup()
 
     except KeyboardInterrupt:
         print("\n⏹️ Operation cancelled by user")
