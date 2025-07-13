@@ -1249,7 +1249,7 @@ class IssueUpdateProcessor:
         legacy_guid = update.get("legacy_guid")
         repo = update.get("repo", self.api.repo)
         parent_issue = update.get("parent_issue")
-        api = self.api if repo == self.repo else GitHubAPI(self.api.token, repo)
+        api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
 
         if not title:
             self.summary.add_error("Missing title for create action")
@@ -1259,18 +1259,13 @@ class IssueUpdateProcessor:
         if parent_issue:
             parent_url = f"https://github.com/{repo}/issues/{parent_issue}"
             body = f"Sub-issue of #{parent_issue}\n\nParent issue: {parent_url}\n\n---\n\n{body}"
-
-            # Add sub-issue label if not already present
             if "sub-issue" not in labels:
                 labels.append("sub-issue")
 
         # Check for duplicate by GUID
-        if not self._check_guid_uniqueness(
-            guid, legacy_guid, "create", {"title": title}, repo=repo
-        ):
+        if not self._check_guid_uniqueness(guid, legacy_guid, "create", {"title": title}, repo=repo):
             return False
 
-        # Add GUID to body for tracking (prefer primary GUID)
         guid_to_embed = guid or legacy_guid
         if guid_to_embed:
             body += f"\n\n<!-- guid:{guid_to_embed} -->"
@@ -1279,18 +1274,16 @@ class IssueUpdateProcessor:
         issue = api.create_issue(title, body, labels)
 
         if issue:
-            self.summary.add_issue_created(
-                issue["number"], issue["title"], issue["html_url"]
-            )
+            self.summary.add_issue_created(issue["number"], issue["title"], issue["html_url"])
             if guid:
                 self.guid_issue_map[guid] = (repo, issue["number"])
             if legacy_guid:
                 self.guid_issue_map[legacy_guid] = (repo, issue["number"])
-            # If this is a sub-issue, add a comment on the parent issue
             if parent_issue:
-                parent_url = f"https://github.com/{repo}/issues/{parent_issue}"
-                comment_body = f"Sub-issue created: [{title}]({issue['html_url']})"
-                api.add_comment(parent_issue, comment_body)
+                # Add a comment to parent issue referencing this sub-issue
+                parent_comment = f"Created sub-issue #{issue['number']}: {issue['html_url']}\n\n<!-- guid:{guid_to_embed} -->"
+                parent_api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
+                parent_api.add_comment(parent_issue, parent_comment)
             return True
         else:
             self.summary.add_error(f"Failed to create issue: {title}")
@@ -1309,41 +1302,17 @@ class IssueUpdateProcessor:
         if not issue_number:
             self.summary.add_error(f"No issue number found for update: {update}")
             return False
-        # Build update payload, excluding action, number, guid, legacy_guid, and permalink
-        update_data = {
-            k: v
-            for k, v in update.items()
-            if k not in ["action", "number", "guid", "legacy_guid", "permalink"]
-        }
-
-        # Add GUID to body if provided (prefer primary GUID)
+        update_data = {k: v for k, v in update.items() if k not in ["action", "number", "guid", "legacy_guid", "permalink"]}
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
-
-        api = (
-            self.api
-            if not repo or repo == self.repo
-            else GitHubAPI(self.api.token, repo)
-        )
-
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
         try:
             success = api.update_issue(issue_number, **update_data)
             if success:
-                issue_data = api.get_issue(issue_number)
-                if issue_data:
-                    title = issue_data.get("title", f"Issue {issue_number}")
-                    url = issue_data.get("html_url", "")
-                    print(f"✅ Updated issue #{issue_number}")
-                    self.summary.add_issue_updated(issue_number, title, url)
-                else:
-                    print(f"✅ Updated issue #{issue_number}")
-                    self.summary.add_issue_updated(
-                        issue_number, f"Issue {issue_number}", ""
-                    )
+                self.summary.add_issue_updated(issue_number, update_data.get("title", ""))
                 return True
             else:
-                print(f"❌ Failed to update issue #{issue_number}")
                 self.summary.add_error(f"Failed to update issue #{issue_number}")
                 return False
         except Exception as e:
@@ -1357,54 +1326,27 @@ class IssueUpdateProcessor:
         repo = update.get("repo", self.api.repo)
         body = update.get("body", "")
         primary_guid, legacy_guid = self._extract_guids(update)
-
-        if not issue_number:
-            parent_guid = update.get("parent")
-            if parent_guid:
-                mapping = self.guid_issue_map.get(parent_guid)
-                if mapping:
-                    repo, issue_number = mapping
-
         if not issue_number:
             self.summary.add_error(f"No issue number found for comment: {update}")
             return False
-
         if not body:
-            self.summary.add_error(f"Comment action missing body: {update}")
+            self.summary.add_error(f"No body found for comment: {update}")
             return False
-
-        # Add GUID to comment for duplicate detection (prefer primary GUID)
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed:
-            body = f"<!-- guid:{guid_to_embed} -->\n{body}"
-
-        api = (
-            self.api
-            if not repo or repo == self.repo
-            else GitHubAPI(self.api.token, repo)
-        )
-
+            body += f"\n\n<!-- guid:{guid_to_embed} -->"
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
         try:
-            result = api.add_comment(issue_number, body)
-            if result:
-                print(f"✅ Added comment to issue #{issue_number}")
-                # Extract comment URL if available
-                comment_url = (
-                    result.get("html_url", "") if isinstance(result, dict) else ""
-                )
-                self.summary.add_comment(issue_number, comment_url)
+            success = api.add_comment(issue_number, body)
+            if success:
+                self.summary.add_comment_added(issue_number, body)
                 return True
             else:
-                print(f"❌ Failed to add comment to issue #{issue_number}")
-                self.summary.add_error(
-                    f"Failed to add comment to issue #{issue_number}"
-                )
+                self.summary.add_error(f"Failed to add comment to issue #{issue_number}")
                 return False
         except Exception as e:
             print(f"❌ Error adding comment to issue #{issue_number}: {e}")
-            self.summary.add_error(
-                f"Error adding comment to issue #{issue_number}: {e}"
-            )
+            self.summary.add_error(f"Error adding comment to issue #{issue_number}: {e}")
             return False
 
     def _close_issue(self, update: Dict[str, Any]) -> bool:
@@ -1413,47 +1355,16 @@ class IssueUpdateProcessor:
         repo = update.get("repo", self.api.repo)
         state_reason = update.get("state_reason", "completed")
         primary_guid, legacy_guid = self._extract_guids(update)
-
-        if not issue_number:
-            parent_guid = update.get("parent")
-            if parent_guid:
-                mapping = self.guid_issue_map.get(parent_guid)
-                if mapping:
-                    repo, issue_number = mapping
-
         if not issue_number:
             self.summary.add_error(f"No issue number found for close: {update}")
             return False
-
-        api = (
-            self.api
-            if not repo or repo == self.repo
-            else GitHubAPI(self.api.token, repo)
-        )
-
+        api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
         try:
-            success = api.close_issue(issue_number, state_reason)
+            success = api.close_issue(issue_number, state_reason=state_reason)
             if success:
-                issue_data = api.get_issue(issue_number)
-                if issue_data:
-                    title = issue_data.get("title", f"Issue {issue_number}")
-                    url = issue_data.get("html_url", "")
-                else:
-                    title = f"Issue {issue_number}"
-                    url = ""
-
-                print(f"✅ Closed issue #{issue_number} (reason: {state_reason})")
-                self.summary.add_issue_closed(issue_number, title, url)
-
-                # Add a tracking comment with GUID if provided (prefer primary GUID)
-                guid_to_embed = primary_guid or legacy_guid
-                if guid_to_embed:
-                    tracking_comment = f"<!-- guid:{guid_to_embed} -->\nIssue closed via automated workflow."
-                    api.add_comment(issue_number, tracking_comment)
-
+                self.summary.add_issue_closed(issue_number, state_reason)
                 return True
             else:
-                print(f"❌ Failed to close issue #{issue_number}")
                 self.summary.add_error(f"Failed to close issue #{issue_number}")
                 return False
         except Exception as e:
@@ -1936,6 +1847,98 @@ class CopilotTicketManager:
                     f.write(github_summary + "\n")
             except Exception as e:
                 print(f"⚠️  Failed to write to GitHub step summary: {e}")
+
+    def _handle_review_comment(self, action: str, event_data: Dict[str, Any]) -> None:
+        """Handle review comment events."""
+        comment = event_data.get("comment", {})
+
+        if comment.get("user", {}).get("login") != COPILOT_USER:
+            print("Not a Copilot comment; skipping")
+            return
+
+        if action == "created":
+            self._create_or_update_ticket(comment)
+        elif action == "deleted":
+            self._handle_comment_deleted(comment)
+
+    def _handle_review(self, action: str, event_data: Dict[str, Any]) -> None:
+        """Handle review events (minimal action currently)."""
+        review = event_data.get("review", {})
+        if review.get("user", {}).get("login") == COPILOT_USER:
+            print(f"Copilot review {action}")
+
+    def _handle_pr_closed(self, event_data: Dict[str, Any]) -> None:
+        """Close all Copilot tickets for a merged PR."""
+        pr = event_data.get("pull_request", {})
+        if not pr.get("merged", False):
+            print("PR not merged, skipping")
+            return
+
+        pr_number = pr["number"]
+        print(f"Processing merged PR #{pr_number}")
+
+        # Search for all open copilot issues mentioning this PR
+        issues = self.api.search_issues(f"label:{COPILOT_LABEL} state:open {pr_number}")
+        print(f"Found {len(issues)} open Copilot issues for PR #{pr_number}")
+
+        closed_count = 0
+        for issue in issues:
+            if self.api.close_issue(issue["number"]):
+                closed_count += 1
+
+        if closed_count > 0:
+            print(f"Closed {closed_count} Copilot issues for merged PR #{pr_number}")
+
+    def _handle_push(self, event_data: Dict[str, Any]) -> None:
+        """Handle pushes to main branch - comprehensive issue analysis."""
+        ref = event_data.get("ref", "")
+        if not ref.endswith("/main") and not ref.endswith("/master"):
+            print(f"Push to {ref} - not main/master, skipping")
+            return
+
+        print(f"Processing push to {ref}")
+
+        # Get all open Copilot issues and analyze them
+        issues = self.api.search_issues(f"label:{COPILOT_LABEL} state:open")
+        print(f"Found {len(issues)} open Copilot issues")
+
+        # Here you could implement file change analysis and stale issue cleanup
+        # For now, just log the activity
+        print("Push analysis complete")
+
+    def _create_or_update_ticket(self, comment: Dict[str, Any]) -> None:
+        """Create or update a ticket for a Copilot comment."""
+        comment_body = comment.get("body", "").strip()
+        key = comment_body.split("\n", 1)[0]  # First line as key
+
+        existing = self.api.search_issues(f"label:{COPILOT_LABEL} state:open {key}")
+
+        line_info = {
+            "id": comment["id"],
+            "path": comment.get("path", ""),
+            "line": comment.get("line", 0),
+            "url": comment.get("html_url", ""),
+        }
+
+        if existing:
+            # Update existing issue
+            issue = existing[0]
+            print(f"Updating existing Copilot issue #{issue['number']}")
+            # Implementation would parse existing body and update it
+            self.summary.add_issue_updated(
+                issue["number"], issue["title"], issue["html_url"]
+            )
+        else:
+            # Create new issue
+            title = f"Copilot Review: {key[:50]}..."
+            body = self._build_ticket_body(comment, [line_info])
+            result = self.api.create_issue(title, body, [COPILOT_LABEL])
+            if result:
+                self.summary.add_issue_created(
+                    result["number"], title, result["html_url"]
+                )
+            else:
+                self.summary.add_error(f"Failed to create Copilot ticket: {title}")
 
     def _handle_review_comment(self, action: str, event_data: Dict[str, Any]) -> None:
         """Handle review comment events."""
