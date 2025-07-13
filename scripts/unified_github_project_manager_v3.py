@@ -50,6 +50,7 @@ Author: GitHub Copilot
 License: MIT
 """
 
+import argparse
 import json
 import logging
 import subprocess
@@ -68,15 +69,20 @@ class UnifiedGitHubProjectManager:
     Consolidates all functionality from previous separate scripts.
     """
 
-    def __init__(self, owner: str, dry_run: bool = False, logger=None):
+    def __init__(
+        self, dry_run: bool = False, force: bool = False, verbose: bool = False
+    ):
         """Initialize the unified project manager."""
-        self.owner = owner
         self.dry_run = dry_run
-        self.logger = logger or self._default_logger()
+        self.force = force
+        self.verbose = verbose
+        self.owner = "jdfalk"  # Organization/user
+
+        # Load configuration
         self.config = self._load_config()
 
         # Setup logging
-        log_level = logging.DEBUG if dry_run else logging.INFO
+        log_level = logging.DEBUG if verbose else logging.INFO
         logging.basicConfig(
             level=log_level,
             format="%(asctime)s - %(levelname)s - %(message)s",
@@ -92,11 +98,6 @@ class UnifiedGitHubProjectManager:
 
         # Validate GitHub CLI
         self._validate_github_cli()
-
-    def _default_logger(self):
-        import logging
-
-        return logging.getLogger("UnifiedGitHubProjectManager")
 
     def _load_config(self):
         import json
@@ -1301,8 +1302,6 @@ class UnifiedGitHubProjectManager:
                 self.owner,
                 "--title",
                 project_name,
-                "--body",
-                project_data.get("description", ""),
             ]
 
             subprocess.run(cmd, check=True, capture_output=True, text=True)
@@ -1344,6 +1343,8 @@ class UnifiedGitHubProjectManager:
                 self.owner,
                 "--format",
                 "json",
+                "--limit",
+                "100",  # Set high limit to get all projects (GitHub CLI default is 30)
             ]
         )
         if not success:
@@ -1361,11 +1362,14 @@ class UnifiedGitHubProjectManager:
                     f"⚠️ Unexpected project list format: {projects_data}"
                 )
                 return {}
-            return {
+
+            result = {
                 p.get("title", f"project-{p.get('number', '')}"): p
                 for p in projects
                 if isinstance(p, dict)
             }
+            self.logger.debug(f"Found {len(result)} existing projects")
+            return result
         except Exception as e:
             self.logger.warning(f"⚠️ Error parsing project list: {e}")
             return {}
@@ -1704,36 +1708,65 @@ class UnifiedGitHubProjectManager:
             self.logger.error(f"❌ Setup failed: {str(e)}")
             raise
 
-    def create_all_projects(self):
-        """Create all missing GitHub projects based on configuration."""
-        self.logger.info("🏗️ Creating GitHub projects...")
+    def create_all_projects(self) -> Dict[str, str]:
+        """Create all GitHub Projects defined in the configuration."""
+        self.logger.info("🚀 Creating GitHub Projects...")
 
         project_definitions = self._get_project_definitions()
         existing_projects = self._get_existing_projects()
-        existing_project_titles = {
-            project["title"] for project in existing_projects.values()
-        }
+        created_projects = {}
 
-        project_numbers = {}
-        created_count = 0
+        for title, config in project_definitions.items():
+            if title in existing_projects:
+                if not self.force:
+                    self.logger.info(f"✅ Project '{title}' already exists (skipping)")
+                    created_projects[title] = existing_projects[title].get("number", "")
+                    continue
+                else:
+                    self.logger.info(
+                        f"🔄 Project '{title}' exists, force update enabled"
+                    )
 
-        for project_name, project_data in project_definitions.items():
-            if project_name not in existing_project_titles:
-                self.logger.info(f"Creating project: {project_name}")
-                project_number = self._create_github_project(project_name, project_data)
-                if project_number:
-                    project_numbers[project_name] = project_number
-                    created_count += 1
+            project_number = self._create_project(title, config["description"])
+            if project_number:
+                created_projects[title] = project_number
+                self.logger.info(f"✅ Created project: {title} (#{project_number})")
             else:
-                # Project exists, find its number
-                for title, data in existing_projects.items():
-                    if title == project_name:
-                        project_numbers[project_name] = data.get("number", "")
-                        break
-                self.logger.info(f"Project already exists: {project_name}")
+                self.logger.error(f"❌ Failed to create project: {title}")
 
-        self.logger.info(f"Created {created_count} new projects")
-        return project_numbers
+        return created_projects
+
+    def _create_project(self, title: str, description: str) -> Optional[str]:
+        """Create a single GitHub Project."""
+        if self.dry_run:
+            self.logger.info(f"DRY-RUN: Would create project '{title}'")
+            return "dry-run-id"
+
+        success, output = self._run_gh_command(
+            [
+                "project",
+                "create",
+                "--owner",
+                self.owner,
+                "--title",
+                title,
+                "--format",
+                "json",
+            ]
+        )
+
+        if success:
+            try:
+                project_data = json.loads(output)
+                return str(project_data.get("number", ""))
+            except json.JSONDecodeError:
+                self.logger.error(
+                    f"Could not parse project creation response for '{title}'"
+                )
+                return None
+        else:
+            self.logger.error(f"Failed to create project '{title}': {output}")
+            return None
 
     def get_auto_add_workflow_config(self):
         """Get auto-add workflow configuration for projects."""
@@ -1812,7 +1845,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        manager = UnifiedGitHubProjectManager(args.owner, args.dry_run)
+        manager = UnifiedGitHubProjectManager(
+            dry_run=args.dry_run, force=args.force, verbose=args.verbose
+        )
 
         # Handle specific actions
         if args.list_projects:
