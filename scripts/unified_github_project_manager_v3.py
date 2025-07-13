@@ -171,15 +171,24 @@ class UnifiedGitHubProjectManager:
                     command_str[0] in ["project", "repo", "auth"]
                     and len(command_str) > 1
                     and command_str[1] in ["list", "view", "token"]
+                ) or (
+                    command_str[0] == "label" and command_str[1] == "list"
+                ) or (
+                    command_str[0] == "api" and "GET" not in command_str and "--method" not in command_str
                 ):
-                    # Execute read-only commands
-                    pass  # Continue to actual execution
+                    # Execute read-only commands even in dry-run mode
+                    self.logger.debug("Executing read-only command in dry-run mode")
+                    # Continue to actual execution
                 else:
-                    # Return mock JSON for commands that expect JSON output
+                    # Return mock responses for commands that expect specific formats
                     if "--json" in command_str or any(
                         "--format" in cmd and "json" in cmd for cmd in command_str
                     ):
-                        return True, "[]"  # Return empty JSON array
+                        # Return proper mock JSON structure based on command type
+                        if "project" in command_str and "list" in command_str:
+                            return True, '{"projects": [], "totalCount": 0}'
+                        else:
+                            return True, "[]"  # Return empty JSON array for other commands
                     return True, "DRY-RUN: Command not executed"
 
             self.logger.debug(f"Executing: gh {' '.join(command_str)}")
