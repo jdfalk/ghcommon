@@ -644,6 +644,7 @@ class IssueUpdateProcessor:
     def __init__(self, github_api: GitHubAPI):
         # Use a mapping from guid to (repo, issue_number) for multi-repo support
         self.api = github_api
+        self.repo = github_api.repo  # Fix: add repo attribute for compatibility
         self.summary = OperationSummary("Issue Update Processing")
         self.guid_issue_map: Dict[str, Tuple[str, int]] = {}
 
@@ -864,47 +865,26 @@ class IssueUpdateProcessor:
             for file_path in json_files:
                 try:
                     with open(file_path, "r", encoding="utf-8") as f:
-                        update_data = json.load(f)
+                        try:
+                            data = json.load(f)
+                        except json.JSONDecodeError as e:
+                            self.summary.add_error(f"Error reading {file_path}: {e}")
+                            continue
 
                     # Handle both single objects and arrays of operations
-                    file_updates = []
-
-                    if isinstance(update_data, list):
-                        # Array format - each item should have an action
-                        for i, item in enumerate(update_data):
-                            if isinstance(item, dict) and "action" in item:
-                                item["_source_file"] = (
-                                    f"{os.path.basename(file_path)}[{i}]"
-                                )
-                                file_updates.append(item)
-                            else:
-                                print(
-                                    f"⚠️  Skipping item {i} in {file_path}: missing 'action' field or not an object"
-                                )
-
-                    elif isinstance(update_data, dict):
-                        # Single object format
-                        if "action" in update_data:
-                            update_data["_source_file"] = os.path.basename(file_path)
-                            file_updates.append(update_data)
-                        else:
-                            print(f"⚠️  Skipping {file_path}: missing 'action' field")
-
+                    if isinstance(data, list):
+                        for item in data:
+                            item["_source_file"] = file_path
+                            updates.append(item)
+                    elif isinstance(data, dict):
+                        data["_source_file"] = file_path
+                        updates.append(data)
                     else:
-                        print(
-                            f"⚠️  Skipping {file_path}: invalid format (must be object or array)"
-                        )
+                        self.summary.add_error(f"Invalid update format in {file_path}")
                         continue
-
-                    # Add all valid updates from this file
-                    if file_updates:
-                        updates.extend(file_updates)
-                        processed_files.append(file_path)
-                    else:
-                        print(f"⚠️  No valid updates found in {file_path}")
-
+                    processed_files.append(file_path)
                 except (json.JSONDecodeError, IOError) as e:
-                    print(f"⚠️  Error reading {file_path}: {e}", file=sys.stderr)
+                    self.summary.add_error(f"Error reading {file_path}: {e}")
                     continue
 
         except OSError as e:
@@ -1098,26 +1078,31 @@ class IssueUpdateProcessor:
         if guid_to_check and self._is_duplicate_operation(
             action, guid_to_check, update
         ):
-            guid_type = "UUID" if primary_guid else "legacy GUID"
-            print(f"⏭️  Skipping duplicate operation with {guid_type}: {guid_to_check}")
-            return True
+            self.summary.add_warning(f"Duplicate operation for GUID {guid_to_check} skipped.")
+            return False
 
         try:
+            # Fix: Use self.api.repo everywhere instead of self.repo
             if action == "create":
                 return self._create_issue(update)
             elif action == "update":
                 return self._update_issue(update)
             elif action == "comment":
+                # Defensive: check for valid issue number
+                issue_number = update.get("number")
+                if not issue_number or issue_number == 0:
+                    self.summary.add_error(f"No issue number found for comment: {update}")
+                    return False
                 return self._add_comment(update)
             elif action == "close":
                 return self._close_issue(update)
             elif action == "delete":
                 return self._delete_issue(update)
             else:
-                print(f"❌ Unknown action: {action}", file=sys.stderr)
+                self.summary.add_error(f"Unknown action: {action} in update: {update}")
                 return False
         except Exception as e:
-            print(f"❌ Error processing {action} action: {e}", file=sys.stderr)
+            self.summary.add_error(f"Error processing {action} action: {e}")
             return False
 
     def _is_duplicate_operation(
