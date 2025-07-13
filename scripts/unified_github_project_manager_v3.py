@@ -1266,14 +1266,18 @@ class UnifiedGitHubProjectManager:
 
                     if needs_update:
                         if self.dry_run:
-                            self.logger.info(f"DRY-RUN: Would update milestone '{milestone_name}' in {repo_name}")
+                            self.logger.info(
+                                f"DRY-RUN: Would update milestone '{milestone_name}' in {repo_name}"
+                            )
                         if self._update_milestone(
                             repo_name, milestone_name, milestone_data
                         ):
                             success_count += 1
                     else:
                         if self.dry_run:
-                            self.logger.info(f"DRY-RUN: Milestone '{milestone_name}' already exists and is up-to-date in {repo_name}")
+                            self.logger.info(
+                                f"DRY-RUN: Milestone '{milestone_name}' already exists and is up-to-date in {repo_name}"
+                            )
                         success_count += 1  # Already up to date
                 else:
                     # Create new milestone
