@@ -1563,16 +1563,32 @@ class UnifiedGitHubProjectManager:
                 ],
                 capture_output=True,
                 text=True,
-                check=True,
+                check=False,  # Don't raise on error
             )
-            return {
-                milestone["title"]: milestone for milestone in json.loads(result.stdout)
-            }
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Failed to get existing milestones for {repo_name}: {e}")
-            return {}
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Failed to parse milestones JSON for {repo_name}: {e}")
+            if result.returncode != 0:
+                # If 404, treat as no milestones
+                if "404" in result.stderr or "Not Found" in result.stderr:
+                    self.logger.warning(
+                        f"No milestones found for {repo_name} (404 Not Found)"
+                    )
+                    return {}
+                # If other error, log and continue
+                self.logger.error(
+                    f"Failed to get existing milestones for {repo_name}: {result.stderr.strip()}"
+                )
+                return {}
+            try:
+                milestones = json.loads(result.stdout)
+                return {milestone["title"]: milestone for milestone in milestones}
+            except json.JSONDecodeError as e:
+                self.logger.error(
+                    f"Failed to parse milestones JSON for {repo_name}: {e}"
+                )
+                return {}
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error getting milestones for {repo_name}: {e}"
+            )
             return {}
 
     def _normalize_color(self, color):
