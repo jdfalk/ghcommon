@@ -1930,12 +1930,16 @@ def main():
             manager.list_projects()
             return
 
+        ran_any = False
         if args.sync_labels:
             manager.sync_labels()
-            return
+            ran_any = True
 
         if args.sync_milestones:
             manager.sync_milestones()
+            ran_any = True
+
+        if ran_any:
             return
 
         if args.update_config:
