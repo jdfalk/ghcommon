@@ -1745,7 +1745,7 @@ class UnifiedGitHubProjectManager:
             # CHECK: Does project exist? (case-insensitive matching)
             existing_project_data = None
             exact_existing_title = None
-            
+
             # First try exact match
             if title in existing_projects:
                 existing_project_data = existing_projects[title]
@@ -1757,9 +1757,11 @@ class UnifiedGitHubProjectManager:
                     if existing_title.lower() == title_lower:
                         existing_project_data = project_data
                         exact_existing_title = existing_title
-                        self.logger.info(f"📝 Found case-insensitive match: '{title}' matches existing '{existing_title}'")
+                        self.logger.info(
+                            f"📝 Found case-insensitive match: '{title}' matches existing '{existing_title}'"
+                        )
                         break
-            
+
             if existing_project_data:
                 project_number = str(existing_project_data.get("number", ""))
                 project_id = str(existing_project_data.get("id", ""))

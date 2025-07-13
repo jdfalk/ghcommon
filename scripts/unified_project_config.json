@@ -2,12 +2,7 @@
   "projects": {
     "gcommon Refactor & Integration": {
       "description": "Hybrid protobuf + Go types migration affecting multiple repositories. Centralizes business logic in gcommon while maintaining compatibility.",
-      "repositories": [
-        "gcommon",
-        "subtitle-manager",
-        "ghcommon",
-        "codex-cli"
-      ],
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
       "labels": [
         "project:gcommon-refactor",
         "tech:protobuf",
@@ -37,27 +32,12 @@
     },
     "Security & Authentication": {
       "description": "Cross-repository security improvements, authentication systems, and compliance initiatives.",
-      "repositories": [
-        "gcommon",
-        "subtitle-manager",
-        "ghcommon",
-        "codex-cli"
-      ],
-      "labels": [
-        "type:security",
-        "module:auth",
-        "tech:go",
-        "tech:python"
-      ],
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": ["type:security", "module:auth", "tech:go", "tech:python"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "type:security",
-          "module:auth",
-          "tech:go",
-          "tech:python"
-        ]
+        "labels": ["type:security", "module:auth", "tech:go", "tech:python"]
       },
       "github_number": "34",
       "github_id": "PVT_kwHOABP9ms4A9mCk",
@@ -70,12 +50,7 @@
     },
     "Testing & Quality Assurance": {
       "description": "Comprehensive testing strategies, quality assurance processes, and validation frameworks across all repositories.",
-      "repositories": [
-        "gcommon",
-        "subtitle-manager",
-        "ghcommon",
-        "codex-cli"
-      ],
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
       "labels": [
         "type:testing",
         "type:enhancement",
@@ -105,23 +80,12 @@
     },
     "Documentation & Standards": {
       "description": "Documentation improvements, coding standards, and knowledge management across all repositories.",
-      "repositories": [
-        "gcommon",
-        "subtitle-manager",
-        "ghcommon",
-        "codex-cli"
-      ],
-      "labels": [
-        "type:documentation",
-        "type:enhancement"
-      ],
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": ["type:documentation", "type:enhancement"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "type:documentation",
-          "type:enhancement"
-        ]
+        "labels": ["type:documentation", "type:enhancement"]
       },
       "github_number": "36",
       "github_id": "PVT_kwHOABP9ms4A9mCn",
@@ -134,10 +98,7 @@
     },
     "AI & Automation Tools": {
       "description": "AI-powered automation tools, GitHub Actions, and workflow improvements.",
-      "repositories": [
-        "ghcommon",
-        "codex-cli"
-      ],
+      "repositories": ["ghcommon", "codex-cli"],
       "labels": [
         "workflow:automation",
         "github-actions",
@@ -165,9 +126,7 @@
     },
     "Media Processing & Transcription": {
       "description": "Whisper integration, subtitle synchronization, quality scoring, and media processing features.",
-      "repositories": [
-        "subtitle-manager"
-      ],
+      "repositories": ["subtitle-manager"],
       "labels": [
         "project:media",
         "project:transcription",
@@ -192,22 +151,12 @@
     },
     "Web UI & User Experience": {
       "description": "Metadata editor, dashboard improvements, authentication UI, and user experience enhancements.",
-      "repositories": [
-        "subtitle-manager"
-      ],
-      "labels": [
-        "module:ui",
-        "module:frontend",
-        "tech:javascript"
-      ],
+      "repositories": ["subtitle-manager"],
+      "labels": ["module:ui", "module:frontend", "tech:javascript"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:ui",
-          "module:frontend",
-          "tech:javascript"
-        ]
+        "labels": ["module:ui", "module:frontend", "tech:javascript"]
       },
       "github_number": "39",
       "github_id": "PVT_kwHOABP9ms4A9mCs",
@@ -217,15 +166,8 @@
     },
     "Database & Performance": {
       "description": "Database backend migration (PebbleDB/SQLite), performance optimization, and caching improvements.",
-      "repositories": [
-        "subtitle-manager"
-      ],
-      "labels": [
-        "module:database",
-        "performance",
-        "tech:go",
-        "module:backend"
-      ],
+      "repositories": ["subtitle-manager"],
+      "labels": ["module:database", "performance", "tech:go", "module:backend"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
@@ -244,24 +186,12 @@
     },
     "Metrics Module": {
       "description": "Implementation of 95 empty protobuf files for metrics collection, monitoring, and observability.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:metrics",
-        "tech:protobuf",
-        "tech:grpc",
-        "tech:go"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:metrics", "tech:protobuf", "tech:grpc", "tech:go"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:metrics",
-          "tech:protobuf",
-          "tech:grpc",
-          "tech:go"
-        ]
+        "labels": ["module:metrics", "tech:protobuf", "tech:grpc", "tech:go"]
       },
       "github_number": "16",
       "github_id": "PVT_kwHOABP9ms4A9h5R",
@@ -271,24 +201,12 @@
     },
     "Queue Module": {
       "description": "Implementation of 175 empty protobuf files for message queuing, task management, and asynchronous processing.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:queue",
-        "tech:protobuf",
-        "tech:grpc",
-        "tech:go"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:queue",
-          "tech:protobuf",
-          "tech:grpc",
-          "tech:go"
-        ]
+        "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"]
       },
       "github_number": "17",
       "github_id": "PVT_kwHOABP9ms4A9h5w",
@@ -298,24 +216,12 @@
     },
     "Web Module": {
       "description": "Implementation of 176 empty protobuf files for web services, HTTP handling, and API management.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:web",
-        "tech:protobuf",
-        "tech:grpc",
-        "tech:go"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:web",
-          "tech:protobuf",
-          "tech:grpc",
-          "tech:go"
-        ]
+        "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"]
       },
       "github_number": "18",
       "github_id": "PVT_kwHOABP9ms4A9h5x",
@@ -325,24 +231,12 @@
     },
     "Auth Module": {
       "description": "Implementation of 109 remaining protobuf files for authentication, authorization, and identity management.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:auth",
-        "tech:protobuf",
-        "tech:grpc",
-        "tech:go"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:auth", "tech:protobuf", "tech:grpc", "tech:go"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:auth",
-          "tech:protobuf",
-          "tech:grpc",
-          "tech:go"
-        ]
+        "labels": ["module:auth", "tech:protobuf", "tech:grpc", "tech:go"]
       },
       "github_number": "19",
       "github_id": "PVT_kwHOABP9ms4A9h5y",
@@ -352,24 +246,12 @@
     },
     "Cache Module": {
       "description": "Implementation of 36 remaining protobuf files for caching, data storage, and performance optimization.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:cache",
-        "performance",
-        "tech:protobuf",
-        "tech:grpc"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:cache", "performance", "tech:protobuf", "tech:grpc"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:cache",
-          "performance",
-          "tech:protobuf",
-          "tech:grpc"
-        ]
+        "labels": ["module:cache", "performance", "tech:protobuf", "tech:grpc"]
       },
       "github_number": "20",
       "github_id": "PVT_kwHOABP9ms4A9h5z",
@@ -379,24 +261,12 @@
     },
     "Config Module": {
       "description": "Implementation of 20 remaining protobuf files for configuration management and system settings.",
-      "repositories": [
-        "gcommon"
-      ],
-      "labels": [
-        "module:config",
-        "tech:protobuf",
-        "tech:grpc",
-        "tech:go"
-      ],
+      "repositories": ["gcommon"],
+      "labels": ["module:config", "tech:protobuf", "tech:grpc", "tech:go"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "module:config",
-          "tech:protobuf",
-          "tech:grpc",
-          "tech:go"
-        ]
+        "labels": ["module:config", "tech:protobuf", "tech:grpc", "tech:go"]
       },
       "github_number": "21",
       "github_id": "PVT_kwHOABP9ms4A9h50",
@@ -406,22 +276,12 @@
     },
     "Infrastructure Cleanup": {
       "description": "File organization, duplicate file removal, deprecated workflow cleanup, and infrastructure improvements.",
-      "repositories": [
-        "ghcommon"
-      ],
-      "labels": [
-        "workflow:automation",
-        "workflow:deployment",
-        "tech:python"
-      ],
+      "repositories": ["ghcommon"],
+      "labels": ["workflow:automation", "workflow:deployment", "tech:python"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "workflow:automation",
-          "workflow:deployment",
-          "tech:python"
-        ]
+        "labels": ["workflow:automation", "workflow:deployment", "tech:python"]
       },
       "github_number": "41",
       "github_id": "PVT_kwHOABP9ms4A9mCw",
@@ -431,22 +291,12 @@
     },
     "Core Workflow Enhancement": {
       "description": "Error handling improvements, workflow modularization, logging framework, and core functionality enhancements.",
-      "repositories": [
-        "ghcommon"
-      ],
-      "labels": [
-        "workflow:deployment",
-        "workflow:automation",
-        "tech:python"
-      ],
+      "repositories": ["ghcommon"],
+      "labels": ["workflow:deployment", "workflow:automation", "tech:python"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "workflow:deployment",
-          "workflow:automation",
-          "tech:python"
-        ]
+        "labels": ["workflow:deployment", "workflow:automation", "tech:python"]
       },
       "github_number": "42",
       "github_id": "PVT_kwHOABP9ms4A9mCx",
@@ -456,22 +306,12 @@
     },
     "Security & Compliance": {
       "description": "Security.md creation, contributing guidelines, code of conduct, and compliance documentation.",
-      "repositories": [
-        "ghcommon"
-      ],
-      "labels": [
-        "type:security",
-        "type:documentation",
-        "tech:python"
-      ],
+      "repositories": ["ghcommon"],
+      "labels": ["type:security", "type:documentation", "tech:python"],
       "workflows": {
         "auto_add_issues": true,
         "auto_close_completed": true,
-        "labels": [
-          "type:security",
-          "type:documentation",
-          "tech:python"
-        ]
+        "labels": ["type:security", "type:documentation", "tech:python"]
       },
       "github_number": "43",
       "github_id": "PVT_kwHOABP9ms4A9mCy",
@@ -481,9 +321,7 @@
     },
     "Subtitle Manager Development": {
       "description": "Subtitle file processing and management with a Go backend and web interface. Key features: subtitle file conversion, web UI, file processing, Docker support.",
-      "repositories": [
-        "subtitle-manager"
-      ],
+      "repositories": ["subtitle-manager"],
       "labels": [
         "type:feature",
         "type:bug",
@@ -494,10 +332,7 @@
       ],
       "workflows": {
         "auto_add_issues": true,
-        "labels": [
-          "type:feature",
-          "type:bug"
-        ]
+        "labels": ["type:feature", "type:bug"]
       },
       "readme": "# Subtitle Manager Development\nSubtitle file processing and management with Go backend and web interface.\nFeatures: Subtitle conversion, web UI, Docker support.",
       "github_number": "5",
@@ -508,9 +343,7 @@
     },
     "gCommon Development": {
       "description": "Common Go libraries and Protocol Buffer definitions for distributed systems. Key features: gRPC services, common data structures, shared utilities.",
-      "repositories": [
-        "gcommon"
-      ],
+      "repositories": ["gcommon"],
       "labels": [
         "type:feature",
         "type:bug",
@@ -520,10 +353,7 @@
       ],
       "workflows": {
         "auto_add_issues": true,
-        "labels": [
-          "type:feature",
-          "type:bug"
-        ]
+        "labels": ["type:feature", "type:bug"]
       },
       "readme": "# gCommon Development\nCommon Go libraries and Protocol Buffer definitions for distributed systems.\nFeatures: gRPC services, shared utilities.",
       "github_number": "2",
@@ -534,9 +364,7 @@
     },
     "GHCommon Infrastructure": {
       "description": "GitHub automation, project management, and workflow tooling. Includes issue management, documentation automation, and CI/CD workflows.",
-      "repositories": [
-        "ghcommon"
-      ],
+      "repositories": ["ghcommon"],
       "labels": [
         "workflow:automation",
         "github-actions",
@@ -545,10 +373,7 @@
       ],
       "workflows": {
         "auto_add_issues": true,
-        "labels": [
-          "workflow:automation",
-          "github-actions"
-        ]
+        "labels": ["workflow:automation", "github-actions"]
       },
       "readme": "# GHCommon Infrastructure\nGitHub automation and project management tooling.\nFeatures: Issue management, workflow automation, CI/CD.",
       "github_number": "45",
@@ -559,14 +384,8 @@
     },
     "Codex CLI Tools": {
       "description": "Shell scripts and GitHub Actions for AI automation and documentation management. Key features: documentation updates, issue management, AI workflow automation.",
-      "repositories": [
-        "codex-cli"
-      ],
-      "labels": [
-        "tech:shell",
-        "workflow:automation",
-        "type:feature"
-      ],
+      "repositories": ["codex-cli"],
+      "labels": ["tech:shell", "workflow:automation", "type:feature"],
       "workflows": {
         "auto_add_issues": false,
         "labels": []
