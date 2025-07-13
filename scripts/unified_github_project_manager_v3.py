@@ -1602,36 +1602,6 @@ class UnifiedGitHubProjectManager:
             )
             return False
 
-    def _create_milestone(self, repo_name, milestone_name, milestone_data):
-        """Create a milestone in the repository."""
-        try:
-            data = {
-                "title": milestone_name,
-                "description": milestone_data.get("description", ""),
-                "state": milestone_data.get("state", "open"),
-            }
-            if "due_on" in milestone_data:
-                data["due_on"] = milestone_data["due_on"]
-
-            cmd = [
-                "gh",
-                "api",
-                f"/repos/{self.owner}/{repo_name}/milestones",
-                "--method",
-                "POST",
-            ]
-            for key, value in data.items():
-                cmd.extend(["--field", f"{key}={value}"])
-
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
-            self.logger.info(f"Created milestone '{milestone_name}' in {repo_name}")
-            return True
-        except subprocess.CalledProcessError as e:
-            self.logger.error(
-                f"Failed to create milestone '{milestone_name}' in {repo_name}: {e}"
-            )
-            return False
-
     def _update_milestone(self, repo_name, milestone_name, milestone_data):
         """Update an existing milestone in the repository."""
         try:
