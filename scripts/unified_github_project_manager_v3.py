@@ -1558,8 +1558,6 @@ class UnifiedGitHubProjectManager:
                     "gh",
                     "api",
                     f"/repos/{self.owner}/{repo_name}/milestones",
-                    "--json",
-                    "title,description,state",
                 ],
                 capture_output=True,
                 text=True,
