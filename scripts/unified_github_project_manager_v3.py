@@ -720,7 +720,7 @@ class UnifiedGitHubProjectManager:
     def _create_label(
         self, repository: str, label_name: str, label_config: Dict[str, str]
     ) -> bool:
-        """Create a single label in a repository."""
+        """Create a single label in a repository (idempotent)."""
         if self.dry_run:
             self.logger.info(
                 f"DRY-RUN: Would create label '{label_name}' in {repository}"
@@ -730,7 +730,7 @@ class UnifiedGitHubProjectManager:
         color = self._normalize_color(label_config["color"])
         description = label_config.get("description", "")
 
-        # Create the label
+        # Create the label with --force to handle existing labels
         success, output = self._run_gh_command(
             [
                 "label",
@@ -746,10 +746,22 @@ class UnifiedGitHubProjectManager:
             ]
         )
 
-        if not success:
-            self.logger.debug(
-                f"Failed to create label '{label_name}' in {repository}: {output}"
-            )
+        if success:
+            self.logger.info(f"✅ Created/updated label '{label_name}' in {repository}")
+        else:
+            # Check if it's just because the label already exists
+            if (
+                "already exists" in output.lower()
+                or "label already exists" in output.lower()
+            ):
+                self.logger.info(
+                    f"✅ Label '{label_name}' already exists in {repository}"
+                )
+                return True
+            else:
+                self.logger.error(
+                    f"❌ Failed to create label '{label_name}' in {repository}: {output}"
+                )
 
         return success
 
@@ -1242,7 +1254,7 @@ class UnifiedGitHubProjectManager:
 
         project_definitions = self._get_project_definitions()
         existing_projects = self._get_existing_projects()
-        existing_project_titles = {project["title"] for project in existing_projects}
+        existing_project_titles = set(existing_projects.keys())
 
         created_count = 0
 
@@ -1263,7 +1275,22 @@ class UnifiedGitHubProjectManager:
         return created_count
 
     def _create_github_project(self, project_name, project_data):
-        """Create a new GitHub project."""
+        """Create a new GitHub project (idempotent)."""
+        # Check if project already exists (case-insensitive)
+        existing_projects = self._get_existing_projects()
+        existing_names_lower = {name.lower(): name for name in existing_projects.keys()}
+
+        if project_name.lower() in existing_names_lower:
+            actual_name = existing_names_lower[project_name.lower()]
+            self.logger.info(
+                f"✅ Project already exists as '{actual_name}' (case-insensitive match for '{project_name}')"
+            )
+            return True
+
+        if self.dry_run:
+            self.logger.info(f"DRY-RUN: Would create project '{project_name}'")
+            return True
+
         try:
             # Create project using GitHub CLI
             cmd = [
@@ -1279,10 +1306,14 @@ class UnifiedGitHubProjectManager:
             ]
 
             subprocess.run(cmd, check=True, capture_output=True, text=True)
-            self.logger.info(f"Successfully created project: {project_name}")
+            self.logger.info(f"✅ Successfully created project: {project_name}")
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.error(f"Failed to create project '{project_name}': {e}")
+            # Check if the error is because project already exists
+            if "already exists" in str(e).lower():
+                self.logger.info(f"✅ Project already exists: {project_name}")
+                return True
+            self.logger.error(f"❌ Failed to create project '{project_name}': {e}")
             return False
 
     def _add_repositories_to_project(self, project_name, repositories):
@@ -1739,6 +1770,9 @@ if __name__ == "__main__":
         "--list-projects", action="store_true", help="List all GitHub projects"
     )
     parser.add_argument(
+        "--create-projects", action="store_true", help="Create missing GitHub projects"
+    )
+    parser.add_argument(
         "--setup-workflows", action="store_true", help="Setup project workflows"
     )
     parser.add_argument(
@@ -1783,6 +1817,8 @@ if __name__ == "__main__":
         # Handle specific actions
         if args.list_projects:
             manager.list_projects(args.output_format)
+        elif args.create_projects:
+            manager.create_projects()
         elif args.setup_workflows:
             # Get existing projects to pass to setup_project_workflows
             project_numbers = {}

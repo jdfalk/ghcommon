@@ -1,5 +1,226 @@
 {
   "projects": {
+    "gcommon Refactor & Integration": {
+      "description": "Hybrid protobuf + Go types migration affecting multiple repositories. Centralizes business logic in gcommon while maintaining compatibility.",
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": [
+        "project:gcommon-refactor",
+        "tech:protobuf",
+        "tech:grpc",
+        "tech:go",
+        "gcommon-refactor"
+      ],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": [
+          "project:gcommon-refactor",
+          "tech:protobuf",
+          "tech:grpc",
+          "tech:go",
+          "gcommon-refactor"
+        ]
+      }
+    },
+    "Security & Authentication": {
+      "description": "Cross-repository security improvements, authentication systems, and compliance initiatives.",
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": ["type:security", "module:auth", "tech:go", "tech:python"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["type:security", "module:auth", "tech:go", "tech:python"]
+      }
+    },
+    "Testing & Quality Assurance": {
+      "description": "Comprehensive testing strategies, quality assurance processes, and validation frameworks across all repositories.",
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": [
+        "type:testing",
+        "type:enhancement",
+        "tech:go",
+        "tech:python",
+        "tech:shell"
+      ],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": [
+          "type:testing",
+          "type:enhancement",
+          "tech:go",
+          "tech:python",
+          "tech:shell"
+        ]
+      }
+    },
+    "Documentation & Standards": {
+      "description": "Documentation improvements, coding standards, and knowledge management across all repositories.",
+      "repositories": ["gcommon", "subtitle-manager", "ghcommon", "codex-cli"],
+      "labels": ["type:documentation", "type:enhancement"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["type:documentation", "type:enhancement"]
+      }
+    },
+    "AI & Automation Tools": {
+      "description": "AI-powered automation tools, GitHub Actions, and workflow improvements.",
+      "repositories": ["ghcommon", "codex-cli"],
+      "labels": [
+        "workflow:automation",
+        "github-actions",
+        "automation",
+        "tech:python",
+        "tech:shell"
+      ],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": [
+          "workflow:automation",
+          "github-actions",
+          "automation",
+          "tech:python",
+          "tech:shell"
+        ]
+      }
+    },
+    "Media Processing & Transcription": {
+      "description": "Whisper integration, subtitle synchronization, quality scoring, and media processing features.",
+      "repositories": ["subtitle-manager"],
+      "labels": [
+        "project:media",
+        "project:transcription",
+        "project:whisper",
+        "tech:go"
+      ],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": [
+          "project:media",
+          "project:transcription",
+          "project:whisper",
+          "tech:go"
+        ]
+      }
+    },
+    "Web UI & User Experience": {
+      "description": "Metadata editor, dashboard improvements, authentication UI, and user experience enhancements.",
+      "repositories": ["subtitle-manager"],
+      "labels": ["module:ui", "module:frontend", "tech:javascript"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:ui", "module:frontend", "tech:javascript"]
+      }
+    },
+    "Database & Performance": {
+      "description": "Database backend migration (PebbleDB/SQLite), performance optimization, and caching improvements.",
+      "repositories": ["subtitle-manager"],
+      "labels": ["module:database", "performance", "tech:go", "module:backend"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": [
+          "module:database",
+          "performance",
+          "tech:go",
+          "module:backend"
+        ]
+      }
+    },
+    "Metrics Module": {
+      "description": "Implementation of 95 empty protobuf files for metrics collection, monitoring, and observability.",
+      "repositories": ["gcommon"],
+      "labels": ["module:metrics", "tech:protobuf", "tech:grpc", "tech:go"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:metrics", "tech:protobuf", "tech:grpc", "tech:go"]
+      }
+    },
+    "Queue Module": {
+      "description": "Implementation of 175 empty protobuf files for message queuing, task management, and asynchronous processing.",
+      "repositories": ["gcommon"],
+      "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"]
+      }
+    },
+    "Web Module": {
+      "description": "Implementation of 176 empty protobuf files for web services, HTTP handling, and API management.",
+      "repositories": ["gcommon"],
+      "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"]
+      }
+    },
+    "Auth Module": {
+      "description": "Implementation of 109 remaining protobuf files for authentication, authorization, and identity management.",
+      "repositories": ["gcommon"],
+      "labels": ["module:auth", "tech:protobuf", "tech:grpc", "tech:go"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:auth", "tech:protobuf", "tech:grpc", "tech:go"]
+      }
+    },
+    "Cache Module": {
+      "description": "Implementation of 36 remaining protobuf files for caching, data storage, and performance optimization.",
+      "repositories": ["gcommon"],
+      "labels": ["module:cache", "performance", "tech:protobuf", "tech:grpc"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:cache", "performance", "tech:protobuf", "tech:grpc"]
+      }
+    },
+    "Config Module": {
+      "description": "Implementation of 20 remaining protobuf files for configuration management and system settings.",
+      "repositories": ["gcommon"],
+      "labels": ["module:config", "tech:protobuf", "tech:grpc", "tech:go"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["module:config", "tech:protobuf", "tech:grpc", "tech:go"]
+      }
+    },
+    "Infrastructure Cleanup": {
+      "description": "File organization, duplicate file removal, deprecated workflow cleanup, and infrastructure improvements.",
+      "repositories": ["ghcommon"],
+      "labels": ["workflow:automation", "workflow:deployment", "tech:python"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["workflow:automation", "workflow:deployment", "tech:python"]
+      }
+    },
+    "Core Workflow Enhancement": {
+      "description": "Error handling improvements, workflow modularization, logging framework, and core functionality enhancements.",
+      "repositories": ["ghcommon"],
+      "labels": ["workflow:deployment", "workflow:automation", "tech:python"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["workflow:deployment", "workflow:automation", "tech:python"]
+      }
+    },
+    "Security & Compliance": {
+      "description": "Security.md creation, contributing guidelines, code of conduct, and compliance documentation.",
+      "repositories": ["ghcommon"],
+      "labels": ["type:security", "type:documentation", "tech:python"],
+      "workflows": {
+        "auto_add_issues": true,
+        "auto_close_completed": true,
+        "labels": ["type:security", "type:documentation", "tech:python"]
+      }
+    },
     "Subtitle Manager Development": {
       "description": "Subtitle file processing and management with a Go backend and web interface. Key features: subtitle file conversion, web UI, file processing, Docker support.",
       "repositories": ["subtitle-manager"],
