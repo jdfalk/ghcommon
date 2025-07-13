@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 1.2.0
+# version: 1.3.0
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -110,6 +110,8 @@ permissions:
   pull-requests: write # Required for PR comments and updates
   packages: read # Required for package access
   security-events: write # Required for security scanning
+  actions: write # Required for uploading artifacts
+  id-token: write # Required for attestation and artifact uploads
 
 jobs:
   super-linter:
