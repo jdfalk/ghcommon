@@ -506,7 +506,7 @@
         "subtitle-manager": false
       }
     },
-    "GCommon Development": {
+    "gCommon Development": {
       "description": "Common Go libraries and Protocol Buffer definitions for distributed systems. Key features: gRPC services, common data structures, shared utilities.",
       "repositories": [
         "gcommon"
@@ -525,7 +525,12 @@
           "type:bug"
         ]
       },
-      "readme": "# GCommon Development\nCommon Go libraries and Protocol Buffer definitions for distributed systems.\nFeatures: gRPC services, shared utilities."
+      "readme": "# gCommon Development\nCommon Go libraries and Protocol Buffer definitions for distributed systems.\nFeatures: gRPC services, shared utilities.",
+      "github_number": "2",
+      "github_id": "PVT_kwHOABP9ms4A679f",
+      "repository_links": {
+        "gcommon": false
+      }
     },
     "GHCommon Infrastructure": {
       "description": "GitHub automation, project management, and workflow tooling. Includes issue management, documentation automation, and CI/CD workflows.",
