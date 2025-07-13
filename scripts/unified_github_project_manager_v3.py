@@ -1564,30 +1564,6 @@ class UnifiedGitHubProjectManager:
             return color[1:]
         return color or "000000"
 
-    def _create_label(self, repo_name, label_name, label_data):
-        """Create a label in the repository."""
-        try:
-            cmd = [
-                "gh",
-                "label",
-                "create",
-                "--repo",
-                f"{self.owner}/{repo_name}",
-                label_name,
-                "--color",
-                self._normalize_color(label_data.get("color", "000000")),
-                "--description",
-                label_data.get("description", ""),
-            ]
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
-            self.logger.info(f"Created label '{label_name}' in {repo_name}")
-            return True
-        except subprocess.CalledProcessError as e:
-            self.logger.error(
-                f"Failed to create label '{label_name}' in {repo_name}: {e}"
-            )
-            return False
-
     def _update_label(self, repo_name, label_name, label_data):
         """Update an existing label in the repository."""
         try:
@@ -1799,7 +1775,7 @@ class UnifiedGitHubProjectManager:
         self.link_all_repositories(project_numbers)
 
         # Update config file with the latest GitHub data (numbers, IDs, links)
-        self._update_config_with_existing_data()
+        self._update_config_with_existing_data(existing_projects)
 
         return project_numbers
 
@@ -1849,9 +1825,10 @@ class UnifiedGitHubProjectManager:
 
         return workflow_config
 
-    def _update_config_with_existing_data(self) -> None:
+    def _update_config_with_existing_data(self, existing_projects: dict = None) -> None:
         """Update the config file with existing project IDs and repository links."""
-        existing_projects = self._get_existing_projects()
+        if existing_projects is None:
+            existing_projects = self._get_existing_projects()
         project_definitions = self._get_project_definitions()
 
         config_updated = False
