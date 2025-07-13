@@ -1277,8 +1277,7 @@ class UnifiedGitHubProjectManager:
                         success_count += 1  # Already up to date
                 else:
                     # Create new milestone
-                    if self.dry_run:
-                        self.logger.info(f"DRY-RUN: Would create milestone '{milestone_name}' in {repo_name}")
+                    # Create milestone
                     if self._create_milestone(
                         repo_name, milestone_name, milestone_data
                     ):
