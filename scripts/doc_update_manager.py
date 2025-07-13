@@ -424,25 +424,35 @@ class DocumentationUpdateManager:
                 with open(update_file, encoding="utf-8") as f:
                     update_data = json.load(f)
             except (OSError, json.JSONDecodeError) as e:
-                self._move_to_malformed(update_file, f"JSON parse error: {e}")
+                # Don't move files in dry-run mode
+                if not self.dry_run:
+                    self._move_to_malformed(update_file, f"JSON parse error: {e}")
+                else:
+                    logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - JSON parse error: {e}")
                 return
 
             # Step 2: Validate required fields
             required_fields = ["file", "mode", "content"]
             for field in required_fields:
                 if field not in update_data:
-                    self._move_to_malformed(update_file, f"Missing required field: {field}")
+                    # Don't move files in dry-run mode
+                    if not self.dry_run:
+                        self._move_to_malformed(update_file, f"Missing required field: {field}")
+                    else:
+                        logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - Missing required field: {field}")
                     return
 
             # Step 3: Process the update
             try:
                 self.process_update_file_data(update_file, update_data)
-                # Success - move to processed immediately
-                if self.cleanup:
+                # Success - move to processed immediately (but not in dry-run mode)
+                if self.cleanup and not self.dry_run:
                     self._move_to_processed(update_file)
             except Exception as e:
                 if self.continue_on_error:
-                    self._move_to_failed(update_file, str(e))
+                    # Don't move files in dry-run mode
+                    if not self.dry_run:
+                        self._move_to_failed(update_file, str(e))
                 else:
                     raise
 
@@ -450,7 +460,11 @@ class DocumentationUpdateManager:
             error_msg = f"Unexpected error processing {update_file.name}: {str(e)}"
             logger.error(error_msg)
             if self.continue_on_error:
-                self._move_to_failed(update_file, error_msg)
+                # Don't move files in dry-run mode
+                if not self.dry_run:
+                    self._move_to_failed(update_file, error_msg)
+                else:
+                    logger.warning(f"❌ [DRY RUN] Would move to failed: {update_file.name} - {error_msg}")
             else:
                 self.stats["errors"].append(error_msg)
                 raise
