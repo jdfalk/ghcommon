@@ -1264,7 +1264,7 @@ class IssueUpdateProcessor:
         legacy_guid = update.get("legacy_guid")
         repo = update.get("repo", self.api.repo)
         parent_issue = update.get("parent_issue")
-        api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
+        api = self.api if repo == self.repo else GitHubAPI(self.api.token, repo)
 
         if not title:
             self.summary.add_error("Missing title for create action")
@@ -2440,7 +2440,7 @@ Environment Variables:
         api = GitHubAPI(token, repo)
 
         if args.operation == "update-issues":
-            processor = IssueUpdateProcessor(api, repo)
+            processor = IssueUpdateProcessor(api)
             success = processor.process_updates()
             return 0 if success else 1
 
@@ -2510,7 +2510,7 @@ Environment Variables:
             return 0
 
         elif args.operation == "update-permalinks":
-            processor = IssueUpdateProcessor(api, repo)
+            processor = IssueUpdateProcessor(api)
             processor.update_permalinks()
             return 0
 
