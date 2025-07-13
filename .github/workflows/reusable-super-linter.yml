@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 1.1.0
+# version: 1.2.0
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -230,16 +230,15 @@ jobs:
           # Create a report directory with proper permissions
           mkdir -p super-linter-reports
 
-          # Fix permissions on all files created by Docker containers FIRST
-          # This is critical because Super Linter runs as Docker and creates files with different ownership
+          # Critical: Fix all Docker-created files recursively FIRST
+          # Super Linter runs as Docker and creates files with root ownership and restricted permissions
+          echo "Fixing permissions on all Docker-created files..."
+          sudo find . -type d -exec chmod 755 {} \; 2>/dev/null || true
+          sudo find . -type f -exec chmod 644 {} \; 2>/dev/null || true
           sudo chown -R $(whoami):$(whoami) . 2>/dev/null || true
-          sudo chmod -R 755 . 2>/dev/null || true
 
           # Look for log files in different possible locations
           if [ -f "super-linter.log" ]; then
-            # Fix permissions before copying
-            sudo chown $(whoami):$(whoami) super-linter.log 2>/dev/null || true
-            sudo chmod 644 super-linter.log 2>/dev/null || true
             cp super-linter.log super-linter-reports/ || true
             echo "Found super-linter.log"
           fi
@@ -251,24 +250,21 @@ jobs:
             echo "Found /tmp/super-linter.log"
           fi
 
-          # Look for output directory and fix permissions before copying
-          if [ -d "super-linter-output" ]; then
-            echo "Found super-linter-output directory"
-            # Fix permissions recursively on source directory
-            sudo chown -R $(whoami):$(whoami) super-linter-output/ 2>/dev/null || true
-            sudo chmod -R 755 super-linter-output/ 2>/dev/null || true
-            # Now copy with fixed permissions
-            cp -r super-linter-output/* super-linter-reports/ 2>/dev/null || true
-          fi
+          # Look for output directories and copy safely
+          for output_dir in "super-linter-output" "/tmp/super-linter-output"; do
+            if [ -d "$output_dir" ]; then
+              echo "Found output directory: $output_dir"
+              # Fix permissions recursively on the source directory
+              sudo find "$output_dir" -type d -exec chmod 755 {} \; 2>/dev/null || true
+              sudo find "$output_dir" -type f -exec chmod 644 {} \; 2>/dev/null || true
+              sudo chown -R $(whoami):$(whoami) "$output_dir" 2>/dev/null || true
 
-          if [ -d "/tmp/super-linter-output" ]; then
-            echo "Found /tmp/super-linter-output directory"
-            # Fix permissions recursively on source directory
-            sudo chown -R $(whoami):$(whoami) /tmp/super-linter-output/ 2>/dev/null || true
-            sudo chmod -R 755 /tmp/super-linter-output/ 2>/dev/null || true
-            # Now copy with fixed permissions
-            cp -r /tmp/super-linter-output/* super-linter-reports/ 2>/dev/null || true
-          fi
+              # Use tar to copy preserving structure but with correct ownership
+              if [ -n "$(ls -A "$output_dir" 2>/dev/null)" ]; then
+                (cd "$output_dir" && tar cf - .) | (cd super-linter-reports && tar xf -) 2>/dev/null || true
+              fi
+            fi
+          done
 
           # Create a summary report from any available logs
           if [ -f "super-linter-reports/super-linter.log" ]; then
@@ -279,21 +275,18 @@ jobs:
             echo "Super Linter completed - no detailed log available" > super-linter-reports/super-linter.report
           fi
 
-          # Final comprehensive permission fix on all output files
+          # Final permission fix on output directory - ensure everything is accessible
+          sudo find super-linter-reports -type d -exec chmod 755 {} \; 2>/dev/null || true
+          sudo find super-linter-reports -type f -exec chmod 644 {} \; 2>/dev/null || true
           sudo chown -R $(whoami):$(whoami) super-linter-reports/ 2>/dev/null || true
-          sudo chmod -R 755 super-linter-reports/ 2>/dev/null || true
-          sudo chmod -R 644 super-linter-reports/* 2>/dev/null || true
-
-          # Ensure the reports directory itself has proper permissions
-          sudo chmod 755 super-linter-reports/ 2>/dev/null || true
 
           # List what we found with detailed permissions
           echo "Files in super-linter-reports:"
           ls -la super-linter-reports/ || echo "No files found"
 
-          # Debug: Show ownership and permissions
-          echo "Checking final permissions:"
-          find super-linter-reports/ -type f -exec ls -la {} \; 2>/dev/null || echo "No files to check"
+          # Debug: Show detailed permissions on all files
+          echo "Detailed permissions check:"
+          find super-linter-reports -ls 2>/dev/null || echo "No files to check"
 
       - name: Upload Super Linter results
         if: always()
