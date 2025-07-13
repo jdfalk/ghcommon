@@ -1248,31 +1248,45 @@ class UnifiedGitHubProjectManager:
         success_count = 0
         total_count = 0
 
-        for repo_name in all_repos:
-            self.logger.info(f"Syncing milestones for {repo_name}...")
-            existing_milestones = self._get_existing_milestones(repo_name)
 
-            for milestone_name, milestone_data in milestones_config.items():
+        for repo_name in all_repos:
+            self.logger.info(f"Syncing labels for {repo_name}...")
+            existing_labels = self._get_existing_labels(repo_name)
+
+            # Check for missing labels in config
+            missing_labels = set(labels_config.keys()) - set(existing_labels.keys())
+            if missing_labels:
+                self.logger.warning(f"Repository '{repo_name}' is missing labels defined in config: {sorted(missing_labels)}")
+
+            for label_name, label_data in labels_config.items():
                 total_count += 1
-                if milestone_name in existing_milestones:
-                    # Update existing milestone
-                    existing_milestone = existing_milestones[milestone_name]
-                    needs_update = (
-                        existing_milestone.get("description", "")
-                        != milestone_data.get("description", "")
-                    ) or existing_milestone.get("state", "") != milestone_data.get(
-                        "state", "open"
+                if label_name in existing_labels:
+                    # Update existing label
+                    existing_label = existing_labels[label_name]
+                    needs_update = self._normalize_color(
+                        existing_label.get("color", "")
+                    ) != self._normalize_color(
+                        label_data.get("color", "")
+                    ) or existing_label.get("description", "") != label_data.get(
+                        "description", ""
                     )
 
                     if needs_update:
-                        if self.dry_run:
-                            self.logger.info(
-                                f"DRY-RUN: Would update milestone '{milestone_name}' in {repo_name}"
-                            )
-                        if self._update_milestone(
-                            repo_name, milestone_name, milestone_data
-                        ):
+                        if self._update_label(repo_name, label_name, label_data):
                             success_count += 1
+                            self.logger.info(f"Updated label '{label_name}' in {repo_name}")
+                        else:
+                            self.logger.error(f"Failed to update label '{label_name}' in {repo_name}")
+                    else:
+                        self.logger.info(f"DRY-RUN: Label '{label_name}' already exists and is up-to-date in {repo_name}")
+                        success_count += 1
+                else:
+                    # Create new label
+                    if self._create_label(repo_name, label_name, label_data):
+                        success_count += 1
+                        self.logger.info(f"Created label '{label_name}' in {repo_name}")
+                    else:
+                        self.logger.error(f"Failed to create label '{label_name}' in {repo_name}")
                     else:
                         if self.dry_run:
                             self.logger.info(
