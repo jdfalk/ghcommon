@@ -319,12 +319,9 @@ class DocumentationUpdateManager:
             logger.warning(f"Failed to archive {update_file}: {e}")
 
     def _save_stats(self) -> None:
-        """Save processing statistics to a file."""
-        try:
-            with open(".doc-update-stats.json", "w") as f:
-                json.dump(self.stats, f, indent=2)
-        except Exception as e:
-            logger.warning(f"Failed to save stats: {e}")
+        """Save processing statistics (disabled to prevent merge conflicts)."""
+        # Stats file generation disabled to prevent merge conflicts in multi-repo setups
+        pass
 
 
 def main():

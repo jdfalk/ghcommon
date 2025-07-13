@@ -680,3 +680,6 @@ go.work.sum
 # .idea/
 # .vscode/
 
+# Documentation update stats (disabled to prevent merge conflicts)
+.doc-update-stats*.json
+

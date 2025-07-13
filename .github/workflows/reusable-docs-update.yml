@@ -193,30 +193,18 @@ jobs:
             $ignore_errors_flag \
             --verbose || {
               echo "❌ Documentation update manager failed with exit code $?"
-              echo "📋 Checking for partial results..."
-              if [[ -f .doc-update-stats.json ]]; then
-                echo "📊 Partial stats found:"
-                cat .doc-update-stats.json
-              fi
+              echo "📋 Operation failed - no additional stats available"
               exit 1
             }
 
           echo ""
           echo "✅ Documentation update manager completed successfully"
 
-          # Capture outputs with validation
-          if [[ -f .doc-update-stats.json ]]; then
-            echo "📊 Processing results:"
-            cat .doc-update-stats.json
-            echo ""
+          # Set default outputs
+          echo "files_processed=0" >> "$GITHUB_OUTPUT"
+          echo "changes_made=false" >> "$GITHUB_OUTPUT"
 
-            files_processed=$(jq -r '.files_processed // 0' .doc-update-stats.json)
-            changes_made=$(jq -r '.changes_made // false' .doc-update-stats.json)
-
-            echo "files_processed=$files_processed" >> "$GITHUB_OUTPUT"
-            echo "changes_made=$changes_made" >> "$GITHUB_OUTPUT"
-
-            echo "📈 Summary: Processed $files_processed files, changes made: $changes_made"
+          echo "📈 Summary: Documentation update completed (detailed stats disabled)"
           else
             echo "⚠️ No stats file generated"
             echo "files_processed=0" >> "$GITHUB_OUTPUT"
@@ -237,12 +225,7 @@ jobs:
           # Enhanced statistics with more detail
           echo "📊 **Execution Statistics:**" >> $GITHUB_STEP_SUMMARY
           echo "- Update files found: ${{ steps.validate.outputs.files_found }}" >> $GITHUB_STEP_SUMMARY
-
-          if [[ -f .doc-update-stats.json ]]; then
-            echo "- Files processed: $(jq -r '.files_processed // 0' .doc-update-stats.json)" >> $GITHUB_STEP_SUMMARY
-            echo "- Changes made: $(jq -r '.changes_made // false' .doc-update-stats.json)" >> $GITHUB_STEP_SUMMARY
-          fi
-
+          echo "- Documentation update completed" >> $GITHUB_STEP_SUMMARY
           echo "- Dry run mode: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
           echo "- Repository: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- Workflow run: [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
@@ -299,14 +282,7 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Show errors if any with more context
-          if [[ -f .doc-update-stats.json ]] && jq -e '.errors | length > 0' .doc-update-stats.json >/dev/null; then
-            echo "❌ **Errors Encountered:**" >> $GITHUB_STEP_SUMMARY
-            jq -r '.errors[]' .doc-update-stats.json | while read error; do
-              echo "- ⚠️ $error" >> $GITHUB_STEP_SUMMARY
-            done
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Error handling section removed - stats file no longer generated
 
           # Enhanced next steps with actionable URLs
           if [[ "${CREATE_PR}" == "true" ]]; then
@@ -621,4 +597,4 @@ jobs:
         if: always()
         run: |
           # Clean up temporary files
-          rm -f doc_update_manager.py .doc-update-stats.json
+          rm -f doc_update_manager.py
