@@ -1271,7 +1271,7 @@ class UnifiedGitHubProjectManager:
                 "project",
                 "create",
                 "--owner",
-                self.org,
+                self.owner,
                 "--title",
                 project_name,
                 "--body",
