@@ -1742,10 +1742,27 @@ class UnifiedGitHubProjectManager:
         project_numbers = {}
 
         for title, config in project_definitions.items():
-            # CHECK: Does project exist?
+            # CHECK: Does project exist? (case-insensitive matching)
+            existing_project_data = None
+            exact_existing_title = None
+            
+            # First try exact match
             if title in existing_projects:
-                project_number = str(existing_projects[title].get("number", ""))
-                project_id = str(existing_projects[title].get("id", ""))
+                existing_project_data = existing_projects[title]
+                exact_existing_title = title
+            else:
+                # Try case-insensitive match
+                title_lower = title.lower()
+                for existing_title, project_data in existing_projects.items():
+                    if existing_title.lower() == title_lower:
+                        existing_project_data = project_data
+                        exact_existing_title = existing_title
+                        self.logger.info(f"📝 Found case-insensitive match: '{title}' matches existing '{existing_title}'")
+                        break
+            
+            if existing_project_data:
+                project_number = str(existing_project_data.get("number", ""))
+                project_id = str(existing_project_data.get("id", ""))
                 project_numbers[title] = project_number
 
                 # Get stored values from config
@@ -1755,12 +1772,12 @@ class UnifiedGitHubProjectManager:
                 # UPDATE: If config needs to be updated with current GitHub data
                 if stored_number != project_number or stored_id != project_id:
                     self.logger.info(
-                        f"✅ Project '{title}' exists (#{project_number}) - updating config"
+                        f"✅ Project '{exact_existing_title}' exists (#{project_number}) - updating config"
                     )
                     # Update will happen in _update_config_with_existing_data
                 else:
                     self.logger.info(
-                        f"✅ Project '{title}' already exists (#{project_number})"
+                        f"✅ Project '{exact_existing_title}' already exists (#{project_number})"
                     )
                 continue
 
