@@ -168,13 +168,17 @@ class UnifiedGitHubProjectManager:
                 self.logger.info(f"DRY-RUN: Would execute: gh {' '.join(command_str)}")
                 # For read-only commands (list, view), execute them even in dry-run
                 if (
-                    command_str[0] in ["project", "repo", "auth"]
-                    and len(command_str) > 1
-                    and command_str[1] in ["list", "view", "token"]
-                ) or (
-                    command_str[0] == "label" and command_str[1] == "list"
-                ) or (
-                    command_str[0] == "api" and "GET" not in command_str and "--method" not in command_str
+                    (
+                        command_str[0] in ["project", "repo", "auth"]
+                        and len(command_str) > 1
+                        and command_str[1] in ["list", "view", "token"]
+                    )
+                    or (command_str[0] == "label" and command_str[1] == "list")
+                    or (
+                        command_str[0] == "api"
+                        and "GET" not in command_str
+                        and "--method" not in command_str
+                    )
                 ):
                     # Execute read-only commands even in dry-run mode
                     self.logger.debug("Executing read-only command in dry-run mode")
@@ -188,7 +192,10 @@ class UnifiedGitHubProjectManager:
                         if "project" in command_str and "list" in command_str:
                             return True, '{"projects": [], "totalCount": 0}'
                         else:
-                            return True, "[]"  # Return empty JSON array for other commands
+                            return (
+                                True,
+                                "[]",
+                            )  # Return empty JSON array for other commands
                     return True, "DRY-RUN: Command not executed"
 
             self.logger.debug(f"Executing: gh {' '.join(command_str)}")
@@ -1392,6 +1399,53 @@ class UnifiedGitHubProjectManager:
             self.logger.warning(f"⚠️ Error parsing project list: {e}")
             return {}
 
+    def _update_config_with_existing_data(self) -> None:
+        """Update the config file with existing project IDs and repository links."""
+        existing_projects = self._get_existing_projects()
+        project_definitions = self._get_project_definitions()
+        
+        config_updated = False
+        
+        # Update project IDs
+        for project_title, project_data in existing_projects.items():
+            if project_title in project_definitions:
+                project_number = str(project_data.get("number", ""))
+                current_id = project_definitions[project_title].get("github_id")
+                
+                if current_id != project_number:
+                    self.logger.info(f"📝 Updating config: '{project_title}' -> #{project_number}")
+                    self.config["projects"][project_title]["github_id"] = project_number
+                    config_updated = True
+                    
+                    # Also update repository links if we can get them
+                    linked_repos = self._get_linked_repositories(project_number)
+                    if linked_repos is not None:
+                        current_links = project_definitions[project_title].get("repository_links", {})
+                        new_links = {}
+                        
+                        # Check each repository that should be linked
+                        for repo in project_definitions[project_title]["repositories"]:
+                            new_links[repo] = repo in linked_repos
+                            
+                        if current_links != new_links:
+                            self.config["projects"][project_title]["repository_links"] = new_links
+                            config_updated = True
+        
+        # Save updated config
+        if config_updated:
+            self._save_config()
+            self.logger.info("💾 Config file updated with latest GitHub data")
+        else:
+            self.logger.debug("✅ Config file is already up to date")
+
+    def _save_config(self) -> None:
+        """Save the current config back to the JSON file."""
+        config_path = os.path.join(
+            os.path.dirname(__file__), "unified_project_config.json"
+        )
+        with open(config_path, "w") as f:
+            json.dump(self.config, f, indent=2)
+
     def setup_project_workflows(self, project_numbers: Dict[str, str]) -> None:
         """
         Set up automated workflows for GitHub Projects.
@@ -1800,113 +1854,52 @@ class UnifiedGitHubProjectManager:
 
         return workflow_config
 
+    def _update_config_with_existing_data(self) -> None:
+        """Update the config file with existing project IDs and repository links."""
+        existing_projects = self._get_existing_projects()
+        project_definitions = self._get_project_definitions()
 
-if __name__ == "__main__":
-    import argparse
+        config_updated = False
 
-    parser = argparse.ArgumentParser(description="Unified GitHub Project Manager v3")
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Dry run mode - don't make changes"
-    )
-    parser.add_argument(
-        "--force", action="store_true", help="Force operations without confirmation"
-    )
-    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
-    parser.add_argument(
-        "--owner", default="jdfalk", help="GitHub organization/user owner"
-    )
+        # Update project IDs
+        for project_title, project_data in existing_projects.items():
+            if project_title in project_definitions:
+                project_number = str(project_data.get("number", ""))
+                current_id = project_definitions[project_title].get("github_id")
 
-    # Specific actions
-    parser.add_argument(
-        "--list-projects", action="store_true", help="List all GitHub projects"
-    )
-    parser.add_argument(
-        "--create-projects", action="store_true", help="Create missing GitHub projects"
-    )
-    parser.add_argument(
-        "--setup-workflows", action="store_true", help="Setup project workflows"
-    )
-    parser.add_argument(
-        "--create-labels", action="store_true", help="Create labels across repositories"
-    )
-    parser.add_argument(
-        "--create-milestones",
-        action="store_true",
-        help="Create milestones across repositories",
-    )
-    parser.add_argument(
-        "--sync-labels",
-        action="store_true",
-        help="Synchronize labels across repositories",
-    )
-    parser.add_argument(
-        "--sync-milestones",
-        action="store_true",
-        help="Synchronize milestones across repositories",
-    )
-    parser.add_argument(
-        "--cleanup-labels", action="store_true", help="Clean up orphaned labels"
-    )
-    parser.add_argument(
-        "--report-orphans", action="store_true", help="Report orphaned labels"
-    )
-    parser.add_argument(
-        "--interactive-cleanup", action="store_true", help="Interactive label cleanup"
-    )
-    parser.add_argument(
-        "--output-format",
-        choices=["table", "json"],
-        default="table",
-        help="Output format",
-    )
+                if current_id != project_number:
+                    self.logger.info(f"📝 Updating config: '{project_title}' -> #{project_number}")
+                    self.config["projects"][project_title]["github_id"] = project_number
+                    config_updated = True
 
-    args = parser.parse_args()
+                    # Also update repository links if we can get them
+                    linked_repos = self._get_linked_repositories(project_number)
+                    if linked_repos is not None:
+                        current_links = project_definitions[project_title].get("repository_links", {})
+                        new_links = {}
 
-    try:
-        manager = UnifiedGitHubProjectManager(
-            dry_run=args.dry_run, force=args.force, verbose=args.verbose
-        )
+                        # Check each repository that should be linked
+                        for repo in project_definitions[project_title]["repositories"]:
+                            new_links[repo] = repo in linked_repos
 
-        # Handle specific actions
-        if args.list_projects:
-            manager.list_projects(args.output_format)
-        elif args.create_projects:
-            manager.create_projects()
-        elif args.setup_workflows:
-            # Get existing projects to pass to setup_project_workflows
-            project_numbers = {}
-            existing_projects = manager._get_existing_projects()
-            for title, data in existing_projects.items():
-                project_numbers[title] = data.get("number", "")
-            manager.setup_project_workflows(project_numbers)
-        elif args.create_labels:
-            manager.create_all_labels()
-        elif args.create_milestones:
-            manager.create_all_milestones()
-        elif args.sync_labels:
-            manager.sync_labels()
-        elif args.sync_milestones:
-            manager.sync_milestones()
-        elif args.cleanup_labels:
-            manager.cleanup_orphaned_labels()
-        elif args.report_orphans:
-            manager.report_orphaned_labels()
-        elif args.interactive_cleanup:
-            manager.interactive_cleanup_labels()
+                        if current_links != new_links:
+                            self.config["projects"][project_title]["repository_links"] = new_links
+                            config_updated = True
+
+        # Save updated config
+        if config_updated:
+            self._save_config()
+            self.logger.info("💾 Config file updated with latest GitHub data")
         else:
-            # DEFAULT ACTION: Run full setup
-            print("🚀 Running full GitHub project setup...")
-            print(
-                "Use --list-projects to just list projects, or other flags for specific actions"
-            )
-            print()
-            manager.run_full_setup()
+            self.logger.debug("✅ Config file is already up to date")
 
-    except KeyboardInterrupt:
-        print("\n❌ Operation cancelled by user")
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        if args.verbose:
-            import traceback
+    def _save_config(self) -> None:
+        """Save the current config back to the JSON file."""
+        config_path = os.path.join(
+            os.path.dirname(__file__), "unified_project_config.json"
+        )
+        with open(config_path, "w") as f:
+            json.dump(self.config, f, indent=2)
 
-            traceback.print_exc()
+    # ...existing code...
+```
