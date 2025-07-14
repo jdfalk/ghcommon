@@ -1,0 +1,36 @@
+# file: examples/workflows/unified-automation.yml
+# version: 1.0.0
+# guid: 17be3eca-f785-4b0f-ae16-6dda1cf9051b
+#
+# Unified Automation Workflow Example
+#
+# This example shows how to invoke the unified automation orchestrator
+# from ghcommon. Copy it to your repository's .github/workflows directory
+# and customize the inputs as needed.
+
+name: Unified Automation
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  security-events: read
+  repository-projects: write
+  actions: read
+  checks: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Which automation tasks to run"
+        required: false
+        type: string
+        default: "all"
+
+jobs:
+  automation:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
+    with:
+      operation: ${{ github.event.inputs.operation || 'all' }}
+    secrets: inherit

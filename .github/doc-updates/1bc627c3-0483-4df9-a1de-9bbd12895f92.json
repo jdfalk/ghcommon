@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "insert-after",
+  "content": "**Documentation**: [docs/unified-automation.md](docs/unified-automation.md)",
+  "guid": "1bc627c3-0483-4df9-a1de-9bbd12895f92",
+  "created_at": "2025-07-14T13:20:19Z",
+  "options": {
+    "section": null,
+    "after": "**Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)",
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
