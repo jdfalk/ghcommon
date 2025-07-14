@@ -1,549 +1,92 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 1.0.0
+# version: 2.0.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
-name: Reusable Unified Automation (Issues + Docs)
+name: Unified Automation Orchestrator
 
 on:
   workflow_call:
     inputs:
-      # Operation control
-      operations:
-        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, doc-updates, rebase, or 'all' to run all, or 'auto' to auto-detect)"
+      operation:
+        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase)"
         required: false
+        default: "all"
         type: string
-        default: "auto"
-      dry_run:
-        description: "Run in dry-run mode (no changes)"
-        required: false
-        type: boolean
-        default: false
-      force_update:
-        description: "Force update existing tickets (issue management only)"
-        required: false
-        type: boolean
-        default: false
-      continue_on_error:
-        description: "Continue processing even if some operations fail. Errors and malformed files are reported separately."
-        required: false
-        type: boolean
-        default: true
-
-      # Issue management inputs
-      issue_updates_file:
-        description: "Path to issue updates JSON file"
-        required: false
-        type: string
-        default: "issue_updates.json"
-      issue_updates_directory:
-        description: "Path to directory containing individual issue update files"
-        required: false
-        type: string
-        default: ".github/issue-updates"
-      cleanup_issue_updates:
-        description: "Whether to clean up the issue updates file after processing"
-        required: false
-        type: boolean
-        default: true
-
-      # Documentation update inputs
-      doc_updates_directory:
-        description: "Directory with documentation update files"
-        required: false
-        default: ".github/doc-updates"
-        type: string
-      cleanup_processed_files:
-        description: "Whether to move processed files to subdirectories after processing (only files that are successfully processed)"
-        required: false
-        type: boolean
-        default: true
-
-      # Common inputs
-      python_version:
-        description: "Python version to use"
-        required: false
-        type: string
-        default: "3.11"
-      create_pr:
-        description: "Create pull request for changes instead of direct commit"
-        required: false
-        type: boolean
-        default: false
-      auto_merge:
-        description: "Auto-merge created PR (requires create_pr=true)"
-        required: false
-        type: boolean
-        default: false
-
     secrets:
       github-token:
-        description: "GitHub token with enhanced permissions for cross-repo operations"
-        required: false
-
-    outputs:
-      # Issue management outputs
-      issues_operations_completed:
-        description: "Number of issue operations completed"
-        value: ${{ jobs.workflow-summary.outputs.issues_operations_completed }}
-      issues_created:
-        description: "Number of issues created"
-        value: ${{ jobs.workflow-summary.outputs.issues_created }}
-      issues_updated:
-        description: "Number of issues updated"
-        value: ${{ jobs.workflow-summary.outputs.issues_updated }}
-
-      # Documentation outputs
-      docs_files_processed:
-        description: "Number of documentation files processed successfully"
-        value: ${{ jobs.workflow-summary.outputs.docs_files_processed }}
-      docs_files_malformed:
-        description: "Number of malformed documentation files"
-        value: ${{ jobs.workflow-summary.outputs.docs_files_malformed }}
-      docs_files_failed:
-        description: "Number of failed documentation files"
-        value: ${{ jobs.workflow-summary.outputs.docs_files_failed }}
-
-      # Common outputs
-      total_prs_created:
-        description: "Total number of PRs created across all operations"
-        value: ${{ jobs.workflow-summary.outputs.total_prs_created }}
-      changes_made:
-        description: "Whether any changes were made"
-        value: ${{ jobs.workflow-summary.outputs.changes_made }}
-      errors_encountered:
-        description: "Whether any errors were encountered"
-        value: ${{ jobs.workflow-summary.outputs.errors_encountered }}
-
-# Explicit permissions required for this unified workflow
-permissions:
-  contents: write # For creating commits and file modifications
-  issues: write # For creating, updating, and closing issues
-  pull-requests: write # For creating pull requests when needed
-  security-events: read # For reading CodeQL security alerts
-  repository-projects: write # For adding issues to project boards
-  actions: read # For workflow access and status
-  checks: write # For workflow status and checks
-  statuses: write # For commit status updates
+        description: "GitHub token with write access"
+        required: true
 
 jobs:
-  determine-operations:
-    runs-on: ubuntu-latest
-    outputs:
-      issue_operations: ${{ steps.determine.outputs.issue_operations }}
-      doc_operations: ${{ steps.determine.outputs.doc_operations }}
-      has_issue_updates: ${{ steps.determine.outputs.has_issue_updates }}
-      has_doc_updates: ${{ steps.determine.outputs.has_doc_updates }}
-      event_name: ${{ steps.context.outputs.event_name }}
-      triggered_by: ${{ steps.context.outputs.triggered_by }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          echo "📥 Downloading requirements.txt from ghcommon..."
-          curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/requirements.txt -o requirements.txt
-          pip install -r requirements.txt
-
-      - name: Set workflow context
-        id: context
-        run: |
-          echo "event_name=${{ github.event_name }}" >> "$GITHUB_OUTPUT"
-          echo "triggered_by=${{ github.triggering_actor }}" >> "$GITHUB_OUTPUT"
-
-      - name: Download unified operations detector
-        run: |
-          echo "📥 Downloading unified operations detector from ghcommon..."
-          curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/unified_operations_detector.py -o unified_operations_detector.py
-          chmod +x unified_operations_detector.py
-          echo "✅ Downloaded unified_operations_detector.py"
-
-      - name: Determine operations to run
-        id: determine
-        run: |
-          python unified_operations_detector.py
-        env:
-          OPERATIONS_INPUT: ${{ inputs.operations }}
-          EVENT_NAME: ${{ github.event_name }}
-          ISSUE_UPDATES_FILE: ${{ inputs.issue_updates_file }}
-          ISSUE_UPDATES_DIRECTORY: ${{ inputs.issue_updates_directory }}
-          DOC_UPDATES_DIRECTORY: ${{ inputs.doc_updates_directory }}
-
   issue-management:
-    runs-on: ubuntu-latest
-    needs: determine-operations
-    if: ${{ needs.determine-operations.outputs.issue_operations != '[]' }}
-    env:
-      GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-    outputs:
-      operations_completed: ${{ steps.aggregate.outputs.operations_completed }}
-      issues_created: ${{ steps.aggregate.outputs.issues_created }}
-      issues_updated: ${{ steps.aggregate.outputs.issues_updated }}
-      prs_created: ${{ steps.aggregate.outputs.prs_created }}
-      errors_encountered: ${{ steps.aggregate.outputs.errors_encountered }}
-    strategy:
-      matrix:
-        operation: ${{ fromJson(needs.determine-operations.outputs.issue_operations) }}
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
+    uses: ./.github/workflows/reusable-unified-issue-management.yml
+    with:
+      operations: auto
+      dry_run: false
+      force_update: false
+      issue_updates_file: issue_updates.json
+      issue_updates_directory: .github/issue-updates
+      cleanup_issue_updates: true
+      python_version: 3.11
+    secrets:
+      github-token: ${{ secrets.github-token }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.python_version }}
+  docs-update:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
+    uses: ./.github/workflows/reusable-docs-update.yml
+    with:
+      updates-directory: .github/doc-updates
+      dry_run: false
+      python_version: 3.11
+      cleanup_processed_files: true
+      create_pr: false
+      auto_merge: false
+      continue_on_error: true
+    secrets:
+      github-token: ${{ secrets.github-token }}
 
-      - name: Download issue manager script
-        run: |
-          echo "📥 Downloading issue manager script from ghcommon..."
-          curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/issue_manager.py -o issue_manager.py
-          chmod +x issue_manager.py
+  labeler:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
+    uses: ./.github/workflows/reusable-labeler.yml
+    with:
+      configuration-path: .github/labeler.yml
+      sync-labels: false
+      dot: true
+      pr-numbers: ""
+    secrets:
+      github-token: ${{ secrets.github-token }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          echo "📥 Downloading requirements.txt from ghcommon..."
-          curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/requirements.txt -o requirements.txt
-          pip install -r requirements.txt
+  super-linter:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
+    uses: ./.github/workflows/reusable-super-linter.yml
+    with:
+      validate-all-codebase: false
+      default-branch: main
+      config-file: .github/super-linter.env
+      run-python: true
+      run-shell: true
+      run-markdown: true
+      run-yaml: true
+      run-json: true
+      run-javascript: true
+      run-go: true
+      run-css: true
+      run-html: true
+      run-protobuf: true
+      run-github-actions: true
+      run-security: true
+      enable-auto-fix: true
+      auto-commit-fixes: true
+      commit-message: "style: auto-fix linting issues [skip ci]"
+    secrets:
+      github-token: ${{ secrets.github-token }}
 
-      - name: Execute issue operation
-        id: execute
-        run: |
-          echo "🚀 Executing issue operation: ${{ matrix.operation }}"
-
-          # Set environment variables
-          export DRY_RUN="${{ inputs.dry_run }}"
-          export FORCE_UPDATE="${{ inputs.force_update }}"
-          export ISSUE_UPDATES_FILE="${{ inputs.issue_updates_file }}"
-          export ISSUE_UPDATES_DIRECTORY="${{ inputs.issue_updates_directory }}"
-
-          # Run the operation and capture results
-          set +e
-          python issue_manager.py ${{ matrix.operation }} > op_stdout.log 2> op_stderr.log
-          status=$?
-          set -e
-
-          # Standardized output formatting
-          echo "---" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Operation: ${{ matrix.operation }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Status:** $([[ "$status" == "0" ]] && echo '✅ Success' || echo '❌ Failed')" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Event:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "### Output (stdout)" >> "$GITHUB_STEP_SUMMARY"
-          if [[ -s op_stdout.log ]]; then
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            cat op_stdout.log >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "_No output captured._" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "### Errors (stderr)" >> "$GITHUB_STEP_SUMMARY"
-          if [[ -s op_stderr.log ]]; then
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            cat op_stderr.log >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "_No errors captured._" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          echo "---" >> "$GITHUB_STEP_SUMMARY"
-
-          # Only move files to processed/ if status == 0
-          if [[ "$status" == "0" ]]; then
-            # Move successfully processed files
-            # (Assume issue_manager.py outputs a list of processed files)
-            # TODO: Parse processed files from output and move them
-            echo "Successfully processed files will be moved to processed/ directory." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "No files moved to processed/ due to errors." >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-          echo "operation_status=$status" >> "$GITHUB_OUTPUT"
-          echo "operation_name=${{ matrix.operation }}" >> "$GITHUB_OUTPUT"
-
-      - name: Aggregate results for matrix
-        id: aggregate
-        if: always()
-        run: |
-          # This will be aggregated in the workflow summary job
-          echo "operations_completed=1" >> "$GITHUB_OUTPUT"
-          echo "issues_created=0" >> "$GITHUB_OUTPUT"  # Would need to parse from output
-          echo "issues_updated=0" >> "$GITHUB_OUTPUT"  # Would need to parse from output
-          echo "prs_created=0" >> "$GITHUB_OUTPUT"     # Would need to parse from output
-          echo "errors_encountered=${{ steps.execute.outputs.operation_status != '0' && 'true' || 'false' }}" >> "$GITHUB_OUTPUT"
-
-  documentation-updates:
-    runs-on: ubuntu-latest
-    needs: determine-operations
-    if: ${{ needs.determine-operations.outputs.doc_operations != '[]' }}
-    outputs:
-      files_processed: ${{ steps.process-docs.outputs.files_processed }}
-      files_malformed: ${{ steps.process-docs.outputs.files_malformed }}
-      files_failed: ${{ steps.process-docs.outputs.files_failed }}
-      changes_made: ${{ steps.process-docs.outputs.changes_made }}
-      prs_created: ${{ steps.create-archive-pr.outputs.pull-request-number && '1' || '0' }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python_version }}
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install jq pyyaml
-
-      - name: Download enhanced documentation update manager
-        run: |
-          echo "📥 Downloading enhanced doc update manager from ghcommon..."
-          curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/enhanced_doc_update_manager.py \
-            -o enhanced_doc_update_manager.py
-          chmod +x enhanced_doc_update_manager.py
-
-      - name: Validate and count update files
-        id: validate
-        env:
-          UPDATES_DIR: ${{ inputs.doc_updates_directory }}
-        run: |
-          echo "🔍 Validating documentation update files..."
-
-          if [[ ! -d "${UPDATES_DIR}" ]]; then
-            echo "📝 No doc update directory found: ${UPDATES_DIR}"
-            echo "files_found=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          files_count=$(find "${UPDATES_DIR}" -maxdepth 1 -name "*.json" -type f | wc -l)
-          echo "files_found=$files_count" >> "$GITHUB_OUTPUT"
-          echo "📊 Found $files_count documentation update files"
-
-      - name: Process documentation updates
-        id: process-docs
-        if: steps.validate.outputs.files_found > 0
-        env:
-          UPDATES_DIR: ${{ inputs.doc_updates_directory }}
-          DRY_RUN: ${{ inputs.dry_run }}
-          CLEANUP_PROCESSED: ${{ inputs.cleanup_processed_files }}
-          CONTINUE_ON_ERROR: ${{ inputs.continue_on_error }}
-        run: |
-          echo "🔄 Processing documentation updates..."
-
-          # Prepare arguments
-          args="--updates-dir ${UPDATES_DIR}"
-
-          if [[ "${DRY_RUN}" == "true" ]]; then
-            args="$args --dry-run"
-          fi
-
-          if [[ "${CLEANUP_PROCESSED}" == "true" ]]; then
-            args="$args --cleanup true"
-          else
-            args="$args --cleanup false"
-          fi
-
-          if [[ "${CONTINUE_ON_ERROR}" == "true" ]]; then
-            args="$args --continue-on-error true"
-          fi
-
-          args="$args --verbose"
-
-          # Execute the enhanced manager
-          python enhanced_doc_update_manager.py $args > process_output.log 2>&1
-          exit_code=$?
-
-          echo "📋 Documentation Process Output:"
-          cat process_output.log
-
-          # Parse results from output
-          files_processed=$(grep "Successfully processed:" process_output.log | grep -o '[0-9]\+' | tail -1 || echo "0")
-          files_malformed=$(grep "Malformed files:" process_output.log | grep -o '[0-9]\+' | tail -1 || echo "0")
-          files_failed=$(grep "Failed files:" process_output.log | grep -o '[0-9]\+' | tail -1 || echo "0")
-          files_updated_count=$(grep "Documentation files updated:" process_output.log | grep -o '[0-9]\+' | tail -1 || echo "0")
-
-          echo "files_processed=$files_processed" >> "$GITHUB_OUTPUT"
-          echo "files_malformed=$files_malformed" >> "$GITHUB_OUTPUT"
-          echo "files_failed=$files_failed" >> "$GITHUB_OUTPUT"
-
-          if [[ $files_updated_count -gt 0 && "${DRY_RUN}" != "true" ]]; then
-            echo "changes_made=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changes_made=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Create archive PR for processed files
-        if: steps.process-docs.outputs.files_processed > 0 || steps.process-docs.outputs.files_malformed > 0 || steps.process-docs.outputs.files_failed > 0
-        id: create-archive-pr
-        continue-on-error: true
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-          base: ${{ github.event.repository.default_branch }}
-          branch: unified/archive-doc-files-${{ github.run_number }}
-          commit-message: |
-            docs: archive documentation update files (unified workflow run ${{ github.run_id }})
-          title: "📦 [Unified] Archive documentation update files"
-          body: |
-            ## 📦 Archive Documentation Update Files (Unified Workflow)
-
-            This PR archives documentation update files processed by the unified automation workflow.
-
-            ### 📊 Processing Summary
-
-            - ✅ **Successfully processed:** ${{ steps.process-docs.outputs.files_processed }}
-            - ⚠️ **Malformed files:** ${{ steps.process-docs.outputs.files_malformed }}
-            - ❌ **Failed files:** ${{ steps.process-docs.outputs.files_failed }}
-
-            ### 🤖 Unified Workflow Info
-
-            - **Workflow run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            - **Operations:** Documentation updates (part of unified automation)
-
-            ---
-            *This PR was automatically created by the unified automation workflow.*
-          delete-branch: true
-          add-paths: |
-            ${{ inputs.doc_updates_directory }}/processed/
-            ${{ inputs.doc_updates_directory }}/malformed/
-            ${{ inputs.doc_updates_directory }}/failed/
-
-  workflow-summary:
-    runs-on: ubuntu-latest
-    needs: [determine-operations, issue-management, documentation-updates]
-    if: always()
-    outputs:
-      # Aggregated outputs
-      issues_operations_completed: ${{ steps.aggregate.outputs.issues_operations_completed }}
-      issues_created: ${{ steps.aggregate.outputs.issues_created }}
-      issues_updated: ${{ steps.aggregate.outputs.issues_updated }}
-      docs_files_processed: ${{ steps.aggregate.outputs.docs_files_processed }}
-      docs_files_malformed: ${{ steps.aggregate.outputs.docs_files_malformed }}
-      docs_files_failed: ${{ steps.aggregate.outputs.docs_files_failed }}
-      total_prs_created: ${{ steps.aggregate.outputs.total_prs_created }}
-      changes_made: ${{ steps.aggregate.outputs.changes_made }}
-      errors_encountered: ${{ steps.aggregate.outputs.errors_encountered }}
-    steps:
-      - name: Aggregate all results
-        id: aggregate
-        run: |
-          echo "🔄 Aggregating results from all operations..."
-
-          # Issue management results
-          issues_ops="${{ needs.issue-management.outputs.operations_completed || '0' }}"
-          issues_created="${{ needs.issue-management.outputs.issues_created || '0' }}"
-          issues_updated="${{ needs.issue-management.outputs.issues_updated || '0' }}"
-          issue_prs="${{ needs.issue-management.outputs.prs_created || '0' }}"
-          issue_errors="${{ needs.issue-management.outputs.errors_encountered || 'false' }}"
-
-          # Documentation results
-          docs_processed="${{ needs.documentation-updates.outputs.files_processed || '0' }}"
-          docs_malformed="${{ needs.documentation-updates.outputs.files_malformed || '0' }}"
-          docs_failed="${{ needs.documentation-updates.outputs.files_failed || '0' }}"
-          docs_changes="${{ needs.documentation-updates.outputs.changes_made || 'false' }}"
-          doc_prs="${{ needs.documentation-updates.outputs.prs_created || '0' }}"
-
-          # Calculate totals
-          total_prs=$((issue_prs + doc_prs))
-
-          # Determine if any changes were made
-          if [[ "$docs_changes" == "true" ]] || [[ "$issues_created" != "0" ]] || [[ "$issues_updated" != "0" ]]; then
-            changes_made="true"
-          else
-            changes_made="false"
-          fi
-
-          # Determine if errors were encountered
-          if [[ "$issue_errors" == "true" ]] || [[ "$docs_failed" != "0" ]] || [[ "$docs_malformed" != "0" ]]; then
-            errors_encountered="true"
-          else
-            errors_encountered="false"
-          fi
-
-          # Set outputs
-          echo "issues_operations_completed=$issues_ops" >> "$GITHUB_OUTPUT"
-          echo "issues_created=$issues_created" >> "$GITHUB_OUTPUT"
-          echo "issues_updated=$issues_updated" >> "$GITHUB_OUTPUT"
-          echo "docs_files_processed=$docs_processed" >> "$GITHUB_OUTPUT"
-          echo "docs_files_malformed=$docs_malformed" >> "$GITHUB_OUTPUT"
-          echo "docs_files_failed=$docs_failed" >> "$GITHUB_OUTPUT"
-          echo "total_prs_created=$total_prs" >> "$GITHUB_OUTPUT"
-          echo "changes_made=$changes_made" >> "$GITHUB_OUTPUT"
-          echo "errors_encountered=$errors_encountered" >> "$GITHUB_OUTPUT"
-
-          echo "📊 Aggregated Results:"
-          echo "  - Issue operations: $issues_ops"
-          echo "  - Issues created: $issues_created"
-          echo "  - Issues updated: $issues_updated"
-          echo "  - Docs processed: $docs_processed"
-          echo "  - Docs malformed: $docs_malformed"
-          echo "  - Docs failed: $docs_failed"
-          echo "  - Total PRs: $total_prs"
-          echo "  - Changes made: $changes_made"
-          echo "  - Errors encountered: $errors_encountered"
-
-      - name: Generate unified workflow summary
-        run: |
-          echo "# 🤖 Unified Automation Workflow Summary" >> $GITHUB_STEP_SUMMARY
-          echo "================================================" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "## 📊 Overall Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Operation Type | Status | Details |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
-
-          # Issue management summary
-          if [[ "${{ needs.determine-operations.outputs.issue_operations }}" != "[]" ]]; then
-            echo "| 🎫 **Issue Management** | ${{ needs.issue-management.result }} | ${{ steps.aggregate.outputs.issues_operations_completed }} operations, ${{ steps.aggregate.outputs.issues_created }} created, ${{ steps.aggregate.outputs.issues_updated }} updated |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 🎫 **Issue Management** | ⏭️ Skipped | No operations needed |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # Documentation summary
-          if [[ "${{ needs.determine-operations.outputs.doc_operations }}" != "[]" ]]; then
-            echo "| 📝 **Documentation Updates** | ${{ needs.documentation-updates.result }} | ${{ steps.aggregate.outputs.docs_files_processed }} processed, ${{ steps.aggregate.outputs.docs_files_malformed }} malformed, ${{ steps.aggregate.outputs.docs_files_failed }} failed |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 📝 **Documentation Updates** | ⏭️ Skipped | No files to process |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Summary stats
-          echo "## 📈 Summary Statistics" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Total PRs Created:** ${{ steps.aggregate.outputs.total_prs_created }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Changes Made:** ${{ steps.aggregate.outputs.changes_made == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Errors Encountered:** ${{ steps.aggregate.outputs.errors_encountered == 'true' && '⚠️ Yes' || '✅ No' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dry Run Mode:** ${{ inputs.dry_run == true && '🧪 Yes' || '🚀 No' }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Next steps
-          echo "## 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-            echo "- This was a **dry run** - no changes were committed" >> $GITHUB_STEP_SUMMARY
-            echo "- Re-run with \`dry_run: false\` to apply changes" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ steps.aggregate.outputs.errors_encountered }}" == "true" ]]; then
-            echo "- **Review errors** in malformed/ and failed/ directories" >> $GITHUB_STEP_SUMMARY
-            echo "- Fix issues and re-run workflow for failed items" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ steps.aggregate.outputs.total_prs_created }}" != "0" ]]; then
-            echo "- **Review and merge** the ${{ steps.aggregate.outputs.total_prs_created }} created PR(s)" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ steps.aggregate.outputs.changes_made }}" == "true" ]]; then
-            echo "- **Changes applied** successfully to the repository" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- **No action needed** - everything is up to date" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "*Generated by unified automation workflow run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*" >> $GITHUB_STEP_SUMMARY
+  ai-rebase:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
+    uses: ./.github/workflows/reusable-ai-rebase.yml
+    with:
+      base-branch: main
+      model: openai/gpt-4o
+    secrets:
+      github-token: ${{ secrets.github-token }}
