@@ -82,6 +82,10 @@ on:
         required: false
         type: string
         default: "3.11"
+    secrets:
+      github-token:
+        description: "GitHub token with necessary permissions for issue management"
+        required: true
 
 # Explicit permissions required for this reusable workflow
 permissions:
