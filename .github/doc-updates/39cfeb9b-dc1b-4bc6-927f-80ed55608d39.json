@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "append",
+  "content": "Fix doc update workflow syntax error",
+  "guid": "39cfeb9b-dc1b-4bc6-927f-80ed55608d39",
+  "created_at": "2025-07-14T01:34:44Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
