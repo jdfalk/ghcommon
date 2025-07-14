@@ -94,7 +94,7 @@ permissions:
   pull-requests: write # For creating pull requests when needed
   security-events: read # For reading CodeQL security alerts
   repository-projects: write # For adding issues to project boards
-  actions: read # For workflow access and status
+  actions: write # For workflow access and status
   checks: write # For workflow status and checks
   statuses: write # For commit status updates
 
