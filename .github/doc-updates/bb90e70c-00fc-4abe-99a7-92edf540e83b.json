@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Fixed\n\n- Fix syntax error in reusable docs update workflow",
+  "guid": "bb90e70c-00fc-4abe-99a7-92edf540e83b",
+  "created_at": "2025-07-14T01:34:33Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

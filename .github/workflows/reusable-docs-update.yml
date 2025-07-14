@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-docs-update.yml
-# version: 2.0.0
+# version: 2.0.1
 # guid: 25b987e1-9e34-4618-8182-53e12c7307e0
 
 name: Reusable Documentation Updates
@@ -205,11 +205,6 @@ jobs:
           echo "changes_made=false" >> "$GITHUB_OUTPUT"
 
           echo "📈 Summary: Documentation update completed (detailed stats disabled)"
-          else
-            echo "⚠️ No stats file generated"
-            echo "files_processed=0" >> "$GITHUB_OUTPUT"
-            echo "changes_made=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Generate update summary
         if: steps.validate.outputs.files_found > 0
