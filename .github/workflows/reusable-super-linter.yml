@@ -102,6 +102,10 @@ on:
         required: false
         default: "style: auto-fix linting issues [skip ci]"
         type: string
+    secrets:
+      github-token:
+        description: "GitHub token with necessary permissions for linting and auto-fix"
+        required: true
 
 permissions:
   contents: write # Required for auto-committing fixes
