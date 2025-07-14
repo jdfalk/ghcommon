@@ -48,7 +48,7 @@ on:
   workflow_call:
     inputs:
       operations:
-        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, or 'auto' to auto-detect). Example: 'update-issues,copilot-tickets'"
+        description: "Operations to run (comma-separated: update-issues, copilot-tickets, close-duplicates, codeql-alerts, update-permalinks, 'all' to run all, or 'auto' to auto-detect). Example: 'all' or 'update-issues,copilot-tickets'"
         required: false
         type: string
         default: "auto"
