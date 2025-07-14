@@ -88,16 +88,21 @@ jobs:
           PR_BRANCH: ${{ matrix.pr.branch }}
           BASE_BRANCH: ${{ inputs.base-branch }}
         run: |
+          source .github/scripts/ci-status.sh
+          print_status "Fetching and rebasing branch $PR_BRANCH onto $BASE_BRANCH"
           git fetch origin "${PR_BRANCH}"
           git checkout -B "${PR_BRANCH}" "origin/${PR_BRANCH}"
-          git rebase "origin/${BASE_BRANCH}" || true
+          git rebase "origin/${BASE_BRANCH}" || print_error "Rebase failed, continuing for conflict detection"
 
       - name: Detect conflicts
         id: conflicts
         run: |
+          source .github/scripts/ci-status.sh
           if git ls-files -u | grep -q .; then
+            print_status "Conflicts detected"
             echo "has_conflict=true" >> "$GITHUB_OUTPUT"
           else
+            print_success "No conflicts detected"
             echo "has_conflict=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -105,7 +110,8 @@ jobs:
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: conflict_info
         run: |
-          # Create a focused conflict summary (avoiding massive env vars)
+          source .github/scripts/ci-status.sh
+          print_status "Collecting conflict information"
           echo "=== Conflicted Files ===" > conflict_summary.txt
           conflicted_files=$(git ls-files -u | cut -f2 | sort -u)
           echo "$conflicted_files" >> conflict_summary.txt
@@ -121,12 +127,12 @@ jobs:
             echo "--- File: $file ---" >> conflict_summary.txt
             # Only include conflict markers and surrounding context (max 50 lines per file)
             if [ -f "$file" ]; then
-              grep -n -A 3 -B 3 "^<<<<<<< \|^======= \|^>>>>>>> " "$file" 2>/dev/null | head -50 >> conflict_summary.txt || true
+              grep -n -A 3 -B 3 "^<<<<<<< |^======= |^>>>>>>> " "$file" 2>/dev/null | head -50 >> conflict_summary.txt || true
             fi
             echo "" >> conflict_summary.txt
           done
 
-          # Set a simple flag for whether conflicts exist
+          print_status "Conflict summary written to conflict_summary.txt"
           echo "has_conflicts=true" >> "$GITHUB_OUTPUT"
           echo "conflict_count=$(echo "$conflicted_files" | wc -l)" >> "$GITHUB_OUTPUT"
 
@@ -288,47 +294,39 @@ jobs:
           PR_BRANCH: ${{ matrix.pr.branch }}
           AI_RESPONSE: ${{ steps.ai.outputs.response }}
         run: |
-          echo "=== AI Response ==="
-          echo "$AI_RESPONSE"
-          echo "=== Attempting to apply patch ==="
-
-          # Save the AI response as a patch file
+          source .github/scripts/ci-status.sh
+          print_status "Applying AI-generated patch"
           echo "$AI_RESPONSE" > ai_patch.patch
 
-          # Try to apply the patch
           if git apply --check ai_patch.patch 2>/dev/null; then
-            echo "Patch validation successful, applying..."
+            print_success "Patch validation successful, applying patch"
             git apply ai_patch.patch
             git add -A
-            echo "Applied AI-generated patch successfully"
+            print_success "Applied AI-generated patch successfully"
           else
-            echo "Patch validation failed, trying alternative approach..."
-            # Try to extract and apply changes manually
-            echo "Manual conflict resolution needed"
-
-            # For now, let's use a simple strategy - accept both changes where possible
+            print_error "Patch validation failed, attempting manual resolution"
             for file in $(git ls-files -u | cut -f2 | sort -u); do
-              echo "Resolving conflicts in $file..."
-              # This is a simple resolution - in practice, you might want more sophisticated logic
+              print_status "Resolving conflicts in $file..."
               git checkout --ours "$file" || git checkout --theirs "$file" || true
             done
             git add -A
           fi
 
-          # Verify we resolved all conflicts
           if git ls-files -u | grep -q .; then
-            echo "Error: Some conflicts remain unresolved"
+            print_error "Some conflicts remain unresolved"
             exit 1
           fi
 
-          # Continue the rebase
-          git rebase --continue || echo "Rebase completed with conflicts resolved"
+          git rebase --continue || print_status "Rebase completed with conflicts resolved"
 
       - name: Push updated branch
         if: steps.conflicts.outputs.has_conflict == 'false' || steps.apply_patch.conclusion == 'success'
         env:
           PR_BRANCH: ${{ matrix.pr.branch }}
-        run: git push --force-with-lease origin "${PR_BRANCH}"
+        run: |
+          source .github/scripts/ci-status.sh
+          print_status "Pushing updated branch $PR_BRANCH"
+          git push --force-with-lease origin "${PR_BRANCH}"
 
       - name: Handle failed AI resolution
         if: steps.conflicts.outputs.has_conflict == 'true' && steps.apply_patch.conclusion == 'failure'
@@ -336,7 +334,8 @@ jobs:
           GH_TOKEN: ${{ secrets.github-token }}
           PR_BRANCH: ${{ matrix.pr.branch }}
         run: |
-          echo "AI resolution failed, leaving PR for manual resolution"
+          source .github/scripts/ci-status.sh
+          print_error "AI resolution failed, leaving PR for manual resolution"
           gh pr comment ${{ matrix.pr.number }} --body "🤖 AI rebase workflow encountered conflicts that couldn't be automatically resolved. Manual intervention required.
 
           **Conflicted files:**
@@ -355,12 +354,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github-token }}
         run: |
-          # Only auto-merge if there were no conflicts or AI successfully resolved them
+          source .github/scripts/ci-status.sh
           if [ "${{ steps.conflicts.outputs.has_conflict }}" = "false" ] || [ "${{ steps.apply_patch.conclusion }}" = "success" ]; then
-            echo "Attempting to auto-merge PR #${{ matrix.pr.number }}"
-            gh pr merge ${{ matrix.pr.number }} --auto --squash || echo "Auto-merge failed - PR may need review"
+            print_status "Attempting to auto-merge PR #${{ matrix.pr.number }}"
+            gh pr merge ${{ matrix.pr.number }} --auto --squash || print_error "Auto-merge failed - PR may need review"
           else
-            echo "Skipping auto-merge due to unresolved conflicts"
+            print_status "Skipping auto-merge due to unresolved conflicts"
           fi
 
       - name: Comment with results
@@ -368,12 +367,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github-token }}
         run: |
+          source .github/scripts/ci-status.sh
           if [ "${{ steps.conflicts.outputs.has_conflict }}" = "false" ]; then
+            print_success "AI rebase workflow completed successfully - no conflicts found."
             gh pr comment ${{ matrix.pr.number }} --body "✅ AI rebase workflow completed successfully - no conflicts found." || true
           elif [ "${{ steps.apply_patch.conclusion }}" = "success" ]; then
+            print_success "AI rebase workflow resolved merge conflicts and updated the branch."
             gh pr comment ${{ matrix.pr.number }} --body "✅ AI rebase workflow resolved merge conflicts and updated the branch." || true
           else
-            echo "Error case already handled by previous step"
+            print_error "Error case already handled by previous step"
           fi
 
   summary:
