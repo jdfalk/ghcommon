@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Added unified automation orchestrator workflow with extensive customization options",
+  "guid": "7c7709ef-44ed-47b5-a889-fefd9cb26934",
+  "created_at": "2025-07-14T13:20:23Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

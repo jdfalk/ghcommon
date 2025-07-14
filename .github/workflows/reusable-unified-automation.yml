@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -12,6 +12,200 @@ on:
         required: false
         default: "all"
         type: string
+      im_operations:
+        description: "Operations for issue management workflow"
+        required: false
+        default: "auto"
+        type: string
+      im_dry_run:
+        description: "Run issue management in dry-run mode"
+        required: false
+        default: false
+        type: boolean
+      im_force_update:
+        description: "Force update existing issues"
+        required: false
+        default: false
+        type: boolean
+      im_issue_updates_file:
+        description: "Path to legacy issue updates file"
+        required: false
+        default: "issue_updates.json"
+        type: string
+      im_issue_updates_directory:
+        description: "Directory containing distributed issue updates"
+        required: false
+        default: ".github/issue-updates"
+        type: string
+      im_cleanup_issue_updates:
+        description: "Cleanup processed issue update files"
+        required: false
+        default: true
+        type: boolean
+      im_python_version:
+        description: "Python version for issue management"
+        required: false
+        default: "3.11"
+        type: string
+
+      docs_updates_directory:
+        description: "Directory with documentation updates"
+        required: false
+        default: ".github/doc-updates"
+        type: string
+      docs_dry_run:
+        description: "Run docs update in dry-run mode"
+        required: false
+        default: false
+        type: boolean
+      docs_python_version:
+        description: "Python version for docs update"
+        required: false
+        default: "3.11"
+        type: string
+      docs_cleanup_processed_files:
+        description: "Cleanup processed doc update files"
+        required: false
+        default: true
+        type: boolean
+      docs_create_pr:
+        description: "Create PR for documentation changes"
+        required: false
+        default: false
+        type: boolean
+      docs_auto_merge:
+        description: "Auto-merge documentation PRs"
+        required: false
+        default: false
+        type: boolean
+      docs_continue_on_error:
+        description: "Continue processing even if some updates fail"
+        required: false
+        default: true
+        type: boolean
+
+      labeler_configuration_path:
+        description: "Path to labeler configuration"
+        required: false
+        default: ".github/labeler.yml"
+        type: string
+      labeler_sync_labels:
+        description: "Remove labels when files are reverted"
+        required: false
+        default: false
+        type: boolean
+      labeler_dot:
+        description: "Include dot files when labeling"
+        required: false
+        default: true
+        type: boolean
+      labeler_pr_numbers:
+        description: "Specific PR numbers to label"
+        required: false
+        default: ""
+        type: string
+
+      sl_validate_all_codebase:
+        description: "Validate entire codebase with Super Linter"
+        required: false
+        default: false
+        type: boolean
+      sl_default_branch:
+        description: "Default branch for Super Linter"
+        required: false
+        default: "main"
+        type: string
+      sl_config_file:
+        description: "Super Linter configuration file"
+        required: false
+        default: ".github/super-linter.env"
+        type: string
+      sl_run_python:
+        description: "Enable Python linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_shell:
+        description: "Enable shell linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_markdown:
+        description: "Enable Markdown linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_yaml:
+        description: "Enable YAML linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_json:
+        description: "Enable JSON linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_javascript:
+        description: "Enable JavaScript linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_go:
+        description: "Enable Go linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_css:
+        description: "Enable CSS linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_html:
+        description: "Enable HTML linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_protobuf:
+        description: "Enable Protobuf linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_github_actions:
+        description: "Enable GitHub Actions linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_security:
+        description: "Enable security scanning"
+        required: false
+        default: true
+        type: boolean
+      sl_enable_auto_fix:
+        description: "Enable auto-fixing where supported"
+        required: false
+        default: true
+        type: boolean
+      sl_auto_commit_fixes:
+        description: "Automatically commit lint fixes"
+        required: false
+        default: true
+        type: boolean
+      sl_commit_message:
+        description: "Commit message for lint fixes"
+        required: false
+        default: "style: auto-fix linting issues [skip ci]"
+        type: string
+
+      rebase_base_branch:
+        description: "Branch to rebase pull requests onto"
+        required: false
+        default: "main"
+        type: string
+      rebase_model:
+        description: "Model to use for AI rebase"
+        required: false
+        default: "openai/gpt-4o"
+        type: string
     secrets:
       github-token:
         description: "GitHub token with write access"
@@ -22,13 +216,13 @@ jobs:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
     uses: ./.github/workflows/reusable-unified-issue-management.yml
     with:
-      operations: auto
-      dry_run: false
-      force_update: false
-      issue_updates_file: issue_updates.json
-      issue_updates_directory: .github/issue-updates
-      cleanup_issue_updates: true
-      python_version: 3.11
+      operations: ${{ inputs.im_operations }}
+      dry_run: ${{ inputs.im_dry_run }}
+      force_update: ${{ inputs.im_force_update }}
+      issue_updates_file: ${{ inputs.im_issue_updates_file }}
+      issue_updates_directory: ${{ inputs.im_issue_updates_directory }}
+      cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
+      python_version: ${{ inputs.im_python_version }}
     secrets:
       github-token: ${{ secrets.github-token }}
 
@@ -36,13 +230,13 @@ jobs:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
     uses: ./.github/workflows/reusable-docs-update.yml
     with:
-      updates-directory: .github/doc-updates
-      dry_run: false
-      python_version: 3.11
-      cleanup_processed_files: true
-      create_pr: false
-      auto_merge: false
-      continue_on_error: true
+      updates-directory: ${{ inputs.docs_updates_directory }}
+      dry_run: ${{ inputs.docs_dry_run }}
+      python_version: ${{ inputs.docs_python_version }}
+      cleanup_processed_files: ${{ inputs.docs_cleanup_processed_files }}
+      create_pr: ${{ inputs.docs_create_pr }}
+      auto_merge: ${{ inputs.docs_auto_merge }}
+      continue_on_error: ${{ inputs.docs_continue_on_error }}
     secrets:
       github-token: ${{ secrets.github-token }}
 
@@ -50,10 +244,10 @@ jobs:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
     uses: ./.github/workflows/reusable-labeler.yml
     with:
-      configuration-path: .github/labeler.yml
-      sync-labels: false
-      dot: true
-      pr-numbers: ""
+      configuration-path: ${{ inputs.labeler_configuration_path }}
+      sync-labels: ${{ inputs.labeler_sync_labels }}
+      dot: ${{ inputs.labeler_dot }}
+      pr-numbers: ${{ inputs.labeler_pr_numbers }}
     secrets:
       github-token: ${{ secrets.github-token }}
 
@@ -61,24 +255,24 @@ jobs:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
     uses: ./.github/workflows/reusable-super-linter.yml
     with:
-      validate-all-codebase: false
-      default-branch: main
-      config-file: .github/super-linter.env
-      run-python: true
-      run-shell: true
-      run-markdown: true
-      run-yaml: true
-      run-json: true
-      run-javascript: true
-      run-go: true
-      run-css: true
-      run-html: true
-      run-protobuf: true
-      run-github-actions: true
-      run-security: true
-      enable-auto-fix: true
-      auto-commit-fixes: true
-      commit-message: "style: auto-fix linting issues [skip ci]"
+      validate-all-codebase: ${{ inputs.sl_validate_all_codebase }}
+      default-branch: ${{ inputs.sl_default_branch }}
+      config-file: ${{ inputs.sl_config_file }}
+      run-python: ${{ inputs.sl_run_python }}
+      run-shell: ${{ inputs.sl_run_shell }}
+      run-markdown: ${{ inputs.sl_run_markdown }}
+      run-yaml: ${{ inputs.sl_run_yaml }}
+      run-json: ${{ inputs.sl_run_json }}
+      run-javascript: ${{ inputs.sl_run_javascript }}
+      run-go: ${{ inputs.sl_run_go }}
+      run-css: ${{ inputs.sl_run_css }}
+      run-html: ${{ inputs.sl_run_html }}
+      run-protobuf: ${{ inputs.sl_run_protobuf }}
+      run-github-actions: ${{ inputs.sl_run_github_actions }}
+      run-security: ${{ inputs.sl_run_security }}
+      enable-auto-fix: ${{ inputs.sl_enable_auto_fix }}
+      auto-commit-fixes: ${{ inputs.sl_auto_commit_fixes }}
+      commit-message: ${{ inputs.sl_commit_message }}
     secrets:
       github-token: ${{ secrets.github-token }}
 
@@ -86,7 +280,7 @@ jobs:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
     uses: ./.github/workflows/reusable-ai-rebase.yml
     with:
-      base-branch: main
-      model: openai/gpt-4o
+      base-branch: ${{ inputs.rebase_base_branch }}
+      model: ${{ inputs.rebase_model }}
     secrets:
       github-token: ${{ secrets.github-token }}

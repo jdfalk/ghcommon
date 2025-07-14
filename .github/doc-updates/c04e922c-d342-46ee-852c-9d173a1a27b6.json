@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "insert-after",
+  "content": "| [`reusable-unified-automation.yml`](.github/workflows/reusable-unified-automation.yml) | Unified automation orchestrator | Runs issue management, docs update, labeler, linting, and AI rebase |",
+  "guid": "c04e922c-d342-46ee-852c-9d173a1a27b6",
+  "created_at": "2025-07-14T13:20:11Z",
+  "options": {
+    "section": null,
+    "after": "| [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |",
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
