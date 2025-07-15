@@ -71,7 +71,8 @@ jobs:
       default-branch: "main"
       enable-auto-fix: true
       auto-commit-fixes: true
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   changes:
     if: inputs.enable-backend-frontend == true

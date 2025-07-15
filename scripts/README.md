@@ -1,4 +1,7 @@
 # Scripts Directory
+<!-- file: scripts/README.md -->
+<!-- version: 1.1.0 -->
+<!-- guid: a6ce4820-bcf8-482e-b2ca-234024d5d77f -->
 
 This directory contains reusable scripts for GitHub automation and issue management.
 
@@ -21,75 +24,6 @@ Unified GitHub issue management script with comprehensive functionality:
 Used by the [`unified-issue-management.yml`](../.github/workflows/reusable-unified-issue-management.yml) reusable workflow.
 
 ### [`label_manager.py`](label_manager.py)
-
-**Version**: 1.0.0
-**Last Updated**: 2025-06-30
-
-GitHub label management script for standardizing labels across multiple repositories:
-
-- Sync labels from configuration file to target repositories
-- Create, update, or delete labels as needed
-- Support dry-run mode for testing
-- Handle multiple repositories in a single operation
-- URL-safe label name handling
-- Comprehensive error handling and reporting
-
-**Usage**:
-
-```bash
-# Sync labels to multiple repositories
-export GH_TOKEN=$(gh auth token)
-./scripts/label_manager.py sync-labels --config labels.json --repos "owner/repo1,owner/repo2"
-
-# Test changes without applying them
-./scripts/label_manager.py sync-labels --config labels.json --repos "owner/repo" --dry-run
-
-# Clean sync (delete extra labels)
-./scripts/label_manager.py sync-labels --config labels.json --repos-file repos.txt --delete-extra
-```
-
-**Features**:
-
-- JSON configuration file support
-- Batch repository processing
-- Safe mode (no deletions) vs cleanup mode
-- Detailed operation reporting
-- GitHub API error handling
-
-### [`setup-label-sync.sh`](setup-label-sync.sh)
-
-**Version**: 1.0.0
-**Last Updated**: 2025-06-30
-
-Helper script to set up label synchronization workflow in repositories:
-
-- Generates workflow file with customizable options
-- Supports different sync modes (safe vs cleanup)
-- Configurable scheduling with cron expressions
-- Built-in dry-run mode for testing
-- Automatic repository detection
-
-**Usage**:
-
-```bash
-# Basic setup with monthly sync
-./scripts/setup-label-sync.sh
-
-# Weekly sync with cleanup mode (delete extra labels)
-./scripts/setup-label-sync.sh --schedule "0 2 * * 1" --mode cleanup
-
-# Setup for testing only
-./scripts/setup-label-sync.sh --dry-run
-```
-
-**Features**:
-
-- Interactive workflow generation
-- Validation of schedule and mode options
-- Git repository detection
-- Comprehensive setup instructions
-
-### [`create-issue-update.sh`](create-issue-update.sh)
 
 **Version**: 1.2.0
 **Last Updated**: 2025-06-21

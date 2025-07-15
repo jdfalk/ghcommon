@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
 # file: scripts/issue_manager.py
+# version: 1.2.0
+# guid: b36ea5e7-e02c-4b99-9b2e-1564e4f1c2b8
+"""
 Unified GitHub issue management script.
 
 This script provides comprehensive issue management functionality:
@@ -943,6 +945,7 @@ class IssueUpdateProcessor:
         modified = False
 
         def update_action(action: Dict[str, Any]) -> None:
+<<<<<<< HEAD
             parent_guid = action.get("parent_guid")
             if parent_guid:
                 mapping = self.guid_issue_map.get(parent_guid)
@@ -959,6 +962,33 @@ class IssueUpdateProcessor:
             for item in data:
                 if isinstance(item, dict) and "action" in item:
                     update_action(item)
+=======
+            nonlocal modified
+            if isinstance(action, dict):
+                parent_guid = action.get("parent")
+                if parent_guid:
+                    mapping = self.guid_issue_map.get(parent_guid)
+                    if mapping:
+                        repo, number = mapping
+                        if not action.get("number"):
+                            action["number"] = number
+                            modified = True
+                        if not action.get("repo"):
+                            action["repo"] = repo
+                            modified = True
+                        if not action.get("issue_url"):
+                            action["issue_url"] = f"https://github.com/{repo}/issues/{number}"
+                            modified = True
+                if action.get("number") and not action.get("issue_url"):
+                    repo = action.get("repo", self.api.repo)
+                    number = action.get("number")
+                    action["issue_url"] = f"https://github.com/{repo}/issues/{number}"
+                    modified = True
+
+        if isinstance(data, list):
+            for item in data:
+                update_action(item)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         elif isinstance(data, dict):
             if "action" in data:
                 update_action(data)
@@ -975,8 +1005,14 @@ class IssueUpdateProcessor:
             try:
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
+<<<<<<< HEAD
             except Exception as e:
                 self.summary.add_error(f"Failed to write file {file_path}: {e}")
+=======
+                print(f"📝 Updated {os.path.basename(file_path)} with issue numbers")
+            except Exception as e:
+                print(f"⚠️  Failed to write {file_path}: {e}")
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
 
     def _is_legacy_file_processed(self, updates_file: str) -> bool:
         """Check if legacy file has been processed before."""
@@ -1121,6 +1157,7 @@ class IssueUpdateProcessor:
         # For update, close, delete - assume no duplicates for now
         return False
 
+<<<<<<< HEAD
     def _comment_guid_exists(
         self, issue_number: int, guid: str, repo: str = None
     ) -> bool:
@@ -1131,6 +1168,12 @@ class IssueUpdateProcessor:
                 if not repo or repo == self.api.repo
                 else GitHubAPI(self.api.token, repo)
             )
+=======
+    def _comment_guid_exists(self, issue_number: int, guid: str, repo: str = None) -> bool:
+        """Check if a comment with the given GUID already exists on the issue."""
+        try:
+            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             url = f"https://api.github.com/repos/{api.repo}/issues/{issue_number}/comments"
             response = requests.get(url, headers=api.headers, timeout=10)
 
@@ -1175,11 +1218,15 @@ class IssueUpdateProcessor:
             return True
 
         try:
+<<<<<<< HEAD
             api = (
                 self.api
                 if not repo or repo == self.api.repo
                 else GitHubAPI(self.api.token, repo)
             )
+=======
+            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             # Search for existing issues with either GUID
             all_issues = api.get_all_issues(state="all")
 
@@ -1216,6 +1263,7 @@ class IssueUpdateProcessor:
             print(f"⚠️  Could not verify GUID uniqueness: {e}")
             return True
 
+<<<<<<< HEAD
     def _create_guid_exists(
         self, guid: str, update: Dict[str, Any], repo: str = None
     ) -> bool:
@@ -1227,6 +1275,13 @@ class IssueUpdateProcessor:
                 if not repo or repo == self.repo
                 else GitHubAPI(self.api.token, repo)
             )
+=======
+    def _create_guid_exists(self, guid: str, update: Dict[str, Any], repo: str = None) -> bool:
+        """Check if an issue with the given GUID was already created."""
+        title = update.get("title", "")
+        try:
+            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             # Search for existing issues with similar title
             existing = api.search_issues(f'is:issue in:title "{title}"')
 
@@ -1247,8 +1302,13 @@ class IssueUpdateProcessor:
         labels = update.get("labels", [])
         guid = update.get("guid")
         legacy_guid = update.get("legacy_guid")
+<<<<<<< HEAD
         repo = update.get("repo", self.api.repo)
         parent_issue = update.get("parent_issue")
+=======
+        parent_issue = update.get("parent_issue")  # New field for sub-issues
+        repo = update.get("repo", self.api.repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
 
         if not title:
@@ -1263,7 +1323,13 @@ class IssueUpdateProcessor:
                 labels.append("sub-issue")
 
         # Check for duplicate by GUID
+<<<<<<< HEAD
         if not self._check_guid_uniqueness(guid, legacy_guid, "create", {"title": title}, repo=repo):
+=======
+        if not self._check_guid_uniqueness(
+            guid, legacy_guid, "create", {"title": title}, repo=repo
+        ):
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             return False
 
         guid_to_embed = guid or legacy_guid
@@ -1274,16 +1340,32 @@ class IssueUpdateProcessor:
         issue = api.create_issue(title, body, labels)
 
         if issue:
+<<<<<<< HEAD
             self.summary.add_issue_created(issue["number"], issue["title"], issue["html_url"])
+=======
+            self.summary.add_issue_created(
+                issue["number"], issue["title"], issue["html_url"]
+            )
+
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             if guid:
                 self.guid_issue_map[guid] = (repo, issue["number"])
             if legacy_guid:
                 self.guid_issue_map[legacy_guid] = (repo, issue["number"])
+<<<<<<< HEAD
             if parent_issue:
                 # Add a comment to parent issue referencing this sub-issue
                 parent_comment = f"Created sub-issue #{issue['number']}: {issue['html_url']}\n\n<!-- guid:{guid_to_embed} -->"
                 parent_api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
                 parent_api.add_comment(parent_issue, parent_comment)
+=======
+
+            # If this is a sub-issue, add a comment on the parent issue
+            if parent_issue:
+                parent_comment = f"Created sub-issue #{issue['number']}: [{title}]({issue['html_url']})"
+                api.add_comment(parent_issue, parent_comment)
+
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             return True
         else:
             self.summary.add_error(f"Failed to create issue: {title}")
@@ -1292,7 +1374,12 @@ class IssueUpdateProcessor:
     def _update_issue(self, update: Dict[str, Any]) -> bool:
         """Update an existing issue with dual-GUID tracking."""
         issue_number = update.get("number")
+<<<<<<< HEAD
         repo = update.get("repo", self.api.repo)
+=======
+        repo = update.get("repo")
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         primary_guid, legacy_guid = self._extract_guids(update)
         parent_guid = update.get("parent_guid")
         if not issue_number and parent_guid:
@@ -1300,17 +1387,52 @@ class IssueUpdateProcessor:
             if mapping:
                 repo, issue_number = mapping
         if not issue_number:
+<<<<<<< HEAD
             self.summary.add_error(f"No issue number found for update: {update}")
+=======
+            parent_guid = update.get("parent")
+            if parent_guid:
+                mapping = self.guid_issue_map.get(parent_guid)
+                if mapping:
+                    repo_from_map, issue_number = mapping
+                    update["number"] = issue_number
+                    if not repo:
+                        repo = repo_from_map
+                        update["repo"] = repo
+
+        if not issue_number:
+            print("❌ Update action missing issue number", file=sys.stderr)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             return False
         update_data = {k: v for k, v in update.items() if k not in ["action", "number", "guid", "legacy_guid", "permalink"]}
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
+<<<<<<< HEAD
         api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
         try:
             success = api.update_issue(issue_number, **update_data)
             if success:
                 self.summary.add_issue_updated(issue_number, update_data.get("title", ""))
+=======
+
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+
+        try:
+            success = api.update_issue(issue_number, **update_data)
+            if success:
+                issue_data = api.get_issue(issue_number)
+                if issue_data:
+                    title = issue_data.get("title", f"Issue {issue_number}")
+                    url = issue_data.get("html_url", "")
+                    print(f"✅ Updated issue #{issue_number}")
+                    self.summary.add_issue_updated(issue_number, title, url)
+                else:
+                    print(f"✅ Updated issue #{issue_number}")
+                    self.summary.add_issue_updated(
+                        issue_number, f"Issue {issue_number}", ""
+                    )
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
                 return True
             else:
                 self.summary.add_error(f"Failed to update issue #{issue_number}")
@@ -1323,23 +1445,58 @@ class IssueUpdateProcessor:
     def _add_comment(self, update: Dict[str, Any]) -> bool:
         """Add a comment to an issue with dual-GUID tracking."""
         issue_number = update.get("number")
+<<<<<<< HEAD
         repo = update.get("repo", self.api.repo)
+=======
+        repo = update.get("repo")
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         body = update.get("body", "")
         primary_guid, legacy_guid = self._extract_guids(update)
         if not issue_number:
+<<<<<<< HEAD
             self.summary.add_error(f"No issue number found for comment: {update}")
+=======
+            parent_guid = update.get("parent")
+            if parent_guid:
+                mapping = self.guid_issue_map.get(parent_guid)
+                if mapping:
+                    repo_from_map, issue_number = mapping
+                    update["number"] = issue_number
+                    if not repo:
+                        repo = repo_from_map
+                        update["repo"] = repo
+
+        if not issue_number:
+            print("❌ Comment action missing issue number", file=sys.stderr)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             return False
         if not body:
             self.summary.add_error(f"No body found for comment: {update}")
             return False
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed:
+<<<<<<< HEAD
             body += f"\n\n<!-- guid:{guid_to_embed} -->"
         api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
         try:
             success = api.add_comment(issue_number, body)
             if success:
                 self.summary.add_comment_added(issue_number, body)
+=======
+            body = f"<!-- guid:{guid_to_embed} -->\n{body}"
+
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+
+        try:
+            result = api.add_comment(issue_number, body)
+            if result:
+                print(f"✅ Added comment to issue #{issue_number}")
+                # Extract comment URL if available
+                comment_url = (
+                    result.get("html_url", "") if isinstance(result, dict) else ""
+                )
+                self.summary.add_comment(issue_number, comment_url)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
                 return True
             else:
                 self.summary.add_error(f"Failed to add comment to issue #{issue_number}")
@@ -1352,10 +1509,15 @@ class IssueUpdateProcessor:
     def _close_issue(self, update: Dict[str, Any]) -> bool:
         """Close an issue with dual-GUID tracking."""
         issue_number = update.get("number")
+<<<<<<< HEAD
         repo = update.get("repo", self.api.repo)
+=======
+        repo = update.get("repo")
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         state_reason = update.get("state_reason", "completed")
         primary_guid, legacy_guid = self._extract_guids(update)
         if not issue_number:
+<<<<<<< HEAD
             self.summary.add_error(f"No issue number found for close: {update}")
             return False
         api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
@@ -1363,6 +1525,44 @@ class IssueUpdateProcessor:
             success = api.close_issue(issue_number, state_reason=state_reason)
             if success:
                 self.summary.add_issue_closed(issue_number, state_reason)
+=======
+            parent_guid = update.get("parent")
+            if parent_guid:
+                mapping = self.guid_issue_map.get(parent_guid)
+                if mapping:
+                    repo_from_map, issue_number = mapping
+                    update["number"] = issue_number
+                    if not repo:
+                        repo = repo_from_map
+                        update["repo"] = repo
+
+        if not issue_number:
+            print("❌ Close action missing issue number", file=sys.stderr)
+            return False
+
+        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+
+        try:
+            success = api.close_issue(issue_number, state_reason)
+            if success:
+                issue_data = api.get_issue(issue_number)
+                if issue_data:
+                    title = issue_data.get("title", f"Issue {issue_number}")
+                    url = issue_data.get("html_url", "")
+                else:
+                    title = f"Issue {issue_number}"
+                    url = ""
+
+                print(f"✅ Closed issue #{issue_number} (reason: {state_reason})")
+                self.summary.add_issue_closed(issue_number, title, url)
+
+                # Add a tracking comment with GUID if provided (prefer primary GUID)
+                guid_to_embed = primary_guid or legacy_guid
+                if guid_to_embed:
+                    tracking_comment = f"<!-- guid:{guid_to_embed} -->\nIssue closed via automated workflow."
+                    api.add_comment(issue_number, tracking_comment)
+
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
                 return True
             else:
                 self.summary.add_error(f"Failed to close issue #{issue_number}")
@@ -1545,9 +1745,13 @@ class IssueUpdateProcessor:
 
         return self._find_permalinks_for_updates(updates)
 
+<<<<<<< HEAD
     def _find_issue_by_guid(
         self, guid: str, repo: str = None
     ) -> Optional[Dict[str, Any]]:
+=======
+    def _find_issue_by_guid(self, guid: str, repo: str = None) -> Optional[Dict[str, Any]]:
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
         """
         Find an issue by its GUID marker in the body.
 
@@ -1561,11 +1765,15 @@ class IssueUpdateProcessor:
             return None
 
         try:
+<<<<<<< HEAD
             api = (
                 self.api
                 if not repo or repo == self.repo
                 else GitHubAPI(self.api.token, repo)
             )
+=======
+            api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+>>>>>>> 0b39435 (docs(issue-management): add missing headers)
             # Search all issues for the GUID marker
             all_issues = api.get_all_issues(state="all")
             guid_marker = f"<!-- guid:{guid} -->"
