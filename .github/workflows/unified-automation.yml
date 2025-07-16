@@ -1,0 +1,68 @@
+# file: .github/workflows/unified-automation.yml
+# version: 1.0.0
+# guid: 9e8f7a6b-5c4d-3b2a-1e0f-9d8c7b6a5e4f
+
+name: Unified Automation Entrypoint
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase)"
+        required: false
+        default: "all"
+        type: string
+      im_operations:
+        description: "Operations for issue management workflow"
+        required: false
+        default: "auto"
+        type: string
+      docs_updates_directory:
+        description: "Directory with documentation updates"
+        required: false
+        default: ".github/doc-updates"
+        type: string
+      labeler_configuration_path:
+        description: "Path to labeler configuration"
+        required: false
+        default: ".github/labeler.yml"
+        type: string
+      sl_validate_all_codebase:
+        description: "Validate entire codebase with Super Linter"
+        required: false
+        default: false
+        type: boolean
+      sl_default_branch:
+        description: "Default branch for Super Linter"
+        required: false
+        default: "main"
+        type: string
+      sl_config_file:
+        description: "Super Linter configuration file"
+        required: false
+        default: ".github/super-linter.env"
+        type: string
+      rebase_base_branch:
+        description: "Branch to rebase pull requests onto"
+        required: false
+        default: "main"
+        type: string
+      config_json:
+        description: "JSON string containing any additional config options. See README for format."
+        required: false
+        default: "{}"
+        type: string
+
+jobs:
+  unified-automation:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
+    with:
+      operation: ${{ inputs.operation }}
+      im_operations: ${{ inputs.im_operations }}
+      docs_updates_directory: ${{ inputs.docs_updates_directory }}
+      labeler_configuration_path: ${{ inputs.labeler_configuration_path }}
+      sl_validate_all_codebase: ${{ inputs.sl_validate_all_codebase }}
+      sl_default_branch: ${{ inputs.sl_default_branch }}
+      sl_config_file: ${{ inputs.sl_config_file }}
+      rebase_base_branch: ${{ inputs.rebase_base_branch }}
+    secrets: inherit
