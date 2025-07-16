@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Fix super linter configuration",
+  "body": "Enable YAML Prettier validation",
+  "labels": ["ci"],
+  "guid": "3d5ca83f-d947-4c49-b1a6-9e5b8db2057b",
+  "legacy_guid": "create-fix-super-linter-configuration-2025-07-16"
+}

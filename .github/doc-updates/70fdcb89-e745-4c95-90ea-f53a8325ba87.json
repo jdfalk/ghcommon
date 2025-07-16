@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Fixed\n\n- Fixed YAML Prettier configuration to avoid super-linter error",
+  "guid": "70fdcb89-e745-4c95-90ea-f53a8325ba87",
+  "created_at": "2025-07-16T01:22:47Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
