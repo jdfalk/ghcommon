@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add manual trigger to unified automation",
+  "body": "Implement workflow_dispatch to run orchestrator manually.",
+  "labels": ["enhancement"],
+  "guid": "5d93957d-55a9-4a50-bf77-294e44d28563",
+  "legacy_guid": "create-add-manual-trigger-to-unified-automation-2025-07-16"
+}

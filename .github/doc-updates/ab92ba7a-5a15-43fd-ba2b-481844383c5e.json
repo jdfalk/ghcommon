@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "Add workflow_dispatch trigger to unified automation",
+  "guid": "ab92ba7a-5a15-43fd-ba2b-481844383c5e",
+  "created_at": "2025-07-16T02:19:52Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
