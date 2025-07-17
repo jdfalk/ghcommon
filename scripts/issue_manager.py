@@ -2457,7 +2457,9 @@ Environment Variables:
         "update-issues", help="Process issue updates from JSON files"
     )
     update_parser.add_argument(
-        "--dry-run", action="store_true", help="Show what would be done without executing"
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without executing",
     )
     update_parser.add_argument(
         "--verbose", action="store_true", help="Enable verbose output"
@@ -2473,7 +2475,9 @@ Environment Variables:
         "copilot-tickets", help="Manage Copilot review comment tickets"
     )
     copilot_parser.add_argument(
-        "--dry-run", action="store_true", help="Show what would be done without executing"
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without executing",
     )
 
     # Close duplicates command
@@ -2481,7 +2485,9 @@ Environment Variables:
         "close-duplicates", help="Close duplicate issues by title"
     )
     duplicate_parser.add_argument(
-        "--dry-run", action="store_true", help="Show what would be done without executing"
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without executing",
     )
 
     # CodeQL alerts command
@@ -2489,7 +2495,9 @@ Environment Variables:
         "codeql-alerts", help="Generate tickets for CodeQL security alerts"
     )
     codeql_parser.add_argument(
-        "--dry-run", action="store_true", help="Show what would be done without executing"
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without executing",
     )
 
     # Event handler command
@@ -2521,12 +2529,8 @@ Environment Variables:
 
         # Execute the requested command
         if args.command == "update-issues":
-            processor = IssueUpdateProcessor(api)
-            success = processor.process_updates(
-                directory=args.directory,
-                dry_run=args.dry_run,
-                verbose=getattr(args, "verbose", False),
-            )
+            processor = IssueUpdateProcessor(api, dry_run=args.dry_run)
+            success = processor.process_updates(updates_directory=args.directory)
             return 0 if success else 1
 
         elif args.command == "copilot-tickets":
@@ -2548,9 +2552,11 @@ Environment Variables:
             # For event handler, we need to determine what type of event this is
             event_name = os.getenv("GITHUB_EVENT_NAME")
             if not event_name:
-                print("❌ Error: GITHUB_EVENT_NAME environment variable is required for event handling")
+                print(
+                    "❌ Error: GITHUB_EVENT_NAME environment variable is required for event handling"
+                )
                 return 1
-            
+
             # For now, just handle as issue updates
             processor = IssueUpdateProcessor(api)
             success = processor.process_updates(dry_run=False)
@@ -2564,6 +2570,7 @@ Environment Variables:
         print(f"❌ Error: {e}")
         if getattr(args, "verbose", False):
             import traceback
+
             traceback.print_exc()
         return 1
 

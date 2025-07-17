@@ -1,8 +1,25 @@
 # file: .github/workflows/unified-automation.yml
-# version: 1.5.0
+# version: 2.0.0
 # guid: 9e8f7a6b-5c4d-3b2a-1e0f-9d8c7b6a5e4f
+#
+# Unified Automation Workflow
+#
+# This workflow triggers the reusable automation orchestrator in ghcommon.
 
-name: Unified Automation Entrypoint
+name: Unified Automation
+
+permissions:
+  contents: write # For creating commits and PRs
+  issues: write # For creating and updating issues
+  pull-requests: write # For creating PRs
+  security-events: write # For security scanning and writing results
+  repository-projects: write # For adding items to projects
+  actions: write # For workflow access
+  checks: write # For workflow status
+  statuses: write # For commit status updates
+  packages: read # For package access (required by super-linter)
+  id-token: write # For attestation and artifact uploads (required by super-linter)
+  models: read # For AI model access (required by ai-rebase)
 
 on:
   push:
@@ -14,25 +31,103 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase)"
+        description: "Which automation tasks to run"
         required: false
-        default: "all"
         type: string
+        default: "all"
       im_operations:
         description: "Operations for issue management workflow"
         required: false
         default: "auto"
         type: string
+      im_dry_run:
+        description: "Run issue management in dry-run mode"
+        required: false
+        default: false
+        type: boolean
+      im_force_update:
+        description: "Force update existing issues"
+        required: false
+        default: false
+        type: boolean
+      im_issue_updates_file:
+        description: "Path to legacy issue updates file"
+        required: false
+        default: "issue_updates.json"
+        type: string
+      im_issue_updates_directory:
+        description: "Directory containing distributed issue updates"
+        required: false
+        default: ".github/issue-updates"
+        type: string
+      im_cleanup_issue_updates:
+        description: "Cleanup processed issue update files"
+        required: false
+        default: true
+        type: boolean
+      im_python_version:
+        description: "Python version for issue management"
+        required: false
+        default: "3.11"
+        type: string
+
       docs_updates_directory:
         description: "Directory with documentation updates"
         required: false
         default: ".github/doc-updates"
         type: string
+      docs_dry_run:
+        description: "Run docs update in dry-run mode"
+        required: false
+        default: false
+        type: boolean
+      docs_python_version:
+        description: "Python version for docs update"
+        required: false
+        default: "3.11"
+        type: string
+      docs_cleanup_processed_files:
+        description: "Cleanup processed doc update files"
+        required: false
+        default: true
+        type: boolean
+      docs_create_pr:
+        description: "Create PR for documentation changes"
+        required: false
+        default: false
+        type: boolean
+      docs_auto_merge:
+        description: "Auto-merge documentation PRs"
+        required: false
+        default: false
+        type: boolean
+      docs_continue_on_error:
+        description: "Continue processing even if some updates fail"
+        required: false
+        default: true
+        type: boolean
+
       labeler_configuration_path:
         description: "Path to labeler configuration"
         required: false
         default: ".github/labeler.yml"
         type: string
+      labeler_sync_labels:
+        description: "Remove labels when files are reverted"
+        required: false
+        default: false
+        type: boolean
+      labeler_dot:
+        description: "Include dot files when labeling"
+        required: false
+        default: true
+        type: boolean
+      labeler_pr_numbers:
+        description: "Specific PR numbers to label"
+        required: false
+        default: ""
+        type: string
+
       sl_validate_all_codebase:
         description: "Validate entire codebase with Super Linter"
         required: false
@@ -48,41 +143,134 @@ on:
         required: false
         default: ".github/super-linter.env"
         type: string
+      sl_run_python:
+        description: "Enable Python linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_shell:
+        description: "Enable shell linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_markdown:
+        description: "Enable Markdown linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_yaml:
+        description: "Enable YAML linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_json:
+        description: "Enable JSON linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_javascript:
+        description: "Enable JavaScript linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_go:
+        description: "Enable Go linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_css:
+        description: "Enable CSS linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_html:
+        description: "Enable HTML linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_protobuf:
+        description: "Enable Protobuf linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_github_actions:
+        description: "Enable GitHub Actions linting"
+        required: false
+        default: true
+        type: boolean
+      sl_run_security:
+        description: "Enable security scanning"
+        required: false
+        default: true
+        type: boolean
+      sl_enable_auto_fix:
+        description: "Enable auto-fixing where supported"
+        required: false
+        default: true
+        type: boolean
+      sl_auto_commit_fixes:
+        description: "Automatically commit lint fixes"
+        required: false
+        default: true
+        type: boolean
+      sl_commit_message:
+        description: "Commit message for lint fixes"
+        required: false
+        default: "style: auto-fix linting issues [skip ci]"
+        type: string
+
       rebase_base_branch:
         description: "Branch to rebase pull requests onto"
         required: false
         default: "main"
         type: string
-      config_json:
-        description: "JSON string containing any additional config options. See README for format."
+      rebase_model:
+        description: "Model to use for AI rebase"
         required: false
-        default: "{}"
+        default: "openai/gpt-4o"
         type: string
 
-permissions:
-  contents: write # For creating commits and PRs
-  issues: write # For creating and updating issues
-  pull-requests: write # For creating PRs
-  security-events: write # For security scanning and writing results
-  repository-projects: write # For adding items to projects
-  actions: write # For workflow access
-  checks: write # For workflow status
-  statuses: write # For commit status updates
-  packages: read # For package access (required by super-linter)
-  id-token: write # For attestation and artifact uploads (required by super-linter)
-  models: read # For AI model access (required by ai-rebase)
-
 jobs:
-  unified-automation:
+  automation:
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
     with:
-      operation: ${{ inputs.operation }}
-      im_operations: ${{ inputs.im_operations }}
-      docs_updates_directory: ${{ inputs.docs_updates_directory }}
-      labeler_configuration_path: ${{ inputs.labeler_configuration_path }}
-      sl_validate_all_codebase: ${{ inputs.sl_validate_all_codebase }}
-      sl_default_branch: ${{ inputs.sl_default_branch }}
-      sl_config_file: ${{ inputs.sl_config_file }}
-      rebase_base_branch: ${{ inputs.rebase_base_branch }}
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      operation: ${{ github.event.inputs.operation || 'all' }}
+      im_operations: ${{ github.event.inputs.im_operations || 'auto' }}
+      im_dry_run: ${{ github.event.inputs.im_dry_run || false }}
+      im_force_update: ${{ github.event.inputs.im_force_update || false }}
+      im_issue_updates_file: ${{ github.event.inputs.im_issue_updates_file || 'issue_updates.json' }}
+      im_issue_updates_directory: ${{ github.event.inputs.im_issue_updates_directory || '.github/issue-updates' }}
+      im_cleanup_issue_updates: ${{ github.event.inputs.im_cleanup_issue_updates || true }}
+      im_python_version: ${{ github.event.inputs.im_python_version || '3.11' }}
+      docs_updates_directory: ${{ github.event.inputs.docs_updates_directory || '.github/doc-updates' }}
+      docs_dry_run: ${{ github.event.inputs.docs_dry_run || false }}
+      docs_python_version: ${{ github.event.inputs.docs_python_version || '3.11' }}
+      docs_cleanup_processed_files: ${{ github.event.inputs.docs_cleanup_processed_files || true }}
+      docs_create_pr: ${{ github.event.inputs.docs_create_pr || false }}
+      docs_auto_merge: ${{ github.event.inputs.docs_auto_merge || false }}
+      docs_continue_on_error: ${{ github.event.inputs.docs_continue_on_error || true }}
+      labeler_configuration_path: ${{ github.event.inputs.labeler_configuration_path || '.github/labeler.yml' }}
+      labeler_sync_labels: ${{ github.event.inputs.labeler_sync_labels || false }}
+      labeler_dot: ${{ github.event.inputs.labeler_dot || true }}
+      labeler_pr_numbers: ${{ github.event.inputs.labeler_pr_numbers || '' }}
+      sl_validate_all_codebase: ${{ github.event.inputs.sl_validate_all_codebase || false }}
+      sl_default_branch: ${{ github.event.inputs.sl_default_branch || 'main' }}
+      sl_config_file: ${{ github.event.inputs.sl_config_file || '.github/super-linter.env' }}
+      sl_run_python: ${{ github.event.inputs.sl_run_python || true }}
+      sl_run_shell: ${{ github.event.inputs.sl_run_shell || true }}
+      sl_run_markdown: ${{ github.event.inputs.sl_run_markdown || true }}
+      sl_run_yaml: ${{ github.event.inputs.sl_run_yaml || true }}
+      sl_run_json: ${{ github.event.inputs.sl_run_json || true }}
+      sl_run_javascript: ${{ github.event.inputs.sl_run_javascript || true }}
+      sl_run_go: ${{ github.event.inputs.sl_run_go || true }}
+      sl_run_css: ${{ github.event.inputs.sl_run_css || true }}
+      sl_run_html: ${{ github.event.inputs.sl_run_html || true }}
+      sl_run_protobuf: ${{ github.event.inputs.sl_run_protobuf || true }}
+      sl_run_github_actions: ${{ github.event.inputs.sl_run_github_actions || true }}
+      sl_run_security: ${{ github.event.inputs.sl_run_security || true }}
+      sl_enable_auto_fix: ${{ github.event.inputs.sl_enable_auto_fix || true }}
+      sl_auto_commit_fixes: ${{ github.event.inputs.sl_auto_commit_fixes || true }}
+      sl_commit_message: "${{ github.event.inputs.sl_commit_message || 'style: auto-fix linting issues [skip ci]' }}"
+      rebase_base_branch: ${{ github.event.inputs.rebase_base_branch || 'main' }}
+      rebase_model: ${{ github.event.inputs.rebase_model || 'openai/gpt-4o' }}
+    secrets: inherit
