@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "- [ ] 🟡 **General**: Add dedicated unified automation workflow",
+  "guid": "89f3d882-cc25-479f-9e5a-f1702263bb1b",
+  "created_at": "2025-07-16T10:21:32Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

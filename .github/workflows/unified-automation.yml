@@ -1,17 +1,30 @@
-# file: .github/workflows/reusable-unified-automation.yml
-# version: 2.3.0
-# guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+# file: .github/workflows/unified-automation.yml
+# version: 1.1.0
+# guid: 17be3eca-f785-4b0f-ae16-6dda1cf9051b
+#
+# Unified Automation Workflow
+#
+# This workflow triggers the reusable automation orchestrator in ghcommon.
 
-name: Unified Automation Orchestrator
+name: Unified Automation
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  security-events: read
+  repository-projects: write
+  actions: read
+  checks: write
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       operation:
-        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase)"
+        description: "Which automation tasks to run"
         required: false
-        default: "all"
         type: string
+        default: "all"
       im_operations:
         description: "Operations for issue management workflow"
         required: false
@@ -206,76 +219,48 @@ on:
         required: false
         default: "openai/gpt-4o"
         type: string
+
 jobs:
-  issue-management:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
-    uses: ./.github/workflows/reusable-unified-issue-management.yml
+  automation:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
     with:
-      operations: ${{ inputs.im_operations }}
-      dry_run: ${{ inputs.im_dry_run }}
-      force_update: ${{ inputs.im_force_update }}
-      issue_updates_file: ${{ inputs.im_issue_updates_file }}
-      issue_updates_directory: ${{ inputs.im_issue_updates_directory }}
-      cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
-      python_version: ${{ inputs.im_python_version }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
-
-  docs-update:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
-    uses: ./.github/workflows/reusable-docs-update.yml
-    with:
-      updates-directory: ${{ inputs.docs_updates_directory }}
-      dry_run: ${{ inputs.docs_dry_run }}
-      python_version: ${{ inputs.docs_python_version }}
-      cleanup_processed_files: ${{ inputs.docs_cleanup_processed_files }}
-      create_pr: ${{ inputs.docs_create_pr }}
-      auto_merge: ${{ inputs.docs_auto_merge }}
-      continue_on_error: ${{ inputs.docs_continue_on_error }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
-
-  labeler:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
-    uses: ./.github/workflows/reusable-labeler.yml
-    with:
-      configuration-path: ${{ inputs.labeler_configuration_path }}
-      sync-labels: ${{ inputs.labeler_sync_labels }}
-      dot: ${{ inputs.labeler_dot }}
-      pr-numbers: ${{ inputs.labeler_pr_numbers }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
-
-  super-linter:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
-    uses: ./.github/workflows/reusable-super-linter.yml
-    with:
-      validate-all-codebase: ${{ inputs.sl_validate_all_codebase }}
-      default-branch: ${{ inputs.sl_default_branch }}
-      config-file: ${{ inputs.sl_config_file }}
-      run-python: ${{ inputs.sl_run_python }}
-      run-shell: ${{ inputs.sl_run_shell }}
-      run-markdown: ${{ inputs.sl_run_markdown }}
-      run-yaml: ${{ inputs.sl_run_yaml }}
-      run-json: ${{ inputs.sl_run_json }}
-      run-javascript: ${{ inputs.sl_run_javascript }}
-      run-go: ${{ inputs.sl_run_go }}
-      run-css: ${{ inputs.sl_run_css }}
-      run-html: ${{ inputs.sl_run_html }}
-      run-protobuf: ${{ inputs.sl_run_protobuf }}
-      run-github-actions: ${{ inputs.sl_run_github_actions }}
-      run-security: ${{ inputs.sl_run_security }}
-      enable-auto-fix: ${{ inputs.sl_enable_auto_fix }}
-      auto-commit-fixes: ${{ inputs.sl_auto_commit_fixes }}
-      commit-message: ${{ inputs.sl_commit_message }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
-
-  ai-rebase:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
-    uses: ./.github/workflows/reusable-ai-rebase.yml
-    with:
-      base-branch: ${{ inputs.rebase_base_branch }}
-      model: ${{ inputs.rebase_model }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+      operation: ${{ github.event.inputs.operation || 'all' }}
+      im_operations: ${{ github.event.inputs.im_operations || 'auto' }}
+      im_dry_run: ${{ github.event.inputs.im_dry_run || false }}
+      im_force_update: ${{ github.event.inputs.im_force_update || false }}
+      im_issue_updates_file: ${{ github.event.inputs.im_issue_updates_file || 'issue_updates.json' }}
+      im_issue_updates_directory: ${{ github.event.inputs.im_issue_updates_directory || '.github/issue-updates' }}
+      im_cleanup_issue_updates: ${{ github.event.inputs.im_cleanup_issue_updates || true }}
+      im_python_version: ${{ github.event.inputs.im_python_version || '3.11' }}
+      docs_updates_directory: ${{ github.event.inputs.docs_updates_directory || '.github/doc-updates' }}
+      docs_dry_run: ${{ github.event.inputs.docs_dry_run || false }}
+      docs_python_version: ${{ github.event.inputs.docs_python_version || '3.11' }}
+      docs_cleanup_processed_files: ${{ github.event.inputs.docs_cleanup_processed_files || true }}
+      docs_create_pr: ${{ github.event.inputs.docs_create_pr || false }}
+      docs_auto_merge: ${{ github.event.inputs.docs_auto_merge || false }}
+      docs_continue_on_error: ${{ github.event.inputs.docs_continue_on_error || true }}
+      labeler_configuration_path: ${{ github.event.inputs.labeler_configuration_path || '.github/labeler.yml' }}
+      labeler_sync_labels: ${{ github.event.inputs.labeler_sync_labels || false }}
+      labeler_dot: ${{ github.event.inputs.labeler_dot || true }}
+      labeler_pr_numbers: ${{ github.event.inputs.labeler_pr_numbers || '' }}
+      sl_validate_all_codebase: ${{ github.event.inputs.sl_validate_all_codebase || false }}
+      sl_default_branch: ${{ github.event.inputs.sl_default_branch || 'main' }}
+      sl_config_file: ${{ github.event.inputs.sl_config_file || '.github/super-linter.env' }}
+      sl_run_python: ${{ github.event.inputs.sl_run_python || true }}
+      sl_run_shell: ${{ github.event.inputs.sl_run_shell || true }}
+      sl_run_markdown: ${{ github.event.inputs.sl_run_markdown || true }}
+      sl_run_yaml: ${{ github.event.inputs.sl_run_yaml || true }}
+      sl_run_json: ${{ github.event.inputs.sl_run_json || true }}
+      sl_run_javascript: ${{ github.event.inputs.sl_run_javascript || true }}
+      sl_run_go: ${{ github.event.inputs.sl_run_go || true }}
+      sl_run_css: ${{ github.event.inputs.sl_run_css || true }}
+      sl_run_html: ${{ github.event.inputs.sl_run_html || true }}
+      sl_run_protobuf: ${{ github.event.inputs.sl_run_protobuf || true }}
+      sl_run_github_actions: ${{ github.event.inputs.sl_run_github_actions || true }}
+      sl_run_security: ${{ github.event.inputs.sl_run_security || true }}
+      sl_enable_auto_fix: ${{ github.event.inputs.sl_enable_auto_fix || true }}
+      sl_auto_commit_fixes: ${{ github.event.inputs.sl_auto_commit_fixes || true }}
+      sl_commit_message: ${{ github.event.inputs.sl_commit_message || 'style: auto-fix linting issues [skip ci]' }}
+      rebase_base_branch: ${{ github.event.inputs.rebase_base_branch || 'main' }}
+      rebase_model: ${{ github.event.inputs.rebase_model || 'openai/gpt-4o' }}
+    secrets: inherit

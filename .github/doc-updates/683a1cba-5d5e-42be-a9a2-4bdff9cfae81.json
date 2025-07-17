@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Added unified automation workflow for manual invocation",
+  "guid": "683a1cba-5d5e-42be-a9a2-4bdff9cfae81",
+  "created_at": "2025-07-16T10:21:27Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

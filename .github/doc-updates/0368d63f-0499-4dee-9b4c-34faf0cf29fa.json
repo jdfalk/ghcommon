@@ -1,0 +1,16 @@
+{
+  "file": "README.md",
+  "mode": "insert-after",
+  "content": "| [`reusable-unified-automation.yml`](.github/workflows/reusable-unified-automation.yml) | Unified automation orchestrator | Runs issue management, docs update, labeler, linting, and AI rebase |",
+  "guid": "0368d63f-0499-4dee-9b4c-34faf0cf29fa",
+  "created_at": "2025-07-16T10:20:53Z",
+  "options": {
+    "section": null,
+    "after": "| [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management |",
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
