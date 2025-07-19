@@ -1,5 +1,5 @@
 # file: .github/workflows/unified-automation.yml
-# version: 1.1.0
+# version: 1.2.0
 # guid: 9e8f7a6b-5c4d-3b2a-1e0f-9d8c7b6a5e4f
 
 name: Unified Automation Entrypoint
@@ -58,6 +58,16 @@ on:
         required: false
         default: "{}"
         type: string
+
+permissions:
+  contents: write        # For creating commits and PRs
+  issues: write          # For creating and updating issues
+  pull-requests: write   # For creating PRs
+  security-events: read  # For reading CodeQL alerts
+  repository-projects: write # For adding items to projects
+  actions: write         # For workflow access
+  checks: write          # For workflow status
+  statuses: write        # For commit status updates
 
 jobs:
   unified-automation:
