@@ -1,5 +1,5 @@
 # file: .github/workflows/unified-automation.yml
-# version: 1.4.0
+# version: 1.5.0
 # guid: 9e8f7a6b-5c4d-3b2a-1e0f-9d8c7b6a5e4f
 
 name: Unified Automation Entrypoint
@@ -84,4 +84,5 @@ jobs:
       sl_default_branch: ${{ inputs.sl_default_branch }}
       sl_config_file: ${{ inputs.sl_config_file }}
       rebase_base_branch: ${{ inputs.rebase_base_branch }}
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
