@@ -85,6 +85,7 @@ class OperationSummary:
         self.permalinks_updated = []
         self.errors = []
         self.warnings = []
+        self.successes = []  # For dry-run operations
 
     def add_issue_created(self, issue_number: int, title: str, url: str):
         """Record an issue creation."""
@@ -144,6 +145,10 @@ class OperationSummary:
     def add_warning(self, message: str):
         """Record a warning."""
         self.warnings.append(message)
+
+    def add_success(self, message: str):
+        """Record a success (for dry-run operations)."""
+        self.successes.append(message)
 
     def get_total_changes(self) -> int:
         """Get total number of changes made."""
@@ -641,12 +646,13 @@ class GitHubAPI:
 class IssueUpdateProcessor:
     """Processes issue updates from issue_updates.json."""
 
-    def __init__(self, github_api: GitHubAPI):
+    def __init__(self, github_api: GitHubAPI, dry_run: bool = False):
         # Use a mapping from guid to (repo, issue_number) for multi-repo support
         self.api = github_api
         self.repo = github_api.repo  # Fix: add repo attribute for compatibility
         self.summary = OperationSummary("Issue Update Processing")
         self.guid_issue_map: Dict[str, Tuple[str, int]] = {}
+        self.dry_run = dry_run
 
     def process_updates(
         self,
@@ -720,18 +726,26 @@ class IssueUpdateProcessor:
 
         print(f"\n✅ Successfully processed {success_count}/{len(all_updates)} updates")
 
-        # Move processed distributed files to processed subdirectory
-        if processed_files and success_count > 0:
+        # Move processed distributed files to processed subdirectory (skip in dry-run)
+        if not self.dry_run and processed_files and success_count > 0:
             for file_path in processed_files:
                 self._fill_numbers_in_file(file_path)
             self._archive_processed_files(processed_files, updates_directory)
+        elif self.dry_run and processed_files:
+            print(
+                f"[DRY RUN] Would move {len(processed_files)} files to processed/ directory"
+            )
 
-        # Mark legacy file as processed if we processed it successfully
-        if not legacy_already_processed and success_count > 0:
+        # Mark legacy file as processed if we processed it successfully (skip in dry-run)
+        if not self.dry_run and not legacy_already_processed and success_count > 0:
             # Check if we had legacy updates to process
             legacy_updates = self._load_legacy_file(updates_file)
             if legacy_updates:
                 self._mark_legacy_file_processed(updates_file)
+        elif self.dry_run and not legacy_already_processed:
+            legacy_updates = self._load_legacy_file(updates_file)
+            if legacy_updates:
+                print(f"[DRY RUN] Would mark legacy file {updates_file} as processed")
 
         # Add file tracking to summary
         if processed_files:
@@ -1113,14 +1127,19 @@ class IssueUpdateProcessor:
         self, action: str, guid: str, update: Dict[str, Any]
     ) -> bool:
         """Check if an operation with the same GUID was already performed."""
+        # Check for duplicates even in dry-run mode to provide accurate feedback
+
         if action == "comment":
             # For comments, check if GUID exists in issue comments
             issue_number = update.get("number")
             if issue_number:
                 return self._comment_guid_exists(issue_number, guid, update.get("repo"))
         elif action == "create":
-            # For creates, check if issue with GUID already exists
-            return self._create_guid_exists(guid, update, update.get("repo"))
+            # For creates, use comprehensive GUID checking across all issues
+            primary_guid, legacy_guid = self._extract_guids(update)
+            return not self._check_guid_uniqueness_for_duplicate_check(
+                primary_guid, legacy_guid, update.get("repo")
+            )
 
         # For update, close, delete - assume no duplicates for now
         return False
@@ -1178,6 +1197,10 @@ class IssueUpdateProcessor:
         if not guid and not legacy_guid:
             return True
 
+        # In dry-run mode, skip actual uniqueness checking
+        if self.dry_run:
+            return True
+
         try:
             api = (
                 self.api
@@ -1217,6 +1240,73 @@ class IssueUpdateProcessor:
         except Exception as e:
             # On error, log but allow operation to proceed
             self.summary.add_warning(f"Could not verify GUID uniqueness: {e}")
+            print(f"⚠️  Could not verify GUID uniqueness: {e}")
+            return True
+
+    def _check_guid_uniqueness_for_duplicate_check(
+        self,
+        guid: str,
+        legacy_guid: str,
+        repo: str = None,
+    ) -> bool:
+        """Check if a GUID is unique across all issues for duplicate detection.
+
+        This version works even in dry-run mode to provide accurate feedback.
+
+        Args:
+            guid: Primary GUID (UUID format)
+            legacy_guid: Legacy GUID for backward compatibility
+            repo: Repository to check (defaults to self.api.repo)
+
+        Returns:
+            True if the GUID is unique (operation can proceed), False if duplicate exists
+        """
+        # If neither GUID is provided, allow the operation (no uniqueness check)
+        if not guid and not legacy_guid:
+            return True
+
+        try:
+            api = (
+                self.api
+                if not repo or repo == self.api.repo
+                else GitHubAPI(self.api.token, repo)
+            )
+            # Search for existing issues with either GUID
+            all_issues = api.get_all_issues(state="all")
+
+            # Check both GUIDs
+            for issue in all_issues:
+                body = issue.get("body", "")
+
+                # Check primary GUID
+                if guid and f"<!-- guid:{guid} -->" in body:
+                    if not self.dry_run:
+                        self.summary.add_error(
+                            f"Duplicate GUID found: {guid} already exists in issue #{issue['number']}"
+                        )
+                    print(
+                        f"🔍 GUID {guid} already exists in issue #{issue['number']}: {issue['title']}"
+                    )
+                    return False
+
+                # Check legacy GUID
+                if legacy_guid and f"<!-- guid:{legacy_guid} -->" in body:
+                    if not self.dry_run:
+                        self.summary.add_error(
+                            f"Duplicate legacy GUID found: {legacy_guid} already exists in issue #{issue['number']}"
+                        )
+                    print(
+                        f"🔍 Legacy GUID {legacy_guid} already exists in issue #{issue['number']}: {issue['title']}"
+                    )
+                    return False
+
+            # GUIDs are unique
+            return True
+
+        except Exception as e:
+            # On error, log but allow operation to proceed
+            if not self.dry_run:
+                self.summary.add_warning(f"Could not verify GUID uniqueness: {e}")
             print(f"⚠️  Could not verify GUID uniqueness: {e}")
             return True
 
@@ -1276,6 +1366,13 @@ class IssueUpdateProcessor:
         if guid_to_embed:
             body += f"\n\n<!-- guid:{guid_to_embed} -->"
 
+        if self.dry_run:
+            print(f"[DRY RUN] Would create issue in {repo}: {title}")
+            print(f"[DRY RUN] Labels: {labels}")
+            print(f"[DRY RUN] GUID: {guid_to_embed}")
+            self.summary.add_success(f"[DRY RUN] Would create issue: {title}")
+            return True
+
         print(f"Creating issue in {repo}: {title}")
         issue = api.create_issue(title, body, labels)
 
@@ -1322,6 +1419,14 @@ class IssueUpdateProcessor:
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
+
+        if self.dry_run:
+            print(f"[DRY RUN] Would update issue #{issue_number} in {repo}")
+            print(f"[DRY RUN] Update fields: {list(update_data.keys())}")
+            print(f"[DRY RUN] GUID: {guid_to_embed}")
+            self.summary.add_success(f"[DRY RUN] Would update issue #{issue_number}")
+            return True
+
         api = (
             self.api
             if not repo or repo == self.api.repo
@@ -1357,6 +1462,16 @@ class IssueUpdateProcessor:
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed:
             body += f"\n\n<!-- guid:{guid_to_embed} -->"
+
+        if self.dry_run:
+            print(f"[DRY RUN] Would add comment to issue #{issue_number} in {repo}")
+            print(f"[DRY RUN] Comment body length: {len(body)} characters")
+            print(f"[DRY RUN] GUID: {guid_to_embed}")
+            self.summary.add_success(
+                f"[DRY RUN] Would add comment to issue #{issue_number}"
+            )
+            return True
+
         api = (
             self.api
             if not repo or repo == self.api.repo
@@ -1388,6 +1503,13 @@ class IssueUpdateProcessor:
         if not issue_number:
             self.summary.add_error(f"No issue number found for close: {update}")
             return False
+
+        if self.dry_run:
+            print(f"[DRY RUN] Would close issue #{issue_number} in {repo}")
+            print(f"[DRY RUN] State reason: {state_reason}")
+            self.summary.add_success(f"[DRY RUN] Would close issue #{issue_number}")
+            return True
+
         api = (
             self.api
             if not repo or repo == self.repo
@@ -1681,6 +1803,14 @@ class IssueUpdateProcessor:
             self.summary.add_error("Delete action missing issue number")
             return False
 
+        if self.dry_run:
+            print(f"[DRY RUN] Would delete issue #{issue_number} in {repo}")
+            print(
+                "[DRY RUN] Note: Requires admin permissions, would fallback to close if needed"
+            )
+            self.summary.add_success(f"[DRY RUN] Would delete issue #{issue_number}")
+            return True
+
         # Get issue data before deletion for summary
         try:
             issue_data = api.get_issue(issue_number)
@@ -1881,98 +2011,6 @@ class CopilotTicketManager:
                     f.write(github_summary + "\n")
             except Exception as e:
                 print(f"⚠️  Failed to write to GitHub step summary: {e}")
-
-    def _handle_review_comment(self, action: str, event_data: Dict[str, Any]) -> None:
-        """Handle review comment events."""
-        comment = event_data.get("comment", {})
-
-        if comment.get("user", {}).get("login") != COPILOT_USER:
-            print("Not a Copilot comment; skipping")
-            return
-
-        if action == "created":
-            self._create_or_update_ticket(comment)
-        elif action == "deleted":
-            self._handle_comment_deleted(comment)
-
-    def _handle_review(self, action: str, event_data: Dict[str, Any]) -> None:
-        """Handle review events (minimal action currently)."""
-        review = event_data.get("review", {})
-        if review.get("user", {}).get("login") == COPILOT_USER:
-            print(f"Copilot review {action}")
-
-    def _handle_pr_closed(self, event_data: Dict[str, Any]) -> None:
-        """Close all Copilot tickets for a merged PR."""
-        pr = event_data.get("pull_request", {})
-        if not pr.get("merged", False):
-            print("PR not merged, skipping")
-            return
-
-        pr_number = pr["number"]
-        print(f"Processing merged PR #{pr_number}")
-
-        # Search for all open copilot issues mentioning this PR
-        issues = self.api.search_issues(f"label:{COPILOT_LABEL} state:open {pr_number}")
-        print(f"Found {len(issues)} open Copilot issues for PR #{pr_number}")
-
-        closed_count = 0
-        for issue in issues:
-            if self.api.close_issue(issue["number"]):
-                closed_count += 1
-
-        if closed_count > 0:
-            print(f"Closed {closed_count} Copilot issues for merged PR #{pr_number}")
-
-    def _handle_push(self, event_data: Dict[str, Any]) -> None:
-        """Handle pushes to main branch - comprehensive issue analysis."""
-        ref = event_data.get("ref", "")
-        if not ref.endswith("/main") and not ref.endswith("/master"):
-            print(f"Push to {ref} - not main/master, skipping")
-            return
-
-        print(f"Processing push to {ref}")
-
-        # Get all open Copilot issues and analyze them
-        issues = self.api.search_issues(f"label:{COPILOT_LABEL} state:open")
-        print(f"Found {len(issues)} open Copilot issues")
-
-        # Here you could implement file change analysis and stale issue cleanup
-        # For now, just log the activity
-        print("Push analysis complete")
-
-    def _create_or_update_ticket(self, comment: Dict[str, Any]) -> None:
-        """Create or update a ticket for a Copilot comment."""
-        comment_body = comment.get("body", "").strip()
-        key = comment_body.split("\n", 1)[0]  # First line as key
-
-        existing = self.api.search_issues(f"label:{COPILOT_LABEL} state:open {key}")
-
-        line_info = {
-            "id": comment["id"],
-            "path": comment.get("path", ""),
-            "line": comment.get("line", 0),
-            "url": comment.get("html_url", ""),
-        }
-
-        if existing:
-            # Update existing issue
-            issue = existing[0]
-            print(f"Updating existing Copilot issue #{issue['number']}")
-            # Implementation would parse existing body and update it
-            self.summary.add_issue_updated(
-                issue["number"], issue["title"], issue["html_url"]
-            )
-        else:
-            # Create new issue
-            title = f"Copilot Review: {key[:50]}..."
-            body = self._build_ticket_body(comment, [line_info])
-            result = self.api.create_issue(title, body, [COPILOT_LABEL])
-            if result:
-                self.summary.add_issue_created(
-                    result["number"], title, result["html_url"]
-                )
-            else:
-                self.summary.add_error(f"Failed to create Copilot ticket: {title}")
 
     def _handle_review_comment(self, action: str, event_data: Dict[str, Any]) -> None:
         """Handle review comment events."""
@@ -2389,157 +2427,3 @@ class CodeQLAlertManager:
 
         print(f"  🔒 Would create issue for CodeQL alert #{alert_id}")
         print(f"     Rule: {rule_id} (Severity: {severity})")
-
-
-def main():
-    """Main entry point for the issue manager script."""
-    parser = argparse.ArgumentParser(
-        description="Unified GitHub issue management script",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python issue_manager.py update-issues     # Process issue_updates.json
-  python issue_manager.py copilot-tickets   # Manage Copilot review tickets
-  python issue_manager.py close-duplicates  # Close duplicate issues
-  python issue_manager.py codeql-alerts     # Generate CodeQL alert tickets
-  python issue_manager.py event-handler     # Handle GitHub webhook events
-
-Environment Variables:
-  GH_TOKEN or GITHUB_TOKEN - GitHub token with repo access
-  REPO or GITHUB_REPOSITORY - repository in owner/name format
-  GITHUB_EVENT_NAME - webhook event name (for event-driven operations)
-  GITHUB_EVENT_PATH - path to the event payload (for event-driven operations)
-        """,
-    )
-
-    parser.add_argument(
-        "operation",
-        choices=[
-            "update-issues",
-            "copilot-tickets",
-            "close-duplicates",
-            "codeql-alerts",
-            "event-handler",
-            "update-permalinks",
-        ],
-        help="Operation to perform",
-    )
-
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be done without making changes",
-    )
-
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Force update existing tickets (for copilot-tickets)",
-    )
-
-    args = parser.parse_args()
-
-    # Get GitHub token
-    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print(
-            "Error: GitHub token not found. Set GH_TOKEN or GITHUB_TOKEN environment variable.",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Get repository
-    repo = os.environ.get("REPO") or os.environ.get("GITHUB_REPOSITORY")
-    if not repo:
-        print(
-            "Error: Repository not specified. Set REPO or GITHUB_REPOSITORY environment variable.",
-            file=sys.stderr,
-        )
-        return 1
-
-    try:
-        # Initialize GitHub API
-        api = GitHubAPI(token, repo)
-
-        if args.operation == "update-issues":
-            processor = IssueUpdateProcessor(api)
-            success = processor.process_updates()
-            return 0 if success else 1
-
-        elif args.operation == "copilot-tickets":
-            manager = CopilotTicketManager(api)
-
-            # Check if this is event-driven
-            event_name = os.environ.get("GITHUB_EVENT_NAME")
-            event_path = os.environ.get("GITHUB_EVENT_PATH")
-
-            if event_name and event_path:
-                # Load event data
-                try:
-                    with open(event_path, "r") as f:
-                        event_data = json.load(f)
-                    manager.handle_event(event_name, event_data)
-                except Exception as e:
-                    print(f"Error processing event: {e}", file=sys.stderr)
-                    return 1
-            else:
-                print("No event data provided for copilot-tickets operation")
-
-            return 0
-
-        elif args.operation == "close-duplicates":
-            manager = DuplicateIssueManager(api)
-            manager.close_duplicates(dry_run=args.dry_run)
-            return 0
-
-        elif args.operation == "codeql-alerts":
-            manager = CodeQLAlertManager(api)
-            manager.process_codeql_alerts(dry_run=args.dry_run)
-            return 0
-
-        elif args.operation == "event-handler":
-            # Generic event handler
-            event_name = os.environ.get("GITHUB_EVENT_NAME")
-            event_path = os.environ.get("GITHUB_EVENT_PATH")
-
-            if not event_name or not event_path:
-                print(
-                    "Error: GITHUB_EVENT_NAME and GITHUB_EVENT_PATH must be set for event-handler",
-                    file=sys.stderr,
-                )
-                return 1
-
-            try:
-                with open(event_path, "r") as f:
-                    event_data = json.load(f)
-
-                # Route to appropriate handler based on event type
-                if event_name in [
-                    "pull_request_review_comment",
-                    "pull_request_review",
-                    "pull_request",
-                    "push",
-                ]:
-                    manager = CopilotTicketManager(api)
-                    manager.handle_event(event_name, event_data)
-                else:
-                    print(f"Unhandled event type: {event_name}")
-
-            except Exception as e:
-                print(f"Error handling event: {e}", file=sys.stderr)
-                return 1
-
-            return 0
-
-        elif args.operation == "update-permalinks":
-            processor = IssueUpdateProcessor(api)
-            processor.update_permalinks()
-            return 0
-
-    except Exception as e:
-        print(f"Unexpected error: {e}", file=sys.stderr)
-        return 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())
