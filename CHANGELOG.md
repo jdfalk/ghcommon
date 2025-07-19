@@ -9,6 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Rebase launcher now auto-commits AI conflict resolutions and force pushes
+
+### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
+
+### Fixed
+
+- Fix syntax error in reusable docs update workflow
+
+### Added
+
+- Common system prompt file for AI rebase workflow
+
+### Added
+
+- Added unified automation orchestrator workflow with extensive customization options
+
+### Fixed
+
+- Fixed YAML Prettier configuration to avoid super-linter error
+
+### Added
+
+- AI rebase workflow now uses file-based prompts to avoid long command lines
+
+### Added
+
+- Added manual workflow_dispatch trigger for unified automation
+
+### Added
+
+- Added reusable stale issue handler
+
+### Added
+
+- Added centralized CodeQL configuration
+
+### Fixed
+
+- Enabled YAML Prettier validation for super linter
+
 ### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
 
 ### Added

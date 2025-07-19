@@ -36,3 +36,5 @@ For a minimal example see [`examples/workflows/unified-automation.yml`](../examp
 
 See the workflow file for the full list of available inputs.
 
+
+## Manual Execution\n\nRun the workflow from the Actions tab using workflow_dispatch inputs to control operations like rebase_base_branch.

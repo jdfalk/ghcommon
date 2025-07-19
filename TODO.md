@@ -395,3 +395,21 @@ Refactor AI rebase workflow for better resiliency
 Document usage for stale workflow
 
 Integrate advanced CodeQL config into setup scripts
+
+Update AI rebase workflow to use file-based prompts
+
+- [ ] 🟡 **General**: Document usage of unified automation workflow across repositories
+
+Propagate shared system prompt file to all repos
+
+Refactor AI rebase workflow for better resiliency
+
+Document usage for stale workflow
+
+Automate commit and push after AI rebase
+
+Integrate advanced CodeQL config into setup scripts
+
+Add workflow_dispatch trigger to unified automation
+
+Track fix for docs workflow

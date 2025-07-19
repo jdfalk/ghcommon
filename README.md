@@ -35,6 +35,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 | [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
 | [`automatic-release.yml`](.github/workflows/automatic-release.yml)                        | Automated GitHub releases      | Release notes, artifact management, notifications                        |
 | [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
+| [`reusable-unified-automation.yml`](.github/workflows/reusable-unified-automation.yml) | Unified automation orchestrator | Runs issue management, docs update, labeler, linting, and AI rebase |
 
 ### Templates
 
@@ -60,6 +61,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 - **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 - **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 - **Advanced CodeQL Configuration**: Centralized config with automatic language detection
@@ -219,6 +221,7 @@ chmod +x scripts/create-issue-update.sh
 ````
 
 **Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
+**Documentation**: [docs/unified-automation.md](docs/unified-automation.md)
 **Examples**: [examples/workflows/](examples/workflows/)
 
 ## 🛡️ Security Features
@@ -371,3 +374,10 @@ Builtin project automation documented
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 Added stale issue management workflow
 Document shared AI rebase system prompt
+- AI rebase workflow now uses file-based prompts for model inference
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+Fix doc update workflow syntax error
+Unified automation workflow can now be run manually via the Actions tab
+Added stale issue management workflow
+Document shared AI rebase system prompt
+Added auto-commit and push in rebase script

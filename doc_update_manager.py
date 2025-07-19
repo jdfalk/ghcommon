@@ -41,30 +41,47 @@ class DocumentationUpdateManager:
         cleanup: bool = True,
         dry_run: bool = False,
         verbose: bool = False,
+        continue_on_error: bool = True,
     ):
         self.updates_dir = Path(updates_dir)
         self.cleanup = cleanup
         self.dry_run = dry_run
         self.verbose = verbose
+        self.continue_on_error = continue_on_error
+
+        # Create error isolation directories
+        self.processed_dir = self.updates_dir / "processed"
+        self.malformed_dir = self.updates_dir / "malformed"
+        self.failed_dir = self.updates_dir / "failed"
+
+        # Ensure directories exist
+        for dir_path in [self.processed_dir, self.malformed_dir, self.failed_dir]:
+            dir_path.mkdir(parents=True, exist_ok=True)
+
         self.stats = {
             "files_processed": 0,
+            "files_malformed": 0,
+            "files_failed": 0,
             "changes_made": False,
             "files_updated": [],
             "errors": [],
+            "malformed_files": [],
+            "failed_files": [],
         }
 
         if verbose:
             logger.setLevel(logging.DEBUG)
 
     def process_all_updates(self) -> Dict[str, Any]:
-        """Process all update files in the updates directory."""
+        """Process all update files in the updates directory with individual error handling."""
         logger.info(f"🔄 Processing documentation updates from {self.updates_dir}")
 
         if not self.updates_dir.exists():
             logger.info(f"📝 Updates directory does not exist: {self.updates_dir}")
             return self.stats
 
-        update_files = list(self.updates_dir.glob("*.json"))
+        # Find only files in main directory (not subdirectories)
+        update_files = [f for f in self.updates_dir.glob("*.json") if f.is_file()]
         if not update_files:
             logger.info("📝 No update files found")
             return self.stats
@@ -74,16 +91,13 @@ class DocumentationUpdateManager:
         # Process files in order (oldest first based on filename/timestamp)
         update_files.sort()
 
+        # Process each file individually with error isolation
         for update_file in update_files:
-            try:
-                self.process_update_file(update_file)
-            except Exception as e:
-                error_msg = f"Failed to process {update_file}: {str(e)}"
-                logger.error(error_msg)
-                self.stats["errors"].append(error_msg)
+            self._process_single_file_safely(update_file)
 
         # Save statistics
         self._save_stats()
+        self._log_processing_summary()
 
         return self.stats
 
@@ -305,25 +319,182 @@ class DocumentationUpdateManager:
         # In practice, you'd want more sophisticated badge updating
         return content + f"\n{badge_content}\n"
 
+    def _move_to_processed(self, update_file: Path) -> None:
+        """Move successfully processed file to processed directory."""
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            processed_name = f"{timestamp}_{update_file.name}"
+            processed_path = self.processed_dir / processed_name
+
+            shutil.move(str(update_file), str(processed_path))
+            logger.debug(f"📦 Moved to processed: {processed_name}")
+        except Exception as e:
+            logger.warning(f"Failed to move {update_file.name} to processed: {e}")
+
+    def _move_to_malformed(self, update_file: Path, error_msg: str) -> None:
+        """Move malformed file to malformed directory with error info."""
+        logger.warning(f"⚠️ Malformed file: {update_file.name} - {error_msg}")
+
+        self.stats["files_malformed"] += 1
+        self.stats["malformed_files"].append(update_file.name)
+        self.stats["errors"].append(f"Malformed file {update_file.name}: {error_msg}")
+
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            malformed_name = f"{timestamp}_{update_file.name}"
+            malformed_path = self.malformed_dir / malformed_name
+
+            # Create error info file
+            error_file = self.malformed_dir / f"{timestamp}_{update_file.stem}_error.txt"
+            with open(error_file, "w", encoding="utf-8") as f:
+                f.write(f"File: {update_file.name}\n")
+                f.write(f"Error: {error_msg}\n")
+                f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+
+            shutil.move(str(update_file), str(malformed_path))
+            logger.debug(f"� Moved to malformed: {malformed_name}")
+        except Exception as e:
+            logger.warning(f"Failed to move {update_file.name} to malformed: {e}")
+
+    def _move_to_failed(self, update_file: Path, error_msg: str) -> None:
+        """Move failed file to failed directory with error info."""
+        logger.warning(f"❌ Failed file: {update_file.name} - {error_msg}")
+
+        self.stats["files_failed"] += 1
+        self.stats["failed_files"].append(update_file.name)
+        self.stats["errors"].append(f"Failed file {update_file.name}: {error_msg}")
+
+        try:
+            from datetime import datetime
+            import traceback
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            failed_name = f"{timestamp}_{update_file.name}"
+            failed_path = self.failed_dir / failed_name
+
+            # Create error info file
+            error_file = self.failed_dir / f"{timestamp}_{update_file.stem}_error.txt"
+            with open(error_file, "w", encoding="utf-8") as f:
+                f.write(f"File: {update_file.name}\n")
+                f.write(f"Error: {error_msg}\n")
+                f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+                f.write(f"Stack trace:\n{traceback.format_exc()}")
+
+            shutil.move(str(update_file), str(failed_path))
+            logger.debug(f"❌ Moved to failed: {failed_name}")
+        except Exception as e:
+            logger.warning(f"Failed to move {update_file.name} to failed: {e}")
+
+    def _log_processing_summary(self) -> None:
+        """Log comprehensive processing summary."""
+        logger.info("\n📊 Processing Summary:")
+        logger.info(f"   Files processed successfully: {self.stats['files_processed']}")
+        logger.info(f"   Files with malformed data: {self.stats['files_malformed']}")
+        logger.info(f"   Files that failed processing: {self.stats['files_failed']}")
+        logger.info(f"   Documentation files updated: {len(self.stats['files_updated'])}")
+        logger.info(f"   Changes made to repository: {self.stats['changes_made']}")
+
+        if self.stats["malformed_files"]:
+            logger.warning(f"   Malformed files: {', '.join(self.stats['malformed_files'])}")
+
+        if self.stats["failed_files"]:
+            logger.warning(f"   Failed files: {', '.join(self.stats['failed_files'])}")
+
+        if self.stats["errors"]:
+            logger.warning(f"   Total errors encountered: {len(self.stats['errors'])}")
+
     def _archive_processed_file(self, update_file: Path) -> None:
         """Move processed file to archive/processed directory."""
-        try:
-            archive_dir = self.updates_dir / "processed"
-            archive_dir.mkdir(exist_ok=True)
-
-            archive_path = archive_dir / update_file.name
-            shutil.move(str(update_file), str(archive_path))
-            logger.debug(f"📦 Archived: {update_file} -> {archive_path}")
-
-        except Exception as e:
-            logger.warning(f"Failed to archive {update_file}: {e}")
+        # This method is now replaced by _move_to_processed for better organization
+        self._move_to_processed(update_file)
 
     def _save_stats(self) -> None:
         """Save processing statistics (disabled to prevent merge conflicts)."""
         # Stats file generation disabled to prevent merge conflicts in multi-repo setups
         pass
 
+    def _process_single_file_safely(self, update_file: Path) -> None:
+        """Process a single file with comprehensive error handling and immediate archival."""
+        logger.debug(f"🔍 Processing: {update_file.name}")
 
+        try:
+            # Step 1: Try to parse JSON and validate
+            try:
+                with open(update_file, encoding="utf-8") as f:
+                    update_data = json.load(f)
+            except (OSError, json.JSONDecodeError) as e:
+                # Don't move files in dry-run mode
+                if not self.dry_run:
+                    self._move_to_malformed(update_file, f"JSON parse error: {e}")
+                else:
+                    logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - JSON parse error: {e}")
+                return
+
+            # Step 2: Validate required fields
+            required_fields = ["file", "mode", "content"]
+            for field in required_fields:
+                if field not in update_data:
+                    # Don't move files in dry-run mode
+                    if not self.dry_run:
+                        self._move_to_malformed(update_file, f"Missing required field: {field}")
+                    else:
+                        logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - Missing required field: {field}")
+                    return
+
+            # Step 3: Process the update
+            try:
+                self.process_update_file_data(update_file, update_data)
+                # Success - move to processed immediately (but not in dry-run mode)
+                if self.cleanup and not self.dry_run:
+                    self._move_to_processed(update_file)
+            except Exception as e:
+                if self.continue_on_error:
+                    # Don't move files in dry-run mode
+                    if not self.dry_run:
+                        self._move_to_failed(update_file, str(e))
+                else:
+                    raise
+
+        except Exception as e:
+            error_msg = f"Unexpected error processing {update_file.name}: {str(e)}"
+            logger.error(error_msg)
+            if self.continue_on_error:
+                # Don't move files in dry-run mode
+                if not self.dry_run:
+                    self._move_to_failed(update_file, error_msg)
+                else:
+                    logger.warning(f"❌ [DRY RUN] Would move to failed: {update_file.name} - {error_msg}")
+            else:
+                self.stats["errors"].append(error_msg)
+                raise
+
+    def process_update_file_data(self, update_file: Path, update_data: Dict) -> None:
+        """Process update data from a successfully parsed file."""
+        target_file = Path(update_data["file"])
+        mode = update_data["mode"]
+        content = update_data["content"]
+        options = update_data.get("options", {})
+
+        logger.info(f"📝 Updating {target_file} (mode: {mode})")
+
+        if self.dry_run:
+            logger.info(f"🧪 [DRY RUN] Would update {target_file}")
+            self.stats["files_processed"] += 1
+            return
+
+        # Apply the update
+        success = self._apply_update(target_file, mode, content, options)
+
+        if success:
+            self.stats["files_processed"] += 1
+            self.stats["changes_made"] = True
+            if str(target_file) not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(str(target_file))
+        else:
+            raise Exception("Update application failed")
+
+    # ...existing code...
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -382,6 +553,7 @@ Examples:
         cleanup=args.cleanup,
         dry_run=args.dry_run,
         verbose=args.verbose,
+        continue_on_error=args.ignore_errors,
     )
 
     try:
@@ -390,12 +562,18 @@ Examples:
         if args.verbose or args.dry_run:
             print("\n📊 Processing Summary:")
             print(f"   Files processed: {stats['files_processed']}")
+            print(f"   Files malformed: {stats['files_malformed']}")
+            print(f"   Files failed: {stats['files_failed']}")
             print(f"   Changes made: {stats['changes_made']}")
             print(f"   Files updated: {len(stats['files_updated'])}")
             if stats["errors"]:
                 print(f"   Errors: {len(stats['errors'])}")
                 for error in stats["errors"]:
                     print(f"     - {error}")
+            if stats["malformed_files"]:
+                print(f"   Malformed files: {', '.join(stats['malformed_files'])}")
+            if stats["failed_files"]:
+                print(f"   Failed files: {', '.join(stats['failed_files'])}")
 
         # Exit with error code if there were errors unless ignoring errors
         if stats["errors"] and not args.ignore_errors:
