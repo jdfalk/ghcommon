@@ -1078,7 +1078,9 @@ class IssueUpdateProcessor:
         if guid_to_check and self._is_duplicate_operation(
             action, guid_to_check, update
         ):
-            self.summary.add_warning(f"Duplicate operation for GUID {guid_to_check} skipped.")
+            self.summary.add_warning(
+                f"Duplicate operation for GUID {guid_to_check} skipped."
+            )
             return False
 
         try:
@@ -1091,7 +1093,9 @@ class IssueUpdateProcessor:
                 # Defensive: check for valid issue number
                 issue_number = update.get("number")
                 if not issue_number or issue_number == 0:
-                    self.summary.add_error(f"No issue number found for comment: {update}")
+                    self.summary.add_error(
+                        f"No issue number found for comment: {update}"
+                    )
                     return False
                 return self._add_comment(update)
             elif action == "close":
@@ -1263,7 +1267,9 @@ class IssueUpdateProcessor:
                 labels.append("sub-issue")
 
         # Check for duplicate by GUID
-        if not self._check_guid_uniqueness(guid, legacy_guid, "create", {"title": title}, repo=repo):
+        if not self._check_guid_uniqueness(
+            guid, legacy_guid, "create", {"title": title}, repo=repo
+        ):
             return False
 
         guid_to_embed = guid or legacy_guid
@@ -1274,7 +1280,9 @@ class IssueUpdateProcessor:
         issue = api.create_issue(title, body, labels)
 
         if issue:
-            self.summary.add_issue_created(issue["number"], issue["title"], issue["html_url"])
+            self.summary.add_issue_created(
+                issue["number"], issue["title"], issue["html_url"]
+            )
             if guid:
                 self.guid_issue_map[guid] = (repo, issue["number"])
             if legacy_guid:
@@ -1282,7 +1290,11 @@ class IssueUpdateProcessor:
             if parent_issue:
                 # Add a comment to parent issue referencing this sub-issue
                 parent_comment = f"Created sub-issue #{issue['number']}: {issue['html_url']}\n\n<!-- guid:{guid_to_embed} -->"
-                parent_api = self.api if repo == self.api.repo else GitHubAPI(self.api.token, repo)
+                parent_api = (
+                    self.api
+                    if repo == self.api.repo
+                    else GitHubAPI(self.api.token, repo)
+                )
                 parent_api.add_comment(parent_issue, parent_comment)
             return True
         else:
@@ -1302,15 +1314,25 @@ class IssueUpdateProcessor:
         if not issue_number:
             self.summary.add_error(f"No issue number found for update: {update}")
             return False
-        update_data = {k: v for k, v in update.items() if k not in ["action", "number", "guid", "legacy_guid", "permalink"]}
+        update_data = {
+            k: v
+            for k, v in update.items()
+            if k not in ["action", "number", "guid", "legacy_guid", "permalink"]
+        }
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
-        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.api.repo
+            else GitHubAPI(self.api.token, repo)
+        )
         try:
             success = api.update_issue(issue_number, **update_data)
             if success:
-                self.summary.add_issue_updated(issue_number, update_data.get("title", ""))
+                self.summary.add_issue_updated(
+                    issue_number, update_data.get("title", "")
+                )
                 return True
             else:
                 self.summary.add_error(f"Failed to update issue #{issue_number}")
@@ -1335,18 +1357,26 @@ class IssueUpdateProcessor:
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed:
             body += f"\n\n<!-- guid:{guid_to_embed} -->"
-        api = self.api if not repo or repo == self.api.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.api.repo
+            else GitHubAPI(self.api.token, repo)
+        )
         try:
             success = api.add_comment(issue_number, body)
             if success:
                 self.summary.add_comment_added(issue_number, body)
                 return True
             else:
-                self.summary.add_error(f"Failed to add comment to issue #{issue_number}")
+                self.summary.add_error(
+                    f"Failed to add comment to issue #{issue_number}"
+                )
                 return False
         except Exception as e:
             print(f"❌ Error adding comment to issue #{issue_number}: {e}")
-            self.summary.add_error(f"Error adding comment to issue #{issue_number}: {e}")
+            self.summary.add_error(
+                f"Error adding comment to issue #{issue_number}: {e}"
+            )
             return False
 
     def _close_issue(self, update: Dict[str, Any]) -> bool:
@@ -1358,7 +1388,11 @@ class IssueUpdateProcessor:
         if not issue_number:
             self.summary.add_error(f"No issue number found for close: {update}")
             return False
-        api = self.api if not repo or repo == self.repo else GitHubAPI(self.api.token, repo)
+        api = (
+            self.api
+            if not repo or repo == self.repo
+            else GitHubAPI(self.api.token, repo)
+        )
         try:
             success = api.close_issue(issue_number, state_reason=state_reason)
             if success:
