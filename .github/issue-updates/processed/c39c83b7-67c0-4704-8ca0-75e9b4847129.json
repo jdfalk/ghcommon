@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Fix GitHub Actions add-to-project workflow",
+  "body": "Fixed the reusable add-to-project workflow that was failing with 'Input required and not supplied: github-token' error.\n## Problem\nThe `actions/add-to-project@v1.0.2` action was failing because the `github-token` input wasn't being properly supplied. The reusable workflow was trying to use `inputs.github-token || secrets.gh-token` but the input parameter was causing issues.\n## Solution\n- Removed the confusing `github-token` input parameter from the reusable workflow\n- Modified the workflow to directly use `secrets.gh-token`\n- Simplified the token handling to use only the secret\n## Impact\nThis fixes the add-to-project automation across all repositories using this reusable workflow:\n- codex-cli\n- subtitle-manager\n- gcommon\n- ghcommon\nThe workflows will now successfully add issues and PRs to GitHub Projects automatically.",
+  "labels": ["bug", "github-actions", "workflow"],
+  "guid": "c39c83b7-67c0-4704-8ca0-75e9b4847129",
+  "legacy_guid": "create-fix-github-actions-add-to-project-workflow-2025-07-09"
+}

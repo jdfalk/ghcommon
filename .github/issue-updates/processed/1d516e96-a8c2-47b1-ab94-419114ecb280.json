@@ -1,0 +1,8 @@
+{
+  "action": "close",
+  "number": 10,
+  "state_reason": "completed",
+  "body": "Examples and templates have been comprehensively created:\n✅ examples/workflows/issue-management-basic.yml\n✅ examples/workflows/issue-management-advanced.yml\n✅ templates/workflows/complete-ci-cd.yml\n✅ templates/workflows/container-only.yml\n✅ templates/workflows/library-release.yml\n✅ Migration guide with step-by-step instructions\n✅ Multiple configuration examples in documentation\nClosing as completed.",
+  "guid": "935770f7-2f2d-4b7c-862b-a5da1d0411a4",
+  "legacy_guid": "close-issue-10-2025-07-01"
+}

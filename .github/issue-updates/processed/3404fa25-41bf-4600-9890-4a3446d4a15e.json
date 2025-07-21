@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Create comprehensive backup and disaster recovery plan",
+  "body": "Implement robust backup strategies and disaster recovery procedures.\n\nTasks:\n- Create automated data backup procedures\n- Implement configuration backup strategies\n- Add workflow state preservation\n- Create recovery documentation\n- Test disaster recovery procedures\n- Add backup monitoring and alerting\n\nGoal: Ensure data safety and quick recovery from system failures.",
+  "labels": ["backup", "disaster-recovery", "reliability"],
+  "guid": "3404fa25-41bf-4600-9890-4a3446d4a15e",
+  "legacy_guid": "create-create-comprehensive-backup-and-disaster-recovery-plan-2025-06-30"
+}

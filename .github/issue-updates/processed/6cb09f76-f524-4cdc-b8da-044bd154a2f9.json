@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement multi-language documentation support",
+  "body": "Add internationalization support for documentation and improve accessibility.\n\nTasks:\n- Add multi-language README support\n- Create documentation translation framework\n- Implement accessibility guidelines\n- Add screen reader compatibility\n- Create documentation style guide for accessibility\n\nGoal: Make the project accessible to global developers and users with disabilities.",
+  "labels": ["documentation", "accessibility", "i18n"],
+  "guid": "6cb09f76-f524-4cdc-b8da-044bd154a2f9",
+  "legacy_guid": "create-implement-multi-language-documentation-support-2025-06-30"
+}

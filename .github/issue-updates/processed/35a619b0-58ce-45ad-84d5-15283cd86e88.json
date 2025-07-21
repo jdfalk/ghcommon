@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement real-time collaboration features",
+  "body": "Add features for real-time team collaboration on workflows and issues.\n\nTasks:\n- Add real-time workflow editing\n- Implement collaborative issue management\n- Create team workspace features\n- Add live chat integration\n- Implement shared workflow sessions\n- Add conflict resolution for concurrent edits\n\nGoal: Enable seamless team collaboration on workflow development and issue management.",
+  "labels": ["collaboration", "real-time", "teamwork"],
+  "guid": "35a619b0-58ce-45ad-84d5-15283cd86e88",
+  "legacy_guid": "create-implement-real-time-collaboration-features-2025-06-30"
+}

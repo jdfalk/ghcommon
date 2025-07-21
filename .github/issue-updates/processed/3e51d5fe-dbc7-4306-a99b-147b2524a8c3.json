@@ -1,0 +1,8 @@
+{
+  "action": "comment",
+  "number": null,
+  "body": "Initial comment referencing parent",
+  "guid": "3e51d5fe-dbc7-4306-a99b-147b2524a8c3",
+  "legacy_guid": "comment-issue-null-2025-07-03",
+  "parent": "28f4faaf-7f10-43be-9423-b9d452377ced"
+}

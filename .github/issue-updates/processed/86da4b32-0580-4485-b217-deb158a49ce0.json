@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Automate PR merge conflict resolution",
+  "body": "Create a workflow to auto-rebase PRs with merge conflicts using actions/ai-inference.",
+  "labels": ["automation", "ci", "enhancement"],
+  "guid": "86da4b32-0580-4485-b217-deb158a49ce0",
+  "legacy_guid": "create-automate-pr-merge-conflict-resolution-2025-07-09"
+}

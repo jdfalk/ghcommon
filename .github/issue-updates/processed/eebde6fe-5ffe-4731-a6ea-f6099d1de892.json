@@ -1,0 +1,7 @@
+{
+  "action": "comment",
+  "number": 8,
+  "body": "Metrics and monitoring are not yet implemented:\n❌ No performance metrics collection\n❌ No workflow telemetry system\n❌ No monitoring dashboards\nThis aligns with TODO.md Phase 4: Performance & Advanced Features. Should remain open as a future enhancement.",
+  "guid": "77afddc9-6576-40ee-b563-a1cbcab098b0",
+  "legacy_guid": "comment-issue-8-2025-07-01"
+}

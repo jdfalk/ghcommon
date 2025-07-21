@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement workflow version control and branching",
+  "body": "Add Git-like version control for workflow configurations.\n\nTasks:\n- Implement workflow versioning system\n- Add branching and merging for workflows\n- Create workflow diff and comparison tools\n- Add rollback capabilities\n- Implement workflow history tracking\n- Add collaborative workflow development\n\nGoal: Enable safe workflow development with version control and collaboration features.",
+  "labels": ["version-control", "workflows", "collaboration"],
+  "guid": "0ebe64f6-b0ce-46f4-b119-9e07bd0eba27",
+  "legacy_guid": "create-implement-workflow-version-control-and-branching-2025-06-30"
+}

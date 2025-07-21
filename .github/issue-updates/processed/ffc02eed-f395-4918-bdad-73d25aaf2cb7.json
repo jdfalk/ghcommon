@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Add advanced debugging and troubleshooting tools",
+  "body": "Create comprehensive debugging tools for workflow and script troubleshooting.\n\nTasks:\n- Add interactive debugging mode for scripts\n- Create workflow execution visualizer\n- Implement step-by-step debugging\n- Add log analysis tools\n- Create error pattern recognition\n- Add remote debugging capabilities\n\nGoal: Provide powerful debugging tools to quickly identify and resolve issues.",
+  "labels": ["debugging", "troubleshooting", "developer-tools"],
+  "guid": "ffc02eed-f395-4918-bdad-73d25aaf2cb7",
+  "legacy_guid": "create-add-advanced-debugging-and-troubleshooting-tools-2025-06-30"
+}

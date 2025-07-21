@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement advanced workflow orchestration features",
+  "body": "Add sophisticated workflow coordination and dependency management.\n\nTasks:\n- Create workflow dependency graphs\n- Implement conditional workflow execution\n- Add workflow pause/resume functionality\n- Create workflow branching and merging\n- Add parallel workflow execution\n- Implement workflow rollback capabilities\n\nGoal: Enable complex workflow patterns and better workflow management.",
+  "labels": ["workflows", "orchestration", "advanced-features"],
+  "guid": "ee633128-7c4a-4285-b1a3-eab512fdf65b",
+  "legacy_guid": "create-implement-advanced-workflow-orchestration-features-2025-06-30"
+}
