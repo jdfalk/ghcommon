@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 2.6.0
+# version: 2.7.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       operation:
-        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase)"
+        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase, intelligent-labeling)"
         required: false
         default: "all"
         type: string
@@ -206,6 +206,53 @@ on:
         required: false
         default: "openai/gpt-4o"
         type: string
+
+      # Intelligent Issue Labeling Configuration
+      il_enabled:
+        description: "Enable intelligent issue labeling"
+        required: false
+        default: true
+        type: boolean
+      il_dry_run:
+        description: "Run intelligent labeling in dry-run mode"
+        required: false
+        default: false
+        type: boolean
+      il_batch_size:
+        description: "Number of issues to process in each batch"
+        required: false
+        default: 10
+        type: number
+      il_use_ai_fallback:
+        description: "Use AI (Copilot) as fallback for complex labeling decisions"
+        required: false
+        default: true
+        type: boolean
+      il_confidence_threshold:
+        description: "Minimum confidence score (0.0-1.0) required to apply labels"
+        required: false
+        default: 0.7
+        type: number
+      il_max_labels_per_issue:
+        description: "Maximum number of labels to apply per issue"
+        required: false
+        default: 8
+        type: number
+      il_preserve_existing_labels:
+        description: "Preserve existing labels when adding new ones"
+        required: false
+        default: true
+        type: boolean
+      il_label_config_path:
+        description: "Path to intelligent labeling configuration file"
+        required: false
+        default: ".github/intelligent-labeling.yml"
+        type: string
+      il_python_version:
+        description: "Python version for intelligent labeling"
+        required: false
+        default: "3.11"
+        type: string
     secrets:
       github-token:
         description: "GitHub token for repository operations"
@@ -278,4 +325,19 @@ jobs:
     with:
       base-branch: ${{ inputs.rebase_base_branch }}
       model: ${{ inputs.rebase_model }}
+    secrets: inherit
+
+  intelligent-labeling:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}
+    uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
+    with:
+      enabled: ${{ inputs.il_enabled }}
+      dry_run: ${{ inputs.il_dry_run }}
+      batch_size: ${{ inputs.il_batch_size }}
+      use_ai_fallback: ${{ inputs.il_use_ai_fallback }}
+      confidence_threshold: ${{ inputs.il_confidence_threshold }}
+      max_labels_per_issue: ${{ inputs.il_max_labels_per_issue }}
+      preserve_existing_labels: ${{ inputs.il_preserve_existing_labels }}
+      label_config_path: ${{ inputs.il_label_config_path }}
+      python_version: ${{ inputs.il_python_version }}
     secrets: inherit
