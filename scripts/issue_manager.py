@@ -1435,8 +1435,9 @@ class IssueUpdateProcessor:
         try:
             success = api.update_issue(issue_number, **update_data)
             if success:
+                issue_url = f"https://github.com/{api.repo}/issues/{issue_number}"
                 self.summary.add_issue_updated(
-                    issue_number, update_data.get("title", "")
+                    issue_number, update_data.get("title", ""), issue_url
                 )
                 return True
             else:
