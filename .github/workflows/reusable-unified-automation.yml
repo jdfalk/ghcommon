@@ -270,7 +270,8 @@ jobs:
       issue_updates_directory: ${{ inputs.im_issue_updates_directory }}
       cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
       python_version: ${{ inputs.im_python_version }}
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
@@ -317,7 +318,8 @@ jobs:
       enable-auto-fix: ${{ inputs.sl_enable_auto_fix }}
       auto-commit-fixes: ${{ inputs.sl_auto_commit_fixes }}
       commit-message: ${{ inputs.sl_commit_message }}
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   ai-rebase:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
@@ -325,7 +327,8 @@ jobs:
     with:
       base-branch: ${{ inputs.rebase_base_branch }}
       model: ${{ inputs.rebase_model }}
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   intelligent-labeling:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}

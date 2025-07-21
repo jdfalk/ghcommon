@@ -1085,6 +1085,16 @@ class IssueUpdateProcessor:
     def _process_single_update(self, update: Dict[str, Any]) -> bool:
         """Process a single update action with dual-GUID tracking."""
         action = update.get("action")
+
+        # Check for missing action field - this indicates a malformed file
+        if action is None:
+            self.summary.add_error(f"Missing action field in update: {update}")
+            # Mark this file as malformed for proper handling
+            source_file = update.get("_source_file")
+            if source_file:
+                self._mark_file_as_malformed(source_file, "Missing action field")
+            return False
+
         primary_guid, legacy_guid = self._extract_guids(update)
 
         # Check for duplicate operations using either GUID
@@ -1095,6 +1105,12 @@ class IssueUpdateProcessor:
             self.summary.add_warning(
                 f"Duplicate operation for GUID {guid_to_check} skipped."
             )
+            # Mark this file as already processed since it's a duplicate
+            source_file = update.get("_source_file")
+            if source_file:
+                self._mark_file_as_processed(
+                    source_file, f"Duplicate GUID: {guid_to_check}"
+                )
             return False
 
         try:
@@ -1118,10 +1134,70 @@ class IssueUpdateProcessor:
                 return self._delete_issue(update)
             else:
                 self.summary.add_error(f"Unknown action: {action} in update: {update}")
+                # Mark this file as malformed for unknown action
+                source_file = update.get("_source_file")
+                if source_file:
+                    self._mark_file_as_malformed(
+                        source_file, f"Unknown action: {action}"
+                    )
                 return False
         except Exception as e:
             self.summary.add_error(f"Error processing {action} action: {e}")
             return False
+
+    def _mark_file_as_processed(self, file_path: str, reason: str) -> None:
+        """Move a file to the processed directory with reason."""
+        if not file_path or not os.path.exists(file_path):
+            return
+
+        try:
+            updates_dir = os.path.dirname(file_path)
+            processed_dir = os.path.join(updates_dir, "processed")
+            os.makedirs(processed_dir, exist_ok=True)
+
+            filename = os.path.basename(file_path)
+            destination = os.path.join(processed_dir, filename)
+
+            # If destination exists, add timestamp to avoid conflicts
+            if os.path.exists(destination):
+                import time
+
+                timestamp = int(time.time())
+                name, ext = os.path.splitext(filename)
+                destination = os.path.join(processed_dir, f"{name}_{timestamp}{ext}")
+
+            os.rename(file_path, destination)
+            print(f"📦 Moved {filename} to processed/ (reason: {reason})")
+
+        except OSError as e:
+            print(f"⚠️  Error moving file to processed: {e}", file=sys.stderr)
+
+    def _mark_file_as_malformed(self, file_path: str, reason: str) -> None:
+        """Move a file to the malformed directory with reason."""
+        if not file_path or not os.path.exists(file_path):
+            return
+
+        try:
+            updates_dir = os.path.dirname(file_path)
+            malformed_dir = os.path.join(updates_dir, "malformed")
+            os.makedirs(malformed_dir, exist_ok=True)
+
+            filename = os.path.basename(file_path)
+            destination = os.path.join(malformed_dir, filename)
+
+            # If destination exists, add timestamp to avoid conflicts
+            if os.path.exists(destination):
+                import time
+
+                timestamp = int(time.time())
+                name, ext = os.path.splitext(filename)
+                destination = os.path.join(malformed_dir, f"{name}_{timestamp}{ext}")
+
+            os.rename(file_path, destination)
+            print(f"🚨 Moved {filename} to malformed/ (reason: {reason})")
+
+        except OSError as e:
+            print(f"⚠️  Error moving file to malformed: {e}", file=sys.stderr)
 
     def _is_duplicate_operation(
         self, action: str, guid: str, update: Dict[str, Any]
