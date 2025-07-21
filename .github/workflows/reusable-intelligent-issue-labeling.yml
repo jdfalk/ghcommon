@@ -1,0 +1,536 @@
+# file: .github/workflows/reusable-intelligent-issue-labeling.yml
+# version: 1.0.0
+# guid: 8c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f
+
+name: Reusable Intelligent Issue Labeling
+
+on:
+  workflow_call:
+    inputs:
+      enabled:
+        description: "Enable intelligent issue labeling"
+        required: false
+        default: true
+        type: boolean
+      dry_run:
+        description: "Run in dry-run mode (no changes)"
+        required: false
+        default: false
+        type: boolean
+      batch_size:
+        description: "Number of issues to process in each batch"
+        required: false
+        default: 10
+        type: number
+      use_ai_fallback:
+        description: "Use AI (Copilot) as fallback for complex labeling decisions"
+        required: false
+        default: true
+        type: boolean
+      confidence_threshold:
+        description: "Minimum confidence score (0.0-1.0) required to apply labels"
+        required: false
+        default: 0.7
+        type: number
+      max_labels_per_issue:
+        description: "Maximum number of labels to apply per issue"
+        required: false
+        default: 8
+        type: number
+      preserve_existing_labels:
+        description: "Preserve existing labels when adding new ones"
+        required: false
+        default: true
+        type: boolean
+      label_config_path:
+        description: "Path to intelligent labeling configuration file"
+        required: false
+        default: ".github/intelligent-labeling.yml"
+        type: string
+      python_version:
+        description: "Python version to use"
+        required: false
+        default: "3.11"
+        type: string
+    outputs:
+      issues_processed:
+        description: "Number of issues processed"
+        value: ${{ jobs.intelligent-labeling.outputs.issues_processed }}
+      labels_applied:
+        description: "Number of labels applied"
+        value: ${{ jobs.intelligent-labeling.outputs.labels_applied }}
+      ai_fallback_used:
+        description: "Whether AI fallback was used"
+        value: ${{ jobs.intelligent-labeling.outputs.ai_fallback_used }}
+    secrets:
+      github-token:
+        description: "GitHub token with necessary permissions"
+        required: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  intelligent-labeling:
+    if: ${{ inputs.enabled }}
+    runs-on: ubuntu-latest
+    outputs:
+      issues_processed: ${{ steps.labeling-summary.outputs.issues_processed }}
+      labels_applied: ${{ steps.labeling-summary.outputs.labels_applied }}
+      ai_fallback_used: ${{ steps.labeling-summary.outputs.ai_fallback_used }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml python-dateutil scikit-learn nltk openai
+
+      - name: Download NLTK data
+        run: |
+          python -c "
+          import nltk
+          nltk.download('punkt', quiet=True)
+          nltk.download('stopwords', quiet=True)
+          nltk.download('wordnet', quiet=True)
+          "
+
+      - name: Show configuration
+        run: |
+          echo "🤖 Intelligent Issue Labeling Configuration:"
+          echo "  Enabled: ${{ inputs.enabled }}"
+          echo "  Dry run: ${{ inputs.dry_run }}"
+          echo "  Batch size: ${{ inputs.batch_size }}"
+          echo "  Use AI fallback: ${{ inputs.use_ai_fallback }}"
+          echo "  Confidence threshold: ${{ inputs.confidence_threshold }}"
+          echo "  Max labels per issue: ${{ inputs.max_labels_per_issue }}"
+          echo "  Preserve existing labels: ${{ inputs.preserve_existing_labels }}"
+          echo "  Label config path: ${{ inputs.label_config_path }}"
+          echo "  Repository: ${{ github.repository }}"
+
+      - name: Run intelligent issue labeling
+        id: labeling
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_BATCH_SIZE: ${{ inputs.batch_size }}
+          INPUT_USE_AI_FALLBACK: ${{ inputs.use_ai_fallback }}
+          INPUT_CONFIDENCE_THRESHOLD: ${{ inputs.confidence_threshold }}
+          INPUT_MAX_LABELS_PER_ISSUE: ${{ inputs.max_labels_per_issue }}
+          INPUT_PRESERVE_EXISTING_LABELS: ${{ inputs.preserve_existing_labels }}
+        run: |
+          python3 - << 'EOF'
+          import os
+          import sys
+          import json
+          import requests
+          import yaml
+          import re
+          from datetime import datetime, timedelta
+          from collections import defaultdict
+          from typing import List, Dict, Set, Tuple, Optional
+          import nltk
+          from nltk.corpus import stopwords
+          from nltk.tokenize import word_tokenize
+          from nltk.stem import WordNetLemmatizer
+          from sklearn.feature_extraction.text import TfidfVectorizer
+          from sklearn.metrics.pairwise import cosine_similarity
+          import openai
+
+          class IntelligentIssueLabeler:
+              def __init__(self, github_token: str, repo: str, config: Dict):
+                  self.token = github_token
+                  self.repo = repo
+                  self.config = config
+                  self.session = requests.Session()
+                  self.session.headers.update({
+                      'Authorization': f'token {github_token}',
+                      'Accept': 'application/vnd.github.v3+json'
+                  })
+                  
+                  # Initialize NLP components
+                  self.lemmatizer = WordNetLemmatizer()
+                  self.stop_words = set(stopwords.words('english'))
+                  
+                  # Statistics tracking
+                  self.stats = {
+                      'issues_processed': 0,
+                      'labels_applied': 0,
+                      'ai_fallback_used': 0
+                  }
+
+              def get_repository_labels(self) -> Dict[str, Dict]:
+                  """Fetch all available labels from the repository."""
+                  try:
+                      response = self.session.get(f'https://api.github.com/repos/{self.repo}/labels?per_page=100')
+                      response.raise_for_status()
+                      
+                      labels = {}
+                      for label in response.json():
+                          labels[label['name']] = {
+                              'color': label['color'],
+                              'description': label.get('description', '')
+                          }
+                      return labels
+                  except Exception as e:
+                      print(f"Error fetching repository labels: {e}")
+                      return {}
+
+              def get_issues_to_process(self, batch_size: int) -> List[Dict]:
+                  """Get issues that need intelligent labeling."""
+                  try:
+                      # Get recent issues (last 30 days) that are open or recently closed
+                      since_date = (datetime.now() - timedelta(days=30)).isoformat()
+                      
+                      params = {
+                          'state': 'all',
+                          'since': since_date,
+                          'per_page': batch_size,
+                          'sort': 'updated',
+                          'direction': 'desc'
+                      }
+                      
+                      response = self.session.get(f'https://api.github.com/repos/{self.repo}/issues', params=params)
+                      response.raise_for_status()
+                      
+                      issues = []
+                      for issue in response.json():
+                          # Skip pull requests
+                          if 'pull_request' not in issue:
+                              issues.append(issue)
+                      
+                      return issues
+                  except Exception as e:
+                      print(f"Error fetching issues: {e}")
+                      return []
+
+              def extract_features(self, issue: Dict) -> Dict[str, any]:
+                  """Extract features from issue for intelligent labeling."""
+                  title = issue.get('title', '').lower()
+                  body = issue.get('body', '').lower() if issue.get('body') else ''
+                  
+                  # Combine title and body for analysis
+                  text_content = f"{title} {body}"
+                  
+                  # Tokenize and clean text
+                  tokens = word_tokenize(text_content)
+                  cleaned_tokens = [
+                      self.lemmatizer.lemmatize(token.lower()) 
+                      for token in tokens 
+                      if token.isalpha() and token.lower() not in self.stop_words
+                  ]
+                  
+                  features = {
+                      'title': title,
+                      'body': body,
+                      'text_content': text_content,
+                      'tokens': cleaned_tokens,
+                      'labels': [label['name'] for label in issue.get('labels', [])],
+                      'author': issue.get('user', {}).get('login', ''),
+                      'state': issue.get('state', ''),
+                      'created_at': issue.get('created_at', ''),
+                      'updated_at': issue.get('updated_at', '')
+                  }
+                  
+                  return features
+
+              def analyze_content_patterns(self, features: Dict) -> Dict[str, float]:
+                  """Analyze content patterns to suggest labels with confidence scores."""
+                  suggestions = defaultdict(float)
+                  text = features['text_content']
+                  tokens = features['tokens']
+                  title = features['title']
+                  
+                  # Issue type detection
+                  if any(word in text for word in ['bug', 'error', 'fail', 'broken', 'issue', 'problem']):
+                      suggestions['bug'] += 0.8
+                  if any(word in text for word in ['feature', 'enhancement', 'improve', 'add', 'new']):
+                      suggestions['enhancement'] += 0.8
+                  if any(word in text for word in ['doc', 'documentation', 'readme', 'guide']):
+                      suggestions['documentation'] += 0.9
+                  if any(word in text for word in ['question', 'help', 'how', 'why', 'what']):
+                      suggestions['question'] += 0.7
+                  
+                  # Priority detection
+                  if any(word in text for word in ['urgent', 'critical', 'blocker', 'asap']):
+                      suggestions['priority-high'] += 0.9
+                  elif any(word in text for word in ['low priority', 'minor', 'nice to have']):
+                      suggestions['priority-low'] += 0.8
+                  else:
+                      suggestions['priority-medium'] += 0.6
+                  
+                  # Technology detection
+                  tech_patterns = {
+                      'tech:go': ['go', 'golang', '.go', 'gofmt'],
+                      'tech:python': ['python', '.py', 'pip', 'pytest'],
+                      'tech:javascript': ['javascript', 'js', '.js', 'npm', 'node'],
+                      'tech:typescript': ['typescript', 'ts', '.ts'],
+                      'tech:protobuf': ['protobuf', 'proto', '.proto', 'grpc'],
+                      'tech:docker': ['docker', 'dockerfile', 'container'],
+                      'tech:kubernetes': ['kubernetes', 'k8s', 'kubectl', 'helm'],
+                      'tech:shell': ['bash', 'shell', '.sh', 'script']
+                  }
+                  
+                  for label, keywords in tech_patterns.items():
+                      if any(keyword in text for keyword in keywords):
+                          suggestions[label] += 0.85
+                  
+                  # Module detection
+                  module_patterns = {
+                      'module:auth': ['auth', 'authentication', 'login', 'password', 'oauth'],
+                      'module:cache': ['cache', 'redis', 'memcache', 'caching'],
+                      'module:config': ['config', 'configuration', 'settings', 'env'],
+                      'module:database': ['database', 'db', 'sql', 'mysql', 'postgres'],
+                      'module:metrics': ['metrics', 'monitoring', 'prometheus', 'grafana'],
+                      'module:queue': ['queue', 'job', 'worker', 'task', 'background'],
+                      'module:web': ['web', 'http', 'server', 'api', 'rest'],
+                      'module:ui': ['ui', 'interface', 'frontend', 'html', 'css']
+                  }
+                  
+                  for label, keywords in module_patterns.items():
+                      if any(keyword in text for keyword in keywords):
+                          suggestions[label] += 0.8
+                  
+                  # Workflow detection
+                  workflow_patterns = {
+                      'workflow:automation': ['automation', 'script', 'workflow', 'ci/cd'],
+                      'workflow:github-actions': ['github actions', 'workflow', '.yml', 'action'],
+                      'workflow:deployment': ['deploy', 'deployment', 'release', 'production'],
+                      'github-actions': ['github actions', 'workflow', 'action', '.github']
+                  }
+                  
+                  for label, keywords in workflow_patterns.items():
+                      if any(keyword in text for keyword in keywords):
+                          suggestions[label] += 0.8
+                  
+                  # Security and performance
+                  if any(word in text for word in ['security', 'vulnerability', 'cve', 'exploit']):
+                      suggestions['security'] += 0.9
+                  if any(word in text for word in ['performance', 'slow', 'optimize', 'speed']):
+                      suggestions['performance'] += 0.8
+                  if any(word in text for word in ['breaking', 'break', 'compatibility']):
+                      suggestions['breaking-change'] += 0.8
+                  
+                  # Special labels
+                  if any(word in title for word in ['good first issue', 'beginner', 'starter']):
+                      suggestions['good first issue'] += 0.9
+                  if any(word in text for word in ['help wanted', 'need help', 'assistance']):
+                      suggestions['help wanted'] += 0.8
+                  
+                  return dict(suggestions)
+
+              def use_ai_fallback(self, issue: Dict, initial_suggestions: Dict[str, float]) -> Dict[str, float]:
+                  """Use AI (OpenAI) as fallback for complex labeling decisions."""
+                  try:
+                      if not os.getenv('OPENAI_API_KEY'):
+                          print("OpenAI API key not available for AI fallback")
+                          return initial_suggestions
+                      
+                      # Get comprehensive label list from repository
+                      repo_labels = self.get_repository_labels()
+                      label_descriptions = []
+                      for name, info in repo_labels.items():
+                          desc = info.get('description', '')
+                          label_descriptions.append(f"- {name}: {desc}")
+                      
+                      prompt = f"""
+                      Analyze this GitHub issue and suggest appropriate labels from the available list.
+                      
+                      Issue Title: {issue.get('title', '')}
+                      Issue Body: {issue.get('body', '')[:1000]}...
+                      
+                      Available Labels:
+                      {chr(10).join(label_descriptions[:50])}  # Limit to avoid token limits
+                      
+                      Current Suggestions: {', '.join(initial_suggestions.keys())}
+                      
+                      Please suggest 3-5 most relevant labels with confidence scores (0.0-1.0).
+                      Respond in JSON format: {{"label_name": confidence_score}}
+                      """
+                      
+                      client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+                      response = client.chat.completions.create(
+                          model="gpt-4o-mini",
+                          messages=[
+                              {"role": "system", "content": "You are an expert at analyzing GitHub issues and applying appropriate labels. Return only valid JSON."},
+                              {"role": "user", "content": prompt}
+                          ],
+                          max_tokens=500,
+                          temperature=0.3
+                      )
+                      
+                      ai_suggestions = json.loads(response.choices[0].message.content)
+                      
+                      # Merge AI suggestions with initial suggestions
+                      combined_suggestions = initial_suggestions.copy()
+                      for label, confidence in ai_suggestions.items():
+                          if label in repo_labels:  # Only use valid labels
+                              combined_suggestions[label] = max(combined_suggestions.get(label, 0), confidence)
+                      
+                      self.stats['ai_fallback_used'] += 1
+                      return combined_suggestions
+                      
+                  except Exception as e:
+                      print(f"AI fallback failed: {e}")
+                      return initial_suggestions
+
+              def apply_labels_to_issue(self, issue_number: int, suggested_labels: List[str], current_labels: List[str]) -> bool:
+                  """Apply suggested labels to an issue."""
+                  try:
+                      if self.config.get('preserve_existing_labels', True):
+                          # Combine existing and new labels, removing duplicates
+                          all_labels = list(set(current_labels + suggested_labels))
+                      else:
+                          all_labels = suggested_labels
+                      
+                      if self.config.get('dry_run', False):
+                          print(f"DRY RUN: Would apply labels {suggested_labels} to issue #{issue_number}")
+                          return True
+                      
+                      data = {'labels': all_labels}
+                      response = self.session.patch(
+                          f'https://api.github.com/repos/{self.repo}/issues/{issue_number}',
+                          json=data
+                      )
+                      response.raise_for_status()
+                      
+                      self.stats['labels_applied'] += len(suggested_labels)
+                      return True
+                      
+                  except Exception as e:
+                      print(f"Error applying labels to issue #{issue_number}: {e}")
+                      return False
+
+              def process_issues(self):
+                  """Main processing function."""
+                  issues = self.get_issues_to_process(self.config.get('batch_size', 10))
+                  print(f"Processing {len(issues)} issues for intelligent labeling...")
+                  
+                  repo_labels = self.get_repository_labels()
+                  confidence_threshold = self.config.get('confidence_threshold', 0.7)
+                  max_labels = self.config.get('max_labels_per_issue', 8)
+                  use_ai = self.config.get('use_ai_fallback', True)
+                  
+                  for issue in issues:
+                      issue_number = issue['number']
+                      print(f"\nProcessing issue #{issue_number}: {issue['title'][:60]}...")
+                      
+                      # Extract features
+                      features = self.extract_features(issue)
+                      current_labels = features['labels']
+                      
+                      # Get initial suggestions from pattern analysis
+                      suggestions = self.analyze_content_patterns(features)
+                      
+                      # Use AI fallback if enabled and we have few suggestions
+                      if use_ai and len(suggestions) < 3:
+                          suggestions = self.use_ai_fallback(issue, suggestions)
+                      
+                      # Filter suggestions by confidence threshold and max labels
+                      filtered_suggestions = {
+                          label: confidence 
+                          for label, confidence in suggestions.items()
+                          if confidence >= confidence_threshold and label in repo_labels
+                      }
+                      
+                      # Sort by confidence and limit
+                      sorted_suggestions = sorted(
+                          filtered_suggestions.items(), 
+                          key=lambda x: x[1], 
+                          reverse=True
+                      )[:max_labels]
+                      
+                      suggested_labels = [label for label, _ in sorted_suggestions]
+                      
+                      # Only apply labels that aren't already present
+                      new_labels = [label for label in suggested_labels if label not in current_labels]
+                      
+                      if new_labels:
+                          print(f"  Suggested labels: {new_labels}")
+                          if self.apply_labels_to_issue(issue_number, new_labels, current_labels):
+                              print(f"  ✅ Applied {len(new_labels)} new labels")
+                          else:
+                              print(f"  ❌ Failed to apply labels")
+                      else:
+                          print(f"  ⏭️ No new labels needed")
+                      
+                      self.stats['issues_processed'] += 1
+                  
+                  return self.stats
+
+          # Main execution
+          def main():
+              github_token = os.getenv('GITHUB_TOKEN')
+              if not github_token:
+                  print("Error: GITHUB_TOKEN environment variable is required")
+                  sys.exit(1)
+              
+              repo = os.getenv('GITHUB_REPOSITORY')
+              if not repo:
+                  print("Error: GITHUB_REPOSITORY environment variable is required")
+                  sys.exit(1)
+              
+              # Configuration from inputs
+              config = {
+                  'dry_run': os.getenv('INPUT_DRY_RUN', 'false').lower() == 'true',
+                  'batch_size': int(os.getenv('INPUT_BATCH_SIZE', '10')),
+                  'use_ai_fallback': os.getenv('INPUT_USE_AI_FALLBACK', 'true').lower() == 'true',
+                  'confidence_threshold': float(os.getenv('INPUT_CONFIDENCE_THRESHOLD', '0.7')),
+                  'max_labels_per_issue': int(os.getenv('INPUT_MAX_LABELS_PER_ISSUE', '8')),
+                  'preserve_existing_labels': os.getenv('INPUT_PRESERVE_EXISTING_LABELS', 'true').lower() == 'true'
+              }
+              
+              print("🤖 Starting Intelligent Issue Labeling...")
+              print(f"Repository: {repo}")
+              print(f"Configuration: {config}")
+              
+              labeler = IntelligentIssueLabeler(github_token, repo, config)
+              stats = labeler.process_issues()
+              
+              print(f"\n📊 Labeling Statistics:")
+              print(f"  Issues processed: {stats['issues_processed']}")
+              print(f"  Labels applied: {stats['labels_applied']}")
+              print(f"  AI fallback used: {stats['ai_fallback_used']} times")
+              
+              # Set outputs for GitHub Actions
+              print(f"::set-output name=issues_processed::{stats['issues_processed']}")
+              print(f"::set-output name=labels_applied::{stats['labels_applied']}")
+              print(f"::set-output name=ai_fallback_used::{stats['ai_fallback_used']}")
+
+          if __name__ == "__main__":
+              main()
+          EOF
+
+      - name: Generate labeling summary
+        id: labeling-summary
+        if: always()
+        run: |
+          echo "✅ Intelligent Issue Labeling completed"
+          echo "📋 Configuration used:"
+          echo "  - Dry run: ${{ inputs.dry_run }}"
+          echo "  - Batch size: ${{ inputs.batch_size }}"
+          echo "  - AI fallback: ${{ inputs.use_ai_fallback }}"
+          echo "  - Confidence threshold: ${{ inputs.confidence_threshold }}"
+          echo "  - Max labels per issue: ${{ inputs.max_labels_per_issue }}"
+          echo "  - Preserve existing: ${{ inputs.preserve_existing_labels }}"
+          
+          # Extract outputs from the labeling step
+          issues_processed=$(echo "${{ steps.labeling.outputs.issues_processed }}" | tail -1)
+          labels_applied=$(echo "${{ steps.labeling.outputs.labels_applied }}" | tail -1)
+          ai_fallback_used=$(echo "${{ steps.labeling.outputs.ai_fallback_used }}" | tail -1)
+          
+          echo "issues_processed=${issues_processed:-0}" >> $GITHUB_OUTPUT
+          echo "labels_applied=${labels_applied:-0}" >> $GITHUB_OUTPUT
+          echo "ai_fallback_used=${ai_fallback_used:-0}" >> $GITHUB_OUTPUT
