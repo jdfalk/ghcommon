@@ -63,6 +63,29 @@ DUPLICATE_CHECK_LABEL = "duplicate-check"
 AUTO_CLOSE_ON_FILE_CHANGE = False  # Set to True to automatically close CodeQL issues when their files are modified
 
 
+def unescape_json_string(text: str) -> str:
+    """Properly unescape JSON string escape sequences.
+    
+    This handles common escape sequences found in JSON strings:
+    - \\n -> actual newline
+    - \\t -> actual tab  
+    - \\r -> carriage return
+    - \\" -> quote
+    - \\\\ -> backslash
+    """
+    if not isinstance(text, str):
+        return text
+        
+    # Use codecs.decode to properly handle escape sequences
+    import codecs
+    try:
+        # First, encode as raw bytes, then decode with 'unicode_escape'
+        return codecs.decode(text, 'unicode_escape')
+    except (UnicodeDecodeError, ValueError):
+        # If decoding fails, return original string
+        return text
+
+
 class OperationSummary:
     """Track and format operation summaries for workflow reporting."""
 
@@ -1390,7 +1413,7 @@ class IssueUpdateProcessor:
         self, guid: str, update: Dict[str, Any], repo: str = None
     ) -> bool:
         """Check if an issue with the given GUID was already created."""
-        title = update.get("title", "")
+        title = unescape_json_string(update.get("title", ""))
         try:
             api = (
                 self.api
@@ -1412,8 +1435,8 @@ class IssueUpdateProcessor:
 
     def _create_issue(self, update: Dict[str, Any]) -> bool:
         """Create a new issue with dual-GUID tracking and sub-issue support."""
-        title = update.get("title", "")
-        body = update.get("body", "")
+        title = unescape_json_string(update.get("title", ""))
+        body = unescape_json_string(update.get("body", ""))
         labels = update.get("labels", [])
         guid = update.get("guid")
         legacy_guid = update.get("legacy_guid")
@@ -1528,7 +1551,7 @@ class IssueUpdateProcessor:
         """Add a comment to an issue with dual-GUID tracking."""
         issue_number = update.get("number")
         repo = update.get("repo", self.api.repo)
-        body = update.get("body", "")
+        body = unescape_json_string(update.get("body", ""))
         primary_guid, legacy_guid = self._extract_guids(update)
 
         # Handle parent resolution - check both "parent" and "parent_guid"
