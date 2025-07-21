@@ -91,46 +91,46 @@ jobs:
 
       # Issue Management - mapped from simplified inputs
       im_operations: auto
-      im_dry_run: ${{ github.event.inputs.dry_run || 'false' }}
-      im_force_update: ${{ github.event.inputs.force_update || 'false' }}
+      im_dry_run: ${{ github.event.inputs.dry_run == 'true' }}
+      im_force_update: ${{ github.event.inputs.force_update == 'true' }}
       im_issue_updates_file: issue_updates.json
       im_issue_updates_directory: .github/issue-updates
-      im_cleanup_issue_updates: 'true'
+      im_cleanup_issue_updates: true
       im_python_version: ${{ github.event.inputs.python_version || '3.11' }}
 
       # Documentation - mapped from simplified inputs
       docs_updates_directory: .github/doc-updates
-      docs_dry_run: ${{ github.event.inputs.dry_run || 'false' }}
+      docs_dry_run: ${{ github.event.inputs.dry_run == 'true' }}
       docs_python_version: ${{ github.event.inputs.python_version || '3.11' }}
-      docs_cleanup_processed_files: 'true'
-      docs_create_pr: ${{ github.event.inputs.create_pr || 'false' }}
-      docs_auto_merge: 'false'
-      docs_continue_on_error: 'true'
+      docs_cleanup_processed_files: true
+      docs_create_pr: ${{ github.event.inputs.create_pr == 'true' }}
+      docs_auto_merge: false
+      docs_continue_on_error: true
 
       # Labeler - use defaults
       labeler_configuration_path: .github/labeler.yml
-      labeler_sync_labels: 'false'
-      labeler_dot: 'true'
+      labeler_sync_labels: false
+      labeler_dot: true
       labeler_pr_numbers: ""
 
       # Super Linter - mapped from simplified inputs
-      sl_validate_all_codebase: ${{ github.event.inputs.validate_all_codebase || 'false' }}
+      sl_validate_all_codebase: ${{ github.event.inputs.validate_all_codebase == 'true' }}
       sl_default_branch: ${{ github.event.inputs.base_branch || 'main' }}
       sl_config_file: .github/super-linter.env
-      sl_run_python: 'true'
-      sl_run_shell: 'true'
-      sl_run_markdown: 'true'
-      sl_run_yaml: 'true'
-      sl_run_json: 'true'
-      sl_run_javascript: 'true'
-      sl_run_go: 'true'
-      sl_run_css: 'true'
-      sl_run_html: 'true'
-      sl_run_protobuf: 'true'
-      sl_run_github_actions: 'true'
-      sl_run_security: 'true'
-      sl_enable_auto_fix: ${{ github.event.inputs.auto_fix || 'true' }}
-      sl_auto_commit_fixes: ${{ github.event.inputs.auto_fix || 'true' }}
+      sl_run_python: true
+      sl_run_shell: true
+      sl_run_markdown: true
+      sl_run_yaml: true
+      sl_run_json: true
+      sl_run_javascript: true
+      sl_run_go: true
+      sl_run_css: true
+      sl_run_html: true
+      sl_run_protobuf: true
+      sl_run_github_actions: true
+      sl_run_security: true
+      sl_enable_auto_fix: ${{ github.event.inputs.auto_fix == 'true' }}
+      sl_auto_commit_fixes: ${{ github.event.inputs.auto_fix == 'true' }}
       sl_commit_message: "style: auto-fix linting issues [skip ci]"
 
       # AI Rebase - mapped from simplified inputs
