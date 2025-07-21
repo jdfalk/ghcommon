@@ -55,13 +55,13 @@ jobs:
       enabled: true
       dry_run: false
       batch_size: 15
-      
+
       # AI configuration
       use_ai_fallback: true
       confidence_threshold: 0.75
       max_labels_per_issue: 6
       preserve_existing_labels: true
-      
+
       # Custom configuration
       label_config_path: ".github/custom-labeling.yml"
       python_version: "3.11"
@@ -226,7 +226,7 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
     with:
       operation: "all"  # Includes intelligent labeling
-      
+
       # Intelligent labeling configuration
       il_enabled: true
       il_batch_size: 15
@@ -250,7 +250,7 @@ patterns:
     bug:
       keywords: ["bug", "error", "broken"]
       confidence: 0.8
-  
+
   technology:
     tech:python:
       keywords: ["python", ".py", "pip"]
@@ -267,14 +267,17 @@ ai_fallback:
 ## Environment Variables
 
 ### Required
+
 - `GITHUB_TOKEN` - GitHub token with issues:write permission
 
 ### Optional
+
 - `OPENAI_API_KEY` - OpenAI API key for AI fallback functionality
 
 ## Best Practices
 
 ### 1. Start with Dry Run
+
 ```yaml
 with:
   dry_run: true
@@ -282,11 +285,13 @@ with:
 ```
 
 ### 2. Adjust Confidence Threshold
+
 - Start with `0.7` (moderate confidence)
 - Increase to `0.8+` for stricter labeling
 - Decrease to `0.6` for more aggressive labeling
 
 ### 3. Use AI Fallback Selectively
+
 ```yaml
 with:
   use_ai_fallback: true
@@ -294,6 +299,7 @@ with:
 ```
 
 ### 4. Monitor Performance
+
 ```yaml
 with:
   batch_size: 10  # Start small, increase as needed
@@ -305,21 +311,25 @@ with:
 ### Common Issues
 
 **No labels applied:**
+
 - Check confidence threshold (try lowering to 0.6)
 - Verify repository has the expected labels
 - Enable AI fallback for better coverage
 
 **Too many labels applied:**
+
 - Increase confidence threshold to 0.8+
 - Reduce max_labels_per_issue
 - Review and refine pattern configurations
 
 **AI fallback not working:**
+
 - Verify OPENAI_API_KEY is set in repository secrets
 - Check OpenAI API quota and usage
 - Review AI fallback trigger conditions
 
 **Performance issues:**
+
 - Reduce batch_size for large repositories
 - Run during off-peak hours
 - Consider splitting into multiple workflows
@@ -327,12 +337,14 @@ with:
 ### Debugging
 
 Enable detailed logging by setting:
+
 ```yaml
 with:
   dry_run: true  # See what would be applied without changes
 ```
 
 Monitor workflow logs for:
+
 - Pattern matching results
 - Confidence scores
 - AI fallback usage

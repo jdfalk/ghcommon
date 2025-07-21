@@ -8,11 +8,11 @@ on:
   # Run on issue events for real-time labeling
   issues:
     types: [opened, edited, reopened]
-  
+
   # Run on schedule for batch processing
   schedule:
-    - cron: "0 2 * * *"  # Daily at 2 AM UTC
-  
+    - cron: "0 2 * * *" # Daily at 2 AM UTC
+
   # Manual trigger
   workflow_dispatch:
     inputs:
@@ -51,23 +51,23 @@ jobs:
     with:
       # Main operation control
       operation: ${{ inputs.operation || 'all' }}
-      
+
       # Issue Management Configuration
       im_operations: "auto"
       im_dry_run: ${{ inputs.dry_run || false }}
       im_force_update: false
       im_cleanup_issue_updates: true
-      
+
       # Documentation Updates
       docs_dry_run: ${{ inputs.dry_run || false }}
       docs_create_pr: true
       docs_auto_merge: false
       docs_continue_on_error: true
-      
+
       # PR Labeling
       labeler_sync_labels: true
       labeler_dot: true
-      
+
       # Intelligent Issue Labeling Configuration
       il_enabled: true
       il_dry_run: ${{ inputs.dry_run || false }}
@@ -76,15 +76,15 @@ jobs:
       il_confidence_threshold: 0.7
       il_max_labels_per_issue: 8
       il_preserve_existing_labels: true
-      
+
       # Super Linter Configuration
       sl_validate_all_codebase: false
       sl_enable_auto_fix: true
       sl_auto_commit_fixes: true
-      
+
       # AI Rebase Configuration
       rebase_model: "openai/gpt-4o"
-    
+
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
@@ -100,7 +100,7 @@ jobs:
           echo "  Issues processed: ${{ needs.unified-automation.outputs.issues_processed || 'N/A' }}"
           echo "  Labels applied: ${{ needs.unified-automation.outputs.labels_applied || 'N/A' }}"
           echo "  AI fallback used: ${{ needs.unified-automation.outputs.ai_fallback_used || 'N/A' }}"
-          
+
           if [ "${{ needs.unified-automation.result }}" = "success" ]; then
             echo "✅ Automation completed successfully"
           else
