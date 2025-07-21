@@ -1453,6 +1453,14 @@ class IssueUpdateProcessor:
         repo = update.get("repo", self.api.repo)
         body = update.get("body", "")
         primary_guid, legacy_guid = self._extract_guids(update)
+
+        # Handle parent resolution - check both "parent" and "parent_guid"
+        parent_guid = update.get("parent_guid") or update.get("parent")
+        if not issue_number and parent_guid:
+            mapping = self.guid_issue_map.get(parent_guid)
+            if mapping:
+                repo, issue_number = mapping
+
         if not issue_number:
             self.summary.add_error(f"No issue number found for comment: {update}")
             return False
@@ -1478,9 +1486,13 @@ class IssueUpdateProcessor:
             else GitHubAPI(self.api.token, repo)
         )
         try:
-            success = api.add_comment(issue_number, body)
-            if success:
-                self.summary.add_comment_added(issue_number, body)
+            comment = api.add_comment(issue_number, body)
+            if comment:
+                comment_url = comment.get(
+                    "html_url",
+                    f"https://github.com/{repo}/issues/{issue_number}#issuecomment-{comment.get('id', '')}",
+                )
+                self.summary.add_comment(issue_number, comment_url)
                 return True
             else:
                 self.summary.add_error(
@@ -1516,9 +1528,18 @@ class IssueUpdateProcessor:
             else GitHubAPI(self.api.token, repo)
         )
         try:
+            # Get issue details before closing
+            issue_data = api.get_issue(issue_number)
+            title = (
+                issue_data.get("title", f"Issue {issue_number}")
+                if issue_data
+                else f"Issue {issue_number}"
+            )
+            issue_url = f"https://github.com/{repo}/issues/{issue_number}"
+
             success = api.close_issue(issue_number, state_reason=state_reason)
             if success:
-                self.summary.add_issue_closed(issue_number, state_reason)
+                self.summary.add_issue_closed(issue_number, title, issue_url)
                 return True
             else:
                 self.summary.add_error(f"Failed to close issue #{issue_number}")
