@@ -14,7 +14,7 @@
 - **Inputs**: Merged all input parameters from both versions
 - **Jobs**: Used the more comprehensive job configuration with full parameter passing
 
-### reusable-unified-automation.yml  
+### reusable-unified-automation.yml
 - **Version**: Updated to 2.4.0 (combining 2.2.1 + 2.3.0)
 - **Secrets**: Removed the explicit secrets definition that was causing conflicts
 - **Inputs**: Kept all comprehensive input parameters
