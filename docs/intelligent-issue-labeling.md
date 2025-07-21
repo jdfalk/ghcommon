@@ -72,17 +72,20 @@ jobs:
 ## Label Categories Detected
 
 ### Issue Types
+
 - `bug` - Error reports and broken functionality
 - `enhancement` - New features and improvements
 - `documentation` - Documentation updates and fixes
 - `question` - Support requests and clarifications
 
 ### Priority Levels
+
 - `priority-high` - Urgent issues requiring immediate attention
 - `priority-medium` - Standard priority issues
 - `priority-low` - Nice-to-have improvements
 
 ### Technology Stack
+
 - `tech:go` - Go programming language
 - `tech:python` - Python programming language
 - `tech:javascript` - JavaScript/Node.js
@@ -93,6 +96,7 @@ jobs:
 - `tech:shell` - Shell scripting
 
 ### Module Classification
+
 - `module:auth` - Authentication and authorization
 - `module:cache` - Caching systems
 - `module:config` - Configuration management
@@ -103,12 +107,14 @@ jobs:
 - `module:ui` - User interface
 
 ### Workflow Types
+
 - `workflow:automation` - Automation scripts and tools
 - `workflow:github-actions` - GitHub Actions workflows
 - `workflow:ci-cd` - CI/CD pipelines
 - `workflow:deployment` - Deployment processes
 
 ### Special Categories
+
 - `security` - Security vulnerabilities and concerns
 - `performance` - Performance optimization
 - `breaking-change` - Breaking changes
