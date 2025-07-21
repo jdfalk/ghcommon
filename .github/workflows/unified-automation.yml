@@ -39,6 +39,7 @@ on:
           - "issues"
           - "docs"
           - "label"
+          - "intelligent-labeling"
           - "lint"
           - "rebase"
         default: "all"
@@ -91,8 +92,8 @@ jobs:
 
       # Issue Management - mapped from simplified inputs
       im_operations: auto
-      im_dry_run: ${{ github.event.inputs.dry_run == 'true' }}
-      im_force_update: ${{ github.event.inputs.force_update == 'true' }}
+      im_dry_run: ${{ github.event.inputs.dry_run || false }}
+      im_force_update: ${{ github.event.inputs.force_update || false }}
       im_issue_updates_file: issue_updates.json
       im_issue_updates_directory: .github/issue-updates
       im_cleanup_issue_updates: true
@@ -100,10 +101,10 @@ jobs:
 
       # Documentation - mapped from simplified inputs
       docs_updates_directory: .github/doc-updates
-      docs_dry_run: ${{ github.event.inputs.dry_run == 'true' }}
+      docs_dry_run: ${{ github.event.inputs.dry_run || false }}
       docs_python_version: ${{ github.event.inputs.python_version || '3.11' }}
       docs_cleanup_processed_files: true
-      docs_create_pr: ${{ github.event.inputs.create_pr == 'true' }}
+      docs_create_pr: ${{ github.event.inputs.create_pr || false }}
       docs_auto_merge: false
       docs_continue_on_error: true
 
@@ -114,7 +115,7 @@ jobs:
       labeler_pr_numbers: ""
 
       # Super Linter - mapped from simplified inputs
-      sl_validate_all_codebase: ${{ github.event.inputs.validate_all_codebase == 'true' }}
+      sl_validate_all_codebase: ${{ github.event.inputs.validate_all_codebase || false }}
       sl_default_branch: ${{ github.event.inputs.base_branch || 'main' }}
       sl_config_file: .github/super-linter.env
       sl_run_python: true
@@ -129,11 +130,22 @@ jobs:
       sl_run_protobuf: true
       sl_run_github_actions: true
       sl_run_security: true
-      sl_enable_auto_fix: ${{ github.event.inputs.auto_fix == 'true' }}
-      sl_auto_commit_fixes: ${{ github.event.inputs.auto_fix == 'true' }}
+      sl_enable_auto_fix: ${{ github.event.inputs.auto_fix || true }}
+      sl_auto_commit_fixes: ${{ github.event.inputs.auto_fix || true }}
       sl_commit_message: "style: auto-fix linting issues [skip ci]"
 
       # AI Rebase - mapped from simplified inputs
       rebase_base_branch: ${{ github.event.inputs.base_branch || 'main' }}
       rebase_model: "openai/gpt-4o"
+
+      # Intelligent Labeling - use defaults with ghcommon config
+      il_enabled: true
+      il_dry_run: ${{ github.event.inputs.dry_run || false }}
+      il_batch_size: 10
+      il_use_ai_fallback: true
+      il_confidence_threshold: 0.7
+      il_max_labels_per_issue: 8
+      il_preserve_existing_labels: true
+      il_label_config_path: ".github/intelligent-labeling.yml"
+      il_python_version: ${{ github.event.inputs.python_version || '3.11' }}
     secrets: inherit
