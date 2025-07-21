@@ -85,7 +85,7 @@ on:
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for issue management"
-        required: true
+        required: false
 
 # Explicit permissions required for this reusable workflow
 permissions:
@@ -150,8 +150,9 @@ jobs:
     if: ${{ needs.determine-operations.outputs.operations != '[]' }}
     env:
       # Use enhanced PAT for cross-repo operations and project management
-      GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+      # Intelligent token selection: prefer custom token, fallback to github-token secret, then GITHUB_TOKEN
+      GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.github-token || secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.github-token || secrets.GITHUB_TOKEN }}
     outputs:
       operations_completed: ${{ steps.set-outputs.outputs.operations_completed }}
       files_processed: ${{ steps.set-outputs.outputs.files_processed }}
@@ -246,7 +247,7 @@ jobs:
             fi
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.github-token || secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
@@ -280,7 +281,7 @@ jobs:
             echo "🔍 No existing legacy file PR found"
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.github-token || secrets.GITHUB_TOKEN }}
 
       - name: Create PR for processed distributed files
         if: ${{ matrix.operation == 'update-issues' && inputs.dry_run != true && steps.execute.outputs.files_changed == 'true' }}
