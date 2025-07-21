@@ -2427,3 +2427,146 @@ class CodeQLAlertManager:
 
         print(f"  🔒 Would create issue for CodeQL alert #{alert_id}")
         print(f"     Rule: {rule_id} (Severity: {severity})")
+
+
+def main():
+    """Main entry point for the issue manager script."""
+    parser = argparse.ArgumentParser(
+        description="Unified GitHub issue management script",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python issue_manager.py update-issues --dry-run
+  python issue_manager.py copilot-tickets
+  python issue_manager.py close-duplicates
+  python issue_manager.py codeql-alerts
+  python issue_manager.py event-handler
+
+Environment Variables:
+  GITHUB_TOKEN - GitHub token with repo access (required)
+  REPO - Repository in owner/name format (required)
+  GITHUB_EVENT_NAME - Webhook event name (for event-driven operations)
+  GITHUB_EVENT_PATH - Path to event payload (for event-driven operations)
+        """,
+    )
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Update issues command
+    update_parser = subparsers.add_parser(
+        "update-issues", help="Process issue updates from JSON files"
+    )
+    update_parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be done without executing"
+    )
+    update_parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose output"
+    )
+    update_parser.add_argument(
+        "--directory",
+        default=".github/issue-updates",
+        help="Directory containing issue update JSON files",
+    )
+
+    # Copilot tickets command
+    copilot_parser = subparsers.add_parser(
+        "copilot-tickets", help="Manage Copilot review comment tickets"
+    )
+    copilot_parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be done without executing"
+    )
+
+    # Close duplicates command
+    duplicate_parser = subparsers.add_parser(
+        "close-duplicates", help="Close duplicate issues by title"
+    )
+    duplicate_parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be done without executing"
+    )
+
+    # CodeQL alerts command
+    codeql_parser = subparsers.add_parser(
+        "codeql-alerts", help="Generate tickets for CodeQL security alerts"
+    )
+    codeql_parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be done without executing"
+    )
+
+    # Event handler command
+    event_parser = subparsers.add_parser(
+        "event-handler", help="Handle GitHub webhook events"
+    )
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    # Validate required environment variables
+    token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    repo = os.getenv("REPO")
+
+    if not token:
+        print("❌ Error: GITHUB_TOKEN or GH_TOKEN environment variable is required")
+        return 1
+
+    if not repo:
+        print("❌ Error: REPO environment variable is required (format: owner/name)")
+        return 1
+
+    try:
+        # Initialize the GitHub API
+        api = GitHubAPI(token, repo)
+
+        # Execute the requested command
+        if args.command == "update-issues":
+            processor = IssueUpdateProcessor(api)
+            success = processor.process_updates(
+                directory=args.directory,
+                dry_run=args.dry_run,
+                verbose=getattr(args, "verbose", False),
+            )
+            return 0 if success else 1
+
+        elif args.command == "copilot-tickets":
+            manager = CopilotTicketManager(api)
+            success = manager.manage_tickets(dry_run=args.dry_run)
+            return 0 if success else 1
+
+        elif args.command == "close-duplicates":
+            manager = DuplicateIssueManager(api)
+            success = manager.close_duplicates(dry_run=args.dry_run)
+            return 0 if success else 1
+
+        elif args.command == "codeql-alerts":
+            manager = CodeQLAlertManager(api)
+            success = manager.create_tickets(dry_run=args.dry_run)
+            return 0 if success else 1
+
+        elif args.command == "event-handler":
+            # For event handler, we need to determine what type of event this is
+            event_name = os.getenv("GITHUB_EVENT_NAME")
+            if not event_name:
+                print("❌ Error: GITHUB_EVENT_NAME environment variable is required for event handling")
+                return 1
+            
+            # For now, just handle as issue updates
+            processor = IssueUpdateProcessor(api)
+            success = processor.process_updates(dry_run=False)
+            return 0 if success else 1
+
+        else:
+            print(f"❌ Unknown command: {args.command}")
+            return 1
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        if getattr(args, "verbose", False):
+            import traceback
+            traceback.print_exc()
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
