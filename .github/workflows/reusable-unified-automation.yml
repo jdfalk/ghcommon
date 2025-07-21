@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 2.4.0
+# version: 2.6.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -206,6 +206,10 @@ on:
         required: false
         default: "openai/gpt-4o"
         type: string
+    secrets:
+      github-token:
+        description: "GitHub token for repository operations"
+        required: false
 
 jobs:
   issue-management:
@@ -219,8 +223,7 @@ jobs:
       issue_updates_directory: ${{ inputs.im_issue_updates_directory }}
       cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
       python_version: ${{ inputs.im_python_version }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+    secrets: inherit
 
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
@@ -233,8 +236,7 @@ jobs:
       create_pr: ${{ inputs.docs_create_pr }}
       auto_merge: ${{ inputs.docs_auto_merge }}
       continue_on_error: ${{ inputs.docs_continue_on_error }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+    secrets: inherit
 
   labeler:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
@@ -244,8 +246,7 @@ jobs:
       sync-labels: ${{ inputs.labeler_sync_labels }}
       dot: ${{ inputs.labeler_dot }}
       pr-numbers: ${{ inputs.labeler_pr_numbers }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+    secrets: inherit
 
   super-linter:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
@@ -269,8 +270,7 @@ jobs:
       enable-auto-fix: ${{ inputs.sl_enable_auto_fix }}
       auto-commit-fixes: ${{ inputs.sl_auto_commit_fixes }}
       commit-message: ${{ inputs.sl_commit_message }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+    secrets: inherit
 
   ai-rebase:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
@@ -278,5 +278,4 @@ jobs:
     with:
       base-branch: ${{ inputs.rebase_base_branch }}
       model: ${{ inputs.rebase_model }}
-    secrets:
-      github-token: ${{ secrets.github-token }}
+    secrets: inherit
