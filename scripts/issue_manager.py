@@ -1515,6 +1515,12 @@ class IssueUpdateProcessor:
             for k, v in update.items()
             if k not in ["action", "number", "guid", "legacy_guid", "permalink"]
         }
+        
+        # Unescape string fields that might contain escape sequences
+        for field in ["title", "body"]:
+            if field in update_data:
+                update_data[field] = unescape_json_string(update_data[field])
+        
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
@@ -2253,7 +2259,7 @@ class CopilotTicketManager:
             for item in lines
         ]
         data = {"comments": lines}
-        json_block = json.dumps(data, separators=(",", ":"))
+        json_block = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
 
         return (
             f"Generated from [Copilot review comment]({comment['url']}).\n\n"
