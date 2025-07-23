@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "Implement cache protobufs",
+  "guid": "d78e60a8-8409-40a2-8c42-b932c90603dc",
+  "created_at": "2025-07-22T16:19:33Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

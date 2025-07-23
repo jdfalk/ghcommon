@@ -1,0 +1,16 @@
+{
+  "file": "PACKAGE_NAMING_RESOLUTION.md",
+  "mode": "append",
+  "content": "Adopted gcommon.v1.cache package name",
+  "guid": "0dd29646-cac0-4484-b94a-023a1f2e6baa",
+  "created_at": "2025-07-22T16:19:45Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

@@ -1,0 +1,43 @@
+// file: proto/gcommon/v1/cache.proto
+// version: 1.0.0
+// guid: 7ed2b7e8-4cb1-4a37-bf0a-2d785c0d7b1f
+
+syntax = "proto3";
+edition = "2023";
+
+package gcommon.v1.cache;
+option go_package = "github.com/jdfalk/ghcommon/proto/gcommon/v1;gcommonv1";
+
+// CacheItem represents a single cache entry.
+message CacheItem {
+  string key = 1;       // Unique cache key
+  bytes value = 2;      // Raw cached value
+  int64 ttl_seconds = 3; // Time-to-live in seconds
+}
+
+// GetCacheRequest retrieves a value for the provided key.
+message GetCacheRequest {
+  string key = 1; // Cache key to retrieve
+}
+
+// GetCacheResponse returns the cached value if found.
+message GetCacheResponse {
+  bool found = 1;  // Indicates if the key was present
+  bytes value = 2; // Cached value if found
+}
+
+// SetCacheRequest stores a cache item.
+message SetCacheRequest {
+  CacheItem item = 1; // Item to store
+}
+
+// SetCacheResponse indicates whether the operation succeeded.
+message SetCacheResponse {
+  bool success = 1; // True if stored successfully
+}
+
+// CacheService provides simple cache operations.
+service CacheService {
+  rpc GetCache(GetCacheRequest) returns (GetCacheResponse);
+  rpc SetCache(SetCacheRequest) returns (SetCacheResponse);
+}
