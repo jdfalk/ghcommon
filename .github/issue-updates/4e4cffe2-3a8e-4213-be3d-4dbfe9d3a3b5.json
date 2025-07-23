@@ -1,0 +1,10 @@
+{
+  "action": "create",
+  "title": "Implement gcommon protobuf definitions",
+  "body": "Migrate queue, cache, and logging proto files from ghcommon into gcommon repository.",
+  "labels": ["module:proto", "tech:protobuf"],
+  "guid": "4e4cffe2-3a8e-4213-be3d-4dbfe9d3a3b5",
+  "legacy_guid": "create-implement-gcommon-protobuf-definitions-2025-07-23",
+  "parent_issue": null,
+  "repo": "jdfalk/gcommon"
+}

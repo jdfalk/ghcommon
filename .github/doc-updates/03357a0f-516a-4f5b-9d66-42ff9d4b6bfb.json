@@ -1,0 +1,16 @@
+{
+  "file": "docs/intelligent-issue-labeling.md",
+  "mode": "replace-section",
+  "content": "### Technology Stack\\n\\n- `tech:go` - Go programming language\\n- `tech:python` - Python programming language\\n- `tech:javascript` - JavaScript/Node.js\\n- `tech:typescript` - TypeScript\\n- `tech:docker` - Docker containerization\\n- `tech:kubernetes` - Kubernetes orchestration\\n- `tech:shell` - Shell scripting",
+  "guid": "03357a0f-516a-4f5b-9d66-42ff9d4b6bfb",
+  "created_at": "2025-07-23T03:11:33Z",
+  "options": {
+    "section": "Technology Stack",
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

@@ -99,7 +99,6 @@ jobs:
               - 'go.sum'
               - 'pkg/**'
               - 'cmd/**'
-              - 'proto/**'
               - 'scripts/**'
               - '.github/workflows/backend.yml'
             frontend:

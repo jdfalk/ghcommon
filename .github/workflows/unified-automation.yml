@@ -127,7 +127,6 @@ jobs:
       sl_run_go: true
       sl_run_css: true
       sl_run_html: true
-      sl_run_protobuf: true
       sl_run_github_actions: true
       sl_run_security: true
       sl_enable_auto_fix: ${{ github.event.inputs.auto_fix || true }}

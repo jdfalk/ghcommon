@@ -165,11 +165,6 @@ on:
         required: false
         default: true
         type: boolean
-      sl_run_protobuf:
-        description: "Enable Protobuf linting"
-        required: false
-        default: true
-        type: boolean
       sl_run_github_actions:
         description: "Enable GitHub Actions linting"
         required: false
@@ -314,11 +309,6 @@ jobs:
       run-go: ${{ inputs.sl_run_go }}
       run-css: ${{ inputs.sl_run_css }}
       run-html: ${{ inputs.sl_run_html }}
-      run-protobuf: ${{ inputs.sl_run_protobuf }}
-      run-github-actions: ${{ inputs.sl_run_github_actions }}
-      run-security: ${{ inputs.sl_run_security }}
-      enable-auto-fix: ${{ inputs.sl_enable_auto_fix }}
-      auto-commit-fixes: ${{ inputs.sl_auto_commit_fixes }}
       commit-message: ${{ inputs.sl_commit_message }}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
