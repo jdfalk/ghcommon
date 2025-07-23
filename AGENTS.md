@@ -19,10 +19,32 @@
 2. **Create Documentation Update**:
 
    ```bash
+   # Basic modes (append/prepend/replace)
    ./scripts/create-doc-update.sh [filename] "[content]" [mode] --issue [issue-number]
+
+   # For precise insertion, use 'after' mode with specific text to insert after
+   ./scripts/create-doc-update.sh README.md "New content here" after --after "## Installation" --issue [issue-number]
+
+   # For section replacement
+   ./scripts/create-doc-update.sh README.md "Updated content" replace-section --section "Usage" --issue [issue-number]
    ```
 
-3. **Link to Issue**: Every documentation change MUST reference a GitHub issue for tracking and context.
+3. **⚠️ CRITICAL - "after" mode requirements**:
+   - **ALWAYS specify `--after "exact text"`** when using `after` mode
+   - The text in `--after` must exist exactly in the target file
+   - Example: `--after "## Installation"` will insert content after that heading
+   - **Malformed JSON error = missing `--after` parameter**
+
+4. **Link to Issue**: Every documentation change MUST reference a GitHub issue for tracking and context.
+
+**Common Modes:**
+
+- `append` - Add to end of file
+- `prepend` - Add to beginning of file
+- `after` - Insert after specific text (REQUIRES `--after "text"`)
+- `replace-section` - Replace entire section (REQUIRES `--section "name"`)
+- `changelog-entry` - Add changelog entry
+- `task-add` - Add TODO task
 
 **Failure to follow this protocol will result in workflow conflicts and lost changes.**
 
