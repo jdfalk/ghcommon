@@ -13,3 +13,8 @@ This document tracks the agreed-upon package naming conventions for all gcommon 
 - Edition 2023 is required for all proto files.
 
 These rules ensure consistency across modules as we complete remaining protobuf implementations.
+
+This document explains package names used for generated protobuf code.
+
+- Go packages follow the pattern `github.com/jdfalk/ghcommon/proto/<path>`.
+- Protobuf packages use the `gcommon.v1.<service>` namespace.

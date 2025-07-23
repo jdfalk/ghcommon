@@ -1,0 +1,16 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Added comprehensive manual unified automation workflow options",
+  "guid": "19191193-6adb-4d52-abb0-89ecffade4af",
+  "created_at": "2025-07-16T13:57:20Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}

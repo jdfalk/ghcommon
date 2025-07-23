@@ -1,0 +1,4 @@
+# Prettier ignore file
+
+# GitHub folder with copilot instructions that contain examples
+.github/copilot-instructions.md
