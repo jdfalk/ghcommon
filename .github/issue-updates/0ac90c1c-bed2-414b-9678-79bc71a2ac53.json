@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Implement queue protobufs",
+  "body": "Added queue proto definitions",
+  "labels": ["module:queue", "tech:protobuf"],
+  "guid": "0ac90c1c-bed2-414b-9678-79bc71a2ac53",
+  "legacy_guid": "create-implement-queue-protobufs-2025-07-22"
+}
