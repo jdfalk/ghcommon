@@ -1,0 +1,57 @@
+# file: .github/workflows/reusable-codeql.yml
+# version: 1.0.0
+# guid: af287302-d723-4712-abf5-2808f583495d
+
+name: Reusable - CodeQL Analysis
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: "Languages to analyze"
+        required: false
+        default: ''
+        type: string
+      config-file:
+        description: "Path to CodeQL config file"
+        required: false
+        default: '.github/codeql.yml'
+        type: string
+    secrets:
+      github-token:
+        description: "GitHub token with security-events permission"
+        required: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: CodeQL Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache CodeQL database
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/codeql
+          key: codeql-${{ runner.os }}-${{ github.repository }}-${{ github.ref_name }}
+          restore-keys: |
+            codeql-${{ runner.os }}-${{ github.repository }}-
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.languages }}
+          config-file: ${{ inputs.config-file }}
+          cache: true
+          cache-id: ${{ github.repository }}-${{ github.ref_name }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

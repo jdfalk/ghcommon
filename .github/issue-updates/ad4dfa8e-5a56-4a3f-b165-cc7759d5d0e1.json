@@ -1,0 +1,7 @@
+{
+  "action": "comment",
+  "number": 12,
+  "body": "Implemented reusable CodeQL workflow with unique cache keys to resolve collisions.",
+  "guid": "ad4dfa8e-5a56-4a3f-b165-cc7759d5d0e1",
+  "legacy_guid": "comment-issue-12-2025-07-23"
+}
