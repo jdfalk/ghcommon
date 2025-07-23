@@ -421,3 +421,5 @@ Track fix for docs workflow
 - [ ] 🟡 **General**: Add dedicated unified automation workflow
 
 Implement cache protobufs
+
+- [ ] 🟡 **General**: Migrate protobuf tasks to gcommon repository

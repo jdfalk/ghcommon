@@ -394,3 +394,12 @@ Added logging protobuf definitions in proto/gcommon/v1
 TODO: Add content for this section
 
 Added cache service protobuf definitions
+
+# Queue Module
+
+## Queue Module\n\nTODO: Add content for this section
+
+
+# Protobuf Definitions
+
+## Protobuf Definitions\n\n_Moved to gcommon repository._

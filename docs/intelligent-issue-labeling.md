@@ -377,3 +377,8 @@ For issues, questions, or contributions:
 ## License
 
 This workflow is part of the ghcommon repository and follows the same license terms.
+
+
+# Technology Stack
+
+### Technology Stack\n\n- `tech:go` - Go programming language\n- `tech:python` - Python programming language\n- `tech:javascript` - JavaScript/Node.js\n- `tech:typescript` - TypeScript\n- `tech:docker` - Docker containerization\n- `tech:kubernetes` - Kubernetes orchestration\n- `tech:shell` - Shell scripting
