@@ -44,7 +44,7 @@ log_error() {
 backup_old_files() {
     local repo_dir="$1"
     local backup_dir="$repo_dir/.github/instructions-backup-$(date +%Y%m%d-%H%M%S)"
-    
+
     # Backup old standalone files if they exist
     local old_files=(
         "$repo_dir/.github/commit-messages.md"
@@ -55,7 +55,7 @@ backup_old_files() {
         "$repo_dir/.github/review-selection.md"
         "$repo_dir/.github/workflow-usage.md"
     )
-    
+
     local backup_needed=false
     for file in "${old_files[@]}"; do
         if [[ -f "$file" ]]; then
@@ -63,7 +63,7 @@ backup_old_files() {
             break
         fi
     done
-    
+
     if [[ "$backup_needed" == "true" ]]; then
         log_info "Creating backup in $backup_dir"
         mkdir -p "$backup_dir"
@@ -76,11 +76,11 @@ backup_old_files() {
     else
         log_info "No old standalone files found to backup"
     fi
-    
+
     # Backup duplicate instruction files in root .github if they exist
     if [[ -d "$repo_dir/.github/instructions" ]]; then
         local found_duplicates=false
-        
+
         # Check if there are any duplicates before creating backup dir
         while IFS= read -r -d '' file; do
             basename_file=$(basename "$file")
@@ -89,13 +89,13 @@ backup_old_files() {
                 break
             fi
         done < <(find "$repo_dir/.github" -maxdepth 1 -name "*.instructions.md" -type f -print0 2>/dev/null)
-        
+
         if [[ "$found_duplicates" == "true" ]]; then
             if [[ "$backup_needed" == "false" ]]; then
                 log_info "Creating backup in $backup_dir"
                 mkdir -p "$backup_dir"
             fi
-            
+
             # Find instruction files in root .github that also exist in .github/instructions
             find "$repo_dir/.github" -maxdepth 1 -name "*.instructions.md" -type f 2>/dev/null | while read -r file; do
                 basename_file=$(basename "$file")
@@ -129,22 +129,36 @@ remove_old_files() {
         "$repo_dir/.github/workflow-usage.md"
     )
 
+    local files_removed=0
     for file in "${old_files[@]}"; do
         if [[ -f "$file" ]]; then
             rm "$file"
             log_success "Removed $(basename "$file")"
+            ((files_removed++))
         fi
     done
 
+    if [[ $files_removed -eq 0 ]]; then
+        log_info "No old standalone files found to remove"
+    fi
+
     # Remove duplicate instruction files from root .github
     if [[ -d "$repo_dir/.github/instructions" ]]; then
-        find "$repo_dir/.github" -maxdepth 1 -name "*.instructions.md" -type f | while read -r file; do
+        local duplicates_removed=0
+        find "$repo_dir/.github" -maxdepth 1 -name "*.instructions.md" -type f 2>/dev/null | while read -r file; do
             basename_file=$(basename "$file")
             if [[ -f "$repo_dir/.github/instructions/$basename_file" ]]; then
                 rm "$file"
                 log_success "Removed duplicate root file: $basename_file"
+                ((duplicates_removed++))
             fi
         done
+
+        if [[ $duplicates_removed -eq 0 ]]; then
+            log_info "No duplicate instruction files found to remove"
+        fi
+    else
+        log_info "No .github/instructions directory found - skipping duplicate removal"
     fi
 }
 
@@ -160,11 +174,35 @@ copy_instruction_files() {
 
     # Copy all instruction files from ghcommon
     if [[ -d "$GHCOMMON_INSTRUCTIONS_DIR" ]]; then
+        local files_copied=0
+        local files_updated=0
+        local files_skipped=0
+
         find "$GHCOMMON_INSTRUCTIONS_DIR" -name "*.instructions.md" -type f | while read -r file; do
             basename_file=$(basename "$file")
-            cp "$file" "$target_instructions_dir/"
-            log_success "Copied $basename_file"
+            target_file="$target_instructions_dir/$basename_file"
+
+            if [[ -f "$target_file" ]]; then
+                # File exists, check if it needs updating
+                if ! cmp -s "$file" "$target_file"; then
+                    cp "$file" "$target_file"
+                    log_success "Updated $basename_file"
+                    ((files_updated++))
+                else
+                    log_info "Skipped $basename_file (already up-to-date)"
+                    ((files_skipped++))
+                fi
+            else
+                # New file
+                cp "$file" "$target_file"
+                log_success "Copied $basename_file"
+                ((files_copied++))
+            fi
         done
+
+        if [[ $files_copied -eq 0 && $files_updated -eq 0 && $files_skipped -gt 0 ]]; then
+            log_info "All instruction files are already up-to-date"
+        fi
     else
         log_error "Source instructions directory not found: $GHCOMMON_INSTRUCTIONS_DIR"
         return 1
@@ -175,15 +213,25 @@ copy_instruction_files() {
 update_copilot_instructions() {
     local repo_dir="$1"
     local copilot_file="$repo_dir/.github/copilot-instructions.md"
+    local source_file="$GHCOMMON_DIR/.github/copilot-instructions.md"
+
+    if [[ ! -f "$source_file" ]]; then
+        log_error "Source copilot-instructions.md not found: $source_file"
+        return 1
+    fi
 
     if [[ -f "$copilot_file" ]]; then
-        log_info "Updating copilot-instructions.md in $repo_dir"
-        # Copy the latest version from ghcommon
-        cp "$GHCOMMON_DIR/.github/copilot-instructions.md" "$copilot_file"
-        log_success "Updated copilot-instructions.md"
+        # File exists, check if it needs updating
+        if ! cmp -s "$source_file" "$copilot_file"; then
+            log_info "Updating copilot-instructions.md in $repo_dir"
+            cp "$source_file" "$copilot_file"
+            log_success "Updated copilot-instructions.md"
+        else
+            log_info "copilot-instructions.md is already up-to-date"
+        fi
     else
         log_info "Creating copilot-instructions.md in $repo_dir"
-        cp "$GHCOMMON_DIR/.github/copilot-instructions.md" "$copilot_file"
+        cp "$source_file" "$copilot_file"
         log_success "Created copilot-instructions.md"
     fi
 }
