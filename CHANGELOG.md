@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added\n\n- Added reusable CodeQL workflow with unique caching keys
+
 ### Changed
 
 - **BREAKING**: Removed protobuf definitions; moved to gcommon repository

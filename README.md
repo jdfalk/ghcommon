@@ -403,3 +403,5 @@ Added cache service protobuf definitions
 # Protobuf Definitions
 
 ## Protobuf Definitions\n\n_Moved to gcommon repository._
+
+- **Reusable CodeQL Workflow**: Unique caching keys prevent collisions

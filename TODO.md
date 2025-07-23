@@ -423,3 +423,5 @@ Track fix for docs workflow
 Implement cache protobufs
 
 - [ ] 🟡 **General**: Migrate protobuf tasks to gcommon repository
+
+Fix CodeQL cache collisions in reusable workflows
