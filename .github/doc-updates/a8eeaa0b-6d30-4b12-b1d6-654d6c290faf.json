@@ -1,0 +1,16 @@
+{
+  "file": "TODO.md",
+  "mode": "task-add",
+  "content": "Fix CodeQL cache collisions in reusable workflows",
+  "guid": "a8eeaa0b-6d30-4b12-b1d6-654d6c290faf",
+  "created_at": "2025-07-23T03:13:07Z",
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
