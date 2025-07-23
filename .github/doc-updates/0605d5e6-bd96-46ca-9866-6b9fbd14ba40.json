@@ -1,9 +1,9 @@
 {
   "file": "TODO.md",
   "mode": "task-add",
-  "content": "Implement logging protobuf definitions",
-  "guid": "53eb62b6-6ddb-4b42-8e9d-24f992538ecc",
-  "created_at": "2025-07-22T16:18:42Z",
+  "content": "- [ ] 🟡 **General**: Migrate protobuf tasks to gcommon repository",
+  "guid": "0605d5e6-bd96-46ca-9866-6b9fbd14ba40",
+  "created_at": "2025-07-23T03:11:13Z",
   "options": {
     "section": null,
     "after": null,

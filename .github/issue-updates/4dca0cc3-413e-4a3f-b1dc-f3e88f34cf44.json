@@ -1,8 +1,0 @@
-{
-  "action": "create",
-  "title": "Implement cache protobuf definitions",
-  "body": "Define caching service protos for gcommon module",
-  "labels": ["module:cache", "tech:protobuf", "tech:grpc"],
-  "guid": "4dca0cc3-413e-4a3f-b1dc-f3e88f34cf44",
-  "legacy_guid": "create-implement-cache-protobuf-definitions-2025-07-22"
-}

@@ -72,11 +72,6 @@ on:
         required: false
         default: true
         type: boolean
-      run-protobuf:
-        description: "Enable Protobuf linting"
-        required: false
-        default: true
-        type: boolean
       run-github-actions:
         description: "Enable GitHub Actions linting"
         required: false

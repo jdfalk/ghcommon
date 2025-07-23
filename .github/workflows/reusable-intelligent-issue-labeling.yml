@@ -277,7 +277,6 @@ jobs:
                       'tech:python': ['python', '.py', 'pip', 'pytest'],
                       'tech:javascript': ['javascript', 'js', '.js', 'npm', 'node'],
                       'tech:typescript': ['typescript', 'ts', '.ts'],
-                      'tech:protobuf': ['protobuf', 'proto', '.proto', 'grpc'],
                       'tech:docker': ['docker', 'dockerfile', 'container'],
                       'tech:kubernetes': ['kubernetes', 'k8s', 'kubectl', 'helm'],
                       'tech:shell': ['bash', 'shell', '.sh', 'script']
