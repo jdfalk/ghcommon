@@ -1,0 +1,34 @@
+// file: proto/gcommon/v1/logging.proto
+// version: 1.0.0
+// guid: 01234567-89ab-cdef-0123-456789abcdef
+
+syntax = "proto3";
+edition = "2023";
+
+package gcommon.v1.logging;
+option go_package = "github.com/jdfalk/ghcommon/proto/gcommon/v1;loggingpb";
+
+// LogEntry represents a structured log event.
+message LogEntry {
+  // ISO8601 timestamp for the log event.
+  string timestamp = 1;
+  // Severity level of the log event (e.g., INFO, ERROR).
+  string level = 2;
+  // Human-readable log message.
+  string message = 3;
+  // Additional metadata as key-value pairs.
+  map<string, string> metadata = 4;
+  // Correlation identifier for tracing.
+  string correlation_id = 5;
+}
+
+// WriteLogResponse returned after a log entry is processed.
+message WriteLogResponse {
+  // Unique identifier assigned to the logged event.
+  string id = 1;
+}
+
+// LoggingService allows clients to send log entries.
+service LoggingService {
+  rpc WriteLog(LogEntry) returns (WriteLogResponse);
+}

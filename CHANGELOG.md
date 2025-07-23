@@ -9,250 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Removed manual workflow_dispatch trigger from reusable-unified-automation.yml
-
 ### Added
 
 - Added unified automation workflow for manual invocation
-
-### Added
-
 - Added initial queue module protobuf definitions
-
-### Added
-
+- Added logging protobuf definitions
 - Added comprehensive manual unified automation workflow options
+- Added unified automation orchestrator workflow with extensive customization options
+- Common system prompt file for AI rebase workflow
+- AI rebase workflow now uses file-based prompts to avoid long command lines
+- Added manual workflow_dispatch trigger for unified automation
+- Added reusable stale issue handler
+- Added centralized CodeQL configuration
+- Added GitHub Projects automation script
 
-### Added
+### Changed
 
+- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
 - Rebase launcher now auto-commits AI conflict resolutions and force pushes
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
 
 ### Fixed
 
 - Fix syntax error in reusable docs update workflow
-
-### Added
-
-- Common system prompt file for AI rebase workflow
-
-### Added
-
-- Added unified automation orchestrator workflow with extensive customization options
-
-### Fixed
-
 - Fixed YAML Prettier configuration to avoid super-linter error
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Added
-
-- Added manual workflow_dispatch trigger for unified automation
-
-### Added
-
-- Added reusable stale issue handler
-
-### Added
-
-- Added centralized CodeQL configuration
-
-### Fixed
-
 - Enabled YAML Prettier validation for super linter
 
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
+### Removed
 
-### Added
-
-- Common system prompt file for AI rebase workflow
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Added
-
-- Added reusable stale issue handler
-
-### Added
-
-- Added centralized CodeQL configuration
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
-
-### Added
-
-- Common system prompt file for AI rebase workflow
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Added
-
-- Added reusable stale issue handler
-
-### Added
-
-- Added centralized CodeQL configuration
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Added
-
-- Added reusable stale issue handler
-
-### Added
-
-- Added centralized CodeQL configuration
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Added
-
-- Added reusable stale issue handler
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
-
-### Added
-
-- AI rebase workflow now uses file-based prompts to avoid long command lines
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Changed\n- Enhanced AI rebase workflow to auto-merge and handle unknown mergeable states
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Added
-
-- Added --ignore-errors option to doc_update_manager
-
-### Removed\n- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation.
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Added
-
-- Added GitHub Projects automation script
-
-### Added
-
-- Completed comprehensive documentation update system implementation across all repositories
-
-### Added
-
-- Enhanced documentation update system with comprehensive templates and workflow automation
-
-### Added
-
-- Initial reusable workflow repository setup
-- Semantic versioning workflow with conventional commits support
-- Multi-architecture container build workflow with Buildah
-- Automatic release workflow with comprehensive artifact management
-- **Unified Issue Management System**: Comprehensive reusable workflow for automated issue management
-  - Advanced Python script (963 lines) with full GitHub API integration
-  - Support for JSON-driven issue updates (create, update, comment, close, delete)
-  - **Sub-issue support**: Parent-child issue linking with automatic labeling and comments
-  - Copilot review comment ticket management
-  - Automatic duplicate issue closure
-  - CodeQL security alert ticket generation
-  - GUID-based duplicate prevention system
-  - Matrix-based parallel execution
-  - Auto-detection of operations based on event context
-  - Comprehensive documentation and migration guides
-  - Example workflows for basic and advanced usage
-- **Enhanced CI/CD with Dependency Submission**: Updated reusable CI workflow with automatic dependency submission
-  - Go dependency submission using `actions/go-dependency-submission@v1`
-  - Automatic detection of Go modules and dependencies
-  - Integration with GitHub's dependency graph for security insights
-  - Dependabot alerts and updates for vulnerable dependencies
-  - Configurable dependency submission with `enable-dependency-submission` input
-- **Automatic Pull Request Labeling**: New reusable workflow for intelligent PR labeling
-  - File-based labeling using glob patterns (documentation, backend, frontend, tests, etc.)
-  - Branch-based labeling using regex patterns (feature, bugfix, release, etc.)
-  - Support for complex matching logic with v5.0.0 labeler action
-  - Comprehensive default configuration with 15+ label categories
-  - Label synchronization to remove labels when files are reverted
-  - Security-conscious implementation using `pull_request_target` event
-- Complete CI/CD pipeline template
-- Container-only pipeline template
-- Library/package release pipeline template
-- Repository setup automation script
-- Repository validation script
-- Comprehensive security guidelines
-- Copilot instructions for AI-assisted development
-- GitHub issue and PR templates
-
-### Changed
-
-- **Updated reusable-ci.yml**: Enhanced with dependency submission capabilities
-  - Added `enable-dependency-submission` input parameter
-  - Integrated Go dependency submission for projects with Go modules
-  - Improved permissions configuration for dependency graph access
-
-### Files Added
-
-- `.github/workflows/reusable-labeler.yml`: New reusable workflow for automatic PR labeling
-- `.github/labeler.yml`: Comprehensive labeler configuration with 15+ label categories
-- `.github/workflows/example-usage.yml`: Example demonstrating both CI and labeler workflows
-- `docs/dependency-submission-and-labeling.md`: Complete documentation for new features
-
-### Security
-
-- SBOM generation for all container builds
-- Vulnerability scanning with Grype
-- Container image signing with Cosign
-- Security attestation for releases
-- Least privilege access patterns
-- Secret management best practices
+- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation
 
 ## [1.0.0] - 2025-06-14
 

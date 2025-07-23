@@ -59,31 +59,100 @@ COPILOT_LABEL = "copilot-review"
 CODEQL_LABEL = "security"
 DUPLICATE_CHECK_LABEL = "duplicate-check"
 
-# CodeQL alert configuration
 AUTO_CLOSE_ON_FILE_CHANGE = False  # Set to True to automatically close CodeQL issues when their files are modified
 
 
-def unescape_json_string(text: str) -> str:
-    """Properly unescape JSON string escape sequences.
-    
-    This handles common escape sequences found in JSON strings:
-    - \\n -> actual newline
-    - \\t -> actual tab  
-    - \\r -> carriage return
-    - \\" -> quote
-    - \\\\ -> backslash
+def normalize_json_string(text: str) -> str:
+    """Intelligently normalize JSON string content.
+
+    This function handles multiple scenarios:
+    1. Escaped sequences like \\n, \\t, \\" that need unescaping
+    2. Already-formatted content with real newlines/tabs that should be preserved
+    3. Mixed content with both escaped and real formatting
+
+    Args:
+        text: The input string from JSON
+
+    Returns:
+        Properly normalized string with escape sequences resolved where appropriate
     """
     if not isinstance(text, str):
         return text
-        
-    # Use codecs.decode to properly handle escape sequences
-    import codecs
-    try:
-        # First, encode as raw bytes, then decode with 'unicode_escape'
-        return codecs.decode(text, 'unicode_escape')
-    except (UnicodeDecodeError, ValueError):
-        # If decoding fails, return original string
+
+    # Quick check: if the string doesn't contain backslashes, no escaping is needed
+    if "\\" not in text:
         return text
+
+    # Count different types of content to make intelligent decisions
+    has_real_newlines = "\n" in text and "\\n" not in text
+    has_escaped_newlines = "\\n" in text
+    has_real_quotes = '"' in text and '\\"' not in text
+    has_escaped_quotes = '\\"' in text
+    has_real_tabs = "\t" in text and "\\t" not in text
+    has_escaped_tabs = "\\t" in text
+
+    # If content has ONLY escaped sequences and no real formatting, unescape it
+    if (has_escaped_newlines or has_escaped_quotes or has_escaped_tabs) and not (
+        has_real_newlines or has_real_quotes or has_real_tabs
+    ):
+        try:
+            import codecs
+
+            return codecs.decode(text, "unicode_escape")
+        except (UnicodeDecodeError, ValueError):
+            # If unescaping fails, try manual replacement of common sequences
+            return (
+                text.replace("\\n", "\n")
+                .replace("\\t", "\t")
+                .replace('\\"', '"')
+                .replace("\\\\", "\\")
+            )
+
+    # If content has BOTH escaped and real formatting, do selective replacement
+    elif has_escaped_newlines or has_escaped_quotes or has_escaped_tabs:
+        # Only replace the clearly escaped sequences, preserve real formatting
+        result = text
+        # Replace escaped sequences but be careful not to double-process
+        if "\\n" in result and not result.count("\\n") > result.count("\n") * 2:
+            result = result.replace("\\n", "\n")
+        if '\\"' in result:
+            result = result.replace('\\"', '"')
+        if "\\t" in result and not result.count("\\t") > result.count("\t") * 2:
+            result = result.replace("\\t", "\t")
+        if "\\\\" in result:
+            result = result.replace("\\\\", "\\")
+        return result
+
+    # If content appears to be already properly formatted, leave it alone
+    return text
+
+
+def escape_for_json_output(data: any) -> str:
+    """Safely escape content for JSON output with proper character handling.
+
+    Args:
+        data: The data to convert to JSON string
+
+    Returns:
+        Properly escaped JSON string
+    """
+    import json
+
+    try:
+        return json.dumps(
+            data,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            escape_forward_slashes=False,
+        )
+    except TypeError:
+        # Fallback for older Python versions that don't support escape_forward_slashes
+        return json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+
+
+def unescape_json_string(text: str) -> str:
+    """Legacy function name - redirects to normalize_json_string for backward compatibility."""
+    return normalize_json_string(text)
 
 
 class OperationSummary:
@@ -1515,12 +1584,12 @@ class IssueUpdateProcessor:
             for k, v in update.items()
             if k not in ["action", "number", "guid", "legacy_guid", "permalink"]
         }
-        
+
         # Unescape string fields that might contain escape sequences
         for field in ["title", "body"]:
             if field in update_data:
                 update_data[field] = unescape_json_string(update_data[field])
-        
+
         guid_to_embed = primary_guid or legacy_guid
         if guid_to_embed and "body" in update_data:
             update_data["body"] += f"\n\n<!-- guid:{guid_to_embed} -->"
@@ -2259,7 +2328,7 @@ class CopilotTicketManager:
             for item in lines
         ]
         data = {"comments": lines}
-        json_block = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+        json_block = escape_for_json_output(data)
 
         return (
             f"Generated from [Copilot review comment]({comment['url']}).\n\n"
