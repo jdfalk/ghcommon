@@ -413,3 +413,9 @@ Integrate advanced CodeQL config into setup scripts
 Add workflow_dispatch trigger to unified automation
 
 Track fix for docs workflow
+
+- [ ] 🟡 **General**: Validate manual unified automation workflow inputs
+
+- [ ] 🟡 **General**: Implement advanced queue protobuf features
+
+- [ ] 🟡 **General**: Add dedicated unified automation workflow

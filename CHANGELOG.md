@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Removed manual workflow_dispatch trigger from reusable-unified-automation.yml
+
+### Added
+
+- Added unified automation workflow for manual invocation
+
+### Added
+
+- Added initial queue module protobuf definitions
+
+### Added
+
+- Added comprehensive manual unified automation workflow options
+
 ### Added
 
 - Rebase launcher now auto-commits AI conflict resolutions and force pushes

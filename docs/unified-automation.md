@@ -23,6 +23,8 @@ jobs:
 ```
 
 For a minimal example see [`examples/workflows/unified-automation.yml`](../examples/workflows/unified-automation.yml).
+The `unified-automation.yml` workflow exposes the same inputs for manual invocation.
+**Tip:** Use the `unified-automation.yml` workflow in your repository to manually run or schedule the orchestrator.
 
 ## Inputs
 

@@ -34,8 +34,11 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 | [`reusable-super-linter.yml`](.github/workflows/reusable-super-linter.yml)                | Comprehensive code linting     | Multi-language linting, style enforcement, security scanning             |
 | [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds    | SBOM generation, vulnerability scanning, attestation, signing            |
 | [`automatic-release.yml`](.github/workflows/automatic-release.yml)                        | Automated GitHub releases      | Release notes, artifact management, notifications                        |
-| [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
+| [`unified-issue-management.yml`](.github/workflows/reusable-unified-issue-management.yml) | Comprehensive issue management |
 | [`reusable-unified-automation.yml`](.github/workflows/reusable-unified-automation.yml) | Unified automation orchestrator | Runs issue management, docs update, labeler, linting, and AI rebase |
+| [`unified-automation.yml`](.github/workflows/unified-automation.yml) | Standalone workflow to run unified automation | Manual trigger with extensive options | JSON-driven updates, Copilot tickets, duplicate closure, security alerts |
+| [`reusable-unified-automation.yml`](.github/workflows/reusable-unified-automation.yml) | Unified automation orchestrator | Runs issue management, docs update, labeler, linting, and AI rebase |
+| [`unified-automation.yml`](.github/workflows/unified-automation.yml) | Standalone workflow to run unified automation | Manual trigger with extensive options |
 
 ### Templates
 
@@ -381,3 +384,4 @@ Unified automation workflow can now be run manually via the Actions tab
 Added stale issue management workflow
 Document shared AI rebase system prompt
 Added auto-commit and push in rebase script
+## Queue Module\n\nTODO: Add content for this section
