@@ -18,3 +18,5 @@ This document explains package names used for generated protobuf code.
 
 - Go packages follow the pattern `github.com/jdfalk/ghcommon/proto/<path>`.
 - Protobuf packages use the `gcommon.v1.<service>` namespace.
+
+Adopted gcommon.v1.cache package name

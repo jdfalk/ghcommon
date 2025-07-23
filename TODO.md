@@ -419,3 +419,5 @@ Track fix for docs workflow
 - [ ] 🟡 **General**: Implement advanced queue protobuf features
 
 - [ ] 🟡 **General**: Add dedicated unified automation workflow
+
+Implement cache protobufs

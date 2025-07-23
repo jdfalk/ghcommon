@@ -18,3 +18,5 @@ This file summarizes major development sessions for protobuf migration.
 
 - Initial setup of protobuf implementation documents.
 - Created logging.proto and marked Logging module complete.
+
+Cache protobufs implemented for gcommon

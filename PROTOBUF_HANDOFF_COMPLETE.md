@@ -11,3 +11,5 @@ This document records protobuf files handed off from planning to implementation.
 - Queue: initial service and message definitions implemented in `proto/gcommon/v1/queue.proto`.
 
 Further modules will be marked here as they are completed.
+
+Cache module proto implemented
