@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-docs-update.yml
-# version: 2.0.1
+# version: 2.1.0
 # guid: 25b987e1-9e34-4618-8182-53e12c7307e0
 
 name: Reusable Documentation Updates
@@ -213,18 +213,17 @@ jobs:
           CREATE_PR: ${{ inputs.create_pr }}
           UPDATES_DIR: ${{ inputs.updates-directory }}
         run: |
-          echo "📋 Documentation Update Summary" >> $GITHUB_STEP_SUMMARY
-          echo "===============================" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Enhanced statistics with more detail
-          echo "📊 **Execution Statistics:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Update files found: ${{ steps.validate.outputs.files_found }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Documentation update completed" >> $GITHUB_STEP_SUMMARY
-          echo "- Dry run mode: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
-          echo "- Repository: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Workflow run: [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# 📋 Documentation Update Summary"
+            echo ""
+            echo "## 📊 Execution Statistics"
+            echo "- **Update files found:** ${{ steps.validate.outputs.files_found }}"
+            echo "- **Status:** Documentation update completed"
+            echo "- **Dry run mode:** ${DRY_RUN}"
+            echo "- **Repository:** \`${{ github.repository }}\`"
+            echo "- **Workflow run:** [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo ""
+          } >> $GITHUB_STEP_SUMMARY
 
           # Show detailed changed files if any
           changed_files=$(git diff --name-only HEAD 2>/dev/null || echo "")
@@ -233,16 +232,19 @@ jobs:
             total_additions=$(git diff --numstat HEAD | awk '{sum += $1} END {print sum+0}')
             total_deletions=$(git diff --numstat HEAD | awk '{sum += $2} END {print sum+0}')
             file_count=$(echo "$changed_files" | wc -l)
+            net_change=$((total_additions - total_deletions))
 
-            echo "� **Change Statistics:**" >> $GITHUB_STEP_SUMMARY
-            echo "- Files modified: **$file_count**" >> $GITHUB_STEP_SUMMARY
-            echo "- Lines added: **+$total_additions**" >> $GITHUB_STEP_SUMMARY
-            echo "- Lines deleted: **-$total_deletions**" >> $GITHUB_STEP_SUMMARY
-            echo "- Net change: **$((total_additions - total_deletions))** lines" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## 📈 Change Statistics"
+              echo "- **Files modified:** $file_count"
+              echo "- **Lines added:** +$total_additions"
+              echo "- **Lines deleted:** -$total_deletions"
+              echo "- **Net change:** $net_change lines"
+              echo ""
+              echo "## 📝 Files Modified"
+            } >> $GITHUB_STEP_SUMMARY
 
-            echo "�📝 **Files Modified:**" >> $GITHUB_STEP_SUMMARY
-            echo "$changed_files" | while read file; do
+            echo "$changed_files" | while read -r file; do
               if [[ -n "$file" ]]; then
                 # Get file-specific stats
                 file_stats=$(git diff --numstat HEAD -- "$file" | awk '{print $1 "," $2}')
@@ -251,27 +253,58 @@ jobs:
                 echo "- [\`$file\`](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/$file) (+$additions/-$deletions)" >> $GITHUB_STEP_SUMMARY
               fi
             done
-            echo "" >> $GITHUB_STEP_SUMMARY
 
-            # Show condensed diff for key files
-            echo "� **Key Changes Preview:**" >> $GITHUB_STEP_SUMMARY
-            echo '```diff' >> $GITHUB_STEP_SUMMARY
-            git diff --stat HEAD 2>/dev/null | head -10 || echo "Diff not available"
+            {
+              echo ""
+              echo "## 🔍 Key Changes Preview"
+              echo '```diff'
+            } >> $GITHUB_STEP_SUMMARY
+
+            # Show actual diff for small files, stat for large ones
+            if [[ $file_count -le 3 ]]; then
+              git diff --unified=3 HEAD | head -50 >> $GITHUB_STEP_SUMMARY || echo "Diff not available" >> $GITHUB_STEP_SUMMARY
+            else
+              git diff --stat HEAD | head -10 >> $GITHUB_STEP_SUMMARY || echo "Stats not available" >> $GITHUB_STEP_SUMMARY
+            fi
+
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
           # Show original update files processed with more detail
           if [[ -d "${UPDATES_DIR}" ]]; then
-            echo "📂 **Update Files Processed:**" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## 📂 Update Files Processed"
+              echo ""
+            } >> $GITHUB_STEP_SUMMARY
+
             update_count=0
-            find "${UPDATES_DIR}" -name "*.json" -type f 2>/dev/null | while read file; do
+            find "${UPDATES_DIR}" -name "*.json" -type f 2>/dev/null | sort | while read -r file; do
               if [[ -f "$file" ]]; then
                 update_count=$((update_count + 1))
-                # Extract update details from JSON
-                action=$(jq -r '.action // .operation // "unknown"' "$file" 2>/dev/null || echo "unknown")
-                target_file=$(jq -r '.target_file // .file // "unknown"' "$file" 2>/dev/null || echo "unknown")
-                echo "- \`$(basename "$file")\` → **$action** on \`$target_file\`" >> $GITHUB_STEP_SUMMARY
+                # Extract update details from JSON with better error handling
+                if action=$(jq -r '.action // .operation // .mode // "append"' "$file" 2>/dev/null); then
+                  target_file=$(jq -r '.target_file // .file // .target // "unknown"' "$file" 2>/dev/null)
+                  description=$(jq -r '.description // .summary // "No description"' "$file" 2>/dev/null)
+
+                  # Clean up the action name
+                  case "$action" in
+                    "append") action_display="📝 append" ;;
+                    "prepend") action_display="⬆️ prepend" ;;
+                    "replace-section") action_display="🔄 replace section" ;;
+                    "changelog-entry") action_display="📋 changelog entry" ;;
+                    "task-add") action_display="✅ add task" ;;
+                    "task-complete") action_display="✔️ complete task" ;;
+                    *) action_display="📄 $action" ;;
+                  esac
+
+                  echo "- \`$(basename "$file")\` → $action_display in \`$target_file\`" >> $GITHUB_STEP_SUMMARY
+                  if [[ "$description" != "No description" ]] && [[ ${#description} -lt 100 ]]; then
+                    echo "  > $description" >> $GITHUB_STEP_SUMMARY
+                  fi
+                else
+                  echo "- \`$(basename "$file")\` → ❌ invalid JSON format" >> $GITHUB_STEP_SUMMARY
+                fi
               fi
             done
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -279,22 +312,32 @@ jobs:
 
           # Error handling section removed - stats file no longer generated
 
-          # Enhanced next steps with actionable URLs
+          # Enhanced next steps with actionable information
+          {
+            echo "## 🚀 Next Steps"
+          } >> $GITHUB_STEP_SUMMARY
+
           if [[ "${CREATE_PR}" == "true" ]]; then
-            echo "🔄 **Next Steps:** A pull request will be created with these changes" >> $GITHUB_STEP_SUMMARY
-            if [[ -n "$changed_files" ]]; then
-              echo "- Review the changes in the Files Changed tab above" >> $GITHUB_STEP_SUMMARY
-              echo "- Check the PR once it's created for automated tests" >> $GITHUB_STEP_SUMMARY
-              echo "- Merge the PR when ready to apply changes" >> $GITHUB_STEP_SUMMARY
-            fi
+            {
+              echo "A pull request will be created with these changes:"
+              echo "- 🔍 Review the changes in the Files Changed tab above"
+              echo "- 🧪 Check the PR once it's created for automated tests"
+              echo "- ✅ Merge the PR when ready to apply changes"
+            } >> $GITHUB_STEP_SUMMARY
           elif [[ "${DRY_RUN}" == "true" ]]; then
-            echo "🧪 **Dry Run Complete:** No changes were committed (dry run mode)" >> $GITHUB_STEP_SUMMARY
-            echo "- To apply these changes, re-run the workflow with \`dry_run: false\`" >> $GITHUB_STEP_SUMMARY
-            echo "- Review the change preview above to verify expected updates" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "**Dry Run Complete** - No changes were committed:"
+              echo "- 🔄 To apply these changes, re-run the workflow with \`dry_run: false\`"
+              echo "- 👀 Review the change preview above to verify expected updates"
+              echo "- 📝 Changes shown are simulated and not yet applied"
+            } >> $GITHUB_STEP_SUMMARY
           else
-            echo "💾 **Changes Committed:** Updates have been applied directly to the repository" >> $GITHUB_STEP_SUMMARY
-            echo "- View the commit: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
-            echo "- Changes are now live in the \`${{ github.ref_name }}\` branch" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "**Changes Committed** - Updates have been applied:"
+              echo "- 📍 View the commit: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
+              echo "- 🌟 Changes are now live in the \`${{ github.ref_name }}\` branch"
+              echo "- 🔄 Documentation is automatically updated"
+            } >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Check for changes
