@@ -21,7 +21,7 @@
 
 3. **Synchronized all repositories** using the migration script:
    - subtitle-manager
-   - gcommon  
+   - gcommon
    - codex-cli
 
 4. **Clean backup system** with timestamped backups for all old files

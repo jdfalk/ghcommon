@@ -88,7 +88,12 @@ jobs:
           PR_BRANCH: ${{ matrix.pr.branch }}
           BASE_BRANCH: ${{ inputs.base-branch }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           print_status "Fetching and rebasing branch $PR_BRANCH onto $BASE_BRANCH"
           git fetch origin "${PR_BRANCH}"
           git checkout -B "${PR_BRANCH}" "origin/${PR_BRANCH}"
@@ -97,7 +102,12 @@ jobs:
       - name: Detect conflicts
         id: conflicts
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           if git ls-files -u | grep -q .; then
             print_status "Conflicts detected"
             echo "has_conflict=true" >> "$GITHUB_OUTPUT"
@@ -110,7 +120,12 @@ jobs:
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: conflict_info
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           print_status "Collecting conflict information"
           echo "=== Conflicted Files ===" > conflict_summary.txt
           conflicted_files=$(git ls-files -u | cut -f2 | sort -u)
@@ -294,7 +309,12 @@ jobs:
           PR_BRANCH: ${{ matrix.pr.branch }}
           AI_RESPONSE: ${{ steps.ai.outputs.response }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           print_status "Applying AI-generated patch"
           echo "$AI_RESPONSE" > ai_patch.patch
 
@@ -324,7 +344,12 @@ jobs:
         env:
           PR_BRANCH: ${{ matrix.pr.branch }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           print_status "Pushing updated branch $PR_BRANCH"
           git push --force-with-lease origin "${PR_BRANCH}"
 
@@ -334,7 +359,12 @@ jobs:
           GH_TOKEN: ${{ secrets.github-token }}
           PR_BRANCH: ${{ matrix.pr.branch }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           print_error "AI resolution failed, leaving PR for manual resolution"
           gh pr comment ${{ matrix.pr.number }} --body "🤖 AI rebase workflow encountered conflicts that couldn't be automatically resolved. Manual intervention required.
 
@@ -354,7 +384,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github-token }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           if [ "${{ steps.conflicts.outputs.has_conflict }}" = "false" ] || [ "${{ steps.apply_patch.conclusion }}" = "success" ]; then
             print_status "Attempting to auto-merge PR #${{ matrix.pr.number }}"
             gh pr merge ${{ matrix.pr.number }} --auto --squash || print_error "Auto-merge failed - PR may need review"
@@ -367,7 +402,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github-token }}
         run: |
-          source .github/scripts/ci-status.sh
+          # Define CI status functions
+          print_status() { echo "::notice ::[STATUS] $1"; }
+          print_error() { echo "::error ::[ERROR] $1" >&2; }
+          print_success() { echo "::notice ::[SUCCESS] $1"; }
+          print_summary() { echo "::notice ::[SUMMARY] $1"; }
+          
           if [ "${{ steps.conflicts.outputs.has_conflict }}" = "false" ]; then
             print_success "AI rebase workflow completed successfully - no conflicts found."
             gh pr comment ${{ matrix.pr.number }} --body "✅ AI rebase workflow completed successfully - no conflicts found." || true
