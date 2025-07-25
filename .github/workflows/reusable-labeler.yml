@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-labeler.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6
 
 name: Reusable Pull Request Labeler
@@ -34,6 +34,9 @@ on:
       configuration-used:
         description: "The configuration path that was used"
         value: ${{ jobs.labeler.outputs.config-path }}
+      pr-context-available:
+        description: "Whether pull request context was available"
+        value: ${{ jobs.labeler.outputs.pr-available }}
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for labeling"
@@ -45,6 +48,7 @@ jobs:
     outputs:
       completed: ${{ steps.labeler-summary.outputs.completed }}
       config-path: ${{ steps.labeler-summary.outputs.config-path }}
+      pr-available: ${{ steps.pr-context.outputs.pr_available }}
     permissions:
       contents: read
       pull-requests: write
@@ -70,8 +74,24 @@ jobs:
             echo "⚠️ Configuration file not found at: ${{ inputs.configuration-path }}"
           fi
 
+      - name: Check pull request context
+        id: pr-context
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "pull_request_target" ]; then
+            echo "pr_available=true" >> $GITHUB_OUTPUT
+            echo "pr_number=${{ github.event.number }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ inputs.pr-numbers }}" ]; then
+            echo "pr_available=true" >> $GITHUB_OUTPUT
+            echo "pr_number=${{ inputs.pr-numbers }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_available=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No pull request context available and no PR numbers specified"
+            echo "This workflow works best when triggered by pull request events or with explicit PR numbers"
+          fi
+
       - name: Apply labels to pull request
         id: labeler
+        if: steps.pr-context.outputs.pr_available == 'true'
         uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.github-token || secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
@@ -84,17 +104,25 @@ jobs:
         id: labeler-summary
         if: always()
         run: |
-          echo "✅ Pull Request Labeler completed"
-          echo "📋 Workflow inputs used:"
-          echo "  - Configuration path: ${{ inputs.configuration-path }}"
-          echo "  - Sync labels: ${{ inputs.sync-labels }}"
-          echo "  - Include dot files: ${{ inputs.dot }}"
-          if [ -n "${{ inputs.pr-numbers }}" ]; then
-            echo "  - Target PR(s): ${{ inputs.pr-numbers }}"
+          if [ "${{ steps.pr-context.outputs.pr_available }}" = "true" ]; then
+            echo "✅ Pull Request Labeler completed"
+            echo "📋 Workflow inputs used:"
+            echo "  - Configuration path: ${{ inputs.configuration-path }}"
+            echo "  - Sync labels: ${{ inputs.sync-labels }}"
+            echo "  - Include dot files: ${{ inputs.dot }}"
+            if [ -n "${{ inputs.pr-numbers }}" ]; then
+              echo "  - Target PR(s): ${{ inputs.pr-numbers }}"
+            else
+              echo "  - Target PR: auto-detected from workflow context"
+            fi
+            echo "completed=true" >> $GITHUB_OUTPUT
           else
-            echo "  - Target PR: auto-detected from workflow context"
+            echo "⚠️ Pull Request Labeler skipped - no PR context available"
+            echo "To enable labeling, either:"
+            echo "  1. Trigger this workflow from a pull request event, or"
+            echo "  2. Provide explicit PR numbers via the pr-numbers input"
+            echo "completed=false" >> $GITHUB_OUTPUT
           fi
 
           # Set outputs for calling workflows
-          echo "completed=true" >> $GITHUB_OUTPUT
           echo "config-path=${{ inputs.configuration-path }}" >> $GITHUB_OUTPUT

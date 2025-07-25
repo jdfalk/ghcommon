@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-intelligent-issue-labeling.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: 8c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f
 
 name: Reusable Intelligent Issue Labeling
@@ -504,9 +504,10 @@ jobs:
               print(f"  AI fallback used: {stats['ai_fallback_used']} times")
 
               # Set outputs for GitHub Actions
-              print(f"::set-output name=issues_processed::{stats['issues_processed']}")
-              print(f"::set-output name=labels_applied::{stats['labels_applied']}")
-              print(f"::set-output name=ai_fallback_used::{stats['ai_fallback_used']}")
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write(f"issues_processed={stats['issues_processed']}\n")
+                  f.write(f"labels_applied={stats['labels_applied']}\n")
+                  f.write(f"ai_fallback_used={stats['ai_fallback_used']}\n")
 
           if __name__ == "__main__":
               main()
