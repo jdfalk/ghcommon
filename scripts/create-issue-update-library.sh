@@ -6,8 +6,11 @@
 # Enhanced Library for creating GitHub issue update files with enhanced timestamp format v2.0
 # This file is meant to be sourced by other scripts, not executed directly
 #
-# Enhanced Features:
-# - Timestamp lifecycle tracking (created_at, processed_at, failed_at)
+# Enhanced Feature            local guid="$uuid"  # Use the passed-in UUID as the GUID
+            local legacy_guid
+            local timestamp
+            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+            legacy_guid=$(generate_legacy_guid "close" "$number")- Timestamp lifecycle tracking (created_at, processed_at, failed_at)
 # - Chronological processing support with sequence numbers
 # - Parent GUID tracking for dependency management
 
@@ -200,7 +203,7 @@ create_issue_file() {
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             local timestamp
-            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
             # Check if issue already exists on GitHub
             if check_github_issue_exists "$title"; then
@@ -249,7 +252,7 @@ create_issue_file() {
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             local timestamp
-            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
             legacy_guid=$(generate_legacy_guid "update" "$number")
 
             local num_field
@@ -281,7 +284,7 @@ create_issue_file() {
             local guid="$uuid"  # Use the passed-in UUID as the GUID
             local legacy_guid
             local timestamp
-            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
             legacy_guid=$(generate_legacy_guid "comment" "$number")
 
             local num_field
