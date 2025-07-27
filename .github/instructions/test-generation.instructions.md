@@ -2,10 +2,6 @@
 <!-- version: 1.1.0 -->
 <!-- guid: test1234-e89b-12d3-a456-426614174000 -->
 
-<!-- file: .github/instructions/test-generation.instructions.md -->
-<!-- version: 1.1.0 -->
-<!-- guid: test1234-e89b-12d3-a456-426614174000 -->
-
 applyTo: "**/*_test.{go,js,ts,py} **/*test*.{go,js,ts,py} **/tests/**"
 description: |
   Test generation and structure rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all test files and follow the project's testing standards. For details, see the main documentation in `.github/copilot-instructions.md`.
