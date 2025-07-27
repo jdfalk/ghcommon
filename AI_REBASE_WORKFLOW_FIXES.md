@@ -5,7 +5,7 @@ Completely overhauled the `reusable-ai-rebase.yml` workflow to fix the "An unexp
 
 ## Root Issues Fixed
 
-### 1. "An unexpected error occurred" 
+### 1. "An unexpected error occurred"
 **Root cause**: GitHub AI inference service reliability issues
 **Solutions**:
 - Added `continue-on-error: true` to prevent workflow failure
@@ -64,7 +64,7 @@ grep -n -A 2 -B 2 "^<<<<<<< |^======= |^>>>>>>> " "$file" | head -20
 ### 5. Better User Communication
 Enhanced PR comments with:
 - Specific error causes
-- Step-by-step resolution instructions  
+- Step-by-step resolution instructions
 - Which AI service was used
 - Troubleshooting guidance
 
@@ -73,7 +73,7 @@ Enhanced PR comments with:
 ### Required
 - `github-token`: Needs `contents: write`, `pull-requests: write`, `models: read`
 
-### Optional  
+### Optional
 - `claude-api-key`: For Claude API fallback when GitHub AI fails
 
 ## Usage Examples
