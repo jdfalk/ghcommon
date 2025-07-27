@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 3.0.0
+# version: 3.1.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -319,7 +319,26 @@ jobs:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   intelligent-labeling:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}
+    if: ${{ inputs.operation == 'intelligent-labeling' }}
+    uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
+    with:
+      enabled: ${{ inputs.il_enabled }}
+      dry_run: ${{ inputs.il_dry_run }}
+      batch_size: ${{ inputs.il_batch_size }}
+      use_ai_fallback: ${{ inputs.il_use_ai_fallback }}
+      confidence_threshold: ${{ inputs.il_confidence_threshold }}
+      max_labels_per_issue: ${{ inputs.il_max_labels_per_issue }}
+      preserve_existing_labels: ${{ inputs.il_preserve_existing_labels }}
+      label_config_path: ${{ inputs.il_label_config_path }}
+      python_version: ${{ inputs.il_python_version }}
+    secrets:
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+
+  intelligent-labeling-post-processing:
+    if: ${{ inputs.operation == 'all' }}
+    needs:
+      - issue-management
+      - docs-update
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
     with:
       enabled: ${{ inputs.il_enabled }}
