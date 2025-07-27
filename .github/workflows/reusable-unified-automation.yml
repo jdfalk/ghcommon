@@ -248,8 +248,6 @@ on:
         required: false
         default: "3.11"
         type: string
-    secrets:
-      # Inherits all secrets from calling workflow, no need to define explicitly
 
 jobs:
   issue-management:
