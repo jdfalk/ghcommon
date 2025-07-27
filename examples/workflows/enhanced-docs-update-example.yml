@@ -1,0 +1,77 @@
+# Example workflow using Enhanced Documentation Updates with Timestamp Lifecycle Tracking
+# file: examples/workflows/enhanced-docs-update-example.yml
+
+name: Enhanced Documentation Updates Example
+
+on:
+  push:
+    paths:
+      - '.github/doc-updates/**'
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      enable_chronological_processing:
+        description: 'Enable chronological processing'
+        required: false
+        default: true
+        type: boolean
+      enable_timestamp_migration:
+        description: 'Migrate legacy files to v2.0'
+        required: false
+        default: false
+        type: boolean
+      continue_on_error:
+        description: 'Continue on errors'
+        required: false
+        default: true
+        type: boolean
+      dry_run:
+        description: 'Show what would be done without executing'
+        required: false
+        default: false
+        type: boolean
+      verbose:
+        description: 'Enable verbose logging'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  checks: write
+
+jobs:
+  enhanced-docs-update:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-enhanced-docs-update.yml@main
+    with:
+      updates_dir: '.github/doc-updates'
+      create_pr: true
+      cleanup: true
+      enable_chronological_processing: ${{ github.event.inputs.enable_chronological_processing || true }}
+      enable_timestamp_migration: ${{ github.event.inputs.enable_timestamp_migration || false }}
+      continue_on_error: ${{ github.event.inputs.continue_on_error || true }}
+      dry_run: ${{ github.event.inputs.dry_run || false }}
+      verbose: ${{ github.event.inputs.verbose || false }}
+
+  post-processing-summary:
+    needs: enhanced-docs-update
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Enhanced Processing Summary
+        run: |
+          echo "📚 Enhanced Documentation Update Results:"
+          echo "   Files processed: ${{ needs.enhanced-docs-update.outputs.files_processed }}"
+          echo "   Documentation files updated: ${{ needs.enhanced-docs-update.outputs.files_updated }}"
+          echo "   Timestamp format: v${{ needs.enhanced-docs-update.outputs.timestamp_format_version }}"
+          
+          if [ "${{ needs.enhanced-docs-update.outputs.files_processed }}" -gt 0 ]; then
+            echo "✅ Successfully processed documentation updates with enhanced timestamp tracking"
+          else
+            echo "📝 No documentation updates were processed"
+          fi

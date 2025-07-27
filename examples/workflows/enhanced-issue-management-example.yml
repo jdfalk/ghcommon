@@ -1,0 +1,75 @@
+# Example workflow using Enhanced Issue Management with Timestamp Lifecycle Tracking
+# file: examples/workflows/enhanced-issue-management-example.yml
+
+name: Enhanced Issue Management Example
+
+on:
+  push:
+    paths:
+      - '.github/issue-updates/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      enable_chronological_processing:
+        description: 'Enable chronological processing'
+        required: false
+        default: true
+        type: boolean
+      enable_timestamp_migration:
+        description: 'Migrate legacy files to v2.0'
+        required: false
+        default: false
+        type: boolean
+      force_processing:
+        description: 'Force processing even if validation fails'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Show what would be done without executing'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  security-events: read
+  repository-projects: write
+  actions: read
+  checks: write
+  statuses: write
+
+jobs:
+  enhanced-issue-management:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-enhanced-issue-management.yml@main
+    with:
+      operations: 'all'
+      create_pr: true
+      include_project_sync: true
+      enable_chronological_processing: ${{ github.event.inputs.enable_chronological_processing || true }}
+      enable_timestamp_migration: ${{ github.event.inputs.enable_timestamp_migration || false }}
+      force_processing: ${{ github.event.inputs.force_processing || false }}
+      dry_run: ${{ github.event.inputs.dry_run || false }}
+
+  post-processing-summary:
+    needs: enhanced-issue-management
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Enhanced Processing Summary
+        run: |
+          echo "🎯 Enhanced Issue Management Results:"
+          echo "   Files processed: ${{ needs.enhanced-issue-management.outputs.files_processed }}"
+          echo "   Issues created: ${{ needs.enhanced-issue-management.outputs.issues_created }}"
+          echo "   Timestamp format: v${{ needs.enhanced-issue-management.outputs.timestamp_format_version }}"
+          
+          if [ "${{ needs.enhanced-issue-management.outputs.files_processed }}" -gt 0 ]; then
+            echo "✅ Successfully processed issue updates with enhanced timestamp tracking"
+          else
+            echo "📝 No issue updates were processed"
+          fi
