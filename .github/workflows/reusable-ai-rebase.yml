@@ -550,7 +550,15 @@ jobs:
 
             **Changes applied:**
             - Rebased branch \`${{ matrix.pr.branch }}\` onto \`${{ inputs.base-branch }}\`
-            - AI successfully resolved $(git ls-files -u | cut -f2 | sort -u | wc -l 2>/dev/null || echo 'multiple') conflicted files
+            - GitHub AI successfully resolved conflicts
+            - Branch has been force-pushed with resolved conflicts" || true
+          elif [ "${{ steps.apply_claude_patch.conclusion }}" = "success" ]; then
+            print_success "Claude fallback successfully resolved merge conflicts and updated the branch."
+            gh pr comment ${{ matrix.pr.number }} --body "✅ AI rebase workflow resolved merge conflicts using Claude fallback.
+
+            **Changes applied:**
+            - Rebased branch \`${{ matrix.pr.branch }}\` onto \`${{ inputs.base-branch }}\`
+            - Claude AI successfully resolved conflicts after GitHub AI failed
             - Branch has been force-pushed with resolved conflicts" || true
           elif [ "${{ steps.ai.outcome }}" = "failure" ]; then
             print_error "AI inference service failed - manual resolution required"
