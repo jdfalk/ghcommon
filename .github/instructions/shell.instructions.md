@@ -4,10 +4,11 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-
-applyTo: "**/*.{sh,bash}"
-description: |
-  Coding, documentation, and workflow rules for shell scripts, following Google Shell style guide and general project rules. Reference this for all shell scripts, documentation, and formatting in this repository. All unique content from the Google Shell Style Guide is merged here.
+applyTo: "\*_/_.{sh,bash}" description: | Coding, documentation, and workflow
+rules for shell scripts, following Google Shell style guide and general project
+rules. Reference this for all shell scripts, documentation, and formatting in
+this repository. All unique content from the Google Shell Style Guide is merged
+here.
 
 ---
 

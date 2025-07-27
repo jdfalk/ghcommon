@@ -4,10 +4,10 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-
-applyTo: "**"
-description: |
-  Conventional commit message format rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all git commits and follow the project's commit message standards. For details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "\*\*" description: | Conventional commit message format rules for all
+Copilot/AI agents and VS Code Copilot customization. These rules apply to all
+git commits and follow the project's commit message standards. For details, see
+the main documentation in `.github/copilot-instructions.md`.
 
 ---
 

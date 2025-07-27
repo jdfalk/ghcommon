@@ -4,10 +4,11 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-
-applyTo: ".github/workflows/*.{yml,yaml}"
-description: |
-  Coding, documentation, and workflow rules for GitHub Actions workflow files, following Google and project-specific style guides. Reference the general instructions for all Copilot/AI agents and VS Code Copilot customization. For details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: ".github/workflows/\*.{yml,yaml}" description: | Coding, documentation,
+and workflow rules for GitHub Actions workflow files, following Google and
+project-specific style guides. Reference the general instructions for all
+Copilot/AI agents and VS Code Copilot customization. For details, see the main
+documentation in `.github/copilot-instructions.md`.
 
 ---
 

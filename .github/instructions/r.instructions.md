@@ -4,10 +4,10 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-
-applyTo: "**/*.R"
-description: |
-  Coding, documentation, and workflow rules for R files, following Google/Tidyverse R style guide and general project rules. Reference this for all R code, documentation, and formatting in this repository. All unique content from the Google/Tidyverse R Style Guide is merged here.
+applyTo: "\*_/_.R" description: | Coding, documentation, and workflow rules for
+R files, following Google/Tidyverse R style guide and general project rules.
+Reference this for all R code, documentation, and formatting in this repository.
+All unique content from the Google/Tidyverse R Style Guide is merged here.
 
 ---
 

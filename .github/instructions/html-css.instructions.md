@@ -4,18 +4,22 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-
-applyTo: "**/*.{html,css}"
-description: |
-  Coding, documentation, and workflow rules for HTML and CSS files, following Google HTML/CSS style guide and general project rules. Reference this for all HTML and CSS code, documentation, and formatting in this repository. All unique content from the Google HTML/CSS Style Guide is merged here.
+applyTo: "\*_/_.{html,css}" description: | Coding, documentation, and workflow
+rules for HTML and CSS files, following Google HTML/CSS style guide and general
+project rules. Reference this for all HTML and CSS code, documentation, and
+formatting in this repository. All unique content from the Google HTML/CSS Style
+Guide is merged here.
 
 ---
 
 # HTML/CSS Coding Instructions
 
 - Follow the [general coding instructions](general-coding.instructions.md).
-- Follow the [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html) for additional best practices.
-- All HTML and CSS files must begin with the required file header (see general instructions for details and HTML/CSS example).
+- Follow the
+  [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html)
+  for additional best practices.
+- All HTML and CSS files must begin with the required file header (see general
+  instructions for details and HTML/CSS example).
 
 ## Core Principles
 
