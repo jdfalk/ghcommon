@@ -1,11 +1,10 @@
 <!-- file: .github/instructions/pull-request-descriptions.instructions.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: pr2d3567-e89b-12d3-a456-426614174000 -->
 
-applyTo: "\*\*" description: | Pull request description format rules for all
-Copilot/AI agents and VS Code Copilot customization. These rules apply to all
-pull request descriptions and follow the project's documentation standards. For
-details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "**"
+description: |
+  Pull request description format rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all pull request descriptions and follow the project's documentation standards. For details, see the main documentation in `.github/copilot-instructions.md`.
 
 ---
 

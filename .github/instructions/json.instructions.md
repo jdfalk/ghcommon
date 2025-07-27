@@ -1,17 +1,10 @@
 <!-- file: .github/instructions/json.instructions.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
 
-applyTo: "\*\*/\*.json"ile: .github/instructions/json.instructions.md -->
-
-<!-- version: 1.0.0 -->
-
-## <!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
-
-applyTo: "\*_/_.json" description: | Coding, documentation, and workflow rules
-for JSON files, following Google JSON style guide and general project rules.
-Reference this for all JSON code, documentation, and formatting in this
-repository. All unique content from the Google JSON Style Guide is merged here.
+applyTo: "**/*.json"
+description: |
+  Coding, documentation, and workflow rules for JSON files, following Google JSON style guide and general project rules. Reference this for all JSON code, documentation, and formatting in this repository. All unique content from the Google JSON Style Guide is merged here.
 
 ---
 

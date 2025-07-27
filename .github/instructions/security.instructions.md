@@ -1,12 +1,10 @@
 <!-- file: .github/instructions/security.instructions.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: sec12345-e89b-12d3-a456-426614174000 -->
 
-applyTo: "**/\*.{yml,yaml} **/_.{sh,bash} \*\*/_.{js,ts,py,go} **/Dockerfile\*
-**/docker-compose\*.yml" description: | Security guidelines and best practices
-for all Copilot/AI agents and VS Code Copilot customization. These rules apply
-to all code, configurations, and workflows to maintain security standards. For
-details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "**/*.{yml,yaml} **/*.{sh,bash} **/*.{js,ts,py,go} **/Dockerfile* **/docker-compose*.yml"
+description: |
+  Security guidelines and best practices for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all code, configurations, and workflows to maintain security standards. For details, see the main documentation in `.github/copilot-instructions.md`.
 
 ---
 
