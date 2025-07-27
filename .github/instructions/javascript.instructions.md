@@ -1,12 +1,10 @@
 <!-- file: .github/instructions/javascript.instructions.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: 8e7d6c5b-4a3c-2d1e-0f9a-8b7c6d5e4f3a -->
 
-applyTo: "\*\*/\*.{js,jsx}" description: | JavaScript language-specific coding,
-documentation, and testing rules for Copilot/AI agents and VS Code Copilot
-customization. These rules extend the general instructions in
-`general-coding.instructions.md` and merge all unique content from the Google
-JavaScript Style Guide.
+applyTo: "**/*.{js,jsx}"
+description: |
+  JavaScript language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google JavaScript Style Guide.
 
 ---
 

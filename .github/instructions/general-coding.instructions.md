@@ -1,12 +1,10 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 1.1.0 -->
+<!-- version: 1.2.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 
-applyTo: "\*\*" description: | General coding, documentation, and workflow rules
-for all Copilot/AI agents and VS Code Copilot customization. These rules apply
-to all files and languages unless overridden by a more specific instructions
-file. For details, see the main documentation in
-`.github/copilot-instructions.md`.
+applyTo: "**"
+description: |
+  General coding, documentation, and workflow rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all files and languages unless overridden by a more specific instructions file. For details, see the main documentation in `.github/copilot-instructions.md`.
 
 ---
 
