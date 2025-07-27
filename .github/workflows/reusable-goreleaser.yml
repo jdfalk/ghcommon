@@ -8,22 +8,22 @@ on:
   workflow_call:
     inputs:
       go-version:
-        description: 'Go version to use'
+        description: "Go version to use"
         required: false
         type: string
-        default: '1.23'
+        default: "1.23"
       release-type:
-        description: 'Type of release (patch, minor, major, prerelease)'
+        description: "Type of release (patch, minor, major, prerelease)"
         required: false
         type: string
-        default: 'patch'
+        default: "patch"
       dry-run:
-        description: 'Run in dry-run mode (no actual release)'
+        description: "Run in dry-run mode (no actual release)"
         required: false
         type: boolean
         default: false
       snapshot:
-        description: 'Create snapshot release (for development)'
+        description: "Create snapshot release (for development)"
         required: false
         type: boolean
         default: false
