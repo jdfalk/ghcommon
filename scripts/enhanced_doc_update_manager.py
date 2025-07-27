@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 # file: scripts/enhanced_doc_update_manager.py
-# version: 3.0.0
+# version: 4.0.0
 # guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
 
 """
-Enhanced Documentation Update Manager with Incremental Processing
+Enhanced Documentation Update Manager with Comprehensive Timestamp Lifecycle Tracking
 
-This enhanced version processes files individually with proper error isolation
-and incremental progress tracking to handle failures gracefully.
+This enhanced version processes files individually with proper error isolation,
+incremental progress tracking, and comprehensive timestamp lifecycle support.
 
 Features:
+- Enhanced timestamp format v2.0 with lifecycle tracking (created_at, processed_at, failed_at)
+- Chronological processing based on created_at timestamps
+- Git-integrated timestamp recovery for historical accuracy
 - Individual file processing with immediate status updates
 - Malformed file isolation to 'malformed/' directory
 - Failed file isolation to 'failed/' directory
 - Resume capability from partial failures
 - Comprehensive error logging and recovery
+- Multiple processing modes (append, prepend, replace-section, etc.)
+- Backwards compatibility with existing formats
 """
 
 import argparse
@@ -415,6 +420,363 @@ class EnhancedDocumentationUpdateManager:
         except Exception as e:
             logger.warning(f"Failed to move {update_file.name} to failed: {e}")
 
+    def process_chronological(self) -> Dict[str, Any]:
+        """Process updates in chronological order based on created_at timestamps."""
+        logger.info(
+            f"🕒 Processing documentation updates chronologically from {self.updates_dir}"
+        )
+
+        if not self.updates_dir.exists():
+            logger.info(f"📝 Updates directory does not exist: {self.updates_dir}")
+            return self.stats
+
+        # Load all updates from files
+        all_updates = []
+        update_files = [f for f in self.updates_dir.glob("*.json") if f.is_file()]
+
+        if not update_files:
+            logger.info("📝 No update files found")
+            return self.stats
+
+        logger.info(f"📊 Found {len(update_files)} update files")
+
+        # Load and validate all updates first
+        for update_file in update_files:
+            try:
+                with open(update_file, encoding="utf-8") as f:
+                    update_data = json.load(f)
+
+                # Handle both single objects and arrays
+                updates_in_file = (
+                    [update_data] if isinstance(update_data, dict) else update_data
+                )
+
+                for update in updates_in_file:
+                    if isinstance(update, dict) and "mode" in update:
+                        update["_source_file"] = str(update_file)
+                        all_updates.append(update)
+
+            except Exception as e:
+                logger.error(f"❌ Error loading {update_file.name}: {e}")
+                self._handle_malformed_file(update_file, str(e))
+
+        if not all_updates:
+            logger.info("📝 No valid updates to process")
+            return self.stats
+
+        # Sort updates chronologically
+        sorted_updates = self._sort_updates_chronologically(all_updates)
+        logger.info(f"✅ Sorted {len(sorted_updates)} updates chronologically")
+
+        # Process updates in chronological order
+        success_count = 0
+        for i, update in enumerate(sorted_updates, 1):
+            mode = update.get("mode", "unknown")
+            filename = update.get("filename", "unknown")
+            guid = update.get("guid", "no-guid")
+            created_at = update.get("created_at", "no-timestamp")
+            source_file = update.get("_source_file", "unknown")
+
+            logger.info(
+                f"📋 Update {i}/{len(sorted_updates)}: {mode} on {filename} (guid: {guid[:8]}, created: {created_at})"
+            )
+
+            if self.dry_run:
+                logger.info(f"🧪 [DRY RUN] Would apply {mode} to {filename}")
+                success_count += 1
+            else:
+                try:
+                    # Apply the update
+                    success = self._apply_doc_update(update)
+
+                    if success:
+                        success_count += 1
+                        self.stats["files_processed"] += 1
+                        self.stats["changes_made"] = True
+                        logger.debug("✅ Successfully applied update")
+                    else:
+                        self.stats["files_failed"] += 1
+                        logger.error("❌ Failed to apply update")
+
+                except Exception as e:
+                    logger.error(f"❌ Error processing update: {e}")
+                    self.stats["files_failed"] += 1
+
+        # Move processed files
+        if self.cleanup and not self.dry_run:
+            processed_files = set()
+            for update in sorted_updates:
+                source_file = Path(update.get("_source_file", ""))
+                if source_file.exists() and str(source_file) not in processed_files:
+                    self._move_to_processed(source_file)
+                    processed_files.add(str(source_file))
+
+        logger.info(
+            f"🎯 Successfully processed {success_count}/{len(sorted_updates)} updates chronologically"
+        )
+        self._log_processing_summary()
+        return self.stats
+
+    def _sort_updates_chronologically(self, updates: list) -> list:
+        """Sort updates by created_at timestamp, then by sequence number."""
+
+        def get_sort_key(update):
+            created_at = update.get("created_at") or update.get("timestamp", "")
+            sequence = update.get("sequence", 0)
+
+            try:
+                # Parse timestamp
+                from datetime import datetime
+
+                dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                return (dt, sequence)
+            except (ValueError, AttributeError):
+                # Fallback for malformed timestamps
+                return (created_at, sequence)
+
+        return sorted(updates, key=get_sort_key)
+
+    def _apply_doc_update(self, update: Dict[str, Any]) -> bool:
+        """Apply a documentation update using the appropriate mode."""
+        mode = update.get("mode")
+        filename = update.get("filename")
+        content = update.get("content", "")
+
+        if not filename:
+            logger.error("No filename specified")
+            return False
+
+        try:
+            if mode == "append":
+                return self._apply_append(filename, content)
+            elif mode == "prepend":
+                return self._apply_prepend(filename, content)
+            elif mode == "replace-section":
+                section = update.get("section")
+                return self._apply_replace_section(filename, content, section)
+            elif mode == "changelog-entry":
+                entry_type = update.get("type", "feature")
+                return self._apply_changelog_entry(filename, content, entry_type)
+            elif mode == "task-add":
+                priority = update.get("priority", "MEDIUM")
+                return self._apply_task_add(filename, content, priority)
+            elif mode == "task-complete":
+                return self._apply_task_complete(filename, content)
+            else:
+                logger.error(f"Unknown mode: {mode}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error applying {mode}: {e}")
+            return False
+
+    def _apply_append(self, filename: str, content: str) -> bool:
+        """Append content to the end of a file."""
+        try:
+            file_path = Path(filename)
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    existing_content = f.read()
+            else:
+                existing_content = ""
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(existing_content)
+                if existing_content and not existing_content.endswith("\n"):
+                    f.write("\n")
+                f.write(content)
+                if not content.endswith("\n"):
+                    f.write("\n")
+
+            logger.debug(f"Appended content to {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error appending to {filename}: {e}")
+            return False
+
+    def _apply_prepend(self, filename: str, content: str) -> bool:
+        """Prepend content to the beginning of a file."""
+        try:
+            file_path = Path(filename)
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    existing_content = f.read()
+            else:
+                existing_content = ""
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(content)
+                if not content.endswith("\n"):
+                    f.write("\n")
+                if existing_content:
+                    f.write(existing_content)
+
+            logger.debug(f"Prepended content to {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error prepending to {filename}: {e}")
+            return False
+
+    def _apply_replace_section(
+        self, filename: str, content: str, section: Optional[str]
+    ) -> bool:
+        """Replace a specific section in a file."""
+        try:
+            file_path = Path(filename)
+            if not file_path.exists():
+                logger.error(f"File {filename} does not exist")
+                return False
+
+            with open(file_path, "r", encoding="utf-8") as f:
+                existing_content = f.read()
+
+            if section:
+                # Replace specific section
+                pattern = rf"(## {re.escape(section)}.*?)(?=\n## |\n# |\Z)"
+                replacement = f"## {section}\n\n{content}"
+                new_content = re.sub(
+                    pattern, replacement, existing_content, flags=re.DOTALL
+                )
+
+                if new_content == existing_content:
+                    logger.warning(
+                        f"Section '{section}' not found in {filename}, appending instead"
+                    )
+                    new_content = existing_content + f"\n\n## {section}\n\n{content}"
+            else:
+                # Replace entire file
+                new_content = content
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+            logger.debug(f"Replaced section in {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error replacing section in {filename}: {e}")
+            return False
+
+    def _apply_changelog_entry(
+        self, filename: str, content: str, entry_type: str
+    ) -> bool:
+        """Add a changelog entry."""
+        try:
+            timestamp = datetime.now().strftime("%Y-%m-%d")
+
+            # Format the changelog entry
+            entry = f"### {entry_type.title()} - {timestamp}\n\n{content}\n"
+
+            file_path = Path(filename)
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    existing_content = f.read()
+
+                # Find the right place to insert (after the first ## heading)
+                lines = existing_content.split("\n")
+                insert_index = 0
+
+                for i, line in enumerate(lines):
+                    if line.startswith("## "):
+                        insert_index = i + 1
+                        break
+
+                lines.insert(insert_index, "")
+                lines.insert(insert_index + 1, entry)
+                new_content = "\n".join(lines)
+            else:
+                new_content = f"# Changelog\n\n{entry}"
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+            logger.debug(f"Added {entry_type} changelog entry to {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error adding changelog entry to {filename}: {e}")
+            return False
+
+    def _apply_task_add(self, filename: str, content: str, priority: str) -> bool:
+        """Add a task to a TODO file."""
+        try:
+            timestamp = datetime.now().strftime("%Y-%m-%d")
+            task_entry = f"- [ ] **{priority}** {content} (added {timestamp})\n"
+
+            file_path = Path(filename)
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    existing_content = f.read()
+
+                # Add to the end of the file
+                new_content = existing_content
+                if not existing_content.endswith("\n"):
+                    new_content += "\n"
+                new_content += task_entry
+            else:
+                new_content = f"# TODO\n\n{task_entry}"
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+            logger.debug(f"Added {priority} priority task to {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error adding task to {filename}: {e}")
+            return False
+
+    def _apply_task_complete(self, filename: str, content: str) -> bool:
+        """Mark a task as complete in a TODO file."""
+        try:
+            file_path = Path(filename)
+            if not file_path.exists():
+                logger.error(f"File {filename} does not exist")
+                return False
+
+            with open(file_path, "r", encoding="utf-8") as f:
+                existing_content = f.read()
+
+            # Find and mark the task as complete
+            lines = existing_content.split("\n")
+            found = False
+
+            for i, line in enumerate(lines):
+                if content.lower() in line.lower() and "- [ ]" in line:
+                    lines[i] = line.replace("- [ ]", "- [x]")
+                    found = True
+                    break
+
+            if not found:
+                logger.warning(f"Task not found in {filename}: {content}")
+                return False
+
+            new_content = "\n".join(lines)
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+            logger.debug(f"Marked task as complete in {filename}")
+            if filename not in self.stats["files_updated"]:
+                self.stats["files_updated"].append(filename)
+            return True
+
+        except Exception as e:
+            logger.error(f"Error completing task in {filename}: {e}")
+            return False
+
     def _log_processing_summary(self) -> None:
         """Log comprehensive processing summary."""
         logger.info("\n📊 Processing Summary:")
@@ -439,40 +801,100 @@ class EnhancedDocumentationUpdateManager:
 
 
 def main():
-    """Main entry point."""
+    """Main function with CLI interface for enhanced documentation update management."""
     parser = argparse.ArgumentParser(
-        description="Enhanced documentation update processor with error isolation",
+        description="Enhanced Documentation Update Manager with Comprehensive Timestamp Lifecycle Tracking v4.0",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python enhanced_doc_update_manager.py
-  python enhanced_doc_update_manager.py --updates-dir .github/doc-updates
-  python enhanced_doc_update_manager.py --dry-run --verbose
-  python enhanced_doc_update_manager.py --no-continue-on-error
+  python enhanced_doc_update_manager.py process                    # Regular processing
+  python enhanced_doc_update_manager.py process-chronological      # Chronological processing
+  python enhanced_doc_update_manager.py --dry-run --verbose        # For backwards compatibility
         """,
     )
 
+    # Add subcommands
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Regular processing command (default behavior)
+    process_parser = subparsers.add_parser(
+        "process", help="Process updates in filename order (default)"
+    )
+    process_parser.add_argument(
+        "--updates-dir",
+        default=".github/doc-updates",
+        help="Directory containing update files (default: .github/doc-updates)",
+    )
+    process_parser.add_argument(
+        "--cleanup",
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        default=True,
+        help="Whether to move processed files to subdirectories (default: true)",
+    )
+    process_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be updated without making changes",
+    )
+    process_parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose logging"
+    )
+    process_parser.add_argument(
+        "--continue-on-error",
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        default=True,
+        help="Continue processing other files when one fails (default: true)",
+    )
+
+    # Chronological processing command
+    chrono_parser = subparsers.add_parser(
+        "process-chronological",
+        help="Process updates in chronological order based on created_at timestamps",
+    )
+    chrono_parser.add_argument(
+        "--updates-dir",
+        default=".github/doc-updates",
+        help="Directory containing update files (default: .github/doc-updates)",
+    )
+    chrono_parser.add_argument(
+        "--cleanup",
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        default=True,
+        help="Whether to move processed files to subdirectories (default: true)",
+    )
+    chrono_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be updated without making changes",
+    )
+    chrono_parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose logging"
+    )
+    chrono_parser.add_argument(
+        "--continue-on-error",
+        type=lambda x: x.lower() in ("true", "1", "yes"),
+        default=True,
+        help="Continue processing other files when one fails (default: true)",
+    )
+
+    # For backwards compatibility, support old argument format without subcommands
     parser.add_argument(
         "--updates-dir",
         default=".github/doc-updates",
         help="Directory containing update files (default: .github/doc-updates)",
     )
-
     parser.add_argument(
         "--cleanup",
         type=lambda x: x.lower() in ("true", "1", "yes"),
         default=True,
         help="Whether to move processed files to subdirectories (default: true)",
     )
-
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Show what would be updated without making changes",
     )
-
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
-
     parser.add_argument(
         "--continue-on-error",
         type=lambda x: x.lower() in ("true", "1", "yes"),
@@ -481,6 +903,12 @@ Examples:
     )
 
     args = parser.parse_args()
+
+    # Determine which command to run
+    command = getattr(args, "command", None)
+    if not command:
+        # Default behavior for backwards compatibility
+        command = "process"
 
     manager = EnhancedDocumentationUpdateManager(
         updates_dir=args.updates_dir,
@@ -491,7 +919,10 @@ Examples:
     )
 
     try:
-        stats = manager.process_all_updates()
+        if command == "process-chronological":
+            stats = manager.process_chronological()
+        else:
+            stats = manager.process_all_updates()
 
         print("\n📊 Final Processing Summary:")
         print(f"   ✅ Successfully processed: {stats['files_processed']}")
