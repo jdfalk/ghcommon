@@ -26,6 +26,9 @@ on:
       github-token:
         description: "GitHub token with write access"
         required: true
+      claude-api-key:
+        description: "Claude API key for fallback AI processing"
+        required: false
 
 permissions:
   contents: write
@@ -274,12 +277,17 @@ jobs:
 
           **Task:** Provide a git patch to resolve these conflicts by:
           1. Keeping both changes where possible
-          2. Following semantic versioning for version updates  
+          2. Following semantic versioning for version updates
           3. Merging documentation changes intelligently
           4. Maintaining proper file headers and structure
 
           Output ONLY the patch in unified diff format.
           EOF
+
+          # Add debug information
+          print_status "Prepared AI prompt for model: ${{ inputs.model }}"
+          print_status "Prompt size: $(wc -c < prompt.txt) characters"
+          print_status "System prompt size: $(wc -c < system_prompt.txt) characters"
 
       - name: Generate patch with AI
         if: steps.conflicts.outputs.has_conflict == 'true'
@@ -303,25 +311,25 @@ jobs:
           print_error() { echo "::error ::[ERROR] $1" >&2; }
           print_success() { echo "::notice ::[SUCCESS] $1"; }
           print_summary() { echo "::notice ::[SUMMARY] $1"; }
-          
+
           print_error "AI inference failed. This may be due to:"
           print_error "1. GitHub AI service availability"
           print_error "2. Token permissions (needs 'models' scope)"
           print_error "3. Prompt size exceeding limits"
           print_error "4. Rate limiting"
-          
+
           # Create a manual resolution comment
           gh pr comment ${{ matrix.pr.number }} --body "⚠️ AI rebase failed to resolve conflicts automatically. Manual resolution required.
 
           **Conflicted files:**
           $(cat conflict_summary.txt | grep -E '^[^-=].*\.(go|md|proto)$' || echo 'See workflow logs for details')
-          
+
           **Next steps:**
           1. Checkout the branch locally: \`git checkout ${{ matrix.pr.branch }}\`
-          2. Run \`git rebase ${{ inputs.base-branch }}\`  
+          2. Run \`git rebase ${{ inputs.base-branch }}\`
           3. Resolve conflicts manually
           4. Push the resolved changes: \`git push --force-with-lease origin ${{ matrix.pr.branch }}\`
-          
+
           **AI Error Details:**
           The GitHub AI inference service failed to process the conflict resolution request." || true
 
@@ -336,17 +344,17 @@ jobs:
           print_error() { echo "::error ::[ERROR] $1" >&2; }
           print_success() { echo "::notice ::[SUCCESS] $1"; }
           print_summary() { echo "::notice ::[SUMMARY] $1"; }
-          
+
           if [ -z "$CLAUDE_API_KEY" ]; then
             print_status "No Claude API key available, skipping fallback"
             exit 0
           fi
-          
+
           print_status "Attempting fallback to Claude API"
-          
+
           # Prepare a simplified prompt for Claude
           prompt_content=$(cat prompt.txt | jq -R -s .)
-          
+
           response=$(curl -s -X POST https://api.anthropic.com/v1/messages \
             -H "Content-Type: application/json" \
             -H "x-api-key: $CLAUDE_API_KEY" \
@@ -357,7 +365,7 @@ jobs:
               \"system\": \"You are a Git merge conflict resolution expert. Provide only unified diff patches.\",
               \"messages\": [{\"role\": \"user\", \"content\": $prompt_content}]
             }")
-          
+
           if echo "$response" | jq -e '.content[0].text' > /dev/null 2>&1; then
             echo "$response" | jq -r '.content[0].text' > claude_patch.txt
             print_success "Claude API provided response"
@@ -378,7 +386,7 @@ jobs:
           print_summary() { echo "::notice ::[SUMMARY] $1"; }
 
           print_status "Applying Claude-generated patch"
-          
+
           if git apply --check claude_patch.txt 2>/dev/null; then
             print_success "Claude patch validation successful, applying patch"
             git apply claude_patch.txt
@@ -426,7 +434,7 @@ jobs:
 
           print_status "Applying AI-generated patch"
           echo "$AI_RESPONSE" > ai_patch.patch
-          
+
           # Show patch for debugging
           print_status "AI generated patch preview:"
           head -20 ai_patch.patch || true
@@ -490,10 +498,10 @@ jobs:
           print_summary() { echo "::notice ::[SUMMARY] $1"; }
 
           print_error "AI resolution failed, leaving PR for manual resolution"
-          
+
           # Abort the rebase to clean state
           git rebase --abort 2>/dev/null || true
-          
+
           gh pr comment ${{ matrix.pr.number }} --body "🤖 AI rebase workflow encountered conflicts that couldn't be automatically resolved. Manual intervention required.
 
           **Conflicted files:**
