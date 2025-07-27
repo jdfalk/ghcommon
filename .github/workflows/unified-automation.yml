@@ -143,6 +143,4 @@ jobs:
       il_preserve_existing_labels: true
       il_label_config_path: ".github/intelligent-labeling.yml"
       il_python_version: ${{ github.event.inputs.python_version || '3.11' }}
-    secrets:
-      github-pat: ${{ secrets.GITHUB_PAT }}
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit

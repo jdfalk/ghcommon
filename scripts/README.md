@@ -1,16 +1,17 @@
 # Scripts Directory
+
 <!-- file: scripts/README.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: a6ce4820-bcf8-482e-b2ca-234024d5d77f -->
 
-This directory contains reusable scripts for GitHub automation and issue management.
+This directory contains reusable scripts for GitHub automation and issue
+management.
 
 ## Available Scripts
 
 ### [`issue_manager.py`](issue_manager.py)
 
-**Version**: 2.0.0
-**Last Updated**: 2025-06-21
+**Version**: 2.0.0 **Last Updated**: 2025-06-21
 
 Unified GitHub issue management script with comprehensive functionality:
 
@@ -19,16 +20,19 @@ Unified GitHub issue management script with comprehensive functionality:
 - Close duplicate issues by title
 - Generate tickets for CodeQL security alerts
 - GUID-based duplicate prevention
-- Support for both legacy `issue_updates.json` and new distributed `.github/issue-updates/` formats
+- Support for both legacy `issue_updates.json` and new distributed
+  `.github/issue-updates/` formats
 
-Used by the [`unified-issue-management.yml`](../.github/workflows/reusable-unified-issue-management.yml) reusable workflow.
+Used by the
+[`unified-issue-management.yml`](../.github/workflows/reusable-unified-issue-management.yml)
+reusable workflow.
 
 ### [`label_manager.py`](label_manager.py)
 
-**Version**: 1.2.0
-**Last Updated**: 2025-06-21
+**Version**: 1.2.0 **Last Updated**: 2025-06-21
 
-Helper script to create new issue update files with proper UUIDs in the distributed format.
+Helper script to create new issue update files with proper UUIDs in the
+distributed format.
 
 **Usage**:
 
@@ -73,7 +77,8 @@ chmod +x scripts/create-issue-update.sh
 
 ### Version Checking
 
-Each script includes version information in the header comments. Check the version to see if updates are available:
+Each script includes version information in the header comments. Check the
+version to see if updates are available:
 
 ```bash
 head -n 10 scripts/create-issue-update.sh | grep "version:"
@@ -81,7 +86,9 @@ head -n 10 scripts/create-issue-update.sh | grep "version:"
 
 ## Workflow Integration
 
-These scripts are designed to work with the unified issue management reusable workflow. See the [workflow examples](../examples/workflows/) for integration patterns.
+These scripts are designed to work with the unified issue management reusable
+workflow. See the [workflow examples](../examples/workflows/) for integration
+patterns.
 
 ## Local Usage
 
@@ -135,5 +142,6 @@ When updating scripts:
 For issues or questions:
 
 - Check the [examples directory](../examples/) for usage patterns
-- Review the [migration guide](../examples/migration-guides/subtitle-manager-migration.md)
+- Review the
+  [migration guide](../examples/migration-guides/subtitle-manager-migration.md)
 - Open an issue in the ghcommon repository

@@ -1,6 +1,8 @@
 # GitHub Common Workflows
 
-A comprehensive repository of reusable GitHub Actions workflows and templates for automated CI/CD, semantic versioning, multi-architecture container builds, and secure release management.
+A comprehensive repository of reusable GitHub Actions workflows and templates
+for automated CI/CD, semantic versioning, multi-architecture container builds,
+and secure release management.
 
 ## 🚀 Quick Start
 
@@ -29,7 +31,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 ### Reusable Workflows
 
 | Workflow                                                                                  | Purpose                                       | Key Features                                                        |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------- |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | [`reusable-semantic-versioning.yml`](.github/workflows/reusable-semantic-versioning.yml)  | Automatic version calculation                 | Conventional commits, PR title updates, version file updates        |
 | [`reusable-super-linter.yml`](.github/workflows/reusable-super-linter.yml)                | Comprehensive code linting                    | Multi-language linting, style enforcement, security scanning        |
 | [`buildah-multiarch.yml`](.github/workflows/buildah-multiarch.yml)                        | Multi-arch container builds                   | SBOM generation, vulnerability scanning, attestation, signing       |
@@ -50,24 +52,40 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 
 ### Supporting Tools
 
-- **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow with templates, automation, and conflict resolution\n - Advanced Python script with multiple update modes and templates\n - Automated workflow processing with PR creation and archival\n - Support for changelogs, TODO lists, README sections, and badge updates\n - Interactive mode and dry-run capabilities for safe operations\n - Complete documentation and usage examples in [docs/documentation-updates.md](docs/documentation-updates.md)
+- **Enhanced Documentation Update System**: Comprehensive JSON-driven
+  documentation update workflow with templates, automation, and conflict
+  resolution\n - Advanced Python script with multiple update modes and
+  templates\n - Automated workflow processing with PR creation and archival\n -
+  Support for changelogs, TODO lists, README sections, and badge updates\n -
+  Interactive mode and dry-run capabilities for safe operations\n - Complete
+  documentation and usage examples in
+  [docs/documentation-updates.md](docs/documentation-updates.md)
 
 - **Setup Scripts**: Automated repository configuration
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project
+  workflows have been removed.
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project
+  workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project
+  workflows have been removed.
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project
+  workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project
+  workflows have been removed.
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance
-- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language
+  detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language
+  detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language
+  detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language
+  detection
 
 ## 🔧 Core Features
 
@@ -160,21 +178,21 @@ on:
   push:
     branches: [main]
     paths:
-      - "issue_updates.json"
-      - ".github/issue-updates/*.json"
+      - 'issue_updates.json'
+      - '.github/issue-updates/*.json'
   pull_request_review_comment:
     types: [created, edited, deleted]
   schedule:
-    - cron: "0 2 * * *" # Daily maintenance
+    - cron: '0 2 * * *' # Daily maintenance
   workflow_dispatch:
 
 jobs:
   issue-management:
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
-      operations: "auto" # Auto-detect based on event
-      issue_updates_file: "issue_updates.json"
-      issue_updates_directory: ".github/issue-updates"
+      operations: 'auto' # Auto-detect based on event
+      issue_updates_file: 'issue_updates.json'
+      issue_updates_directory: '.github/issue-updates'
       cleanup_issue_updates: true
     secrets: inherit
 ```
@@ -187,14 +205,14 @@ name: Sync Labels from ghcommon
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 1 * *" # Monthly on 1st at 3 AM UTC
+    - cron: '0 3 1 * *' # Monthly on 1st at 3 AM UTC
 
 jobs:
   sync-labels:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
       repositories: ${{ github.repository }}
-      source-repo: "jdfalk/ghcommon"
+      source-repo: 'jdfalk/ghcommon'
       delete-extra-labels: false # Safe mode
     secrets: inherit
 ```
@@ -223,7 +241,8 @@ chmod +x scripts/create-issue-update.sh
 ./scripts/create-issue-update.sh comment 123 "Testing completed successfully"
 ````
 
-**Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
+**Documentation**:
+[docs/unified-issue-management.md](docs/unified-issue-management.md)
 **Documentation**: [docs/unified-automation.md](docs/unified-automation.md)
 **Examples**: [examples/workflows/](examples/workflows/)
 
@@ -255,15 +274,20 @@ chmod +x scripts/create-issue-update.sh
 
 ### Setup Guides
 
-- [Repository Setup Guide](.github/repository-setup.md) - Complete setup instructions
-- [Security Guidelines](.github/security-guidelines.md) - Security best practices
+- [Repository Setup Guide](.github/repository-setup.md) - Complete setup
+  instructions
+- [Security Guidelines](.github/security-guidelines.md) - Security best
+  practices
 - [Workflow Usage](.github/workflow-usage.md) - Detailed workflow documentation
 
 ### Templates
 
-- [Complete CI/CD](templates/workflows/complete-ci-cd.yml) - Full pipeline template
-- [Container Only](templates/workflows/container-only.yml) - Container-focused template
-- [Library Release](templates/workflows/library-release.yml) - Package release template
+- [Complete CI/CD](templates/workflows/complete-ci-cd.yml) - Full pipeline
+  template
+- [Container Only](templates/workflows/container-only.yml) - Container-focused
+  template
+- [Library Release](templates/workflows/library-release.yml) - Package release
+  template
 
 ## 🚦 Validation
 
@@ -283,7 +307,8 @@ This will check:
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our
+[Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -295,17 +320,20 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.
 
 ## 🆘 Support
 
 - **Issues**: [GitHub Issues](https://github.com/jdfalk/ghcommon/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/jdfalk/ghcommon/discussions)
+- **Discussions**:
+  [GitHub Discussions](https://github.com/jdfalk/ghcommon/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting security issues
 
 ## 🏷️ Versioning
 
-This project uses [Semantic Versioning](https://semver.org/). See [CHANGELOG.md](CHANGELOG.md) for version history.
+This project uses [Semantic Versioning](https://semver.org/). See
+[CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## 🙏 Acknowledgments
 
@@ -314,76 +342,64 @@ This project uses [Semantic Versioning](https://semver.org/). See [CHANGELOG.md]
 - [Syft](https://github.com/anchore/syft) for SBOM generation
 - [Grype](https://github.com/anchore/grype) for vulnerability scanning
 - [Cosign](https://github.com/sigstore/cosign) for container signing
-- [Conventional Commits](https://www.conventionalcommits.org/) for commit standards
+- [Conventional Commits](https://www.conventionalcommits.org/) for commit
+  standards
 
-Automation note added
-Document built-in automation
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
+Automation note added Document built-in automation This repository now relies on
+GitHub's built-in project automation. Final automation note Builtin project
+automation documented
 
-Doc update manager now supports `--ignore-errors` to continue processing even if an update fails.
-Automation note added
-Document built-in automation
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
+Doc update manager now supports `--ignore-errors` to continue processing even if
+an update fails. Automation note added Document built-in automation This
+repository now relies on GitHub's built-in project automation. Final automation
+note Builtin project automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added
-Document built-in automation
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
+Automation note added Document built-in automation This repository now relies on
+GitHub's built-in project automation. Final automation note Builtin project
+automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added
-Document built-in automation
-Added stale issue management workflow
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
+Automation note added Document built-in automation Added stale issue management
+workflow This repository now relies on GitHub's built-in project automation.
+Final automation note Builtin project automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added
-Document built-in automation
-Added stale issue management workflow
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Builtin project automation documented
+Automation note added Document built-in automation Added stale issue management
+workflow This repository now relies on GitHub's built-in project automation.
+Final automation note Builtin project automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added
-Document built-in automation
-Added stale issue management workflow
-This repository now relies on GitHub's built-in project automation.
-Final automation note
-Document shared AI rebase system prompt
-Builtin project automation documented
+Automation note added Document built-in automation Added stale issue management
+workflow This repository now relies on GitHub's built-in project automation.
+Final automation note Document shared AI rebase system prompt Builtin project
+automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
+
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-Added stale issue management workflow
-Document shared AI rebase system prompt
+
+Added stale issue management workflow Document shared AI rebase system prompt
+
 - AI rebase workflow now uses file-based prompts for model inference
+
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-Fix doc update workflow syntax error
-Unified automation workflow can now be run manually via the Actions tab
-Added stale issue management workflow
-Document shared AI rebase system prompt
-Added auto-commit and push in rebase script
+
+Fix doc update workflow syntax error Unified automation workflow can now be run
+manually via the Actions tab Added stale issue management workflow Document
+shared AI rebase system prompt Added auto-commit and push in rebase script
 
 ## Protobuf Definitions
 
@@ -399,9 +415,8 @@ Added cache service protobuf definitions
 
 ## Queue Module\n\nTODO: Add content for this section
 
-
 # Protobuf Definitions
 
-## Protobuf Definitions\n\n_Moved to gcommon repository._
+## Protobuf Definitions\n\n*Moved to gcommon repository.*
 
 - **Reusable CodeQL Workflow**: Unique caching keys prevent collisions

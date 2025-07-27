@@ -2,17 +2,22 @@
 <!-- version: 1.0.0 -->
 <!-- guid: 8e7d6c5b-4a3c-2d1e-0f9a-8b7c6d5e4f3a -->
 
-applyTo: "\*\*/\*.{js,jsx}"
-description: |
-JavaScript language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google JavaScript Style Guide.
+applyTo: "\*\*/\*.{js,jsx}" description: | JavaScript language-specific coding,
+documentation, and testing rules for Copilot/AI agents and VS Code Copilot
+customization. These rules extend the general instructions in
+`general-coding.instructions.md` and merge all unique content from the Google
+JavaScript Style Guide.
 
 ---
 
 # JavaScript Coding Instructions
 
 - Follow the [general coding instructions](general-coding.instructions.md).
-- Follow the [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html) for additional best practices.
-- All JavaScript files must begin with the required file header (see general instructions for details and JavaScript example).
+- Follow the
+  [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
+  for additional best practices.
+- All JavaScript files must begin with the required file header (see general
+  instructions for details and JavaScript example).
 
 ## File Structure
 
@@ -31,7 +36,9 @@ JavaScript language-specific coding, documentation, and testing rules for Copilo
 
 ## Naming Conventions
 
-- `functionNamesLikeThis`, `variableNamesLikeThis`, `ClassNamesLikeThis`, `EnumNamesLikeThis`, `methodNamesLikeThis`, `CONSTANT_VALUES_LIKE_THIS`, `private_values_with_underscore`, `package-names-like-this`
+- `functionNamesLikeThis`, `variableNamesLikeThis`, `ClassNamesLikeThis`,
+  `EnumNamesLikeThis`, `methodNamesLikeThis`, `CONSTANT_VALUES_LIKE_THIS`,
+  `private_values_with_underscore`, `package-names-like-this`
 
 ## Comments
 
@@ -69,7 +76,9 @@ JavaScript language-specific coding, documentation, and testing rules for Copilo
 
 ## Required File Header
 
-All JavaScript files must begin with a standard header as described in the [general coding instructions](general-coding.instructions.md). Example for JavaScript:
+All JavaScript files must begin with a standard header as described in the
+[general coding instructions](general-coding.instructions.md). Example for
+JavaScript:
 
 ```js
 // file: path/to/file.js

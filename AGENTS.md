@@ -4,11 +4,13 @@
 
 # AGENTS.md
 
-> **NOTE:** This is a pointer file. All detailed Copilot, agent, and workflow instructions are in the [.github/](.github/) directory.
+> **NOTE:** This is a pointer file. All detailed Copilot, agent, and workflow
+> instructions are in the [.github/](.github/) directory.
 
 ## 🚨 CRITICAL: Documentation Update Protocol
 
-**NEVER edit markdown files directly. ALWAYS use the documentation update system:**
+**NEVER edit markdown files directly. ALWAYS use the documentation update
+system:**
 
 1. **Create GitHub Issue First** (if none exists):
 
@@ -35,7 +37,8 @@
    - Example: `--after "## Installation"` will insert content after that heading
    - **Malformed JSON error = missing `--after` parameter**
 
-4. **Link to Issue**: Every documentation change MUST reference a GitHub issue for tracking and context.
+4. **Link to Issue**: Every documentation change MUST reference a GitHub issue
+   for tracking and context.
 
 **Common Modes:**
 
@@ -46,7 +49,8 @@
 - `changelog-entry` - Add changelog entry
 - `task-add` - Add TODO task
 
-**Failure to follow this protocol will result in workflow conflicts and lost changes.**
+**Failure to follow this protocol will result in workflow conflicts and lost
+changes.**
 
 ## Key Copilot/Agent Documents
 

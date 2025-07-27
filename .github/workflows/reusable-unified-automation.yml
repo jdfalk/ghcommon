@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 2.9.0
+# version: 3.0.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -249,12 +249,7 @@ on:
         default: "3.11"
         type: string
     secrets:
-      github-token:
-        description: "GitHub token for repository operations (use PAT for enhanced permissions)"
-        required: false
-      github-pat:
-        description: "Personal Access Token for enhanced GitHub operations"
-        required: false
+      # Inherits all secrets from calling workflow, no need to define explicitly
 
 jobs:
   issue-management:
@@ -269,7 +264,7 @@ jobs:
       cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
       python_version: ${{ inputs.im_python_version }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
@@ -283,7 +278,7 @@ jobs:
       auto_merge: ${{ inputs.docs_auto_merge }}
       continue_on_error: ${{ inputs.docs_continue_on_error }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   labeler:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
@@ -294,7 +289,7 @@ jobs:
       dot: ${{ inputs.labeler_dot }}
       pr-numbers: ${{ inputs.labeler_pr_numbers }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   super-linter:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
@@ -314,7 +309,7 @@ jobs:
       run-html: ${{ inputs.sl_run_html }}
       commit-message: ${{ inputs.sl_commit_message }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   ai-rebase:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
@@ -323,7 +318,7 @@ jobs:
       base-branch: ${{ inputs.rebase_base_branch }}
       model: ${{ inputs.rebase_model }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   intelligent-labeling:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}
@@ -339,4 +334,4 @@ jobs:
       label_config_path: ${{ inputs.il_label_config_path }}
       python_version: ${{ inputs.il_python_version }}
     secrets:
-      github-token: ${{ secrets.github-pat || secrets.github-token || secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}

@@ -3,21 +3,26 @@
 <!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
 
 applyTo: "\*\*/\*.json"ile: .github/instructions/json.instructions.md -->
+
 <!-- version: 1.0.0 -->
 
 ## <!-- guid: 3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f -->
 
-applyTo: "\*_/_.json"
-description: |
-Coding, documentation, and workflow rules for JSON files, following Google JSON style guide and general project rules. Reference this for all JSON code, documentation, and formatting in this repository. All unique content from the Google JSON Style Guide is merged here.
+applyTo: "\*_/_.json" description: | Coding, documentation, and workflow rules
+for JSON files, following Google JSON style guide and general project rules.
+Reference this for all JSON code, documentation, and formatting in this
+repository. All unique content from the Google JSON Style Guide is merged here.
 
 ---
 
 # JSON Coding Instructions
 
 - Follow the [general coding instructions](general-coding.instructions.md).
-- Follow the [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml) for additional best practices.
-- All JSON files must begin with the required file header (see general instructions for details and JSON example).
+- Follow the
+  [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml)
+  for additional best practices.
+- All JSON files must begin with the required file header (see general
+  instructions for details and JSON example).
 
 ## Core Principles
 
@@ -41,7 +46,11 @@ Coding, documentation, and workflow rules for JSON files, following Google JSON 
 
 ## Required File Header
 
-All JSONC files must begin with a standard header as described in the [general coding instructions](general-coding.instructions.md). The **only exception** is files with the `.json` extension (JSON without comments), which are exempt from this requirement and do not require a file header. For standard `.jsonc` files, include the following header:
+All JSONC files must begin with a standard header as described in the
+[general coding instructions](general-coding.instructions.md). The **only
+exception** is files with the `.json` extension (JSON without comments), which
+are exempt from this requirement and do not require a file header. For standard
+`.jsonc` files, include the following header:
 
 ```jsonc
 // file: path/to/file.jsonc

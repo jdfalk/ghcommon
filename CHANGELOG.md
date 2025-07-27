@@ -5,7 +5,8 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
@@ -25,7 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added initial queue module protobuf definitions
 - Added logging protobuf definitions
 - Added comprehensive manual unified automation workflow options
-- Added unified automation orchestrator workflow with extensive customization options
+- Added unified automation orchestrator workflow with extensive customization
+  options
 - Common system prompt file for AI rebase workflow
 - AI rebase workflow now uses file-based prompts to avoid long command lines
 - Added manual workflow_dispatch trigger for unified automation
@@ -46,7 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation
+- Deprecated custom add-to-project workflows in favor of GitHub's built-in
+  project automation
 
 ## [1.0.0] - 2025-06-14
 

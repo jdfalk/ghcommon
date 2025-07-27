@@ -2,18 +2,22 @@
 
 # Migration Guide: subtitle-manager to Centralized Issue Management
 
-This guide shows how to migrate the subtitle-manager repository from its custom issue management workflow to the centralized reusable workflow in ghcommon.
+This guide shows how to migrate the subtitle-manager repository from its custom
+issue management workflow to the centralized reusable workflow in ghcommon.
 
 ## Overview
 
-The subtitle-manager repository currently has a sophisticated issue management system with:
+The subtitle-manager repository currently has a sophisticated issue management
+system with:
 
 - Advanced Python script (962 lines) with comprehensive functionality
 - Full workflow with matrix strategy and parallel execution
 - GUID-based duplicate prevention
-- Support for multiple operations (update-issues, copilot-tickets, close-duplicates, codeql-alerts)
+- Support for multiple operations (update-issues, copilot-tickets,
+  close-duplicates, codeql-alerts)
 
-We'll migrate this to use the centralized reusable workflow from ghcommon while preserving all functionality.
+We'll migrate this to use the centralized reusable workflow from ghcommon while
+preserving all functionality.
 
 ## Migration Steps
 
@@ -63,25 +67,25 @@ on:
   # Scheduled operations
   schedule:
     # Close duplicates daily at 1 AM UTC
-    - cron: "0 1 * * *"
+    - cron: '0 1 * * *'
     # CodeQL alert tickets twice daily at 8 AM and 8 PM UTC
-    - cron: "0 8,20 * * *"
+    - cron: '0 8,20 * * *'
 
   # Manual triggers
   workflow_dispatch:
     inputs:
       operations:
-        description: "Operations to run (comma-separated or auto)"
+        description: 'Operations to run (comma-separated or auto)'
         required: false
         type: string
-        default: "auto"
+        default: 'auto'
       dry_run:
-        description: "Run in dry-run mode (no changes)"
+        description: 'Run in dry-run mode (no changes)'
         required: false
         type: boolean
         default: false
       force_update:
-        description: "Force update existing tickets"
+        description: 'Force update existing tickets'
         required: false
         type: boolean
         default: false
@@ -94,15 +98,16 @@ jobs:
       operations: ${{ github.event.inputs.operations || 'auto' }}
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
       force_update: ${{ github.event.inputs.force_update == 'true' }}
-      issue_updates_file: "issue_updates.json"
+      issue_updates_file: 'issue_updates.json'
       cleanup_issue_updates: true
-      python_version: "3.11"
+      python_version: '3.11'
     secrets: inherit
 ```
 
 ### Step 3: Remove Local Script (Optional)
 
-Since the centralized workflow downloads its own copy of the script, you can remove the local copy:
+Since the centralized workflow downloads its own copy of the script, you can
+remove the local copy:
 
 ```bash
 # Remove the local script (it's now centralized in ghcommon)
@@ -123,8 +128,7 @@ rm -f .github/scripts/issue_manager.py
    # Set operations to "close-duplicates" (safe test)
    ```
 
-2. **Test with issue updates**:
-   Create a test `issue_updates.json`:
+2. **Test with issue updates**: Create a test `issue_updates.json`:
 
    ```json
    {
@@ -148,7 +152,8 @@ rm -f .github/scripts/issue_manager.py
 Update any repository documentation that references the old workflow:
 
 1. **README.md**: Update any references to the issue management system
-2. **CONTRIBUTING.md**: Update contributor guidelines if they mention the workflow
+2. **CONTRIBUTING.md**: Update contributor guidelines if they mention the
+   workflow
 3. **docs/**: Update any technical documentation
 
 ## Benefits of Migration
@@ -243,4 +248,7 @@ If you encounter issues during migration:
 
 ## Conclusion
 
-This migration centralizes issue management while preserving all existing functionality. The subtitle-manager repository will now benefit from ongoing improvements to the centralized system while reducing its own maintenance burden.
+This migration centralizes issue management while preserving all existing
+functionality. The subtitle-manager repository will now benefit from ongoing
+improvements to the centralized system while reducing its own maintenance
+burden.

@@ -2,17 +2,22 @@
 <!-- version: 1.0.0 -->
 <!-- guid: 5b4a3c2d-1e0f-9a8b-7c6d-5e4f3a2b1c0d -->
 
-applyTo: "\*\*/\*.{sh,bash}"
-description: |
-Coding, documentation, and workflow rules for shell scripts, following Google Shell style guide and general project rules. Reference this for all shell scripts, documentation, and formatting in this repository. All unique content from the Google Shell Style Guide is merged here.
+applyTo: "\*\*/\*.{sh,bash}" description: | Coding, documentation, and workflow
+rules for shell scripts, following Google Shell style guide and general project
+rules. Reference this for all shell scripts, documentation, and formatting in
+this repository. All unique content from the Google Shell Style Guide is merged
+here.
 
 ---
 
 # Shell Script Coding Instructions
 
 - Follow the [general coding instructions](general-coding.instructions.md).
-- Follow the [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html) for additional best practices.
-- All shell scripts must begin with the required file header (see general instructions for details and Shell example).
+- Follow the
+  [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)
+  for additional best practices.
+- All shell scripts must begin with the required file header (see general
+  instructions for details and Shell example).
 
 ## Core Principles
 
@@ -37,7 +42,9 @@ Coding, documentation, and workflow rules for shell scripts, following Google Sh
 
 ## Required File Header
 
-All shell scripts must begin with a standard header as described in the [general coding instructions](general-coding.instructions.md). Example for Shell:
+All shell scripts must begin with a standard header as described in the
+[general coding instructions](general-coding.instructions.md). Example for
+Shell:
 
 ```bash
 #!/bin/bash

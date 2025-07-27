@@ -1,6 +1,7 @@
 # AI Automation Instructions
 
-This document provides comprehensive guidelines for AI-driven development work in this repository.
+This document provides comprehensive guidelines for AI-driven development work
+in this repository.
 
 ## Git Operations
 
@@ -37,7 +38,8 @@ Files changed:
 [optional footer with issue references]
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
+`ci`, `chore`, `revert`
 
 **Rules:**
 
@@ -133,9 +135,7 @@ Use the `issue_updates.json` file with grouped format:
 
 ## Related Issues
 
-Closes #123
-Fixes #456
-Related to #789
+Closes #123 Fixes #456 Related to #789
 ```
 
 ### PR Best Practices
@@ -264,13 +264,13 @@ Always include file identification in the first line:
 ### Test Documentation
 
 ```javascript
-describe("SubtitleConverter", () => {
-  describe("convertToSRT", () => {
-    it("should convert VTT subtitle format to SRT with proper timing adjustment", async () => {
+describe('SubtitleConverter', () => {
+  describe('convertToSRT', () => {
+    it('should convert VTT subtitle format to SRT with proper timing adjustment', async () => {
       // Test implementation...
     });
 
-    it("should handle malformed timestamp formats gracefully", async () => {
+    it('should handle malformed timestamp formats gracefully', async () => {
       // Test implementation...
     });
   });
@@ -304,15 +304,15 @@ try {
   const result = await riskyOperation();
   return { success: true, data: result };
 } catch (error) {
-  logger.error("Operation failed", {
-    operation: "riskyOperation",
+  logger.error('Operation failed', {
+    operation: 'riskyOperation',
     error: error.message,
     stack: error.stack,
   });
 
   return {
     success: false,
-    error: "Operation failed. Please try again.",
+    error: 'Operation failed. Please try again.',
   };
 }
 ```

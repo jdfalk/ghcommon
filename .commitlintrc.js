@@ -13,59 +13,59 @@
  */
 
 module.exports = {
-  extends: ["@commitlint/config-conventional"],
+  extends: ['@commitlint/config-conventional'],
 
   rules: {
     // Type enum - matches our validation script
-    "type-enum": [
+    'type-enum': [
       2,
-      "always",
+      'always',
       [
-        "feat", // A new feature
-        "fix", // A bug fix
-        "docs", // Documentation only changes
-        "style", // Changes that do not affect the meaning of the code
-        "refactor", // A code change that neither fixes a bug nor adds a feature
-        "perf", // A code change that improves performance
-        "test", // Adding missing tests or correcting existing tests
-        "chore", // Changes to the build process or auxiliary tools
-        "build", // Changes that affect the build system or external dependencies
-        "ci", // Changes to our CI configuration files and scripts
-        "revert", // Reverts a previous commit
+        'feat', // A new feature
+        'fix', // A bug fix
+        'docs', // Documentation only changes
+        'style', // Changes that do not affect the meaning of the code
+        'refactor', // A code change that neither fixes a bug nor adds a feature
+        'perf', // A code change that improves performance
+        'test', // Adding missing tests or correcting existing tests
+        'chore', // Changes to the build process or auxiliary tools
+        'build', // Changes that affect the build system or external dependencies
+        'ci', // Changes to our CI configuration files and scripts
+        'revert', // Reverts a previous commit
       ],
     ],
 
     // Subject and body rules
-    "subject-case": [
+    'subject-case': [
       2,
-      "never",
-      ["sentence-case", "start-case", "pascal-case", "upper-case"],
+      'never',
+      ['sentence-case', 'start-case', 'pascal-case', 'upper-case'],
     ],
-    "subject-empty": [2, "never"],
-    "subject-full-stop": [2, "never", "."],
-    "subject-max-length": [2, "always", 72],
-    "subject-min-length": [2, "always", 10],
+    'subject-empty': [2, 'never'],
+    'subject-full-stop': [2, 'never', '.'],
+    'subject-max-length': [2, 'always', 72],
+    'subject-min-length': [2, 'always', 10],
 
     // Type and format rules
-    "type-case": [2, "always", "lower-case"],
-    "type-empty": [2, "never"],
+    'type-case': [2, 'always', 'lower-case'],
+    'type-empty': [2, 'never'],
 
     // Scope rules (optional but when present must be lowercase)
-    "scope-case": [2, "always", "lower-case"],
+    'scope-case': [2, 'always', 'lower-case'],
 
     // Header rules
-    "header-max-length": [2, "always", 100],
+    'header-max-length': [2, 'always', 100],
 
     // Body rules
-    "body-leading-blank": [2, "always"],
-    "body-max-line-length": [2, "always", 100],
+    'body-leading-blank': [2, 'always'],
+    'body-max-line-length': [2, 'always', 100],
   },
 
   // Custom plugin to enforce "Files changed:" section
   plugins: [
     {
       rules: {
-        "files-changed-section": (parsed) => {
+        'files-changed-section': parsed => {
           const { body } = parsed;
 
           // Only check if there's a body
@@ -77,7 +77,7 @@ module.exports = {
           }
 
           // Check if "Files changed:" section exists
-          if (!body.includes("Files changed:")) {
+          if (!body.includes('Files changed:')) {
             return [
               false,
               'Commit body must include a "Files changed:" section listing all modified files',
@@ -93,6 +93,6 @@ module.exports = {
   // Enable the custom rule
   rules: {
     ...module.exports.rules,
-    "files-changed-section": [1, "always"], // Warning level, not error
+    'files-changed-section': [1, 'always'], // Warning level, not error
   },
 };

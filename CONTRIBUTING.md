@@ -2,11 +2,13 @@
 
 # Contributing to GitHub Common Workflows
 
-Thank you for your interest in contributing to GitHub Common Workflows! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to GitHub Common Workflows! This
+document provides guidelines and information for contributors.
 
 ## Code of Conduct
 
-This project adheres to a code of conduct that we expect all contributors to follow. Please be respectful and constructive in all interactions.
+This project adheres to a code of conduct that we expect all contributors to
+follow. Please be respectful and constructive in all interactions.
 
 ## How to Contribute
 
@@ -104,12 +106,12 @@ on:
   workflow_call:
     inputs:
       input-name:
-        description: "Clear description of the input"
+        description: 'Clear description of the input'
         required: true
         type: string
     outputs:
       output-name:
-        description: "Clear description of the output"
+        description: 'Clear description of the output'
         value: ${{ jobs.job-name.outputs.output-name }}
 
 jobs:

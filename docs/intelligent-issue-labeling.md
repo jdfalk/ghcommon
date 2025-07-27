@@ -4,11 +4,14 @@
 
 # Intelligent Issue Labeling
 
-Automatically analyze GitHub issues and apply appropriate labels using machine learning patterns and AI fallback for complex cases.
+Automatically analyze GitHub issues and apply appropriate labels using machine
+learning patterns and AI fallback for complex cases.
 
 ## Overview
 
-The Intelligent Issue Labeling system analyzes issue content (title, body, comments) and automatically suggests and applies relevant labels from your repository's comprehensive label taxonomy. It uses:
+The Intelligent Issue Labeling system analyzes issue content (title, body,
+comments) and automatically suggests and applies relevant labels from your
+repository's comprehensive label taxonomy. It uses:
 
 1. **Pattern-based analysis** for fast, reliable labeling
 2. **Machine learning techniques** for content analysis
@@ -18,7 +21,8 @@ The Intelligent Issue Labeling system analyzes issue content (title, body, comme
 ## Features
 
 - **Comprehensive Analysis**: Analyzes issue title, body, and metadata
-- **Technology Detection**: Automatically detects programming languages and frameworks
+- **Technology Detection**: Automatically detects programming languages and
+  frameworks
 - **Module Classification**: Identifies which modules/components are affected
 - **Priority Assessment**: Suggests appropriate priority levels
 - **Workflow Integration**: Identifies CI/CD, automation, and deployment issues
@@ -63,8 +67,8 @@ jobs:
       preserve_existing_labels: true
 
       # Custom configuration
-      label_config_path: ".github/custom-labeling.yml"
-      python_version: "3.11"
+      label_config_path: '.github/custom-labeling.yml'
+      python_version: '3.11'
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT }}
 ```
@@ -131,12 +135,12 @@ The system uses keyword matching and pattern recognition to identify:
 ```yaml
 # Example patterns
 bug:
-  keywords: ["bug", "error", "fail", "broken", "crash"]
+  keywords: ['bug', 'error', 'fail', 'broken', 'crash']
   confidence: 0.8
 
 tech:go:
-  keywords: ["go", "golang", ".go", "gofmt"]
-  file_patterns: ["*.go", "go.mod"]
+  keywords: ['go', 'golang', '.go', 'gofmt']
+  file_patterns: ['*.go', 'go.mod']
   confidence: 0.85
 ```
 
@@ -158,7 +162,8 @@ Each suggested label gets a confidence score (0.0-1.0):
 
 ### 4. AI Fallback
 
-When pattern matching produces few or low-confidence suggestions, the system uses OpenAI's GPT-4 to analyze the issue and suggest appropriate labels.
+When pattern matching produces few or low-confidence suggestions, the system
+uses OpenAI's GPT-4 to analyze the issue and suggest appropriate labels.
 
 ## Usage Examples
 
@@ -169,7 +174,7 @@ name: Daily Issue Labeling
 
 on:
   schedule:
-    - cron: "0 2 * * *"  # Daily at 2 AM
+    - cron: '0 2 * * *' # Daily at 2 AM
 
 jobs:
   label-issues:
@@ -218,14 +223,15 @@ jobs:
 
 ## Integration with Unified Automation
 
-The intelligent labeling system integrates seamlessly with the unified automation workflow:
+The intelligent labeling system integrates seamlessly with the unified
+automation workflow:
 
 ```yaml
 jobs:
   unified-automation:
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
     with:
-      operation: "all"  # Includes intelligent labeling
+      operation: 'all' # Includes intelligent labeling
 
       # Intelligent labeling configuration
       il_enabled: true
@@ -248,18 +254,18 @@ global:
 patterns:
   issue_types:
     bug:
-      keywords: ["bug", "error", "broken"]
+      keywords: ['bug', 'error', 'broken']
       confidence: 0.8
 
   technology:
     tech:python:
-      keywords: ["python", ".py", "pip"]
-      file_patterns: ["*.py", "requirements.txt"]
+      keywords: ['python', '.py', 'pip']
+      file_patterns: ['*.py', 'requirements.txt']
       confidence: 0.85
 
 ai_fallback:
   enabled: true
-  model: "gpt-4o-mini"
+  model: 'gpt-4o-mini'
   trigger_conditions:
     few_suggestions: 3
 ```
@@ -295,15 +301,15 @@ with:
 ```yaml
 with:
   use_ai_fallback: true
-  confidence_threshold: 0.8  # Only use AI for uncertain cases
+  confidence_threshold: 0.8 # Only use AI for uncertain cases
 ```
 
 ### 4. Monitor Performance
 
 ```yaml
 with:
-  batch_size: 10  # Start small, increase as needed
-  max_labels_per_issue: 6  # Prevent over-labeling
+  batch_size: 10 # Start small, increase as needed
+  max_labels_per_issue: 6 # Prevent over-labeling
 ```
 
 ## Troubleshooting
@@ -340,7 +346,7 @@ Enable detailed logging by setting:
 
 ```yaml
 with:
-  dry_run: true  # See what would be applied without changes
+  dry_run: true # See what would be applied without changes
 ```
 
 Monitor workflow logs for:
@@ -369,15 +375,16 @@ Monitor workflow logs for:
 
 For issues, questions, or contributions:
 
-1. Check existing issues in the [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
+1. Check existing issues in the
+   [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
 2. Create a new issue with the `intelligent-labeling` label
 3. Include workflow logs and configuration for debugging
 4. Provide example issues that aren't being labeled correctly
 
 ## License
 
-This workflow is part of the ghcommon repository and follows the same license terms.
-
+This workflow is part of the ghcommon repository and follows the same license
+terms.
 
 # Technology Stack
 

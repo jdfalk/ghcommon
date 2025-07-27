@@ -1,23 +1,30 @@
 # Label Synchronization Workflow
 
-A comprehensive GitHub Actions workflow for standardizing labels across multiple repositories from a central configuration.
+A comprehensive GitHub Actions workflow for standardizing labels across multiple
+repositories from a central configuration.
 
 ## Overview
 
-The Label Synchronization workflow provides centralized label management that automatically syncs a standard set of labels from the ghcommon repository to target repositories. This ensures consistency across all your projects.
+The Label Synchronization workflow provides centralized label management that
+automatically syncs a standard set of labels from the ghcommon repository to
+target repositories. This ensures consistency across all your projects.
 
 ## Workflow Architecture
 
-- **Canonical Workflow**: `jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main`
+- **Canonical Workflow**:
+  `jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main`
 - **Configuration**: `labels.json` (JSON array of label definitions)
-- **Repository List**: `repositories.txt` (optional file listing target repositories)
-- **Examples**: `/examples/workflows/label-sync-basic.yml` and `/examples/workflows/label-sync-advanced.yml`
+- **Repository List**: `repositories.txt` (optional file listing target
+  repositories)
+- **Examples**: `/examples/workflows/label-sync-basic.yml` and
+  `/examples/workflows/label-sync-advanced.yml`
 
 ## Quick Start
 
 ### Basic Setup
 
-1. **Copy the basic example** to `.github/workflows/label-sync.yml` in your repository:
+1. **Copy the basic example** to `.github/workflows/label-sync.yml` in your
+   repository:
 
 ```yaml
 name: Sync Labels from ghcommon
@@ -25,7 +32,7 @@ name: Sync Labels from ghcommon
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 1 * *" # Monthly
+    - cron: '0 3 1 * *' # Monthly
 
 permissions:
   contents: read
@@ -34,9 +41,9 @@ jobs:
   sync-labels:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
-      config-file: "labels.json"
+      config-file: 'labels.json'
       repositories: ${{ github.repository }}
-      source-repo: "jdfalk/ghcommon"
+      source-repo: 'jdfalk/ghcommon'
     secrets: inherit
 ```
 
@@ -94,19 +101,19 @@ You can specify target repositories in three ways:
 1. **Inline list** via `repositories` parameter:
 
    ```yaml
-   repositories: "owner/repo1,owner/repo2,owner/repo3"
+   repositories: 'owner/repo1,owner/repo2,owner/repo3'
    ```
 
 2. **File-based list** via `repositories-file` parameter:
 
    ```yaml
-   repositories-file: "repositories.txt"
+   repositories-file: 'repositories.txt'
    ```
 
 3. **Combination** of both (they will be merged):
    ```yaml
-   repositories: "owner/repo1"
-   repositories-file: "more-repos.txt"
+   repositories: 'owner/repo1'
+   repositories-file: 'more-repos.txt'
    ```
 
 ### Repository File Format
@@ -133,14 +140,14 @@ name: Monthly Label Sync
 
 on:
   schedule:
-    - cron: "0 2 1 * *" # 1st of month at 2 AM UTC
+    - cron: '0 2 1 * *' # 1st of month at 2 AM UTC
 
 jobs:
   sync:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
       repositories: ${{ github.repository }}
-      source-repo: "jdfalk/ghcommon"
+      source-repo: 'jdfalk/ghcommon'
     secrets: inherit
 ```
 
@@ -154,14 +161,14 @@ name: Organization Label Sync
 on:
   workflow_dispatch:
   push:
-    paths: ["labels.json"]
+    paths: ['labels.json']
 
 jobs:
   sync:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
-      config-file: "labels.json"
-      repositories-file: "target-repos.txt"
+      config-file: 'labels.json'
+      repositories-file: 'target-repos.txt'
       delete-extra-labels: true
     secrets: inherit
 ```
@@ -175,7 +182,7 @@ name: Test Label Changes
 
 on:
   pull_request:
-    paths: ["labels.json"]
+    paths: ['labels.json']
 
 jobs:
   test-sync:
@@ -197,7 +204,8 @@ permissions:
   pull-requests: read # For API access validation
 ```
 
-**Note**: The `GITHUB_TOKEN` automatically has sufficient permissions to manage labels in repositories where the workflow runs.
+**Note**: The `GITHUB_TOKEN` automatically has sufficient permissions to manage
+labels in repositories where the workflow runs.
 
 ## Operational Modes
 
@@ -304,7 +312,8 @@ The default configuration includes these categories:
 
 ## Integration with Issue Management
 
-The label sync workflow integrates well with the existing issue management system:
+The label sync workflow integrates well with the existing issue management
+system:
 
 ```yaml
 # Combined workflow example
@@ -348,7 +357,7 @@ jobs:
   test-sync:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
-      repositories: "owner/repo"
+      repositories: 'owner/repo'
       dry-run: true
     secrets: inherit
 ```
@@ -369,11 +378,13 @@ delete-extra-labels: true
 
 For issues, questions, or contributions:
 
-1. **Check existing issues** in the [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
+1. **Check existing issues** in the
+   [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
 2. **Create a new issue** with the `label-sync` label
 3. **Include workflow logs** and configuration for debugging
 4. **Provide minimal reproduction** steps when possible
 
 ## License
 
-This workflow is part of the ghcommon repository and follows the same license terms.
+This workflow is part of the ghcommon repository and follows the same license
+terms.

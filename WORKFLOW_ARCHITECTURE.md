@@ -1,31 +1,40 @@
 # GitHub Actions Workflow Architecture
 
-This document clarifies the intended structure and usage of the issue management workflows in this repository.
+This document clarifies the intended structure and usage of the issue management
+workflows in this repository.
 
 ## Canonical Workflow
 
-**Use this workflow**: `jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main`
+**Use this workflow**:
+`jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main`
 
-This is the single, comprehensive, and actively maintained reusable workflow that provides all issue management functionality.
+This is the single, comprehensive, and actively maintained reusable workflow
+that provides all issue management functionality.
 
 ## Documentation
 
-**Primary documentation**: [`docs/unified-issue-management.md`](docs/unified-issue-management.md)
+**Primary documentation**:
+[`docs/unified-issue-management.md`](docs/unified-issue-management.md)
 
-This contains complete usage instructions, configuration options, examples, and troubleshooting guidance.
+This contains complete usage instructions, configuration options, examples, and
+troubleshooting guidance.
 
 ## Examples
 
-**Basic setup**: [`examples/workflows/issue-management-basic.yml`](examples/workflows/issue-management-basic.yml)
-**Advanced setup**: [`examples/workflows/issue-management-advanced.yml`](examples/workflows/issue-management-advanced.yml)
+**Basic setup**:
+[`examples/workflows/issue-management-basic.yml`](examples/workflows/issue-management-basic.yml)
+**Advanced setup**:
+[`examples/workflows/issue-management-advanced.yml`](examples/workflows/issue-management-advanced.yml)
 
-Copy these examples to your repository's `.github/workflows/` directory and customize as needed.
+Copy these examples to your repository's `.github/workflows/` directory and
+customize as needed.
 
 ## Legacy Files
 
 **Deprecated**: `.github/workflows/reusable-issue-management.yml`
 
-This file is deprecated and will be removed in a future version. It has been marked with deprecation notices and migration instructions.
+This file is deprecated and will be removed in a future version. It has been
+marked with deprecation notices and migration instructions.
 
 ## Migration Path
 
@@ -74,13 +83,17 @@ For automatic PR creation, ensure these repository settings:
 
 ## Quick Start
 
-1. Copy [`examples/workflows/issue-management-basic.yml`](examples/workflows/issue-management-basic.yml) to `.github/workflows/issue-management.yml` in your repository
+1. Copy
+   [`examples/workflows/issue-management-basic.yml`](examples/workflows/issue-management-basic.yml)
+   to `.github/workflows/issue-management.yml` in your repository
 2. Commit the file
-3. The workflow will automatically handle issue management based on file changes and events
+3. The workflow will automatically handle issue management based on file changes
+   and events
 
 ## Support
 
-- **Documentation**: [`docs/unified-issue-management.md`](docs/unified-issue-management.md)
+- **Documentation**:
+  [`docs/unified-issue-management.md`](docs/unified-issue-management.md)
 - **Examples**: [`examples/workflows/`](examples/workflows/)
 - **Issues**: Create an issue in this repository for support
 

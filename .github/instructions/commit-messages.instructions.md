@@ -2,26 +2,34 @@
 <!-- version: 1.0.0 -->
 <!-- guid: c0mm1712-e553-4a6e-9f8b-1234567890ab -->
 
-applyTo: "**"
-description: |
-  Conventional commit message format rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all git commits and follow the project's commit message standards. For details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "\*\*" description: | Conventional commit message format rules for all
+Copilot/AI agents and VS Code Copilot customization. These rules apply to all
+git commits and follow the project's commit message standards. For details, see
+the main documentation in `.github/copilot-instructions.md`.
 
 ---
 
 # Conventional Commit Message Instructions
 
-These instructions are the canonical source for all conventional commit message formatting rules in this repository. They are used by GitHub Copilot for commit message generation and follow our established standards.
+These instructions are the canonical source for all conventional commit message
+formatting rules in this repository. They are used by GitHub Copilot for commit
+message generation and follow our established standards.
 
-- Follow the [general coding instructions](general-coding.instructions.md) for basic file formatting rules.
-- All commit formatting and workflow rules are found in `.github/instructions/*.instructions.md` files.
+- Follow the [general coding instructions](general-coding.instructions.md) for
+  basic file formatting rules.
+- All commit formatting and workflow rules are found in
+  `.github/instructions/*.instructions.md` files.
 - Document all changes comprehensively in commit messages.
-- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related files.
+- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related
+  files.
 
-For more details and the full system, see [copilot-instructions.md](../copilot-instructions.md).
+For more details and the full system, see
+[copilot-instructions.md](../copilot-instructions.md).
 
 ## Template Structure
 
-**IMPORTANT**: Only include issue numbers if you are working on a specific GitHub issue. Do not use placeholder numbers like #123.
+**IMPORTANT**: Only include issue numbers if you are working on a specific
+GitHub issue. Do not use placeholder numbers like #123.
 
 For commits that address multiple issues, use this multi-issue format:
 
@@ -88,7 +96,8 @@ Files changed:
 ### Commit Header
 
 - Use conventional commit format: `type(scope): description`
-- Include issue number only if working on a specific issue: `type(scope): description (#issue-number)`
+- Include issue number only if working on a specific issue:
+  `type(scope): description (#issue-number)`
 - Keep the header under 72 characters
 - Use present tense ("add feature" not "added feature")
 - Be specific and descriptive
@@ -118,7 +127,8 @@ Files changed:
 
 - **Always list every modified file**
 - Explain what changed in each file, not just what the file does
-- Use relative paths from repository root as markdown links: `[path/to/file.ext](path/to/file.ext)`
+- Use relative paths from repository root as markdown links:
+  `[path/to/file.ext](path/to/file.ext)`
 - Be specific about the nature of changes
 
 ### Issue References
@@ -209,7 +219,8 @@ Closes #345
 2. **Group by issue** - Keep related changes together
 3. **List all files** - Don't leave any modified files undocumented
 4. **Use present tense** - "add" not "added"
-5. **Reference issues only when working on specific issues** - Don't use placeholder numbers
+5. **Reference issues only when working on specific issues** - Don't use
+   placeholder numbers
 6. **Be consistent** - Follow the format every time
 
 ### Don't
@@ -217,12 +228,15 @@ Closes #345
 1. **Mix unrelated changes** - One commit per logical change set
 2. **Use vague descriptions** - "fix stuff" or "update files"
 3. **Forget file listings** - Every file should be documented
-4. **Use placeholder issue numbers** - Only reference real issues you're working on
+4. **Use placeholder issue numbers** - Only reference real issues you're working
+   on
 5. **Use past tense** - Avoid "fixed" or "added"
 
 ## Integration with VS Code
 
-Your VS Code settings are configured to use these commit message guidelines. When generating commit messages with GitHub Copilot, it will follow this format automatically.
+Your VS Code settings are configured to use these commit message guidelines.
+When generating commit messages with GitHub Copilot, it will follow this format
+automatically.
 
 ## Atomic Commits
 

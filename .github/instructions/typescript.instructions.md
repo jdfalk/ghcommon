@@ -2,17 +2,22 @@
 <!-- version: 1.0.0 -->
 <!-- guid: 8f4a3c5d-6e7b-5d9f-0a1b-2c3d4e5f6a7b -->
 
-applyTo: "\*\*/\*.ts"
-description: |
-TypeScript language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google TypeScript Style Guide.
+applyTo: "\*\*/\*.ts" description: | TypeScript language-specific coding,
+documentation, and testing rules for Copilot/AI agents and VS Code Copilot
+customization. These rules extend the general instructions in
+`general-coding.instructions.md` and merge all unique content from the Google
+TypeScript Style Guide.
 
 ---
 
 # TypeScript Coding Instructions
 
 - Follow the [general coding instructions](general-coding.instructions.md).
-- Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html) for additional best practices.
-- All TypeScript files must begin with the required file header (see general instructions for details and TypeScript example).
+- Follow the
+  [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
+  for additional best practices.
+- All TypeScript files must begin with the required file header (see general
+  instructions for details and TypeScript example).
 
 ## Core Principles
 
@@ -25,7 +30,8 @@ TypeScript language-specific coding, documentation, and testing rules for Copilo
 
 - Use `.ts` for TypeScript files, `.tsx` for TypeScript with JSX
 - Use ES6 import/export style
-- License header (if required), then imports, then main export, then implementation
+- License header (if required), then imports, then main export, then
+  implementation
 
 ## Naming Conventions
 
@@ -72,7 +78,9 @@ TypeScript language-specific coding, documentation, and testing rules for Copilo
 
 ## Required File Header
 
-All TypeScript files must begin with a standard header as described in the [general coding instructions](general-coding.instructions.md). Example for TypeScript:
+All TypeScript files must begin with a standard header as described in the
+[general coding instructions](general-coding.instructions.md). Example for
+TypeScript:
 
 ```typescript
 // file: path/to/file.ts

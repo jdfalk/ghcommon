@@ -4,20 +4,28 @@
 
 # GitHub Projects Automation
 
-This document describes the automated GitHub Projects integration setup across all repositories.
+This document describes the automated GitHub Projects integration setup across
+all repositories.
 
 ## Overview
 
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
+⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in
+project automation now handles issue and PR assignment. ⚠️ Note: Custom
+add-to-project workflows have been removed. GitHub's built-in project automation
+now handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows
+have been removed. GitHub's built-in project automation now handles issue and PR
+assignment. ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's
+built-in project automation now handles issue and PR assignment.
 
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now handles issue and PR assignment.
+⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in
+project automation now handles issue and PR assignment. ⚠️ Note: Custom
+add-to-project workflows have been removed. GitHub's built-in project automation
+now handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows
+have been removed. GitHub's built-in project automation now handles issue and PR
+assignment.
 
-We use a reusable workflow to automatically add issues and pull requests to GitHub Projects based on labels and repository context.
+We use a reusable workflow to automatically add issues and pull requests to
+GitHub Projects based on labels and repository context.
 
 ## Reusable Workflow
 
@@ -53,7 +61,8 @@ The main reusable workflow is located at:
 
 **Projects Used:**
 
-- **Subtitle Manager Development** (#5): `https://github.com/users/jdfalk/projects/5`
+- **Subtitle Manager Development** (#5):
+  `https://github.com/users/jdfalk/projects/5`
   - Triggers: All issues and PRs
 
 ### gcommon Repository
@@ -111,9 +120,9 @@ To modify which labels trigger project assignment, edit the calling workflow:
 
 ```yaml
 with:
-  project-url: "https://github.com/users/jdfalk/projects/9"
-  labeled: "bug,documentation,urgent"
-  label-operator: "OR" # OR means any of these labels
+  project-url: 'https://github.com/users/jdfalk/projects/9'
+  labeled: 'bug,documentation,urgent'
+  label-operator: 'OR' # OR means any of these labels
 ```
 
 ### Adding New Projects
@@ -129,8 +138,8 @@ add-to-new-project:
   secrets:
     gh-token: ${{ secrets.JF_CI_GH_PAT }}
   with:
-    project-url: "https://github.com/users/jdfalk/projects/NEW_NUMBER"
-    labeled: "specific,labels"
+    project-url: 'https://github.com/users/jdfalk/projects/NEW_NUMBER'
+    labeled: 'specific,labels'
 ```
 
 ## Troubleshooting
@@ -138,17 +147,14 @@ add-to-new-project:
 ### Common Issues
 
 1. **"Unable to find reusable workflow"**
-
    - Ensure the reusable workflow is committed to the main branch
    - Check the repository reference format
 
 2. **"Context access might be invalid: JF_CI_GH_PAT"**
-
    - Set up the secret in repository settings
    - Verify the secret name matches exactly
 
 3. **"Invalid project URL format"**
-
    - Use format: `https://github.com/users/USERNAME/projects/NUMBER`
    - For organizations: `https://github.com/orgs/ORGNAME/projects/NUMBER`
 

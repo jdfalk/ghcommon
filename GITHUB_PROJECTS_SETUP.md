@@ -4,8 +4,9 @@
 
 # GitHub Projects Automation Setup Summary
 
-This document summarizes the GitHub Projects automation setup created across all repositories.
-⚠️ The reusable add-to-project workflows described here have been removed. Repositories now rely on GitHub's built-in project automation.
+This document summarizes the GitHub Projects automation setup created across all
+repositories. ⚠️ The reusable add-to-project workflows described here have been
+removed. Repositories now rely on GitHub's built-in project automation.
 
 ## 🎯 What Was Created
 
@@ -106,9 +107,9 @@ Edit the calling workflow in the target repository:
 
 ```yaml
 with:
-  project-url: "https://github.com/users/jdfalk/projects/9"
-  labeled: "bug,documentation,new-label"
-  label-operator: "OR"
+  project-url: 'https://github.com/users/jdfalk/projects/9'
+  labeled: 'bug,documentation,new-label'
+  label-operator: 'OR'
 ```
 
 ### Adding New Projects
@@ -149,10 +150,12 @@ Modify the `project-url` and `labeled` inputs in the calling workflows.
 
 ## 🎉 Benefits
 
-- ✅ **Automatic Organization**: Issues/PRs automatically go to appropriate projects
+- ✅ **Automatic Organization**: Issues/PRs automatically go to appropriate
+  projects
 - ✅ **Consistent Workflow**: Same pattern across all repositories
 - ✅ **Centralized Management**: Reusable workflow in one place
 - ✅ **Flexible Configuration**: Easy to adjust mappings and add new projects
 - ✅ **Comprehensive Logging**: Clear success/failure feedback
 
-This setup provides a robust, automated way to manage GitHub Projects across your entire repository ecosystem!
+This setup provides a robust, automated way to manage GitHub Projects across
+your entire repository ecosystem!

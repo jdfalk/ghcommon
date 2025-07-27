@@ -37,97 +37,97 @@ on:
   workflow_call:
     inputs:
       updates_dir:
-        description: 'Directory containing documentation update files'
+        description: "Directory containing documentation update files"
         required: false
-        default: '.github/doc-updates'
+        default: ".github/doc-updates"
         type: string
-      
+
       create_pr:
-        description: 'Create a pull request if files are processed'
+        description: "Create a pull request if files are processed"
         required: false
         default: false
         type: boolean
-      
+
       cleanup:
-        description: 'Move processed files to subdirectories'
+        description: "Move processed files to subdirectories"
         required: false
         default: true
         type: boolean
 
       enable_chronological_processing:
-        description: 'Enable chronological processing based on created_at timestamps'
+        description: "Enable chronological processing based on created_at timestamps"
         required: false
         default: true
         type: boolean
 
       enable_timestamp_migration:
-        description: 'Enable migration of legacy files to enhanced timestamp format v2.0'
+        description: "Enable migration of legacy files to enhanced timestamp format v2.0"
         required: false
         default: false
         type: boolean
 
       continue_on_error:
-        description: 'Continue processing other files when one fails'
+        description: "Continue processing other files when one fails"
         required: false
         default: true
         type: boolean
 
       dry_run:
-        description: 'Show what would be done without executing'
+        description: "Show what would be done without executing"
         required: false
         default: false
         type: boolean
 
       verbose:
-        description: 'Enable verbose logging'
+        description: "Enable verbose logging"
         required: false
         default: false
         type: boolean
 
     outputs:
       files_processed:
-        description: 'Number of files processed successfully'
+        description: "Number of files processed successfully"
         value: ${{ jobs.process-doc-updates.outputs.files_processed }}
-      
+
       files_updated:
-        description: 'Number of documentation files updated'
+        description: "Number of documentation files updated"
         value: ${{ jobs.process-doc-updates.outputs.files_updated }}
-      
+
       timestamp_format_version:
-        description: 'Timestamp format version used'
+        description: "Timestamp format version used"
         value: ${{ jobs.process-doc-updates.outputs.timestamp_format_version }}
 
 jobs:
   process-doc-updates:
     runs-on: ubuntu-latest
-    
+
     outputs:
       files_processed: ${{ steps.enhanced-doc-processor.outputs.files_processed }}
       files_updated: ${{ steps.enhanced-doc-processor.outputs.files_updated }}
       timestamp_format_version: ${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }}
       files_changed: ${{ steps.enhanced-doc-processor.outputs.files_changed }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for git-based timestamp extraction
+          fetch-depth: 0 # Full history for git-based timestamp extraction
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Download enhanced documentation update scripts
         run: |
           # Create scripts directory
           mkdir -p scripts
-          
+
           # Download enhanced doc update manager
           curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/enhanced_doc_update_manager.py \
             -o scripts/enhanced_doc_update_manager.py
           chmod +x scripts/enhanced_doc_update_manager.py
-          
+
           # Download original doc update manager as fallback
           curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/doc_update_manager.py \
             -o scripts/doc_update_manager.py
@@ -137,7 +137,7 @@ jobs:
         if: ${{ inputs.enable_timestamp_migration == true }}
         run: |
           echo "🔄 Migrating legacy doc-update files to enhanced timestamp format v2.0..."
-          
+
           if [ -d "${{ inputs.updates_dir }}" ]; then
             python scripts/enhanced_doc_update_manager.py migrate-format \
               --directory "${{ inputs.updates_dir }}"
@@ -149,13 +149,13 @@ jobs:
         id: enhanced-doc-processor
         run: |
           echo "🚀 Processing documentation updates with enhanced timestamp lifecycle tracking..."
-          
+
           # Initialize output variables
           FILES_PROCESSED=0
           FILES_UPDATED=0
           FILES_CHANGED="false"
           TIMESTAMP_FORMAT_VERSION="2.0.0"
-          
+
           # Check if doc updates directory exists
           if [ ! -d "${{ inputs.updates_dir }}" ]; then
             echo "📝 No ${{ inputs.updates_dir }} directory found"
@@ -165,11 +165,11 @@ jobs:
             echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           # Count files before processing
           BEFORE_COUNT=$(find "${{ inputs.updates_dir }}" -name "*.json" -not -path "*/processed/*" -not -path "*/failed/*" -not -path "*/malformed/*" | wc -l)
           echo "📊 Found ${BEFORE_COUNT} doc-update files to process"
-          
+
           if [ "${BEFORE_COUNT}" -eq 0 ]; then
             echo "📝 No doc-update files to process"
             echo "files_processed=${FILES_PROCESSED}" >> "$GITHUB_OUTPUT"
@@ -178,7 +178,7 @@ jobs:
             echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           # Choose processing method based on input
           if [ "${{ inputs.enable_chronological_processing }}" = "true" ]; then
             echo "🕒 Using chronological processing with timestamp lifecycle tracking"
@@ -187,89 +187,89 @@ jobs:
             echo "📝 Using standard processing mode"
             PROCESS_COMMAND="process"
           fi
-          
+
           # Build command arguments
           CMD_ARGS="--updates-dir ${{ inputs.updates_dir }}"
-          
+
           if [ "${{ inputs.cleanup }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --cleanup true"
           else
             CMD_ARGS="${CMD_ARGS} --cleanup false"
           fi
-          
+
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --dry-run"
             echo "🧪 Running in dry-run mode"
           fi
-          
+
           if [ "${{ inputs.verbose }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --verbose"
             echo "🔍 Verbose logging enabled"
           fi
-          
+
           if [ "${{ inputs.continue_on_error }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --continue-on-error true"
           else
             CMD_ARGS="${CMD_ARGS} --continue-on-error false"
           fi
-          
+
           # Execute enhanced doc processing
           echo "🔄 Executing: python scripts/enhanced_doc_update_manager.py ${PROCESS_COMMAND} ${CMD_ARGS}"
-          
+
           # Capture output for parsing
           OUTPUT_FILE=$(mktemp)
-          
+
           if python scripts/enhanced_doc_update_manager.py ${PROCESS_COMMAND} ${CMD_ARGS} 2>&1 | tee "${OUTPUT_FILE}"; then
             echo "✅ Enhanced doc processing completed successfully"
-            
+
             # Parse output for statistics
             if grep -q "Successfully processed:" "${OUTPUT_FILE}"; then
               FILES_PROCESSED=$(grep "Successfully processed:" "${OUTPUT_FILE}" | grep -o '[0-9]\+' | head -1 || echo "0")
             fi
-            
+
             if grep -q "Documentation files updated:" "${OUTPUT_FILE}"; then
               FILES_UPDATED=$(grep "Documentation files updated:" "${OUTPUT_FILE}" | grep -o '[0-9]\+' | head -1 || echo "0")
             fi
-            
+
             # Check if any files were processed
             if [ "${FILES_PROCESSED}" -gt 0 ]; then
               FILES_CHANGED="true"
               echo "📊 Successfully processed ${FILES_PROCESSED} doc-update files"
               echo "📄 Updated ${FILES_UPDATED} documentation files"
             fi
-            
+
           else
             echo "❌ Enhanced doc processing failed, falling back to original processor"
-            
+
             # Fallback to original doc update manager
             if python scripts/doc_update_manager.py --updates-dir "${{ inputs.updates_dir }}"; then
               echo "✅ Fallback processing completed successfully"
-              
+
               # Count files after processing for fallback
               AFTER_COUNT=$(find "${{ inputs.updates_dir }}" -name "*.json" -not -path "*/processed/*" -not -path "*/failed/*" -not -path "*/malformed/*" | wc -l)
               FILES_PROCESSED=$((BEFORE_COUNT - AFTER_COUNT))
               FILES_UPDATED=${FILES_PROCESSED}  # Approximation for fallback
-              
+
               if [ "${FILES_PROCESSED}" -gt 0 ]; then
                 FILES_CHANGED="true"
               fi
-              
+
               TIMESTAMP_FORMAT_VERSION="1.0.0"
             else
               echo "❌ Both enhanced and fallback processing failed"
               exit 1
             fi
           fi
-          
+
           # Clean up temp file
           rm -f "${OUTPUT_FILE}"
-          
+
           # Set outputs
           echo "files_processed=${FILES_PROCESSED}" >> "$GITHUB_OUTPUT"
           echo "files_updated=${FILES_UPDATED}" >> "$GITHUB_OUTPUT"
           echo "files_changed=${FILES_CHANGED}" >> "$GITHUB_OUTPUT"
           echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
-          
+
           echo "📋 Processing Summary:"
           echo "   Files processed: ${FILES_PROCESSED}"
           echo "   Documentation files updated: ${FILES_UPDATED}"
@@ -280,10 +280,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Add all changes (documentation updates and processed file moves)
           git add .
-          
+
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "📝 No changes to commit"
@@ -293,9 +293,9 @@ jobs:
             - Processed ${{ steps.enhanced-doc-processor.outputs.files_processed }} doc-update files
             - Updated ${{ steps.enhanced-doc-processor.outputs.files_updated }} documentation files
             - Timestamp format: v${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }}
-            
+
             Auto-generated by enhanced documentation update workflow"
-            
+
             git push
             echo "✅ Committed and pushed documentation updates"
           fi
@@ -307,22 +307,22 @@ jobs:
           token: ${{ github.token }}
           commit-message: |
             docs: process documentation updates with enhanced timestamp tracking
-            
+
             - Processed ${{ steps.enhanced-doc-processor.outputs.files_processed }} doc-update files
             - Updated ${{ steps.enhanced-doc-processor.outputs.files_updated }} documentation files
             - Timestamp format: v${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }}
           title: "📚 Process Documentation Updates (Enhanced v${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }})"
           body: |
             ## Enhanced Documentation Update Processing
-            
+
             This PR was automatically generated by the enhanced documentation update workflow with comprehensive timestamp lifecycle tracking.
-            
+
             ### Summary
             - **Files processed**: ${{ steps.enhanced-doc-processor.outputs.files_processed }}
             - **Documentation files updated**: ${{ steps.enhanced-doc-processor.outputs.files_updated }}
             - **Timestamp format**: v${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }}
             - **Chronological processing**: ${{ inputs.enable_chronological_processing }}
-            
+
             ### What's Included
             - ✅ Documentation files updated with new content
             - ✅ Processed doc-update files moved to `processed/` directory
@@ -330,7 +330,7 @@ jobs:
             - ✅ Malformed files isolated to `malformed/` directory
             - ✅ Enhanced timestamp lifecycle tracking
             - ✅ Git-integrated timestamp recovery
-            
+
             ### Processing Modes Used
             - **Append**: Add content to end of files
             - **Prepend**: Add content to beginning of files
@@ -338,13 +338,13 @@ jobs:
             - **Changelog Entry**: Add structured changelog entries
             - **Task Add**: Add tasks to TODO files
             - **Task Complete**: Mark tasks as completed
-            
+
             ### Review Notes
             - All processed files have been archived automatically
             - Failed files include error logs for debugging
             - Timestamp format v2.0 provides comprehensive lifecycle tracking
             - Documentation changes are safe and follow established patterns
-            
+
             This PR contains both documentation updates and processed file archival.
           branch: automated/process-enhanced-doc-updates
           delete-branch: true
@@ -357,7 +357,7 @@ jobs:
           echo "   Timestamp format: v${{ steps.enhanced-doc-processor.outputs.timestamp_format_version }}"
           echo "   Chronological processing: ${{ inputs.enable_chronological_processing }}"
           echo "   Files changed: ${{ steps.enhanced-doc-processor.outputs.files_changed }}"
-          
+
           if [ "${{ steps.enhanced-doc-processor.outputs.files_processed }}" -gt 0 ]; then
             echo "✅ Enhanced documentation processing completed successfully"
           else

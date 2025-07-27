@@ -41,80 +41,80 @@ on:
   workflow_call:
     inputs:
       operations:
-        description: 'Operations to perform (comma-separated): create-issues, update-issues, close-duplicates, create-alerts, project-sync, all'
+        description: "Operations to perform (comma-separated): create-issues, update-issues, close-duplicates, create-alerts, project-sync, all"
         required: false
-        default: 'all'
+        default: "all"
         type: string
-      
+
       create_pr:
-        description: 'Create a pull request if files are processed'
+        description: "Create a pull request if files are processed"
         required: false
         default: false
         type: boolean
-      
+
       include_project_sync:
-        description: 'Include project synchronization'
+        description: "Include project synchronization"
         required: false
         default: true
         type: boolean
 
       enable_chronological_processing:
-        description: 'Enable chronological processing based on created_at timestamps'
+        description: "Enable chronological processing based on created_at timestamps"
         required: false
         default: true
         type: boolean
 
       enable_timestamp_migration:
-        description: 'Enable migration of legacy files to enhanced timestamp format v2.0'
+        description: "Enable migration of legacy files to enhanced timestamp format v2.0"
         required: false
         default: false
         type: boolean
 
       force_processing:
-        description: 'Force processing even if validation fails'
+        description: "Force processing even if validation fails"
         required: false
         default: false
         type: boolean
 
       dry_run:
-        description: 'Show what would be done without executing'
+        description: "Show what would be done without executing"
         required: false
         default: false
         type: boolean
 
     outputs:
       files_processed:
-        description: 'Number of files processed successfully'
+        description: "Number of files processed successfully"
         value: ${{ jobs.process-issue-updates.outputs.files_processed }}
-      
+
       issues_created:
-        description: 'Number of issues created'
+        description: "Number of issues created"
         value: ${{ jobs.process-issue-updates.outputs.issues_created }}
-      
+
       timestamp_format_version:
-        description: 'Timestamp format version used'
+        description: "Timestamp format version used"
         value: ${{ jobs.process-issue-updates.outputs.timestamp_format_version }}
 
 jobs:
   process-issue-updates:
     runs-on: ubuntu-latest
-    
+
     outputs:
       files_processed: ${{ steps.enhanced-issue-processor.outputs.files_processed }}
       issues_created: ${{ steps.enhanced-issue-processor.outputs.issues_created }}
       timestamp_format_version: ${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }}
       files_changed: ${{ steps.enhanced-issue-processor.outputs.files_changed }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for git-based timestamp extraction
+          fetch-depth: 0 # Full history for git-based timestamp extraction
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -125,12 +125,12 @@ jobs:
         run: |
           # Create scripts directory
           mkdir -p scripts
-          
+
           # Download enhanced issue manager
           curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/enhanced_issue_manager.py \
             -o scripts/enhanced_issue_manager.py
           chmod +x scripts/enhanced_issue_manager.py
-          
+
           # Download original issue manager as fallback
           curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/issue_manager.py \
             -o scripts/issue_manager.py
@@ -140,7 +140,7 @@ jobs:
         if: ${{ inputs.enable_timestamp_migration == true }}
         run: |
           echo "🔄 Migrating legacy issue update files to enhanced timestamp format v2.0..."
-          
+
           if [ -d ".github/issue-updates" ]; then
             python scripts/enhanced_issue_manager.py migrate-format \
               --directory .github/issue-updates
@@ -155,19 +155,19 @@ jobs:
         id: enhanced-issue-processor
         run: |
           echo "🚀 Processing issue updates with enhanced timestamp lifecycle tracking..."
-          
+
           # Set up environment
           export GH_TOKEN="${{ github.token }}"
           export REPO="${{ github.repository }}"
           export GITHUB_EVENT_NAME="${{ github.event_name }}"
           export GITHUB_EVENT_PATH="${{ github.event_path }}"
-          
+
           # Initialize output variables
           FILES_PROCESSED=0
           ISSUES_CREATED=0
           FILES_CHANGED="false"
           TIMESTAMP_FORMAT_VERSION="2.0.0"
-          
+
           # Check if issue updates directory exists
           if [ ! -d ".github/issue-updates" ]; then
             echo "📝 No .github/issue-updates directory found"
@@ -177,11 +177,11 @@ jobs:
             echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           # Count files before processing
           BEFORE_COUNT=$(find .github/issue-updates -name "*.json" -not -path "*/processed/*" -not -path "*/failed/*" | wc -l)
           echo "📊 Found ${BEFORE_COUNT} issue update files to process"
-          
+
           if [ "${BEFORE_COUNT}" -eq 0 ]; then
             echo "📝 No issue update files to process"
             echo "files_processed=${FILES_PROCESSED}" >> "$GITHUB_OUTPUT"
@@ -190,7 +190,7 @@ jobs:
             echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           # Choose processing method based on input
           if [ "${{ inputs.enable_chronological_processing }}" = "true" ]; then
             echo "🕒 Using chronological processing with timestamp lifecycle tracking"
@@ -199,42 +199,42 @@ jobs:
             echo "📝 Using standard processing mode"
             PROCESS_COMMAND="process"
           fi
-          
+
           # Build command arguments
           CMD_ARGS="--directory .github/issue-updates"
-          
+
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --dry-run"
             echo "🧪 Running in dry-run mode"
           fi
-          
+
           if [ "${{ inputs.force_processing }}" = "true" ]; then
             CMD_ARGS="${CMD_ARGS} --force-update"
             echo "⚡ Force processing enabled"
           fi
-          
+
           # Execute enhanced issue processing
           echo "🔄 Executing: python scripts/enhanced_issue_manager.py ${PROCESS_COMMAND} ${CMD_ARGS}"
-          
+
           if python scripts/enhanced_issue_manager.py ${PROCESS_COMMAND} ${CMD_ARGS}; then
             echo "✅ Enhanced issue processing completed successfully"
-            
+
             # Count files after processing
             AFTER_COUNT=$(find .github/issue-updates -name "*.json" -not -path "*/processed/*" -not -path "*/failed/*" | wc -l)
             FILES_PROCESSED=$((BEFORE_COUNT - AFTER_COUNT))
-            
+
             # Check if any files were processed
             if [ "${FILES_PROCESSED}" -gt 0 ]; then
               FILES_CHANGED="true"
               echo "📊 Successfully processed ${FILES_PROCESSED} issue update files"
-              
+
               # Try to extract issue count from output (this would need to be implemented in the script)
               ISSUES_CREATED=${FILES_PROCESSED}  # Approximation for now
             fi
-            
+
           else
             echo "❌ Enhanced issue processing failed, falling back to original processor"
-            
+
             # Fallback to original issue manager
             if python scripts/issue_manager.py; then
               echo "✅ Fallback processing completed successfully"
@@ -250,13 +250,13 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # Set outputs
           echo "files_processed=${FILES_PROCESSED}" >> "$GITHUB_OUTPUT"
           echo "issues_created=${ISSUES_CREATED}" >> "$GITHUB_OUTPUT"
           echo "files_changed=${FILES_CHANGED}" >> "$GITHUB_OUTPUT"
           echo "timestamp_format_version=${TIMESTAMP_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
-          
+
           echo "📋 Processing Summary:"
           echo "   Files processed: ${FILES_PROCESSED}"
           echo "   Issues created: ${ISSUES_CREATED}"
@@ -270,10 +270,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Add processed and failed directories
           git add .github/issue-updates/processed/ .github/issue-updates/failed/ 2>/dev/null || true
-          
+
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "📝 No changes to commit"
@@ -283,9 +283,9 @@ jobs:
             - Processed ${{ steps.enhanced-issue-processor.outputs.files_processed }} issue update files
             - Created ${{ steps.enhanced-issue-processor.outputs.issues_created }} issues
             - Timestamp format: v${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }}
-            
+
             Auto-generated by enhanced issue management workflow"
-            
+
             git push
             echo "✅ Committed and pushed processed files"
           fi
@@ -297,33 +297,33 @@ jobs:
           token: ${{ github.token }}
           commit-message: |
             chore: process issue updates with enhanced timestamp tracking
-            
+
             - Processed ${{ steps.enhanced-issue-processor.outputs.files_processed }} issue update files
             - Created ${{ steps.enhanced-issue-processor.outputs.issues_created }} issues
             - Timestamp format: v${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }}
           title: "🔄 Process Issue Updates (Enhanced v${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }})"
           body: |
             ## Enhanced Issue Update Processing
-            
+
             This PR was automatically generated by the enhanced issue management workflow with comprehensive timestamp lifecycle tracking.
-            
+
             ### Summary
             - **Files processed**: ${{ steps.enhanced-issue-processor.outputs.files_processed }}
             - **Issues created**: ${{ steps.enhanced-issue-processor.outputs.issues_created }}
             - **Timestamp format**: v${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }}
             - **Chronological processing**: ${{ inputs.enable_chronological_processing }}
-            
+
             ### What's Included
             - ✅ Processed issue update files moved to `processed/` directory
             - ✅ Failed files moved to `failed/` directory with error logs
             - ✅ Enhanced timestamp lifecycle tracking
             - ✅ Git-integrated timestamp recovery
-            
+
             ### Review Notes
             - All processed files have been archived automatically
             - Failed files include error logs for debugging
             - Timestamp format v2.0 provides comprehensive lifecycle tracking
-            
+
             This PR is safe to merge as it only moves processed files and doesn't modify source code.
           branch: automated/process-enhanced-issue-updates
           delete-branch: true
@@ -336,7 +336,7 @@ jobs:
           echo "   Timestamp format: v${{ steps.enhanced-issue-processor.outputs.timestamp_format_version }}"
           echo "   Chronological processing: ${{ inputs.enable_chronological_processing }}"
           echo "   Files changed: ${{ steps.enhanced-issue-processor.outputs.files_changed }}"
-          
+
           if [ "${{ steps.enhanced-issue-processor.outputs.files_processed }}" -gt 0 ]; then
             echo "✅ Enhanced issue processing completed successfully"
           else

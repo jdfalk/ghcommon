@@ -4,7 +4,9 @@
 
 ## What We Accomplished
 
-Successfully migrated and centralized the advanced issue management system from subtitle-manager to ghcommon, creating a robust reusable workflow that can be shared across multiple repositories.
+Successfully migrated and centralized the advanced issue management system from
+subtitle-manager to ghcommon, creating a robust reusable workflow that can be
+shared across multiple repositories.
 
 ## Components Created
 
@@ -13,8 +15,10 @@ Successfully migrated and centralized the advanced issue management system from 
 **Location**: `scripts/issue_manager.py`
 
 - **Size**: 963 lines (migrated from subtitle-manager)
-- **Features**: Complete issue management suite with GUID tracking, multi-operation support
-- **Operations**: update-issues, copilot-tickets, close-duplicates, codeql-alerts
+- **Features**: Complete issue management suite with GUID tracking,
+  multi-operation support
+- **Operations**: update-issues, copilot-tickets, close-duplicates,
+  codeql-alerts
 
 ### 2. Reusable Workflow
 
@@ -50,15 +54,18 @@ Successfully migrated and centralized the advanced issue management system from 
 
 ### Core Operations
 
-1. **Issue Updates**: Process JSON files with create/update/comment/close/delete operations
+1. **Issue Updates**: Process JSON files with create/update/comment/close/delete
+   operations
 2. **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
 3. **Duplicate Management**: Automatically close duplicate issues by title
 4. **Security Alerts**: Generate tickets for CodeQL security alerts
 
 ### Advanced Features
 
-1. **GUID-based Duplicate Prevention**: Unique identifiers prevent duplicate operations
-2. **Matrix Parallel Execution**: Multiple operations run efficiently in parallel
+1. **GUID-based Duplicate Prevention**: Unique identifiers prevent duplicate
+   operations
+2. **Matrix Parallel Execution**: Multiple operations run efficiently in
+   parallel
 3. **Auto-detection**: Automatically determines which operations to run
 4. **Flexible Configuration**: Extensive customization options
 5. **Comprehensive Logging**: Detailed summaries and progress tracking
@@ -81,12 +88,12 @@ jobs:
   issue-management:
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
     with:
-      operations: "update-issues,copilot-tickets"
+      operations: 'update-issues,copilot-tickets'
       dry_run: false
       force_update: false
-      issue_updates_file: "issue_updates.json"
+      issue_updates_file: 'issue_updates.json'
       cleanup_issue_updates: true
-      python_version: "3.11"
+      python_version: '3.11'
     secrets: inherit
 ```
 
@@ -186,12 +193,16 @@ ghcommon/
 
 ## Conclusion
 
-This implementation successfully centralizes the advanced issue management capabilities from subtitle-manager into a reusable workflow in ghcommon. The solution:
+This implementation successfully centralizes the advanced issue management
+capabilities from subtitle-manager into a reusable workflow in ghcommon. The
+solution:
 
 1. **Preserves all existing functionality** while making it reusable
 2. **Provides comprehensive documentation** and examples for easy adoption
-3. **Enables centralized maintenance** while allowing per-repository customization
+3. **Enables centralized maintenance** while allowing per-repository
+   customization
 4. **Follows GitHub Actions best practices** for reusable workflows
 5. **Includes migration guidance** for smooth transitions
 
-The centralized system is now ready for use across multiple repositories, providing a consistent and powerful issue management solution.
+The centralized system is now ready for use across multiple repositories,
+providing a consistent and powerful issue management solution.

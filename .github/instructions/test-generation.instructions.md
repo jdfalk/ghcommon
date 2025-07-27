@@ -2,31 +2,39 @@
 <!-- version: 1.0.0 -->
 <!-- guid: test1234-e89b-12d3-a456-426614174000 -->
 
-applyTo: "**/*_test.{go,js,ts,py} **/*test*.{go,js,ts,py} **/test*.{go,js,ts,py} **/tests/**"
-description: |
-  Test generation and structure rules for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all test files and follow the project's testing standards. For details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "**/\*\_test.{go,js,ts,py} **/_test_.{go,js,ts,py}
+**/test\*.{go,js,ts,py} **/tests/\*\*" description: | Test generation and
+structure rules for all Copilot/AI agents and VS Code Copilot customization.
+These rules apply to all test files and follow the project's testing standards.
+For details, see the main documentation in `.github/copilot-instructions.md`.
 
 ---
 
 # Test Generation Instructions
 
-These instructions are the canonical source for all test generation, structure, and best practice rules in this repository. They are used by GitHub Copilot for test file creation and follow our established testing standards.
+These instructions are the canonical source for all test generation, structure,
+and best practice rules in this repository. They are used by GitHub Copilot for
+test file creation and follow our established testing standards.
 
-- Follow the [general coding instructions](general-coding.instructions.md) for basic file formatting rules.
-- All testing and workflow rules are found in `.github/instructions/*.instructions.md` files.
-- Document all test cases comprehensively using appropriate style for the language.
-- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related files.
+- Follow the [general coding instructions](general-coding.instructions.md) for
+  basic file formatting rules.
+- All testing and workflow rules are found in
+  `.github/instructions/*.instructions.md` files.
+- Document all test cases comprehensively using appropriate style for the
+  language.
+- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related
+  files.
 
-For more details and the full system, see [copilot-instructions.md](../copilot-instructions.md).
+For more details and the full system, see
+[copilot-instructions.md](../copilot-instructions.md).
 
 ## Test Structure
 
 Follow this structure when creating tests:
 
 ```markdown
-[Setup] - Prepare the test environment and inputs
-[Exercise] - Execute the functionality being tested
-[Verify] - Check that the results match expectations
+[Setup] - Prepare the test environment and inputs [Exercise] - Execute the
+functionality being tested [Verify] - Check that the results match expectations
 [Teardown] - Clean up any resources (if needed)
 ```
 

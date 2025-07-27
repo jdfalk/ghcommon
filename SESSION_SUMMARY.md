@@ -6,7 +6,8 @@
 
 ## Session Summary 1
 
-This development session added initial protobuf definitions for the Queue module and updated project documentation accordingly.
+This development session added initial protobuf definitions for the Queue module
+and updated project documentation accordingly.
 
 - Created `queue.proto` implementing basic queue operations.
 - Documented naming conventions and implementation plan.

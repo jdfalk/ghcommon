@@ -2,22 +2,30 @@
 <!-- version: 1.0.0 -->
 <!-- guid: sec12345-e89b-12d3-a456-426614174000 -->
 
-applyTo: "**/*.{yml,yaml} **/*.{sh,bash} **/*.{js,ts,py,go} **/Dockerfile* **/docker-compose*.yml"
-description: |
-  Security guidelines and best practices for all Copilot/AI agents and VS Code Copilot customization. These rules apply to all code, configurations, and workflows to maintain security standards. For details, see the main documentation in `.github/copilot-instructions.md`.
+applyTo: "**/\*.{yml,yaml} **/_.{sh,bash} \*\*/_.{js,ts,py,go} **/Dockerfile\*
+**/docker-compose\*.yml" description: | Security guidelines and best practices
+for all Copilot/AI agents and VS Code Copilot customization. These rules apply
+to all code, configurations, and workflows to maintain security standards. For
+details, see the main documentation in `.github/copilot-instructions.md`.
 
 ---
 
 # Security Instructions
 
-These instructions are the canonical source for all security guidelines and best practices in this repository. They are used by GitHub Copilot for secure code generation and follow our established security standards.
+These instructions are the canonical source for all security guidelines and best
+practices in this repository. They are used by GitHub Copilot for secure code
+generation and follow our established security standards.
 
-- Follow the [general coding instructions](general-coding.instructions.md) for basic file formatting rules.
-- All security and workflow rules are found in `.github/instructions/*.instructions.md` files.
+- Follow the [general coding instructions](general-coding.instructions.md) for
+  basic file formatting rules.
+- All security and workflow rules are found in
+  `.github/instructions/*.instructions.md` files.
 - Document all security considerations in code and configurations.
-- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related files.
+- For agent/AI-specific instructions, see [AGENTS.md](../AGENTS.md) and related
+  files.
 
-For more details and the full system, see [copilot-instructions.md](../copilot-instructions.md).
+For more details and the full system, see
+[copilot-instructions.md](../copilot-instructions.md).
 
 ## General Security Principles
 

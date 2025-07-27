@@ -10,14 +10,18 @@
 
 1. **Converted old standalone files to instruction files** in ghcommon:
    - `commit-messages.md` → `commit-messages.instructions.md`
-   - `pull-request-descriptions.md` → `pull-request-descriptions.instructions.md`
+   - `pull-request-descriptions.md` →
+     `pull-request-descriptions.instructions.md`
    - `test-generation.md` → `test-generation.instructions.md`
    - `security-guidelines.md` → `security.instructions.md`
 
-2. **Established ghcommon as central source of truth** with 16 instruction files:
+2. **Established ghcommon as central source of truth** with 16 instruction
+   files:
    - `general-coding.instructions.md` (applies to all files)
-   - Language-specific: `go.instructions.md`, `python.instructions.md`, `javascript.instructions.md`, `typescript.instructions.md`, etc.
-   - Task-specific: `github-actions.instructions.md`, `security.instructions.md`, etc.
+   - Language-specific: `go.instructions.md`, `python.instructions.md`,
+     `javascript.instructions.md`, `typescript.instructions.md`, etc.
+   - Task-specific: `github-actions.instructions.md`,
+     `security.instructions.md`, etc.
 
 3. **Synchronized all repositories** using the migration script:
    - subtitle-manager
@@ -28,13 +32,13 @@
 
 ### Script Features
 
-The migration script (`scripts/migrate-instruction-files.sh`) is fully **idempotent** and safe to run multiple times:
+The migration script (`scripts/migrate-instruction-files.sh`) is fully
+**idempotent** and safe to run multiple times:
 
-✅ **Checks file existence** before backing up or removing
-✅ **Compares file content** using `cmp -s` to avoid unnecessary copies
-✅ **Creates timestamped backups** only when needed
-✅ **Provides detailed logging** with color-coded output
-✅ **Handles edge cases** gracefully with proper error checking
+✅ **Checks file existence** before backing up or removing ✅ **Compares file
+content** using `cmp -s` to avoid unnecessary copies ✅ **Creates timestamped
+backups** only when needed ✅ **Provides detailed logging** with color-coded
+output ✅ **Handles edge cases** gracefully with proper error checking
 
 ### Current State
 
@@ -50,11 +54,13 @@ cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
 ./scripts/migrate-instruction-files.sh
 ```
 
-**Safe to run multiple times** - it will only update changed files and skip up-to-date ones.
+**Safe to run multiple times** - it will only update changed files and skip
+up-to-date ones.
 
 ### Results from Second Run (Idempotency Test)
 
 The script correctly identified:
+
 - No old standalone files to backup/remove (already done)
 - All instruction files were "already up-to-date" (skipped copying)
 - copilot-instructions.md was "already up-to-date"

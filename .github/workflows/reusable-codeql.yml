@@ -10,12 +10,12 @@ on:
       languages:
         description: "Languages to analyze"
         required: false
-        default: ''
+        default: ""
         type: string
       config-file:
         description: "Path to CodeQL config file"
         required: false
-        default: '.github/codeql.yml'
+        default: ".github/codeql.yml"
         type: string
     secrets:
       github-token:
