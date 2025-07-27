@@ -1,6 +1,8 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
 <!-- version: 1.2.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
+<!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
+<!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
 applyTo: "**"
 description: |

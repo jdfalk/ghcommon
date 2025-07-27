@@ -1,6 +1,9 @@
 <!-- file: .github/instructions/security.instructions.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: sec12345-e89b-12d3-a456-426614174000 -->
+<!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
+<!-- To update: Create an issue/PR in jdfalk/ghcommon -->
+
 
 applyTo: "**/*.{yml,yaml} **/*.{sh,bash} **/*.{js,ts,py,go} **/Dockerfile* **/docker-compose*.yml"
 description: |
