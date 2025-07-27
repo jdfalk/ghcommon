@@ -1,6 +1,6 @@
 # file: .github/workflows/reusable-docs-update.yml
-# version: 2.1.0
-# guid: 25b987e1-9e34-4618-8182-53e12c7307e0
+# version: 2.9.0
+# guid: 5a6b7c8d-9e0f-1a2b-3c4d-5e6f7a8b9c0d
 
 name: Reusable Documentation Updates
 
@@ -165,7 +165,21 @@ jobs:
           echo "📋 Update files to process:"
           find "${UPDATES_DIR}" -name "*.json" -type f | while read file; do
             echo "  - $(basename "$file")"
-            echo "    📄 Contents preview: $(jq -r '.action // .operation // "unknown"' "$file" 2>/dev/null || echo "invalid JSON")"
+            # Try to extract a meaningful preview from the JSON
+            preview=$(jq -r '
+              if .mode then
+                .mode + ": " + (.content // .file // "")
+              elif .action then
+                .action + ": " + (.content // .target // "")
+              elif .operation then
+                .operation + ": " + (.content // .description // "")
+              else
+                "type: " + (.type // "unknown")
+              end
+            ' "$file" 2>/dev/null || echo "invalid JSON")
+            # Truncate preview to first 60 characters
+            preview_truncated=$(echo "$preview" | cut -c1-60)
+            echo "    📄 Preview: $preview_truncated"
           done
           echo ""
 
