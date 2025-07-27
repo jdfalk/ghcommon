@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/protobuf.instructions.md -->
-<!-- version: 2.0.0 -->
+<!-- version: 2.1.0 -->
 <!-- guid: 7d6c5b4a-3c2d-1e0f-9a8b-7c6d5e4f3a2b -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -255,10 +255,43 @@ string status = 4 [default = "pending"];
 ```
 
 ### Improved Field Presence
+
+**CRITICAL: Edition 2023 Field Presence Rules**
+
+In Edition 2023, the `optional` label is **NOT ALLOWED**. Instead, use `option features.field_presence` to control field presence:
+
 ```protobuf
-// Field presence control
-optional string optional_field = 1;  // Explicit presence
-string implicit_field = 2;           // Implicit presence (default)
+// ❌ WRONG - Do NOT use 'optional' label in Edition 2023
+optional string confidence_score = 1;
+optional string parent_id = 2;
+
+// ✅ CORRECT - Use features.field_presence instead
+string confidence_score = 1 [features.field_presence = EXPLICIT];
+string parent_id = 2 [features.field_presence = EXPLICIT];
+
+// ✅ CORRECT - Default implicit presence (most common)
+string user_id = 3;  // Implicit presence (default behavior)
+string name = 4;     // Implicit presence (default behavior)
+```
+
+**Field Presence Options:**
+- `EXPLICIT` - Field can be unset/null (equivalent to old `optional`)
+- `IMPLICIT` - Field always has a value (default behavior)
+- `LEGACY_REQUIRED` - Field must be set (proto2 style)
+
+**When to Use EXPLICIT Presence:**
+- Optional configuration values
+- Nullable database fields
+- Fields that may not be available in all contexts
+- Fields where "unset" vs "default value" matters
+
+```protobuf
+message SubtitleRecord {
+  string id = 1;                                           // Always present
+  string content = 2;                                      // Always present
+  double confidence_score = 3 [features.field_presence = EXPLICIT];  // May be unset
+  string parent_id = 4 [features.field_presence = EXPLICIT];         // May be unset
+}
 ```
 
 ### Better Validation
