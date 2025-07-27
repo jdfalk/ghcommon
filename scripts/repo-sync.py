@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/repo-sync.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: 9a8b7c6d-5e4f-3d2c-1b0a-9c8b7a6d5e4f
 
 """
@@ -22,11 +22,10 @@ import json
 import re
 import shutil
 import sys
-import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -152,7 +151,7 @@ class RepoSynchronizer:
 
             return "outdated", version, guid, False
 
-        except Exception as e:
+        except Exception:
             return "error", "no-version", "no-guid", False
 
     def _should_sync_file(
