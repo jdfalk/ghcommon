@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 1.3.0
+# version: 2.1.0
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -97,6 +97,7 @@ on:
         required: false
         default: "style: auto-fix linting issues [skip ci]"
         type: string
+
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for linting and auto-fix"
@@ -123,178 +124,149 @@ jobs:
         with:
           # Full git history is needed to get list of changed files
           fetch-depth: 0
-          token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.github-token }}
 
       - name: Setup Super Linter environment
         run: |
-          echo "Super Linter environment will be configured in the Run Super Linter step"
+          echo "Setting up Super Linter environment..."
+          echo "VALIDATE_ALL_CODEBASE=${{ inputs.validate-all-codebase }}" >> $GITHUB_ENV
+          echo "DEFAULT_BRANCH=${{ inputs.default-branch }}" >> $GITHUB_ENV
+          echo "FILTER_REGEX_EXCLUDE=${{ inputs.filter-regex-exclude }}" >> $GITHUB_ENV
 
       - name: Load custom configuration
         run: |
-          # Check for various config file locations
-          CONFIG_FILES=(
-            ".github/super-linter.env"
-            ".super-linter.env"
-            "super-linter.env"
-          )
-
-          CONFIG_FOUND=""
-          for config_file in "${CONFIG_FILES[@]}"; do
-            if [ -f "${config_file}" ]; then
-              CONFIG_FOUND="${config_file}"
-              echo "Found configuration file: ${config_file}"
-              break
-            fi
-          done
-
-          if [ -n "${CONFIG_FOUND}" ]; then
-            echo "Loading configuration from ${CONFIG_FOUND}"
-            echo "Configuration contents:"
-            cat "${CONFIG_FOUND}"
-            echo ""
-            echo "Exporting configuration to environment..."
-            # Export variables to GITHUB_ENV so they persist to next steps
-            cat "${CONFIG_FOUND}" | grep -E '^[A-Z_].*=' >> $GITHUB_ENV || true
+          if [ -f "${{ inputs.config-file }}" ]; then
+            echo "Loading custom configuration from ${{ inputs.config-file }}"
+            cat "${{ inputs.config-file }}" >> $GITHUB_ENV
           else
-            echo "No custom configuration file found, using workflow defaults"
+            echo "No custom configuration file found at ${{ inputs.config-file }}"
           fi
 
       - name: Run Super Linter
+        id: run-super-linter
         uses: super-linter/super-linter@v7
         env:
-          # Authentication
-          GITHUB_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-
-          # Core settings
+          # Basic configuration
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
-
-          # Filter settings
           FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
 
-          # Logging and output
+          # Output and display settings
+          SUPPRESS_POSSUM: true
+          LOG_LEVEL: NOTICE
+          OUTPUT_FORMAT: colored
+          OUTPUT_FOLDER: super-linter-output
+          OUTPUT_DETAILS: detailed
           CREATE_LOG_FILE: true
-          LOG_FILE: super-linter.log
-          SAVE_SUPER_LINTER_OUTPUT: true
-          SUPER_LINTER_OUTPUT_DIRECTORY_NAME: super-linter-output
 
-          # Performance settings
-          MULTI_STATUS: true
-          PARALLEL: true
+          # Language validation settings
+          VALIDATE_PYTHON: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_BLACK: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_FLAKE8: ${{ inputs.run-python }}
+          VALIDATE_PYTHON_ISORT: ${{ inputs.run-python }}
 
-          # Use slim image for better performance
-          SLIM_IMAGE: true
+          VALIDATE_BASH: ${{ inputs.run-shell }}
+          VALIDATE_SHELL_SHFMT: ${{ inputs.run-shell }}
+
+          VALIDATE_MARKDOWN: ${{ inputs.run-markdown }}
+          VALIDATE_YAML: ${{ inputs.run-yaml }}
+          VALIDATE_JSON: ${{ inputs.run-json }}
+
+          VALIDATE_JAVASCRIPT_ES: ${{ inputs.run-javascript }}
+          VALIDATE_TYPESCRIPT_ES: ${{ inputs.run-javascript }}
+          VALIDATE_JAVASCRIPT_PRETTIER: ${{ inputs.run-javascript }}
+          VALIDATE_TYPESCRIPT_PRETTIER: ${{ inputs.run-javascript }}
+
+          VALIDATE_GO: ${{ inputs.run-go }}
+          VALIDATE_GO_MODULES: ${{ inputs.run-go }}
+
+          VALIDATE_CSS: ${{ inputs.run-css }}
+          VALIDATE_HTML: ${{ inputs.run-html }}
+
+          VALIDATE_GITHUB_ACTIONS: ${{ inputs.run-github-actions }}
+          VALIDATE_GITLEAKS: ${{ inputs.run-security }}
+          VALIDATE_DOCKERFILE_HADOLINT: ${{ inputs.run-security }}
+
+          # Auto-fix settings (enable for supported linters)
+          FIX_GO: ${{ inputs.enable-auto-fix && inputs.run-go }}
+          FIX_JAVASCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
+          FIX_TYPESCRIPT_ES: ${{ inputs.enable-auto-fix && inputs.run-javascript }}
+          FIX_JSON: ${{ inputs.enable-auto-fix }}
+          FIX_MARKDOWN: ${{ inputs.enable-auto-fix }}
+          FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
+          FIX_PYTHON_ISORT: ${{ inputs.enable-auto-fix && inputs.run-python }}
+          FIX_SHELL_SHFMT: ${{ inputs.enable-auto-fix && inputs.run-shell }}
+          FIX_YAML: ${{ inputs.enable-auto-fix }}
+          FIX_CSS: ${{ inputs.enable-auto-fix && inputs.run-css }}
 
       - name: Check for auto-fixes
         if: inputs.enable-auto-fix == true
         id: check-fixes
         run: |
-          # Check if there are any changes made by Super Linter auto-fix
-          if git diff --quiet; then
-            echo "has_fixes=false" >> $GITHUB_OUTPUT
-            echo "No auto-fixes applied"
-          else
+          if ! git diff --quiet; then
             echo "has_fixes=true" >> $GITHUB_OUTPUT
-            echo "Auto-fixes applied, changes detected:"
-            git diff --name-only
+            echo "Auto-fixes were applied by Super Linter"
+          else
+            echo "has_fixes=false" >> $GITHUB_OUTPUT
+            echo "No auto-fixes were applied"
           fi
 
       - name: Commit and push auto-fixes
         if: steps.check-fixes.outputs.has_fixes == 'true' && inputs.auto-commit-fixes == true
         run: |
-          # Configure git
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action - Super Linter Auto-fix"
+          git config --local user.name "GitHub Action"
 
-          # Add all changes
-          git add .
+          echo "Staging auto-fixes..."
+          git add -A
 
-          # Commit changes
-          git commit -m "${{ inputs.commit-message }}"
+          # Create detailed commit message
+          FIXED_FILES=$(git diff --cached --name-only | head -10)
+          TOTAL_FILES=$(git diff --cached --name-only | wc -l)
 
-          # Push changes
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # For PRs, push to the PR branch
-            git push origin HEAD:${{ github.head_ref }}
-            echo "✅ Auto-fixes committed and pushed to PR branch: ${{ github.head_ref }}"
-          else
-            # For push events, push to the current branch
-            git push origin HEAD
-            echo "✅ Auto-fixes committed and pushed to branch: ${{ github.ref_name }}"
+          echo "${{ inputs.commit-message }}" > commit_msg.txt
+          echo "" >> commit_msg.txt
+          echo "Auto-formatting and fixes applied by Super Linter." >> commit_msg.txt
+          echo "" >> commit_msg.txt
+          echo "Files changed:" >> commit_msg.txt
+
+          echo "$FIXED_FILES" | while IFS= read -r file; do
+            echo "- $file - Auto-formatting applied" >> commit_msg.txt
+          done
+
+          if [ "$TOTAL_FILES" -gt 10 ]; then
+            echo "- ... and $((TOTAL_FILES - 10)) more files" >> commit_msg.txt
           fi
+
+          git commit -F commit_msg.txt
+          rm commit_msg.txt
+
+          echo "Pushing auto-fixes..."
+          git push
+          echo "✅ Auto-fixes committed and pushed successfully"
 
       - name: Prepare Super Linter outputs
         if: always()
         run: |
-          echo "Checking for Super Linter output files..."
+          # Ensure output directory exists
+          mkdir -p super-linter-output
 
-          # Create a report directory with proper permissions
-          mkdir -p super-linter-reports
-
-          # Critical: Fix all Docker-created files recursively FIRST
-          # Super Linter runs as Docker and creates files with root ownership and restricted permissions
-          echo "Fixing permissions on all Docker-created files..."
-          sudo find . -type d -exec chmod 755 {} \; 2>/dev/null || true
-          sudo find . -type f -exec chmod 644 {} \; 2>/dev/null || true
-          sudo chown -R $(whoami):$(whoami) . 2>/dev/null || true
-
-          # Look for log files in different possible locations
+          # Copy any log files to output directory
           if [ -f "super-linter.log" ]; then
-            cp super-linter.log super-linter-reports/ || true
-            echo "Found super-linter.log"
+            cp super-linter.log super-linter-output/
           fi
 
-          if [ -f "/tmp/super-linter.log" ]; then
-            sudo chown $(whoami):$(whoami) /tmp/super-linter.log 2>/dev/null || true
-            sudo chmod 644 /tmp/super-linter.log 2>/dev/null || true
-            cp /tmp/super-linter.log super-linter-reports/super-linter.log || true
-            echo "Found /tmp/super-linter.log"
-          fi
-
-          # Look for output directories and copy safely
-          for output_dir in "super-linter-output" "/tmp/super-linter-output"; do
-            if [ -d "$output_dir" ]; then
-              echo "Found output directory: $output_dir"
-              # Fix permissions recursively on the source directory
-              sudo find "$output_dir" -type d -exec chmod 755 {} \; 2>/dev/null || true
-              sudo find "$output_dir" -type f -exec chmod 644 {} \; 2>/dev/null || true
-              sudo chown -R $(whoami):$(whoami) "$output_dir" 2>/dev/null || true
-
-              # Use tar to copy preserving structure but with correct ownership
-              if [ -n "$(ls -A "$output_dir" 2>/dev/null)" ]; then
-                (cd "$output_dir" && tar cf - .) | (cd super-linter-reports && tar xf -) 2>/dev/null || true
-              fi
-            fi
-          done
-
-          # Create a summary report from any available logs
-          if [ -f "super-linter-reports/super-linter.log" ]; then
-            echo "Creating summary report from log..."
-            tail -n 100 super-linter-reports/super-linter.log > super-linter-reports/super-linter.report || true
-          else
-            echo "No log file found, creating basic report..."
-            echo "Super Linter completed - no detailed log available" > super-linter-reports/super-linter.report
-          fi
-
-          # Final permission fix on output directory - ensure everything is accessible
-          sudo find super-linter-reports -type d -exec chmod 755 {} \; 2>/dev/null || true
-          sudo find super-linter-reports -type f -exec chmod 644 {} \; 2>/dev/null || true
-          sudo chown -R $(whoami):$(whoami) super-linter-reports/ 2>/dev/null || true
-
-          # List what we found with detailed permissions
-          echo "Files in super-linter-reports:"
-          ls -la super-linter-reports/ || echo "No files found"
-
-          # Debug: Show detailed permissions on all files
-          echo "Detailed permissions check:"
-          find super-linter-reports -ls 2>/dev/null || echo "No files to check"
+          # Create a summary file
+          echo "Super Linter execution completed at $(date)" > super-linter-output/summary.txt
+          echo "Validation mode: ${{ inputs.validate-all-codebase && 'Full codebase' || 'Changed files only' }}" >> super-linter-output/summary.txt
 
       - name: Upload Super Linter results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: super-linter-results
-          path: super-linter-reports/
+          name: super-linter-output
+          path: super-linter-output/
           retention-days: 7
           if-no-files-found: warn
 
@@ -302,11 +274,100 @@ jobs:
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         env:
-          HAS_AUTO_FIXES: ${{ steps.check-fixes.outputs.has_fixes }}
-          AUTO_FIX_ENABLED: ${{ inputs.enable-auto-fix }}
           AUTO_COMMIT_ENABLED: ${{ inputs.auto-commit-fixes }}
         with:
-          github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.github-token }}
           script: |
-            const script = require('./.github/scripts/super-linter-pr-comment.js');
-            return await script({ github, context, core });
+            const fs = require('fs');
+
+            // Skip if not a pull request
+            if (!context.payload.pull_request) {
+              console.log('Not a pull request, skipping summary comment');
+              return;
+            }
+
+            const linterOutcome = '${{ steps.run-super-linter.outcome }}' || 'unknown';
+            const autoFixEnabled = '${{ inputs.enable-auto-fix }}' === 'true';
+            const autoCommitEnabled = process.env.AUTO_COMMIT_ENABLED === 'true';
+            const hasAutoFixes = '${{ steps.check-fixes.outputs.has_fixes }}' === 'true';
+
+            let summary = '## 🔍 Super Linter Results\n\n';
+
+            // Add status based on outcome
+            if (linterOutcome === 'success') {
+              summary += '✅ **All code quality checks passed!**\n\n';
+            } else if (linterOutcome === 'failure') {
+              summary += '❌ **Code quality issues found.** Please review the details below.\n\n';
+            } else {
+              summary += '⚠️ **Linter status unknown.** Check the workflow logs for details.\n\n';
+            }
+
+            // Auto-fix information
+            if (autoFixEnabled && hasAutoFixes && autoCommitEnabled) {
+              summary += '🔧 **Auto-fixes were applied and committed to this PR.**\n\n';
+            } else if (autoFixEnabled && hasAutoFixes) {
+              summary += '🔧 **Auto-fixes were applied but not committed.**\n\n';
+            }
+
+            // Configuration summary
+            summary += '### Configuration\n';
+            summary += `- **Validate all codebase**: \`${{ inputs.validate-all-codebase }}\`\n`;
+            summary += `- **Python**: \`${{ inputs.run-python }}\`\n`;
+            summary += `- **Shell**: \`${{ inputs.run-shell }}\`\n`;
+            summary += `- **Go**: \`${{ inputs.run-go }}\`\n`;
+            summary += `- **JavaScript/TypeScript**: \`${{ inputs.run-javascript }}\`\n`;
+            summary += `- **Markdown**: \`${{ inputs.run-markdown }}\`\n`;
+            summary += `- **YAML**: \`${{ inputs.run-yaml }}\`\n`;
+            summary += `- **JSON**: \`${{ inputs.run-json }}\`\n`;
+            summary += `- **CSS**: \`${{ inputs.run-css }}\`\n`;
+            summary += `- **HTML**: \`${{ inputs.run-html }}\`\n`;
+            summary += `- **GitHub Actions**: \`${{ inputs.run-github-actions }}\`\n`;
+            summary += `- **Security**: \`${{ inputs.run-security }}\`\n`;
+            summary += `- **Auto-fix**: \`${{ inputs.enable-auto-fix }}\`\n`;
+            summary += `- **Auto-commit**: \`${{ inputs.auto-commit-fixes }}\`\n\n`;
+
+            // Additional information for failed linting
+            if (linterOutcome === 'failure') {
+              summary += '### 🔧 Next Steps\n';
+              summary += '1. Check the workflow logs for detailed error information\n';
+              summary += '2. Download the Super Linter output artifact for detailed reports\n';
+              summary += '3. Fix the identified issues and push the changes\n';
+              if (autoFixEnabled) {
+                summary += '4. Some issues may have been auto-fixed - check for new commits\n';
+              }
+              summary += '\n';
+            }
+
+            summary += '### 📊 Artifacts\n';
+            summary += 'Super Linter output artifacts are available for download for 7 days after the workflow run.\n\n';
+
+            summary += '---\n*Generated by Super Linter v7*';
+
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Super Linter Results')
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: summary
+              });
+              console.log('Updated existing Super Linter comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+              console.log('Created new Super Linter comment');
+            }
