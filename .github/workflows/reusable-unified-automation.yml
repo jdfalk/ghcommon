@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 3.1.0
+# version: 3.2.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       operation:
-        description: "Which operation(s) to run (all, issues, docs, label, lint, rebase, intelligent-labeling)"
+        description: "Which operation(s) to run (all, issues, docs, label, lint, intelligent-labeling)"
         required: false
         default: "all"
         type: string
@@ -191,17 +191,6 @@ on:
         default: "style: auto-fix linting issues [skip ci]"
         type: string
 
-      rebase_base_branch:
-        description: "Branch to rebase pull requests onto"
-        required: false
-        default: "main"
-        type: string
-      rebase_model:
-        description: "Model to use for AI rebase"
-        required: false
-        default: "openai/gpt-4o"
-        type: string
-
       # Intelligent Issue Labeling Configuration
       il_enabled:
         description: "Enable intelligent issue labeling"
@@ -306,15 +295,6 @@ jobs:
       run-css: ${{ inputs.sl_run_css }}
       run-html: ${{ inputs.sl_run_html }}
       commit-message: ${{ inputs.sl_commit_message }}
-    secrets:
-      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-
-  ai-rebase:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'rebase' }}
-    uses: ./.github/workflows/reusable-ai-rebase.yml
-    with:
-      base-branch: ${{ inputs.rebase_base_branch }}
-      model: ${{ inputs.rebase_model }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
