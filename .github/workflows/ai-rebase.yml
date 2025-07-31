@@ -1,0 +1,24 @@
+# file: .github/workflows/ai-rebase.yml
+# version: 1.0.2
+# guid: 1f5cfd66-3c0f-4a31-84be-707ca9bd7658
+
+name: Fix Merge Conflicts
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  rebase:
+    name: Scan and Rebase PRs
+    uses: ./.github/workflows/reusable-ai-rebase.yml
+    with:
+      base-branch: ${{ github.event.inputs.base_branch || 'main' }}
+      model: gpt-4o-mini
+    secrets: inherit
