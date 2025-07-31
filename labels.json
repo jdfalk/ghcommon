@@ -98,5 +98,10 @@
     "name": "ui/ux",
     "color": "e99695",
     "description": "User interface and user experience"
-  }
+  },
+  {
+    "name": "merge-conflict",
+    "color": "b60205",
+    "description": "Pull request has merge conflicts"
+  },
 ]
