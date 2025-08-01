@@ -44,7 +44,7 @@ jobs:
       - uses: actions/github-script@v7
         id: find
         with:
-          github-token: ${{ secrets.github-token }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           script: |
             const prs = await github.paginate(github.rest.pulls.list, {
               owner: context.repo.owner,
@@ -295,7 +295,7 @@ jobs:
         uses: actions/ai-inference@v1.1.0
         continue-on-error: true
         with:
-          token: ${{ secrets.github-token }}
+          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           model: ${{ inputs.model }}
           system-prompt-file: system_prompt.txt
           prompt-file: prompt.txt
@@ -304,7 +304,7 @@ jobs:
       - name: Handle AI inference failure
         if: steps.conflicts.outputs.has_conflict == 'true' && steps.ai.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ secrets.github-token }}
+          GH_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
         run: |
           # Define CI status functions
           print_status() { echo "::notice ::[STATUS] $1"; }
@@ -488,7 +488,7 @@ jobs:
       - name: Handle failed AI resolution
         if: steps.conflicts.outputs.has_conflict == 'true' && (steps.ai.outcome == 'failure' || steps.apply_patch.conclusion == 'failure') && steps.apply_claude_patch.conclusion != 'success'
         env:
-          GH_TOKEN: ${{ secrets.github-token }}
+          GH_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           PR_BRANCH: ${{ matrix.pr.branch }}
         run: |
           # Define CI status functions
@@ -523,7 +523,7 @@ jobs:
       - name: Auto-merge PR (if applicable)
         if: steps.conflicts.outputs.has_conflict == 'false' || steps.apply_patch.conclusion == 'success' || steps.apply_claude_patch.conclusion == 'success'
         env:
-          GH_TOKEN: ${{ secrets.github-token }}
+          GH_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
         run: |
           # Define CI status functions
           print_status() { echo "::notice ::[STATUS] $1"; }
@@ -541,7 +541,7 @@ jobs:
       - name: Comment with results
         if: always()
         env:
-          GH_TOKEN: ${{ secrets.github-token }}
+          GH_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
         run: |
           # Define CI status functions
           print_status() { echo "::notice ::[STATUS] $1"; }

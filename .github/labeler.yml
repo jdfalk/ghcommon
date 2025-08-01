@@ -160,31 +160,10 @@ issue-management:
           - "**/issue*update*"
           - "templates/issue*"
 
-# SIZE LABELS (based on file count/complexity)
-size:small:
-  - changed-files:
-      - all-globs-to-all-files:
-          - "**/*"
-      - count: 1-3
+# SIZE LABELS (File count-based sizing not supported in labeler v5)
+# Note: Size labels based on changed file counts are not supported in labeler v5+
+# Alternative: Use GitHub's built-in PR size detection or manual labeling
 
 # AI/AUTOMATION LABELS
 codex:
   - head-branch: ["^feature/codex-.*", "^codex/.*", "^ai/.*", "^automated/.*"]
-
-size:medium:
-  - changed-files:
-      - all-globs-to-all-files:
-          - "**/*"
-      - count: 4-10
-
-size:large:
-  - changed-files:
-      - all-globs-to-all-files:
-          - "**/*"
-      - count: 11-25
-
-size:epic:
-  - changed-files:
-      - all-globs-to-all-files:
-          - "**/*"
-      - count: 26+

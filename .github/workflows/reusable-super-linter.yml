@@ -101,7 +101,7 @@ on:
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for linting and auto-fix"
-        required: true
+        required: false
 
 jobs:
   super-linter:
@@ -114,7 +114,7 @@ jobs:
         with:
           # Full git history is needed to get list of changed files
           fetch-depth: 0
-          token: ${{ secrets.github-token }}
+          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
 
       - name: Setup Super Linter environment
         run: |
@@ -127,7 +127,8 @@ jobs:
         run: |
           if [ -f "${{ inputs.config-file }}" ]; then
             echo "Loading custom configuration from ${{ inputs.config-file }}"
-            cat "${{ inputs.config-file }}" >> $GITHUB_ENV
+            # Filter out comments and empty lines when loading config
+            grep -v '^#' "${{ inputs.config-file }}" | grep -v '^$' >> $GITHUB_ENV
           else
             echo "No custom configuration file found at ${{ inputs.config-file }}"
           fi
@@ -138,7 +139,7 @@ jobs:
         env:
           # Basic configuration
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
-          GITHUB_TOKEN: ${{ secrets.github-token }}
+          GITHUB_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
 
@@ -266,7 +267,7 @@ jobs:
         env:
           AUTO_COMMIT_ENABLED: ${{ inputs.auto-commit-fixes }}
         with:
-          github-token: ${{ secrets.github-token }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
 
