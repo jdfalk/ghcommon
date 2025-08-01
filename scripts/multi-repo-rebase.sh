@@ -722,12 +722,14 @@ process_repository() {
     fi
 
     # Clean up created branches (only ones we created, not pre-existing ones)
-    for branch in "${created_branches[@]}"; do
-        if [[ "$branch" != "$original_branch" ]] && [[ "$branch" != "$DEFAULT_BRANCH" ]]; then
-            log_debug "Deleting locally created branch '$branch'"
-            git branch -D "$branch" 2>/dev/null || log_warning "Could not delete branch '$branch'"
-        fi
-    done
+    if [[ ${#created_branches[@]} -gt 0 ]]; then
+        for branch in "${created_branches[@]}"; do
+            if [[ "$branch" != "$original_branch" ]] && [[ "$branch" != "$DEFAULT_BRANCH" ]]; then
+                log_debug "Deleting locally created branch '$branch'"
+                git branch -D "$branch" 2>/dev/null || log_warning "Could not delete branch '$branch'"
+            fi
+        done
+    fi
 
     # Summary
     log_info "Repository $repo_name summary:"
