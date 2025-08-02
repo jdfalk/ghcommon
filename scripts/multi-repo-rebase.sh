@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/multi-repo-rebase.sh
-# version: 1.0.0
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
 set -euo pipefail
@@ -12,6 +12,69 @@ git config --global core.editor true
 
 # Set preferred AI model for GitHub Copilot (if supported in future)
 export GITHUB_COPILOT_MODEL="${GITHUB_COPILOT_MODEL:-claude-3.5-sonnet}"
+
+# Multi-Repository Rebase Automation Script
+# Handles automatic rebasing across multiple repositories with AI conflict resolution
+# Supports GitHub Copilot for intelligent conflict resolution
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+log_debug() {
+    if [[ "${VERBOSE:-false}" == "true" ]]; then
+        echo -e "${PURPLE}[DEBUG]${NC} $1"
+    fi
+}
+
+log_step() {
+    echo -e "${CYAN}[STEP]${NC} $1"
+}
+
+# Save original git settings and configure for automation
+ORIGINAL_EDITOR=$(git config --global --get core.editor 2>/dev/null || echo "")
+git config --global advice.mergeConflict false
+git config --global core.editor true
+
+# Set preferred AI model for GitHub Copilot (if supported in future)
+export GITHUB_COPILOT_MODEL="${GITHUB_COPILOT_MODEL:-claude-3.5-sonnet}"
+
+# Simple cleanup function
+cleanup_git_settings() {
+    log_debug "Restoring git settings..."
+    if [[ -n "$ORIGINAL_EDITOR" ]]; then
+        git config --global core.editor "$ORIGINAL_EDITOR"
+    else
+        git config --global --unset core.editor 2>/dev/null || true
+    fi
+    git config --global --unset advice.mergeConflict 2>/dev/null || true
+}
+
+# Set trap for cleanup
+trap cleanup_git_settings EXIT INT TERM
 
 # Multi-Repository Rebase Automation Script
 # Handles automatic rebasing across multiple repositories with AI conflict resolution
@@ -44,6 +107,14 @@ DRY_RUN=false
 VERBOSE=false
 SKIP_CONFLICTS=false
 MAX_RETRIES=3
+
+# Save original git settings and configure for automation
+ORIGINAL_EDITOR=$(git config --global --get core.editor 2>/dev/null || echo "")
+git config --global advice.mergeConflict false
+git config --global core.editor true
+
+# Set preferred AI model for GitHub Copilot (if supported in future)
+export GITHUB_COPILOT_MODEL="${GITHUB_COPILOT_MODEL:-claude-3.5-sonnet}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -80,6 +151,59 @@ log_debug() {
 
 log_step() {
     echo -e "${CYAN}[STEP]${NC} $1"
+}
+
+# Stash management functions
+stash_uncommitted_changes() {
+    local repo_path="$1"
+    local repo_name=$(basename "$repo_path")
+
+    cd "$repo_path"
+
+    # Check if there are uncommitted changes
+    if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+        log_info "Stashing uncommitted changes in $repo_name"
+        if git stash push -m "multi-repo-rebase: auto-stash $(date '+%Y-%m-%d %H:%M:%S')" 2>/dev/null; then
+            # Create a marker file to track stash
+            echo "stashed" > ".git/multi-repo-rebase-stash"
+            log_success "Changes stashed in $repo_name"
+            return 0
+        else
+            log_error "Failed to stash changes in $repo_name"
+            return 1
+        fi
+    else
+        log_debug "No uncommitted changes in $repo_name"
+        return 0
+    fi
+}
+
+restore_stashed_changes() {
+    local repo_path="$1"
+    local repo_name=$(basename "$repo_path")
+
+    cd "$repo_path"
+
+    # Check if we have a stash marker
+    if [[ -f ".git/multi-repo-rebase-stash" ]]; then
+        log_info "Restoring stashed changes in $repo_name"
+        if git stash pop 2>/dev/null; then
+            rm -f ".git/multi-repo-rebase-stash"
+            log_success "Stashed changes restored in $repo_name"
+        else
+            log_warning "Failed to restore stash in $repo_name - stash may still exist"
+        fi
+    fi
+}
+
+cleanup_git_settings() {
+    log_debug "Restoring git settings..."
+    if [[ -n "$ORIGINAL_EDITOR" ]]; then
+        git config --global core.editor "$ORIGINAL_EDITOR"
+    else
+        git config --global --unset core.editor 2>/dev/null || true
+    fi
+    git config --global --unset advice.mergeConflict 2>/dev/null || true
 }
 
 # Help function
@@ -644,17 +768,24 @@ process_repository() {
 
     cd "$repo_path"
 
-    # Clean up any existing rebase state first
-    cleanup_rebase_state "$repo_path"
-
-    # Save current branch
+    # Save current branch for restoration
     local original_branch
-    original_branch=$(git rev-parse --abbrev-ref HEAD)
+    original_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
     log_debug "Current branch: $original_branch"
+
+    # Stash any uncommitted changes first
+    if ! stash_uncommitted_changes "$repo_path"; then
+        log_error "Failed to stash changes in $repo_name"
+        return 1
+    fi
+
+    # Clean up any existing rebase state
+    cleanup_rebase_state "$repo_path"
 
     # Ensure we're on the default branch
     if ! git checkout "$DEFAULT_BRANCH"; then
         log_error "Failed to checkout $DEFAULT_BRANCH branch"
+        restore_stashed_changes "$repo_path"
         return 1
     fi
 
@@ -740,6 +871,9 @@ process_repository() {
         log_error "  Failed to process: ${failed_branches[*]}"
     fi
 
+    # Restore stashed changes if any
+    restore_stashed_changes "$repo_path"
+
     return 0
 }
 
@@ -786,24 +920,15 @@ main() {
 
     if [[ $success_count -eq $total_repos ]]; then
         log_success "All repositories processed successfully!"
+        # Disable trap since we're completing successfully
+        trap - EXIT INT TERM
+        cleanup_git_settings
+        exit 0
     else
         log_warning "Some repositories had issues. Check the logs above for details."
         exit 1
     fi
 }
-
-# Cleanup function to restore original git settings
-cleanup_git_settings() {
-    log_debug "Restoring original git settings..."
-    if [[ -n "$ORIGINAL_EDITOR" ]]; then
-        git config --global core.editor "$ORIGINAL_EDITOR"
-    else
-        git config --global --unset core.editor 2>/dev/null || true
-    fi
-}
-
-# Trap to ensure cleanup happens on exit
-trap cleanup_git_settings EXIT
 
 # Execute main function with all arguments
 main "$@"
