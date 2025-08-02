@@ -8,11 +8,11 @@ on:
 
 # Required permissions for reusable-semantic-versioning.yml
 permissions:
-  contents: write
-  checks: write
   actions: read
-  pull-requests: write
+  checks: write
   issues: write
+  contents: write
+  pull-requests: write
 
 jobs:
   call-semantic-versioning:

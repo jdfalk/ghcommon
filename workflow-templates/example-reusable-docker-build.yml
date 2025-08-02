@@ -8,10 +8,10 @@ on:
 
 # Required permissions for reusable-docker-build.yml
 permissions:
-  contents: read
   id-token: write
-  attestations: write
+  contents: read
   packages: write
+  attestations: write
 
 jobs:
   call-docker-build:

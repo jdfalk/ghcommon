@@ -16,20 +16,20 @@
       ],
       "github_api_calls": [],
       "inferred_permissions": [
-        "contents: read",
         "pull-requests: write",
+        "contents: read",
         "issues: write"
       ],
       "description": ""
     },
     "recommended_permissions": [
+      "pull-requests: write",
       "contents: read",
-      "issues: write",
-      "pull-requests: write"
+      "issues: write"
     ],
     "minimal_permissions": [
-      "contents: read",
       "pull-requests: write",
+      "contents: read",
       "issues: write"
     ]
   },
@@ -97,13 +97,13 @@
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
-      "security-events: write",
-      "id-token: write",
-      "attestations: write",
-      "repository-projects: write",
       "actions: read",
       "packages: write",
+      "id-token: write",
+      "repository-projects: write",
+      "contents: read",
+      "security-events: write",
+      "attestations: write",
       "pull-requests: write"
     ],
     "minimal_permissions": [
@@ -129,17 +129,17 @@
       ],
       "github_api_calls": [],
       "inferred_permissions": [
-        "contents: read",
-        "contents: write"
+        "contents: write",
+        "contents: read"
       ],
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
+      "issues: write",
       "repository-projects: write",
+      "contents: read",
       "pull-requests: write",
-      "contents: write",
-      "issues: write"
+      "contents: write"
     ],
     "minimal_permissions": [
       "contents: write"
@@ -190,10 +190,10 @@
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
       "id-token: write",
-      "attestations: write",
-      "packages: write"
+      "contents: read",
+      "packages: write",
+      "attestations: write"
     ],
     "minimal_permissions": [
       "contents: read",
@@ -212,14 +212,14 @@
       ],
       "github_api_calls": [],
       "inferred_permissions": [
-        "contents: read",
-        "contents: write"
+        "contents: write",
+        "contents: read"
       ],
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
-      "contents: write"
+      "contents: write",
+      "contents: read"
     ],
     "minimal_permissions": [
       "contents: write"
@@ -283,8 +283,8 @@
       "issues: write"
     ],
     "minimal_permissions": [
-      "contents: read",
       "pull-requests: write",
+      "contents: read",
       "issues: write"
     ]
   },
@@ -362,9 +362,9 @@
     },
     "recommended_permissions": [
       "pull-requests: write",
+      "contents: write",
       "contents: read",
-      "models: read",
-      "contents: write"
+      "models: read"
     ],
     "minimal_permissions": [
       "contents: read"
@@ -404,15 +404,15 @@
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
-      "repository-projects: write",
-      "security-events: read",
-      "checks: write",
-      "statuses: write",
-      "pull-requests: write",
       "actions: write",
+      "statuses: write",
+      "issues: write",
+      "checks: write",
+      "repository-projects: write",
+      "contents: read",
+      "pull-requests: write",
       "contents: write",
-      "issues: write"
+      "security-events: read"
     ],
     "minimal_permissions": [
       "contents: read",
@@ -442,17 +442,17 @@
       ],
       "github_api_calls": [],
       "inferred_permissions": [
-        "contents: read",
-        "contents: write"
+        "contents: write",
+        "contents: read"
       ],
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
       "packages: write",
+      "issues: write",
+      "contents: read",
       "pull-requests: write",
-      "contents: write",
-      "issues: write"
+      "contents: write"
     ],
     "minimal_permissions": [
       "contents: write"
@@ -482,12 +482,12 @@
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
-      "checks: write",
       "actions: read",
+      "checks: write",
+      "issues: write",
+      "contents: read",
       "pull-requests: write",
-      "contents: write",
-      "issues: write"
+      "contents: write"
     ],
     "minimal_permissions": [
       "contents: read"
@@ -516,8 +516,8 @@
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
-      "contents: write"
+      "contents: write",
+      "contents: read"
     ],
     "minimal_permissions": [
       "contents: read"
@@ -540,20 +540,20 @@
       ],
       "github_api_calls": [],
       "inferred_permissions": [
-        "contents: read",
         "pull-requests: write",
+        "contents: read",
         "issues: write"
       ],
       "description": ""
     },
     "recommended_permissions": [
-      "contents: read",
       "pull-requests: write",
+      "contents: read",
       "issues: write"
     ],
     "minimal_permissions": [
-      "contents: read",
       "pull-requests: write",
+      "contents: read",
       "issues: write"
     ]
   },

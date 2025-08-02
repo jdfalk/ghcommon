@@ -8,10 +8,10 @@ on:
 
 # Required permissions for reusable-goreleaser.yml
 permissions:
-  contents: write
   packages: write
-  pull-requests: write
   issues: write
+  contents: write
+  pull-requests: write
 
 jobs:
   call-goreleaser:

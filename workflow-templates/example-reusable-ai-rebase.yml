@@ -9,7 +9,7 @@ on:
 # Required permissions for reusable-ai-rebase.yml
 permissions:
   pull-requests: write
-  contents: write
+  contents: read
   models: read
 
 jobs:

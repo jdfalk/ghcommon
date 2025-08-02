@@ -8,8 +8,8 @@ on:
 
 # Required permissions for reusable-label-sync.yml
 permissions:
-  contents: read
   pull-requests: write
+  contents: read
   issues: write
 
 jobs:

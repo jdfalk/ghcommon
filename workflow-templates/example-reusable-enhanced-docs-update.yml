@@ -8,7 +8,7 @@ on:
 
 # Required permissions for reusable-enhanced-docs-update.yml
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   call-enhanced-docs-update:

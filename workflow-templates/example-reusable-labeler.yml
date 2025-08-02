@@ -8,9 +8,9 @@ on:
 
 # Required permissions for reusable-labeler.yml
 permissions:
+  pull-requests: write
   contents: read
   issues: write
-  pull-requests: write
 
 jobs:
   call-labeler:

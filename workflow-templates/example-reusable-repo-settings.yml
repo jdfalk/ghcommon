@@ -8,7 +8,7 @@ on:
 
 # Required permissions for reusable-repo-settings.yml
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   call-repo-settings:

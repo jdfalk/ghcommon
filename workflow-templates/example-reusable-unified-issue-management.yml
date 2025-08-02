@@ -8,14 +8,14 @@ on:
 
 # Required permissions for reusable-unified-issue-management.yml
 permissions:
-  contents: write
-  repository-projects: write
-  security-events: read
-  checks: write
-  statuses: write
-  pull-requests: write
   actions: write
+  statuses: write
   issues: write
+  checks: write
+  repository-projects: write
+  contents: write
+  pull-requests: write
+  security-events: read
 
 jobs:
   call-unified-issue-management:

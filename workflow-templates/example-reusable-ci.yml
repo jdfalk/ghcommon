@@ -8,13 +8,13 @@ on:
 
 # Required permissions for reusable-ci.yml
 permissions:
-  contents: read
-  security-events: write
-  id-token: write
-  attestations: write
-  repository-projects: write
   actions: read
   packages: write
+  id-token: write
+  repository-projects: write
+  contents: read
+  security-events: write
+  attestations: write
   pull-requests: write
 
 jobs:
