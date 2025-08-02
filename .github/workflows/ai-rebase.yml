@@ -10,10 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
-  models: read
-
+  contents: read
 jobs:
   rebase:
     name: Scan and Rebase PRs

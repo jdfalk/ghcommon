@@ -249,7 +249,7 @@ jobs:
         run: |
           echo "# 🔍 Super Linter Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ steps.run-super-linter.outcome }}" = "success" ]; then
             echo "✅ **All code quality checks passed!**" >> $GITHUB_STEP_SUMMARY
           elif [ "${{ steps.run-super-linter.outcome }}" = "failure" ]; then
@@ -273,9 +273,9 @@ jobs:
           else
             echo "⚠️ **Linter status unknown** - check workflow logs" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Show auto-fixes if applied
           if [ "${{ steps.check-fixes.outputs.has_fixes }}" = "true" ]; then
             echo "## 🔧 Auto-fixes Applied" >> $GITHUB_STEP_SUMMARY
@@ -286,7 +286,7 @@ jobs:
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "## Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- **Mode**: ${{ inputs.validate-all-codebase && 'Full codebase validation' || 'Changed files only' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Auto-fix**: ${{ inputs.enable-auto-fix }}" >> $GITHUB_STEP_SUMMARY
@@ -397,7 +397,7 @@ jobs:
             // For failures, show specific actionable issues
             if (linterOutcome === 'failure') {
               summary += '### Issues to Fix\n\n';
-              
+
               let issuesFound = false;
               try {
                 if (fs.existsSync('super-linter-output')) {
@@ -413,8 +413,8 @@ jobs:
                     // Extract specific error lines with file context
                     const errors = lines.filter(line => {
                       const l = line.toLowerCase();
-                      return (l.includes('error') || l.includes('fail')) && 
-                             (l.includes('.go') || l.includes('.py') || l.includes('.js') || 
+                      return (l.includes('error') || l.includes('fail')) &&
+                             (l.includes('.go') || l.includes('.py') || l.includes('.js') ||
                               l.includes('.md') || l.includes('.yml') || l.includes('.yaml') ||
                               l.includes('.json') || l.includes('.sh'));
                     }).slice(0, 2); // Max 2 errors per log file
@@ -430,11 +430,11 @@ jobs:
                             .replace(/^.*super-linter.*?:/, '') // Remove super-linter prefix
                             .replace(/^.*ERROR.*?:/, '') // Remove ERROR prefix
                             .trim();
-                          
+
                           if (cleanError.length > 100) {
                             cleanError = cleanError.substring(0, 100) + '...';
                           }
-                          
+
                           summary += `- ${cleanError}\n`;
                           issueCount++;
                           issuesFound = true;

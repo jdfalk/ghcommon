@@ -113,15 +113,15 @@ The following linters support automatic fixing:
 
 | Language/Tool         | Linter            | Auto-fix Available | What Gets Fixed                             |
 | --------------------- | ----------------- | ------------------ | ------------------------------------------- |
-| Python                | Black             | ✅                 | Code formatting, line length, quotes        |
-| Python                | Ruff              | ✅                 | Import sorting, unused imports, basic style |
-| JavaScript/TypeScript | ESLint            | ✅                 | Syntax, formatting, import organization     |
-| CSS                   | StyleLint         | ✅                 | Property ordering, formatting, syntax       |
-| JSON                  | jq/Prettier       | ✅                 | Formatting, indentation                     |
-| Markdown              | markdownlint      | ✅                 | Heading structure, list formatting          |
-| YAML                  | yamllint/Prettier | ✅                 | Indentation, formatting                     |
-| Go                    | gofmt/goimports   | ✅                 | Code formatting, import organization        |
-| Shell                 | shfmt             | ✅                 | Script formatting, indentation              |
+| Python                | Black             | ✅                  | Code formatting, line length, quotes        |
+| Python                | Ruff              | ✅                  | Import sorting, unused imports, basic style |
+| JavaScript/TypeScript | ESLint            | ✅                  | Syntax, formatting, import organization     |
+| CSS                   | StyleLint         | ✅                  | Property ordering, formatting, syntax       |
+| JSON                  | jq/Prettier       | ✅                  | Formatting, indentation                     |
+| Markdown              | markdownlint      | ✅                  | Heading structure, list formatting          |
+| YAML                  | yamllint/Prettier | ✅                  | Indentation, formatting                     |
+| Go                    | gofmt/goimports   | ✅                  | Code formatting, import organization        |
+| Shell                 | shfmt             | ✅                  | Script formatting, indentation              |
 
 ### Auto-fix Configuration
 

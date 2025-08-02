@@ -12,18 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # Required for auto-committing linting fixes
-  pull-requests: write
-  actions: write # Required for uploading artifacts
-  checks: write
-  security-events: write
-  id-token: write
-  statuses: write
-  # Additional permissions for dependency submission
-  repository-projects: write
-  packages: write
-  attestations: write
-
+  contents: read
 jobs:
   ci:
     uses: ./.github/workflows/reusable-ci.yml

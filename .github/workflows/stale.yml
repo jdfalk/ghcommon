@@ -5,9 +5,9 @@
 name: Handle Stale Issues
 
 permissions:
+  contents: read
   issues: write
   pull-requests: write
-
 on:
   schedule:
     - cron: "0 3 * * 1"
