@@ -18,6 +18,7 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+      - "priority-low"
     allow:
       - dependency-type: "direct"
       - dependency-type: "indirect"
@@ -49,6 +50,7 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+      - "priority-low"
     allow:
       - dependency-type: "direct"
     ignore:
@@ -69,7 +71,8 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "ci/cd"
+      - "ci-cd"
+      - "priority-low"
     groups:
       ci-dependencies:
         patterns:
