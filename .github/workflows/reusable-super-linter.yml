@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.2.0
+# version: 2.3.0
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -248,9 +248,21 @@ jobs:
             cp super-linter.log super-linter-output/
           fi
 
+          # Copy all log files from Super Linter output folder
+          if [ -d "super-linter-output" ]; then
+            find super-linter-output -name "*.log" -type f 2>/dev/null | head -10 | while read logfile; do
+              echo "Found log file: $logfile"
+            done
+          fi
+
           # Create a summary file
           echo "Super Linter execution completed at $(date)" > super-linter-output/summary.txt
           echo "Validation mode: ${{ inputs.validate-all-codebase && 'Full codebase' || 'Changed files only' }}" >> super-linter-output/summary.txt
+          echo "Super Linter outcome: ${{ steps.run-super-linter.outcome }}" >> super-linter-output/summary.txt
+
+          # List all files in output directory for debugging
+          echo "Files in super-linter-output:" >> super-linter-output/summary.txt
+          ls -la super-linter-output/ >> super-linter-output/summary.txt 2>/dev/null || echo "No files found" >> super-linter-output/summary.txt
 
       - name: Upload Super Linter results
         if: always()
@@ -327,6 +339,54 @@ jobs:
                 summary += '4. Some issues may have been auto-fixed - check for new commits\n';
               }
               summary += '\n';
+
+              // Try to include actual linting errors from the log files
+              try {
+                if (fs.existsSync('super-linter-output')) {
+                  summary += '### 📋 Linting Issues Found\n';
+
+                  // Read log files to extract actual errors
+                  const logFiles = fs.readdirSync('super-linter-output').filter(f => f.endsWith('.log'));
+                  let errorCount = 0;
+
+                  for (const logFile of logFiles.slice(0, 5)) { // Limit to first 5 log files
+                    if (errorCount >= 10) break; // Limit total errors shown
+
+                    const logContent = fs.readFileSync(`super-linter-output/${logFile}`, 'utf8');
+                    const lines = logContent.split('\n');
+
+                    // Extract error lines (this is a simplified approach)
+                    const errors = lines.filter(line =>
+                      line.includes('ERROR') ||
+                      line.includes('FAIL') ||
+                      line.includes('error:') ||
+                      line.includes('Error:')
+                    ).slice(0, 3); // Max 3 errors per file
+
+                    if (errors.length > 0) {
+                      summary += `\n**${logFile}:**\n`;
+                      summary += '```\n';
+                      errors.forEach(error => {
+                        if (error.trim() && errorCount < 10) {
+                          summary += error.trim() + '\n';
+                          errorCount++;
+                        }
+                      });
+                      summary += '```\n';
+                    }
+                  }
+
+                  if (errorCount === 0) {
+                    summary += '\n*No specific errors found in logs. Check the workflow run details for more information.*\n';
+                  } else if (errorCount >= 10) {
+                    summary += '\n*... and more errors. Check the full logs for complete details.*\n';
+                  }
+                  summary += '\n';
+                }
+              } catch (error) {
+                console.log('Could not read linting errors:', error);
+                summary += '\n*Could not extract specific error details. Please check the workflow logs.*\n\n';
+              }
             }
 
             summary += '### 📊 Artifacts\n';
