@@ -30,7 +30,7 @@ jobs:
       validate-all-codebase: false
       enable-auto-fix: true
       auto-commit-fixes: true
-      show-detailed-summary: false  # Default: concise, actionable output
+      show-detailed-summary: false # Default: concise, actionable output
       run-python: true
       run-shell: true
       run-go: true
@@ -50,7 +50,7 @@ jobs:
       validate-all-codebase: true
       enable-auto-fix: false
       auto-commit-fixes: false
-      show-detailed-summary: true  # Verbose output for debugging
+      show-detailed-summary: true # Verbose output for debugging
       run-python: true
       run-shell: true
       run-go: true
@@ -70,7 +70,7 @@ jobs:
       validate-all-codebase: true
       enable-auto-fix: true
       auto-commit-fixes: true
-      show-detailed-summary: false  # Clean, focused output
+      show-detailed-summary: false # Clean, focused output
       commit-message: "style: auto-fix code formatting [skip ci]"
       run-security: true
     secrets:
