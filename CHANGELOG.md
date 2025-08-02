@@ -10,18 +10,35 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Added\n\n- Added reusable CodeQL workflow with unique caching keys
+### Added
+
+- Added concise output mode to Super Linter workflow (default behavior)
+- Added `show-detailed-summary` parameter to control Super Linter verbosity
+- Added focused GitHub Job Summary for Super Linter results
+- Added improved PR comment formatting with actionable issue details
+- Added example workflows demonstrating both concise and detailed modes
+- Added reusable CodeQL workflow with unique caching keys
 
 ### Changed
 
+- **BREAKING**: Super Linter now defaults to concise output mode (shows only issues/changes)
+- Improved Super Linter error extraction and presentation
+- Restructured Super Linter PR comments to be more actionable
+- Updated Super Linter configuration to reduce verbose processing logs
+- Minimized configuration details in summaries (moved to collapsible sections)
 - **BREAKING**: Removed protobuf definitions; moved to gcommon repository
+
+### Fixed
+
+- Fixed verbose Super Linter output showing all processed files instead of just issues
+- Fixed poor formatting in Super Linter summaries and comments
+- Fixed unhelpful configuration dumps in final summaries
+
+## [1.1.0] - 2025-08-02
 
 ### Added
 
 - Implemented cache service protobuf definitions
-
-### Added
-
 - Added unified automation workflow for manual invocation
 - Added initial queue module protobuf definitions
 - Added logging protobuf definitions
