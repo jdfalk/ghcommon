@@ -49,8 +49,10 @@ jobs:
       completed: ${{ steps.labeler-summary.outputs.completed }}
       config-path: ${{ steps.labeler-summary.outputs.config-path }}
       pr-available: ${{ steps.pr-context.outputs.pr_available }}
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

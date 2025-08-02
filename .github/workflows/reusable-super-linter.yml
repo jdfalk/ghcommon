@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.3.0
+# version: 2.4.0
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -97,6 +97,11 @@ on:
         required: false
         default: "style: auto-fix linting issues [skip ci]"
         type: string
+      show-detailed-summary:
+        description: "Show detailed processing information instead of just issues and changes"
+        required: false
+        default: false
+        type: boolean
 
     secrets:
       github-token:
@@ -145,11 +150,12 @@ jobs:
 
           # Output and display settings
           SUPPRESS_POSSUM: true
-          LOG_LEVEL: NOTICE
+          LOG_LEVEL: ${{ inputs.show-detailed-summary && 'VERBOSE' || 'WARN' }}
           OUTPUT_FORMAT: colored
           OUTPUT_FOLDER: super-linter-output
-          OUTPUT_DETAILS: detailed
+          OUTPUT_DETAILS: ${{ inputs.show-detailed-summary && 'detailed' || 'simpler' }}
           CREATE_LOG_FILE: true
+          SLIM_IMAGE: false
 
           # Language validation settings
           VALIDATE_PYTHON: ${{ inputs.run-python }}
@@ -237,6 +243,50 @@ jobs:
           git push
           echo "✅ Auto-fixes committed and pushed successfully"
 
+      - name: Create Job Summary
+        if: always()
+        run: |
+          echo "# 🔍 Super Linter Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.run-super-linter.outcome }}" = "success" ]; then
+            echo "✅ **All code quality checks passed!**" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.run-super-linter.outcome }}" = "failure" ]; then
+            echo "❌ **Issues found that need attention**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## Issues to Address" >> $GITHUB_STEP_SUMMARY
+            
+            # Look for actual error files and summarize
+            if [ -d "super-linter-output" ]; then
+              find super-linter-output -name "*.log" -type f | while read logfile; do
+                if grep -q "ERROR\|FAIL" "$logfile" 2>/dev/null; then
+                  linter_name=$(basename "$logfile" .log | sed 's/^.*-//')
+                  echo "- **$linter_name**: Check \`$logfile\` for details" >> $GITHUB_STEP_SUMMARY
+                fi
+              done
+            fi
+          else
+            echo "⚠️ **Linter status unknown** - check workflow logs" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Show auto-fixes if applied
+          if [ "${{ steps.check-fixes.outputs.has_fixes }}" = "true" ]; then
+            echo "## 🔧 Auto-fixes Applied" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ inputs.auto-commit-fixes }}" = "true" ]; then
+              echo "Auto-formatting fixes were applied and committed." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Auto-formatting fixes were applied but not committed." >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: ${{ inputs.validate-all-codebase && 'Full codebase validation' || 'Changed files only' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Auto-fix**: ${{ inputs.enable-auto-fix }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Auto-commit**: ${{ inputs.auto-commit-fixes }}" >> $GITHUB_STEP_SUMMARY
+
       - name: Prepare Super Linter outputs
         if: always()
         run: |
@@ -248,21 +298,45 @@ jobs:
             cp super-linter.log super-linter-output/
           fi
 
-          # Copy all log files from Super Linter output folder
+          # Copy all log files from Super Linter output folder if they exist
           if [ -d "super-linter-output" ]; then
             find super-linter-output -name "*.log" -type f 2>/dev/null | head -10 | while read logfile; do
               echo "Found log file: $logfile"
             done
           fi
 
-          # Create a summary file
-          echo "Super Linter execution completed at $(date)" > super-linter-output/summary.txt
-          echo "Validation mode: ${{ inputs.validate-all-codebase && 'Full codebase' || 'Changed files only' }}" >> super-linter-output/summary.txt
-          echo "Super Linter outcome: ${{ steps.run-super-linter.outcome }}" >> super-linter-output/summary.txt
+          # Create a focused summary file with only relevant information
+          echo "Super Linter Summary" > super-linter-output/summary.txt
+          echo "===================" >> super-linter-output/summary.txt
+          echo "Execution Date: $(date)" >> super-linter-output/summary.txt
+          echo "Validation Mode: ${{ inputs.validate-all-codebase && 'Full codebase' || 'Changed files only' }}" >> super-linter-output/summary.txt
+          echo "Outcome: ${{ steps.run-super-linter.outcome }}" >> super-linter-output/summary.txt
+          echo "" >> super-linter-output/summary.txt
 
-          # List all files in output directory for debugging
-          echo "Files in super-linter-output:" >> super-linter-output/summary.txt
-          ls -la super-linter-output/ >> super-linter-output/summary.txt 2>/dev/null || echo "No files found" >> super-linter-output/summary.txt
+          # Extract actual errors and fixes applied
+          if [ "${{ steps.run-super-linter.outcome }}" = "failure" ]; then
+            echo "Issues Found:" >> super-linter-output/summary.txt
+            echo "=============" >> super-linter-output/summary.txt
+            
+            # Parse error logs for actual issues (not just file processing)
+            find super-linter-output -name "*.log" -type f 2>/dev/null | while read logfile; do
+              if grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
+                echo "- $(basename "$logfile"): Issues detected" >> super-linter-output/summary.txt
+              fi
+            done
+          else
+            echo "✅ No linting issues found" >> super-linter-output/summary.txt
+          fi
+
+          # Show auto-fixes if any were applied
+          if [ "${{ steps.check-fixes.outputs.has_fixes }}" = "true" ]; then
+            echo "" >> super-linter-output/summary.txt
+            echo "Auto-fixes Applied:" >> super-linter-output/summary.txt
+            echo "==================" >> super-linter-output/summary.txt
+            git diff --name-only HEAD~1 2>/dev/null | head -10 | while read file; do
+              echo "- $file" >> super-linter-output/summary.txt
+            done
+          fi
 
       - name: Upload Super Linter results
         if: always()
@@ -296,103 +370,99 @@ jobs:
 
             let summary = '## 🔍 Super Linter Results\n\n';
 
-            // Add status based on outcome
+            // Add concise status
             if (linterOutcome === 'success') {
               summary += '✅ **All code quality checks passed!**\n\n';
             } else if (linterOutcome === 'failure') {
-              summary += '❌ **Code quality issues found.** Please review the details below.\n\n';
+              summary += '❌ **Code quality issues found**\n\n';
             } else {
-              summary += '⚠️ **Linter status unknown.** Check the workflow logs for details.\n\n';
+              summary += '⚠️ **Linter status unknown**\n\n';
             }
 
-            // Auto-fix information
+            // Show auto-fix information if relevant
             if (autoFixEnabled && hasAutoFixes && autoCommitEnabled) {
-              summary += '🔧 **Auto-fixes were applied and committed to this PR.**\n\n';
+              summary += '🔧 **Auto-fixes applied and committed**\n\n';
             } else if (autoFixEnabled && hasAutoFixes) {
-              summary += '🔧 **Auto-fixes were applied but not committed.**\n\n';
+              summary += '🔧 **Auto-fixes applied (not committed)**\n\n';
             }
 
-            // Configuration summary
-            summary += '### Configuration\n';
-            summary += `- **Validate all codebase**: \`${{ inputs.validate-all-codebase }}\`\n`;
-            summary += `- **Python**: \`${{ inputs.run-python }}\`\n`;
-            summary += `- **Shell**: \`${{ inputs.run-shell }}\`\n`;
-            summary += `- **Go**: \`${{ inputs.run-go }}\`\n`;
-            summary += `- **JavaScript/TypeScript**: \`${{ inputs.run-javascript }}\`\n`;
-            summary += `- **Markdown**: \`${{ inputs.run-markdown }}\`\n`;
-            summary += `- **YAML**: \`${{ inputs.run-yaml }}\`\n`;
-            summary += `- **JSON**: \`${{ inputs.run-json }}\`\n`;
-            summary += `- **CSS**: \`${{ inputs.run-css }}\`\n`;
-            summary += `- **HTML**: \`${{ inputs.run-html }}\`\n`;
-            summary += `- **GitHub Actions**: \`${{ inputs.run-github-actions }}\`\n`;
-            summary += `- **Security**: \`${{ inputs.run-security }}\`\n`;
-            summary += `- **Auto-fix**: \`${{ inputs.enable-auto-fix }}\`\n`;
-            summary += `- **Auto-commit**: \`${{ inputs.auto-commit-fixes }}\`\n\n`;
-
-            // Additional information for failed linting
+            // For failures, show specific actionable issues
             if (linterOutcome === 'failure') {
-              summary += '### 🔧 Next Steps\n';
-              summary += '1. Check the workflow logs for detailed error information\n';
-              summary += '2. Download the Super Linter output artifact for detailed reports\n';
-              summary += '3. Fix the identified issues and push the changes\n';
-              if (autoFixEnabled) {
-                summary += '4. Some issues may have been auto-fixed - check for new commits\n';
-              }
-              summary += '\n';
-
-              // Try to include actual linting errors from the log files
+              summary += '### Issues to Fix\n\n';
+              
+              let issuesFound = false;
               try {
                 if (fs.existsSync('super-linter-output')) {
-                  summary += '### 📋 Linting Issues Found\n';
-
-                  // Read log files to extract actual errors
                   const logFiles = fs.readdirSync('super-linter-output').filter(f => f.endsWith('.log'));
-                  let errorCount = 0;
+                  let issueCount = 0;
 
-                  for (const logFile of logFiles.slice(0, 5)) { // Limit to first 5 log files
-                    if (errorCount >= 10) break; // Limit total errors shown
+                  for (const logFile of logFiles.slice(0, 3)) { // Limit to first 3 log files
+                    if (issueCount >= 5) break; // Limit total issues shown
 
                     const logContent = fs.readFileSync(`super-linter-output/${logFile}`, 'utf8');
                     const lines = logContent.split('\n');
 
-                    // Extract error lines (this is a simplified approach)
-                    const errors = lines.filter(line =>
-                      line.includes('ERROR') ||
-                      line.includes('FAIL') ||
-                      line.includes('error:') ||
-                      line.includes('Error:')
-                    ).slice(0, 3); // Max 3 errors per file
+                    // Extract specific error lines with file context
+                    const errors = lines.filter(line => {
+                      const l = line.toLowerCase();
+                      return (l.includes('error') || l.includes('fail')) && 
+                             (l.includes('.go') || l.includes('.py') || l.includes('.js') || 
+                              l.includes('.md') || l.includes('.yml') || l.includes('.yaml') ||
+                              l.includes('.json') || l.includes('.sh'));
+                    }).slice(0, 2); // Max 2 errors per log file
 
                     if (errors.length > 0) {
-                      summary += `\n**${logFile}:**\n`;
-                      summary += '```\n';
+                      const linterType = logFile.replace('.log', '').replace(/^.*-/, '');
+                      summary += `**${linterType.toUpperCase()}:**\n`;
                       errors.forEach(error => {
-                        if (error.trim() && errorCount < 10) {
-                          summary += error.trim() + '\n';
-                          errorCount++;
+                        if (error.trim() && issueCount < 5) {
+                          // Clean up the error message
+                          let cleanError = error.trim()
+                            .replace(/^\d+:\d+:\d+\s*/, '') // Remove timestamps
+                            .replace(/^.*super-linter.*?:/, '') // Remove super-linter prefix
+                            .replace(/^.*ERROR.*?:/, '') // Remove ERROR prefix
+                            .trim();
+                          
+                          if (cleanError.length > 100) {
+                            cleanError = cleanError.substring(0, 100) + '...';
+                          }
+                          
+                          summary += `- ${cleanError}\n`;
+                          issueCount++;
+                          issuesFound = true;
                         }
                       });
-                      summary += '```\n';
+                      summary += '\n';
                     }
                   }
-
-                  if (errorCount === 0) {
-                    summary += '\n*No specific errors found in logs. Check the workflow run details for more information.*\n';
-                  } else if (errorCount >= 10) {
-                    summary += '\n*... and more errors. Check the full logs for complete details.*\n';
-                  }
-                  summary += '\n';
                 }
               } catch (error) {
-                console.log('Could not read linting errors:', error);
-                summary += '\n*Could not extract specific error details. Please check the workflow logs.*\n\n';
+                console.log('Could not parse linting errors:', error);
               }
+
+              if (!issuesFound) {
+                summary += 'Check the workflow logs for detailed error information.\n\n';
+              }
+
+              summary += '### Next Steps\n';
+              summary += '1. Fix the issues listed above\n';
+              summary += '2. Push changes to update this PR\n';
+              if (autoFixEnabled) {
+                summary += '3. Some formatting issues may auto-fix on next run\n';
+              }
+              summary += '\n';
             }
 
-            summary += '### 📊 Artifacts\n';
-            summary += 'Super Linter output artifacts are available for download for 7 days after the workflow run.\n\n';
+            // Only show minimal config for debugging if needed
+            if (linterOutcome !== 'success') {
+              summary += '<details>\n<summary>🔧 Configuration</summary>\n\n';
+              summary += `- Mode: ${{ inputs.validate-all-codebase && 'Full codebase' || 'Changed files only' }}\n`;
+              summary += `- Auto-fix: ${{ inputs.enable-auto-fix }}\n`;
+              summary += `- Auto-commit: ${{ inputs.auto-commit-fixes }}\n`;
+              summary += '\n</details>\n\n';
+            }
 
-            summary += '---\n*Generated by Super Linter v7*';
+            summary += '*View detailed logs in the workflow run artifacts*';
 
             // Find and update existing comment or create new one
             const { data: comments } = await github.rest.issues.listComments({

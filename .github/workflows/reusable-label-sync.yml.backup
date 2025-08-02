@@ -40,8 +40,10 @@ on:
         default: "main"
         type: string
 
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   sync-labels:
     runs-on: ubuntu-latest

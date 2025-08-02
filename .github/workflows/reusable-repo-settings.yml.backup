@@ -9,8 +9,8 @@ on:
 jobs:
   apply-settings:
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: write
     steps:
       - name: Configure repository settings
         uses: actions/github-script@v7

@@ -67,8 +67,11 @@ on:
         description: "GitHub token with necessary permissions"
         required: false
 
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
 jobs:
   intelligent-labeling:
     if: ${{ inputs.enabled }}

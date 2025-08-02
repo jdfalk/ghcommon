@@ -30,8 +30,11 @@ on:
         description: "Claude API key for fallback AI processing"
         required: false
 
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
 jobs:
   find:
     runs-on: ubuntu-latest

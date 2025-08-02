@@ -77,8 +77,8 @@ jobs:
   changes:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -109,8 +109,8 @@ jobs:
     if: inputs.enable-backend-frontend == true && (needs.changes.outputs.backend == 'true' || github.event_name == 'push')
     needs: changes
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: ${{ inputs.backend-path }}
@@ -169,8 +169,8 @@ jobs:
     if: inputs.enable-backend-frontend == true && (needs.changes.outputs.frontend == 'true' || github.event_name == 'push')
     needs: changes
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: ${{ inputs.frontend-path }}
@@ -201,8 +201,8 @@ jobs:
   universal-ci:
     if: inputs.enable-backend-frontend != true
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
     needs: [super-linter]
     steps:
       - name: Checkout code
@@ -276,8 +276,8 @@ jobs:
   ci-complete:
     if: inputs.enable-backend-frontend == true
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
     needs: [super-linter, backend, frontend]
     steps:
       - name: Check workflow results
@@ -318,8 +318,16 @@ jobs:
   dependency-submission:
     if: inputs.enable-dependency-submission == true && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      security-events: write
+      # Add explicit permissions for dependency submission
+      repository-projects: write
+      pull-requests: write
+      packages: write
+      attestations: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

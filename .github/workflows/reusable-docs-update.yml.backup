@@ -78,8 +78,11 @@ on:
 jobs:
   docs-update:
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      repository-projects: write
     outputs:
       files_processed: ${{ steps.process-updates.outputs.files_processed }}
       changes_made: ${{ steps.process-updates.outputs.changes_made }}

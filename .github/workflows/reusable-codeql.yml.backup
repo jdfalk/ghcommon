@@ -22,8 +22,10 @@ on:
         description: "GitHub token with security-events permission"
         required: true
 
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   analyze:
     name: CodeQL Analyze

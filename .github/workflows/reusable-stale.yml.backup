@@ -43,8 +43,9 @@ on:
 jobs:
   mark-stale:
     runs-on: ubuntu-latest
-    # Permissions removed - should be set in calling workflow
-    # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Run stale action
         uses: actions/stale@v9

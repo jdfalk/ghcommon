@@ -78,8 +78,12 @@ on:
         description: "Path to generated SBOM"
         value: ${{ jobs.build.outputs.sbom-path }}
 
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: read # Required for repository checkout
+  packages: write # Required for pushing to container registry
+  id-token: write # Required for signing and attestations
+  attestations: write # Required for build attestations
+
 jobs:
   build:
     name: Build and Publish Docker Image

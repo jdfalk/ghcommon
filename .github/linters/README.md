@@ -1,7 +1,5 @@
 # file: .github/linters/README.md
-
-# version: 1.0.0
-
+# version: 1.1.0
 # guid: c2d3e4f5-a6b7-89cd-ef01-23456789cdef
 
 # Linter Configuration Files
@@ -9,7 +7,7 @@
 This directory contains configuration files for Super Linter, which provides
 comprehensive code quality checks across multiple languages.
 
-## Configuration Files
+## 🔧 Configuration Files
 
 | File                 | Purpose                       | Language/Tool   |
 | -------------------- | ----------------------------- | --------------- |
@@ -21,7 +19,7 @@ comprehensive code quality checks across multiple languages.
 | `.eslintrc.json`     | JavaScript/TypeScript linting | ESLint          |
 | `.stylelintrc.json`  | CSS linting                   | StyleLint       |
 
-## Style Guide Compliance
+## 📋 Style Guide Compliance
 
 These configurations enforce the coding standards defined in our style guides:
 
@@ -34,10 +32,32 @@ These configurations enforce the coding standards defined in our style guides:
 - **YAML**: Standard YAML formatting with proper indentation
 - **JSON**: Standard JSON formatting and validation
 
-## Usage
+## 🚀 Usage in Workflows
 
 These files are automatically used by the Super Linter workflow
 (`reusable-super-linter.yml`) when linting is enabled in CI/CD pipelines.
+
+### ✨ New: Improved Output Options
+
+The reusable workflow now supports two output modes:
+
+1. **Concise Mode** (default): Shows only issues and changes
+2. **Detailed Mode**: Shows all processing information (for debugging)
+
+```yaml
+# Concise output - recommended for PRs
+- uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+  with:
+    show-detailed-summary: false  # Default: clean, actionable output
+    enable-auto-fix: true
+    auto-commit-fixes: true
+
+# Detailed output - useful for debugging
+- uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+  with:
+    show-detailed-summary: true   # Verbose processing information
+    enable-auto-fix: false
+```
 
 ### Local Development
 

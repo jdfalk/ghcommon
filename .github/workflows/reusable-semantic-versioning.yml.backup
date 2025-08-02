@@ -47,8 +47,13 @@ on:
         value: ${{ jobs.version.outputs.should-release }}
 
 # Explicit permissions required for this reusable workflow
-# Permissions removed - should be set in calling workflow
-# See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+permissions:
+  contents: write # For creating commits, tags, and releases
+  issues: write # For updating issues referenced in commits
+  pull-requests: write # For updating PR titles and descriptions
+  actions: read # For workflow access
+  checks: write # For workflow status
+
 jobs:
   version:
     name: Calculate and Update Version
