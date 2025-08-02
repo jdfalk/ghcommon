@@ -1,0 +1,19 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-repo-settings.yml
+permissions:
+  contents: write
+
+jobs:
+  call-repo-settings:
+    uses: ./.github/workflows/reusable-repo-settings.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

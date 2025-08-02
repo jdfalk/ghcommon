@@ -1,0 +1,26 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-unified-issue-management.yml
+permissions:
+  contents: write
+  repository-projects: write
+  security-events: read
+  checks: write
+  statuses: write
+  pull-requests: write
+  actions: write
+  issues: write
+
+jobs:
+  call-unified-issue-management:
+    uses: ./.github/workflows/reusable-unified-issue-management.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

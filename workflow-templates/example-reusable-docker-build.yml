@@ -1,0 +1,22 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-docker-build.yml
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  packages: write
+
+jobs:
+  call-docker-build:
+    uses: ./.github/workflows/reusable-docker-build.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

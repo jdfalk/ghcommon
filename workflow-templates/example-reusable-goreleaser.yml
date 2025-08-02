@@ -1,0 +1,22 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-goreleaser.yml
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  call-goreleaser:
+    uses: ./.github/workflows/reusable-goreleaser.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

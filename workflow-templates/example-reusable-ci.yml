@@ -1,0 +1,26 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-ci.yml
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+  attestations: write
+  repository-projects: write
+  actions: read
+  packages: write
+  pull-requests: write
+
+jobs:
+  call-ci:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

@@ -1,0 +1,21 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-ai-rebase.yml
+permissions:
+  pull-requests: write
+  contents: write
+  models: read
+
+jobs:
+  call-ai-rebase:
+    uses: ./.github/workflows/reusable-ai-rebase.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

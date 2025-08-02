@@ -1,0 +1,20 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-codeql.yml
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  call-codeql:
+    uses: ./.github/workflows/reusable-codeql.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

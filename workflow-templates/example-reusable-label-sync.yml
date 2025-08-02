@@ -1,0 +1,21 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-label-sync.yml
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  call-label-sync:
+    uses: ./.github/workflows/reusable-label-sync.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

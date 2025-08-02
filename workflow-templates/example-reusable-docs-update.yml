@@ -1,0 +1,22 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-docs-update.yml
+permissions:
+  contents: write
+  repository-projects: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  call-docs-update:
+    uses: ./.github/workflows/reusable-docs-update.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

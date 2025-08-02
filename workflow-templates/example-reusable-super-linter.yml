@@ -1,0 +1,19 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-super-linter.yml
+permissions:
+  contents: read
+
+jobs:
+  call-super-linter:
+    uses: ./.github/workflows/reusable-super-linter.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here

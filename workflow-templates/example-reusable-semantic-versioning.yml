@@ -1,0 +1,23 @@
+name: Example Calling Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Required permissions for reusable-semantic-versioning.yml
+permissions:
+  contents: write
+  checks: write
+  actions: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  call-semantic-versioning:
+    uses: ./.github/workflows/reusable-semantic-versioning.yml
+    with:
+      # Add required inputs here
+    secrets:
+      # Add required secrets here
