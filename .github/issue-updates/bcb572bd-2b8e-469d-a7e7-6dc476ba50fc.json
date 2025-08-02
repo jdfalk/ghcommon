@@ -1,0 +1,7 @@
+{
+  "action": "comment",
+  "number": 50,
+  "body": "Updated Super Linter workflow to continue after failures so auto-fixes can commit back to PR.",
+  "guid": "bcb572bd-2b8e-469d-a7e7-6dc476ba50fc",
+  "legacy_guid": "comment-issue-50-2025-08-02"
+}

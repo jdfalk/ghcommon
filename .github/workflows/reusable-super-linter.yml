@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.0
+# version: 2.4.1
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -141,6 +141,7 @@ jobs:
       - name: Run Super Linter
         id: run-super-linter
         uses: super-linter/super-linter@v7
+        continue-on-error: true
         env:
           # Basic configuration
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
@@ -255,13 +256,17 @@ jobs:
             echo "❌ **Issues found that need attention**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "## Issues to Address" >> $GITHUB_STEP_SUMMARY
-            
-            # Look for actual error files and summarize
+
+            # Print all error lines from log files
             if [ -d "super-linter-output" ]; then
-              find super-linter-output -name "*.log" -type f | while read logfile; do
-                if grep -q "ERROR\|FAIL" "$logfile" 2>/dev/null; then
+              find super-linter-output -name "*.log" -type f | sort | while read -r logfile; do
+                if grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
                   linter_name=$(basename "$logfile" .log | sed 's/^.*-//')
-                  echo "- **$linter_name**: Check \`$logfile\` for details" >> $GITHUB_STEP_SUMMARY
+                  echo "### $linter_name" >> $GITHUB_STEP_SUMMARY
+                  echo '```' >> $GITHUB_STEP_SUMMARY
+                  grep -E "ERROR|FAIL|error:" "$logfile" >> $GITHUB_STEP_SUMMARY
+                  echo '```' >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
                 fi
               done
             fi
@@ -317,11 +322,14 @@ jobs:
           if [ "${{ steps.run-super-linter.outcome }}" = "failure" ]; then
             echo "Issues Found:" >> super-linter-output/summary.txt
             echo "=============" >> super-linter-output/summary.txt
-            
-            # Parse error logs for actual issues (not just file processing)
-            find super-linter-output -name "*.log" -type f 2>/dev/null | while read logfile; do
+
+            # Include error lines from each log file
+            find super-linter-output -name "*.log" -type f 2>/dev/null | sort | while read -r logfile; do
               if grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
-                echo "- $(basename "$logfile"): Issues detected" >> super-linter-output/summary.txt
+                echo "" >> super-linter-output/summary.txt
+                echo "$(basename "$logfile")" >> super-linter-output/summary.txt
+                echo "-------------------" >> super-linter-output/summary.txt
+                grep -E "ERROR|FAIL|error:" "$logfile" >> super-linter-output/summary.txt
               fi
             done
           else
@@ -492,3 +500,7 @@ jobs:
               });
               console.log('Created new Super Linter comment');
             }
+
+      - name: Fail if linting errors remain
+        if: steps.run-super-linter.outcome == 'failure'
+        run: exit 1
