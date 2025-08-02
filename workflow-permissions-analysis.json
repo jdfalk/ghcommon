@@ -1,0 +1,592 @@
+{
+  "reusable-labeler.yml": {
+    "file_name": "reusable-labeler.yml",
+    "original_permissions": [
+      {
+        "contents": "read",
+        "pull-requests": "write",
+        "issues": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "labeling",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/labeler@v5"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "pull-requests: write",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "issues: write",
+      "pull-requests: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "pull-requests: write",
+      "issues: write"
+    ]
+  },
+  "reusable-ci.yml": {
+    "file_name": "reusable-ci.yml",
+    "original_permissions": [
+      {
+        "contents": "read"
+      },
+      {
+        "contents": "read"
+      },
+      {
+        "contents": "read"
+      },
+      {
+        "contents": "read"
+      },
+      {
+        "contents": "read"
+      },
+      {
+        "contents": "read",
+        "id-token": "write",
+        "actions": "read",
+        "security-events": "write",
+        "repository-projects": "write",
+        "pull-requests": "write",
+        "packages": "write",
+        "attestations": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "continuous_integration",
+      "actions_used": [
+        "actions/checkout@v4",
+        "dorny/paths-filter@v3",
+        "actions/checkout@v4",
+        "actions/setup-go@v5",
+        "actions/setup-python@v5",
+        "actions/checkout@v4",
+        "actions/setup-node@v4",
+        "actions/checkout@v4",
+        "actions/setup-go@v5",
+        "actions/setup-python@v5",
+        "actions/setup-node@v4",
+        "actions/checkout@v4",
+        "actions/setup-java@v4",
+        "gradle/actions/dependency-submission@v3",
+        "actions/setup-java@v4",
+        "advanced-security/maven-dependency-submission-action@v4",
+        "actions/setup-java@v4",
+        "ckipp01/mill-dependency-submission@v1",
+        "erlef/setup-beam@v1",
+        "erlef/mix-dependency-submission@v1",
+        "actions/setup-java@v4",
+        "scalacenter/sbt-dependency-submission@v2",
+        "docker/setup-buildx-action@v3",
+        "advanced-security/component-detection-dependency-submission-action@v0.1.0"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "security-events: write",
+      "id-token: write",
+      "attestations: write",
+      "repository-projects: write",
+      "actions: read",
+      "packages: write",
+      "pull-requests: write"
+    ],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-docs-update.yml": {
+    "file_name": "reusable-docs-update.yml",
+    "original_permissions": [
+      {
+        "contents": "write",
+        "pull-requests": "write",
+        "issues": "write",
+        "repository-projects": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "documentation",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v5",
+        "peter-evans/create-pull-request@v7"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "contents: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "repository-projects: write",
+      "pull-requests: write",
+      "contents: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: write"
+    ]
+  },
+  "reusable-unified-automation.yml": {
+    "file_name": "reusable-unified-automation.yml",
+    "original_permissions": [],
+    "purpose_analysis": {
+      "purpose": "unknown",
+      "actions_used": [],
+      "github_api_calls": [],
+      "inferred_permissions": [],
+      "description": ""
+    },
+    "recommended_permissions": [],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-docker-build.yml": {
+    "file_name": "reusable-docker-build.yml",
+    "original_permissions": [
+      {
+        "contents": "read",
+        "packages": "write",
+        "id-token": "write",
+        "attestations": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "container_build",
+      "actions_used": [
+        "actions/checkout@v4",
+        "docker/setup-qemu-action@v3",
+        "docker/setup-buildx-action@v3",
+        "docker/login-action@v3",
+        "docker/metadata-action@v5",
+        "docker/build-push-action@v6",
+        "actions/upload-artifact@v4",
+        "actions/upload-artifact@v4"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "packages: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "id-token: write",
+      "attestations: write",
+      "packages: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "packages: write"
+    ]
+  },
+  "reusable-enhanced-docs-update.yml": {
+    "file_name": "reusable-enhanced-docs-update.yml",
+    "original_permissions": [],
+    "purpose_analysis": {
+      "purpose": "documentation",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v5",
+        "peter-evans/create-pull-request@v7"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "contents: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "contents: write"
+    ],
+    "minimal_permissions": [
+      "contents: write"
+    ]
+  },
+  "reusable-codeql.yml": {
+    "file_name": "reusable-codeql.yml",
+    "original_permissions": [
+      {
+        "contents": "read",
+        "security-events": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "security_scanning",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/cache@v3",
+        "github/codeql-action/init@v3",
+        "github/codeql-action/autobuild@v3",
+        "github/codeql-action/analyze@v3"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "security-events: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "security-events: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "security-events: write"
+    ]
+  },
+  "reusable-stale.yml": {
+    "file_name": "reusable-stale.yml",
+    "original_permissions": [
+      {
+        "issues": "write",
+        "pull-requests": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "maintenance",
+      "actions_used": [
+        "actions/stale@v9"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "pull-requests: write",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "pull-requests: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "pull-requests: write",
+      "issues: write"
+    ]
+  },
+  "reusable-enhanced-issue-management.yml": {
+    "file_name": "reusable-enhanced-issue-management.yml",
+    "original_permissions": [],
+    "purpose_analysis": {
+      "purpose": "issue_management",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v5",
+        "peter-evans/create-pull-request@v7"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "issues: write"
+    ]
+  },
+  "reusable-super-linter.yml": {
+    "file_name": "reusable-super-linter.yml",
+    "original_permissions": [],
+    "purpose_analysis": {
+      "purpose": "unknown",
+      "actions_used": [
+        "actions/checkout@v4",
+        "super-linter/super-linter@v7",
+        "actions/upload-artifact@v4",
+        "actions/github-script@v7"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read"
+    ],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-ai-rebase.yml": {
+    "file_name": "reusable-ai-rebase.yml",
+    "original_permissions": [
+      {
+        "contents": "write",
+        "pull-requests": "write",
+        "models": "read"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "unknown",
+      "actions_used": [
+        "actions/github-script@v7",
+        "actions/checkout@v4",
+        "actions/ai-inference@v1.1.0"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "pull-requests: write",
+      "contents: read",
+      "models: read",
+      "contents: write"
+    ],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-unified-issue-management.yml": {
+    "file_name": "reusable-unified-issue-management.yml",
+    "original_permissions": [
+      {
+        "contents": "write",
+        "issues": "write",
+        "pull-requests": "write",
+        "security-events": "read",
+        "repository-projects": "write",
+        "actions": "write",
+        "checks": "write",
+        "statuses": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "issue_management",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v4",
+        "actions/checkout@v4",
+        "actions/setup-python@v4",
+        "peter-evans/create-pull-request@v7",
+        "peter-evans/create-pull-request@v7",
+        "actions/checkout@v4",
+        "actions/setup-python@v4"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "repository-projects: write",
+      "security-events: read",
+      "checks: write",
+      "statuses: write",
+      "pull-requests: write",
+      "actions: write",
+      "contents: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "issues: write"
+    ]
+  },
+  "reusable-goreleaser.yml": {
+    "file_name": "reusable-goreleaser.yml",
+    "original_permissions": [
+      {
+        "contents": "write",
+        "packages": "write",
+        "issues": "write",
+        "pull-requests": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "release_management",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/checkout@v4",
+        "actions/setup-go@v5",
+        "goreleaser/goreleaser-action@v6",
+        "goreleaser/goreleaser-action@v6",
+        "goreleaser/goreleaser-action@v6",
+        "goreleaser/goreleaser-action@v6"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "contents: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "packages: write",
+      "pull-requests: write",
+      "contents: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: write"
+    ]
+  },
+  "reusable-semantic-versioning.yml": {
+    "file_name": "reusable-semantic-versioning.yml",
+    "original_permissions": [
+      {
+        "contents": "write",
+        "issues": "write",
+        "pull-requests": "write",
+        "actions": "read",
+        "checks": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "unknown",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-node@v4"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "checks: write",
+      "actions: read",
+      "pull-requests: write",
+      "contents: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-repo-settings.yml": {
+    "file_name": "reusable-repo-settings.yml",
+    "original_permissions": [
+      {
+        "contents": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "unknown",
+      "actions_used": [
+        "actions/github-script@v7",
+        "actions/checkout@v4",
+        "actions/github-script@v7",
+        "actions/checkout@v4",
+        "actions/github-script@v7"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "contents: write"
+    ],
+    "minimal_permissions": [
+      "contents: read"
+    ]
+  },
+  "reusable-label-sync.yml": {
+    "file_name": "reusable-label-sync.yml",
+    "original_permissions": [
+      {
+        "contents": "read",
+        "issues": "write"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "labeling",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v4",
+        "actions/upload-artifact@v4"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "pull-requests: write",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "pull-requests: write",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "pull-requests: write",
+      "issues: write"
+    ]
+  },
+  "reusable-intelligent-issue-labeling.yml": {
+    "file_name": "reusable-intelligent-issue-labeling.yml",
+    "original_permissions": [
+      {
+        "contents": "read",
+        "issues": "write",
+        "pull-requests": "read"
+      }
+    ],
+    "purpose_analysis": {
+      "purpose": "issue_management",
+      "actions_used": [
+        "actions/checkout@v4",
+        "actions/setup-python@v5"
+      ],
+      "github_api_calls": [],
+      "inferred_permissions": [
+        "contents: read",
+        "issues: write"
+      ],
+      "description": ""
+    },
+    "recommended_permissions": [
+      "contents: read",
+      "pull-requests: read",
+      "issues: write"
+    ],
+    "minimal_permissions": [
+      "contents: read",
+      "issues: write"
+    ]
+  }
+}

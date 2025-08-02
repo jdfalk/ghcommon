@@ -4,14 +4,16 @@
 
 name: Handle Stale Issues
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
 on:
   schedule:
     - cron: "0 3 * * 1"
   workflow_dispatch:
+
+# Required permissions for reusable workflows
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   call-stale:
