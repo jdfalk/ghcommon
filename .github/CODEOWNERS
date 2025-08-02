@@ -1,0 +1,29 @@
+# Global ownership
+* @jdfalk
+
+# GitHub workflows and reusable actions
+.github/workflows/ @jdfalk
+.github/actions/ @jdfalk
+
+# Documentation and guides
+*.md @jdfalk
+docs/ @jdfalk
+
+# Scripts and automation tools
+scripts/ @jdfalk
+*.py @jdfalk
+*.sh @jdfalk
+
+# Configuration files
+*.json @jdfalk
+*.yml @jdfalk
+*.yaml @jdfalk
+
+# Instructions and prompts
+.github/instructions/ @jdfalk
+.github/prompts/ @jdfalk
+.github/linters/ @jdfalk
+
+# Copilot configuration
+.github/copilot/ @jdfalk
+copilot/ @jdfalk
