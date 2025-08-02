@@ -1,0 +1,126 @@
+# file: examples/workflows/codeql-analysis-example.yml
+# version: 1.0.0
+# guid: 123e4567-e89b-12d3-a456-426614174000
+
+# Example usage of the improved reusable CodeQL workflow
+# This demonstrates proper cache key generation and matrix support
+
+name: CodeQL Analysis Example
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run CodeQL analysis daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # Example 1: Single language analysis
+  codeql-single:
+    name: CodeQL Analysis (Single Language)
+    uses: jdfalk/ghcommon/.github/workflows/reusable-codeql.yml@main
+    with:
+      languages: 'javascript'
+      config-file: '.github/codeql.yml'
+      matrix-key: 'single-js'
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Example 2: Matrix build for multiple languages
+  codeql-matrix:
+    name: CodeQL Analysis (Multi-Language)
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'python', 'go', 'java']
+        include:
+          - language: javascript
+            config: '.github/codeql-js.yml'
+          - language: python
+            config: '.github/codeql-python.yml'
+          - language: go
+            config: '.github/codeql-go.yml'
+          - language: java
+            config: '.github/codeql-java.yml'
+    uses: jdfalk/ghcommon/.github/workflows/reusable-codeql.yml@main
+    with:
+      languages: ${{ matrix.language }}
+      config-file: ${{ matrix.config }}
+      # Use language as matrix-key to ensure unique caching per language
+      matrix-key: ${{ matrix.language }}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Example 3: Auto-detect languages with custom configuration
+  codeql-auto:
+    name: CodeQL Analysis (Auto-detect)
+    uses: jdfalk/ghcommon/.github/workflows/reusable-codeql.yml@main
+    with:
+      # Leave languages empty for auto-detection
+      languages: ''
+      config-file: '.github/codeql-custom.yml'
+      matrix-key: 'auto-detect'
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Example 4: Conditional analysis based on file changes
+  detect-languages:
+    name: Detect Changed Languages
+    runs-on: ubuntu-latest
+    outputs:
+      languages: ${{ steps.detect.outputs.languages }}
+      has-changes: ${{ steps.detect.outputs.has-changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect language changes
+        id: detect
+        run: |
+          # Simple language detection based on file changes
+          languages=()
+          
+          if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E '\.(js|ts|jsx|tsx)$'; then
+            languages+=("javascript")
+          fi
+          
+          if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E '\.py$'; then
+            languages+=("python")
+          fi
+          
+          if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E '\.go$'; then
+            languages+=("go")
+          fi
+          
+          if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E '\.(java|kt)$'; then
+            languages+=("java")
+          fi
+          
+          if [ ${#languages[@]} -gt 0 ]; then
+            # Join array elements with comma
+            IFS=','
+            echo "languages=${languages[*]}" >> $GITHUB_OUTPUT
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "languages=" >> $GITHUB_OUTPUT
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          fi
+
+  codeql-conditional:
+    name: CodeQL Analysis (Conditional)
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has-changes == 'true'
+    uses: jdfalk/ghcommon/.github/workflows/reusable-codeql.yml@main
+    with:
+      languages: ${{ needs.detect-languages.outputs.languages }}
+      config-file: '.github/codeql.yml'
+      matrix-key: 'conditional-${{ github.sha }}'
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
