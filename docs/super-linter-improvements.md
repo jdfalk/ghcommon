@@ -1,27 +1,32 @@
-# file: docs/super-linter-improvements.md
-# version: 1.0.0
-# guid: 456e7890-f1a2-3b4c-5d6e-789012345678
+<!--
+file: docs/super-linter-improvements.md
+version: 1.0.0
+guid: 456e7890-f1a2-3b4c-5d6e-789012345678
+-->
 
 # Super Linter Improvements Summary
 
 ## 🎯 Issues Addressed
 
-Based on feedback about the GitHub Action run at https://github.com/jdfalk/subtitle-manager/actions/runs/16693240374, the following improvements have been made to the reusable Super Linter workflow:
+Based on feedback about the GitHub Action run at <https://github.com/jdfalk/subtitle-manager/actions/runs/16693240374>, the following improvements have been made to the reusable Super Linter workflow:
 
 ### 1. **Verbose Output Problem**
+
 - **Issue**: Summary showed all processed files instead of just issues/changes
 - **Solution**: Added `show-detailed-summary` parameter (default: false) to control verbosity
 - **Result**: By default, only issues and changes are shown
 
 ### 2. **Poor Formatting**
+
 - **Issue**: Unreadable, cluttered output in summaries and comments
-- **Solution**: 
+- **Solution**:
   - Restructured PR comments to be concise and actionable
   - Added GitHub Job Summary with clean formatting
   - Improved error extraction and presentation
 - **Result**: Clean, scannable output focused on what needs action
 
-### 3. **Unhelpful Final Summary** 
+### 3. **Unhelpful Final Summary**
+
 - **Issue**: Long configuration dump that wasn't useful for decision making
 - **Solution**:
   - Minimized configuration details (hidden in collapsible section)
@@ -32,6 +37,7 @@ Based on feedback about the GitHub Action run at https://github.com/jdfalk/subti
 ## 🔧 New Features
 
 ### Concise Mode (Default)
+
 ```yaml
 uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
 with:
@@ -39,12 +45,14 @@ with:
 ```
 
 **Output includes:**
+
 - ✅/❌ Status at a glance
 - 🔧 Auto-fixes applied (if any)
 - 📋 Specific issues with file references
 - 🔧 Clear next steps
 
 ### Detailed Mode (Debugging)
+
 ```yaml
 uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
 with:
@@ -52,6 +60,7 @@ with:
 ```
 
 **Output includes:**
+
 - All file processing details
 - Verbose logging (LOG_LEVEL: VERBOSE)
 - Complete configuration information
@@ -60,18 +69,21 @@ with:
 ## 📊 Improved Outputs
 
 ### 1. GitHub Job Summary
+
 - Focused summary in workflow run page
 - Issue categorization by linter type
 - Auto-fix status clearly indicated
 - Minimal configuration details
 
 ### 2. PR Comments
+
 - Concise status header
 - Actionable issue list with file context
 - Collapsible configuration details
 - Eliminated redundant information
 
 ### 3. Artifacts
+
 - Cleaned up summary files
 - Focus on errors and changes, not processing logs
 - Structured issue reporting
@@ -79,9 +91,11 @@ with:
 ## 🔄 Migration Guide
 
 ### For Existing Workflows
+
 No changes required! The new default behavior provides cleaner output.
 
 ### To Enable Detailed Mode (for debugging)
+
 Add `show-detailed-summary: true` to your workflow call:
 
 ```yaml
@@ -96,12 +110,14 @@ lint:
 ## 🎯 Results
 
 ### Before
+
 - 📄 Long lists of all processed files
 - 🔍 Configuration dump in every summary
 - ❓ Unclear what action is needed
 - 📊 200+ line PR comments
 
-### After  
+### After
+
 - ✅ Shows only issues and changes
 - 🎯 Focused on actionable items
 - 📝 Clear next steps
