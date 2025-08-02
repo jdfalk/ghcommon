@@ -103,5 +103,5 @@
     "name": "merge-conflict",
     "color": "b60205",
     "description": "Pull request has merge conflicts"
-  },
+  }
 ]
