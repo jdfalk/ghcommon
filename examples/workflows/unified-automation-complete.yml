@@ -1,5 +1,5 @@
 # file: examples/workflows/unified-automation-complete.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: complete-unified-automation-workflow-template
 
 name: Complete Unified Automation
@@ -177,8 +177,7 @@ jobs:
       il_label_config_path: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.label_config_path }}
       il_python_version: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.python_version }}
 
-    secrets:
-      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+    secrets: inherit
 
   # Post-automation cleanup and notifications
   post-automation:
