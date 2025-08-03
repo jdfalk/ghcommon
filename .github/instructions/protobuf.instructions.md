@@ -4,12 +4,10 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-applyTo: "\*_/_.proto" description: | Protocol Buffers (protobuf) style and
-documentation rules for Copilot/AI agents and VS Code Copilot customization.
-These rules extend the general instructions in `general-coding.instructions.md`
-and implement comprehensive protobuf best practices including the 1-1-1 design
-pattern, Edition 2023 features, and Google's style guide.
-
+---
+applyTo: "**/*.proto"
+description: |
+  Protocol Buffers (protobuf) style and documentation rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and implement comprehensive protobuf best practices including the 1-1-1 design pattern, Edition 2023 features, and Google's style guide.
 ---
 
 # Protobuf Coding Instructions

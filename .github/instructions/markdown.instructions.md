@@ -4,11 +4,10 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-applyTo: "\*_/_.md" description: | Markdown formatting, documentation, and style
-rules for Copilot/AI agents and VS Code Copilot customization. These rules
-extend the general instructions in `general-coding.instructions.md` and merge
-all unique content from the Google Markdown Style Guide.
-
+---
+applyTo: "**/*.md"
+description: |
+  Markdown formatting, documentation, and style rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google Markdown Style Guide.
 ---
 
 # Markdown Coding Instructions

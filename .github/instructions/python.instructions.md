@@ -4,12 +4,10 @@
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
-applyTo: "\*_/_.py" description: | Python language-specific coding,
-documentation, and testing rules for Copilot/AI agents and VS Code Copilot
-customization. These rules extend the general instructions in
-`general-coding.instructions.md` and merge all unique content from the Google
-Python Style Guide.
-
+---
+applyTo: "**/*.py"
+description: |
+  Python language-specific coding, documentation, and testing rules for Copilot/AI agents and VS Code Copilot customization. These rules extend the general instructions in `general-coding.instructions.md` and merge all unique content from the Google Python Style Guide.
 ---
 
 # Python Coding Instructions
