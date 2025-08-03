@@ -1,10 +1,25 @@
+# file: repositories.txt
+# version: 1.2.0
+# guid: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
+
 # Repository list for label synchronization
 # Add repositories in owner/name format (one per line)
 # Lines starting with # are comments and will be ignored
 
-# Example repositories (uncomment and modify as needed):
-# jdfalk/subtitle-manager
-# jdfalk/ghcommon
-
 # Add your repositories here:
 jdfalk/ghcommon
+jdfalk/subtitle-manager
+jdfalk/gcommon
+jdfalk/apt-cacher-go
+jdfalk/audiobook-organizer
+jdfalk/scratch
+jdfalk/ubuntu-autoinstall-webhook
+jdfalk/autoinstall-dir
+jdfalk/docker-aws-sam
+jdfalk/public-scratch
+jdfalk/scripts
+jdfalk/tools-scripts-nonsense
+jdfalk/argocd-repo
+jdfalk/habk
+jdfalk/puppet-thanos
+jdfalk/mediasetup
