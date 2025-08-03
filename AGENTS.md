@@ -1,5 +1,5 @@
 <!-- file: AGENTS.md -->
-<!-- version: 2.0.0 -->
+<!-- version: 2.1.0 -->
 <!-- guid: 2e7c1a4b-5d3f-4b8c-9e1f-7a6b2c3d4e5f -->
 
 # AGENTS.md
@@ -51,6 +51,21 @@ system:**
 
 **Failure to follow this protocol will result in workflow conflicts and lost
 changes.**
+
+## ⚠️ CRITICAL: File Version Updates
+
+**When modifying any file with a version header, ALWAYS update the version number:**
+
+- **Patch version** (x.y.Z): Bug fixes, typos, minor formatting changes
+- **Minor version** (x.Y.z): New features, significant content additions, template changes
+- **Major version** (X.y.z): Breaking changes, structural overhauls, format changes
+
+**Examples:**
+- Fix typo: `1.2.3` → `1.2.4`
+- Add new section: `1.2.3` → `1.3.0`
+- Change template structure: `1.2.3` → `2.0.0`
+
+**This applies to ALL files with version headers including documentation, templates, and configuration files.**
 
 ## Key Copilot/Agent Documents
 
