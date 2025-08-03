@@ -162,12 +162,16 @@ def process_reusable_workflow(file_path: Path, dry_run: bool = False) -> Dict[st
 
         if not analysis.get("is_reusable", False):
             logger.warning(f"File {file_path} doesn't appear to be a reusable workflow")
-            return {"status": "skipped", "reason": "not_reusable", "analysis": analysis}
+            return {
+                "status": "not_reusable",
+                "reason": "not_reusable",
+                "analysis": analysis,
+            }
 
         if analysis.get("permissions_count", 0) == 0:
             logger.info(f"No permissions found in {file_path}")
             return {
-                "status": "skipped",
+                "status": "already_correct",
                 "reason": "no_permissions",
                 "analysis": analysis,
             }
@@ -259,7 +263,8 @@ def main():
     print("=" * 60)
 
     modified_count = 0
-    skipped_count = 0
+    already_correct_count = 0
+    not_reusable_count = 0
     error_count = 0
 
     for file_path, result in results.items():
@@ -272,19 +277,26 @@ def main():
             if "analysis" in result:
                 perms_count = result["analysis"].get("permissions_count", 0)
                 print(f"  - Removed {perms_count} permissions block(s)")
-        elif status == "skipped":
-            skipped_count += 1
+        elif status == "already_correct":
+            already_correct_count += 1
             reason = result.get("reason", "unknown")
-            print(f"- {file_name}: skipped ({reason})")
+            print(f"✅ {file_name}: already correct ({reason})")
+        elif status == "not_reusable":
+            not_reusable_count += 1
+            print(f"⚠️  {file_name}: not a reusable workflow")
+        elif status == "no_changes":
+            already_correct_count += 1
+            print(f"✅ {file_name}: already correct (no changes needed)")
         elif status == "error":
             error_count += 1
-            print(f"✗ {file_name}: error - {result.get('error', 'unknown')}")
+            print(f"❌ {file_name}: error - {result.get('error', 'unknown')}")
         else:
             print(f"? {file_name}: {status}")
 
     print(f"\nFiles processed: {len(results)}")
     print(f"Modified: {modified_count}")
-    print(f"Skipped: {skipped_count}")
+    print(f"Already correct: {already_correct_count}")
+    print(f"Not reusable workflows: {not_reusable_count}")
     print(f"Errors: {error_count}")
 
     if args.dry_run:

@@ -384,7 +384,7 @@ def main():
     print("=" * 70)
 
     modified_count = 0
-    skipped_count = 0
+    already_correct_count = 0
     error_count = 0
 
     for file_path, result in results.items():
@@ -408,19 +408,23 @@ def main():
                     f"  - Permissions: {', '.join(f'{k}:{v}' for k, v in permissions.items())}"
                 )
 
-        elif status in ["no_permissions_needed", "no_changes_needed"]:
-            skipped_count += 1
-            print(f"- {file_name}: {status}")
+        elif status == "no_permissions_needed":
+            already_correct_count += 1
+            print(f"✅ {file_name}: already correct (no reusable workflows called)")
+
+        elif status == "no_changes_needed":
+            already_correct_count += 1
+            print(f"✅ {file_name}: already correct (permissions already sufficient)")
 
         else:
             error_count += 1
-            print(f"✗ {file_name}: {status}")
+            print(f"❌ {file_name}: {status}")
             if "error" in result:
                 print(f"  - Error: {result['error']}")
 
     print(f"\nFiles processed: {len(results)}")
     print(f"Modified: {modified_count}")
-    print(f"Skipped: {skipped_count}")
+    print(f"Already correct: {already_correct_count}")
     print(f"Errors: {error_count}")
 
     if args.dry_run:

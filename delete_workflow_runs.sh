@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Workflow run IDs to delete
+# Workflow run IDs to delete (removed already deleted ones)
 run_ids=(
-16699889144
-16699872311
-16696221649
-16696221257
-16696214461
 16696204468
 16696194691
 16696165738
@@ -71,14 +66,14 @@ failed=0
 for run_id in "${run_ids[@]}"; do
     count=$((count + 1))
     echo "[$count/${#run_ids[@]}] Deleting run ID: $run_id"
-    
-    if gh run delete "$run_id" --confirm 2>/dev/null; then
+
+    if gh run delete "$run_id" 2>/dev/null; then
         echo "  ✓ Successfully deleted run $run_id"
     else
-        echo "  ✗ Failed to delete run $run_id"
+        echo "  ✗ Failed to delete run $run_id (might already be deleted or permission issue)"
         failed=$((failed + 1))
     fi
-    
+
     # Add a small delay to avoid rate limiting
     sleep 0.5
 done
