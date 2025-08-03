@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 3.2.0
+# version: 3.4.0
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       operation:
-        description: "Which operation(s) to run (all, issues, docs, label, lint, intelligent-labeling)"
+        description: "Which operation(s) to run (all, issues, docs, lint, intelligent-labeling, duplicates)"
         required: false
         default: "all"
         type: string
@@ -103,27 +103,6 @@ on:
         required: false
         default: true
         type: boolean
-
-      labeler_configuration_path:
-        description: "Path to labeler configuration"
-        required: false
-        default: ".github/labeler.yml"
-        type: string
-      labeler_sync_labels:
-        description: "Remove labels when files are reverted"
-        required: false
-        default: false
-        type: boolean
-      labeler_dot:
-        description: "Include dot files when labeling"
-        required: false
-        default: true
-        type: boolean
-      labeler_pr_numbers:
-        description: "Specific PR numbers to label"
-        required: false
-        default: ""
-        type: string
 
       sl_validate_all_codebase:
         description: "Validate entire codebase with Super Linter"
@@ -277,6 +256,19 @@ jobs:
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
+  duplicate-cleanup:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' || inputs.operation == 'duplicates' }}
+    uses: ./.github/workflows/reusable-unified-issue-management.yml
+    with:
+      operations: "close-duplicates"
+      dry_run: ${{ inputs.im_dry_run }}
+      python_version: ${{ inputs.im_python_version }}
+      enable_duplicate_closure: true
+      duplicate_prevention_method: ${{ inputs.im_duplicate_prevention_method }}
+      max_duplicate_check_issues: ${{ inputs.im_max_duplicate_check_issues }}
+    secrets:
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
     uses: ./.github/workflows/reusable-docs-update.yml
@@ -288,17 +280,6 @@ jobs:
       create_pr: ${{ inputs.docs_create_pr }}
       auto_merge: ${{ inputs.docs_auto_merge }}
       continue_on_error: ${{ inputs.docs_continue_on_error }}
-    secrets:
-      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-
-  labeler:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
-    uses: ./.github/workflows/reusable-labeler.yml
-    with:
-      configuration-path: ${{ inputs.labeler_configuration_path }}
-      sync-labels: ${{ inputs.labeler_sync_labels }}
-      dot: ${{ inputs.labeler_dot }}
-      pr-numbers: ${{ inputs.labeler_pr_numbers }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
@@ -323,7 +304,7 @@ jobs:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   intelligent-labeling:
-    if: ${{ inputs.operation == 'intelligent-labeling' }}
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
     with:
       enabled: ${{ inputs.il_enabled }}
