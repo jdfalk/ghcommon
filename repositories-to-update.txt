@@ -3,8 +3,10 @@
 # Lines starting with # are comments
 
 # Example repositories (uncomment to use):
-# jdfalk/gcommon
-# jdfalk/ghcommon
+jdfalk/gcommon
+jdfalk/ghcommon
+jdfalk/subtitle-manager
+
 # jdfalk/example-repo
 
 # Add your repositories here, one per line
