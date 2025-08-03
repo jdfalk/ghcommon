@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.1
+# version: 2.4.2
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -259,8 +259,9 @@ jobs:
 
             # Print all error lines from log files
             if [ -d "super-linter-output" ]; then
-              find super-linter-output -name "*.log" -type f | sort | while read -r logfile; do
-                if grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
+              # Use process substitution to avoid subshell issues with piped while loop
+              while IFS= read -r -d '' logfile; do
+                if [ -f "$logfile" ] && grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
                   linter_name=$(basename "$logfile" .log | sed 's/^.*-//')
                   echo "### $linter_name" >> $GITHUB_STEP_SUMMARY
                   echo '```' >> $GITHUB_STEP_SUMMARY
@@ -268,7 +269,7 @@ jobs:
                   echo '```' >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
                 fi
-              done
+              done < <(find super-linter-output -name "*.log" -type f -print0 | sort -z)
             fi
           else
             echo "⚠️ **Linter status unknown** - check workflow logs" >> $GITHUB_STEP_SUMMARY
@@ -305,9 +306,14 @@ jobs:
 
           # Copy all log files from Super Linter output folder if they exist
           if [ -d "super-linter-output" ]; then
-            find super-linter-output -name "*.log" -type f 2>/dev/null | head -10 | while read logfile; do
-              echo "Found log file: $logfile"
-            done
+            # Find and list first 10 log files
+            count=0
+            while IFS= read -r -d '' logfile && [ $count -lt 10 ]; do
+              if [ -f "$logfile" ]; then
+                echo "Found log file: $logfile"
+                count=$((count + 1))
+              fi
+            done < <(find super-linter-output -name "*.log" -type f -print0 2>/dev/null)
           fi
 
           # Create a focused summary file with only relevant information
@@ -324,14 +330,14 @@ jobs:
             echo "=============" >> super-linter-output/summary.txt
 
             # Include error lines from each log file
-            find super-linter-output -name "*.log" -type f 2>/dev/null | sort | while read -r logfile; do
-              if grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
+            while IFS= read -r -d '' logfile; do
+              if [ -f "$logfile" ] && grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
                 echo "" >> super-linter-output/summary.txt
                 echo "$(basename "$logfile")" >> super-linter-output/summary.txt
                 echo "-------------------" >> super-linter-output/summary.txt
                 grep -E "ERROR|FAIL|error:" "$logfile" >> super-linter-output/summary.txt
               fi
-            done
+            done < <(find super-linter-output -name "*.log" -type f -print0 2>/dev/null | sort -z)
           else
             echo "✅ No linting issues found" >> super-linter-output/summary.txt
           fi
@@ -341,9 +347,11 @@ jobs:
             echo "" >> super-linter-output/summary.txt
             echo "Auto-fixes Applied:" >> super-linter-output/summary.txt
             echo "==================" >> super-linter-output/summary.txt
-            git diff --name-only HEAD~1 2>/dev/null | head -10 | while read file; do
-              echo "- $file" >> super-linter-output/summary.txt
-            done
+            while IFS= read -r file; do
+              if [ -n "$file" ]; then
+                echo "- $file" >> super-linter-output/summary.txt
+              fi
+            done < <(git diff --name-only HEAD~1 2>/dev/null | head -10)
           fi
 
       - name: Upload Super Linter results
