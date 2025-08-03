@@ -1,6 +1,6 @@
 <!-- file: .github/instructions/commit-messages.instructions.md -->
-<!-- version: 1.1.0 -->
-<!-- guid: c0mm1712-e553-4a6e-9f8b-1234567890ab -->
+<!-- version: 1.2.0 -->
+<!-- guid: msg12345-e89b-12d3-a456-426614174000 -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
