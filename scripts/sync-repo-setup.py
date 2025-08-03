@@ -574,7 +574,7 @@ class RepoSetupSyncer:
 
         return result
 
-    def _sync_file(self, source_file: Path, target_file: Path) -> bool:
+    def _sync_file(self, source_file: Path, target_file: Path) -> Tuple[bool, str]:
         """Sync a single file with version checking."""
         try:
             # Create parent directory if needed
@@ -606,7 +606,7 @@ class RepoSetupSyncer:
             logger.error(f"  Error syncing file {source_file}: {e}")
             return False, f"error: {e}"
 
-    def _sync_directory(self, source_dir: Path, target_dir: Path) -> tuple[bool, str]:
+    def _sync_directory(self, source_dir: Path, target_dir: Path) -> Tuple[bool, str]:
         """Sync a directory recursively."""
         try:
             # Check if directories are identical
