@@ -366,14 +366,3 @@ jobs:
       python_version: ${{ inputs.il_python_version }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-
-  labeler:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
-    uses: ./.github/workflows/reusable-labeler.yml
-    with:
-      configuration-path: ${{ inputs.labeler_configuration_path }}
-      sync-labels: ${{ inputs.labeler_sync_labels }}
-      dot: ${{ inputs.labeler_dot }}
-      pr-numbers: ${{ inputs.labeler_pr_numbers }}
-    secrets:
-      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
