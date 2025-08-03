@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/update-repository-automation.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: 7f8a9b0c-1d2e-3f4a-5b6c-7d8e9f0a1b2c
 
 """
@@ -322,6 +322,16 @@ class RepositoryAutomationUpdater:
 
     def _get_complete_workflow_template(self) -> str:
         """Get the complete workflow template."""
+        # First try to read local template if available
+        local_template_path = "examples/workflows/unified-automation-complete.yml"
+        if os.path.exists(local_template_path):
+            try:
+                with open(local_template_path, 'r') as f:
+                    return f.read()
+            except Exception:
+                pass
+
+        # Fallback to remote template
         try:
             response = requests.get(
                 "https://raw.githubusercontent.com/jdfalk/ghcommon/main/examples/workflows/unified-automation-complete.yml"

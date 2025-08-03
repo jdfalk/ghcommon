@@ -520,7 +520,9 @@ class RepoSetupSyncer:
             "languages": {},
             "structure": {},
             "files_synced": [],
+            "files_skipped": [],
             "directories_synced": [],
+            "directories_skipped": [],
             "dependabot_generated": False,
             "errors": [],
         }
@@ -543,8 +545,11 @@ class RepoSetupSyncer:
                 target_file = target_repo / file_path
 
                 if source_file.exists():
-                    if self._sync_file(source_file, target_file):
+                    synced, reason = self._sync_file(source_file, target_file)
+                    if synced:
                         result["files_synced"].append(file_path)
+                    else:
+                        result["files_skipped"].append((file_path, reason))
 
             # Sync directories
             for dir_path in self.sync_directories:
@@ -552,8 +557,11 @@ class RepoSetupSyncer:
                 target_dir = target_repo / dir_path
 
                 if source_dir.exists():
-                    if self._sync_directory(source_dir, target_dir):
+                    synced, reason = self._sync_directory(source_dir, target_dir)
+                    if synced:
                         result["directories_synced"].append(dir_path)
+                    else:
+                        result["directories_skipped"].append((dir_path, reason))
 
             # Generate dependabot.yml
             if self._should_generate_dependabot(result["languages"]):
@@ -579,7 +587,10 @@ class RepoSetupSyncer:
                 logger.debug(
                     f"  Skipped file ({reason}): {target_file.relative_to(target_file.parents[1])}"
                 )
-                return False  # Return False to indicate no sync was needed
+                return (
+                    False,
+                    reason,
+                )  # Return False and reason to indicate no sync was needed
 
             # Files should be overwritten
             if not self.dry_run:
@@ -589,13 +600,13 @@ class RepoSetupSyncer:
             logger.info(
                 f"  {action} file ({reason}): {target_file.relative_to(target_file.parents[1])}"
             )
-            return True
+            return True, reason
 
         except Exception as e:
             logger.error(f"  Error syncing file {source_file}: {e}")
-            return False
+            return False, f"error: {e}"
 
-    def _sync_directory(self, source_dir: Path, target_dir: Path) -> bool:
+    def _sync_directory(self, source_dir: Path, target_dir: Path) -> tuple[bool, str]:
         """Sync a directory recursively."""
         try:
             # Check if directories are identical
@@ -626,7 +637,10 @@ class RepoSetupSyncer:
                         logger.debug(
                             f"  Skipped directory (already identical): {target_dir.relative_to(target_dir.parents[1])}"
                         )
-                        return False  # Return False to indicate no sync was needed
+                        return (
+                            False,
+                            "already identical",
+                        )  # Return False and reason to indicate no sync was needed
 
                 except Exception:
                     # If comparison fails, proceed with sync
@@ -642,11 +656,11 @@ class RepoSetupSyncer:
             logger.info(
                 f"  {action} directory: {target_dir.relative_to(target_dir.parents[1])}"
             )
-            return True
+            return True, "directories differ"
 
         except Exception as e:
             logger.error(f"  Error syncing directory {source_dir}: {e}")
-            return False
+            return False, f"error: {e}"
 
     def _should_generate_dependabot(self, languages: Dict[str, bool]) -> bool:
         """Check if dependabot.yml should be generated."""
@@ -722,7 +736,9 @@ class RepoSetupSyncer:
         total_repos = len(results)
         successful_repos = 0
         total_files_synced = 0
+        total_files_skipped = 0
         total_dirs_synced = 0
+        total_dirs_skipped = 0
         dependabot_generated = 0
 
         for repo_name, result in results.items():
@@ -730,7 +746,9 @@ class RepoSetupSyncer:
                 successful_repos += 1
 
             total_files_synced += len(result["files_synced"])
+            total_files_skipped += len(result["files_skipped"])
             total_dirs_synced += len(result["directories_synced"])
+            total_dirs_skipped += len(result["directories_skipped"])
 
             if result["dependabot_generated"]:
                 dependabot_generated += 1
@@ -748,17 +766,25 @@ class RepoSetupSyncer:
 
             # Show what was synced
             files_count = len(result["files_synced"])
+            files_skipped_count = len(result["files_skipped"])
             dirs_count = len(result["directories_synced"])
+            dirs_skipped_count = len(result["directories_skipped"])
 
             if files_count > 0:
                 print(f"  Files synced: {files_count}")
             else:
                 print("  Files: all up-to-date")
 
+            if files_skipped_count > 0:
+                print(f"  Files already correct: {files_skipped_count}")
+
             if dirs_count > 0:
                 print(f"  Directories synced: {dirs_count}")
             else:
                 print("  Directories: all up-to-date")
+
+            if dirs_skipped_count > 0:
+                print(f"  Directories already correct: {dirs_skipped_count}")
 
             if result["dependabot_generated"]:
                 print("  ✓ Generated dependabot.yml")
@@ -774,7 +800,9 @@ class RepoSetupSyncer:
         print(f"Total repositories: {total_repos}")
         print(f"Successful: {successful_repos}")
         print(f"Files synced: {total_files_synced}")
+        print(f"Files already correct: {total_files_skipped}")
         print(f"Directories synced: {total_dirs_synced}")
+        print(f"Directories already correct: {total_dirs_skipped}")
         print(f"Dependabot configs generated: {dependabot_generated}")
 
         if self.dry_run:

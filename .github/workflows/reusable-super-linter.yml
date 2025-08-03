@@ -195,8 +195,6 @@ jobs:
           FIX_PYTHON_BLACK: ${{ inputs.enable-auto-fix && inputs.run-python }}
           FIX_PYTHON_ISORT: ${{ inputs.enable-auto-fix && inputs.run-python }}
           FIX_SHELL_SHFMT: ${{ inputs.enable-auto-fix && inputs.run-shell }}
-          FIX_YAML: ${{ inputs.enable-auto-fix }}
-          FIX_CSS: ${{ inputs.enable-auto-fix && inputs.run-css }}
 
       - name: Check for auto-fixes
         if: inputs.enable-auto-fix == true

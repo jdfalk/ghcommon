@@ -1,7 +1,7 @@
 {
   "_comment": "Default Unified Automation Configuration",
   "_description": "This file contains all default values for the unified automation orchestrator. Copy and modify as needed for your repository.",
-  "_version": "1.0.0",
+  "_version": "1.1.0",
   "_guid": "auto-config-12345-67890-abcdef",
 
   "issue_management": {
@@ -15,7 +15,9 @@
     "enable_duplicate_prevention": true,
     "enable_duplicate_closure": true,
     "duplicate_prevention_method": "guid_and_title",
-    "max_duplicate_check_issues": 1000
+    "max_duplicate_check_issues": 1000,
+    "auto_close_duplicates": true,
+    "duplicate_selection_strategy": "oldest_with_most_activity"
   },
 
   "docs_update": {
