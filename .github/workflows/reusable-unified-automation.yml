@@ -47,6 +47,26 @@ on:
         required: false
         default: "3.11"
         type: string
+      im_enable_duplicate_prevention:
+        description: "Enable duplicate prevention during issue creation"
+        required: false
+        default: true
+        type: boolean
+      im_enable_duplicate_closure:
+        description: "Enable automatic closure of duplicate issues"
+        required: false
+        default: true
+        type: boolean
+      im_duplicate_prevention_method:
+        description: "Method for duplicate detection (guid_and_title, guid_only, title_only)"
+        required: false
+        default: "guid_and_title"
+        type: string
+      im_max_duplicate_check_issues:
+        description: "Maximum number of issues to check for duplicates"
+        required: false
+        default: 1000
+        type: number
 
       docs_updates_directory:
         description: "Directory with documentation updates"
@@ -250,6 +270,10 @@ jobs:
       issue_updates_directory: ${{ inputs.im_issue_updates_directory }}
       cleanup_issue_updates: ${{ inputs.im_cleanup_issue_updates }}
       python_version: ${{ inputs.im_python_version }}
+      enable_duplicate_prevention: ${{ inputs.im_enable_duplicate_prevention }}
+      enable_duplicate_closure: ${{ inputs.im_enable_duplicate_closure }}
+      duplicate_prevention_method: ${{ inputs.im_duplicate_prevention_method }}
+      max_duplicate_check_issues: ${{ inputs.im_max_duplicate_check_issues }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 

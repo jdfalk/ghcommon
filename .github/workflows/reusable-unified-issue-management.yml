@@ -82,6 +82,26 @@ on:
         required: false
         type: string
         default: "3.11"
+      enable_duplicate_prevention:
+        description: "Enable duplicate prevention during issue creation"
+        required: false
+        type: boolean
+        default: true
+      enable_duplicate_closure:
+        description: "Enable automatic closure of duplicate issues"
+        required: false
+        type: boolean
+        default: true
+      duplicate_prevention_method:
+        description: "Method for duplicate detection (guid_and_title, guid_only, title_only)"
+        required: false
+        type: string
+        default: "guid_and_title"
+      max_duplicate_check_issues:
+        description: "Maximum number of issues to check for duplicates"
+        required: false
+        type: number
+        default: 1000
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for issue management"
@@ -199,6 +219,10 @@ jobs:
           export FORCE_UPDATE="${{ inputs.force_update }}"
           export ISSUE_UPDATES_FILE="${{ inputs.issue_updates_file }}"
           export ISSUE_UPDATES_DIRECTORY="${{ inputs.issue_updates_directory }}"
+          export ENABLE_DUPLICATE_PREVENTION="${{ inputs.enable_duplicate_prevention }}"
+          export ENABLE_DUPLICATE_CLOSURE="${{ inputs.enable_duplicate_closure }}"
+          export DUPLICATE_PREVENTION_METHOD="${{ inputs.duplicate_prevention_method }}"
+          export MAX_DUPLICATE_CHECK_ISSUES="${{ inputs.max_duplicate_check_issues }}"
 
           # Run the operation and capture output and errors
           set +e
