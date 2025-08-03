@@ -237,6 +237,35 @@ on:
         default: "3.11"
         type: string
 
+      # Labeler Configuration
+      labeler_configuration_path:
+        description: "Path to labeler configuration file"
+        required: false
+        default: ".github/labeler.yml"
+        type: string
+      labeler_sync_labels:
+        description: "Whether to sync labels from configuration"
+        required: false
+        default: true
+        type: boolean
+      labeler_dot:
+        description: "Whether to use dot notation for label paths"
+        required: false
+        default: false
+        type: boolean
+      labeler_pr_numbers:
+        description: "PR numbers to apply labeler to"
+        required: false
+        default: ""
+        type: string
+
+      # Rebase Configuration
+      rebase_base_branch:
+        description: "Base branch for rebase operations"
+        required: false
+        default: "main"
+        type: string
+
 jobs:
   issue-management:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
@@ -335,5 +364,16 @@ jobs:
       preserve_existing_labels: ${{ inputs.il_preserve_existing_labels }}
       label_config_path: ${{ inputs.il_label_config_path }}
       python_version: ${{ inputs.il_python_version }}
+    secrets:
+      github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+
+  labeler:
+    if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
+    uses: ./.github/workflows/reusable-labeler.yml
+    with:
+      configuration-path: ${{ inputs.labeler_configuration_path }}
+      sync-labels: ${{ inputs.labeler_sync_labels }}
+      dot: ${{ inputs.labeler_dot }}
+      pr-numbers: ${{ inputs.labeler_pr_numbers }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
