@@ -746,6 +746,20 @@ class IssueUpdateProcessor:
         self.guid_issue_map: Dict[str, Tuple[str, int]] = {}
         self.dry_run = dry_run
 
+        # Load configuration from environment variables
+        self.enable_duplicate_prevention = (
+            os.getenv("ENABLE_DUPLICATE_PREVENTION", "true").lower() == "true"
+        )
+        self.enable_duplicate_closure = (
+            os.getenv("ENABLE_DUPLICATE_CLOSURE", "true").lower() == "true"
+        )
+        self.duplicate_prevention_method = os.getenv(
+            "DUPLICATE_PREVENTION_METHOD", "guid_and_title"
+        )
+        self.max_duplicate_check_issues = int(
+            os.getenv("MAX_DUPLICATE_CHECK_ISSUES", "1000")
+        )
+
     def process_updates(
         self,
         updates_file: str = "issue_updates.json",
@@ -1502,8 +1516,39 @@ class IssueUpdateProcessor:
         except Exception:
             return False
 
+    def _check_duplicate_by_title(self, title: str, api: GitHubAPI) -> bool:
+        """Check if an issue with the same title already exists.
+
+        Args:
+            title: The issue title to check
+            api: GitHub API instance for the target repository
+
+        Returns:
+            True if duplicate found, False if unique
+        """
+        try:
+            # Search for issues with exact title match
+            search_query = f'is:issue in:title "{title}"'
+            existing_issues = api.search_issues(search_query)
+
+            # Check for exact title matches (case-insensitive)
+            title_lower = title.lower().strip()
+            for issue in existing_issues[: self.max_duplicate_check_issues]:
+                existing_title = issue.get("title", "").lower().strip()
+                if existing_title == title_lower:
+                    print(
+                        f"🔍 Found duplicate title in issue #{issue['number']}: {issue['title']}"
+                    )
+                    return True
+
+            return False
+
+        except Exception as e:
+            print(f"⚠️  Error checking for duplicate titles: {e}")
+            return False
+
     def _create_issue(self, update: Dict[str, Any]) -> bool:
-        """Create a new issue with dual-GUID tracking and sub-issue support."""
+        """Create a new issue with dual-GUID tracking and enhanced duplicate prevention."""
         title = unescape_json_string(update.get("title", ""))
         body = unescape_json_string(update.get("body", ""))
         labels = update.get("labels", [])
@@ -1524,11 +1569,21 @@ class IssueUpdateProcessor:
             if "sub-issue" not in labels:
                 labels.append("sub-issue")
 
-        # Check for duplicate by GUID
-        if not self._check_guid_uniqueness(
-            guid, legacy_guid, "create", {"title": title}, repo=repo
-        ):
-            return False
+        # Enhanced duplicate prevention
+        if self.enable_duplicate_prevention:
+            if self.duplicate_prevention_method in ["guid_and_title", "guid_only"]:
+                # Check for duplicate by GUID
+                if not self._check_guid_uniqueness(
+                    guid, legacy_guid, "create", {"title": title}, repo=repo
+                ):
+                    print(f"🚫 Duplicate GUID detected for issue: {title}")
+                    return False
+
+            if self.duplicate_prevention_method in ["guid_and_title", "title_only"]:
+                # Check for duplicate by title
+                if self._check_duplicate_by_title(title, api):
+                    print(f"🚫 Duplicate title detected for issue: {title}")
+                    return False
 
         guid_to_embed = guid or legacy_guid
         if guid_to_embed:
@@ -2339,15 +2394,23 @@ class CopilotTicketManager:
 
 
 class DuplicateIssueManager:
-    """Manages duplicate issue detection and closure."""
+    """Manages duplicate issue detection and closure with enhanced configuration."""
 
     def __init__(self, github_api: GitHubAPI):
         self.api = github_api
         self.summary = OperationSummary("close-duplicates")
 
+        # Load configuration from environment variables
+        self.enable_duplicate_closure = (
+            os.getenv("ENABLE_DUPLICATE_CLOSURE", "true").lower() == "true"
+        )
+        self.max_duplicate_check_issues = int(
+            os.getenv("MAX_DUPLICATE_CHECK_ISSUES", "1000")
+        )
+
     def close_duplicates(self, dry_run: bool = False) -> int:
         """
-        Close duplicate issues by title.
+        Close duplicate issues by title with enhanced configuration support.
 
         Args:
             dry_run: If True, only print what would be done
@@ -2355,9 +2418,22 @@ class DuplicateIssueManager:
         Returns:
             Number of duplicate issues that were (or would be) closed
         """
+        if not self.enable_duplicate_closure:
+            print("🚫 Duplicate closure is disabled by configuration")
+            self.summary.add_warning("Duplicate closure disabled by configuration")
+            return 0
+
         print("Fetching open issues...")
         issues = self.api.get_all_issues(state="open")
-        print(f"Found {len(issues)} open issues")
+
+        # Limit the number of issues checked to prevent API rate limiting
+        if len(issues) > self.max_duplicate_check_issues:
+            print(
+                f"⚠️  Limiting duplicate check to {self.max_duplicate_check_issues} issues (found {len(issues)})"
+            )
+            issues = issues[: self.max_duplicate_check_issues]
+
+        print(f"Found {len(issues)} open issues to check")
 
         # Group issues by title
         title_groups = self._group_by_title(issues)
@@ -2377,7 +2453,8 @@ class DuplicateIssueManager:
                     closed_count += self._close_duplicate_group(issue_list)
 
         if not duplicates_found:
-            print("No duplicate issues found")
+            print("✅ No duplicate issues found")
+            self.summary.add_success("No duplicate issues found")
 
         # Print operation summary
         self.summary.print_summary()
@@ -2697,9 +2774,7 @@ Environment Variables:
     )
 
     # Event handler command
-    event_parser = subparsers.add_parser(
-        "event-handler", help="Handle GitHub webhook events"
-    )
+    subparsers.add_parser("event-handler", help="Handle GitHub webhook events")
 
     args = parser.parse_args()
 

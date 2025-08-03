@@ -1,0 +1,10 @@
+# Repository List for Unified Automation Updates
+# Format: owner/repository-name
+# Lines starting with # are comments
+
+# Example repositories (uncomment to use):
+# jdfalk/gcommon
+# jdfalk/ghcommon
+# jdfalk/example-repo
+
+# Add your repositories here, one per line
