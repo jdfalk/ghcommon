@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.2
+# version: 2.4.3
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -157,6 +157,9 @@ jobs:
           OUTPUT_DETAILS: ${{ inputs.show-detailed-summary && 'detailed' || 'simpler' }}
           CREATE_LOG_FILE: true
           SLIM_IMAGE: false
+          
+          # Ensure logs are written to the expected location
+          LOG_FILE: super-linter.log
 
           # Language validation settings
           VALIDATE_PYTHON: ${{ inputs.run-python }}
@@ -297,21 +300,44 @@ jobs:
           # Ensure output directory exists
           mkdir -p super-linter-output
 
-          # Copy any log files to output directory
+          # Debug: Show current directory and contents
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          
+          # Look for Super Linter log files in multiple possible locations
+          echo "Searching for Super Linter log files..."
+          
+          # Copy main log file if it exists
           if [ -f "super-linter.log" ]; then
+            echo "Found super-linter.log, copying to output directory"
             cp super-linter.log super-linter-output/
+          else
+            echo "super-linter.log not found in current directory"
           fi
 
-          # Copy all log files from Super Linter output folder if they exist
+          # Check if logs exist in the default Super Linter output location
+          if [ -d "/tmp/super-linter-output" ]; then
+            echo "Found logs in /tmp/super-linter-output, copying..."
+            cp -r /tmp/super-linter-output/* super-linter-output/ 2>/dev/null || true
+          fi
+
+          # Check for any .log files in current directory
+          find . -maxdepth 1 -name "*.log" -type f | while read -r logfile; do
+            if [ -f "$logfile" ]; then
+              echo "Found log file: $logfile"
+              cp "$logfile" super-linter-output/
+            fi
+          done
+
+          # List what we have in the output directory
+          echo "Contents of super-linter-output directory:"
           if [ -d "super-linter-output" ]; then
-            # Find and list first 10 log files
-            count=0
-            while IFS= read -r -d '' logfile && [ $count -lt 10 ]; do
-              if [ -f "$logfile" ]; then
-                echo "Found log file: $logfile"
-                count=$((count + 1))
-              fi
-            done < <(find super-linter-output -name "*.log" -type f -print0 2>/dev/null)
+            ls -la super-linter-output/
+            count=$(find super-linter-output -name "*.log" -type f | wc -l)
+            echo "Total log files found: $count"
+          else
+            echo "super-linter-output directory still does not exist!"
           fi
 
           # Create a focused summary file with only relevant information
@@ -406,14 +432,36 @@ jobs:
 
               let issuesFound = false;
               try {
+                console.log('Checking for super-linter-output directory...');
                 if (fs.existsSync('super-linter-output')) {
-                  const logFiles = fs.readdirSync('super-linter-output').filter(f => f.endsWith('.log'));
+                  console.log('super-linter-output directory found');
+                  let logFiles;
+                  try {
+                    logFiles = fs.readdirSync('super-linter-output').filter(f => f.endsWith('.log'));
+                    console.log(`Found ${logFiles.length} log files:`, logFiles);
+                  } catch (dirError) {
+                    console.log('Error reading super-linter-output directory:', dirError.message);
+                    logFiles = [];
+                  }
                   let issueCount = 0;
 
                   for (const logFile of logFiles.slice(0, 3)) { // Limit to first 3 log files
                     if (issueCount >= 5) break; // Limit total issues shown
 
-                    const logContent = fs.readFileSync(`super-linter-output/${logFile}`, 'utf8');
+                    const logPath = `super-linter-output/${logFile}`;
+                    if (!fs.existsSync(logPath)) {
+                      console.log(`Log file not found: ${logPath}`);
+                      continue;
+                    }
+
+                    let logContent;
+                    try {
+                      logContent = fs.readFileSync(logPath, 'utf8');
+                    } catch (readError) {
+                      console.log(`Error reading log file ${logPath}:`, readError.message);
+                      continue;
+                    }
+                    
                     const lines = logContent.split('\n');
 
                     // Extract specific error lines with file context
@@ -449,9 +497,13 @@ jobs:
                       summary += '\n';
                     }
                   }
+                } else {
+                  console.log('super-linter-output directory not found');
+                  summary += 'No detailed error logs available. Check the Super Linter step for more information.\n\n';
                 }
               } catch (error) {
-                console.log('Could not parse linting errors:', error);
+                console.log('Error accessing super-linter output:', error.message);
+                summary += 'Error accessing linting logs. Check the workflow logs for detailed error information.\n\n';
               }
 
               if (!issuesFound) {
