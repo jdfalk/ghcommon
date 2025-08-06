@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-codeql.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: af287302-d723-4712-abf5-2808f583495d
 
 name: Reusable - CodeQL Analysis
@@ -17,6 +17,11 @@ on:
         required: false
         default: ".github/codeql.yml"
         type: string
+      matrix-key:
+        description: "Additional key for matrix builds to prevent cache collisions"
+        required: false
+        default: "default"
+        type: string
     secrets:
       github-token:
         description: "GitHub token with security-events permission"
@@ -32,21 +37,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache CodeQL database
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/codeql
-          key: codeql-${{ runner.os }}-${{ github.repository }}-${{ github.ref_name }}
-          restore-keys: |
-            codeql-${{ runner.os }}-${{ github.repository }}-
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ inputs.languages }}
           config-file: ${{ inputs.config-file }}
           cache: true
-          cache-id: ${{ github.repository }}-${{ github.ref_name }}
+          # Create unique cache-id to prevent collisions between parallel runs
+          # Include languages, matrix key, repository, and ref for uniqueness
+          cache-id: ${{ github.repository }}-${{ github.ref_name }}-${{ inputs.languages || 'auto' }}-${{ inputs.matrix-key }}
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
