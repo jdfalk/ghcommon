@@ -1,3 +1,7 @@
+# file: .github/dependabot.yml
+# version: 1.0.0
+# guid: 909d8346-3b01-4667-ae90-a44d8dde6de3
+#
 # Smart Dependabot configuration for ghcommon
 # GitHub Common Workflows - reusable workflows and tooling
 # Automatically detected: Node.js/npm, Python, GitHub Actions
@@ -18,6 +22,7 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+      - "npm"
     allow:
       - dependency-type: "direct"
       - dependency-type: "indirect"
@@ -49,6 +54,7 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+      - "python"
     allow:
       - dependency-type: "direct"
     ignore:
@@ -69,7 +75,7 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "ci/cd"
+      - "ci-cd"
     groups:
       ci-dependencies:
         patterns:
