@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 2.0.1
+# version: 2.0.2
 # guid: 7e2b1c4d-5f6a-4b7c-8e9f-0a1b2c3d4e5f
 
 name: Universal CI/CD
@@ -76,6 +76,7 @@ jobs:
 
   changes:
     if: inputs.enable-backend-frontend == true
+    needs: [super-linter]
     runs-on: ubuntu-latest
     # Permissions removed - should be set in calling workflow
     # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow

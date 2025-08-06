@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 3.2.0
+# version: 3.2.1
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -241,6 +241,7 @@ on:
 jobs:
   issue-management:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-unified-issue-management.yml
     with:
       operations: ${{ inputs.im_operations }}
@@ -255,6 +256,7 @@ jobs:
 
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-docs-update.yml
     with:
       updates-directory: ${{ inputs.docs_updates_directory }}
@@ -269,6 +271,7 @@ jobs:
 
   labeler:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'label' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-labeler.yml
     with:
       configuration-path: ${{ inputs.labeler_configuration_path }}
@@ -279,27 +282,31 @@ jobs:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   super-linter:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
     uses: ./.github/workflows/reusable-super-linter.yml
     with:
-      validate-all-codebase: ${{ inputs.sl_validate_all_codebase }}
+      validate-all-codebase: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_validate_all_codebase || false }}
       default-branch: ${{ inputs.sl_default_branch }}
       config-file: ${{ inputs.sl_config_file }}
-      run-python: ${{ inputs.sl_run_python }}
-      run-shell: ${{ inputs.sl_run_shell }}
-      run-markdown: ${{ inputs.sl_run_markdown }}
-      run-yaml: ${{ inputs.sl_run_yaml }}
-      run-json: ${{ inputs.sl_run_json }}
-      run-javascript: ${{ inputs.sl_run_javascript }}
-      run-go: ${{ inputs.sl_run_go }}
-      run-css: ${{ inputs.sl_run_css }}
-      run-html: ${{ inputs.sl_run_html }}
+      run-python: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_python || false }}
+      run-shell: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_shell || false }}
+      run-markdown: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_markdown || false }}
+      run-yaml: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_yaml || false }}
+      run-json: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_json || false }}
+      run-javascript: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_javascript || false }}
+      run-go: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_go || false }}
+      run-css: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_css || false }}
+      run-html: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_html || false }}
+      run-github-actions: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_github_actions || false }}
+      run-security: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_run_security || false }}
+      enable-auto-fix: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_enable_auto_fix || false }}
+      auto-commit-fixes: ${{ (inputs.operation == 'all' || inputs.operation == 'lint') && inputs.sl_auto_commit_fixes || false }}
       commit-message: ${{ inputs.sl_commit_message }}
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   intelligent-labeling:
     if: ${{ inputs.operation == 'intelligent-labeling' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
     with:
       enabled: ${{ inputs.il_enabled }}
@@ -317,6 +324,7 @@ jobs:
   intelligent-labeling-post-processing:
     if: ${{ inputs.operation == 'all' }}
     needs:
+      - super-linter
       - issue-management
       - docs-update
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml

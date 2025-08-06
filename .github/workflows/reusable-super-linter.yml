@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.2
+# version: 2.4.3
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -119,6 +119,7 @@ jobs:
         with:
           # Full git history is needed to get list of changed files
           fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref }}
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
 
       - name: Setup Super Linter environment
@@ -156,6 +157,7 @@ jobs:
           OUTPUT_FOLDER: super-linter-output
           OUTPUT_DETAILS: ${{ inputs.show-detailed-summary && 'detailed' || 'simpler' }}
           CREATE_LOG_FILE: true
+          SAVE_SUPER_LINTER_OUTPUT: true
           SLIM_IMAGE: false
 
           # Language validation settings
@@ -241,7 +243,8 @@ jobs:
           rm commit_msg.txt
 
           echo "Pushing auto-fixes..."
-          git push
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          git push origin "HEAD:$BRANCH"
           echo "✅ Auto-fixes committed and pushed successfully"
 
       - name: Create Job Summary
