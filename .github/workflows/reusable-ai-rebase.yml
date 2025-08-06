@@ -289,7 +289,7 @@ jobs:
       - name: Generate patch with AI
         if: steps.conflicts.outputs.has_conflict == 'true'
         id: ai
-        uses: actions/ai-inference@v1.2.3
+        uses: actions/ai-inference@v1.2.8
         continue-on-error: true
         with:
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
