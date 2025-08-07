@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 2.1.0
+# version: 2.1.1
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 
 name: PR Automation
@@ -27,8 +27,9 @@ jobs:
     name: Code Quality Check
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
-      validate-all-codebase: false
+      validate-all-codebase: true
       default-branch: ${{ github.event.repository.default_branch }}
+      config-file: .github/super-linter.env
       filter-regex-exclude: ".*\\.git/.*|.*\\.github/copilot/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|.*vendor/.*|.*dist/.*"
       run-python: true
       run-shell: true
@@ -36,16 +37,20 @@ jobs:
       run-yaml: true
       run-json: true
       run-javascript: true
-      run-go: false
+      run-go: true
+      run-css: true
+      run-html: true
       run-github-actions: true
       run-security: true
       enable-auto-fix: true
       auto-commit-fixes: true
+      show-detailed-summary: true
     secrets: inherit
 
   # Unified automation for issue management and docs
   unified-automation:
     name: Unified PR Automation
+    needs: super-linter
     uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
     with:
       operation: "all"
@@ -65,6 +70,7 @@ jobs:
   # Intelligent issue labeling for PRs
   intelligent-labeling:
     name: Intelligent Labeling
+    needs: super-linter
     uses: jdfalk/ghcommon/.github/workflows/reusable-intelligent-issue-labeling.yml@main
     with:
       dry_run: false
@@ -74,6 +80,7 @@ jobs:
   # Standard labeler based on file patterns
   standard-labeler:
     name: Standard File-based Labeling
+    needs: super-linter
     uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@main
     with:
       configuration-path: ".github/labeler.yml"
@@ -85,6 +92,7 @@ jobs:
   ai-rebase:
     name: AI Rebase & Conflict Resolution
     if: (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && github.event.action != 'closed'
+    needs: super-linter
     uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@main
     with:
       base-branch: ${{ github.event.repository.default_branch }}

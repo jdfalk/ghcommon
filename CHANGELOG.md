@@ -10,6 +10,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs, and validates entire codebase
+
 ### Added
 
 - Added concise output mode to Super Linter workflow (default behavior)

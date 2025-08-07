@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "title": "Improve Super Linter workflows",
+  "body": "Ensure Super Linter auto-fixes lint issues, pushes results, runs before other jobs, and validates entire codebase.",
+  "labels": ["automation", "github-actions"],
+  "guid": "db0e0733-eca5-461e-baf5-137df58f89c3",
+  "legacy_guid": "create-improve-super-linter-workflows-2025-08-06"
+}
