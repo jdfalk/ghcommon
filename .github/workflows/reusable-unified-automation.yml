@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-unified-automation.yml
-# version: 3.4.0
+# version: 3.4.1
 # guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
 
 name: Unified Automation Orchestrator
@@ -107,7 +107,7 @@ on:
       sl_validate_all_codebase:
         description: "Validate entire codebase with Super Linter"
         required: false
-        default: false
+        default: true
         type: boolean
       sl_default_branch:
         description: "Default branch for Super Linter"
@@ -269,6 +269,7 @@ on:
 jobs:
   issue-management:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-unified-issue-management.yml
     with:
       operations: ${{ inputs.im_operations }}
@@ -287,6 +288,7 @@ jobs:
 
   duplicate-cleanup:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'issues' || inputs.operation == 'duplicates' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-unified-issue-management.yml
     with:
       operations: "close-duplicates"
@@ -300,6 +302,7 @@ jobs:
 
   docs-update:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'docs' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-docs-update.yml
     with:
       updates-directory: ${{ inputs.docs_updates_directory }}
@@ -313,7 +316,6 @@ jobs:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
 
   super-linter:
-    if: ${{ inputs.operation == 'all' || inputs.operation == 'lint' }}
     uses: ./.github/workflows/reusable-super-linter.yml
     with:
       validate-all-codebase: ${{ inputs.sl_validate_all_codebase }}
@@ -334,6 +336,7 @@ jobs:
 
   intelligent-labeling:
     if: ${{ inputs.operation == 'all' || inputs.operation == 'intelligent-labeling' }}
+    needs: super-linter
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
     with:
       enabled: ${{ inputs.il_enabled }}
@@ -351,6 +354,7 @@ jobs:
   intelligent-labeling-post-processing:
     if: ${{ inputs.operation == 'all' }}
     needs:
+      - super-linter
       - issue-management
       - docs-update
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml

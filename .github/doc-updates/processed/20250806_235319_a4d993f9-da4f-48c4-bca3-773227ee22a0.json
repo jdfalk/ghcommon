@@ -1,0 +1,20 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Fixed\n\n- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs, and validates entire codebase",
+  "guid": "a4d993f9-da4f-48c4-bca3-773227ee22a0",
+  "created_at": "2025-08-06T23:53:14Z",
+  "processed_at": null,
+  "failed_at": null,
+  "sequence": 0,
+  "parent_guid": null,
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
