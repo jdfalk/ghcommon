@@ -42,9 +42,57 @@
             "problemMatcher": []
         },
         {
+            "label": "Python Test",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && python -m pytest > logs/python_test.log 2>&1 && echo 'SUCCESS: python test completed' >> logs/python_test.log || echo 'FAILED: python test failed' >> logs/python_test.log",
+            "group": "test",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "Python Lint",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && flake8 . > logs/python_lint.log 2>&1 && echo 'SUCCESS: python lint completed' >> logs/python_lint.log || echo 'FAILED: python lint failed' >> logs/python_lint.log",
+            "group": "test",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "Git Add All",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && git add . > logs/git_add.log 2>&1 && echo 'SUCCESS: git add completed' >> logs/git_add.log || echo 'FAILED: git add failed' >> logs/git_add.log",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
             "label": "Git Add Selective",
             "type": "shell",
-            "command": "mkdir -p logs && PATTERN='${input:filePattern}'; git add $PATTERN > logs/git_add_selective.log 2>&1 && echo \"SUCCESS: git add completed for pattern: $PATTERN\" >> logs/git_add_selective.log || echo \"FAILED: git add failed for pattern: $PATTERN\" >> logs/git_add_selective.log",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && PATTERN='${input:filePattern}'; git add $PATTERN > logs/git_add_selective.log 2>&1 && echo \"SUCCESS: git add completed for pattern: $PATTERN\" >> logs/git_add_selective.log || echo \"FAILED: git add failed for pattern: $PATTERN\" >> logs/git_add_selective.log",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "Git Commit",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && MESSAGE='${input:commitMessage}'; git commit -m \"$MESSAGE\" > logs/git_commit.log 2>&1 && echo 'SUCCESS: git commit completed' >> logs/git_commit.log || echo 'FAILED: git commit failed' >> logs/git_commit.log",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "Git Push",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && git push > logs/git_push.log 2>&1 && echo 'SUCCESS: git push completed' >> logs/git_push.log || echo 'FAILED: git push failed' >> logs/git_push.log",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "Git Status",
+            "type": "shell",
+            "command": "cd ${workspaceFolder} && mkdir -p logs && git status --porcelain > logs/git_status.log 2>&1 && echo '--- Git Status Summary ---' >> logs/git_status.log && git status >> logs/git_status.log",
             "group": "build",
             "isBackground": false,
             "problemMatcher": []
