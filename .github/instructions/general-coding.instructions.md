@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 1.2.0 -->
+<!-- version: 1.3.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -34,6 +34,8 @@ Copilot customization.
 - Do not duplicate rules; reference this file from more specific instructions.
 - For VS Code Copilot customization, this file is included via symlink in
   `.vscode/copilot/`.
+- **ALWAYS check before doing:** Before creating files, running operations, or executing scripts, always check current state first. Make all scripts and operations idempotent by checking if the desired state already exists before making changes.
+- **Use VS Code Tasks when available:** When performing git operations (add, commit, push, status) or project-specific builds/tests, prefer using the standardized VS Code tasks over manual terminal commands. All task output is logged to the `logs/` folder for review and debugging. Always check the corresponding log file after running a task to verify success or diagnose issues.
 
 For more details and the full system, see
 [copilot-instructions.md](../copilot-instructions.md).
@@ -182,3 +184,43 @@ of direct edits:
 
 **Always use this system for documentation updates instead of direct file
 edits.**
+
+## VS Code Tasks and Automation
+
+All repositories are configured with standardized VS Code tasks for common
+operations. **Always prefer using these tasks over manual terminal commands.**
+
+### Task Categories
+
+- **Git Operations**: `Git Add All`, `Git Add Selective`, `Git Commit`, `Git Push`, `Git Status`
+- **Build Operations**: Repository-specific tasks (e.g., `Go Build`, `Buf Generate`, `Python Test`)
+- **Project Operations**: Language/framework-specific tasks
+
+### Task Output and Logging
+
+- **All task output is logged to the `logs/` folder** (gitignored)
+- **Always check log files after running tasks** to verify success or diagnose issues
+- Log files are named descriptively: `git_commit.log`, `go_build.log`, etc.
+- Tasks include success/failure messages at the end of each log
+
+### Usage
+
+1. **Run tasks via VS Code**: Command Palette (`Ctrl/Cmd+Shift+P`) → "Tasks: Run Task"
+2. **Check results**: Read the corresponding log file in `logs/` folder
+3. **Automate workflows**: Chain tasks together for complex operations
+
+### Examples
+
+```bash
+# Instead of: git add . && git commit -m "message" && git push
+# Use tasks: "Git Add All" → "Git Commit" → "Git Push"
+
+# Instead of: go build -o bin/app
+# Use task: "Go Build"
+
+# Instead of: buf generate
+# Use task: "Buf Generate with Output"
+```
+
+This approach provides consistent logging, error handling, and automation across
+all repositories.
