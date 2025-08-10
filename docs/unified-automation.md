@@ -5,9 +5,9 @@
 # Unified Automation Workflow
 
 A reusable GitHub Actions workflow that orchestrates issue management,
-documentation updates, duplicate cleanup, labeling, linting, and AI-powered automation. It exposes
-numerous inputs so each repository can fine-tune exactly which tasks run and how
-they're configured.
+documentation updates, duplicate cleanup, labeling, linting, and AI-powered
+automation. It exposes numerous inputs so each repository can fine-tune exactly
+which tasks run and how they're configured.
 
 ## Overview
 
@@ -51,4 +51,5 @@ See the workflow file for the full list of available inputs.
 
 ## Manual Execution
 
-Run the workflow from the Actions tab using workflow_dispatch inputs to control operations
+Run the workflow from the Actions tab using workflow_dispatch inputs to control
+operations

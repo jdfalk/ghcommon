@@ -2,18 +2,21 @@
 
 ## Overview
 
-This document explains the migration from reusable workflows with embedded permissions to a security-enhanced model where permissions are only defined in calling workflows.
+This document explains the migration from reusable workflows with embedded
+permissions to a security-enhanced model where permissions are only defined in
+calling workflows.
 
 ## What Changed
 
 ### Before (Security Risk)
+
 ```yaml
 # reusable-workflow.yml
 name: Reusable Workflow
 on:
   workflow_call:
 
-permissions:  # ❌ This creates security conflicts
+permissions: # ❌ This creates security conflicts
   contents: write
   issues: write
 
@@ -25,6 +28,7 @@ jobs:
 ```
 
 ### After (Secure)
+
 ```yaml
 # reusable-workflow.yml
 name: Reusable Workflow
@@ -48,7 +52,7 @@ on:
   push:
     branches: [main]
 
-permissions:  # ✅ Permissions defined here
+permissions: # ✅ Permissions defined here
   contents: write
   issues: write
 
@@ -60,8 +64,10 @@ jobs:
 ## Benefits
 
 1. **No Permission Conflicts**: Eliminates GitHub's "allowed permissions" errors
-2. **Better Security**: Calling workflows explicitly declare what permissions they grant
-3. **Principle of Least Privilege**: Each calling workflow can grant only the minimal permissions needed
+2. **Better Security**: Calling workflows explicitly declare what permissions
+   they grant
+3. **Principle of Least Privilege**: Each calling workflow can grant only the
+   minimal permissions needed
 4. **Transparency**: Clear visibility of what permissions each workflow requires
 
 ## Migration Steps
@@ -69,25 +75,30 @@ jobs:
 ### 1. Automated Migration (Completed)
 
 We've automatically removed permissions from all reusable workflows using:
+
 ```bash
 python3 scripts/remove-reusable-workflow-permissions.py
 ```
 
 This script:
+
 - ✅ Removed permissions blocks from 13 reusable workflows
 - ✅ Created backups of original files (`.backup` extension)
 - ✅ Added explanatory comments where permissions were removed
 
 ### 2. Update Calling Workflows
 
-For each calling workflow, add the appropriate permissions based on which reusable workflows it calls.
+For each calling workflow, add the appropriate permissions based on which
+reusable workflows it calls.
 
 ## Required Permissions by Reusable Workflow
 
 ### Core Workflows
 
 #### `reusable-codeql.yml` (Security Scanning)
+
 **Minimal required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -95,13 +106,16 @@ permissions:
 ```
 
 #### `reusable-ci.yml` (Continuous Integration)
+
 **Minimal required permissions:**
+
 ```yaml
 permissions:
   contents: read
 ```
 
 **Full permissions (if using all features):**
+
 ```yaml
 permissions:
   contents: read
@@ -115,7 +129,9 @@ permissions:
 ```
 
 #### `reusable-docker-build.yml` (Container Build)
+
 **Minimal required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -125,7 +141,9 @@ permissions:
 ### Issue & PR Management
 
 #### `reusable-labeler.yml` (Auto Labeling)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -134,7 +152,9 @@ permissions:
 ```
 
 #### `reusable-label-sync.yml` (Label Synchronization)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -143,7 +163,9 @@ permissions:
 ```
 
 #### `reusable-stale.yml` (Stale Issue Management)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -152,7 +174,9 @@ permissions:
 ```
 
 #### `reusable-intelligent-issue-labeling.yml` (AI Issue Labeling)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -160,7 +184,9 @@ permissions:
 ```
 
 #### `reusable-unified-issue-management.yml` (Comprehensive Issue Management)
+
 **Minimal required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -168,6 +194,7 @@ permissions:
 ```
 
 **Full permissions (if using all features):**
+
 ```yaml
 permissions:
   contents: write
@@ -183,7 +210,9 @@ permissions:
 ### Documentation
 
 #### `reusable-docs-update.yml` (Documentation Updates)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: write
@@ -192,7 +221,9 @@ permissions:
 ```
 
 #### `reusable-enhanced-docs-update.yml` (Enhanced Documentation)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: write
@@ -201,13 +232,16 @@ permissions:
 ### Release Management
 
 #### `reusable-goreleaser.yml` (Go Release Management)
+
 **Minimal required permissions:**
+
 ```yaml
 permissions:
   contents: write
 ```
 
 **Full permissions (if publishing packages):**
+
 ```yaml
 permissions:
   contents: write
@@ -217,7 +251,9 @@ permissions:
 ```
 
 #### `reusable-semantic-versioning.yml` (Semantic Versioning)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: write
@@ -230,7 +266,9 @@ permissions:
 ### Automation & Maintenance
 
 #### `reusable-ai-rebase.yml` (AI-Assisted Rebasing)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: write
@@ -238,14 +276,18 @@ permissions:
 ```
 
 #### `reusable-repo-settings.yml` (Repository Settings)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: write
 ```
 
 #### `reusable-super-linter.yml` (Code Linting)
+
 **Required permissions:**
+
 ```yaml
 permissions:
   contents: read
@@ -254,6 +296,7 @@ permissions:
 ## Example Calling Workflows
 
 ### Basic CI with Security Scanning
+
 ```yaml
 name: CI with Security
 
@@ -278,6 +321,7 @@ jobs:
 ```
 
 ### Comprehensive Issue Management
+
 ```yaml
 name: Issue Management
 
@@ -304,6 +348,7 @@ jobs:
 ```
 
 ### Release Pipeline
+
 ```yaml
 name: Release
 
@@ -327,6 +372,7 @@ jobs:
 ## Best Practices
 
 ### 1. Principle of Least Privilege
+
 Only grant the minimal permissions required for your specific use case:
 
 ```yaml
@@ -344,6 +390,7 @@ permissions:
 ```
 
 ### 2. Separate Workflows by Permission Requirements
+
 Consider splitting workflows that require different permission levels:
 
 ```yaml
@@ -358,17 +405,20 @@ permissions:
 ```
 
 ### 3. Document Permission Requirements
+
 Always document why specific permissions are needed:
 
 ```yaml
 permissions:
-  contents: read        # For checking out code
+  contents: read # For checking out code
   security-events: write # For uploading SARIF results
-  packages: write       # For publishing Docker images
+  packages: write # For publishing Docker images
 ```
 
 ### 4. Regular Permission Audits
+
 Periodically review and minimize permissions:
+
 - Remove unused permissions
 - Split workflows with different security requirements
 - Use separate tokens for different permission levels when possible
@@ -376,27 +426,30 @@ Periodically review and minimize permissions:
 ## Troubleshooting
 
 ### "Required permission not granted" Error
+
 If you see this error, add the missing permission to your calling workflow:
 
 ```yaml
 # Error: security-events permission required
 permissions:
   contents: read
-  security-events: write  # Add this
+  security-events: write # Add this
 ```
 
 ### Multiple Reusable Workflows with Different Permissions
+
 Use the union of all required permissions:
 
 ```yaml
 # Workflow calls both CI (needs contents: read) and labeler (needs issues: write)
 permissions:
-  contents: read    # For CI
-  issues: write     # For labeler
-  pull-requests: write  # For labeler
+  contents: read # For CI
+  issues: write # For labeler
+  pull-requests: write # For labeler
 ```
 
 ### Token Scope Issues
+
 Ensure your workflow token has the necessary scopes:
 
 ```yaml
@@ -416,6 +469,7 @@ Ensure your workflow token has the necessary scopes:
 ## Files Changed
 
 ### Reusable Workflows Modified (13 files)
+
 - `reusable-labeler.yml` - Removed 1 permissions block
 - `reusable-ci.yml` - Removed 6 permissions blocks
 - `reusable-docs-update.yml` - Removed 1 permissions block
@@ -431,20 +485,28 @@ Ensure your workflow token has the necessary scopes:
 - `reusable-intelligent-issue-labeling.yml` - Removed 1 permissions block
 
 ### Backup Files Created
-All original files are preserved with `.backup` extension in case rollback is needed.
+
+All original files are preserved with `.backup` extension in case rollback is
+needed.
 
 ### Analysis Files Generated
-- `workflow-permissions-analysis.json` - Detailed analysis of permission requirements
+
+- `workflow-permissions-analysis.json` - Detailed analysis of permission
+  requirements
 - `workflow-templates/` - Example calling workflow templates
 
 ## Support
 
 For questions about this migration:
+
 1. Check the generated templates in `workflow-templates/`
 2. Review the analysis in `workflow-permissions-analysis.json`
-3. Refer to [GitHub's official documentation](https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow)
+3. Refer to
+   [GitHub's official documentation](https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow)
 
 ## Scripts Used
 
-- `scripts/remove-reusable-workflow-permissions.py` - Removes permissions from reusable workflows
-- `scripts/analyze-reusable-workflow-permissions.py` - Analyzes permission requirements and generates templates
+- `scripts/remove-reusable-workflow-permissions.py` - Removes permissions from
+  reusable workflows
+- `scripts/analyze-reusable-workflow-permissions.py` - Analyzes permission
+  requirements and generates templates

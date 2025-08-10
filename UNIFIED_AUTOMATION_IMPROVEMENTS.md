@@ -7,22 +7,32 @@
 ## Issues Identified
 
 ### 1. Workflow Summary Timing Issue
-**Problem**: The `post-automation` job runs immediately after `unified-automation` completes, but doesn't wait for all sub-operations (super-linter, intelligent-labeling, etc.) to finish.
 
-**Solution**: The workflow structure is actually correct - all operations run within the `unified-automation` reusable workflow job, so `post-automation` does wait for everything to complete. However, the naming could be clearer.
+**Problem**: The `post-automation` job runs immediately after
+`unified-automation` completes, but doesn't wait for all sub-operations
+(super-linter, intelligent-labeling, etc.) to finish.
+
+**Solution**: The workflow structure is actually correct - all operations run
+within the `unified-automation` reusable workflow job, so `post-automation` does
+wait for everything to complete. However, the naming could be clearer.
 
 ### 2. Labeler vs Intelligent-Labeling Confusion
+
 **Problem**: Two similar-sounding but different labeling systems:
+
 - `labeler`: Basic GitHub label syncing and configuration
 - `intelligent-labeling`: AI-powered labeling of issues/PRs based on content
 
 **Solution**:
+
 - **Keep both** - they serve different purposes
 - **Improve documentation** to clarify the difference
 - **Consider renaming** `labeler` to `label-sync` for clarity
 
 ### 3. Issue Management Duplicate Handling Gaps
+
 **Problem**: While duplicate prevention exists, it has several gaps:
+
 - No proactive cleanup of existing duplicates
 - Simple "keep lowest number" strategy instead of "oldest with most activity"
 - Processed update files aren't moved to avoid re-processing
@@ -30,7 +40,9 @@
 **Solutions Implemented**:
 
 #### A. Enhanced Configuration (✅ DONE)
+
 Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
+
 ```json
 {
   "issue_management": {
@@ -41,6 +53,7 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
 ```
 
 #### B. Improved Duplicate Detection Logic (🔄 NEEDS IMPLEMENTATION)
+
 - **Before creating**: Check for duplicates by GUID and title
 - **During processing**: Automatically run duplicate cleanup
 - **Selection strategy**: Keep the issue with:
@@ -49,19 +62,24 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
   3. Most labels (shows categorization)
 
 #### C. File Management Improvements (🔄 NEEDS IMPLEMENTATION)
-- Move processed `issue_updates.json` files to `.github/issue-updates/processed/`
+
+- Move processed `issue_updates.json` files to
+  `.github/issue-updates/processed/`
 - Commit the move operation to prevent reprocessing
 - Add timestamp to processed files
 
 ## Recommended Implementation Plan
 
 ### Phase 1: Immediate Fixes (✅ COMPLETED)
+
 1. ✅ Fixed workflow `secrets: inherit` issue across all repositories
 2. ✅ Enhanced configuration with better duplicate handling options
 3. ✅ Added version tracking to all modified files
 
 ### Phase 2: Enhanced Duplicate Management (🔄 NEXT)
+
 1. **Improve duplicate selection logic** in `scripts/issue_manager.py`:
+
    ```python
    def _select_canonical_issue(self, issues):
        """Select best issue to keep based on age and activity."""
@@ -80,6 +98,7 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
    ```
 
 2. **Add automatic file processing**:
+
    ```python
    def _move_processed_file(self, file_path):
        """Move processed file to processed directory."""
@@ -92,6 +111,7 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
 3. **Add proactive duplicate cleanup** to the workflow operations
 
 ### Phase 3: Workflow Documentation Improvements (🔄 FUTURE)
+
 1. **Clarify labeler vs intelligent-labeling** in README
 2. **Add workflow timing diagram** showing job dependencies
 3. **Document configuration options** thoroughly
@@ -99,12 +119,13 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
 ## Configuration Reference
 
 ### Current Enhanced Settings
+
 ```json
 {
   "issue_management": {
-    "enable_duplicate_prevention": true,     // Prevent new duplicates
-    "enable_duplicate_closure": true,        // Close existing duplicates
-    "auto_close_duplicates": true,           // NEW: Auto-run cleanup
+    "enable_duplicate_prevention": true, // Prevent new duplicates
+    "enable_duplicate_closure": true, // Close existing duplicates
+    "auto_close_duplicates": true, // NEW: Auto-run cleanup
     "duplicate_prevention_method": "guid_and_title",
     "duplicate_selection_strategy": "oldest_with_most_activity", // NEW
     "max_duplicate_check_issues": 1000,
@@ -114,6 +135,7 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
 ```
 
 ### Duplicate Selection Strategies
+
 - `"lowest_number"`: Keep the oldest issue by number (current default)
 - `"oldest_with_most_activity"`: Keep oldest issue with most engagement (NEW)
 - `"most_recent"`: Keep the newest issue
@@ -128,7 +150,8 @@ Updated `.github/unified-automation-config.json` v1.0.0 → v1.1.0:
 
 ## Deployment
 
-1. ✅ **Template fixed**: `examples/workflows/unified-automation-complete.yml` v2.1.0
+1. ✅ **Template fixed**: `examples/workflows/unified-automation-complete.yml`
+   v2.1.0
 2. ✅ **Script enhanced**: `scripts/update-repository-automation.py` v1.2.0
 3. ✅ **Configuration updated**: `.github/unified-automation-config.json` v1.1.0
 4. ✅ **All repositories updated** with corrected workflows

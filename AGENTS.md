@@ -54,18 +54,23 @@ changes.**
 
 ## ⚠️ CRITICAL: File Version Updates
 
-**When modifying any file with a version header, ALWAYS update the version number:**
+**When modifying any file with a version header, ALWAYS update the version
+number:**
 
 - **Patch version** (x.y.Z): Bug fixes, typos, minor formatting changes
-- **Minor version** (x.Y.z): New features, significant content additions, template changes
-- **Major version** (X.y.z): Breaking changes, structural overhauls, format changes
+- **Minor version** (x.Y.z): New features, significant content additions,
+  template changes
+- **Major version** (X.y.z): Breaking changes, structural overhauls, format
+  changes
 
 **Examples:**
+
 - Fix typo: `1.2.3` → `1.2.4`
 - Add new section: `1.2.3` → `1.3.0`
 - Change template structure: `1.2.3` → `2.0.0`
 
-**This applies to ALL files with version headers including documentation, templates, and configuration files.**
+**This applies to ALL files with version headers including documentation,
+templates, and configuration files.**
 
 ## Key Copilot/Agent Documents
 

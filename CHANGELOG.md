@@ -12,7 +12,8 @@ and this project adheres to
 
 ### Fixed
 
-- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs, and validates entire codebase
+- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs,
+  and validates entire codebase
 
 ### Added
 
@@ -25,7 +26,8 @@ and this project adheres to
 
 ### Changed
 
-- **BREAKING**: Super Linter now defaults to concise output mode (shows only issues/changes)
+- **BREAKING**: Super Linter now defaults to concise output mode (shows only
+  issues/changes)
 - Improved Super Linter error extraction and presentation
 - Restructured Super Linter PR comments to be more actionable
 - Updated Super Linter configuration to reduce verbose processing logs
@@ -34,7 +36,8 @@ and this project adheres to
 
 ### Fixed
 
-- Fixed verbose Super Linter output showing all processed files instead of just issues
+- Fixed verbose Super Linter output showing all processed files instead of just
+  issues
 - Fixed poor formatting in Super Linter summaries and comments
 - Fixed unhelpful configuration dumps in final summaries
 

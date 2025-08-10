@@ -2,9 +2,9 @@ name: Example Calling Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 # Required permissions for reusable-enhanced-docs-update.yml
 permissions:

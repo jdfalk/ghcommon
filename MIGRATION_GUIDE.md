@@ -5,12 +5,14 @@
 ### For New Repositories
 
 1. **Copy the complete workflow template**:
+
    ```bash
    curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/examples/workflows/unified-automation-complete.yml \
      -o .github/workflows/unified-automation.yml
    ```
 
 2. **Optional: Add custom configuration**:
+
    ```bash
    curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/.github/unified-automation-config.json \
      -o .github/unified-automation-config.json
@@ -87,7 +89,9 @@ python scripts/update-repository-automation.py --repo owner/repo-name --dry-run
 
 ### Complete Configuration
 
-See [`.github/unified-automation-config.json`](.github/unified-automation-config.json) for all available options covering:
+See
+[`.github/unified-automation-config.json`](.github/unified-automation-config.json)
+for all available options covering:
 
 - Issue Management
 - Documentation Updates
@@ -99,7 +103,8 @@ See [`.github/unified-automation-config.json`](.github/unified-automation-config
 
 ## Environment Variables
 
-The system respects these environment variables (set automatically from configuration):
+The system respects these environment variables (set automatically from
+configuration):
 
 ```bash
 ENABLE_DUPLICATE_PREVENTION=true
@@ -121,15 +126,18 @@ MAX_DUPLICATE_CHECK_ISSUES=1000
 ### Common Issues
 
 **❌ Workflow fails with "Invalid input" errors**
+
 - Ensure you're using the latest workflow templates
 - Check that all input parameters are defined in your calling workflow
 
 **❌ Duplicate prevention not working**
+
 - Verify `enable_duplicate_prevention: true` in configuration
 - Check that environment variables are being set correctly
 - Review workflow logs for duplicate detection messages
 
 **❌ API rate limiting**
+
 - Reduce `max_duplicate_check_issues` in configuration
 - Consider running automation less frequently
 - Use GitHub Apps tokens for higher rate limits
@@ -151,4 +159,5 @@ MAX_DUPLICATE_CHECK_ISSUES=1000
 
 ---
 
-*For detailed technical information, see [UNIFIED_AUTOMATION_ENHANCEMENT_SUMMARY.md](UNIFIED_AUTOMATION_ENHANCEMENT_SUMMARY.md)*
+_For detailed technical information, see
+[UNIFIED_AUTOMATION_ENHANCEMENT_SUMMARY.md](UNIFIED_AUTOMATION_ENHANCEMENT_SUMMARY.md)_

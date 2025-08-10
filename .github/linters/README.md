@@ -1,5 +1,7 @@
 # file: .github/linters/README.md
+
 # version: 1.1.0
+
 # guid: c2d3e4f5-a6b7-89cd-ef01-23456789cdef
 
 # Linter Configuration Files
@@ -48,14 +50,14 @@ The reusable workflow now supports two output modes:
 # Concise output - recommended for PRs
 - uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
   with:
-    show-detailed-summary: false  # Default: clean, actionable output
+    show-detailed-summary: false # Default: clean, actionable output
     enable-auto-fix: true
     auto-commit-fixes: true
 
 # Detailed output - useful for debugging
 - uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
   with:
-    show-detailed-summary: true   # Verbose processing information
+    show-detailed-summary: true # Verbose processing information
     enable-auto-fix: false
 ```
 
@@ -113,15 +115,15 @@ The following linters support automatic fixing:
 
 | Language/Tool         | Linter            | Auto-fix Available | What Gets Fixed                             |
 | --------------------- | ----------------- | ------------------ | ------------------------------------------- |
-| Python                | Black             | ✅                  | Code formatting, line length, quotes        |
-| Python                | Ruff              | ✅                  | Import sorting, unused imports, basic style |
-| JavaScript/TypeScript | ESLint            | ✅                  | Syntax, formatting, import organization     |
-| CSS                   | StyleLint         | ✅                  | Property ordering, formatting, syntax       |
-| JSON                  | jq/Prettier       | ✅                  | Formatting, indentation                     |
-| Markdown              | markdownlint      | ✅                  | Heading structure, list formatting          |
-| YAML                  | yamllint/Prettier | ✅                  | Indentation, formatting                     |
-| Go                    | gofmt/goimports   | ✅                  | Code formatting, import organization        |
-| Shell                 | shfmt             | ✅                  | Script formatting, indentation              |
+| Python                | Black             | ✅                 | Code formatting, line length, quotes        |
+| Python                | Ruff              | ✅                 | Import sorting, unused imports, basic style |
+| JavaScript/TypeScript | ESLint            | ✅                 | Syntax, formatting, import organization     |
+| CSS                   | StyleLint         | ✅                 | Property ordering, formatting, syntax       |
+| JSON                  | jq/Prettier       | ✅                 | Formatting, indentation                     |
+| Markdown              | markdownlint      | ✅                 | Heading structure, list formatting          |
+| YAML                  | yamllint/Prettier | ✅                 | Indentation, formatting                     |
+| Go                    | gofmt/goimports   | ✅                 | Code formatting, import organization        |
+| Shell                 | shfmt             | ✅                 | Script formatting, indentation              |
 
 ### Auto-fix Configuration
 
