@@ -6,13 +6,6 @@
 # Enhanced Library for creating GitHub issue update files with enhanced timestamp format v2.0
 # This file is meant to be sourced by other scripts, not executed directly
 #
-# Enhanced Feature            local guid="$uuid"  # Use the passed-in UUID as the GUID
-            local legacy_guid
-            local timestamp
-            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-            legacy_guid=$(generate_legacy_guid "close" "$number")- Timestamp lifecycle tracking (created_at, processed_at, failed_at)
-# - Chronological processing support with sequence numbers
-# - Parent GUID tracking for dependency management
 
 # Function to generate legacy GUID for backward compatibility
 generate_legacy_guid() {
@@ -51,11 +44,26 @@ generate_uuid() {
 # Function to check if issue already exists on GitHub
 check_github_issue_exists() {
     local title="$1"
-    local repo="${GITHUB_REPOSITORY:-$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')}"
-    local token="${GITHUB_TOKEN:-${GH_TOKEN}}"
+    local repo=""
 
+    # Determine repository from environment or git remote if available
+    if [[ -n "${GITHUB_REPOSITORY:-}" ]]; then
+        repo="$GITHUB_REPOSITORY"
+    else
+        repo=$(git remote get-url origin 2>/dev/null | \
+            sed 's/.*github.com[:/]\(.*\)\.git/\1/') || true
+    fi
+
+    local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+
+    # If we don't have the necessary info, skip the GitHub check gracefully
     if [[ -z "$token" ]]; then
         echo "Warning: No GitHub token found. Skipping GitHub issue check." >&2
+        return 1
+    fi
+
+    if [[ -z "$repo" ]]; then
+        echo "Warning: No git remote 'origin' found. Skipping GitHub issue check." >&2
         return 1
     fi
 
