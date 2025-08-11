@@ -45,8 +45,6 @@ jobs:
         with:
           languages: ${{ inputs.languages }}
           config-file: ${{ inputs.config-file }}
-          cache: true
-          cache-id: ${{ github.repository }}-${{ github.ref_name }}
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
