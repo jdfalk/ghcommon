@@ -338,7 +338,7 @@ class WorkflowDebugger:
         return jobs
 
     def download_logs(self, repo: str, run_id: str) -> str:
-        """Download logs for a workflow run."""
+        """Download logs and artifacts for a workflow run."""
         log_file = self.output_dir / "logs" / f"{repo.replace('/', '_')}_{run_id}.log"
 
         if log_file.exists():
@@ -356,11 +356,61 @@ class WorkflowDebugger:
 
         combined_logs = []
 
+        # Try to download artifacts first
+        try:
+            import tempfile
+            import os
+
+            logger.debug(f"Attempting to download artifacts for run {run_id}")
+            with tempfile.TemporaryDirectory() as temp_dir:
+                artifact_result = subprocess.run(
+                    [
+                        "gh",
+                        "run",
+                        "download",
+                        run_id,
+                        "--repo",
+                        repo,
+                        "--dir",
+                        temp_dir,
+                    ],
+                    capture_output=True,
+                    text=True,
+                )
+
+                if artifact_result.returncode == 0:
+                    combined_logs.append("\n=== DOWNLOADED ARTIFACTS ===\n")
+
+                    # Read artifact files
+                    for root, dirs, files in os.walk(temp_dir):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            try:
+                                with open(
+                                    file_path, "r", encoding="utf-8", errors="ignore"
+                                ) as f:
+                                    content = f.read()
+                                    combined_logs.append(
+                                        f"\n--- ARTIFACT FILE: {file} ---\n"
+                                    )
+                                    combined_logs.append(content)
+                            except Exception as e:
+                                logger.debug(
+                                    f"Could not read artifact file {file}: {e}"
+                                )
+                else:
+                    logger.debug(
+                        f"No artifacts found or could not download: {artifact_result.stderr}"
+                    )
+
+        except Exception as e:
+            logger.debug(f"Could not download artifacts: {e}")
+
         # Download logs for each job
         for job in jobs:
             logger.debug(f"Getting logs for job {job.name} ({job.id})")
 
-            # Use gh run view with --log flag to get job logs
+            # Method 1: Use gh run view with --log flag
             result = subprocess.run(
                 ["gh", "run", "view", run_id, "--repo", repo, "--job", job.id, "--log"],
                 capture_output=True,
@@ -371,17 +421,10 @@ class WorkflowDebugger:
                 combined_logs.append(f"\n=== JOB: {job.name} ===\n")
                 combined_logs.append(result.stdout)
             else:
-                # Try alternative method using gh api
+                # Method 2: Try using gh api to get logs directly
                 try:
                     api_result = subprocess.run(
-                        [
-                            "gh",
-                            "api",
-                            f"/repos/{repo}/actions/jobs/{job.id}/logs",
-                            "--jq",
-                            ".",
-                            "--paginate",
-                        ],
+                        ["gh", "api", f"/repos/{repo}/actions/jobs/{job.id}/logs"],
                         capture_output=True,
                         text=True,
                     )
@@ -391,29 +434,21 @@ class WorkflowDebugger:
                         combined_logs.append(api_result.stdout)
                     else:
                         logger.warning(
-                            f"Could not get logs for job {job.name}: {result.stderr}"
+                            f"Could not get logs for job {job.name}: API returned {api_result.returncode}"
                         )
                         combined_logs.append(
-                            f"\n=== JOB: {job.name} (NO LOGS AVAILABLE) ===\n"
+                            f"\n=== JOB: {job.name} (FAILED TO GET LOGS) ===\n"
                         )
 
-                        # Add step information instead
-                        for step in job.steps:
-                            if step.get("conclusion") == "failure":
-                                combined_logs.append(
-                                    f"FAILED STEP: {step.get('name', 'Unknown')}\n"
-                                )
-                                combined_logs.append(
-                                    f"Status: {step.get('status', 'Unknown')}\n"
-                                )
-                                combined_logs.append(
-                                    f"Conclusion: {step.get('conclusion', 'Unknown')}\n"
-                                )
+                        # Add step failure information
+                        self._add_job_failure_info(combined_logs, job)
 
                 except Exception as e:
                     logger.warning(
                         f"Failed to get logs via API for job {job.name}: {e}"
                     )
+                    combined_logs.append(f"\n=== JOB: {job.name} (API ERROR) ===\n")
+                    self._add_job_failure_info(combined_logs, job)
 
         # Save combined logs
         try:
@@ -422,7 +457,7 @@ class WorkflowDebugger:
                 f.write("\n".join(combined_logs))
 
             if combined_logs:
-                logger.info(f"Saved logs to {log_file}")
+                logger.info(f"Saved logs to {log_file} ({len(combined_logs)} sections)")
                 return str(log_file)
             else:
                 logger.warning(f"No logs were downloaded for run {run_id}")
@@ -431,6 +466,28 @@ class WorkflowDebugger:
         except Exception as e:
             logger.error(f"Failed to save combined logs: {e}")
             return ""
+
+    def _add_job_failure_info(self, combined_logs: List[str], job: WorkflowJob):
+        """Add failure information when logs are not available."""
+        combined_logs.append(f"Job Status: {job.status}\n")
+        combined_logs.append(f"Job Conclusion: {job.conclusion}\n")
+        combined_logs.append(f"Job URL: {job.url}\n")
+
+        if job.steps:
+            combined_logs.append("Steps:\n")
+            for step in job.steps:
+                step_status = step.get("status", "unknown")
+                step_conclusion = step.get("conclusion", "unknown")
+                step_name = step.get("name", "Unknown Step")
+
+                combined_logs.append(
+                    f"  - {step_name}: {step_status}/{step_conclusion}\n"
+                )
+
+                if step_conclusion == "failure":
+                    combined_logs.append("    ^^^ FAILED STEP ^^^\n")
+        else:
+            combined_logs.append("No step information available\n")
 
     def analyze_logs(self, log_file: str) -> Tuple[List[str], str, List[str]]:
         """Analyze logs to identify error patterns and root causes."""
