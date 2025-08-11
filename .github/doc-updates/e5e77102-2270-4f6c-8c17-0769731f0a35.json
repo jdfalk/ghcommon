@@ -1,0 +1,20 @@
+{
+  "file": "CHANGELOG.md",
+  "mode": "changelog-entry",
+  "content": "### Added\n\n- Add script to submit codex jobs",
+  "guid": "e5e77102-2270-4f6c-8c17-0769731f0a35",
+  "created_at": "2025-08-10T23:50:39Z",
+  "processed_at": null,
+  "failed_at": null,
+  "sequence": 0,
+  "parent_guid": null,
+  "options": {
+    "section": null,
+    "after": null,
+    "before": null,
+    "task_id": null,
+    "badge_name": null,
+    "priority": null,
+    "category": null
+  }
+}
