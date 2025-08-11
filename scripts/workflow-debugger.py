@@ -1,34 +1,26 @@
 #!/usr/bin/env python3
 # file: scripts/workflow-debugger.py
-# version: 1.0.0
-# guid: f1e2d3c4-b5a6-7c8d-9e0f-1a2b3c4d5e6f
+# version: 2.1.0
+# guid: 9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d
 
 """
-Ultimate GitHub Workflow Debugger and Fixer
-==========================================
+Enhanced Workflow Debugger
+=========================
 
-This script provides comprehensive GitHub workflow debugging and fixing capabilities:
+A comprehensive tool for debugging GitHub Actions workflows across repositories.
+This script:
 
-1. **Discovery**: Finds all failing workflows across all repositories
-2. **Analysis**: Downloads logs, analyzes failures, identifies root causes
-3. **Diagnosis**: Creates detailed reports with actionable insights
-4. **Fix Generation**: Generates JSON task files for Copilot to fix issues
-5. **Batch Operations**: Handles multiple repositories and workflows
-6. **Smart Filtering**: Focuses on actionable failures vs infrastructure issues
-
-Features:
-- Uses GitHub CLI (gh) for all API interactions
-- Downloads and analyzes workflow logs
-- Identifies common failure patterns
-- Generates structured fix tasks for AI agents
-- Supports multiple output formats (JSON, markdown, CSV)
-- Provides detailed error categorization
-- Suggests specific fixes for common issues
+1. Discovers failed workflows across specified repositories
+2. Downloads and analyzes workflow logs
+3. Categorizes failures by type (build, test, dependency, etc.)
+4. Generates detailed failure reports with suggested fixes
+5. Creates JSON tasks for Copilot to implement fixes
+6. Provides comprehensive debugging information
 
 Usage:
-    python workflow-debugger.py --scan-all
-    python workflow-debugger.py --repo jdfalk/gcommon --fix-tasks
-    python workflow-debugger.py --recent-failures --days 7
+    python workflow-debugger.py --repositories jdfalk/repo1,jdfalk/repo2
+    python workflow-debugger.py --auto-discover --org jdfalk
+    python workflow-debugger.py --all --max-failures 50
 """
 
 import argparse
@@ -37,21 +29,18 @@ import logging
 import re
 import subprocess
 import sys
-import tempfile
-from dataclasses import dataclass, asdict
+import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Any
-import uuid
+from typing import Dict, List, Tuple, Set, Any
+from dataclasses import dataclass, asdict
+
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("workflow-debugger.log"),
-        logging.StreamHandler(sys.stdout),
-    ],
+    handlers=[logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
@@ -358,42 +347,90 @@ class WorkflowDebugger:
 
         logger.info(f"Downloading logs for run {run_id} in {repo}...")
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Download logs to temporary directory
+        # First, get the jobs for this run
+        jobs = self.get_workflow_jobs(repo, run_id)
+
+        if not jobs:
+            logger.warning(f"No jobs found for run {run_id}")
+            return ""
+
+        combined_logs = []
+
+        # Download logs for each job
+        for job in jobs:
+            logger.debug(f"Getting logs for job {job.name} ({job.id})")
+
+            # Use gh run view with --log flag to get job logs
             result = subprocess.run(
-                ["gh", "run", "download", run_id, "--repo", repo, "--dir", temp_dir],
+                ["gh", "run", "view", run_id, "--repo", repo, "--job", job.id, "--log"],
                 capture_output=True,
                 text=True,
             )
 
-            if result.returncode != 0:
-                logger.warning(f"Failed to download logs for {run_id}: {result.stderr}")
-                return ""
-
-            # Combine all log files into one
-            combined_logs = []
-            temp_path = Path(temp_dir)
-
-            for log_file_path in temp_path.rglob("*.txt"):
+            if result.returncode == 0 and result.stdout.strip():
+                combined_logs.append(f"\n=== JOB: {job.name} ===\n")
+                combined_logs.append(result.stdout)
+            else:
+                # Try alternative method using gh api
                 try:
-                    with open(
-                        log_file_path, "r", encoding="utf-8", errors="ignore"
-                    ) as f:
-                        content = f.read()
-                        combined_logs.append(f"\n=== {log_file_path.name} ===\n")
-                        combined_logs.append(content)
-                except Exception as e:
-                    logger.warning(f"Failed to read log file {log_file_path}: {e}")
+                    api_result = subprocess.run(
+                        [
+                            "gh",
+                            "api",
+                            f"/repos/{repo}/actions/jobs/{job.id}/logs",
+                            "--jq",
+                            ".",
+                            "--paginate",
+                        ],
+                        capture_output=True,
+                        text=True,
+                    )
 
-            # Save combined logs
-            try:
-                with open(log_file, "w", encoding="utf-8") as f:
-                    f.write("\n".join(combined_logs))
+                    if api_result.returncode == 0 and api_result.stdout.strip():
+                        combined_logs.append(f"\n=== JOB: {job.name} ===\n")
+                        combined_logs.append(api_result.stdout)
+                    else:
+                        logger.warning(
+                            f"Could not get logs for job {job.name}: {result.stderr}"
+                        )
+                        combined_logs.append(
+                            f"\n=== JOB: {job.name} (NO LOGS AVAILABLE) ===\n"
+                        )
+
+                        # Add step information instead
+                        for step in job.steps:
+                            if step.get("conclusion") == "failure":
+                                combined_logs.append(
+                                    f"FAILED STEP: {step.get('name', 'Unknown')}\n"
+                                )
+                                combined_logs.append(
+                                    f"Status: {step.get('status', 'Unknown')}\n"
+                                )
+                                combined_logs.append(
+                                    f"Conclusion: {step.get('conclusion', 'Unknown')}\n"
+                                )
+
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to get logs via API for job {job.name}: {e}"
+                    )
+
+        # Save combined logs
+        try:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_file, "w", encoding="utf-8") as f:
+                f.write("\n".join(combined_logs))
+
+            if combined_logs:
                 logger.info(f"Saved logs to {log_file}")
                 return str(log_file)
-            except Exception as e:
-                logger.error(f"Failed to save combined logs: {e}")
+            else:
+                logger.warning(f"No logs were downloaded for run {run_id}")
                 return ""
+
+        except Exception as e:
+            logger.error(f"Failed to save combined logs: {e}")
+            return ""
 
     def analyze_logs(self, log_file: str) -> Tuple[List[str], str, List[str]]:
         """Analyze logs to identify error patterns and root causes."""
