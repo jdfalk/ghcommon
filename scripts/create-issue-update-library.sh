@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/create-issue-update-library.sh
-# version: 2.0.0
+# version: 2.0.1
 # guid: 4a81c3e0-5f7b-4e2a-b92d-6c8a7c1d3e5f
 #
 # Enhanced Library for creating GitHub issue update files with enhanced timestamp format v2.0
@@ -205,11 +205,8 @@ create_issue_file() {
             local timestamp
             timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
-            # Check if issue already exists on GitHub
-            if check_github_issue_exists "$title"; then
-                echo "❌ Skipping creation: Issue with this title already exists on GitHub" >&2
-                return 1
-            fi
+            # Note: GitHub duplicate check is handled by the workflow processing the JSON files
+            # This script should only create JSON files, not make API calls
 
             legacy_guid=$(generate_legacy_guid "create" "$title")
 
