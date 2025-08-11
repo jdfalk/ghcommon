@@ -12,8 +12,8 @@ on:
 # Required permissions for reusable workflows
 permissions:
   contents: read
-  issues: write
   pull-requests: write
+  issues: write
 jobs:
   call-stale:
     uses: ./.github/workflows/reusable-stale.yml
