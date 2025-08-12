@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.6
+# version: 2.4.7
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -106,7 +106,7 @@ on:
     secrets:
       github-token:
         description: "GitHub token with necessary permissions for linting and auto-fix"
-        required: false
+        required: true
 
 jobs:
   super-linter:
@@ -435,10 +435,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: super-linter-output
+          name: super-linter-output-${{ github.run_id }}-${{ github.run_attempt }}
           path: super-linter-output/
           retention-days: 7
           if-no-files-found: warn
+          compression-level: 6
+          overwrite: true
+          include-hidden-files: false
 
       - name: Comment PR with linting results
         if: always() && github.event_name == 'pull_request'

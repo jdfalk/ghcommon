@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 2.1.1
+# version: 2.1.2
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 
 name: PR Automation
@@ -45,7 +45,8 @@ jobs:
       enable-auto-fix: true
       auto-commit-fixes: true
       show-detailed-summary: true
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   # Unified automation for issue management and docs
   unified-automation:
