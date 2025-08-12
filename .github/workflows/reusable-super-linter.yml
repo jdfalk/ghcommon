@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-super-linter.yml
-# version: 2.4.4
+# version: 2.4.5
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
 name: Reusable - Super Linter
@@ -308,10 +308,18 @@ jobs:
           # Look for Super Linter log files in multiple possible locations
           echo "Searching for Super Linter log files..."
 
-          # Copy main log file if it exists
+          # Copy main log file if it exists, handle permission issues
           if [ -f "super-linter.log" ]; then
             echo "Found super-linter.log, copying to output directory"
-            cp super-linter.log super-linter-output/
+            # Use sudo if regular copy fails due to permissions
+            if ! cp super-linter.log super-linter-output/ 2>/dev/null; then
+              echo "Permission denied, trying with sudo..."
+              sudo cp super-linter.log super-linter-output/ 2>/dev/null || echo "Failed to copy super-linter.log even with sudo"
+              # Fix ownership if copy succeeded
+              if [ -f "super-linter-output/super-linter.log" ]; then
+                sudo chown runner:docker super-linter-output/super-linter.log 2>/dev/null || true
+              fi
+            fi
           else
             echo "super-linter.log not found in current directory"
           fi
@@ -319,22 +327,41 @@ jobs:
           # Check if logs exist in the default Super Linter output location
           if [ -d "/tmp/super-linter-output" ]; then
             echo "Found logs in /tmp/super-linter-output, copying..."
-            cp -r /tmp/super-linter-output/* super-linter-output/ 2>/dev/null || true
+            # Handle permission issues when copying from /tmp
+            if ! cp -r /tmp/super-linter-output/* super-linter-output/ 2>/dev/null; then
+              echo "Permission denied, trying with sudo..."
+              sudo cp -r /tmp/super-linter-output/* super-linter-output/ 2>/dev/null || true
+              # Fix ownership of copied files
+              sudo chown -R runner:docker super-linter-output/ 2>/dev/null || true
+            fi
           fi
 
           # Check for any .log files in current directory
           find . -maxdepth 1 -name "*.log" -type f | while read -r logfile; do
             if [ -f "$logfile" ]; then
               echo "Found log file: $logfile"
-              cp "$logfile" super-linter-output/
+              # Try regular copy first, then sudo if needed
+              if ! cp "$logfile" super-linter-output/ 2>/dev/null; then
+                echo "Permission denied for $logfile, trying with sudo..."
+                sudo cp "$logfile" super-linter-output/ 2>/dev/null || echo "Failed to copy $logfile even with sudo"
+                # Fix ownership if copy succeeded
+                filename=$(basename "$logfile")
+                if [ -f "super-linter-output/$filename" ]; then
+                  sudo chown runner:docker "super-linter-output/$filename" 2>/dev/null || true
+                fi
+              fi
             fi
           done
 
           # List what we have in the output directory
           echo "Contents of super-linter-output directory:"
           if [ -d "super-linter-output" ]; then
+            # Fix any remaining permission issues
+            sudo chown -R runner:docker super-linter-output/ 2>/dev/null || true
+            sudo chmod -R u+r super-linter-output/ 2>/dev/null || true
+            
             ls -la super-linter-output/
-            count=$(find super-linter-output -name "*.log" -type f | wc -l)
+            count=$(find super-linter-output -name "*.log" -type f 2>/dev/null | wc -l)
             echo "Total log files found: $count"
           else
             echo "super-linter-output directory still does not exist!"
@@ -355,11 +382,11 @@ jobs:
 
             # Include error lines from each log file
             while IFS= read -r -d '' logfile; do
-              if [ -f "$logfile" ] && grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
+              if [ -f "$logfile" ] && [ -r "$logfile" ] && grep -q "ERROR\|FAIL\|error:" "$logfile" 2>/dev/null; then
                 echo "" >> super-linter-output/summary.txt
                 echo "$(basename "$logfile")" >> super-linter-output/summary.txt
                 echo "-------------------" >> super-linter-output/summary.txt
-                grep -E "ERROR|FAIL|error:" "$logfile" >> super-linter-output/summary.txt
+                grep -E "ERROR|FAIL|error:" "$logfile" >> super-linter-output/summary.txt 2>/dev/null || echo "Could not read log file" >> super-linter-output/summary.txt
               fi
             done < <(find super-linter-output -name "*.log" -type f -print0 2>/dev/null | sort -z)
           else
