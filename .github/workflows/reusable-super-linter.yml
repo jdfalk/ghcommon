@@ -127,7 +127,7 @@ jobs:
           echo "VALIDATE_ALL_CODEBASE=${{ inputs.validate-all-codebase }}" >> $GITHUB_ENV
           echo "DEFAULT_BRANCH=${{ inputs.default-branch }}" >> $GITHUB_ENV
           echo "FILTER_REGEX_EXCLUDE=${{ inputs.filter-regex-exclude }}" >> $GITHUB_ENV
-          
+
           # Debug workspace contents
           echo "Current working directory: $(pwd)"
           echo "Contents of workspace:"
@@ -144,11 +144,11 @@ jobs:
           else
             echo "No custom configuration file found at ${{ inputs.config-file }}"
           fi
-          
+
           # Ensure git is properly configured for super-linter
           git config --global --add safe.directory /github/workspace
           git config --global --add safe.directory ${{ github.workspace }}
-          
+
           # Additional debug info
           echo "Git status:"
           git status --porcelain || echo "Git status failed"
@@ -165,11 +165,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all-codebase }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.filter-regex-exclude }}
-          
+
           # Workspace configuration - ensure super-linter finds files
           GITHUB_WORKSPACE: ${{ github.workspace }}
           DEFAULT_WORKSPACE: ${{ github.workspace }}
-          
+
           # Repository information for git operations
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
