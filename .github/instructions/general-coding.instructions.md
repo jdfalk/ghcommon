@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 1.3.0 -->
+<!-- version: 1.4.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -35,10 +35,57 @@ Copilot customization.
 - For VS Code Copilot customization, this file is included via symlink in
   `.vscode/copilot/`.
 - **ALWAYS check before doing:** Before creating files, running operations, or executing scripts, always check current state first. Make all scripts and operations idempotent by checking if the desired state already exists before making changes.
-- **Use VS Code Tasks when available:** When performing git operations (add, commit, push, status) or project-specific builds/tests, prefer using the standardized VS Code tasks over manual terminal commands. All task output is logged to the `logs/` folder for review and debugging. Always check the corresponding log file after running a task to verify success or diagnose issues.
+- **USE VS CODE TASKS FIRST:** ALWAYS use VS Code tasks when available instead of manual terminal commands. Tasks provide consistent logging, error handling, and automation. Only fall back to manual commands when no appropriate task exists.
 
 For more details and the full system, see
 [copilot-instructions.md](../copilot-instructions.md).
+
+## 🚨 CRITICAL: Use VS Code Tasks First
+
+**MANDATORY RULE: Always attempt to use VS Code tasks before manual commands.**
+
+When performing ANY operation (git, build, test, etc.), follow this priority:
+
+1. **FIRST**: Check if a VS Code task exists for the operation
+2. **SECOND**: Use the task via `run_task` tool with appropriate workspace folder
+3. **THIRD**: Check task logs in `logs/` folder for results
+4. **LAST RESORT**: Use manual terminal commands only if no task exists
+
+### Common Operations and Their Tasks
+
+| Operation | Task Name | Manual Fallback |
+|-----------|-----------|-----------------|
+| Git add all files | `Git Add All` | `git add .` |
+| Git add specific files | `Git Add Selective` | `git add <pattern>` |
+| Git commit | `Git Commit` | `git commit -m "message"` |
+| Git push | `Git Push` | `git push` |
+| Git status | `Git Status` | `git status` |
+| Build Go project | `Go Build` | `go build` |
+| Run Go tests | `Go Test` | `go test ./...` |
+| Protocol buffer generation | `Buf Generate with Output` | `buf generate` |
+| Python tests | `Python Test` | `python -m pytest` |
+| Rust build | `Rust Build` | `cargo build` |
+| Rust tests | `Rust Test` | `cargo test` |
+
+### Task Usage Examples
+
+```bash
+# ✅ CORRECT: Use tasks first
+run_task("Git Add All", "/path/to/workspace")
+run_task("Git Commit", "/path/to/workspace")  # Will prompt for message
+run_task("Git Push", "/path/to/workspace")
+
+# ❌ INCORRECT: Manual commands without checking for tasks
+git add . && git commit -m "message" && git push
+```
+
+### Benefits of Using Tasks
+
+- **Consistent Logging**: All output logged to `logs/` folder with timestamps
+- **Error Handling**: Standardized error reporting and debugging information
+- **Workspace Awareness**: Tasks run in correct directory with proper context
+- **Automation**: Tasks can chain together and include pre/post operations
+- **Debugging**: Log files provide complete audit trail for troubleshooting
 
 ## Required File Header (File Identification)
 
@@ -185,10 +232,9 @@ of direct edits:
 **Always use this system for documentation updates instead of direct file
 edits.**
 
-## VS Code Tasks and Automation
+## VS Code Tasks Implementation Details
 
-All repositories are configured with standardized VS Code tasks for common
-operations. **Always prefer using these tasks over manual terminal commands.**
+All repositories are configured with standardized VS Code tasks following the priority system outlined above.
 
 ### Task Categories
 
@@ -203,24 +249,11 @@ operations. **Always prefer using these tasks over manual terminal commands.**
 - Log files are named descriptively: `git_commit.log`, `go_build.log`, etc.
 - Tasks include success/failure messages at the end of each log
 
-### Usage
+### Task Execution Workflow
 
-1. **Run tasks via VS Code**: Command Palette (`Ctrl/Cmd+Shift+P`) → "Tasks: Run Task"
-2. **Check results**: Read the corresponding log file in `logs/` folder
-3. **Automate workflows**: Chain tasks together for complex operations
+1. **Execute**: Use `run_task` tool with task name and workspace folder
+2. **Verify**: Check the corresponding log file in `logs/` folder
+3. **Debug**: Review log contents if task fails
+4. **Retry**: Fix issues and re-run task if needed
 
-### Examples
-
-```bash
-# Instead of: git add . && git commit -m "message" && git push
-# Use tasks: "Git Add All" → "Git Commit" → "Git Push"
-
-# Instead of: go build -o bin/app
-# Use task: "Go Build"
-
-# Instead of: buf generate
-# Use task: "Buf Generate with Output"
-```
-
-This approach provides consistent logging, error handling, and automation across
-all repositories.
+This approach provides consistent logging, error handling, and automation across all repositories.

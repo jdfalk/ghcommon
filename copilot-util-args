@@ -2,7 +2,7 @@
 # Auto-loaded when utility is run from this directory or subdirectories
 # file: copilot-util-args
 # version: 1.0.0
-# guid: c3d4e5f6-a7b8-9012-3456-789012cdef03
+# guid: c3d4e5f6-a7b8-9012-3456-789012cdef02
 
 # Git settings
 git.default-branch=main
@@ -19,6 +19,12 @@ editor.word-wrap=false
 editor.theme=dark
 editor.auto-save=true
 editor.backup-files=false
+
+# Buf/protobuf settings
+buf.config-file=.buf.yaml
+buf.output-dir=gen
+buf.generate-docs=true
+buf.lint-config=strict
 
 # Text processing
 sed.backup-suffix=.bak
