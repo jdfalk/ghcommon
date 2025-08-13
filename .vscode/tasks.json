@@ -2,65 +2,80 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Python Test",
+      "label": "Buf Generate with Output",
       "type": "shell",
-      "command": "mkdir -p logs && python -m pytest > logs/python_test.log 2>&1 && echo 'SUCCESS: python test completed' >> logs/python_test.log || echo 'FAILED: python test failed' >> logs/python_test.log",
-      "group": "test",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Python Script Run",
-      "type": "shell",
-      "command": "mkdir -p logs && SCRIPT='${input:scriptName}'; python $SCRIPT > logs/python_run.log 2>&1 && echo \"SUCCESS: python script $SCRIPT completed\" >> logs/python_run.log || echo \"FAILED: python script $SCRIPT failed\" >> logs/python_run.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "buf",
+        "generate"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
     },
     {
-      "label": "Node Install",
+      "label": "Buf Generate Module",
       "type": "shell",
-      "command": "mkdir -p logs && npm install > logs/npm_install.log 2>&1 && echo 'SUCCESS: npm install completed' >> logs/npm_install.log || echo 'FAILED: npm install failed' >> logs/npm_install.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "buf",
+        "generate",
+        "--module",
+        "${input:module}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
     },
     {
-      "label": "Node Test",
+      "label": "Buf Lint with Output",
       "type": "shell",
-      "command": "mkdir -p logs && npm test > logs/npm_test.log 2>&1 && echo 'SUCCESS: npm test completed' >> logs/npm_test.log || echo 'FAILED: npm test failed' >> logs/npm_test.log",
-      "group": "test",
+      "command": "copilot-agent-util",
+      "args": [
+        "buf",
+        "lint"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf Lint Module",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "buf",
+        "lint",
+        "--module",
+        "${input:module}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
       "isBackground": false,
       "problemMatcher": []
     },
     {
       "label": "Git Add All",
       "type": "shell",
-      "command": "mkdir -p logs && git add . > logs/git_add.log 2>&1 && echo 'SUCCESS: git add completed' >> logs/git_add.log || echo 'FAILED: git add failed' >> logs/git_add.log",
-      "group": "build",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Python Test",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && python -m pytest > logs/python_test.log 2>&1 && echo 'SUCCESS: python test completed' >> logs/python_test.log || echo 'FAILED: python test failed' >> logs/python_test.log",
-      "group": "test",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Python Lint",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && flake8 . > logs/python_lint.log 2>&1 && echo 'SUCCESS: python lint completed' >> logs/python_lint.log || echo 'FAILED: python lint failed' >> logs/python_lint.log",
-      "group": "test",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Git Add All",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && git add . > logs/git_add.log 2>&1 && echo 'SUCCESS: git add completed' >> logs/git_add.log || echo 'FAILED: git add failed' >> logs/git_add.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "add"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
@@ -68,39 +83,15 @@
     {
       "label": "Git Add Selective",
       "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && PATTERN='${input:filePattern}'; git add $PATTERN > logs/git_add_selective.log 2>&1 && echo \"SUCCESS: git add completed for pattern: $PATTERN\" >> logs/git_add_selective.log || echo \"FAILED: git add failed for pattern: $PATTERN\" >> logs/git_add_selective.log",
-      "group": "build",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Git Commit",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && MESSAGE='${input:commitMessage}'; git commit -m \"$MESSAGE\" > logs/git_commit.log 2>&1 && echo 'SUCCESS: git commit completed' >> logs/git_commit.log || echo 'FAILED: git commit failed' >> logs/git_commit.log",
-      "group": "build",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Git Push",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && git push > logs/git_push.log 2>&1 && echo 'SUCCESS: git push completed' >> logs/git_push.log || echo 'FAILED: git push failed' >> logs/git_push.log",
-      "group": "build",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Git Status",
-      "type": "shell",
-      "command": "cd ${workspaceFolder} && mkdir -p logs && git status --porcelain > logs/git_status.log 2>&1 && echo '--- Git Status Summary ---' >> logs/git_status.log && git status >> logs/git_status.log",
-      "group": "build",
-      "isBackground": false,
-      "problemMatcher": []
-    },
-    {
-      "label": "Git Commit",
-      "type": "shell",
-      "command": "mkdir -p logs && MESSAGE='${input:commitMessage}'; git commit -m \"$MESSAGE\" > logs/git_commit.log 2>&1 && echo 'SUCCESS: git commit completed' >> logs/git_commit.log || echo 'FAILED: git commit failed' >> logs/git_commit.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "add",
+        "${input:filePattern}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
@@ -108,7 +99,14 @@
     {
       "label": "Git Push",
       "type": "shell",
-      "command": "mkdir -p logs && git push > logs/git_push.log 2>&1 && echo 'SUCCESS: git push completed' >> logs/git_push.log || echo 'FAILED: git push failed' >> logs/git_push.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "push"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
@@ -116,7 +114,147 @@
     {
       "label": "Git Status",
       "type": "shell",
-      "command": "mkdir -p logs && git status --porcelain > logs/git_status.log 2>&1 && echo '--- Git Status Summary ---' >> logs/git_status.log && git status >> logs/git_status.log",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Add All Auto",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "add",
+        "."
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Commit Auto",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "git",
+        "commit",
+        "-m",
+        "fix: systematic protobuf import fixes"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf Check All Proto Files",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "find pkg -name '*.proto' -type f | while read file; do echo \"=== $file ===\"; buf lint --path \"$file\" 2>&1 | grep -E '(error|Error|file does not exist)' || echo 'OK'; done"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf Generate with Args File",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "buf",
+        "generate"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf Lint with Args File",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "buf",
+        "lint"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Add All with Args File",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "add"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Push with Args File",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "push"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Status with Args File",
+      "type": "shell",
+      "command": "copilot-agent-util",
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "isBackground": false,
       "problemMatcher": []
@@ -124,21 +262,15 @@
   ],
   "inputs": [
     {
-      "id": "commitMessage",
-      "description": "Commit message",
-      "default": "fix: update project files",
+      "id": "module",
+      "description": "Module to generate (e.g., auth, config, metrics)",
+      "default": "auth",
       "type": "promptString"
     },
     {
       "id": "filePattern",
-      "description": "File pattern to add (e.g., '*.py', '*.js', '*.md')",
-      "default": "*.py",
-      "type": "promptString"
-    },
-    {
-      "id": "scriptName",
-      "description": "Python script to run (e.g., 'script.py', 'analyze.py')",
-      "default": "script.py",
+      "description": "File pattern to add (e.g., '*.proto', 'pkg/auth/', '**/*.go')",
+      "default": "*.proto",
       "type": "promptString"
     }
   ]
