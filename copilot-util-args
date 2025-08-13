@@ -1,0 +1,39 @@
+# Copilot Agent Utility Configuration
+# Auto-loaded when utility is run from this directory or subdirectories
+# file: copilot-util-args
+# version: 1.0.0
+# guid: c3d4e5f6-a7b8-9012-3456-789012cdef03
+
+# Git settings
+git.default-branch=main
+git.auto-push=false
+git.commit-template="feat: {message}"
+git.merge-strategy=no-ff
+git.push-default=current
+
+# Editor settings
+editor.syntax=auto-detect
+editor.tab-width=4
+editor.show-line-numbers=true
+editor.word-wrap=false
+editor.theme=dark
+editor.auto-save=true
+editor.backup-files=false
+
+# Text processing
+sed.backup-suffix=.bak
+sed.extended-regexp=true
+sed.case-insensitive=false
+
+awk.field-separator="\t"
+awk.output-separator=" | "
+awk.case-insensitive=false
+
+# Exec settings
+exec.log-output=true
+exec.timeout=300
+exec.capture-env=true
+
+# Global settings
+verbose=true
+log-level=info
