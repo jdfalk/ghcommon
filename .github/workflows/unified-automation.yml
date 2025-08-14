@@ -71,7 +71,7 @@ jobs:
       config: ${{ steps.load.outputs.config }}
       operation: ${{ steps.determine.outputs.operation }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Load configuration file
         id: load
@@ -185,7 +185,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Generate automation summary
         run: |
