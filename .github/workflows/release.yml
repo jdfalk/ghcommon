@@ -64,7 +64,7 @@ jobs:
       has_docker: ${{ steps.detect.outputs.has_docker }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -166,7 +166,7 @@ jobs:
       release_notes: ${{ steps.notes.outputs.release_notes }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -246,7 +246,7 @@ jobs:
             goos: windows
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         if: needs.detect-project.outputs.has_go == 'true'
@@ -352,7 +352,7 @@ jobs:
       release_url: ${{ steps.create.outputs.release-url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -426,7 +426,7 @@ jobs:
     if: needs.detect-project.outputs.should_release == 'true' && github.event.inputs.draft != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 

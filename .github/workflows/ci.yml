@@ -53,7 +53,7 @@ jobs:
       should-build: ${{ steps.determine.outputs.should-build }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -131,7 +131,7 @@ jobs:
     if: needs.detect-changes.outputs.should-lint == 'true'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -234,7 +234,7 @@ jobs:
             primary: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -284,7 +284,7 @@ jobs:
             primary: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -334,7 +334,7 @@ jobs:
             primary: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -380,7 +380,7 @@ jobs:
         language: ["go", "javascript", "python"]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -404,7 +404,7 @@ jobs:
     if: always() && needs.detect-changes.outputs.should-build == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         if: needs.detect-changes.outputs.go == 'true'
@@ -458,7 +458,7 @@ jobs:
     if: always() && (needs.test-go.result == 'success' || needs.test-frontend.result == 'success' || needs.test-python.result == 'success')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all coverage artifacts
         uses: actions/download-artifact@v4
