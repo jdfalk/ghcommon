@@ -35,8 +35,15 @@ on:
           - "labels"
 
 permissions:
-  contents: read
+  contents: write
   actions: write
+  packages: write
+  pull-requests: write
+  issues: write
+  repository-projects: write
+  checks: write
+  statuses: write
+  deployments: write
 
 env:
   # Target repositories for synchronization
