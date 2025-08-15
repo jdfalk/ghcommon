@@ -1,6 +1,8 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.0.0
+# version: 4.2.0
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
+# NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
+# To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
 
 name: PR Automation
 
@@ -43,6 +45,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Setup Super Linter environment
         run: |
           echo "Setting up Super Linter environment..."
@@ -52,35 +59,50 @@ jobs:
 
       - name: Run Super Linter
         id: run-super-linter
-        uses: github/super-linter/slim@v5
+        uses: github/super-linter/slim@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: ${{ env.VALIDATE_ALL_CODEBASE }}
           DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
           FILTER_REGEX_EXCLUDE: ${{ env.FILTER_REGEX_EXCLUDE }}
 
-          # Enable validations and auto-fixes (only true/false, not mixed)
-          VALIDATE_MARKDOWN: true
+          # Enable validations (only for linters without FIX options)
           VALIDATE_YAML: true
-          VALIDATE_JSON: true
-          VALIDATE_SHELL_SHFMT: true
-          VALIDATE_PYTHON_BLACK: true
           VALIDATE_PYTHON_PYLINT: false
-          VALIDATE_PYTHON_ISORT: true
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_TYPESCRIPT_ES: true
           VALIDATE_GO: true
           VALIDATE_GO_MODULES: true
-          VALIDATE_CSS: true
           VALIDATE_HTML: true
           VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_GITLEAKS: true
           VALIDATE_DOCKERFILE_HADOLINT: true
 
-          # Auto-fix settings (separate from validation)
-          FIX_JSON: true
+          # Auto-fix settings - Prettier prioritized for formatting
+          FIX_ANSIBLE: true
+          FIX_CLANG_FORMAT: true
+          FIX_CSHARP: true
+          FIX_CSS_PRETTIER: true  # Prettier for CSS formatting
+          FIX_ENV: true
+          FIX_GO: true
+          FIX_GO_MODULES: true
+          FIX_GROOVY: true
+          FIX_JAVASCRIPT_ES: true      # ESLint for JavaScript validation
+          FIX_JAVASCRIPT_PRETTIER: true  # Prettier for JavaScript formatting
+          FIX_JSON_PRETTIER: true     # Prettier for JSON formatting
           FIX_MARKDOWN: true
+          FIX_POWERSHELL: true
+          FIX_PROTOBUF: true
+          FIX_PYTHON_BLACK: true
+          FIX_PYTHON_ISORT: true
+          FIX_PYTHON_RUFF: true
+          FIX_RUST_2015: true
+          FIX_RUST_2018: true
+          FIX_RUST_2021: true
+          FIX_RUST_CLIPPY: true
           FIX_SHELL_SHFMT: true
+          FIX_SNAKEMAKE_SNAKEFMT: true
+          FIX_TERRAFORM_FMT: true
+          FIX_TYPESCRIPT_ES: true      # ESLint for TypeScript validation
+          FIX_TYPESCRIPT_PRETTIER: true  # Prettier for TypeScript formatting
 
       - name: Check for auto-fixes
         id: check-fixes
@@ -470,7 +492,7 @@ jobs:
   pr-summary:
     name: PR Automation Summary
     runs-on: ubuntu-latest
-    needs: [code-quality, auto-labeling, intelligent-labeling, pr-analysis, breaking-changes, conflict-resolution]
+    needs: [code-quality, auto-labeling, intelligent-labeling, pr-analysis, ai-rebase]
     if: always()
     steps:
       - name: Generate summary
@@ -502,5 +524,72 @@ jobs:
             echo "⏭️ **PR Analysis**: Skipped" >> $GITHUB_STEP_SUMMARY
           fi
 
+          if [[ "${{ needs.ai-rebase.result }}" == "success" ]]; then
+            echo "✅ **AI Rebase**: Completed" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.ai-rebase.result }}" == "skipped" ]]; then
+            echo "⏭️ **AI Rebase**: Skipped (no conflicts)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **AI Rebase**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Workflow completed at**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+
+  # AI-powered rebase and conflict resolution
+  ai-rebase:
+    name: AI Rebase & Conflict Resolution
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check for merge conflicts
+        id: conflict-check
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const pr_number = context.issue.number;
+
+            try {
+              let pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr_number,
+              });
+
+              // GitHub may return 'unknown' mergeable_state on first request
+              if (pr.data.mergeable_state === 'unknown') {
+                await new Promise(r => setTimeout(r, 2000));
+                pr = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr_number,
+                });
+              }
+
+              const state = pr.data.mergeable_state;
+              core.info(`PR #${pr_number} mergeable state: ${state}`);
+
+              if (state === 'dirty' || state === 'behind') {
+                return 'true';
+              } else {
+                return 'false';
+              }
+            } catch (error) {
+              core.error(`Error checking PR: ${error.message}`);
+              return 'false';
+            }
+
+      - name: Run AI rebase assistant
+        if: steps.conflict-check.outputs.result == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x .github/scripts/ai-rebase.sh
+          .github/scripts/ai-rebase.sh \
+            "${{ github.event.pull_request.number }}" \
+            "${{ github.event.pull_request.base.ref }}" \
+            "${{ github.event.pull_request.head.ref }}"
