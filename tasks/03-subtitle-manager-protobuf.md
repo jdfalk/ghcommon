@@ -27,7 +27,7 @@ Implement comprehensive protobuf definitions for subtitle-manager, integrate wit
 Follow all instructions from:
 
 - [General coding instructions](../.github/instructions/general-coding.instructions.md)
-- [Go instructions](../.github/instructions/go.instructions.md) 
+- [Go instructions](../.github/instructions/go.instructions.md)
 - [Protobuf instructions](../.github/instructions/protobuf.instructions.md)
 - [Rust utility instructions](../.github/instructions/rust-utility.instructions.md)
 
@@ -198,7 +198,7 @@ service SubtitleStorageService {
 ### Integration Points
 
 1. **Authentication:** Use `gcommon/auth` protobuf types
-2. **Logging:** Integrate with `gcommon/logging` types  
+2. **Logging:** Integrate with `gcommon/logging` types
 3. **Metrics:** Use `gcommon/metrics` for monitoring
 4. **Errors:** Follow `gcommon/errors` patterns
 5. **Configuration:** Use `gcommon/config` types

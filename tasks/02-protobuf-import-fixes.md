@@ -131,13 +131,13 @@ pkg/module/proto/
 
 ### Module Prefix Mapping
 
-| Module | Prefix | Examples |
-|--------|--------|----------|
-| `auth` | `Auth` | `AuthUserInfo`, `AuthSessionData`, `AuthLoginRequest` |
-| `subtitle` | `Subtitle` | `SubtitleRecord`, `SubtitleMetadata`, `SubtitleProcessingJob` |
-| `metrics` | `Metrics` | `MetricsHealthStatus`, `MetricsBatchOptions`, `MetricsCollectionData` |
-| `logging` | `Log` | `LogEntry`, `LogLevel`, `LogConfiguration` |
-| `storage` | `Storage` | `StorageBackend`, `StorageConfiguration`, `StorageMetrics` |
+| Module     | Prefix     | Examples                                                              |
+| ---------- | ---------- | --------------------------------------------------------------------- |
+| `auth`     | `Auth`     | `AuthUserInfo`, `AuthSessionData`, `AuthLoginRequest`                 |
+| `subtitle` | `Subtitle` | `SubtitleRecord`, `SubtitleMetadata`, `SubtitleProcessingJob`         |
+| `metrics`  | `Metrics`  | `MetricsHealthStatus`, `MetricsBatchOptions`, `MetricsCollectionData` |
+| `logging`  | `Log`      | `LogEntry`, `LogLevel`, `LogConfiguration`                            |
+| `storage`  | `Storage`  | `StorageBackend`, `StorageConfiguration`, `StorageMetrics`            |
 
 ### General Naming Rules
 

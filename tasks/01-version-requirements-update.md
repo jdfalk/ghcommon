@@ -17,7 +17,7 @@ Update all Go and Python version requirements across all repositories to use min
 
 **ALWAYS follow the VS Code task priority:**
 1. Use VS Code tasks first (via `run_task` tool)
-2. Use `copilot-agent-util` / `copilot-agent-utilr` 
+2. Use `copilot-agent-util` / `copilot-agent-utilr`
 3. Manual terminal commands only as last resort
 
 ## Repository Standards
@@ -251,7 +251,7 @@ For complete command reference and advanced features, see the full documentation
 
 For each repository:
 - Update `go.mod` to specify `go 1.23` minimum version
-- Update any `go.work` files to specify `go 1.23` minimum version  
+- Update any `go.work` files to specify `go 1.23` minimum version
 - Update Go file headers that reference older versions
 
 ### 2. Update Python Requirements Files
@@ -272,7 +272,7 @@ For each repository:
 ## Expected Deliverables
 
 1. Updated `go.mod` and `go.work` files with Go 1.23+ requirements
-2. Updated Python requirements files with Python 3.13+ requirements  
+2. Updated Python requirements files with Python 3.13+ requirements
 3. Updated file headers where version numbers were changed
 4. Validation that all modules build and work correctly
 5. Documentation updates using the proper update system (NOT direct edits)
@@ -288,7 +288,7 @@ For each repository:
 ## Repository List to Update
 
 1. `/Users/jdfalk/repos/github.com/jdfalk/gcommon`
-2. `/Users/jdfalk/repos/github.com/jdfalk/ghcommon` 
+2. `/Users/jdfalk/repos/github.com/jdfalk/ghcommon`
 3. `/Users/jdfalk/repos/github.com/jdfalk/subtitle-manager`
 4. `/Users/jdfalk/repos/github.com/jdfalk/audiobook-organizer`
 5. `/Users/jdfalk/repos/github.com/jdfalk/copilot-agent-util-rust`
