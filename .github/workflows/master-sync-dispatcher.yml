@@ -33,13 +33,17 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 env:
   # Target repositories for synchronization
   TARGET_REPOS: |
     jdfalk/gcommon
+    jdfalk/ghcommon
     jdfalk/subtitle-manager
     jdfalk/copilot-agent-util-rust
+    jdfalk/apt-cacher-go
+    jdfalk/audiobook-organizer
 
 jobs:
   dispatch-sync:
@@ -67,7 +71,7 @@ jobs:
 
       - name: Dispatch sync events to target repositories
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
         run: |
           sync_type="${{ github.event.inputs.sync_type }}"
           if [ -z "$sync_type" ]; then
