@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/rust-utility.instructions.md -->
-<!-- version: 1.1.0 -->
+<!-- version: 1.2.0 -->
 <!-- guid: a1b2c3d4-e5f6-7890-1234-567890abcdef -->
 
 ---
@@ -10,7 +10,56 @@ Instructions for using the copilot-agent-util Rust utility as the primary tool f
 
 ---
 
-# Copilot Agent Utility (Rust) - Command Reference
+# Copilot Agent Utility (Rust) - Installation and Command Reference
+
+## 📥 Installation
+
+### Option 1: Download from GitHub Releases (Recommended)
+
+**Download from:** https://github.com/jdfalk/copilot-agent-util-rust/releases
+
+Available binaries for:
+- **macOS**: `copilot-agent-util-macos-arm64` and `copilot-agent-util-macos-x86_64`
+- **Linux**: `copilot-agent-util-linux-arm64` and `copilot-agent-util-linux-x86_64` 
+- **Windows**: `copilot-agent-util-windows-x86_64.exe`
+
+```bash
+# Example installation on macOS ARM64:
+curl -L -o copilot-agent-util https://github.com/jdfalk/copilot-agent-util-rust/releases/latest/download/copilot-agent-util-macos-arm64
+chmod +x copilot-agent-util
+sudo mv copilot-agent-util /usr/local/bin/
+```
+
+### Option 2: Build from Source
+
+**Source code:** https://github.com/jdfalk/copilot-agent-util-rust
+
+```bash
+# Clone and build
+git clone https://github.com/jdfalk/copilot-agent-util-rust
+cd copilot-agent-util-rust
+cargo build --release
+cp target/release/copilot-agent-util /usr/local/bin/
+```
+
+### Option 3: Use Local Copy (Development)
+
+Many repositories include a copy in `tools/copilot-agent-util-rust/`:
+
+```bash
+cd tools/copilot-agent-util-rust
+cargo build --release
+cp target/release/copilot-agent-util /usr/local/bin/
+```
+
+### Verification
+
+```bash
+# Verify installation
+copilot-agent-util --version
+# Or alternatively:
+copilot-agent-utilr --version
+```
 
 The `copilot-agent-util` (or `copilot-agent-utilr`) is a comprehensive Rust-based development utility that provides superior performance, memory safety, and extensive command coverage. **Always prefer this utility over manual commands when available.**
 

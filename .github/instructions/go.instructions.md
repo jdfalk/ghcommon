@@ -21,10 +21,12 @@ description: |
 
 ## Version Requirements
 
-- **MANDATORY**: All Go projects must use Go 1.23 or higher
-- Update `go.mod` files to specify `go 1.23` minimum
-- Update `go.work` files to specify `go 1.23` minimum
+- **MANDATORY**: All Go projects must use Go 1.23.0 or higher
+- **NO EXCEPTIONS**: Do not use older Go versions in any repository
+- Update `go.mod` files to specify `go 1.23` minimum version
+- Update `go.work` files to specify `go 1.23` minimum version  
 - All Go file headers must use version 1.23.0 or higher
+- Use `go version` to verify your installation meets requirements
 
 ## Core Principles
 

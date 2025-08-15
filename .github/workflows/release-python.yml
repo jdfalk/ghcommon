@@ -67,85 +67,17 @@ jobs:
 
       - name: Create package.json for semantic-release
         run: |
-          cat > package.json << EOF
-          {
-            "name": "python-project",
-            "version": "0.0.0-development",
-            "private": true,
-            "devDependencies": {
-              "@semantic-release/changelog": "^6.0.3",
-              "@semantic-release/git": "^10.0.1",
-              "@semantic-release/github": "^9.2.6",
-              "@semantic-release/exec": "^6.0.3",
-              "semantic-release": "^22.0.12",
-              "conventional-changelog-conventionalcommits": "^7.0.2"
-            }
-          }
-          EOF
+          python3 ./.github/scripts/sync-release-create-package-json.py python
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
 
       - name: Create semantic-release config for Python
         run: |
-          cat > .releaserc.json << EOF
-          {
-            "branches": ["main"],
-            "plugins": [
-              [
-                "@semantic-release/commit-analyzer",
-                {
-                  "preset": "conventionalcommits",
-                  "releaseRules": [
-                    {"type": "feat", "release": "minor"},
-                    {"type": "fix", "release": "patch"},
-                    {"type": "perf", "release": "patch"},
-                    {"type": "revert", "release": "patch"},
-                    {"type": "docs", "release": false},
-                    {"type": "style", "release": false},
-                    {"type": "chore", "release": false},
-                    {"type": "refactor", "release": "patch"},
-                    {"type": "test", "release": false},
-                    {"type": "build", "release": false},
-                    {"type": "ci", "release": false},
-                    {"breaking": true, "release": "major"}
-                  ]
-                }
-              ],
-              [
-                "@semantic-release/release-notes-generator",
-                {
-                  "preset": "conventionalcommits"
-                }
-              ],
-              [
-                "@semantic-release/exec",
-                {
-                  "prepareCmd": "python scripts/update_version.py \${nextRelease.version}"
-                }
-              ],
-              [
-                "@semantic-release/changelog",
-                {
-                  "changelogFile": "CHANGELOG.md"
-                }
-              ],
-              [
-                "@semantic-release/git",
-                {
-                  "assets": ["pyproject.toml", "setup.py", "__init__.py", "CHANGELOG.md"],
-                  "message": "chore(release): \${nextRelease.version} [skip ci]\n\n\${nextRelease.notes}"
-                }
-              ],
-              [
-                "@semantic-release/github",
-                {
-                  "assets": [
-                    "./dist/*.whl",
-                    "./dist/*.tar.gz"
-                  ]
-                }
-              ]
-            ]
-          }
-          EOF
+          python3 ./.github/scripts/sync-release-create-semantic-config.py python
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PRERELEASE: ${{ inputs.prerelease }}
 
       - name: Install dependencies
         run: npm install
@@ -156,8 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MANUAL_RELEASE_TYPE: ${{ inputs.release_type }}
         run: |
-          if [[ "$MANUAL_RELEASE_TYPE" != "auto" && "$MANUAL_RELEASE_TYPE" != "" ]]; then
-            echo "Manual release type specified: $MANUAL_RELEASE_TYPE"
+          python3 ./.github/scripts/sync-release-determine-version.py pythoned: $MANUAL_RELEASE_TYPE"
             # Try to get current version from pyproject.toml or setup.py
             if [[ -f "pyproject.toml" ]]; then
               CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/' || echo "0.1.0")
@@ -326,21 +257,10 @@ jobs:
 
       - name: Create package.json for semantic-release
         run: |
-          cat > package.json << EOF
-          {
-            "name": "python-project",
-            "version": "0.0.0-development",
-            "private": true,
-            "devDependencies": {
-              "@semantic-release/changelog": "^6.0.3",
-              "@semantic-release/git": "^10.0.1",
-              "@semantic-release/github": "^9.2.6",
-              "@semantic-release/exec": "^6.0.3",
-              "semantic-release": "^22.0.12",
-              "conventional-changelog-conventionalcommits": "^7.0.2"
-            }
-          }
-          EOF
+          python3 ./.github/scripts/sync-release-create-package-json.py python
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
 
       - name: Create version update script
         run: |
@@ -393,67 +313,10 @@ jobs:
 
       - name: Create semantic-release config for Python
         run: |
-          cat > .releaserc.json << EOF
-          {
-            "branches": ["main"],
-            "plugins": [
-              [
-                "@semantic-release/commit-analyzer",
-                {
-                  "preset": "conventionalcommits",
-                  "releaseRules": [
-                    {"type": "feat", "release": "minor"},
-                    {"type": "fix", "release": "patch"},
-                    {"type": "perf", "release": "patch"},
-                    {"type": "revert", "release": "patch"},
-                    {"type": "docs", "release": false},
-                    {"type": "style", "release": false},
-                    {"type": "chore", "release": false},
-                    {"type": "refactor", "release": "patch"},
-                    {"type": "test", "release": false},
-                    {"type": "build", "release": false},
-                    {"type": "ci", "release": false},
-                    {"breaking": true, "release": "major"}
-                  ]
-                }
-              ],
-              [
-                "@semantic-release/release-notes-generator",
-                {
-                  "preset": "conventionalcommits"
-                }
-              ],
-              [
-                "@semantic-release/exec",
-                {
-                  "prepareCmd": "python scripts/update_version.py \${nextRelease.version}"
-                }
-              ],
-              [
-                "@semantic-release/changelog",
-                {
-                  "changelogFile": "CHANGELOG.md"
-                }
-              ],
-              [
-                "@semantic-release/git",
-                {
-                  "assets": ["pyproject.toml", "setup.py", "__init__.py", "CHANGELOG.md"],
-                  "message": "chore(release): \${nextRelease.version} [skip ci]\n\n\${nextRelease.notes}"
-                }
-              ],
-              [
-                "@semantic-release/github",
-                {
-                  "assets": [
-                    "./dist/*.whl",
-                    "./dist/*.tar.gz"
-                  ]
-                }
-              ]
-            ]
-          }
-          EOF
+          python3 ./.github/scripts/sync-release-create-semantic-config.py python
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PRERELEASE: ${{ inputs.prerelease }}
 
       - name: Install dependencies
         run: npm install
@@ -462,18 +325,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [[ "${{ inputs.release_type }}" != "auto" && "${{ inputs.release_type }}" != "" ]]; then
-            # Manual release - create GitHub release directly
-            gh release create "${{ needs.determine-version.outputs.tag }}" \
-              --title "Release ${{ needs.determine-version.outputs.version }}" \
-              --notes "${{ needs.determine-version.outputs.changelog }}" \
-              ${{ inputs.prerelease && '--prerelease' || '' }} \
-              ${{ inputs.draft && '--draft' || '' }} \
-              ./dist/*
-          else
-            # Use semantic-release for automated releases
-            npx semantic-release
-          fi
+          python3 ./.github/scripts/sync-release-handle-manual-release.py python
 
   publish-pypi:
     name: Publish to PyPI
