@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 1.4.0 -->
+<!-- version: 1.5.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -39,6 +39,15 @@ Copilot customization.
 
 For more details and the full system, see
 [copilot-instructions.md](../copilot-instructions.md).
+
+## Copilot Agent Utility
+
+The repositories use the `copilot-agent-util` command-line tool for enhanced logging, error handling, and automation in VS Code tasks. This Rust-based utility provides consistent output formatting and task management across all repositories.
+
+**If the `copilot-agent-util` tool is not available in your environment:**
+- Install it from the source repository: https://github.com/jdfalk/copilot-agent-util-rust
+- Follow the installation instructions in that repository's README
+- The tool is required for proper VS Code task execution and logging
 
 ## 🚨 CRITICAL: Use VS Code Tasks First
 
