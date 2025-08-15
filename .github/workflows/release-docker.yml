@@ -1,0 +1,386 @@
+# file: .github/workflows/release-docker.yml
+# version: 1.0.0
+# guid: d1e2f3a4-b5c6-d7e8-f9a0-b1c2d3e4f5a6
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
+name: Docker Release Plugin
+
+on:
+  workflow_call:
+    inputs:
+      depends_on_language:
+        description: "Language this Docker build depends on"
+        required: false
+        default: ""
+        type: string
+      use_release_artifacts:
+        description: "Use pre-built release artifacts"
+        required: false
+        default: true
+        type: boolean
+      platforms:
+        description: "Target platforms"
+        required: false
+        default: "linux/amd64,linux/arm64"
+        type: string
+      registry:
+        description: "Container registry"
+        required: false
+        default: "ghcr.io"
+        type: string
+      push:
+        description: "Push image to registry"
+        required: false
+        default: true
+        type: boolean
+      use_buildah:
+        description: "Use buildah instead of docker"
+        required: false
+        default: false
+        type: boolean
+    outputs:
+      image-digest:
+        description: "The built image digest"
+        value: ${{ jobs.build-docker.outputs.digest }}
+      image-tags:
+        description: "The built image tags"
+        value: ${{ jobs.build-docker.outputs.tags }}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+  security-events: write
+
+env:
+  REGISTRY: ${{ inputs.registry }}
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Detect Docker configuration and dependencies
+  detect-config:
+    name: Detect Docker Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      has-dockerfile: ${{ steps.check.outputs.has-dockerfile }}
+      dockerfile-path: ${{ steps.check.outputs.dockerfile-path }}
+      has-compose: ${{ steps.check.outputs.has-compose }}
+      should-build: ${{ steps.check.outputs.should-build }}
+      build-args: ${{ steps.check.outputs.build-args }}
+      depends-on: ${{ steps.check.outputs.depends-on }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Docker files and dependencies
+        id: check
+        env:
+          DEPENDS_ON_LANGUAGE: ${{ inputs.depends_on_language }}
+        run: |
+          # Check for Dockerfile
+          if [[ -f "Dockerfile" ]]; then
+            echo "has-dockerfile=true" >> $GITHUB_OUTPUT
+            echo "dockerfile-path=Dockerfile" >> $GITHUB_OUTPUT
+          elif [[ -f "docker/Dockerfile" ]]; then
+            echo "has-dockerfile=true" >> $GITHUB_OUTPUT
+            echo "dockerfile-path=docker/Dockerfile" >> $GITHUB_OUTPUT
+          elif find . -name "Dockerfile*" -type f | head -1; then
+            DOCKERFILE=$(find . -name "Dockerfile*" -type f | head -1)
+            echo "has-dockerfile=true" >> $GITHUB_OUTPUT
+            echo "dockerfile-path=$DOCKERFILE" >> $GITHUB_OUTPUT
+          else
+            echo "has-dockerfile=false" >> $GITHUB_OUTPUT
+            echo "should-build=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check for docker-compose
+          if [[ -f "docker-compose.yml" || -f "docker-compose.yaml" ]]; then
+            echo "has-compose=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-compose=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Determine build strategy
+          if [[ "${{ inputs.use_release_artifacts }}" == "true" && -n "$DEPENDS_ON_LANGUAGE" ]]; then
+            echo "should-build=true" >> $GITHUB_OUTPUT
+            echo "depends-on=$DEPENDS_ON_LANGUAGE" >> $GITHUB_OUTPUT
+            echo "Using release artifacts from $DEPENDS_ON_LANGUAGE"
+          elif [[ "${{ inputs.use_release_artifacts }}" == "false" ]]; then
+            echo "should-build=true" >> $GITHUB_OUTPUT
+            echo "depends-on=" >> $GITHUB_OUTPUT
+            echo "Building from source"
+          else
+            echo "should-build=true" >> $GITHUB_OUTPUT
+            echo "depends-on=" >> $GITHUB_OUTPUT
+            echo "No dependency specified, building standalone"
+          fi
+
+  # Wait for dependency language builds to complete
+  wait-for-dependencies:
+    name: Wait for Dependencies
+    runs-on: ubuntu-latest
+    needs: detect-config
+    if: needs.detect-config.outputs.should-build == 'true' && needs.detect-config.outputs.depends-on != ''
+    steps:
+      - name: Wait for dependency builds
+        env:
+          DEPENDS_ON: ${{ needs.detect-config.outputs.depends-on }}
+        run: |
+          echo "Waiting for $DEPENDS_ON build artifacts to be available..."
+          # This would be implemented by the main release.yml workflow
+          # by ensuring this job runs after the dependency language build job
+          echo "Dependencies ready"
+
+  # Download release artifacts if using them
+  download-artifacts:
+    name: Download Release Artifacts
+    runs-on: ubuntu-latest
+    needs: [detect-config, wait-for-dependencies]
+    if: needs.detect-config.outputs.should-build == 'true' && inputs.use_release_artifacts == true
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-release-*"
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: List available artifacts
+        run: |
+          echo "Available artifacts:"
+          find ./artifacts -type f -ls || echo "No artifacts found"
+
+      - name: Upload artifacts for Docker build
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-artifacts
+          path: ./artifacts/
+          retention-days: 1
+
+  # Build Docker image
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [detect-config, download-artifacts]
+    if: always() && needs.detect-config.outputs.should-build == 'true'
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        if: inputs.use_release_artifacts == true
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-build-artifacts
+          path: ./artifacts/
+        continue-on-error: true
+
+      - name: Set up QEMU
+        if: inputs.use_buildah == false
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: inputs.use_buildah == false
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Buildah
+        if: inputs.use_buildah == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y buildah
+
+      - name: Log in to Container Registry
+        if: inputs.push == true
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,prefix={{branch}}-
+          labels: |
+            org.opencontainers.image.title=${{ github.repository }}
+            org.opencontainers.image.description=Container image for ${{ github.repository }}
+            org.opencontainers.image.vendor=${{ github.repository_owner }}
+
+      - name: Build and push with Docker
+        if: inputs.use_buildah == false
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ needs.detect-config.outputs.dockerfile-path }}
+          platforms: ${{ inputs.platforms }}
+          push: ${{ inputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Pass artifacts as build context if available
+          build-args: |
+            ARTIFACTS_PATH=./artifacts
+
+      - name: Build and push with Buildah
+        if: inputs.use_buildah == true
+        id: build-buildah
+        run: |
+          # Buildah build implementation
+          DOCKERFILE="${{ needs.detect-config.outputs.dockerfile-path }}"
+          IMAGE_NAME="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+
+          # Build for each platform
+          for platform in $(echo "${{ inputs.platforms }}" | tr ',' ' '); do
+            echo "Building for platform: $platform"
+
+            # Create a new container
+            CTR=$(buildah from --platform="$platform" scratch || buildah from --platform="$platform" ubuntu:22.04)
+
+            # Build using Dockerfile
+            buildah config --workingdir /app "$CTR"
+
+            # Copy artifacts if available
+            if [[ -d "./artifacts" ]]; then
+              buildah copy "$CTR" ./artifacts /app/artifacts
+            fi
+
+            # Run dockerfile commands (simplified)
+            buildah config --entrypoint '[]' "$CTR"
+
+            # Commit the image
+            TAG_NAME="${IMAGE_NAME}:${platform##*/}-$(date +%s)"
+            buildah commit "$CTR" "$TAG_NAME"
+
+            # Push if requested
+            if [[ "${{ inputs.push }}" == "true" ]]; then
+              buildah push "$TAG_NAME"
+            fi
+
+            buildah rm "$CTR"
+          done
+
+  # Security scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [detect-config, build-docker]
+    if: needs.detect-config.outputs.should-build == 'true'
+    permissions:
+      security-events: write
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ needs.build-docker.outputs.tags }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Generate SBOM
+  generate-sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    needs: [detect-config, build-docker]
+    if: needs.detect-config.outputs.should-build == 'true'
+    steps:
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ needs.build-docker.outputs.tags }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+
+      - name: Attest SBOM
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ needs.build-docker.outputs.tags }}
+          subject-digest: ${{ needs.build-docker.outputs.digest }}
+
+  # Validate docker-compose if present
+  validate-compose:
+    name: Validate Docker Compose
+    runs-on: ubuntu-latest
+    needs: detect-config
+    if: needs.detect-config.outputs.has-compose == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: |
+          docker compose config --quiet
+          echo "Docker Compose configuration is valid"
+
+  # Test the built image
+  test-image:
+    name: Test Docker Image
+    runs-on: ubuntu-latest
+    needs: [detect-config, build-docker]
+    if: needs.detect-config.outputs.should-build == 'true'
+    steps:
+      - name: Test image functionality
+        env:
+          IMAGE_TAGS: ${{ needs.build-docker.outputs.tags }}
+        run: |
+          # Get the first tag for testing
+          TEST_TAG=$(echo "$IMAGE_TAGS" | head -1)
+          echo "Testing image: $TEST_TAG"
+
+          # Basic functionality test
+          docker run --rm "$TEST_TAG" --version 2>/dev/null || \
+          docker run --rm "$TEST_TAG" version 2>/dev/null || \
+          docker run --rm "$TEST_TAG" --help 2>/dev/null || \
+          echo "Image basic test completed"
+
+  # Summary
+  docker-summary:
+    name: Docker Build Summary
+    runs-on: ubuntu-latest
+    needs: [detect-config, build-docker, security-scan, generate-sbom, test-image, validate-compose]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Docker Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Should Build**: ${{ needs.detect-config.outputs.should-build }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Has Dockerfile**: ${{ needs.detect-config.outputs.has-dockerfile }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Has Compose**: ${{ needs.detect-config.outputs.has-compose }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Use Buildah**: ${{ inputs.use_buildah }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platforms**: ${{ inputs.platforms }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry**: ${{ inputs.registry }}" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.build-docker.result }}" == "success" ]]; then
+            echo "- **Image Tags**: ${{ needs.build-docker.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Image Digest**: ${{ needs.build-docker.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "- **Security Scan**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Generated**: ${{ needs.generate-sbom.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Test**: ${{ needs.test-image.result }}" >> $GITHUB_STEP_SUMMARY

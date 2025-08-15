@@ -1,0 +1,254 @@
+# file: .github/release-config.yml
+# version: 1.0.0
+# guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+
+# Release Configuration Schema
+# This file defines the default configuration for the modular release system.
+# It can be overridden by placing a .release-config.yml in the repository root.
+#
+# All settings support workflow_dispatch inputs for runtime override.
+
+# Language Detection Configuration
+language_detection:
+  # File patterns that determine the primary language
+  patterns:
+    rust:
+      - "Cargo.toml"
+      - "Cargo.lock"
+    go:
+      - "go.mod"
+      - "go.sum"
+      - "*.go"
+    python:
+      - "pyproject.toml"
+      - "setup.py"
+      - "requirements.txt"
+      - "poetry.lock"
+    javascript:
+      - "package.json"
+      - "package-lock.json"
+      - "yarn.lock"
+    typescript:
+      - "tsconfig.json"
+      - "*.ts"
+      - "*.tsx"
+
+  # Priority order when multiple languages are detected
+  priority:
+    - rust
+    - go
+    - typescript
+    - javascript
+    - python
+
+# Release Configuration
+release:
+  # Semantic versioning settings
+  versioning:
+    # Conventional commit types that trigger releases
+    release_types:
+      major: ["feat!", "fix!", "chore!", "breaking"]
+      minor: ["feat"]
+      patch: ["fix", "perf", "docs", "style", "refactor", "test", "chore"]
+
+    # Custom version patterns
+    patterns:
+      rust: 'version = "{version}"'
+      go: "// version: {version}"
+      python: '__version__ = "{version}"'
+      javascript: '"version": "{version}"'
+      typescript: '"version": "{version}"'
+
+  # Build matrix configuration
+  build:
+    # Build dependencies - specify which languages must build first
+    dependencies:
+      # Example: Docker images might need the main language built first
+      docker:
+        depends_on: ["rust", "go", "python", "javascript", "typescript"]
+        # Wait for specific jobs from the dependency language
+        wait_for_jobs: ["build", "test"]
+
+      # Example: Integration tests might need multiple languages
+      integration_tests:
+        depends_on: ["rust", "go"]
+        wait_for_jobs: ["build"]
+
+      # Example: Multi-language projects where one language builds others
+      wasm_bindings:
+        depends_on: ["rust"]
+        wait_for_jobs: ["build"]
+        # Can specify which build targets to depend on
+        target_filter: ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin"]
+
+    # Parallel execution settings
+    parallel:
+      # Maximum number of concurrent jobs per language
+      max_concurrent_per_language: 6
+      # Maximum total concurrent jobs across all languages
+      max_total_concurrent: 20
+      # Allow cross-language parallelism
+      cross_language_parallel: true
+
+    # Target platforms per language
+    targets:
+      rust:
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+        - target: aarch64-unknown-linux-gnu
+          os: ubuntu-latest
+        - target: x86_64-unknown-linux-musl
+          os: ubuntu-latest
+        - target: aarch64-unknown-linux-musl
+          os: ubuntu-latest
+        - target: x86_64-apple-darwin
+          os: macos-latest
+        - target: aarch64-apple-darwin
+          os: macos-latest
+        - target: x86_64-pc-windows-gnu
+          os: windows-latest
+
+      go:
+        - goos: linux
+          goarch: amd64
+          os: ubuntu-latest
+        - goos: linux
+          goarch: arm64
+          os: ubuntu-latest
+        - goos: darwin
+          goarch: amd64
+          os: macos-latest
+        - goos: darwin
+          goarch: arm64
+          os: macos-latest
+        - goos: windows
+          goarch: amd64
+          os: windows-latest
+
+      python:
+        - os: ubuntu-latest
+          python-version: "3.12"
+        - os: macos-latest
+          python-version: "3.12"
+        - os: windows-latest
+          python-version: "3.12"
+
+      javascript:
+        - os: ubuntu-latest
+          node-version: "22"
+
+      typescript:
+        - os: ubuntu-latest
+          node-version: "22"
+
+# Plugin Configuration
+plugins:
+  # Job orchestration and dependency management
+  orchestration:
+    # Enable cross-language job dependencies
+    cross_language_deps: true
+    # Job execution order strategies
+    execution_strategy: "dependency_aware" # options: "parallel", "sequential", "dependency_aware"
+    # Timeout settings
+    timeouts:
+      job_timeout: "60m"
+      dependency_wait_timeout: "30m"
+    # Failure handling
+    failure_handling:
+      # Continue with independent jobs if dependency fails
+      continue_on_dependency_failure: false
+      # Retry failed jobs
+      retry_count: 2
+      retry_delay: "5m"
+
+  # Docker build plugin
+  docker:
+    enabled: true
+    # Use release artifacts instead of rebuilding
+    use_release_artifacts: true
+    # Docker registry settings
+    registry: ghcr.io
+    # Build settings
+    build:
+      platforms: "linux/amd64,linux/arm64"
+      context: "."
+      push: true
+      # Use buildah as alternative
+      buildah: false
+    # Security scanning
+    security:
+      trivy: true
+      snyk: false
+    # SBOM generation
+    sbom:
+      enabled: true
+      format: "spdx-json"
+
+  # Container image plugin (buildah alternative)
+  buildah:
+    enabled: false
+    registry: ghcr.io
+    platforms: "linux/amd64,linux/arm64"
+
+  # Package publishing plugins
+  publishing:
+    rust:
+      crates_io: false
+      homebrew: true
+    go:
+      goproxy: true
+      homebrew: true
+    python:
+      pypi: false
+      conda: false
+    javascript:
+      npm: false
+    typescript:
+      npm: false
+
+# Workflow Customization
+workflow:
+  # CI integration
+  ci:
+    # Run tests before release
+    test: true
+    # Run linting before release
+    lint: true
+    # Security scanning
+    security: true
+
+  # Release behavior
+  behavior:
+    # Create draft releases
+    draft: false
+    # Mark as prerelease
+    prerelease: false
+    # Skip CI if version bump only
+    skip_ci_version_bump: true
+    # Auto-merge dependency updates
+    auto_merge_deps: false
+
+  # Notification settings
+  notifications:
+    slack: false
+    discord: false
+    email: false
+
+# Environment Variables
+environment:
+  # Default environment variables available to all workflows
+  defaults:
+    CARGO_TERM_COLOR: always
+    RUST_BACKTRACE: 1
+    GO_VERSION: "1.24"
+    NODE_VERSION: "22"
+    PYTHON_VERSION: "3.12"
+# Override Examples (place in repository root as .release-config.yml)
+# ---
+# plugins:
+#   docker:
+#     enabled: false
+# release:
+#   behavior:
+#     draft: true
+# ---

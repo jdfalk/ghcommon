@@ -173,3 +173,18 @@ jobs:
       prerelease: ${{ github.event.inputs.prerelease == 'true' }}
       draft: ${{ github.event.inputs.draft == 'true' }}
     secrets: inherit
+
+  # Docker plugin - builds container images using release artifacts
+  release-docker:
+    name: Docker Release
+    needs: [detect-language, release-rust, release-go, release-python, release-javascript, release-typescript]
+    if: always() && needs.detect-language.outputs.should-release == 'true' && (needs.release-rust.result == 'success' || needs.release-go.result == 'success' || needs.release-python.result == 'success' || needs.release-javascript.result == 'success' || needs.release-typescript.result == 'success')
+    uses: ./.github/workflows/release-docker.yml
+    with:
+      depends_on_language: ${{ needs.detect-language.outputs.language }}
+      use_release_artifacts: true
+      platforms: "linux/amd64,linux/arm64"
+      registry: "ghcr.io"
+      push: true
+      use_buildah: false
+    secrets: inherit

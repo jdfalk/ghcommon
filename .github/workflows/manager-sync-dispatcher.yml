@@ -1,8 +1,8 @@
-# file: .github/workflows/master-sync-dispatcher.yml
-# version: 1.0.0
+# file: .github/workflows/manager-sync-dispatcher.yml
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
-name: Master Sync Dispatcher
+name: Manager Sync Dispatcher
 
 on:
   push:
