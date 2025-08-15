@@ -1,5 +1,5 @@
 # file: .github/workflows/sync-receiver.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2
 
 name: Sync Receiver
@@ -17,6 +17,10 @@ jobs:
   sync-from-ghcommon:
     name: Sync Files from ghcommon
     runs-on: ubuntu-latest
+    env:
+      SYNC_TYPE_PAYLOAD: ${{ github.event.client_payload.sync_type }}
+      SOURCE_REPO_PAYLOAD: ${{ github.event.client_payload.source_repo }}
+      SOURCE_SHA_PAYLOAD: ${{ github.event.client_payload.source_sha }}
     steps:
       - name: Checkout current repo
         uses: actions/checkout@v5
@@ -32,7 +36,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync files based on type
-        run: ./.github/scripts/sync-receiver-sync-files.sh "${{ github.event.client_payload.sync_type }}"
+        run: ./.github/scripts/sync-receiver-sync-files.sh "$SYNC_TYPE_PAYLOAD"
 
       - name: Check for changes
         id: changes
@@ -40,7 +44,9 @@ jobs:
 
       - name: Commit and push changes
         if: steps.changes.outputs.has_changes == 'true'
-        run: ./.github/scripts/sync-receiver-commit-push.sh "${{ github.event.client_payload.source_repo }}" "${{ github.event.client_payload.source_sha }}" "${{ github.event.client_payload.sync_type }}"
+        run: ./.github/scripts/sync-receiver-commit-push.sh "$SOURCE_REPO_PAYLOAD" "$SOURCE_SHA_PAYLOAD" "$SYNC_TYPE_PAYLOAD"
 
       - name: Summary
-        run: ./.github/scripts/sync-receiver-generate-summary.sh "${{ github.event.client_payload.sync_type }}" "${{ github.event.client_payload.source_repo }}" "${{ github.event.client_payload.source_sha }}" "${{ steps.changes.outputs.has_changes }}"
+        env:
+          HAS_CHANGES_OUTPUT: ${{ steps.changes.outputs.has_changes }}
+        run: ./.github/scripts/sync-receiver-generate-summary.sh "$SYNC_TYPE_PAYLOAD" "$SOURCE_REPO_PAYLOAD" "$SOURCE_SHA_PAYLOAD" "$HAS_CHANGES_OUTPUT"
