@@ -27,14 +27,14 @@ def get_base_dependencies():
 def create_package_json(language):
     """Create package.json for the specified language."""
     base_deps = get_base_dependencies()
-    
+
     package_configs = {
         "rust": {
             "name": "rust-project",
             "devDependencies": base_deps,
         },
         "go": {
-            "name": "go-project", 
+            "name": "go-project",
             "devDependencies": base_deps,
         },
         "python": {
@@ -56,23 +56,23 @@ def create_package_json(language):
             },
         },
     }
-    
+
     if language not in package_configs:
         raise ValueError(f"Unsupported language: {language}")
-    
+
     config = package_configs[language]
-    
+
     package_json = {
         "name": config["name"],
         "version": "0.0.0-development",
         "private": True,
         "devDependencies": config["devDependencies"],
     }
-    
+
     # Write package.json with proper formatting
     with open("package.json", "w") as f:
         json.dump(package_json, f, indent=2)
-    
+
     print(f"Package.json created successfully for {language}")
 
 
@@ -82,9 +82,9 @@ def main():
         print("Error: Language parameter required")
         print("Usage: sync-release-create-package-json.py <language>")
         sys.exit(1)
-    
+
     language = sys.argv[1]
-    
+
     try:
         create_package_json(language)
     except ValueError as e:
