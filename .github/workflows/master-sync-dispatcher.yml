@@ -37,6 +37,7 @@ on:
 permissions:
   contents: read
   actions: write
+  pull-requests: write
 
 env:
   # Target repositories for synchronization
@@ -65,6 +66,34 @@ jobs:
             echo "repos=${{ github.event.inputs.target_repos }}" >> $GITHUB_OUTPUT
           fi
           echo "Target repos determined: $(cat $GITHUB_OUTPUT | grep repos=)"
+
+      - name: Debug token and permissions
+        env:
+          GH_TOKEN: ${{ secrets.JF_CI_GH_PAT }}
+        run: |
+          echo "Token check..."
+          if [ -z "$GH_TOKEN" ]; then
+            echo "❌ JF_CI_GH_PAT secret is not set or empty"
+            exit 1
+          else
+            echo "✅ JF_CI_GH_PAT secret is available (length: ${#GH_TOKEN})"
+          fi
+          
+          echo "Testing GitHub CLI authentication..."
+          if gh auth status; then
+            echo "✅ GitHub CLI authentication successful"
+          else
+            echo "❌ GitHub CLI authentication failed"
+            exit 1
+          fi
+          
+          echo "Testing repository access..."
+          if gh api user; then
+            echo "✅ User API access successful"
+          else
+            echo "❌ User API access failed"
+            exit 1
+          fi
 
       - name: Dispatch sync events to target repositories
         env:
