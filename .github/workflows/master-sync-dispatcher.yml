@@ -40,9 +40,9 @@ permissions:
 
 env:
   # Target repositories for synchronization
+  # DO NOT ADD ghcommon as that would overwrite itself.
   TARGET_REPOS: |
     jdfalk/gcommon
-    jdfalk/ghcommon
     jdfalk/subtitle-manager
     jdfalk/copilot-agent-util-rust
     jdfalk/apt-cacher-go
