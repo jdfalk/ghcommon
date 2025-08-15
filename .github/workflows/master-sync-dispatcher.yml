@@ -1,0 +1,97 @@
+# file: .github/workflows/master-sync-dispatcher.yml
+# version: 1.0.0
+# guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
+
+name: Master Sync Dispatcher
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/instructions/**"
+      - ".github/copilot-instructions.md"
+      - "labels.json"
+      - "labels.md"
+  workflow_dispatch:
+    inputs:
+      target_repos:
+        description: "Comma-separated list of repos to sync (or 'all')"
+        required: false
+        default: "all"
+        type: string
+      sync_type:
+        description: "Type of sync to perform"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - "all"
+          - "workflows"
+          - "instructions"
+          - "labels"
+
+permissions:
+  contents: read
+
+env:
+  # Target repositories for synchronization
+  TARGET_REPOS: |
+    jdfalk/gcommon
+    jdfalk/subtitle-manager
+    jdfalk/copilot-agent-util-rust
+
+jobs:
+  dispatch-sync:
+    name: Dispatch Sync Events
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup GitHub CLI
+        run: |
+          # GitHub CLI is pre-installed on GitHub runners
+          gh --version
+
+      - name: Determine target repositories
+        id: repos
+        run: |
+          if [ "${{ github.event.inputs.target_repos }}" = "all" ] || [ -z "${{ github.event.inputs.target_repos }}" ]; then
+            echo "repos<<EOF" >> $GITHUB_OUTPUT
+            echo "$TARGET_REPOS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "repos=${{ github.event.inputs.target_repos }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Dispatch sync events to target repositories
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sync_type="${{ github.event.inputs.sync_type }}"
+          if [ -z "$sync_type" ]; then
+            sync_type="all"
+          fi
+
+          echo "Dispatching sync events for type: $sync_type"
+
+          # Convert repos to array and dispatch to each
+          echo "${{ steps.repos.outputs.repos }}" | tr ',' '\n' | while read -r repo; do
+            repo=$(echo "$repo" | xargs)  # trim whitespace
+            if [ -n "$repo" ]; then
+              echo "Dispatching to: $repo"
+              gh api repos/$repo/dispatches \
+                --method POST \
+                --field event_type="sync-from-ghcommon" \
+                --field client_payload="{\"sync_type\":\"$sync_type\",\"source_repo\":\"${{ github.repository }}\",\"source_sha\":\"${{ github.sha }}\"}" \
+                || echo "Failed to dispatch to $repo (repo may not exist or no access)"
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "## Sync Dispatch Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sync Type:** ${{ github.event.inputs.sync_type || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Repos:** ${{ steps.repos.outputs.repos }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source SHA:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

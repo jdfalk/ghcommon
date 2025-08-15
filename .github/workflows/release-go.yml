@@ -1,0 +1,417 @@
+# file: .github/workflows/release-go.yml
+# version: 1.0.0
+# guid: c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f
+
+name: Go Release
+
+on:
+  workflow_call:
+    inputs:
+      release_type:
+        description: "Release type"
+        required: false
+        default: "auto"
+        type: string
+      prerelease:
+        description: "Is this a prerelease?"
+        required: false
+        default: false
+        type: boolean
+      draft:
+        description: "Create as draft?"
+        required: false
+        default: false
+        type: boolean
+    outputs:
+      version:
+        description: "The released version"
+        value: ${{ jobs.release.outputs.version }}
+      tag:
+        description: "The release tag"
+        value: ${{ jobs.release.outputs.tag }}
+
+permissions:
+  contents: write
+  packages: write
+  attestations: write
+  id-token: write
+
+env:
+  GO_VERSION: "1.24"
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      changelog: ${{ steps.version.outputs.changelog }}
+      should-release: ${{ steps.version.outputs.should-release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js for semantic-release
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Create package.json for semantic-release
+        run: |
+          cat > package.json << EOF
+          {
+            "name": "go-project",
+            "version": "0.0.0-development",
+            "private": true,
+            "devDependencies": {
+              "@semantic-release/changelog": "^6.0.3",
+              "@semantic-release/git": "^10.0.1",
+              "@semantic-release/github": "^9.2.6",
+              "@semantic-release/exec": "^6.0.3",
+              "semantic-release": "^22.0.12",
+              "conventional-changelog-conventionalcommits": "^7.0.2"
+            }
+          }
+          EOF
+
+      - name: Create semantic-release config for Go
+        run: |
+          cat > .releaserc.json << EOF
+          {
+            "branches": ["main"],
+            "plugins": [
+              [
+                "@semantic-release/commit-analyzer",
+                {
+                  "preset": "conventionalcommits",
+                  "releaseRules": [
+                    {"type": "feat", "release": "minor"},
+                    {"type": "fix", "release": "patch"},
+                    {"type": "perf", "release": "patch"},
+                    {"type": "revert", "release": "patch"},
+                    {"type": "docs", "release": false},
+                    {"type": "style", "release": false},
+                    {"type": "chore", "release": false},
+                    {"type": "refactor", "release": "patch"},
+                    {"type": "test", "release": false},
+                    {"type": "build", "release": false},
+                    {"type": "ci", "release": false},
+                    {"breaking": true, "release": "major"}
+                  ]
+                }
+              ],
+              [
+                "@semantic-release/release-notes-generator",
+                {
+                  "preset": "conventionalcommits"
+                }
+              ],
+              [
+                "@semantic-release/exec",
+                {
+                  "prepareCmd": "echo \"\${nextRelease.version}\" > VERSION"
+                }
+              ],
+              [
+                "@semantic-release/changelog",
+                {
+                  "changelogFile": "CHANGELOG.md"
+                }
+              ],
+              [
+                "@semantic-release/git",
+                {
+                  "assets": ["VERSION", "CHANGELOG.md"],
+                  "message": "chore(release): \${nextRelease.version} [skip ci]\n\n\${nextRelease.notes}"
+                }
+              ],
+              [
+                "@semantic-release/github",
+                {
+                  "assets": [
+                    "./releases/*.tar.gz",
+                    "./releases/*.zip"
+                  ]
+                }
+              ]
+            ]
+          }
+          EOF
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Determine next version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MANUAL_RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          if [[ "$MANUAL_RELEASE_TYPE" != "auto" && "$MANUAL_RELEASE_TYPE" != "" ]]; then
+            echo "Manual release type specified: $MANUAL_RELEASE_TYPE"
+            if [[ -f "VERSION" ]]; then
+              CURRENT_VERSION=$(cat VERSION)
+            else
+              CURRENT_VERSION="0.1.0"
+            fi
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MAJOR=${VERSION_PARTS[0]}
+            MINOR=${VERSION_PARTS[1]}
+            PATCH=${VERSION_PARTS[2]}
+
+            case "$MANUAL_RELEASE_TYPE" in
+              "major")
+                NEW_VERSION="$((MAJOR + 1)).0.0"
+                ;;
+              "minor")
+                NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+                ;;
+              "patch")
+                NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+                ;;
+            esac
+
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "should-release=true" >> $GITHUB_OUTPUT
+            echo "changelog=Manual $MANUAL_RELEASE_TYPE release" >> $GITHUB_OUTPUT
+          else
+            # Run semantic-release in dry-run mode to determine version
+            npx semantic-release --dry-run > release_output.log 2>&1 || true
+
+            if grep -q "The next release version is" release_output.log; then
+              NEW_VERSION=$(grep "The next release version is" release_output.log | sed 's/.*The next release version is \([0-9.]*\).*/\1/')
+              echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+              echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+              echo "should-release=true" >> $GITHUB_OUTPUT
+
+              # Extract changelog
+              CHANGELOG=$(npx semantic-release --dry-run 2>&1 | grep -A 100 "Release note for version" | tail -n +2 | head -n -1 || echo "Automated release")
+              echo "changelog<<EOF" >> $GITHUB_OUTPUT
+              echo "$CHANGELOG" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            else
+              echo "No release needed based on conventional commits"
+              echo "should-release=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  build:
+    name: Build for ${{ matrix.goos }}-${{ matrix.goarch }}
+    runs-on: ${{ matrix.os }}
+    needs: determine-version
+    if: needs.determine-version.outputs.should-release == 'true'
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            os: ubuntu-latest
+          - goos: linux
+            goarch: arm64
+            os: ubuntu-latest
+          - goos: darwin
+            goarch: amd64
+            os: macos-latest
+          - goos: darwin
+            goarch: arm64
+            os: macos-latest
+          - goos: windows
+            goarch: amd64
+            os: windows-latest
+            ext: .exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Get module info
+        id: module-info
+        run: |
+          MODULE_NAME=$(go list -m)
+          BINARY_NAME=$(basename $MODULE_NAME)
+          echo "module_name=$MODULE_NAME" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+          echo "Module: $MODULE_NAME, Binary: $BINARY_NAME"
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          mkdir -p releases
+          OUTPUT_NAME="${{ steps.module-info.outputs.binary_name }}"
+          if [[ "${{ matrix.goos }}" == "windows" ]]; then
+            OUTPUT_NAME="${OUTPUT_NAME}.exe"
+          fi
+          go build -ldflags "-s -w -X main.version=${{ needs.determine-version.outputs.version }}" -o "releases/${OUTPUT_NAME}" .
+
+      - name: Create archive (Unix)
+        if: matrix.goos != 'windows'
+        run: |
+          cd releases
+          tar -czf "${{ steps.module-info.outputs.binary_name }}-${{ needs.determine-version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" "${{ steps.module-info.outputs.binary_name }}"
+          rm "${{ steps.module-info.outputs.binary_name }}"
+
+      - name: Create archive (Windows)
+        if: matrix.goos == 'windows'
+        run: |
+          cd releases
+          Compress-Archive -Path "${{ steps.module-info.outputs.binary_name }}.exe" -DestinationPath "${{ steps.module-info.outputs.binary_name }}-${{ needs.determine-version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}.zip"
+          Remove-Item "${{ steps.module-info.outputs.binary_name }}.exe"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.module-info.outputs.binary_name }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: releases/*
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [determine-version, build]
+    if: needs.determine-version.outputs.should-release == 'true'
+    outputs:
+      version: ${{ needs.determine-version.outputs.version }}
+      tag: ${{ needs.determine-version.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js for semantic-release
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./releases
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la ./releases/
+
+      - name: Create package.json for semantic-release
+        run: |
+          cat > package.json << EOF
+          {
+            "name": "go-project",
+            "version": "0.0.0-development",
+            "private": true,
+            "devDependencies": {
+              "@semantic-release/changelog": "^6.0.3",
+              "@semantic-release/git": "^10.0.1",
+              "@semantic-release/github": "^9.2.6",
+              "@semantic-release/exec": "^6.0.3",
+              "semantic-release": "^22.0.12",
+              "conventional-changelog-conventionalcommits": "^7.0.2"
+            }
+          }
+          EOF
+
+      - name: Create semantic-release config for Go
+        run: |
+          cat > .releaserc.json << EOF
+          {
+            "branches": ["main"],
+            "plugins": [
+              [
+                "@semantic-release/commit-analyzer",
+                {
+                  "preset": "conventionalcommits",
+                  "releaseRules": [
+                    {"type": "feat", "release": "minor"},
+                    {"type": "fix", "release": "patch"},
+                    {"type": "perf", "release": "patch"},
+                    {"type": "revert", "release": "patch"},
+                    {"type": "docs", "release": false},
+                    {"type": "style", "release": false},
+                    {"type": "chore", "release": false},
+                    {"type": "refactor", "release": "patch"},
+                    {"type": "test", "release": false},
+                    {"type": "build", "release": false},
+                    {"type": "ci", "release": false},
+                    {"breaking": true, "release": "major"}
+                  ]
+                }
+              ],
+              [
+                "@semantic-release/release-notes-generator",
+                {
+                  "preset": "conventionalcommits"
+                }
+              ],
+              [
+                "@semantic-release/exec",
+                {
+                  "prepareCmd": "echo \"\${nextRelease.version}\" > VERSION"
+                }
+              ],
+              [
+                "@semantic-release/changelog",
+                {
+                  "changelogFile": "CHANGELOG.md"
+                }
+              ],
+              [
+                "@semantic-release/git",
+                {
+                  "assets": ["VERSION", "CHANGELOG.md"],
+                  "message": "chore(release): \${nextRelease.version} [skip ci]\n\n\${nextRelease.notes}"
+                }
+              ],
+              [
+                "@semantic-release/github",
+                {
+                  "assets": [
+                    "./releases/*.tar.gz",
+                    "./releases/*.zip"
+                  ]
+                }
+              ]
+            ]
+          }
+          EOF
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ inputs.release_type }}" != "auto" && "${{ inputs.release_type }}" != "" ]]; then
+            # Manual release - create GitHub release directly
+            gh release create "${{ needs.determine-version.outputs.tag }}" \
+              --title "Release ${{ needs.determine-version.outputs.version }}" \
+              --notes "${{ needs.determine-version.outputs.changelog }}" \
+              ${{ inputs.prerelease && '--prerelease' || '' }} \
+              ${{ inputs.draft && '--draft' || '' }} \
+              ./releases/*
+          else
+            # Use semantic-release for automated releases
+            npx semantic-release
+          fi
