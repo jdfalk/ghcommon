@@ -1,7 +1,8 @@
+<!-- file: WORKFLOW_MODERNIZATION_PLAN.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: d0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a -->
+
 # Comprehensive Workflow Modernization Plan
-# file: WORKFLOW_MODERNIZATION_PLAN.md
-# version: 1.0.0
-# guid: d0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a
 
 ## Executive Summary
 
