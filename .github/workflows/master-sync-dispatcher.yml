@@ -29,6 +29,9 @@ on:
           - "all"
           - "workflows"
           - "instructions"
+          - "prompts"
+          - "scripts"
+          - "linters"
           - "labels"
 
 permissions:
