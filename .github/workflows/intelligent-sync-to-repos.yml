@@ -4,8 +4,8 @@
 
 name: Intelligent Sync Files to Repos
 
-on:
-  workflow_dispatch:
+# DISABLED - on:
+# DISABLED -   workflow_dispatch:
     inputs:
       target_repos:
         description: "Comma-separated list of target repos (e.g. jdfalk/subtitle-manager,jdfalk/gcommon,jdfalk/codex-cli)"
