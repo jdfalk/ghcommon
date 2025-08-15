@@ -150,16 +150,16 @@ import "google/protobuf/empty.proto";
 service SubtitleService {
   // Parse subtitle file
   rpc ParseSubtitle(ParseSubtitleRequest) returns (ParseSubtitleResponse);
-  
+
   // Validate subtitle content
   rpc ValidateSubtitle(ValidateSubtitleRequest) returns (ValidateSubtitleResponse);
-  
+
   // Convert between subtitle formats
   rpc ConvertSubtitle(ConvertSubtitleRequest) returns (ConvertSubtitleResponse);
-  
+
   // Synchronize subtitle timing
   rpc SynchronizeSubtitle(SynchronizeSubtitleRequest) returns (SynchronizeSubtitleResponse);
-  
+
   // Get subtitle metadata
   rpc GetSubtitleMetadata(GetSubtitleMetadataRequest) returns (GetSubtitleMetadataResponse);
 }
@@ -184,7 +184,7 @@ message ValidateSubtitleRequest {
   repeated SubtitleEntry entries = 2;
 }
 
-// Validate subtitle response  
+// Validate subtitle response
 message ValidateSubtitleResponse {
   bool is_valid = 1;
   repeated ValidationError errors = 2;
@@ -343,7 +343,7 @@ package service
 
 import (
     "context"
-    
+
     subtitlepb "github.com/jdfalk/subtitle-manager/pkg/subtitle/proto"
     authpb "github.com/jdfalk/gcommon/pkg/auth/proto"
 )
@@ -443,7 +443,7 @@ import metricspb "github.com/jdfalk/gcommon/pkg/metrics/proto"
 
 ```go
 // file: cmd/subtitle-server/main.go
-// version: 1.0.0  
+// version: 1.0.0
 // guid: 90123456-9012-9012-9012-901234567234
 
 package main
@@ -620,7 +620,7 @@ graph TD
     B --> D[Task 6.4: API Server]
     C --> D
     D --> E[Task 6.5: Client SDK]
-    
+
     F[gcommon auth ready] --> C
     G[gcommon config ready] --> C
     H[gcommon metrics ready] --> C
@@ -629,7 +629,7 @@ graph TD
 **Estimated Timeline:**
 
 - Task 6.1: 2-3 days
-- Task 6.2: 5-7 days  
+- Task 6.2: 5-7 days
 - Task 6.3: 3-4 days
 - Task 6.4: 4-5 days
 - Task 6.5: 2-3 days

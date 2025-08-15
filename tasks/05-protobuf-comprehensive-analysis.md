@@ -316,7 +316,7 @@ copilot-agent-util buf lint
 copilot-agent-util buf generate
 copilot-agent-util buf breaking --against .git#branch=main
 
-# Go operations  
+# Go operations
 copilot-agent-util exec "go mod tidy"
 copilot-agent-util exec "go build ./..."
 copilot-agent-util exec "go test ./..."
