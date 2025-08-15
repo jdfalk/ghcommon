@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/go.instructions.md -->
-<!-- version: 1.2.0 -->
+<!-- version: 1.3.0 -->
 <!-- guid: 4f5a6b7c-8d9e-0f1a-2b3c-4d5e6f7a8b9c -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -18,6 +18,13 @@ description: |
   additional best practices.
 - All Go files must begin with the required file header (see general
   instructions for details and Go example).
+
+## Version Requirements
+
+- **MANDATORY**: All Go projects must use Go 1.23 or higher
+- Update `go.mod` files to specify `go 1.23` minimum
+- Update `go.work` files to specify `go 1.23` minimum
+- All Go file headers must use version 1.23.0 or higher
 
 ## Core Principles
 
