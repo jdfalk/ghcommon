@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.2.0
+# version: 4.3.0
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
@@ -68,7 +68,6 @@ jobs:
 
           # Enable validations (only for linters without FIX options)
           VALIDATE_YAML: true
-          VALIDATE_PYTHON_PYLINT: false
           VALIDATE_GO: true
           VALIDATE_GO_MODULES: true
           VALIDATE_HTML: true
@@ -80,14 +79,14 @@ jobs:
           FIX_ANSIBLE: true
           FIX_CLANG_FORMAT: true
           FIX_CSHARP: true
-          FIX_CSS_PRETTIER: true  # Prettier for CSS formatting
+          FIX_CSS_PRETTIER: true # Prettier for CSS formatting
           FIX_ENV: true
           FIX_GO: true
           FIX_GO_MODULES: true
           FIX_GROOVY: true
-          FIX_JAVASCRIPT_ES: true      # ESLint for JavaScript validation
-          FIX_JAVASCRIPT_PRETTIER: true  # Prettier for JavaScript formatting
-          FIX_JSON_PRETTIER: true     # Prettier for JSON formatting
+          FIX_JAVASCRIPT_ES: true # ESLint for JavaScript validation
+          FIX_JAVASCRIPT_PRETTIER: true # Prettier for JavaScript formatting
+          FIX_JSON_PRETTIER: true # Prettier for JSON formatting
           FIX_MARKDOWN: true
           FIX_POWERSHELL: true
           FIX_PROTOBUF: true
@@ -101,8 +100,8 @@ jobs:
           FIX_SHELL_SHFMT: true
           FIX_SNAKEMAKE_SNAKEFMT: true
           FIX_TERRAFORM_FMT: true
-          FIX_TYPESCRIPT_ES: true      # ESLint for TypeScript validation
-          FIX_TYPESCRIPT_PRETTIER: true  # Prettier for TypeScript formatting
+          FIX_TYPESCRIPT_ES: true # ESLint for TypeScript validation
+          FIX_TYPESCRIPT_PRETTIER: true # Prettier for TypeScript formatting
 
       - name: Check for auto-fixes
         id: check-fixes
