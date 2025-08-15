@@ -2,6 +2,12 @@
 # version: 1.0.0
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
+# file: .github/workflows/release-typescript.yml
+# version: 1.0.0
+# guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: TypeScript Release
 
 on:
