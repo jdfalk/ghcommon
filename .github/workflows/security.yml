@@ -1,5 +1,5 @@
 # file: .github/workflows/security.yml
-# version: 1.1.2
+# version: 1.1.3
 # guid: s3c4r5t6-y7a8-b9c0-d1e2-f3a4b5c6d7e8
 
 name: Security
@@ -35,13 +35,13 @@ jobs:
     name: Detect Languages
     runs-on: ubuntu-latest
     outputs:
-  languages: ${{ steps.detect.outputs.languages }}
-  languages_json: ${{ steps.detect.outputs.languages_json }}
-      has_go: ${{ steps.detect.outputs.has_go }}
-      has_javascript: ${{ steps.detect.outputs.has_javascript }}
-      has_python: ${{ steps.detect.outputs.has_python }}
-      has_rust: ${{ steps.detect.outputs.has_rust }}
-      has_docker: ${{ steps.detect.outputs.has_docker }}
+      languages: ${{ steps.detect.outputs.languages }}
+      languages_json: ${{ steps.detect.outputs.languages_json }}
+      has_go: ${{ fromJSON(steps.detect.outputs.languages_json).go }}
+      has_javascript: ${{ fromJSON(steps.detect.outputs.languages_json).javascript }}
+      has_python: ${{ fromJSON(steps.detect.outputs.languages_json).python }}
+      has_rust: ${{ fromJSON(steps.detect.outputs.languages_json).rust }}
+      has_docker: ${{ fromJSON(steps.detect.outputs.languages_json).docker }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
