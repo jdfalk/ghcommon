@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/monitor-rollout.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: 7f1a3b2c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
 
 """
@@ -163,16 +163,19 @@ def summarize_repo(repo: str, per_page: int, since_hours: int) -> Dict:
 
 
 def write_step_summary(md: str) -> None:
+    """Write summary to both job summary and stdout for visibility."""
+    # Always echo to logs for easy inspection
+    print(md)
+
+    # Also write to step summary panel if available
     path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not path:
-        print(md)
         return
     try:
         with open(path, "a", encoding="utf-8") as f:
             f.write(md)
     except Exception as e:
         print(f"Failed writing step summary: {e}", file=sys.stderr)
-        print(md)
 
 
 def build_markdown(results: List[Dict]) -> str:
@@ -251,8 +254,13 @@ def main():
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
         try:
+            # Consider both security and release statuses for overall health
+            def ok_status(st: str) -> bool:
+                return st in ("success", "completed")
+
             all_ok = all(
-                (r["security"]["status"] in ("success", "completed")) for r in results
+                ok_status(r["security"]["status"]) and ok_status(r["release"]["status"])  # type: ignore[index]
+                for r in results
             )
             with open(github_output, "a", encoding="utf-8") as f:
                 f.write(f"overall={'green' if all_ok else 'needs_attention'}\n")

@@ -24,12 +24,23 @@ When the user says "do not prompt me," this means:
 2. **NO INTERACTIVE TASKS** - Do not use VS Code tasks that require user input
 3. **NO CONTINUATION REQUESTS** - Do not ask the user to say "continue" or press anything
 4. **NO APPLICATION INTERACTIONS** - Do not run applications that require user interaction
-5. **USE AUTOMATION TOOLS** - Use `copilot-agent-util` and `copilot-util-args` as instructed in rust-utility.instructions.md
-6. **WORK AUTONOMOUSLY** - Make reasonable decisions and proceed without interruption
+5. **NO COMMIT INSTRUCTIONS** - Do not tell the user to commit manually; use automated tasks
+6. **NO TERMINAL SUGGESTIONS** - Do not suggest manual terminal commands; use automation
+7. **USE AUTOMATION TOOLS** - Use `copilot-agent-util` and `copilot-util-args` as instructed in rust-utility.instructions.md
+8. **WORK AUTONOMOUSLY** - Make reasonable decisions and proceed without interruption
+
+**SPECIFICALLY PROHIBITED:**
+- "Please commit these changes"
+- "Run this command"
+- "Press continue"
+- "Enter your input"
+- "Confirm this action"
+- Any form of user interaction request
 
 **If you encounter any situation that would normally require prompting, instead:**
 - Use default values or make reasonable assumptions
 - Use the automation tools provided (copilot-agent-util, copilot-util-args)
+- Use VS Code tasks with appropriate arguments
 - Proceed with the most logical course of action
 - Only report completion or limits reached
 
