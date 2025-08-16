@@ -41,9 +41,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/codeql
-          key: codeql-${{ runner.os }}-${{ env.GITHUB_REPOSITORY }}-${{ github.ref_name }}
+          key: codeql-${{ runner.os }}-${{ github.repository }}-${{ github.ref_name }}
           restore-keys: |
-            codeql-${{ runner.os }}-${{ env.GITHUB_REPOSITORY }}-
+            codeql-${{ runner.os }}-${{ github.repository }}-
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
