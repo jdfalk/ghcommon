@@ -70,10 +70,7 @@ def detect_languages() -> Dict[str, bool]:
         langs["rust"] = True
     if check_file_exists("go.mod") or list(Path(".").glob("**/*.go")):
         langs["go"] = True
-    if (
-        check_file_exists("pyproject.toml")
-        or check_file_exists("setup.py")
-    ):
+    if check_file_exists("pyproject.toml") or check_file_exists("setup.py"):
         langs["python"] = True
     if check_file_exists("package.json") or list(Path(".").glob("**/*.js")):
         langs["javascript"] = True
@@ -122,7 +119,14 @@ def main():
     if force_language and force_language != "auto":
         # Back-compat: force single primary language
         language = force_language
-        languages = {"rust": False, "go": False, "python": False, "javascript": False, "typescript": False, "docker": False}
+        languages = {
+            "rust": False,
+            "go": False,
+            "python": False,
+            "javascript": False,
+            "typescript": False,
+            "docker": False,
+        }
         languages[language] = True
         print(f"Language forced to: {language}")
     else:
@@ -130,7 +134,9 @@ def main():
         # Choose a primary for back-compat; priority order
         priority: List[str] = ["rust", "go", "typescript", "javascript", "python"]
         language = next((lang for lang in priority if languages.get(lang)), "unknown")
-        print(f"Detected languages: {', '.join([k for k,v in languages.items() if v]) or 'none'}")
+        print(
+            f"Detected languages: {', '.join([k for k, v in languages.items() if v]) or 'none'}"
+        )
 
     # Determine if release should happen
     should_rel = should_release()
@@ -144,14 +150,16 @@ def main():
     set_github_output("languages_json", json.dumps(languages))
     # Ordered matrix array (TS before GO to allow codegen, then others)
     ordered = [
-        lang for lang in ["typescript", "go", "rust", "javascript", "python"] if languages.get(lang)
+        lang
+        for lang in ["typescript", "go", "rust", "javascript", "python"]
+        if languages.get(lang)
     ]
     set_github_output("languages_matrix", json.dumps({"language": ordered}))
 
     # Print summary
     print("\nLanguage Detection Summary:")
     print(f"  Primary: {language}")
-    print(f"  All: {', '.join([k for k,v in languages.items() if v]) or 'none'}")
+    print(f"  All: {', '.join([k for k, v in languages.items() if v]) or 'none'}")
     print(f"  Matrix JSON: {json.dumps(languages)}")
     print(f"  Should Release: {should_rel}")
 
