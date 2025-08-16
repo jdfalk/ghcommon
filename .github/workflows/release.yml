@@ -80,4 +80,4 @@ jobs:
         id: detect
         env:
           FORCE_LANGUAGE: ${{ github.event.inputs.force_language }}
-        run: python3 .github/scripts/sync-release-build-artifacts.py
+        run: python3 .github/scripts/sync-release-detect-language.py
