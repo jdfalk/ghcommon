@@ -10,6 +10,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add script to submit codex jobs
+
 ### Fixed
 
 - Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs,
