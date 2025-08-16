@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-release-detect-language.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d
 
 """
@@ -113,7 +113,10 @@ def set_github_output(name, value):
 
 def main():
     """Main entry point."""
-    force_language = sys.argv[1] if len(sys.argv) > 1 else None
+    # Prefer argv if provided; fall back to FORCE_LANGUAGE env for workflow_dispatch compatibility
+    force_language = sys.argv[1] if len(sys.argv) > 1 else os.getenv("FORCE_LANGUAGE")
+    if force_language:
+        force_language = force_language.strip().lower()
 
     # Detect languages
     if force_language and force_language != "auto":

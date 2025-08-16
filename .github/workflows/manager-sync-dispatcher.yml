@@ -1,5 +1,5 @@
 # file: .github/workflows/manager-sync-dispatcher.yml
-# version: 2.1.0
+# version: 2.1.1
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
 name: Manager Sync Dispatcher
@@ -83,6 +83,7 @@ jobs:
       - name: Dispatch sync events to target repositories
         env:
           GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_TYPE: sync-from-ghcommon
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
