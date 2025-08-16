@@ -36,17 +36,26 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync files based on type
-        run: ./.github/scripts/sync-receiver-sync-files.sh "$SYNC_TYPE_PAYLOAD"
+        env:
+          SYNC_TYPE_PAYLOAD: ${{ github.event.client_payload.sync_type }}
+        run: python3 ./.github/scripts/sync-receiver-sync-files.py
 
       - name: Check for changes
         id: changes
-        run: ./.github/scripts/sync-receiver-check-changes.sh
+        run: python3 ./.github/scripts/sync-receiver-check-changes.py
 
       - name: Commit and push changes
         if: steps.changes.outputs.has_changes == 'true'
-        run: ./.github/scripts/sync-receiver-commit-push.sh "$SOURCE_REPO_PAYLOAD" "$SOURCE_SHA_PAYLOAD" "$SYNC_TYPE_PAYLOAD"
+        env:
+          SOURCE_REPO_PAYLOAD: ${{ github.event.client_payload.source_repo }}
+          SOURCE_SHA_PAYLOAD: ${{ github.event.client_payload.source_sha }}
+          SYNC_TYPE_PAYLOAD: ${{ github.event.client_payload.sync_type }}
+        run: python3 ./.github/scripts/sync-receiver-commit-push.py
 
       - name: Summary
         env:
           HAS_CHANGES_OUTPUT: ${{ steps.changes.outputs.has_changes }}
-        run: ./.github/scripts/sync-receiver-generate-summary.sh "$SYNC_TYPE_PAYLOAD" "$SOURCE_REPO_PAYLOAD" "$SOURCE_SHA_PAYLOAD" "$HAS_CHANGES_OUTPUT"
+          SYNC_TYPE_PAYLOAD: ${{ github.event.client_payload.sync_type }}
+          SOURCE_REPO_PAYLOAD: ${{ github.event.client_payload.source_repo }}
+          SOURCE_SHA_PAYLOAD: ${{ github.event.client_payload.source_sha }}
+        run: python3 ./.github/scripts/sync-receiver-generate-summary.py

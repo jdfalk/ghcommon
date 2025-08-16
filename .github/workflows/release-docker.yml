@@ -1,5 +1,5 @@
 # file: .github/workflows/release-docker.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: d1e2f3a4-b5c6-d7e8-f9a0-b1c2d3e4f5a6
 # DO NOT EDIT: This file is managed centrally in ghcommon repository
 # To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
@@ -52,11 +52,10 @@ permissions:
   packages: write
   id-token: write
   attestations: write
-  security-events: write
 
 env:
   REGISTRY: ${{ inputs.registry }}
-  IMAGE_NAME: ${{ env.GITHUB_REPOSITORY }}
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   # Detect Docker configuration and dependencies

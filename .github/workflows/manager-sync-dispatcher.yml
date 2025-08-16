@@ -75,15 +75,26 @@ jobs:
 
       - name: Determine target repositories
         id: repos
-        run: ./.github/scripts/sync-determine-target-repos.sh "$TARGET_REPOS_INPUT" "$TARGET_REPOS"
+        env:
+          TARGET_REPOS_INPUT: ${{ github.event.inputs.target_repos }}
+          TARGET_REPOS_LIST: ${{ env.TARGET_REPOS }}
+        run: python3 ./.github/scripts/sync-determine-target-repos.py
 
       - name: Dispatch sync events to target repositories
         env:
           GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-          REPOS_OUTPUT: ${{ steps.repos.outputs.repos }}
-        run: ./.github/scripts/sync-dispatch-events.sh "$SYNC_TYPE_INPUT" "$REPOS_OUTPUT" "$GITHUB_REPOSITORY_VAR" "$GITHUB_SHA_VAR"
+          EVENT_TYPE: sync-from-ghcommon
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+        run: python3 ./.github/scripts/sync-dispatch-events.py
 
       - name: Summary
         env:
-          REPOS_OUTPUT: ${{ steps.repos.outputs.repos }}
-        run: ./.github/scripts/sync-generate-summary.sh "$SYNC_TYPE_INPUT" "$REPOS_OUTPUT" "$GITHUB_SHA_VAR"
+          TARGET_REPOS: ${{ steps.repos.outputs.target_repos }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: python3 ./.github/scripts/sync-generate-summary.py

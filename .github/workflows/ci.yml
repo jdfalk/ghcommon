@@ -1,5 +1,5 @@
 # file: .github/workflows/ci-consolidated.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ env.GITHUB_REF }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
