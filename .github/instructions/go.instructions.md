@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/go.instructions.md -->
-<!-- version: 1.4.0 -->
+<!-- version: 1.5.0 -->
 <!-- guid: 4f5a6b7c-8d9e-0f1a-2b3c-4d5e6f7a8b9c -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -24,7 +24,7 @@ description: |
 - **MANDATORY**: All Go projects must use Go 1.23.0 or higher
 - **NO EXCEPTIONS**: Do not use older Go versions in any repository
 - Update `go.mod` files to specify `go 1.23` minimum version
-- Update `go.work` files to specify `go 1.23` minimum version  
+- Update `go.work` files to specify `go 1.23` minimum version
 - All Go file headers must use version 1.23.0 or higher
 - Use `go version` to verify your installation meets requirements
 

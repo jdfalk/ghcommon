@@ -203,7 +203,7 @@ jobs:
           echo "🔧 Operation: ${{ matrix.operation }}"
           echo "📅 Event: ${{ needs.determine-operations.outputs.event_name }}"
           echo "🏃 Triggered by: ${{ needs.determine-operations.outputs.triggered_by }}"
-          echo "📁 Repository: ${{ github.repository }}"
+          echo "📁 Repository: ${{ env.GITHUB_REPOSITORY }}"
           echo "🔍 Dry run: ${{ inputs.dry_run }}"
           echo "⚡ Force update: ${{ inputs.force_update }}"
           echo "📄 Legacy issue updates file: ${{ inputs.issue_updates_file }}"
@@ -264,7 +264,7 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.github-token || secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+          REPO: ${{ env.GITHUB_REPOSITORY }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
 
@@ -314,7 +314,7 @@ jobs:
             Automatically archiving processed distributed issue update files to the `processed/` directory.
 
             **Latest Operation:** ${{ matrix.operation }}
-            **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ github.run_id }})
             **Event:** ${{ needs.determine-operations.outputs.event_name }}
             **Triggered by:** ${{ needs.determine-operations.outputs.triggered_by }}
             **Updated:** ${{ steps.timestamp.outputs.current }}
@@ -352,7 +352,7 @@ jobs:
             Automatically updating `${{ inputs.issue_updates_file }}` with permalinks to processed issues.
 
             **Latest Operation:** ${{ matrix.operation }}
-            **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Latest Workflow run:** [${{ github.run_id }}](https://github.com/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ github.run_id }})
             **Event:** ${{ needs.determine-operations.outputs.event_name }}
             **Triggered by:** ${{ needs.determine-operations.outputs.triggered_by }}
             **Updated:** ${{ steps.timestamp.outputs.current }}
@@ -418,11 +418,11 @@ jobs:
 
           # Show information about existing PRs that might be open
           if [[ "${{ steps.check-prs.outputs.existing_processed_pr }}" != "" && "${{ steps.processed-files-pr.outputs.pull-request-number }}" == "" ]]; then
-            echo "📦 **Existing Distributed Files Archive PR:** [#${{ steps.check-prs.outputs.existing_processed_pr }}](https://github.com/${{ github.repository }}/pull/${{ steps.check-prs.outputs.existing_processed_pr }}) (No new changes to add)" >> "$GITHUB_STEP_SUMMARY"
+            echo "📦 **Existing Distributed Files Archive PR:** [#${{ steps.check-prs.outputs.existing_processed_pr }}](https://github.com/${{ env.GITHUB_REPOSITORY }}/pull/${{ steps.check-prs.outputs.existing_processed_pr }}) (No new changes to add)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [[ "${{ steps.check-prs.outputs.existing_legacy_pr }}" != "" && "${{ steps.legacy-file-pr.outputs.pull-request-number }}" == "" ]]; then
-            echo "🔗 **Existing Legacy File Update PR:** [#${{ steps.check-prs.outputs.existing_legacy_pr }}](https://github.com/${{ github.repository }}/pull/${{ steps.check-prs.outputs.existing_legacy_pr }}) (No new changes to add)" >> "$GITHUB_STEP_SUMMARY"
+            echo "🔗 **Existing Legacy File Update PR:** [#${{ steps.check-prs.outputs.existing_legacy_pr }}](https://github.com/${{ env.GITHUB_REPOSITORY }}/pull/${{ steps.check-prs.outputs.existing_legacy_pr }}) (No new changes to add)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Generate detailed operation summary
@@ -432,7 +432,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Status:** $([[ \"${{ steps.execute.outputs.op_status }}\" == \"0\" ]] && echo '✅ Completed successfully' || echo '❌ Failed')" >> "$GITHUB_STEP_SUMMARY"
           echo "**Event:** ${{ needs.determine-operations.outputs.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Repository:** ${{ env.GITHUB_REPOSITORY }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
 
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
@@ -568,7 +568,7 @@ jobs:
         env:
           OPERATIONS_JSON: ${{ needs.determine-operations.outputs.operations }}
           GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
           EVENT_NAME: ${{ needs.determine-operations.outputs.event_name }}
           TRIGGERED_BY: ${{ needs.determine-operations.outputs.triggered_by }}
           ISSUE_MANAGEMENT_RESULT: ${{ needs.issue-management.result }}

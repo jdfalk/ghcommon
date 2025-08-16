@@ -193,7 +193,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Operation:** ${{ needs.load-config.outputs.operation }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Event:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Repository:** ${{ github.repository }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Repository:** ${{ env.GITHUB_REPOSITORY }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Status:** ${{ needs.unified-automation.result }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Dry Run:** ${{ github.event.inputs.dry_run || 'false' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"

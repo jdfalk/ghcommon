@@ -62,8 +62,8 @@ jobs:
     env:
       TARGET_REPOS_INPUT: ${{ github.event.inputs.target_repos }}
       SYNC_TYPE_INPUT: ${{ github.event.inputs.sync_type }}
-      GITHUB_REPOSITORY_VAR: ${{ github.repository }}
-      GITHUB_SHA_VAR: ${{ github.sha }}
+      GITHUB_REPOSITORY_VAR: ${{ env.GITHUB_REPOSITORY }}
+      GITHUB_SHA_VAR: ${{ env.GITHUB_SHA }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5

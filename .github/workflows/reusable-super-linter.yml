@@ -171,9 +171,9 @@ jobs:
           DEFAULT_WORKSPACE: ${{ github.workspace }}
 
           # Repository information for git operations
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+          GITHUB_SHA: ${{ env.GITHUB_SHA }}
+          GITHUB_REF: ${{ env.GITHUB_REF }}
 
           # Output and display settings
           SUPPRESS_POSSUM: true

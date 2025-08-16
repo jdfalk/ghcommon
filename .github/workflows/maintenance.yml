@@ -35,7 +35,7 @@ permissions:
   security-events: read
 
 concurrency:
-  group: maintenance-${{ github.ref }}
+  group: maintenance-${{ env.GITHUB_REF }}
   cancel-in-progress: false
 
 env:

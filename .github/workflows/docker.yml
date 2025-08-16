@@ -31,12 +31,12 @@ on:
         type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ env.GITHUB_REF }}
   cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ env.GITHUB_REPOSITORY }}
 
 permissions:
   contents: read
@@ -87,7 +87,7 @@ jobs:
           fi
 
           # Determine if we should build
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ env.GITHUB_REF }}" == "refs/heads/main" ]]; then
             echo "should-build=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event_name }}" == "release" ]]; then
             echo "should-build=true" >> $GITHUB_OUTPUT
@@ -113,8 +113,8 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix={{branch}}-
           labels: |
-            org.opencontainers.image.title=${{ github.repository }}
-            org.opencontainers.image.description=Container for ${{ github.repository }}
+            org.opencontainers.image.title=${{ env.GITHUB_REPOSITORY }}
+            org.opencontainers.image.description=Container for ${{ env.GITHUB_REPOSITORY }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
 
   # Build and test Docker image
@@ -145,7 +145,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
+          username: ${{ env.GITHUB_ACTOR }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
@@ -195,7 +195,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_SHA }}
           format: "sarif"
           output: "trivy-results.sarif"
 
@@ -234,7 +234,7 @@ jobs:
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_SHA }}
           format: spdx-json
           output-file: sbom.spdx.json
 
@@ -273,7 +273,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
+          username: ${{ env.GITHUB_ACTOR }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test image functionality
@@ -282,7 +282,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [[ "${{ needs.detect-docker.outputs.should-build }}" == "true" ]]; then
-            IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_SHA }}"
           else
             # Build test image for PRs
             docker build -t test-image -f ${{ needs.detect-docker.outputs.dockerfile-path }} .

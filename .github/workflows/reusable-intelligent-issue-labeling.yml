@@ -114,7 +114,7 @@ jobs:
           echo "  Max labels per issue: ${{ inputs.max_labels_per_issue }}"
           echo "  Preserve existing labels: ${{ inputs.preserve_existing_labels }}"
           echo "  Label config path: ${{ inputs.label_config_path }}"
-          echo "  Repository: ${{ github.repository }}"
+          echo "  Repository: ${{ env.GITHUB_REPOSITORY }}"
 
       - name: Run intelligent issue labeling
         id: labeling

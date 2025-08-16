@@ -112,7 +112,7 @@ jobs:
         env:
           REGISTRY_TOKEN: ${{ secrets.gh-token }}
           REGISTRY: ${{ inputs.registry }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
         run: |
           echo "$REGISTRY_TOKEN" | buildah login --username "${GITHUB_ACTOR}" --password-stdin "${REGISTRY}"
 
@@ -122,7 +122,7 @@ jobs:
         env:
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
-          SHA: ${{ github.sha }}
+          SHA: ${{ env.GITHUB_SHA }}
           TAG_SUFFIX: ${{ inputs.tag-suffix }}
         run: |
           IMAGE_NAME="${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}"
@@ -157,7 +157,7 @@ jobs:
               [ -n "$line" ] && BUILDAH_ARGS="$BUILDAH_ARGS --build-arg $line"
             done <<< "$BUILD_ARGS"
           fi
-          MANIFEST_NAME="$IMAGE_NAME:manifest-${{ github.sha }}"
+          MANIFEST_NAME="$IMAGE_NAME:manifest-${{ env.GITHUB_SHA }}"
           buildah manifest create "$MANIFEST_NAME"
           IFS=',' read -ra PLATFORM_ARRAY <<< "$PLATFORMS"
           for platform in "${PLATFORM_ARRAY[@]}"; do
@@ -168,11 +168,11 @@ jobs:
               --file="${{ inputs.dockerfile }}" \
               --label="org.opencontainers.image.title=${{ inputs.image-name }}" \
               --label="org.opencontainers.image.description=Built with GitHub Actions" \
-              --label="org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}" \
-              --label="org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}" \
+              --label="org.opencontainers.image.url=${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}" \
+              --label="org.opencontainers.image.source=${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}" \
               --label="org.opencontainers.image.version=${{ github.ref_name }}" \
               --label="org.opencontainers.image.created=${{ steps.meta-buildah.outputs.build-timestamp }}" \
-              --label="org.opencontainers.image.revision=${{ github.sha }}" \
+              --label="org.opencontainers.image.revision=${{ env.GITHUB_SHA }}" \
               --label="org.opencontainers.image.licenses=MIT" \
               $BUILDAH_ARGS \
               "${{ inputs.context }}"
@@ -223,7 +223,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.registry }}/${{ github.repository }}
+          images: ${{ inputs.registry }}/${{ env.GITHUB_REPOSITORY }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -290,7 +290,7 @@ jobs:
         if: inputs.generate-sbom == true
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-${{ github.sha }}
+          name: sbom-${{ env.GITHUB_SHA }}
           path: ${{ steps.sbom.outputs.sbom-path }}
           retention-days: 30
 
@@ -305,7 +305,7 @@ jobs:
         if: inputs.scan-vulnerability == true
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report-${{ github.sha }}
+          name: vulnerability-report-${{ env.GITHUB_SHA }}
           path: vulnerability-report.json
           retention-days: 30
 
@@ -323,9 +323,9 @@ jobs:
             },
             "invocation": {
               "configSource": {
-                "uri": "${{ github.server_url }}/${{ github.repository }}",
+                "uri": "${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}",
                 "digest": {
-                  "sha1": "${{ github.sha }}"
+                  "sha1": "${{ env.GITHUB_SHA }}"
                 }
               }
             },
@@ -340,9 +340,9 @@ jobs:
             },
             "materials": [
               {
-                "uri": "${{ github.server_url }}/${{ github.repository }}",
+                "uri": "${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}",
                 "digest": {
-                  "sha1": "${{ github.sha }}"
+                  "sha1": "${{ env.GITHUB_SHA }}"
                 }
               }
             ]
@@ -361,4 +361,4 @@ jobs:
       - name: Cleanup (buildah only)
         if: always() && inputs.builder == 'buildah'
         run: |
-          buildah manifest rm "${{ steps.meta-buildah.outputs.image-name }}:manifest-${{ github.sha }}" || true
+          buildah manifest rm "${{ steps.meta-buildah.outputs.image-name }}:manifest-${{ env.GITHUB_SHA }}" || true

@@ -319,18 +319,18 @@ jobs:
           {
             "releaseType": "github-release",
             "tag": "$NEW_TAG",
-            "repository": "${{ github.repository }}",
-            "commit": "${{ github.sha }}",
+            "repository": "${{ env.GITHUB_REPOSITORY }}",
+            "commit": "${{ env.GITHUB_SHA }}",
             "releaseId": "${{ steps.create-release.outputs.id }}",
             "releaseUrl": "${{ steps.create-release.outputs.html_url }}",
             "buildTimestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
-            "actor": "${{ github.actor }}",
+            "actor": "${{ env.GITHUB_ACTOR }}",
             "workflow": "${{ github.workflow }}"
           }
           EOF
 
           # Sign the attestation
-          cosign attest --predicate release-attestation.json --type custom "${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}" --yes || echo "Attestation signing failed"
+          cosign attest --predicate release-attestation.json --type custom "${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}@${{ env.GITHUB_SHA }}" --yes || echo "Attestation signing failed"
 
       # Example of a conditional pytest/coverage step (add this where your Python test step is):
       # - name: Run Python tests with coverage

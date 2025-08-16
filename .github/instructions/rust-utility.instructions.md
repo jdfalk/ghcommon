@@ -20,7 +20,7 @@ Instructions for using the copilot-agent-util Rust utility as the primary tool f
 
 Available binaries for:
 - **macOS**: `copilot-agent-util-macos-arm64` and `copilot-agent-util-macos-x86_64`
-- **Linux**: `copilot-agent-util-linux-arm64` and `copilot-agent-util-linux-x86_64` 
+- **Linux**: `copilot-agent-util-linux-arm64` and `copilot-agent-util-linux-x86_64`
 - **Windows**: `copilot-agent-util-windows-x86_64.exe`
 
 ```bash

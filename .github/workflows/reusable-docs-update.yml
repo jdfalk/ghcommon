@@ -231,8 +231,8 @@ jobs:
             echo "- **Update files found:** ${{ steps.validate.outputs.files_found }}"
             echo "- **Status:** Documentation update completed"
             echo "- **Dry run mode:** ${DRY_RUN}"
-            echo "- **Repository:** \`${{ github.repository }}\`"
-            echo "- **Workflow run:** [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo "- **Repository:** \`${{ env.GITHUB_REPOSITORY }}\`"
+            echo "- **Workflow run:** [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ github.run_id }})"
             echo ""
           } >> $GITHUB_STEP_SUMMARY
 
@@ -261,7 +261,7 @@ jobs:
                 file_stats=$(git diff --numstat HEAD -- "$file" | awk '{print $1 "," $2}')
                 additions=$(echo "$file_stats" | cut -d',' -f1)
                 deletions=$(echo "$file_stats" | cut -d',' -f2)
-                echo "- [\`$file\`](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/$file) (+$additions/-$deletions)" >> $GITHUB_STEP_SUMMARY
+                echo "- [\`$file\`](${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/blob/${{ github.ref_name }}/$file) (+$additions/-$deletions)" >> $GITHUB_STEP_SUMMARY
               fi
             done
 
@@ -345,7 +345,7 @@ jobs:
           else
             {
               echo "**Changes Committed** - Updates have been applied:"
-              echo "- 📍 View the commit: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
+              echo "- 📍 View the commit: [\`${{ env.GITHUB_SHA }}\`](${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/commit/${{ env.GITHUB_SHA }})"
               echo "- 🌟 Changes are now live in the \`${{ github.ref_name }}\` branch"
               echo "- 🔄 Documentation is automatically updated"
             } >> $GITHUB_STEP_SUMMARY
@@ -475,8 +475,8 @@ jobs:
 
             ### 🤖 Automation Info
 
-            - **Workflow run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            - **Repository:** `${{ github.repository }}`
+            - **Workflow run:** [${{ github.run_id }}](${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ github.run_id }})
+            - **Repository:** `${{ env.GITHUB_REPOSITORY }}`
             - **Branch:** `${{ github.ref_name }}`
             - **Generated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
@@ -496,7 +496,7 @@ jobs:
             Action types: ${{ steps.capture-changes.outputs.action_breakdown }}
 
             Workflow run: ${{ github.run_id }}
-            Repository: ${{ github.repository }}
+            Repository: ${{ env.GITHUB_REPOSITORY }}
           delete-branch: true
           draft: false
 
@@ -555,7 +555,7 @@ jobs:
           - Net change: $((total_additions - total_deletions)) lines
           - Action types: $unique_actions
           - Workflow run: ${{ github.run_id }}
-          - Repository: ${{ github.repository }}
+          - Repository: ${{ env.GITHUB_REPOSITORY }}
 
           📝 Files modified:"
 
@@ -565,7 +565,7 @@ jobs:
               additions=$(echo "$file_stats" | cut -d',' -f1)
               deletions=$(echo "$file_stats" | cut -d',' -f2)
               commit_body="$commit_body
-          - Updated documentation: [$file](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/$file) (+$additions/-$deletions)"
+          - Updated documentation: [$file](${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/blob/${{ github.ref_name }}/$file) (+$additions/-$deletions)"
             fi
           done
 
@@ -577,7 +577,7 @@ jobs:
           echo "🚀 Pushing changes to repository..."
           git push
           echo "✅ Changes committed and pushed successfully"
-          echo "🔗 View changes: ${{ github.server_url }}/${{ github.repository }}/commit/$(git rev-parse HEAD)"
+          echo "🔗 View changes: ${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/commit/$(git rev-parse HEAD)"
 
       - name: Set outputs
         id: set-outputs
@@ -611,9 +611,9 @@ jobs:
           echo "  - PR created: ${{ steps.set-outputs.outputs.pr_created || false }}"
           if [[ "${{ steps.set-outputs.outputs.pr_number }}" != "" ]]; then
             echo "  - PR number: #${{ steps.set-outputs.outputs.pr_number }}"
-            echo "  - PR URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.set-outputs.outputs.pr_number }}"
+            echo "  - PR URL: ${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/pull/${{ steps.set-outputs.outputs.pr_number }}"
           fi
-          echo "  - Repository: ${{ github.repository }}"
+          echo "  - Repository: ${{ env.GITHUB_REPOSITORY }}"
           echo "  - Workflow run: ${{ github.run_id }}"
           echo "  - Dry run mode: ${DRY_RUN}"
           echo ""
@@ -632,10 +632,10 @@ jobs:
             echo "   To apply changes, run the workflow again with dry_run=false"
           elif [[ "${{ steps.set-outputs.outputs.pr_created }}" == "true" ]]; then
             echo "🔄 Next Steps: Review and merge PR #${{ steps.set-outputs.outputs.pr_number }}"
-            echo "   PR URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.set-outputs.outputs.pr_number }}"
+            echo "   PR URL: ${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/pull/${{ steps.set-outputs.outputs.pr_number }}"
           elif [[ "${{ steps.process-updates.outputs.changes_made }}" == "true" ]]; then
             echo "✅ Next Steps: Changes have been committed and pushed to the repository"
-            echo "   View changes: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+            echo "   View changes: ${{ github.server_url }}/${{ env.GITHUB_REPOSITORY }}/commit/${{ env.GITHUB_SHA }}"
           else
             echo "✨ Next Steps: No action needed - documentation is up to date"
           fi
