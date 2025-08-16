@@ -13,7 +13,7 @@ This plan outlines the complete modernization of the GitHub Actions workflow sys
 ### Issues Identified:
 1. **Security-events permission errors** - Fixed ✅
 2. **Bash script reliability concerns** - Bash escape sequences, complex templating
-3. **Workflow duplication** - Same logic repeated across multiple workflows  
+3. **Workflow duplication** - Same logic repeated across multiple workflows
 4. **Manual maintenance burden** - Scripts embedded in workflows
 5. **Limited error handling** - Basic error reporting
 6. **Inconsistent patterns** - Different approaches across languages
@@ -68,7 +68,7 @@ This plan outlines the complete modernization of the GitHub Actions workflow sys
 
 #### Converted to Python (Reliability Improvement):
 1. `sync-release-detect-language.py` ✅ - Language detection logic
-2. `sync-release-create-package-json.py` ✅ - Package.json generation  
+2. `sync-release-create-package-json.py` ✅ - Package.json generation
 3. `sync-release-create-semantic-config.py` ✅ - Semantic-release config
 4. `sync-release-determine-version.py` ✅ - Version calculation
 5. `sync-release-handle-manual-release.py` ✅ - Manual release handling
