@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 2.0.3
+# version: 2.0.4
 # guid: 7e2b1c4d-5f6a-4b7c-8e9f-0a1b2c3d4e5f
 
 name: Universal CI/CD
@@ -149,4 +149,16 @@ jobs:
 
       - name: Install Python dependencies
         if: hashFiles(format('{0}/requirements*.txt', inputs.backend-path)) != ''
-        run: python3 .github/scripts/sync-release-detect-language.py
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          # Prefer a dev requirements file if present; otherwise use the first requirements*.txt
+          if [ -f "requirements-dev.txt" ]; then
+            REQ_FILE="requirements-dev.txt"
+          elif [ -f "requirements.txt" ]; then
+            REQ_FILE="requirements.txt"
+          else
+            REQ_FILE=$(ls -1 requirements*.txt | head -n1)
+          fi
+          echo "Installing Python dependencies from $REQ_FILE"
+          pip install -r "$REQ_FILE"
