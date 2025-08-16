@@ -1,5 +1,5 @@
 # file: .github/workflows/repo-sync-dispatch.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: 9f8e7d6c-5b4a-3c2d-1e0f-a9b8c7d6e5f4
 
 name: Repository Sync Dispatcher
@@ -12,14 +12,14 @@ on:
         required: false
         default: "sync-from-ghcommon"
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - '.github/workflows/**'
-      - '.github/scripts/**'
-      - '.github/instructions/**'
-      - '.github/prompts/**'
-      - 'AGENTS.md'
-      - '.github/copilot-instructions.md'
+      - ".github/workflows/**"
+      - ".github/scripts/**"
+      - ".github/instructions/**"
+      - ".github/prompts/**"
+      - "AGENTS.md"
+      - ".github/copilot-instructions.md"
 
 permissions:
   contents: read
@@ -50,10 +50,11 @@ jobs:
       - name: Dispatch repository events
         env:
           # Use provided input for workflow_dispatch, otherwise script default applies
-          EVENT_TYPE: ${{ github.event.inputs.event-type || '' }}
+          EVENT_TYPE: ${{ github.event.inputs.event-type || 'sync-from-ghcommon' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JF_CI_GH_PAT: ${{ secrets.JF_CI_GH_PAT }}
         run: |
+          echo "EVENT_TYPE=${EVENT_TYPE}"
           python3 .github/scripts/sync-dispatch-events.py
 
       - name: Generate step summary

@@ -1,5 +1,5 @@
 # file: .github/workflows/release.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 #
 # ⚠️  CENTRAL SOURCE OF TRUTH: This file is maintained in jdfalk/ghcommon
@@ -64,20 +64,42 @@ permissions:
   security-events: write
 
 jobs:
-  detect-language:
-    name: Detect Programming Language
+  detect-languages:
+    name: Detect Languages
     runs-on: ubuntu-latest
     outputs:
       language: ${{ steps.detect.outputs.language }}
       should-release: ${{ steps.detect.outputs.should-release }}
+      languages: ${{ steps.detect.outputs.languages }}
+      languages_json: ${{ steps.detect.outputs.languages_json }}
+      languages_matrix: ${{ steps.detect.outputs.languages_matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Detect primary language
+      - name: Detect languages
         id: detect
         env:
           FORCE_LANGUAGE: ${{ github.event.inputs.force_language }}
         run: python3 .github/scripts/sync-release-detect-language.py
+
+  # Example: route to language-specific reusables using the matrix
+  build-by-language:
+    name: Build by Language - ${{ matrix.language }}
+    needs: detect-languages
+    if: needs.detect-languages.outputs.should-release == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-languages.outputs.languages_matrix) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate artifacts per language
+        env:
+          LANGUAGE: ${{ matrix.language }}
+        run: python3 .github/scripts/sync-release-build-artifacts.py

@@ -139,7 +139,6 @@ def set_github_output(name, value):
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"{name}={value}\n")
-    print(f"::set-output name={name}::{value}")
 
 
 def main():

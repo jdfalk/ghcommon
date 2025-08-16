@@ -21,9 +21,6 @@ def main():
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"config={json.dumps(config)}\n")
-    else:
-        # Fallback for older runners
-        print(f"::set-output name=config::{json.dumps(config)}")
 
     print(f"Parsed config_json with {len(config)} keys")
 

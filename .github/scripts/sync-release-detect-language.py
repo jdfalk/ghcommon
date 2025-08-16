@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-release-detect-language.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d
 
 """
-Detect programming language and determine if release should be triggered.
+Detect programming languages and determine if release should be triggered.
 Usage: sync-release-detect-language.py [force_language]
 """
 
 import os
+import json
 import sys
 import subprocess
 from pathlib import Path
+from typing import Dict, List
 
 
 def check_file_exists(filename):
@@ -52,58 +54,39 @@ def has_changes_since_last_release():
         return True
 
 
-def detect_language():
-    """Detect the primary programming language of the project."""
-    # Language detection priority order
-    language_files = [
-        ("rust", "Cargo.toml"),
-        ("go", "go.mod"),
-        ("python", "pyproject.toml"),
-        ("python", "setup.py"),
-        ("python", "requirements.txt"),
-        ("javascript", "package.json"),  # Will be refined below
-        ("typescript", "tsconfig.json"),
-    ]
+def detect_languages() -> Dict[str, bool]:
+    """Detect all programming languages present in the project."""
+    langs = {
+        "rust": False,
+        "go": False,
+        "python": False,
+        "javascript": False,
+        "typescript": False,
+        "docker": False,
+    }
 
-    detected_language = None
+    # Fast file-based checks
+    if check_file_exists("Cargo.toml") or list(Path("src").glob("**/*.rs")):
+        langs["rust"] = True
+    if check_file_exists("go.mod") or list(Path(".").glob("**/*.go")):
+        langs["go"] = True
+    if (
+        check_file_exists("pyproject.toml")
+        or check_file_exists("setup.py")
+    ):
+        langs["python"] = True
+    if check_file_exists("package.json") or list(Path(".").glob("**/*.js")):
+        langs["javascript"] = True
+    # TypeScript refinement
+    if check_file_exists("tsconfig.json") or list(Path(".").glob("**/*.ts")):
+        langs["typescript"] = True
+        # If TS present, JS may be build output; keep both true when both exist
+    # Docker
+    dockerfiles = list(Path(".").glob("**/Dockerfile*"))
+    if dockerfiles:
+        langs["docker"] = True
 
-    # Check for language-specific files
-    for language, filename in language_files:
-        if check_file_exists(filename):
-            detected_language = language
-            break
-
-    # Refine JavaScript vs TypeScript detection
-    if detected_language == "javascript":
-        if (
-            check_file_exists("tsconfig.json")
-            or check_file_exists("src/main.ts")
-            or check_file_exists("index.ts")
-        ):
-            detected_language = "typescript"
-
-    # Additional checks for edge cases
-    if not detected_language:
-        # Check for common source directories
-        src_path = Path("src")
-        if src_path.exists():
-            # Look for TypeScript files
-            if list(src_path.glob("**/*.ts")):
-                detected_language = "typescript"
-            # Look for Rust files
-            elif list(src_path.glob("**/*.rs")):
-                detected_language = "rust"
-            # Look for Go files
-            elif list(src_path.glob("**/*.go")):
-                detected_language = "go"
-            # Look for Python files
-            elif list(src_path.glob("**/*.py")):
-                detected_language = "python"
-            # Look for JavaScript files
-            elif list(src_path.glob("**/*.js")):
-                detected_language = "javascript"
-
-    return detected_language or "unknown"
+    return langs
 
 
 def should_release():
@@ -129,32 +112,47 @@ def set_github_output(name, value):
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"{name}={value}\n")
-    print(f"::set-output name={name}::{value}")
 
 
 def main():
     """Main entry point."""
     force_language = sys.argv[1] if len(sys.argv) > 1 else None
 
-    # Detect language
+    # Detect languages
     if force_language and force_language != "auto":
+        # Back-compat: force single primary language
         language = force_language
+        languages = {"rust": False, "go": False, "python": False, "javascript": False, "typescript": False, "docker": False}
+        languages[language] = True
         print(f"Language forced to: {language}")
     else:
-        language = detect_language()
-        print(f"Detected language: {language}")
+        languages = detect_languages()
+        # Choose a primary for back-compat; priority order
+        priority: List[str] = ["rust", "go", "typescript", "javascript", "python"]
+        language = next((lang for lang in priority if languages.get(lang)), "unknown")
+        print(f"Detected languages: {', '.join([k for k,v in languages.items() if v]) or 'none'}")
 
     # Determine if release should happen
     should_rel = should_release()
     print(f"Should release: {should_rel}")
 
-    # Set outputs for GitHub Actions
+    # Set outputs for GitHub Actions (back-compat + matrix)
     set_github_output("language", language)
     set_github_output("should-release", "true" if should_rel else "false")
+    # New multi-language outputs
+    set_github_output("languages", ",".join([k for k, v in languages.items() if v]))
+    set_github_output("languages_json", json.dumps(languages))
+    # Ordered matrix array (TS before GO to allow codegen, then others)
+    ordered = [
+        lang for lang in ["typescript", "go", "rust", "javascript", "python"] if languages.get(lang)
+    ]
+    set_github_output("languages_matrix", json.dumps({"language": ordered}))
 
     # Print summary
     print("\nLanguage Detection Summary:")
-    print(f"  Language: {language}")
+    print(f"  Primary: {language}")
+    print(f"  All: {', '.join([k for k,v in languages.items() if v]) or 'none'}")
+    print(f"  Matrix JSON: {json.dumps(languages)}")
     print(f"  Should Release: {should_rel}")
 
     return 0

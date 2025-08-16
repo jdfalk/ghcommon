@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-dispatch-events.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
 """
@@ -65,6 +65,11 @@ def dispatch_event(repo, event_type, client_payload):
         f"Authorization: Bearer {token}",
         "-H",
         "X-GitHub-Api-Version: 2022-11-28",
+        "-sS",
+        "-o",
+        "/dev/null",
+        "-w",
+        "%{http_code}",
         api_url,
         "-d",
         json.dumps(payload),
@@ -74,8 +79,16 @@ def dispatch_event(repo, event_type, client_payload):
         result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=30)
 
         if result.returncode == 0:
-            print(f"✅ Successfully dispatched event to {repo}")
-            return True
+            status = (result.stdout or "").strip()
+            if status == "204" or status == "200":
+                print(f"✅ Dispatched '{payload.get('event_type')}' to {repo}")
+                return True
+            else:
+                print(
+                    f"❌ Dispatch to {repo} returned HTTP {status}",
+                    file=sys.stderr,
+                )
+                return False
         else:
             print(
                 f"❌ Failed to dispatch event to {repo}: {result.stderr}",
@@ -92,7 +105,8 @@ def dispatch_event(repo, event_type, client_payload):
 
 def main():
     """Main entry point."""
-    event_type = os.getenv("EVENT_TYPE", "sync-from-ghcommon")
+    # Default event type if not provided or blank
+    event_type = os.getenv("EVENT_TYPE", "").strip() or "sync-from-ghcommon"
 
     # Get source repository and SHA
     source_repo = os.getenv("GITHUB_REPOSITORY", "jdfalk/ghcommon")
@@ -109,6 +123,10 @@ def main():
 
     print(f"Dispatching '{event_type}' events to target repositories...")
     print(f"Source: {source_repo}@{source_sha}")
+    try:
+        print(f"Client payload: {json.dumps(client_payload, separators=(',', ':'))}")
+    except Exception:
+        pass
 
     target_repos = get_target_repos()
 
