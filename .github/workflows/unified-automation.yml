@@ -1,5 +1,5 @@
-# file: examples/workflows/unified-automation-complete.yml
-# version: 2.1.0
+# file: .github/workflows/unified-automation.yml
+# version: 2.1.1
 # guid: complete-unified-automation-workflow-template
 
 name: Complete Unified Automation
