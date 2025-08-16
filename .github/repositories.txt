@@ -1,0 +1,16 @@
+# file: .github/repositories.txt
+# version: 1.0.0
+# guid: d6e5f4a3-b2c1-0d9e-8f7a-6b5c4d3e2f10
+#
+# List of repositories to receive syncs from ghcommon
+# Accepted formats:
+# - owner/repo
+# - repo (owner defaults to jdfalk)
+# Lines starting with # are comments.
+
+jdfalk/apt-cacher-go
+jdfalk/audiobook-organizer
+jdfalk/gcommon
+jdfalk/ghcommon
+jdfalk/merge-srt-subtitles
+jdfalk/subtitle-manager
