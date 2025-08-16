@@ -113,11 +113,15 @@ def list_recent_runs(repo: str, per_page: int) -> List[Dict]:
     return payload.get("workflow_runs", []) or []
 
 
-def pick_latest(runs: List[Dict], name_contains: List[str], since_cutoff: dt.datetime) -> Optional[Dict]:
+def pick_latest(
+    runs: List[Dict], name_contains: List[str], since_cutoff: dt.datetime
+) -> Optional[Dict]:
     name_lc = [n.lower() for n in name_contains]
     for run in runs:
         n = (run.get("name") or "").lower()
-        created_at = parse_iso8601(run.get("created_at") or run.get("run_started_at") or "")
+        created_at = parse_iso8601(
+            run.get("created_at") or run.get("run_started_at") or ""
+        )
         if all(term in n for term in name_lc):
             if created_at and created_at >= since_cutoff:
                 return run
@@ -130,12 +134,16 @@ def summarize_repo(repo: str, per_page: int, since_hours: int) -> Dict:
     sec = pick_latest(runs, ["security"], cutoff)
     rel = pick_latest(runs, ["release"], cutoff)
     # Match various names for the sync receiver workflow
-    sync = pick_latest(runs, ["sync", "receiver"], cutoff) or pick_latest(runs, ["repo", "sync"], cutoff)
+    sync = pick_latest(runs, ["sync", "receiver"], cutoff) or pick_latest(
+        runs, ["repo", "sync"], cutoff
+    )
+
     def status_of(run: Optional[Dict]) -> str:
         if not run:
             return "missing"
         # conclusion may be None while in progress
         return run.get("conclusion") or run.get("status") or "unknown"
+
     result = {
         "repo": repo,
         "security": {
@@ -175,6 +183,7 @@ def build_markdown(results: List[Dict]) -> str:
         sec = r["security"]["status"]
         rel = r["release"]["status"]
         syn = r["sync_receiver"]["status"]
+
         def badge(st: str) -> str:
             if st in ("success", "completed"):
                 return "✅"
@@ -183,12 +192,19 @@ def build_markdown(results: List[Dict]) -> str:
             if st == "missing":
                 return "⚪"
             return "❌"
+
         if sec not in ("success", "completed") or rel not in ("success", "completed"):
             ok_all = False
         lines.append(f"## {repo}")
-        lines.append(f"- Security: {badge(sec)} {sec}{' | ' + r['security']['url'] if r['security']['url'] else ''}")
-        lines.append(f"- Release: {badge(rel)} {rel}{' | ' + r['release']['url'] if r['release']['url'] else ''}")
-        lines.append(f"- Sync Receiver: {badge(syn)} {syn}{' | ' + r['sync_receiver']['url'] if r['sync_receiver']['url'] else ''}")
+        lines.append(
+            f"- Security: {badge(sec)} {sec}{' | ' + r['security']['url'] if r['security']['url'] else ''}"
+        )
+        lines.append(
+            f"- Release: {badge(rel)} {rel}{' | ' + r['release']['url'] if r['release']['url'] else ''}"
+        )
+        lines.append(
+            f"- Sync Receiver: {badge(syn)} {syn}{' | ' + r['sync_receiver']['url'] if r['sync_receiver']['url'] else ''}"
+        )
         lines.append("")
     overall = "All green" if ok_all else "Attention needed"
     lines.insert(1, f"Overall: {overall}")
@@ -197,7 +213,9 @@ def build_markdown(results: List[Dict]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Monitor rollout across target repositories")
+    parser = argparse.ArgumentParser(
+        description="Monitor rollout across target repositories"
+    )
     parser.add_argument("--per-page", type=int, default=10)
     parser.add_argument("--since-hours", type=int, default=72)
     parser.add_argument("--repos", type=str, default="")
@@ -208,19 +226,23 @@ def main():
         print("No target repositories found.")
         return 1
     if not get_token():
-        print("Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits.")
+        print(
+            "Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits."
+        )
 
     results: List[Dict] = []
     for repo in repos:
         try:
             results.append(summarize_repo(repo, args.per_page, args.since_hours))
         except Exception as e:
-            results.append({
-                "repo": repo,
-                "security": {"status": f"error: {e}", "url": None},
-                "release": {"status": "unknown", "url": None},
-                "sync_receiver": {"status": "unknown", "url": None},
-            })
+            results.append(
+                {
+                    "repo": repo,
+                    "security": {"status": f"error: {e}", "url": None},
+                    "release": {"status": "unknown", "url": None},
+                    "sync_receiver": {"status": "unknown", "url": None},
+                }
+            )
 
     md = build_markdown(results)
     write_step_summary(md)
@@ -229,7 +251,9 @@ def main():
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
         try:
-            all_ok = all((r["security"]["status"] in ("success", "completed")) for r in results)
+            all_ok = all(
+                (r["security"]["status"] in ("success", "completed")) for r in results
+            )
             with open(github_output, "a", encoding="utf-8") as f:
                 f.write(f"overall={'green' if all_ok else 'needs_attention'}\n")
         except Exception:

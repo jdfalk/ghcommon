@@ -11,7 +11,7 @@ on:
         description: "Comma or space-separated list of repos (owner/name). If empty, uses .github/repositories.txt"
         required: false
   schedule:
-    - cron: '17 */4 * * *' # Every 4 hours at 17 past to stagger with other jobs
+    - cron: "17 */4 * * *" # Every 4 hours at 17 past to stagger with other jobs
 
 permissions:
   contents: read
@@ -33,7 +33,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Run monitor script
         id: monitor
