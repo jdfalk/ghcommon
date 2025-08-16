@@ -41,13 +41,13 @@ def copy_directory_safe(src, dst):
         if not src_path.exists():
             print(f"⚠️  Source directory not found: {src}")
             return False
-        
+
         dst_path = Path(dst)
         ensure_directory(dst_path.parent)
-        
+
         if dst_path.exists():
             shutil.rmtree(dst_path)
-        
+
         shutil.copytree(src, dst)
         print(f"✅ Copied directory {src} -> {dst}")
         return True
@@ -70,7 +70,7 @@ def make_scripts_executable(pattern):
 def sync_workflows():
     """Sync workflow files."""
     print("Syncing workflows...")
-    
+
     # Copy specific workflows (avoid sync workflows to prevent recursion)
     workflows = [
         "pr-automation.yml",
@@ -82,7 +82,7 @@ def sync_workflows():
         "release-typescript.yml",
         "release-docker.yml",
     ]
-    
+
     for workflow in workflows:
         src = f"ghcommon-source/.github/workflows/{workflow}"
         dst = f".github/workflows/{workflow}"
@@ -92,13 +92,13 @@ def sync_workflows():
 def sync_instructions():
     """Sync instruction files."""
     print("Syncing instructions...")
-    
+
     # Copy main instructions file
     copy_file_safe(
         "ghcommon-source/.github/copilot-instructions.md",
-        ".github/copilot-instructions.md"
+        ".github/copilot-instructions.md",
     )
-    
+
     # Copy instructions directory
     src_dir = Path("ghcommon-source/.github/instructions")
     if src_dir.exists():
@@ -106,7 +106,7 @@ def sync_instructions():
             if instruction_file.is_file():
                 copy_file_safe(
                     str(instruction_file),
-                    f".github/instructions/{instruction_file.name}"
+                    f".github/instructions/{instruction_file.name}",
                 )
 
 
@@ -119,20 +119,17 @@ def sync_prompts():
 def sync_scripts():
     """Sync script files."""
     print("Syncing scripts...")
-    
+
     # Copy root scripts
     copy_directory_safe("ghcommon-source/scripts", "scripts")
-    
+
     # Copy GitHub scripts
     src_dir = Path("ghcommon-source/.github/scripts")
     if src_dir.exists():
         for script_file in src_dir.glob("*"):
             if script_file.is_file():
-                copy_file_safe(
-                    str(script_file),
-                    f".github/scripts/{script_file.name}"
-                )
-    
+                copy_file_safe(str(script_file), f".github/scripts/{script_file.name}")
+
     # Make sync scripts executable
     make_scripts_executable("sync-*.sh")
     make_scripts_executable("sync-*.py")
@@ -154,41 +151,41 @@ def sync_labels():
 def main():
     """Main entry point."""
     sync_type = sys.argv[1] if len(sys.argv) > 1 else "all"
-    
+
     print(f"Performing sync of type: {sync_type}")
-    
+
     # Create necessary directories
     directories = [
         ".github/workflows",
-        ".github/instructions", 
+        ".github/instructions",
         ".github/prompts",
         ".github/scripts",
         ".github/linters",
-        "scripts"
+        "scripts",
     ]
-    
+
     for directory in directories:
         ensure_directory(directory)
-    
+
     # Perform sync based on type
     if sync_type in ["all", "workflows"]:
         sync_workflows()
-    
+
     if sync_type in ["all", "instructions"]:
         sync_instructions()
-    
+
     if sync_type in ["all", "prompts"]:
         sync_prompts()
-    
+
     if sync_type in ["all", "scripts"]:
         sync_scripts()
-    
+
     if sync_type in ["all", "linters"]:
         sync_linters()
-    
+
     if sync_type in ["all", "labels"]:
         sync_labels()
-    
+
     print(f"✅ Sync completed for type: {sync_type}")
 
 

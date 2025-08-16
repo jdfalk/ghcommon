@@ -15,19 +15,19 @@ from datetime import datetime
 def generate_summary():
     """Generate a comprehensive sync summary."""
     # Get environment variables
-    source_repo = os.getenv('GITHUB_REPOSITORY', 'jdfalk/ghcommon')
-    source_sha = os.getenv('GITHUB_SHA', 'unknown')
-    run_id = os.getenv('GITHUB_RUN_ID', 'unknown')
-    run_number = os.getenv('GITHUB_RUN_NUMBER', 'unknown')
-    actor = os.getenv('GITHUB_ACTOR', 'unknown')
-    
+    source_repo = os.getenv("GITHUB_REPOSITORY", "jdfalk/ghcommon")
+    source_sha = os.getenv("GITHUB_SHA", "unknown")
+    run_id = os.getenv("GITHUB_RUN_ID", "unknown")
+    run_number = os.getenv("GITHUB_RUN_NUMBER", "unknown")
+    actor = os.getenv("GITHUB_ACTOR", "unknown")
+
     # Get target repositories count (if available)
-    target_repos_env = os.getenv('TARGET_REPOS', '')
+    target_repos_env = os.getenv("TARGET_REPOS", "")
     target_repos = target_repos_env.split() if target_repos_env else []
-    
+
     # Current timestamp
-    timestamp = datetime.utcnow().isoformat() + 'Z'
-    
+    timestamp = datetime.utcnow().isoformat() + "Z"
+
     # Generate summary markdown
     summary = f"""# 🔄 Repository Synchronization Summary
 
@@ -42,14 +42,14 @@ def generate_summary():
 
 ### Target Repositories
 """
-    
+
     if target_repos:
         summary += f"**Total**: {len(target_repos)} repositories\n\n"
         for i, repo in enumerate(target_repos, 1):
             summary += f"{i}. `{repo}`\n"
     else:
         summary += "No target repositories specified\n"
-    
+
     summary += f"""
 
 ### Sync Process
@@ -66,17 +66,17 @@ def generate_summary():
 
 *This summary was generated automatically by the repository sync system.*
 """
-    
+
     return summary
 
 
 def write_to_step_summary(content):
     """Write content to GitHub Actions step summary."""
-    github_step_summary = os.getenv('GITHUB_STEP_SUMMARY')
-    
+    github_step_summary = os.getenv("GITHUB_STEP_SUMMARY")
+
     if github_step_summary:
         try:
-            with open(github_step_summary, 'a') as f:
+            with open(github_step_summary, "a") as f:
                 f.write(content)
             print("✅ Summary written to GitHub Actions step summary")
         except Exception as e:
@@ -89,12 +89,12 @@ def write_to_step_summary(content):
 def main():
     """Main entry point."""
     print("Generating synchronization summary...")
-    
+
     summary = generate_summary()
-    
+
     # Write to step summary
     write_to_step_summary(summary)
-    
+
     # Also output key information for logs
     print("Repository synchronization completed successfully")
 

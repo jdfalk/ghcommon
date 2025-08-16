@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-semantic-versioning.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
 name: Reusable - Semantic Versioning
@@ -60,6 +60,10 @@ jobs:
       should-release: ${{ steps.semantic.outputs.new_release_published }}
 
     steps:
+      - name: Detect project language
+        id: detect
+        run: python3 .github/scripts/sync-release-detect-language.py
+
       - name: Checkout code
         uses: actions/checkout@v5
         with:
@@ -72,8 +76,14 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Install semantic-release
-        run: python3 .github/scripts/sync-release-create-semantic-config.py ${{ env.LANGUAGE }}      - name: Run semantic-release
+      - name: Generate semantic-release config
+        run: python3 .github/scripts/sync-release-create-semantic-config.py ${{ steps.detect.outputs.language }}
+
+      - name: Install semantic-release tooling
+        run: |
+          npm install --no-save semantic-release@^23 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/exec
+
+      - name: Run semantic-release
         id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

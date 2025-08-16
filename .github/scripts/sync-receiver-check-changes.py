@@ -17,19 +17,16 @@ def main():
     try:
         # Check git status for changes
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            check=True
+            ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
         )
-        
+
         if result.stdout.strip():
             print("true")
             print("Changes detected after sync operation")
         else:
             print("false")
             print("No changes detected")
-            
+
     except subprocess.CalledProcessError as e:
         print(f"Error checking git status: {e}")
         sys.exit(1)
