@@ -1,5 +1,47 @@
 # file: CONTRIBUTING.md
 
+## Table of Contents
+
+- [file: CONTRIBUTING.md](#file-contributing-md)
+- [Contributing to GitHub Common Workflows](#contributing-to-github-common-workflows)
+  - [Code of Conduct](#code-of-conduct)
+  - [How to Contribute](#how-to-contribute)
+    - [Reporting Issues](#reporting-issues)
+    - [Suggesting Features](#suggesting-features)
+    - [Submitting Pull Requests](#submitting-pull-requests)
+      - [Before You Start](#before-you-start)
+      - [Development Process](#development-process)
+      - [Pull Request Guidelines](#pull-request-guidelines)
+  - [Development Guidelines](#development-guidelines)
+    - [Workflow Development](#workflow-development)
+      - [Security First](#security-first)
+      - [Best Practices](#best-practices)
+      - [Example Workflow Structure](#example-workflow-structure)
+    - [Documentation Standards](#documentation-standards)
+      - [File Headers](#file-headers)
+- [file: path/to/file.md](#file-path-to-file-md)
+      - [Structure](#structure)
+      - [Code Examples](#code-examples)
+    - [Testing](#testing)
+      - [Workflow Testing](#workflow-testing)
+      - [Script Testing](#script-testing)
+  - [Style Guidelines](#style-guidelines)
+    - [YAML Workflows](#yaml-workflows)
+    - [Shell Scripts](#shell-scripts)
+    - [Markdown Documentation](#markdown-documentation)
+  - [Submission Process](#submission-process)
+    - [Before Submitting](#before-submitting)
+    - [Review Process](#review-process)
+    - [After Approval](#after-approval)
+  - [Release Process](#release-process)
+    - [Version Strategy](#version-strategy)
+    - [Release Steps](#release-steps)
+  - [Getting Help](#getting-help)
+    - [Resources](#resources)
+    - [Maintainer Contact](#maintainer-contact)
+  - [Recognition](#recognition)
+
+
 # Contributing to GitHub Common Workflows
 
 Thank you for your interest in contributing to GitHub Common Workflows! This

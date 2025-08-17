@@ -1,5 +1,24 @@
 # file: CHANGELOG.md
 
+## Table of Contents
+
+- [file: CHANGELOG.md](#file-changelog-md)
+- [Changelog](#changelog)
+  - [[Unreleased]](#-unreleased)
+    - [Added](#added)
+    - [Fixed](#fixed)
+    - [Added](#added)
+    - [Changed](#changed)
+    - [Fixed](#fixed)
+  - [[1.1.0] - 2025-08-02](#-1-1-0-2025-08-02)
+    - [Added](#added)
+    - [Changed](#changed)
+    - [Fixed](#fixed)
+    - [Removed](#removed)
+  - [[1.0.0] - 2025-06-14](#-1-0-0-2025-06-14)
+    - [Added](#added)
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
