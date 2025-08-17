@@ -2,6 +2,9 @@
 # version: 1.0.1
 # guid: m4i5n6t7-e8n9-a0b1-c2d3-e4f5a6b7c8d9
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Maintenance
 
 on:

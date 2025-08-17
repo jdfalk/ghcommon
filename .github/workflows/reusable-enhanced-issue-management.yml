@@ -35,6 +35,9 @@
 #     checks: write          # For workflow status
 #     statuses: write        # For commit status updates
 
+
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 name: Reusable - Enhanced Issue Management
 
 on:

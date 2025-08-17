@@ -2,6 +2,9 @@
 # version: 2.4.7
 # guid: b2c3d4e5-f6a7-89bc-def0-123456789bcd
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable - Super Linter
 
 on:

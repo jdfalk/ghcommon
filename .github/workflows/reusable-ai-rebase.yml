@@ -2,6 +2,9 @@
 # version: 1.4.0
 # guid: 8baaa277-345e-4c24-8659-47c93e0f3a8d
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable - AI Rebase Conflicted PRs
 
 on:

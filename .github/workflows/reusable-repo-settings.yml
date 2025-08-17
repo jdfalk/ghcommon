@@ -1,6 +1,9 @@
 # file: .github/workflows/reusable-repo-settings.yml
 # Reusable workflow to apply default repository settings and provide commit guidance
 
+
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 name: Reusable - Repository Settings
 
 on:

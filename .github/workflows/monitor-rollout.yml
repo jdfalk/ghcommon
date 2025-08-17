@@ -2,6 +2,9 @@
 # version: 1.0.0
 # guid: 8f2d9e1a-3b4c-4f6a-9a2b-7c1d2e3f4a5b
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Monitor Rollout
 
 on:

@@ -2,6 +2,9 @@
 # version: 1.0.0
 # guid: 8d2f38b2-1a07-4cd4-9c17-3e77c21f1f1e
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable - Stale Issue Handler
 
 on:

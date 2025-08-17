@@ -1,6 +1,9 @@
 # file: .github/workflows/reusable-docker-build.yml
 # version: 1.0.1
 # guid: 9a6f1b4c-2d3e-4f5a-8b9c-0d1e2f3a4b5c
+
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 name: "Reusable -  Multi-Arch Docker Build and Publish"
 
 on:

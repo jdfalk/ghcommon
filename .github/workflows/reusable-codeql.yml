@@ -2,6 +2,9 @@
 # version: 1.0.0
 # guid: af287302-d723-4712-abf5-2808f583495d
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable - CodeQL Analysis
 
 on:

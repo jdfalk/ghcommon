@@ -1,6 +1,8 @@
 # file: .github/linters/rustfmt.toml
 # version: 1.0.0
 # guid: 5e6f7a8b-9c0d-1234-ef56-789abcdef012
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 
 # Rust formatting configuration following Rust Style Guide
 # https://doc.rust-lang.org/nightly/style-guide/

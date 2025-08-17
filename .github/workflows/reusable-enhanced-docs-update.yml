@@ -31,6 +31,9 @@
 #     actions: read          # For workflow access
 #     checks: write          # For workflow status
 
+
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 name: Reusable - Enhanced Documentation Updates
 
 on:

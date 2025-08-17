@@ -2,6 +2,9 @@
 # version: 1.1.0
 # guid: 8c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable Intelligent Issue Labeling
 
 on:

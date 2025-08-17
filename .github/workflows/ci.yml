@@ -1,6 +1,8 @@
-# file: .github/workflows/ci-consolidated.yml
-# version: 1.0.1
+# file: .github/workflows/ci.yml
+# version: 1.2.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 
 name: Continuous Integration
 
@@ -21,6 +23,7 @@ env:
   GO_VERSION: "1.24"
   NODE_VERSION: "22"
   PYTHON_VERSION: "3.12"
+  RUST_VERSION: "1.76"
   COVERAGE_THRESHOLD: "80"
   CACHE_VERSION: "v1"
 
@@ -37,14 +40,19 @@ permissions:
   id-token: write
 
 jobs:
+  # Check for commit message overrides first
+  check-overrides:
+    uses: ./.github/workflows/commit-override-handler.yml
   # Detect what files changed to optimize workflow execution
   detect-changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    needs: check-overrides
     outputs:
       go: ${{ steps.filter.outputs.go }}
       frontend: ${{ steps.filter.outputs.frontend }}
       python: ${{ steps.filter.outputs.python }}
+      rust: ${{ steps.filter.outputs.rust }}
       docker: ${{ steps.filter.outputs.docker }}
       docs: ${{ steps.filter.outputs.docs }}
       workflows: ${{ steps.filter.outputs.workflows }}
@@ -89,6 +97,10 @@ jobs:
               - '**/pyproject.toml'
               - '**/setup.py'
               - '**/Pipfile'
+            rust:
+              - '**/*.rs'
+              - '**/Cargo.toml'
+              - '**/Cargo.lock'
             docker:
               - '**/Dockerfile*'
               - '**/docker-compose*.yml'
@@ -104,4 +116,155 @@ jobs:
 
       - name: Determine workflow execution
         id: determine
-        run: python3 .github/scripts/sync-release-build-artifacts.py
+        run: |
+          echo "Determining what should run based on changes..."
+          
+          # Should lint if any code files changed
+          if [[ "${{ steps.filter.outputs.go }}" == "true" ||
+                "${{ steps.filter.outputs.frontend }}" == "true" ||
+                "${{ steps.filter.outputs.python }}" == "true" ||
+                "${{ steps.filter.outputs.rust }}" == "true" ||
+                "${{ steps.filter.outputs.workflows }}" == "true" ]]; then
+            echo "should-lint=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-lint=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Should test if any testable code changed
+          if [[ "${{ steps.filter.outputs.go }}" == "true" ||
+                "${{ steps.filter.outputs.frontend }}" == "true" ||
+                "${{ steps.filter.outputs.python }}" == "true" ||
+                "${{ steps.filter.outputs.rust }}" == "true" ]]; then
+            echo "should-test=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-test=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Should build if any buildable code changed
+          if [[ "${{ steps.filter.outputs.go }}" == "true" ||
+                "${{ steps.filter.outputs.frontend }}" == "true" ||
+                "${{ steps.filter.outputs.rust }}" == "true" ||
+                "${{ steps.filter.outputs.docker }}" == "true" ]]; then
+            echo "should-build=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-build=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Matrix build system integration
+  matrix-build:
+    name: Matrix Build
+    needs: [check-overrides, detect-changes]
+    if: needs.detect-changes.outputs.should-build == 'true' && needs.check-overrides.outputs.skip-build != 'true' && needs.check-overrides.outputs.skip-ci != 'true'
+    uses: ./.github/workflows/matrix-build.yml
+    with:
+      build_target: all
+    secrets: inherit
+
+  # Quick lint check for faster feedback
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    needs: [check-overrides, detect-changes]
+    if: needs.detect-changes.outputs.should-lint == 'true' && needs.check-overrides.outputs.skip-validation != 'true' && needs.check-overrides.outputs.skip-ci != 'true'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Run Super Linter
+        uses: github/super-linter/slim@v7
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          FILTER_REGEX_EXCLUDE: ".*\\.git/.*|.*\\.github/copilot/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|.*vendor/.*|.*dist/.*"
+          
+          # Language-specific validation only (no FIX_ to avoid conflicts)
+          VALIDATE_GO: ${{ needs.detect-changes.outputs.go }}
+          VALIDATE_JAVASCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
+          VALIDATE_TYPESCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
+          VALIDATE_PYTHON_BLACK: ${{ needs.detect-changes.outputs.python }}
+          VALIDATE_PYTHON_PYLINT: ${{ needs.detect-changes.outputs.python }}
+          VALIDATE_PYTHON_ISORT: ${{ needs.detect-changes.outputs.python }}
+          VALIDATE_RUST_2015: ${{ needs.detect-changes.outputs.rust }}
+          VALIDATE_RUST_2018: ${{ needs.detect-changes.outputs.rust }}
+          VALIDATE_RUST_2021: ${{ needs.detect-changes.outputs.rust }}
+          VALIDATE_RUST_CLIPPY: ${{ needs.detect-changes.outputs.rust }}
+          
+          # Always validate these
+          VALIDATE_MARKDOWN: true
+          VALIDATE_JSON: true
+          VALIDATE_YAML: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_SHELL_SHFMT: true
+          VALIDATE_GITLEAKS: true
+
+  # Security scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [check-overrides, detect-changes]
+    if: needs.check-overrides.outputs.skip-validation != 'true' && needs.check-overrides.outputs.skip-ci != 'true'
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    strategy:
+      matrix:
+        language: ["go", "javascript", "python", "rust"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # Final status check
+  ci-status:
+    name: CI Status
+    runs-on: ubuntu-latest
+    needs: [check-overrides, detect-changes, lint, matrix-build, security-scan]
+    if: always() && needs.check-overrides.outputs.skip-ci != 'true'
+    steps:
+      - name: Check CI status
+        run: |
+          echo "## 🏗️ CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check each job
+          if [[ "${{ needs.lint.result }}" == "success" || "${{ needs.lint.result }}" == "skipped" ]]; then
+            echo "✅ **Lint**: Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Lint**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.matrix-build.result }}" == "success" || "${{ needs.matrix-build.result }}" == "skipped" ]]; then
+            echo "✅ **Matrix Build**: Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Matrix Build**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.security-scan.result }}" == "success" || "${{ needs.security-scan.result }}" == "skipped" ]]; then
+            echo "✅ **Security Scan**: Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Security Scan**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for failures
+          if [[ "${{ needs.lint.result }}" == "failure" ||
+                "${{ needs.matrix-build.result }}" == "failure" ||
+                "${{ needs.security-scan.result }}" == "failure" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Overall Status**: FAILED - Critical issues found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Overall Status**: PASSED - All checks successful" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -2,6 +2,9 @@
 # version: 1.1.0
 # guid: a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6
 
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
 name: Reusable Pull Request Labeler
 
 on:

@@ -1,4 +1,7 @@
 # file: .github/workflows/automatic-release.yml
+
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 name: Automatic Release
 
 on:
