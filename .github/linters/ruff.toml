@@ -1,6 +1,8 @@
 # file: .github/linters/ruff.toml
 # version: 1.1.0
 # guid: f1a2b3c4-d5e6-789f-a012-456789abcdef
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
 
 # Ruff configuration following Google Python Style Guide
 # https://google.github.io/styleguide/pyguide.html

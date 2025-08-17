@@ -1,22 +1,29 @@
-# Smart Dependabot configuration for ghcommon
-# Automatically detected: python, nodejs, github-actions
+# file: .github/dependabot.yml
+# version: 1.2.0
+# guid: 5b1b7e5b-317a-470e-bf6f-fddf1c808ca0
+# DO NOT EDIT: This file is managed centrally in ghcommon repository
+# To update: Edit the version in jdfalk/ghcommon and it will be synced to all repos
+
+# Comprehensive Dependabot configuration supporting all major language ecosystems
+# Uses only repository-defined labels from labels.md documentation
 
 version: 2
 updates:
+  # JavaScript/Node.js ecosystem
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-      time: 09:00
-      timezone: America/New_York
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
     open-pull-requests-limit: 8
     commit-message:
-      prefix: npm
+      prefix: "feat(deps)"
       include: scope
     labels:
-      - dependencies
-      - priority-low
+      - "dependencies"
+      - "tech:javascript"
     allow:
       - dependency-type: direct
       - dependency-type: indirect
@@ -29,11 +36,37 @@ updates:
         patterns:
           - "*eslint*"
           - "*prettier*"
-          - "*commitlint*"
-          - "@types/*"
+          - "*typescript*"
+          - "*jest*"
+          - "*@types/*"
         update-types:
           - minor
           - patch
+
+  # TypeScript ecosystem (via npm)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:30"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:typescript"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+
+  # Python ecosystem
   - package-ecosystem: pip
     directory: /
     schedule:
@@ -41,16 +74,72 @@ updates:
       day: tuesday
       time: 09:00
       timezone: America/New_York
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 5
     commit-message:
-      prefix: python
+      prefix: "feat(deps)"
       include: scope
     labels:
-      - dependencies
-      - priority-medium
+      - "dependencies"
+      - "tech:python"
     allow:
       - dependency-type: direct
       - dependency-type: indirect
+
+  # Go ecosystem
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:go"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Rust ecosystem
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: thursday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Docker ecosystem
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: thursday
+      time: 10:00
+      timezone: America/New_York
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:docker"
+
+  # GitHub Actions ecosystem
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -60,8 +149,26 @@ updates:
       timezone: America/New_York
     open-pull-requests-limit: 5
     commit-message:
-      prefix: ci
+      prefix: "feat(ci)"
       include: scope
     labels:
-      - dependencies
-      - priority-high
+      - "dependencies"
+      - "workflow:ci-cd"
+      - "workflow:github-actions"
+    groups:
+      official-actions:
+        patterns:
+          - "actions/*"
+          - "github/*"
+        update-types:
+          - "minor"
+          - "patch"
+      third-party-actions:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "actions/*"
+          - "github/*"
+        update-types:
+          - "minor"
+          - "patch"
