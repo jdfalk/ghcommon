@@ -1,4 +1,6 @@
 # file: .github/workflows/reusable-matrix-build.yml
+# file: .github/workflows/reusable-matrix-build.yml
+# file: .github/workflows/reusable-matrix-build.yml
 # version: 1.1.0
 # guid: f6a7b8c9-d0e1-2345-fa67-890123456789
 
@@ -12,37 +14,37 @@ on:
   workflow_call:
     inputs:
       go-versions:
-        description: 'Go versions to test (JSON array)'
+        description: "Go versions to test (JSON array)"
         required: false
         type: string
         default: '["1.22", "1.23", "1.24"]'
       python-versions:
-        description: 'Python versions to test (JSON array)'
+        description: "Python versions to test (JSON array)"
         required: false
         type: string
         default: '["3.11", "3.12", "3.13"]'
       node-versions:
-        description: 'Node.js versions to test (JSON array)'
+        description: "Node.js versions to test (JSON array)"
         required: false
         type: string
         default: '["20", "22", "24"]'
       rust-versions:
-        description: 'Rust versions to test (JSON array)'
+        description: "Rust versions to test (JSON array)"
         required: false
         type: string
         default: '["1.75", "1.76", "1.77"]'
       enable-protobuf:
-        description: 'Enable protobuf generation'
+        description: "Enable protobuf generation"
         required: false
         type: boolean
         default: true
       enable-docker:
-        description: 'Enable Docker builds'
+        description: "Enable Docker builds"
         required: false
         type: boolean
         default: true
       skip-tests:
-        description: 'Skip running tests'
+        description: "Skip running tests"
         required: false
         type: boolean
         default: false
@@ -78,7 +80,7 @@ jobs:
         id: detect
         run: |
           echo "Detecting project structure..."
-          
+
           # Go detection
           if [[ -f "go.mod" ]] || find . -name "*.go" -not -path "./vendor/*" | head -1 | grep -q .; then
             echo "has-go=true" >> $GITHUB_OUTPUT
@@ -86,7 +88,7 @@ jobs:
           else
             echo "has-go=false" >> $GITHUB_OUTPUT
           fi
-          
+
           # Python detection
           if [[ -f "pyproject.toml" || -f "requirements.txt" || -f "setup.py" ]] || find . -name "*.py" | head -1 | grep -q .; then
             echo "has-python=true" >> $GITHUB_OUTPUT
@@ -94,7 +96,7 @@ jobs:
           else
             echo "has-python=false" >> $GITHUB_OUTPUT
           fi
-          
+
           # Frontend detection
           if [[ -f "package.json" || -f "yarn.lock" || -f "pnpm-lock.yaml" ]]; then
             echo "has-frontend=true" >> $GITHUB_OUTPUT
@@ -102,7 +104,7 @@ jobs:
           else
             echo "has-frontend=false" >> $GITHUB_OUTPUT
           fi
-          
+
           # Rust detection
           if [[ -f "Cargo.toml" ]] || find . -name "*.rs" -not -path "./target/*" | head -1 | grep -q .; then
             echo "has-rust=true" >> $GITHUB_OUTPUT
@@ -110,7 +112,7 @@ jobs:
           else
             echo "has-rust=false" >> $GITHUB_OUTPUT
           fi
-          
+
           # Docker detection
           if find . -name "Dockerfile*" -o -name "docker-compose*.yml" -o -name "docker-compose*.yaml" | head -1 | grep -q .; then
             echo "has-docker=true" >> $GITHUB_OUTPUT
@@ -118,7 +120,7 @@ jobs:
           else
             echo "has-docker=false" >> $GITHUB_OUTPUT
           fi
-          
+
           # Protobuf detection
           if [[ -f "buf.yaml" || -f "buf.gen.yaml" ]] || find . -name "*.proto" | head -1 | grep -q .; then
             echo "has-protobuf=true" >> $GITHUB_OUTPUT
@@ -142,20 +144,20 @@ jobs:
             ]
           }')
           echo "go-matrix=$GO_MATRIX" >> $GITHUB_OUTPUT
-          
+
           # Python matrix
           PYTHON_VERSIONS='${{ inputs.python-versions }}'
           PYTHON_MATRIX=$(echo "$PYTHON_VERSIONS" | jq -c '{
             include: [
               .[] as $version | {
                 "python-version": $version,
-                "os": "ubuntu-latest", 
+                "os": "ubuntu-latest",
                 "primary": ($version == "3.12")
               }
             ]
           }')
           echo "python-matrix=$PYTHON_MATRIX" >> $GITHUB_OUTPUT
-          
+
           # Frontend matrix
           NODE_VERSIONS='${{ inputs.node-versions }}'
           FRONTEND_MATRIX=$(echo "$NODE_VERSIONS" | jq -c '{
@@ -168,7 +170,7 @@ jobs:
             ]
           }')
           echo "frontend-matrix=$FRONTEND_MATRIX" >> $GITHUB_OUTPUT
-          
+
           # Rust matrix
           RUST_VERSIONS='${{ inputs.rust-versions }}'
           RUST_MATRIX=$(echo "$RUST_VERSIONS" | jq -c '{
@@ -466,7 +468,7 @@ jobs:
         run: |
           echo "## 🏗️ Reusable Matrix Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Check each job
           PROTOBUF_STATUS="${{ needs.protobuf.result }}"
           GO_STATUS="${{ needs.build-go.result }}"
@@ -474,50 +476,50 @@ jobs:
           FRONTEND_STATUS="${{ needs.build-frontend.result }}"
           RUST_STATUS="${{ needs.build-rust.result }}"
           DOCKER_STATUS="${{ needs.build-docker.result }}"
-          
+
           # Report status
           if [[ "$PROTOBUF_STATUS" == "success" || "$PROTOBUF_STATUS" == "skipped" ]]; then
             echo "✅ **Protobuf**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Protobuf**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "$GO_STATUS" == "success" || "$GO_STATUS" == "skipped" ]]; then
             echo "✅ **Go Build**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Go Build**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "$PYTHON_STATUS" == "success" || "$PYTHON_STATUS" == "skipped" ]]; then
             echo "✅ **Python Build**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Python Build**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "$FRONTEND_STATUS" == "success" || "$FRONTEND_STATUS" == "skipped" ]]; then
             echo "✅ **Frontend Build**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Frontend Build**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "$RUST_STATUS" == "success" || "$RUST_STATUS" == "skipped" ]]; then
             echo "✅ **Rust Build**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Rust Build**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "$DOCKER_STATUS" == "success" || "$DOCKER_STATUS" == "skipped" ]]; then
             echo "✅ **Docker Build**: Completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Docker Build**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Check for failures
-          if [[ "$GO_STATUS" == "failure" || 
-                "$PYTHON_STATUS" == "failure" || 
-                "$FRONTEND_STATUS" == "failure" || 
+          if [[ "$GO_STATUS" == "failure" ||
+                "$PYTHON_STATUS" == "failure" ||
+                "$FRONTEND_STATUS" == "failure" ||
                 "$RUST_STATUS" == "failure" ||
-                "$DOCKER_STATUS" == "failure" || 
+                "$DOCKER_STATUS" == "failure" ||
                 "$PROTOBUF_STATUS" == "failure" ]]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ **Overall Status**: FAILED" >> $GITHUB_STEP_SUMMARY
