@@ -1,215 +1,120 @@
 # file: .github/workflows/unified-automation.yml
-# version: 2.1.1
-# guid: complete-unified-automation-workflow-template
+# version: 1.0.0
+# guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
-name: Complete Unified Automation
+# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
+# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
+# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/unified-automation.yml
 
-# Comprehensive permissions for all automation features
-permissions:
-  contents: write # For creating commits and PRs
-  issues: write # For creating and updating issues
-  pull-requests: write # For creating PRs
-  security-events: read # For reading CodeQL alerts
-  repository-projects: write # For adding items to projects
-  actions: read # For workflow access
-  checks: write # For workflow status
-  statuses: write # For commit status updates
+name: Unified Automation
 
 on:
-  # Triggered manually with customizable options
+  schedule:
+    - cron: "0 0 * * 0" # Weekly on Sunday
   workflow_dispatch:
     inputs:
       operation:
-        description: "Which operation(s) to run"
+        description: 'Operation to perform'
         required: false
-        default: "all"
+        default: 'issues'
         type: choice
         options:
-          - "all"
-          - "issues"
-          - "docs"
-          - "label"
-          - "lint"
-          - "intelligent-labeling"
-
-      config_file:
-        description: "Path to configuration file (optional)"
-        required: false
-        default: ".github/unified-automation-config.json"
-        type: string
-
+          - issues
+          - migrate
+          - dependencies
       dry_run:
-        description: "Run in dry-run mode (no changes made)"
+        description: 'Run in dry-run mode'
         required: false
         default: false
         type: boolean
 
-  # Automatic triggers for common scenarios
-  push:
-    branches: [main, develop]
-    paths:
-      - ".github/issue-updates/**"
-      - ".github/doc-updates/**"
-      - "issue_updates.json"
-
-  schedule:
-    # Run maintenance tasks daily at 2 AM UTC
-    - cron: "0 2 * * *"
-
-  # Handle issue and PR events
-  issues:
-    types: [opened, edited, labeled]
-
-  pull_request:
-    types: [opened, synchronize, labeled]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-  # Load configuration from file if provided
-  load-config:
-    runs-on: ubuntu-latest
-    outputs:
-      config: ${{ steps.load.outputs.config }}
-      operation: ${{ steps.determine.outputs.operation }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Load configuration file
-        id: load
-        run: |
-          CONFIG_FILE="${{ github.event.inputs.config_file || '.github/unified-automation-config.json' }}"
-
-          if [[ -f "$CONFIG_FILE" ]]; then
-            echo "📄 Loading configuration from $CONFIG_FILE"
-            CONFIG=$(cat "$CONFIG_FILE" | jq -c .)
-            echo "config=$CONFIG" >> "$GITHUB_OUTPUT"
-            echo "✅ Configuration loaded successfully"
-          else
-            echo "📄 Configuration file not found, downloading default from ghcommon..."
-            curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/.github/unified-automation-config.json -o default-config.json
-            CONFIG=$(cat default-config.json | jq -c .)
-            echo "config=$CONFIG" >> "$GITHUB_OUTPUT"
-            echo "✅ Default configuration loaded"
-          fi
-
-      - name: Determine operation
-        id: determine
-        run: |
-          OPERATION="${{ github.event.inputs.operation || 'all' }}"
-
-          # Auto-detect operation based on event type and changed files
-          if [[ "$OPERATION" == "all" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
-            case "${{ github.event_name }}" in
-              "push")
-                if git diff --name-only HEAD~1 | grep -E '\\.github/(issue|doc)-updates/|issue_updates\\.json'; then
-                  OPERATION="issues"
-                fi
-                ;;
-              "issues"|"pull_request")
-                OPERATION="intelligent-labeling"
-                ;;
-              "schedule")
-                OPERATION="all"
-                ;;
-            esac
-          fi
-
-          echo "operation=$OPERATION" >> "$GITHUB_OUTPUT"
-          echo "🎯 Selected operation: $OPERATION"
-
-  # Main automation orchestrator
   unified-automation:
-    needs: load-config
-    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
-    with:
-      operation: ${{ needs.load-config.outputs.operation }}
-
-      # Issue Management Configuration
-      im_operations: ${{ fromJson(needs.load-config.outputs.config).issue_management.operations }}
-      im_dry_run: ${{ github.event.inputs.dry_run == 'true' || fromJson(needs.load-config.outputs.config).issue_management.dry_run }}
-      im_force_update: ${{ fromJson(needs.load-config.outputs.config).issue_management.force_update }}
-      im_issue_updates_file: ${{ fromJson(needs.load-config.outputs.config).issue_management.issue_updates_file }}
-      im_issue_updates_directory: ${{ fromJson(needs.load-config.outputs.config).issue_management.issue_updates_directory }}
-      im_cleanup_issue_updates: ${{ fromJson(needs.load-config.outputs.config).issue_management.cleanup_issue_updates }}
-      im_python_version: ${{ fromJson(needs.load-config.outputs.config).issue_management.python_version }}
-
-      # Documentation Update Configuration
-      docs_updates_directory: ${{ fromJson(needs.load-config.outputs.config).docs_update.updates_directory }}
-      docs_dry_run: ${{ github.event.inputs.dry_run == 'true' || fromJson(needs.load-config.outputs.config).docs_update.dry_run }}
-      docs_python_version: ${{ fromJson(needs.load-config.outputs.config).docs_update.python_version }}
-      docs_cleanup_processed_files: ${{ fromJson(needs.load-config.outputs.config).docs_update.cleanup_processed_files }}
-      docs_create_pr: ${{ fromJson(needs.load-config.outputs.config).docs_update.create_pr }}
-      docs_auto_merge: ${{ fromJson(needs.load-config.outputs.config).docs_update.auto_merge }}
-      docs_continue_on_error: ${{ fromJson(needs.load-config.outputs.config).docs_update.continue_on_error }}
-
-      # Labeler Configuration
-      labeler_configuration_path: ${{ fromJson(needs.load-config.outputs.config).labeler.configuration_path }}
-      labeler_sync_labels: ${{ fromJson(needs.load-config.outputs.config).labeler.sync_labels }}
-      labeler_dot: ${{ fromJson(needs.load-config.outputs.config).labeler.dot }}
-      labeler_pr_numbers: ${{ fromJson(needs.load-config.outputs.config).labeler.pr_numbers }}
-
-      # Super Linter Configuration
-      sl_validate_all_codebase: ${{ fromJson(needs.load-config.outputs.config).super_linter.validate_all_codebase }}
-      sl_default_branch: ${{ fromJson(needs.load-config.outputs.config).super_linter.default_branch }}
-      sl_config_file: ${{ fromJson(needs.load-config.outputs.config).super_linter.config_file }}
-      sl_run_python: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_python }}
-      sl_run_shell: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_shell }}
-      sl_run_markdown: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_markdown }}
-      sl_run_yaml: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_yaml }}
-      sl_run_json: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_json }}
-      sl_run_javascript: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_javascript }}
-      sl_run_go: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_go }}
-      sl_run_css: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_css }}
-      sl_run_html: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_html }}
-      sl_run_github_actions: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_github_actions }}
-      sl_run_security: ${{ fromJson(needs.load-config.outputs.config).super_linter.run_security }}
-      sl_enable_auto_fix: ${{ fromJson(needs.load-config.outputs.config).super_linter.enable_auto_fix }}
-      sl_auto_commit_fixes: ${{ fromJson(needs.load-config.outputs.config).super_linter.auto_commit_fixes }}
-      sl_commit_message: ${{ fromJson(needs.load-config.outputs.config).super_linter.commit_message }}
-
-      # Intelligent Labeling Configuration
-      il_enabled: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.enabled }}
-      il_dry_run: ${{ github.event.inputs.dry_run == 'true' || fromJson(needs.load-config.outputs.config).intelligent_labeling.dry_run }}
-      il_batch_size: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.batch_size }}
-      il_use_ai_fallback: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.use_ai_fallback }}
-      il_confidence_threshold: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.confidence_threshold }}
-      il_max_labels_per_issue: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.max_labels_per_issue }}
-      il_preserve_existing_labels: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.preserve_existing_labels }}
-      il_label_config_path: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.label_config_path }}
-      il_python_version: ${{ fromJson(needs.load-config.outputs.config).intelligent_labeling.python_version }}
-
-    secrets: inherit
-
-  # Post-automation cleanup and notifications
-  post-automation:
-    needs: [load-config, unified-automation]
-    if: always()
+    name: Unified Automation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate automation summary
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
         run: |
-          echo "## 🤖 Unified Automation Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Operation:** ${{ needs.load-config.outputs.operation }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Event:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Repository:** ${{ env.GITHUB_REPOSITORY }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Status:** ${{ needs.unified-automation.result }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Dry Run:** ${{ github.event.inputs.dry_run || 'false' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          # Install common dependencies for automation
+          pip install PyYAML requests python-dateutil
 
-          if [[ "${{ needs.unified-automation.result }}" == "success" ]]; then
-            echo "✅ All automation tasks completed successfully!" >> "$GITHUB_STEP_SUMMARY"
+      - name: Run unified issue automation
+        run: |
+          echo "Running unified automation with operation: ${{ github.event.inputs.operation || 'issues' }}"
+
+          # Set parameters
+          OPERATION="${{ github.event.inputs.operation || 'issues' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+
+          # Build command - focused on issue management and core automation
+          CMD="python3 unified_issue_automation.py --operation $OPERATION"
+          if [ "$DRY_RUN" = "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+          CMD="$CMD --quiet"
+
+          # Execute automation
+          echo "Executing: $CMD"
+          $CMD
+
+          echo ""
+          echo "Note: Document updates are handled by separate workflows in .github/workflows/docs-automation.yml"
+          echo "Note: Migration tasks are handled by scripts/migrate_to_python.py and workflow_manager.py"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
           else
-            echo "❌ Some automation tasks encountered issues. Check the logs above for details." >> "$GITHUB_STEP_SUMMARY"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected:"
+            git diff --name-only
           fi
 
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "### 📊 Configuration Used" >> "$GITHUB_STEP_SUMMARY"
-          echo "Configuration was loaded from: \`${{ github.event.inputs.config_file || '.github/unified-automation-config.json' }}\`" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Notify on failure
-        if: failure() && fromJson(needs.load-config.outputs.config).notification_settings.notify_on_failure
+      - name: Commit automation changes
+        if: steps.changes.outputs.has_changes == 'true'
         run: |
-          echo "🚨 Automation failed - implement notification logic here"
-          # Add your notification logic (Slack, Teams, email, etc.)
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "automation: unified issue automation updates
+
+          Operation: ${{ github.event.inputs.operation || 'issues' }}
+          Dry run: ${{ github.event.inputs.dry_run || 'false' }}
+          Triggered: ${{ github.event_name }}"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## 🤖 Unified Automation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Operation:** ${{ github.event.inputs.operation || 'issues' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dry Run:** ${{ github.event.inputs.dry_run || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changes Made:** ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Scope:** This workflow focuses on issue management and core automation." >> $GITHUB_STEP_SUMMARY
+          echo "**Document Updates:** Handled by docs-automation.yml workflow" >> $GITHUB_STEP_SUMMARY
+          echo "**Migration Tasks:** Handled by workflow_manager.py and migrate_to_python.py scripts" >> $GITHUB_STEP_SUMMARY

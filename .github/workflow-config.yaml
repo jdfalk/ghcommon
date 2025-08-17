@@ -1,0 +1,176 @@
+# file: .github/workflow-config.yaml
+# version: 1.0.0
+# guid: e5f6a7b8-c9d0-1234-ef56-789012345678
+
+# Modern Workflow Configuration
+# This file configures the modernized workflow system for cross-repository automation
+
+build:
+  # Language version matrices
+  go_versions:
+    - "1.22"
+    - "1.23" 
+    - "1.24"
+  
+  python_versions:
+    - "3.11"
+    - "3.12"
+    - "3.13"
+  
+  node_versions:
+    - "20"
+    - "22"
+    - "24"
+  
+  # Platform support
+  platforms:
+    - "linux/amd64"
+    - "linux/arm64"
+  
+  operating_systems:
+    - "ubuntu-latest"
+    - "macos-latest"
+    - "windows-latest"
+  
+  # Feature flags
+  enable_protobuf: true
+  enable_docker: true
+  enable_cross_compile: true
+  enable_coverage: true
+  enable_security_scan: true
+
+# Repository sync configuration
+repositories:
+  - name: "subtitle-manager"
+    url: "https://github.com/jdfalk/subtitle-manager"
+    sync_enabled: true
+    custom_build_config:
+      go_versions: ["1.23", "1.24"]
+      enable_protobuf: true
+      enable_docker: true
+  
+  - name: "audiobook-organizer"
+    url: "https://github.com/jdfalk/audiobook-organizer"
+    sync_enabled: true
+    custom_build_config:
+      go_versions: ["1.23", "1.24"]
+      enable_protobuf: false
+      enable_docker: true
+  
+  - name: "copilot-agent-util-rust"
+    url: "https://github.com/jdfalk/copilot-agent-util-rust"
+    sync_enabled: true
+    custom_build_config:
+      rust_versions: ["1.75", "1.76", "1.77"]
+      enable_protobuf: false
+      enable_docker: true
+
+# Sync configuration
+sync:
+  auto_sync: true
+  sync_on_push: true
+  sync_on_schedule: true
+  
+  # Paths to sync across repositories
+  sync_paths:
+    - ".github/workflows/matrix-build.yml"
+    - ".github/workflows/unified-automation.yml"
+    - ".github/workflows/ci.yml"
+    - ".github/workflows/pr-automation.yml"
+    - ".github/workflows/commit-override-handler.yml"
+    - ".github/workflows/reusable-matrix-build.yml"
+    - ".github/instructions/"
+    - ".github/prompts/"
+    - ".github/linters/"
+    - ".pre-commit-config.yaml"
+    - "scripts/workflow_manager.py"
+    - "labels.json"
+    - "labels.md"
+  
+  # Files to explicitly exclude from sync (repo-specific configs)
+  exclude_files:
+    - ".github/workflow-config.yaml"  # Each repo has its own config
+    - ".github/super-linter.env"     # Repo-specific linter config
+    - ".github/unified-automation-config.json"  # Repo-specific automation config
+  
+  # Exclusions to prevent sync loops
+  exclude_repos:
+    - "ghcommon"  # Prevent self-syncing
+  
+  # Sync schedule
+  schedule: "0 0 * * 0"  # Weekly on Sunday
+
+# Automation features
+automation:
+  issue_management:
+    enabled: true
+    auto_process: true
+    migration_enabled: true
+  
+  dependency_updates:
+    enabled: true
+    auto_merge_minor: false
+    schedule: "0 0 * * 1"  # Weekly on Monday
+  
+  security_scanning:
+    enabled: true
+    auto_fix: false
+    schedule: "0 0 * * 2"  # Weekly on Tuesday
+
+# Quality gates
+quality:
+  coverage_threshold: 80
+  security_scan_required: true
+  lint_required: true
+  tests_required: true
+  
+  # Branch protection rules
+  branch_protection:
+    required_status_checks:
+      - "Matrix Build System"
+      - "Lint Code"
+      - "Security Scan"
+    
+    require_code_review: true
+    dismiss_stale_reviews: true
+    require_review_from_codeowners: true
+
+# Notification settings
+notifications:
+  slack:
+    enabled: false
+    webhook_url: ""  # Set via secrets
+    channels:
+      success: "#ci-success"
+      failure: "#ci-failure"
+  
+  email:
+    enabled: false
+    recipients: []
+  
+  github:
+    enabled: true
+    use_step_summary: true
+    create_issues_on_failure: false
+
+# Performance settings
+performance:
+  cache_enabled: true
+  parallel_jobs: 4
+  timeout_minutes: 60
+  
+  # Matrix job limits
+  max_go_jobs: 15
+  max_python_jobs: 15
+  max_frontend_jobs: 15
+  max_docker_jobs: 4
+
+# Development settings
+development:
+  debug_mode: false
+  verbose_logging: false
+  dry_run_default: false
+  
+  # Local development
+  skip_slow_tests: false
+  use_local_cache: true

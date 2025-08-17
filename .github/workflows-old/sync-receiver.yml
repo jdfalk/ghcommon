@@ -2,10 +2,6 @@
 # version: 1.0.0
 # guid: f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2
 
-# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
-# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
-# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/sync-receiver.yml
-
 name: Sync Receiver
 
 on:

@@ -2,10 +2,6 @@
 # version: 1.0.0
 # guid: m4i5n6t7-e8n9-a0b1-c2d3-e4f5a6b7c8d9
 
-# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
-# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
-# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/maintenance.yml
-
 name: Maintenance
 
 on:

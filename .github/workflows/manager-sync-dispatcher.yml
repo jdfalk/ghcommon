@@ -1,6 +1,10 @@
 # file: .github/workflows/manager-sync-dispatcher.yml
-# version: 2.1.1
-# guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
+# version: 1.0.0
+# guid: b2c3d4e5-f6a7-8901-bcde-f23456789012
+
+# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
+# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
+# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/manager-sync-dispatcher.yml
 
 name: Manager Sync Dispatcher
 
@@ -8,94 +12,143 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/**"
-      - ".github/instructions/**"
-      - ".github/copilot-instructions.md"
-      - "labels.json"
-      - "labels.md"
+      - '.github/workflows/**'
+      - '.github/instructions/**'
+      - '.github/prompts/**'
+      - 'scripts/**'
+      - '.github/linters/**'
+      - 'labels.json'
+      - 'labels.md'
   workflow_dispatch:
     inputs:
-      target_repos:
-        description: "Comma-separated list of repos to sync (or 'all')"
-        required: false
-        default: "all"
-        type: string
       sync_type:
-        description: "Type of sync to perform"
+        description: 'Type of sync to perform'
         required: false
-        default: "all"
+        default: 'all'
         type: choice
         options:
-          - "all"
-          - "workflows"
-          - "instructions"
-          - "prompts"
-          - "scripts"
-          - "linters"
-          - "labels"
+          - all
+          - workflows
+          - instructions
+          - prompts
+          - scripts
+          - linters
+          - labels
+      target_repos:
+        description: 'Target repositories (comma-separated)'
+        required: false
+        default: 'auto'
 
 permissions:
-  contents: write
+  contents: read
   actions: write
-  packages: write
-  pull-requests: write
-  issues: write
-  repository-projects: write
-  checks: write
-  statuses: write
-  deployments: write
-
-env:
-  # Target repositories for synchronization
-  # DO NOT ADD ghcommon as that would overwrite itself.
-  TARGET_REPOS: |
-    jdfalk/gcommon
-    jdfalk/subtitle-manager
-    jdfalk/copilot-agent-util-rust
-    jdfalk/apt-cacher-go
-    jdfalk/audiobook-organizer
 
 jobs:
   dispatch-sync:
-    name: Dispatch Sync Events
+    name: Dispatch Sync to Repositories
     runs-on: ubuntu-latest
-    env:
-      TARGET_REPOS_INPUT: ${{ github.event.inputs.target_repos }}
-      SYNC_TYPE_INPUT: ${{ github.event.inputs.sync_type }}
-      GITHUB_REPOSITORY_VAR: ${{ env.GITHUB_REPOSITORY }}
-      GITHUB_SHA_VAR: ${{ env.GITHUB_SHA }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      - name: Setup GitHub CLI
-        run: |
-          # GitHub CLI is pre-installed on GitHub runners
-          gh --version
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Determine target repositories
+      - name: Create repositories list
         id: repos
-        env:
-          TARGET_REPOS_INPUT: ${{ github.event.inputs.target_repos }}
-          TARGET_REPOS_LIST: ${{ env.TARGET_REPOS }}
-        run: python3 ./.github/scripts/sync-determine-target-repos.py
+        run: |
+          # Default repository list - exclude ghcommon to prevent self-syncing
+          DEFAULT_REPOS="jdfalk/subtitle-manager,jdfalk/audiobook-organizer,jdfalk/copilot-agent-util-rust"
+          
+          if [ "${{ github.event.inputs.target_repos }}" = "auto" ] || [ -z "${{ github.event.inputs.target_repos }}" ]; then
+            echo "repos=$DEFAULT_REPOS" >> $GITHUB_OUTPUT
+            echo "Using default repository list: $DEFAULT_REPOS"
+          else
+            echo "repos=${{ github.event.inputs.target_repos }}" >> $GITHUB_OUTPUT
+            echo "Using custom repository list: ${{ github.event.inputs.target_repos }}"
+          fi
 
-      - name: Dispatch sync events to target repositories
-        env:
-          GH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_TYPE: sync-from-ghcommon
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_REF: ${{ github.ref }}
-        run: python3 ./.github/scripts/sync-dispatch-events.py
+      - name: Determine sync type
+        id: sync-type
+        run: |
+          SYNC_TYPE="${{ github.event.inputs.sync_type }}"
+          
+          if [ -z "$SYNC_TYPE" ] || [ "$SYNC_TYPE" = "all" ]; then
+            # Auto-detect based on changed files for push events
+            if [ "${{ github.event_name }}" = "push" ]; then
+              echo "Auto-detecting sync type based on changed files..."
+              
+              # Get changed files
+              CHANGED_FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.sha }})
+              echo "Changed files: $CHANGED_FILES"
+              
+              if echo "$CHANGED_FILES" | grep -q "^\.github/workflows/"; then
+                SYNC_TYPE="workflows"
+              elif echo "$CHANGED_FILES" | grep -q "^\.github/instructions/"; then
+                SYNC_TYPE="instructions"
+              elif echo "$CHANGED_FILES" | grep -q "^\.github/prompts/"; then
+                SYNC_TYPE="prompts"
+              elif echo "$CHANGED_FILES" | grep -q "^scripts/"; then
+                SYNC_TYPE="scripts"
+              elif echo "$CHANGED_FILES" | grep -q "^\.github/linters/"; then
+                SYNC_TYPE="linters"
+              elif echo "$CHANGED_FILES" | grep -q "labels\."; then
+                SYNC_TYPE="labels"
+              else
+                SYNC_TYPE="all"
+              fi
+            else
+              SYNC_TYPE="all"
+            fi
+          fi
+          
+          echo "sync_type=$SYNC_TYPE" >> $GITHUB_OUTPUT
+          echo "Sync type determined: $SYNC_TYPE"
+
+      - name: Dispatch sync events
+        run: |
+          IFS=',' read -ra REPOS <<< "${{ steps.repos.outputs.repos }}"
+          SYNC_TYPE="${{ steps.sync-type.outputs.sync_type }}"
+          
+          echo "Dispatching sync events to repositories..."
+          echo "Sync type: $SYNC_TYPE"
+          echo "Target repositories: ${{ steps.repos.outputs.repos }}"
+          
+          for repo in "${REPOS[@]}"; do
+            # Trim whitespace
+            repo=$(echo "$repo" | xargs)
+            
+            echo "Dispatching to $repo..."
+            
+            # Create repository dispatch event
+            curl -X POST \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/$repo/dispatches" \
+              -d "{
+                \"event_type\": \"sync-from-ghcommon\",
+                \"client_payload\": {
+                  \"sync_type\": \"$SYNC_TYPE\",
+                  \"source_repo\": \"${{ github.repository }}\",
+                  \"source_sha\": \"${{ github.sha }}\",
+                  \"triggered_by\": \"${{ github.event_name }}\",
+                  \"actor\": \"${{ github.actor }}\"
+                }
+              }" || echo "Failed to dispatch to $repo (repository may not exist or may not have sync-receiver workflow)"
+            
+            # Small delay between requests
+            sleep 1
+          done
 
       - name: Summary
-        env:
-          TARGET_REPOS: ${{ steps.repos.outputs.target_repos }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        run: python3 ./.github/scripts/sync-generate-summary.py
+        run: |
+          echo "## 🔄 Sync Dispatch Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sync Type:** ${{ steps.sync-type.outputs.sync_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Repositories:** ${{ steps.repos.outputs.repos }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source SHA:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered By:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

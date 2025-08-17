@@ -1,22 +1,26 @@
-# Smart Dependabot configuration for ghcommon
-# Automatically detected: python, nodejs, github-actions
+# file: .github/dependabot.yml
+# version: 1.2.0
+# guid: 5b1b7e5b-317a-470e-bf6f-fddf1c808ca0
+# Comprehensive Dependabot configuration supporting all major language ecosystems
+# Uses only repository-defined labels from labels.md documentation
 
 version: 2
 updates:
+  # JavaScript/Node.js ecosystem
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-      time: 09:00
-      timezone: America/New_York
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
     open-pull-requests-limit: 8
     commit-message:
-      prefix: npm
+      prefix: "feat(deps)"
       include: scope
     labels:
-      - dependencies
-      - priority-low
+      - "dependencies"
+      - "tech:javascript"
     allow:
       - dependency-type: direct
       - dependency-type: indirect
@@ -34,6 +38,31 @@ updates:
         update-types:
           - minor
           - patch
+
+  # TypeScript ecosystem (via npm)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:30"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:typescript"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+
+  # Python ecosystem
   - package-ecosystem: pip
     directory: /
     schedule:
@@ -41,17 +70,54 @@ updates:
       day: tuesday
       time: 09:00
       timezone: America/New_York
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 5
     commit-message:
-      prefix: python
+      prefix: "feat(deps)"
       include: scope
     labels:
-      - dependencies
-      - priority-medium
+      - "dependencies"
+      - "tech:python"
     allow:
       - dependency-type: direct
       - dependency-type: indirect
-  - package-ecosystem: github-actions
+
+  # Go ecosystem
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:go"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Docker ecosystem
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: thursday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "tech:docker"
+
+  # Maven ecosystem (Java)
+  - package-ecosystem: maven
     directory: /
     schedule:
       interval: weekly
@@ -60,8 +126,156 @@ updates:
       timezone: America/New_York
     open-pull-requests-limit: 5
     commit-message:
-      prefix: ci
+      prefix: "feat(deps)"
       include: scope
     labels:
-      - dependencies
-      - priority-high
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Gradle ecosystem (Java/Kotlin)
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+      time: 10:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Ruby ecosystem
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Composer ecosystem (PHP)
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: 10:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # Rust ecosystem
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: 11:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # NuGet ecosystem (.NET)
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+      day: sunday
+      time: 09:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+
+  # GitHub Actions ecosystem
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: sunday
+      time: 10:00
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "feat(ci)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "workflow:ci-cd"
+      - "workflow:github-actions"
+    groups:
+      official-actions:
+        patterns:
+          - "actions/*"
+          - "github/*"
+        update-types:
+          - "minor"
+          - "patch"
+      third-party-actions:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "actions/*"
+          - "github/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Terraform ecosystem
+  - package-ecosystem: terraform
+    directory: /
+    schedule:
+      interval: weekly
+      day: sunday
+      time: 11:00
+      timezone: America/New_York
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "feat(infra)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "external-dependency"
