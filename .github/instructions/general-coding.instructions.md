@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 1.6.0 -->
+<!-- version: 1.7.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -129,6 +129,52 @@ git add . && git commit -m "message" && git push
 - **Workspace Awareness**: Tasks run in correct directory with proper context
 - **Automation**: Tasks can chain together and include pre/post operations
 - **Debugging**: Log files provide complete audit trail for troubleshooting
+
+## Script Language Preference
+
+**MANDATORY RULE: Prefer Python for scripts unless they are incredibly simple.**
+
+When creating automation scripts, configuration tools, or data processing utilities:
+
+1. **FIRST CHOICE**: Python for any script with:
+   - API interactions (GitHub, REST APIs, etc.)
+   - JSON/YAML processing
+   - File manipulation beyond simple copying
+   - Error handling and logging
+   - Data parsing or transformation
+   - More than 20-30 lines of logic
+
+2. **SECOND CHOICE**: Shell scripts (bash/sh) only for:
+   - Simple file operations (copy, move, basic checks)
+   - Basic git commands
+   - Simple environment setup
+   - Scripts under 20 lines with minimal logic
+
+3. **CONVERSION REQUIRED**: When existing shell scripts become complex:
+   - Convert to Python when adding features
+   - Rewrite in Python if error handling is insufficient
+   - Migrate when API calls or JSON processing is needed
+
+### Examples
+
+**✅ CORRECT - Use Python for:**
+- GitHub API interactions
+- Configuration file processing
+- Multi-step automation workflows
+- Scripts with error handling requirements
+- Data validation and transformation
+
+**❌ INCORRECT - Don't use shell for:**
+- Complex JSON parsing
+- API authentication and error handling
+- Multi-repository operations
+- Scripts requiring robust error recovery
+
+**✅ ACCEPTABLE - Shell scripts for:**
+- Simple `cp`, `mv`, `mkdir` operations
+- Basic git commands with minimal logic
+- Environment variable setup
+- Simple file existence checks
 
 ## Required File Header (File Identification)
 
