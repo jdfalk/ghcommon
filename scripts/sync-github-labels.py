@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/sync-github-labels.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: b2c3d4e5-f6g7-8901-bcde-f23456789abc
 
 """
@@ -13,10 +13,10 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
-import urllib.error
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 
 class GitHubLabelsSync:
@@ -96,6 +96,20 @@ class GitHubLabelsSync:
             print(f"   ❌ Failed to update label '{name}': {e}")
             return False
 
+    def labels_are_identical(
+        self, existing_label: Dict[str, Any], new_color: str, new_description: str
+    ) -> bool:
+        """Check if existing label is identical to the new one."""
+        # Normalize colors (remove # prefix if present)
+        existing_color = existing_label.get("color", "").lstrip("#")
+        new_color = new_color.lstrip("#")
+
+        # Normalize descriptions (empty string and None are considered the same)
+        existing_desc = existing_label.get("description") or ""
+        new_desc = new_description or ""
+
+        return existing_color == new_color and existing_desc == new_desc
+
     def sync_labels(self, labels_file: str) -> bool:
         """Synchronize labels from JSON file to GitHub repository."""
         print("🏷️  GitHub Labels Sync")
@@ -127,6 +141,7 @@ class GitHubLabelsSync:
         # Process each label from the file
         print(f"🔄 Processing {len(labels_data)} labels from {labels_file}...")
         success_count = 0
+        skipped_count = 0
 
         for label_config in labels_data:
             name = label_config.get("name")
@@ -140,10 +155,17 @@ class GitHubLabelsSync:
             print(f"🏷️  Processing label: {name}")
 
             if name in existing_by_name:
-                # Update existing label
-                print("   📝 Updating existing label...")
-                if self.update_label(name, color, description):
-                    success_count += 1
+                # Check if the label is identical
+                existing_label = existing_by_name[name]
+                if self.labels_are_identical(existing_label, color, description):
+                    print("   ⏭️  Skipping - label is identical")
+                    skipped_count += 1
+                    success_count += 1  # Count as success since no change needed
+                else:
+                    # Update existing label
+                    print("   📝 Updating existing label...")
+                    if self.update_label(name, color, description):
+                        success_count += 1
             else:
                 # Create new label
                 print("   ➕ Creating new label...")
@@ -151,6 +173,8 @@ class GitHubLabelsSync:
                     success_count += 1
 
         print()
+        if skipped_count > 0:
+            print(f"⏭️  Skipped {skipped_count} identical labels")
         print(
             f"✅ GitHub labels sync completed! ({success_count}/{len(labels_data)} successful)"
         )
