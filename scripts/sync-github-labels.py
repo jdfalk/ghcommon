@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/sync-github-labels.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: b2c3d4e5-f6g7-8901-bcde-f23456789abc
 
 """
@@ -184,10 +184,13 @@ Environment variables:
 
     args = parser.parse_args()
 
-    # Get GitHub token
-    github_token = os.environ.get("GITHUB_TOKEN")
+    # Get GitHub token (try PAT_TOKEN first, then GITHUB_TOKEN)
+    github_token = os.environ.get("PAT_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if not github_token:
-        print("❌ GITHUB_TOKEN environment variable is required")
+        print("❌ GitHub token is required")
+        print("   Set one of these environment variables:")
+        print("   - PAT_TOKEN (recommended for enhanced permissions)")
+        print("   - GITHUB_TOKEN (basic GitHub Actions token)")
         print("   Get a token from: https://github.com/settings/tokens")
         print("   Required scopes: repo")
         sys.exit(1)
