@@ -183,25 +183,29 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           FILTER_REGEX_EXCLUDE: ".*\\.git/.*|.*\\.github/copilot/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|.*vendor/.*|.*dist/.*"
 
-          # Language-specific validation only (no FIX_ to avoid conflicts)
-          VALIDATE_GO: ${{ needs.detect-changes.outputs.go }}
-          VALIDATE_JAVASCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
-          VALIDATE_TYPESCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
-          VALIDATE_PYTHON_BLACK: ${{ needs.detect-changes.outputs.python }}
-          VALIDATE_PYTHON_PYLINT: ${{ needs.detect-changes.outputs.python }}
-          VALIDATE_PYTHON_ISORT: ${{ needs.detect-changes.outputs.python }}
-          VALIDATE_RUST_2015: ${{ needs.detect-changes.outputs.rust }}
-          VALIDATE_RUST_2018: ${{ needs.detect-changes.outputs.rust }}
-          VALIDATE_RUST_2021: ${{ needs.detect-changes.outputs.rust }}
-          VALIDATE_RUST_CLIPPY: ${{ needs.detect-changes.outputs.rust }}
+          # Auto-fix settings - use FIX_ instead of VALIDATE_ whenever possible
+          FIX_GO: ${{ needs.detect-changes.outputs.go }}
+          FIX_JAVASCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
+          FIX_JAVASCRIPT_PRETTIER: ${{ needs.detect-changes.outputs.frontend }}
+          FIX_TYPESCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
+          FIX_TYPESCRIPT_PRETTIER: ${{ needs.detect-changes.outputs.frontend }}
+          FIX_PYTHON_BLACK: ${{ needs.detect-changes.outputs.python }}
+          FIX_PYTHON_ISORT: ${{ needs.detect-changes.outputs.python }}
+          FIX_PYTHON_RUFF: ${{ needs.detect-changes.outputs.python }}
+          FIX_RUST_2015: ${{ needs.detect-changes.outputs.rust }}
+          FIX_RUST_2018: ${{ needs.detect-changes.outputs.rust }}
+          FIX_RUST_2021: ${{ needs.detect-changes.outputs.rust }}
+          FIX_RUST_CLIPPY: ${{ needs.detect-changes.outputs.rust }}
 
-          # Always validate these
-          VALIDATE_MARKDOWN: true
+          # Auto-fix these always
+          FIX_MARKDOWN: true
+          FIX_JSON_PRETTIER: true
+          FIX_SHELL_SHFMT: true
+
+          # Only validate these (no FIX_ option available)
           VALIDATE_YAML: true
-          VALIDATE_JSON: true
           VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_DOCKERFILE_HADOLINT: ${{ needs.detect-changes.outputs.docker }}
-          VALIDATE_SHELL_SHFMT: true
           VALIDATE_GITLEAKS: true
 
       - name: Check for auto-fixes

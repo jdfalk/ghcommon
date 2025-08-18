@@ -70,16 +70,14 @@ jobs:
           DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
           FILTER_REGEX_EXCLUDE: ${{ env.FILTER_REGEX_EXCLUDE }}
 
-          # Enable validations (only for linters without FIX options)
+          # Only validate these (no FIX_ option available)
           VALIDATE_YAML: true
-          VALIDATE_GO: true
-          VALIDATE_GO_MODULES: true
           VALIDATE_HTML: true
           VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_GITLEAKS: true
           VALIDATE_DOCKERFILE_HADOLINT: true
 
-          # Auto-fix settings - Prettier prioritized for formatting
+          # Auto-fix settings - use FIX_ as default behavior
           FIX_ANSIBLE: true
           FIX_CLANG_FORMAT: true
           FIX_CSHARP: true
