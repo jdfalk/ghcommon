@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [GitHub Common Workflows](#github-common-workflows)
+  - [Table of Contents](#table-of-contents)
   - [🚀 Quick Start](#-quick-start)
     - [For Complete CI/CD Pipeline](#for-complete-ci-cd-pipeline)
     - [For Container-Only Projects](#for-container-only-projects)
@@ -50,11 +51,6 @@
   - [Queue Module\n\nTODO: Add content for this section](#queue-module-n-ntodo-add-content-for-this-section)
 - [Protobuf Definitions](#protobuf-definitions)
   - [Protobuf Definitions\n\n*Moved to gcommon repository.*](#protobuf-definitions-n-n-moved-to-gcommon-repository)
-
-
-A comprehensive repository of reusable GitHub Actions workflows and templates
-for automated CI/CD, semantic versioning, multi-architecture container builds,
-and secure release management.
 
 ## 🚀 Quick Start
 

@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [file: CHANGELOG.md](#file-changelog-md)
+  - [Table of Contents](#table-of-contents)
 - [Changelog](#changelog)
   - [[Unreleased]](#-unreleased)
     - [Added](#added)
@@ -17,15 +18,6 @@
     - [Removed](#removed)
   - [[1.0.0] - 2025-06-14](#-1-0-0-2025-06-14)
     - [Added](#added)
-
-
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 

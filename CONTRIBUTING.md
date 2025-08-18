@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [file: CONTRIBUTING.md](#file-contributing-md)
+  - [Table of Contents](#table-of-contents)
 - [Contributing to GitHub Common Workflows](#contributing-to-github-common-workflows)
   - [Code of Conduct](#code-of-conduct)
   - [How to Contribute](#how-to-contribute)
@@ -40,12 +41,6 @@
     - [Resources](#resources)
     - [Maintainer Contact](#maintainer-contact)
   - [Recognition](#recognition)
-
-
-# Contributing to GitHub Common Workflows
-
-Thank you for your interest in contributing to GitHub Common Workflows! This
-document provides guidelines and information for contributors.
 
 ## Code of Conduct
 
