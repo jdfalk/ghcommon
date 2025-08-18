@@ -1,5 +1,5 @@
 # file: .github/workflows/commit-override-handler.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: 7a8b9c0d-1e2f-3456-789a-bcdef0123456
 
 # ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
@@ -9,6 +9,23 @@
 name: Commit Override Handler
 
 on:
+  workflow_call:
+    outputs:
+      skip-tests:
+        description: "Whether to skip test execution"
+        value: ${{ jobs.check-overrides.outputs.skip-tests }}
+      skip-validation:
+        description: "Whether to skip validation/linting"
+        value: ${{ jobs.check-overrides.outputs.skip-validation }}
+      skip-ci:
+        description: "Whether to skip CI entirely"
+        value: ${{ jobs.check-overrides.outputs.skip-ci }}
+      skip-build:
+        description: "Whether to skip build steps"
+        value: ${{ jobs.check-overrides.outputs.skip-build }}
+      commit-message:
+        description: "The commit message(s) analyzed"
+        value: ${{ jobs.check-overrides.outputs.commit-message }}
   push:
     branches: [main, master, develop]
   pull_request:
