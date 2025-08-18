@@ -1,107 +1,709 @@
 [
   {
-    "name": "bug",
     "color": "d73a49",
-    "description": "Something isn't working"
+    "description": "Something isn't working",
+    "id": "LA_kwDOO7oZus8AAAACC3Fjsg",
+    "name": "bug"
   },
   {
-    "name": "enhancement",
-    "color": "a2eeef",
-    "description": "New feature or request"
-  },
-  {
-    "name": "documentation",
     "color": "0075ca",
-    "description": "Improvements or additions to documentation"
+    "description": "Improvements or additions to documentation",
+    "id": "LA_kwDOO7oZus8AAAACC3Fjvg",
+    "name": "documentation"
   },
   {
-    "name": "good first issue",
-    "color": "7057ff",
-    "description": "Good for newcomers"
-  },
-  {
-    "name": "help wanted",
-    "color": "008672",
-    "description": "Extra attention is needed"
-  },
-  {
-    "name": "duplicate",
     "color": "cfd3d7",
-    "description": "This issue or pull request already exists"
+    "description": "This issue or pull request already exists",
+    "id": "LA_kwDOO7oZus8AAAACC3Fjxw",
+    "name": "duplicate"
   },
   {
-    "name": "invalid",
+    "color": "a2eeef",
+    "description": "New feature or request",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj0A",
+    "name": "enhancement"
+  },
+  {
+    "color": "7057ff",
+    "description": "Good for newcomers",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj5A",
+    "name": "good first issue"
+  },
+  {
+    "color": "008672",
+    "description": "Extra attention is needed",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj2g",
+    "name": "help wanted"
+  },
+  {
     "color": "e4e669",
-    "description": "This doesn't seem right"
+    "description": "This doesn't seem right",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj7Q",
+    "name": "invalid"
   },
   {
-    "name": "question",
     "color": "d876e3",
-    "description": "Further information is requested"
+    "description": "Further information is requested",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj9w",
+    "name": "question"
   },
   {
-    "name": "wontfix",
     "color": "ffffff",
-    "description": "This will not be worked on"
+    "description": "This will not be worked on",
+    "id": "LA_kwDOO7oZus8AAAACC3Fj_w",
+    "name": "wontfix"
   },
   {
-    "name": "priority-high",
-    "color": "b60205",
-    "description": "High priority issue"
-  },
-  {
-    "name": "priority-medium",
-    "color": "fbca04",
-    "description": "Medium priority issue"
-  },
-  {
-    "name": "priority-low",
-    "color": "0e8a16",
-    "description": "Low priority issue"
-  },
-  {
-    "name": "security",
-    "color": "d93f0b",
-    "description": "Security-related issue"
-  },
-  {
-    "name": "breaking-change",
-    "color": "c5000b",
-    "description": "Introduces a breaking change"
-  },
-  {
-    "name": "dependencies",
     "color": "0366d6",
-    "description": "Pull requests that update a dependency file"
+    "description": "Pull requests that update a dependency file",
+    "id": "LA_kwDOO7oZus8AAAACD6LM5w",
+    "name": "dependencies"
   },
   {
-    "name": "ci/cd",
-    "color": "0052cc",
-    "description": "Continuous integration and deployment"
+    "color": "ff6b9d",
+    "description": "Created or modified by AI/automation agents",
+    "id": "LA_kwDOO7oZus8AAAACD7qKew",
+    "name": "codex"
   },
   {
-    "name": "testing",
-    "color": "1d76db",
-    "description": "Related to testing"
+    "color": "2088ff",
+    "description": "GitHub Actions related work",
+    "id": "LA_kwDOO7oZus8AAAACE35zDw",
+    "name": "github-actions"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACE56P2w", "name": "bugfix" },
+  {
+    "color": "d93f0b",
+    "description": "Security-related issue",
+    "id": "LA_kwDOO7oZus8AAAACE_Fx4Q",
+    "name": "security"
   },
   {
-    "name": "refactoring",
+    "color": "1f883d",
+    "description": "Automation scripts and tools",
+    "id": "LA_kwDOO7oZus8AAAACE_Fyrg",
+    "name": "automation"
+  },
+  {
     "color": "f9d0c4",
-    "description": "Code refactoring"
+    "description": "gcommon refactoring work",
+    "id": "LA_kwDOO7oZus8AAAACE_Fy0A",
+    "name": "gcommon-refactor"
   },
   {
-    "name": "performance",
     "color": "ff9500",
-    "description": "Performance improvements"
+    "description": "Performance improvements",
+    "id": "LA_kwDOO7oZus8AAAACE_FzFA",
+    "name": "performance"
   },
   {
-    "name": "ui/ux",
+    "color": "fff3cd",
+    "description": "Needs code review",
+    "id": "LA_kwDOO7oZus8AAAACE_FzKg",
+    "name": "needs-review"
+  },
+  {
+    "color": "7057ff",
+    "description": "Good for newcomers",
+    "id": "LA_kwDOO7oZus8AAAACE_FzTA",
+    "name": "good-first-issue"
+  },
+  {
+    "color": "008672",
+    "description": "Extra attention is needed",
+    "id": "LA_kwDOO7oZus8AAAACE_FzXw",
+    "name": "help-wanted"
+  },
+  {
+    "color": "d73a49",
+    "description": "Critical priority - immediate attention required",
+    "id": "LA_kwDOO7oZus8AAAACFCmdWA",
+    "name": "priority:critical"
+  },
+  {
+    "color": "d93f0b",
+    "description": "High priority",
+    "id": "LA_kwDOO7oZus8AAAACFCmdbg",
+    "name": "priority:high"
+  },
+  {
+    "color": "fbca04",
+    "description": "Medium priority",
+    "id": "LA_kwDOO7oZus8AAAACFCmdiQ",
+    "name": "priority:medium"
+  },
+  {
+    "color": "0e8a16",
+    "description": "Low priority",
+    "id": "LA_kwDOO7oZus8AAAACFCmdow",
+    "name": "priority:low"
+  },
+  {
+    "color": "c2e0c6",
+    "description": "Small change (1-2 hours)",
+    "id": "LA_kwDOO7oZus8AAAACFCmdvw",
+    "name": "size:small"
+  },
+  {
+    "color": "d73a49",
+    "description": "Epic change (multiple days/weeks)",
+    "id": "LA_kwDOO7oZus8AAAACFCmeBw",
+    "name": "size:epic"
+  },
+  {
+    "color": "f9d0c4",
+    "description": "Large change (1-2 days)",
+    "id": "LA_kwDOO7oZus8AAAACFCmd8w",
+    "name": "size:large"
+  },
+  {
+    "color": "bfd4f2",
+    "description": "Medium change (half day)",
+    "id": "LA_kwDOO7oZus8AAAACFCmd2w",
+    "name": "size:medium"
+  },
+  {
+    "color": "d73a49",
+    "description": "Something isn't working",
+    "id": "LA_kwDOO7oZus8AAAACFCmeKQ",
+    "name": "type:bug"
+  },
+  {
+    "color": "0075ca",
+    "description": "Improvements or additions to documentation",
+    "id": "LA_kwDOO7oZus8AAAACFCmefw",
+    "name": "type:documentation"
+  },
+  {
+    "color": "a2eeef",
+    "description": "Improvement to existing feature",
+    "id": "LA_kwDOO7oZus8AAAACFCmeYA",
+    "name": "type:enhancement"
+  },
+  {
+    "color": "0052cc",
+    "description": "New feature development",
+    "id": "LA_kwDOO7oZus8AAAACFCmePQ",
+    "name": "type:feature"
+  },
+  {
+    "color": "f1c232",
+    "description": "Code refactoring without feature changes",
+    "id": "LA_kwDOO7oZus8AAAACFCmexg",
+    "name": "type:refactor"
+  },
+  {
+    "color": "ee0701",
+    "description": "Security related issues",
+    "id": "LA_kwDOO7oZus8AAAACFCmetQ",
+    "name": "type:security"
+  },
+  {
+    "color": "1d76db",
+    "description": "Testing related work",
+    "id": "LA_kwDOO7oZus8AAAACFCmelw",
+    "name": "type:testing"
+  },
+  {
+    "color": "d4edda",
+    "description": "Work in progress",
+    "id": "LA_kwDOO7oZus8AAAACFCmfCw",
+    "name": "status:in-progress"
+  },
+  {
+    "color": "ffffff",
+    "description": "To do - not started",
+    "id": "LA_kwDOO7oZus8AAAACFCme9A",
+    "name": "status:todo"
+  },
+  {
+    "color": "6c757d",
+    "description": "Maintenance and housekeeping",
+    "id": "LA_kwDOO7oZus8AAAACFCme3g",
+    "name": "type:maintenance"
+  },
+  {
+    "color": "f8d7da",
+    "description": "Blocked by external dependencies",
+    "id": "LA_kwDOO7oZus8AAAACFCmfPQ",
+    "name": "status:blocked"
+  },
+  {
+    "color": "fff3cd",
+    "description": "Needs code review",
+    "id": "LA_kwDOO7oZus8AAAACFCmfXA",
+    "name": "status:needs-review"
+  },
+  {
+    "color": "c3e6cb",
+    "description": "Ready for implementation",
+    "id": "LA_kwDOO7oZus8AAAACFCmfbA",
+    "name": "status:ready"
+  },
+  {
+    "color": "0052cc",
+    "description": "Authentication and authorization",
+    "id": "LA_kwDOO7oZus8AAAACFCmf8A",
+    "name": "module:auth"
+  },
+  {
+    "color": "6f42c1",
+    "description": "Duplicate issue",
+    "id": "LA_kwDOO7oZus8AAAACFCmfjA",
+    "name": "status:duplicate"
+  },
+  {
+    "color": "6c757d",
+    "description": "This will not be worked on",
+    "id": "LA_kwDOO7oZus8AAAACFCmfxw",
+    "name": "status:wontfix"
+  },
+  {
+    "color": "5319e7",
+    "description": "Caching and data storage",
+    "id": "LA_kwDOO7oZus8AAAACFCmgHg",
+    "name": "module:cache"
+  },
+  {
+    "color": "006b75",
+    "description": "Configuration management",
+    "id": "LA_kwDOO7oZus8AAAACFCmgRA",
+    "name": "module:config"
+  },
+  {
+    "color": "fd7e14",
+    "description": "Database related work",
+    "id": "LA_kwDOO7oZus8AAAACFCmgaA",
+    "name": "module:database"
+  },
+  {
+    "color": "6f42c1",
+    "description": "Metrics collection and monitoring",
+    "id": "LA_kwDOO7oZus8AAAACFCmgdA",
+    "name": "module:metrics"
+  },
+  {
     "color": "e99695",
-    "description": "User interface and user experience"
+    "description": "Message queuing and task management",
+    "id": "LA_kwDOO7oZus8AAAACFCmgeg",
+    "name": "module:queue"
   },
   {
-    "name": "merge-conflict",
     "color": "b60205",
-    "description": "Pull request has merge conflicts"
+    "description": "Web services and HTTP handling",
+    "id": "LA_kwDOO7oZus8AAAACFCmgjQ",
+    "name": "module:web"
+  },
+  {
+    "color": "0366d6",
+    "description": "API development and changes",
+    "id": "LA_kwDOO7oZus8AAAACFCmg2Q",
+    "name": "module:api"
+  },
+  {
+    "color": "343a40",
+    "description": "Backend development",
+    "id": "LA_kwDOO7oZus8AAAACFCmg9Q",
+    "name": "module:backend"
+  },
+  {
+    "color": "495057",
+    "description": "User interface development",
+    "id": "LA_kwDOO7oZus8AAAACFCmgsQ",
+    "name": "module:ui"
+  },
+  {
+    "color": "6c757d",
+    "description": "Frontend development",
+    "id": "LA_kwDOO7oZus8AAAACFCmhDQ",
+    "name": "module:frontend"
+  },
+  {
+    "color": "00add8",
+    "description": "Go programming language",
+    "id": "LA_kwDOO7oZus8AAAACFCmhKg",
+    "name": "tech:go"
+  },
+  {
+    "color": "3572a5",
+    "description": "Python programming language",
+    "id": "LA_kwDOO7oZus8AAAACFCmhPg",
+    "name": "tech:python"
+  },
+  {
+    "color": "bfd4f2",
+    "description": "gRPC service implementations",
+    "id": "LA_kwDOO7oZus8AAAACFCmhww",
+    "name": "tech:grpc"
+  },
+  {
+    "color": "f1e05a",
+    "description": "JavaScript programming language",
+    "id": "LA_kwDOO7oZus8AAAACFCmhYQ",
+    "name": "tech:javascript"
+  },
+  {
+    "color": "c5def5",
+    "description": "Protocol buffer definitions",
+    "id": "LA_kwDOO7oZus8AAAACFCmhnQ",
+    "name": "tech:protobuf"
+  },
+  {
+    "color": "3178c6",
+    "description": "TypeScript programming language",
+    "id": "LA_kwDOO7oZus8AAAACFCmheQ",
+    "name": "tech:typescript"
+  },
+  {
+    "color": "2496ed",
+    "description": "Docker containerization",
+    "id": "LA_kwDOO7oZus8AAAACFCmh0A",
+    "name": "tech:docker"
+  },
+  {
+    "color": "326ce5",
+    "description": "Kubernetes orchestration",
+    "id": "LA_kwDOO7oZus8AAAACFCmh5g",
+    "name": "tech:kubernetes"
+  },
+  {
+    "color": "89e051",
+    "description": "Shell scripting (bash, sh)",
+    "id": "LA_kwDOO7oZus8AAAACFCmiBA",
+    "name": "tech:shell"
+  },
+  {
+    "color": "1f883d",
+    "description": "Automation and tooling",
+    "id": "LA_kwDOO7oZus8AAAACFCmiKw",
+    "name": "workflow:automation"
+  },
+  {
+    "color": "28a745",
+    "description": "Continuous integration and deployment",
+    "id": "LA_kwDOO7oZus8AAAACFCmiZw",
+    "name": "workflow:ci-cd"
+  },
+  {
+    "color": "2088ff",
+    "description": "GitHub Actions workflows",
+    "id": "LA_kwDOO7oZus8AAAACFCmiUg",
+    "name": "workflow:github-actions"
+  },
+  {
+    "color": "e99695",
+    "description": "Issue tracking and management",
+    "id": "LA_kwDOO7oZus8AAAACFCmiow",
+    "name": "issue-management"
+  },
+  {
+    "color": "0366d6",
+    "description": "Deployment and release management",
+    "id": "LA_kwDOO7oZus8AAAACFCmieg",
+    "name": "workflow:deployment"
+  },
+  {
+    "color": "ffa8a8",
+    "description": "Audio transcription features",
+    "id": "LA_kwDOO7oZus8AAAACFCmi7Q",
+    "name": "project:transcription"
+  },
+  {
+    "color": "ff6b6b",
+    "description": "Whisper ASR integration",
+    "id": "LA_kwDOO7oZus8AAAACFCmizQ",
+    "name": "project:whisper"
+  },
+  {
+    "color": "74c0fc",
+    "description": "Media processing and handling",
+    "id": "LA_kwDOO7oZus8AAAACFCmjGQ",
+    "name": "project:media"
+  },
+  {
+    "color": "4c956c",
+    "description": "Subtitle processing and conversion",
+    "id": "LA_kwDOO7oZus8AAAACFCmjOQ",
+    "name": "project:subtitles"
+  },
+  {
+    "color": "f9d0c4",
+    "description": "gcommon refactor initiative",
+    "id": "LA_kwDOO7oZus8AAAACFCmjXQ",
+    "name": "project:gcommon-refactor"
+  },
+  {
+    "color": "6f42c1",
+    "description": "GitHub project management and workflows",
+    "id": "LA_kwDOO7oZus8AAAACFCmjiw",
+    "name": "project:github-management"
+  },
+  {
+    "color": "c5def5",
+    "description": "Protocol buffer implementation work",
+    "id": "LA_kwDOO7oZus8AAAACFCmjbw",
+    "name": "project:protobuf-implementation"
+  },
+  {
+    "color": "c5000b",
+    "description": "Introduces a breaking change",
+    "id": "LA_kwDOO7oZus8AAAACFCmjzQ",
+    "name": "breaking-change"
+  },
+  {
+    "color": "e4b429",
+    "description": "Depends on external systems or libraries",
+    "id": "LA_kwDOO7oZus8AAAACFCmj5w",
+    "name": "external-dependency"
+  },
+  {
+    "color": "e99695",
+    "description": "Issue management and tracking workflows",
+    "id": "LA_kwDOO7oZus8AAAACFCmjqw",
+    "name": "project:issue-management"
+  },
+  {
+    "color": "b60205",
+    "description": "High priority issue",
+    "id": "LA_kwDOO7oZus8AAAACFIuY6A",
+    "name": "priority-high"
+  },
+  {
+    "color": "0052cc",
+    "description": "Continuous integration and deployment",
+    "id": "LA_kwDOO7oZus8AAAACFIuY_w",
+    "name": "ci/cd"
+  },
+  {
+    "color": "0e8a16",
+    "description": "Low priority issue",
+    "id": "LA_kwDOO7oZus8AAAACFIuY-Q",
+    "name": "priority-low"
+  },
+  {
+    "color": "fbca04",
+    "description": "Medium priority issue",
+    "id": "LA_kwDOO7oZus8AAAACFIuY8Q",
+    "name": "priority-medium"
+  },
+  {
+    "color": "f9d0c4",
+    "description": "Code refactoring",
+    "id": "LA_kwDOO7oZus8AAAACFIuZBw",
+    "name": "refactoring"
+  },
+  {
+    "color": "1d76db",
+    "description": "Related to testing",
+    "id": "LA_kwDOO7oZus8AAAACFIuZAg",
+    "name": "testing"
+  },
+  {
+    "color": "e99695",
+    "description": "User interface and user experience",
+    "id": "LA_kwDOO7oZus8AAAACFIuZEg",
+    "name": "ui/ux"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcCXQ", "name": "community" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcCkg",
+    "name": "version-control"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcClQ", "name": "workflows" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcClw",
+    "name": "collaboration"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDFA", "name": "ci" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDFQ", "name": "issues" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDWw", "name": "api" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcDXw",
+    "name": "compatibility"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDXA", "name": "versioning" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDhg", "name": "changelog" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcDhQ", "name": "release" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcECA", "name": "backup" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcECQ",
+    "name": "disaster-recovery"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcECg",
+    "name": "reliability"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcENg", "name": "real-time" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcENw", "name": "teamwork" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcEUg",
+    "name": "benchmarking"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFLw", "name": "audit" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFLg", "name": "compliance" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFMA", "name": "enterprise" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFaA", "name": "refactor" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFxw", "name": "feature" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcFyQ", "name": "ui" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcGCA",
+    "name": "integration-testing"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcGCw",
+    "name": "quality-assurance"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcGXQ", "name": "cleanup" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcGdQ", "name": "e2e" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcG9Q",
+    "name": "accessibility"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcG9g", "name": "i18n" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcHHw", "name": "validation" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcHSg",
+    "name": "architecture"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcHTA", "name": "python" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcHWQ", "name": "quality" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcHmQ",
+    "name": "marketplace"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcHmg", "name": "templates" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcHwg",
+    "name": "observability"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcI2Q", "name": "examples" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcJPA", "name": "workflow" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcJ3Q", "name": "planning" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcJ8Q", "name": "dogfooding" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcKbA", "name": "ai" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcKaw",
+    "name": "machine-learning"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcKbQ",
+    "name": "optimization"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcL1w",
+    "name": "developer-experience"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcMKw", "name": "apps" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcMLQ",
+    "name": "cross-platform"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcMKg", "name": "mobile" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcMkQ", "name": "analytics" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcMkw",
+    "name": "business-intelligence"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcMlg", "name": "metrics" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcM1g",
+    "name": "containerization"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcM2A", "name": "devops" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcM1Q", "name": "docker" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNFw",
+    "name": "advanced-features"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNFg",
+    "name": "orchestration"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNLQ",
+    "name": "infrastructure"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNlQ",
+    "name": "high-priority"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcNyA", "name": "debugging" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNzA",
+    "name": "developer-tools"
+  },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACFwcNyg",
+    "name": "troubleshooting"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACFwcN-Q", "name": "test" },
+  {
+    "color": "b60205",
+    "description": "Pull request has merge conflicts",
+    "id": "LA_kwDOO7oZus8AAAACGxotmw",
+    "name": "merge-conflict"
+  },
+  {
+    "color": "B60205",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACHbdBOA",
+    "name": "auto-generated"
+  },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACHtzzwg", "name": "size/M" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACHtz3CQ", "name": "tests" },
+  { "color": "ededed", "description": "", "id": "LA_kwDOO7oZus8AAAACHt0Dxw", "name": "size/L" },
+  {
+    "color": "ededed",
+    "description": "",
+    "id": "LA_kwDOO7oZus8AAAACIADC7Q",
+    "name": "needs-triage"
   }
 ]
