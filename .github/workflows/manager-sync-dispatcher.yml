@@ -15,6 +15,7 @@ on:
       - '.github/workflows/**'
       - '.github/instructions/**'
       - '.github/prompts/**'
+      - '.github/scripts/**'
       - 'scripts/**'
       - '.github/linters/**'
       - 'labels.json'
@@ -32,6 +33,7 @@ on:
           - instructions
           - prompts
           - scripts
+          - github-scripts
           - linters
           - labels
       target_repos:
@@ -92,6 +94,8 @@ jobs:
                 SYNC_TYPE="instructions"
               elif echo "$CHANGED_FILES" | grep -q "^\.github/prompts/"; then
                 SYNC_TYPE="prompts"
+              elif echo "$CHANGED_FILES" | grep -q "^\.github/scripts/"; then
+                SYNC_TYPE="github-scripts"
               elif echo "$CHANGED_FILES" | grep -q "^scripts/"; then
                 SYNC_TYPE="scripts"
               elif echo "$CHANGED_FILES" | grep -q "^\.github/linters/"; then

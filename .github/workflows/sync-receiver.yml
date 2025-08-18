@@ -46,6 +46,7 @@ jobs:
           mkdir -p .github/prompts
           mkdir -p scripts
           mkdir -p .github/linters
+          mkdir -p .github/scripts
 
           case "$sync_type" in
             "all"|"workflows")
@@ -63,9 +64,15 @@ jobs:
               echo "Syncing prompts..."
               cp -r ghcommon-source/.github/prompts/* .github/prompts/ 2>/dev/null || true
               ;;&
-            "all"|"scripts")
+            "all"|"scripts"|"github-scripts")
               echo "Syncing scripts..."
-              cp -r ghcommon-source/scripts/* scripts/ 2>/dev/null || true
+              if [ "$sync_type" = "scripts" ] || [ "$sync_type" = "all" ]; then
+                cp -r ghcommon-source/scripts/* scripts/ 2>/dev/null || true
+              fi
+              if [ "$sync_type" = "github-scripts" ] || [ "$sync_type" = "all" ]; then
+                # Also sync .github/scripts for workflow support scripts
+                cp -r ghcommon-source/.github/scripts/* .github/scripts/ 2>/dev/null || true
+              fi
               ;;&
             "all"|"linters")
               echo "Syncing linters..."
