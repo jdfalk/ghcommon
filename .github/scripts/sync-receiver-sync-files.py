@@ -126,8 +126,8 @@ def sync_scripts():
     # Scripts to exclude from sync (master dispatcher scripts)
     excluded_scripts = {
         "sync-determine-target-repos.py",
-        "sync-dispatch-events.py", 
-        "sync-generate-summary.py"
+        "sync-dispatch-events.py",
+        "sync-generate-summary.py",
     }
 
     # Copy GitHub scripts (excluding master dispatcher scripts)
