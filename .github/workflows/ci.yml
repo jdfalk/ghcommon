@@ -1,10 +1,6 @@
 # file: .github/workflows/ci.yml
-# version: 1.2.2
+# version: 1.3.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
-
-# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
-# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
-# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/ci.yml
 
 name: Continuous Integration
 
@@ -34,9 +30,10 @@ permissions:
   actions: read
 
 jobs:
-  # Check for commit message overrides first
+  # Check for commit override flags
   check-overrides:
-    uses: ./.github/workflows/commit-override-handler.yml
+    name: Check Commit Overrides
+    uses: jdfalk/gcommon/.github/workflows/commit-override-handler.yml@main
 
   # Detect what files changed to optimize workflow execution
   detect-changes:
@@ -64,6 +61,52 @@ jobs:
         id: filter
         with:
           filters: |
+            go:
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - '**/go.mod'
+              - '**/go.sum'
+            frontend:
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.vue'
+              - '**/*.svelte'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'yarn.lock'
+              - 'pnpm-lock.yaml'
+              - '**/package.json'
+              - 'webui/**'
+            python:
+              - '**/*.py'
+              - 'requirements.txt'
+              - 'pyproject.toml'
+              - 'setup.py'
+              - 'setup.cfg'
+              - 'Pipfile'
+              - 'poetry.lock'
+            rust:
+              - '**/*.rs'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - '**/Cargo.toml'
+              - '**/Cargo.lock'
+            docker:
+              - 'Dockerfile*'
+              - 'docker-compose*.yml'
+              - 'docker-compose*.yaml'
+              - '.dockerignore'
+            docs:
+              - '**/*.md'
+              - 'docs/**'
+              - '**/*.rst'
+              - '**/*.txt'
+            workflows:
+              - '.github/workflows/**'
+              - '.github/actions/**'
             go:
               - '**/*.go'
               - 'go.mod'
@@ -135,8 +178,8 @@ jobs:
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
-    needs: [check-overrides, detect-changes]
-    if: needs.detect-changes.outputs.should-lint == 'true' && needs.check-overrides.outputs.skip-validation != 'true'
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.should-lint == 'true'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
@@ -238,8 +281,8 @@ jobs:
   test-go:
     name: Test Go
     runs-on: ubuntu-latest
-    needs: [check-overrides, detect-changes, lint]
-    if: needs.detect-changes.outputs.go == 'true' && needs.check-overrides.outputs.skip-tests != 'true'
+    needs: [detect-changes, lint]
+    if: needs.detect-changes.outputs.go == 'true'
     strategy:
       matrix:
         go-version: ["1.22", "1.23", "1.24"]
@@ -288,8 +331,8 @@ jobs:
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
-    needs: [check-overrides, detect-changes, lint]
-    if: needs.detect-changes.outputs.frontend == 'true' && needs.check-overrides.outputs.skip-tests != 'true'
+    needs: [detect-changes, lint]
+    if: needs.detect-changes.outputs.frontend == 'true'
     strategy:
       matrix:
         node-version: ["20", "22", "24"]
@@ -581,25 +624,31 @@ jobs:
           name: combined-coverage-report
           path: coverage-artifacts/
 
-  # Matrix build system (uses the reusable workflow)
+  # Run matrix build workflow if needed
   matrix-build:
     name: Matrix Build
-    needs: [check-overrides, detect-changes]
-    if: needs.detect-changes.outputs.should-build == 'true' && needs.check-overrides.outputs.skip-build != 'true'
-    uses: ./.github/workflows/reusable-matrix-build.yml
-    with:
-      rust-versions: '["1.75", "1.76", "1.77"]'
-      enable-protobuf: true
-      enable-docker: true
-      skip-tests: ${{ needs.check-overrides.outputs.skip-tests == 'true' }}
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.should-build == 'true'
+    uses: ./.github/workflows/matrix-build.yml
+    secrets: inherit
 
   # Final status check
   ci-status:
     name: CI Status
     runs-on: ubuntu-latest
-    needs: [check-overrides, detect-changes, lint, test-go, test-frontend, test-python, test-rust, security-scan, build, matrix-build]
+    needs:
+      [
+        check-overrides,
+        detect-changes,
+        lint,
+        test-go,
+        test-frontend,
+        test-python,
+        test-rust,
+        security-scan,
+        build,
+        matrix-build,
+      ]
     if: always() && needs.check-overrides.outputs.skip-ci != 'true'
     steps:
       - name: Check CI status
