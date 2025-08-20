@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# version: 1.3.0
+# version: 1.5.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -26,8 +26,10 @@ env:
   CACHE_VERSION: "v1"
 
 permissions:
-  contents: read
-  actions: read
+  contents: write
+  actions: write
+  checks: write
+  packages: write
 
 jobs:
   # Check for commit override flags
@@ -74,12 +76,19 @@ jobs:
               - '**/*.tsx'
               - '**/*.vue'
               - '**/*.svelte'
+              - '**/*.css'
+              - '**/*.scss'
+              - '**/*.sass'
+              - '**/*.html'
               - 'package.json'
               - 'package-lock.json'
               - 'yarn.lock'
               - 'pnpm-lock.yaml'
               - '**/package.json'
+              - '**/package-lock.json'
+              - '**/yarn.lock'
               - 'webui/**'
+              - 'frontend/**'
             python:
               - '**/*.py'
               - 'requirements.txt'
@@ -88,6 +97,10 @@ jobs:
               - 'setup.cfg'
               - 'Pipfile'
               - 'poetry.lock'
+              - '**/requirements.txt'
+              - '**/pyproject.toml'
+              - '**/setup.py'
+              - '**/Pipfile'
             rust:
               - '**/*.rs'
               - 'Cargo.toml'
@@ -96,57 +109,19 @@ jobs:
               - '**/Cargo.lock'
             docker:
               - 'Dockerfile*'
+              - '**/Dockerfile*'
               - 'docker-compose*.yml'
               - 'docker-compose*.yaml'
-              - '.dockerignore'
-            docs:
-              - '**/*.md'
-              - 'docs/**'
-              - '**/*.rst'
-              - '**/*.txt'
-            workflows:
-              - '.github/workflows/**'
-              - '.github/actions/**'
-            go:
-              - '**/*.go'
-              - 'go.mod'
-              - 'go.sum'
-              - '**/go.mod'
-              - '**/go.sum'
-            frontend:
-              - 'webui/**'
-              - 'frontend/**'
-              - '**/package.json'
-              - '**/package-lock.json'
-              - '**/yarn.lock'
-              - '**/*.js'
-              - '**/*.ts'
-              - '**/*.jsx'
-              - '**/*.tsx'
-              - '**/*.vue'
-              - '**/*.css'
-              - '**/*.scss'
-              - '**/*.sass'
-              - '**/*.html'
-            python:
-              - '**/*.py'
-              - '**/requirements.txt'
-              - '**/pyproject.toml'
-              - '**/setup.py'
-              - '**/Pipfile'
-            rust:
-              - '**/*.rs'
-              - '**/Cargo.toml'
-              - '**/Cargo.lock'
-            docker:
-              - '**/Dockerfile*'
               - '**/docker-compose*.yml'
               - '**/docker-compose*.yaml'
+              - '.dockerignore'
               - '**/.dockerignore'
             docs:
               - '**/*.md'
+              - 'docs/**'
               - '**/docs/**'
               - '**/*.rst'
+              - '**/*.txt'
             workflows:
               - '.github/workflows/**'
               - '.github/actions/**'
@@ -228,8 +203,10 @@ jobs:
 
           # Auto-fix settings - use FIX_ instead of VALIDATE_ whenever possible
           FIX_GO: ${{ needs.detect-changes.outputs.go }}
+          FIX_GO_MODULES: ${{ needs.detect-changes.outputs.go }}
           FIX_JAVASCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
           FIX_JAVASCRIPT_PRETTIER: ${{ needs.detect-changes.outputs.frontend }}
+          FIX_JSX_PRETTIER: ${{ needs.detect-changes.outputs.frontend }}
           FIX_TYPESCRIPT_ES: ${{ needs.detect-changes.outputs.frontend }}
           FIX_TYPESCRIPT_PRETTIER: ${{ needs.detect-changes.outputs.frontend }}
           FIX_PYTHON_BLACK: ${{ needs.detect-changes.outputs.python }}
@@ -241,13 +218,19 @@ jobs:
           FIX_RUST_CLIPPY: ${{ needs.detect-changes.outputs.rust }}
 
           # Auto-fix these always
-          FIX_MARKDOWN: true
+          FIX_MARKDOWN_PRETTIER: true
           FIX_JSON_PRETTIER: true
           FIX_SHELL_SHFMT: true
+          FIX_CSS_PRETTIER: true
+          FIX_GITHUB_ACTIONS_ZIZMOR: true
+          FIX_HTML_PRETTIER: true
+          FIX_JSONC_PRETTIER: true
+          FIX_PROTOBUF: true
+          FIX_YAML_PRETTIER: true
 
           # Only validate these (no FIX_ option available)
-          VALIDATE_YAML: true
-          VALIDATE_GITHUB_ACTIONS: true
+          #   VALIDATE_YAML: true
+          #   VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_DOCKERFILE_HADOLINT: ${{ needs.detect-changes.outputs.docker }}
           VALIDATE_GITLEAKS: true
 
