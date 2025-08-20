@@ -287,6 +287,17 @@
 				"-m",
 				"fix(sync): exclude ghcommon from sync target repositories\n\nRemoved jdfalk/gcommon from the default repository list in the manager sync dispatcher to prevent ghcommon from syncing to itself.\n\nFiles changed:\n- .github/workflows/manager-sync-dispatcher.yml - Updated DEFAULT_REPOS to exclude jdfalk/gcommon\n- .github/workflows/reusable-matrix-build.yml - Removed obsolete workflow file"
 			]
+		},
+		{
+			"label": "Git Commit PAT Fix",
+			"type": "shell",
+			"command": "copilot-agent-util",
+			"args": [
+				"git",
+				"commit",
+				"-m",
+				"fix(sync): use correct PAT and environment variables\n\nFixed the manager sync dispatcher to use the correct Personal Access Token (JF_CI_GH_PAT) with fallback to GITHUB_TOKEN, and moved all GitHub context variables to environment variables for consistency.\n\nFiles changed:\n- .github/workflows/manager-sync-dispatcher.yml - Updated to use JF_CI_GH_PAT and env variables throughout"
+			]
 		}
 	],
 	"inputs": [
