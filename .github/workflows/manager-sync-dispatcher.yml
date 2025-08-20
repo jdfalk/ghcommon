@@ -45,6 +45,17 @@ permissions:
   contents: read
   actions: write
 
+env:
+  # Use PAT for cross-repository dispatch, fallback to GITHUB_TOKEN
+  DISPATCH_TOKEN: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
+  SOURCE_REPO: ${{ github.repository }}
+  SOURCE_SHA: ${{ github.sha }}
+  EVENT_NAME: ${{ github.event_name }}
+  ACTOR: ${{ github.actor }}
+  BEFORE_SHA: ${{ github.event.before }}
+  INPUT_SYNC_TYPE: ${{ github.event.inputs.sync_type }}
+  INPUT_TARGET_REPOS: ${{ github.event.inputs.target_repos }}
+
 jobs:
   dispatch-sync:
     name: Dispatch Sync to Repositories
@@ -66,26 +77,26 @@ jobs:
           # Default repository list - include all target repositories except ghcommon itself
           DEFAULT_REPOS="jdfalk/subtitle-manager,jdfalk/audiobook-organizer,jdfalk/copilot-agent-util-rust,jdfalk/apt-cacher-go"
 
-          if [ "${{ github.event.inputs.target_repos }}" = "auto" ] || [ -z "${{ github.event.inputs.target_repos }}" ]; then
+          if [ "$INPUT_TARGET_REPOS" = "auto" ] || [ -z "$INPUT_TARGET_REPOS" ]; then
             echo "repos=$DEFAULT_REPOS" >> $GITHUB_OUTPUT
             echo "Using default repository list: $DEFAULT_REPOS"
           else
-            echo "repos=${{ github.event.inputs.target_repos }}" >> $GITHUB_OUTPUT
-            echo "Using custom repository list: ${{ github.event.inputs.target_repos }}"
+            echo "repos=$INPUT_TARGET_REPOS" >> $GITHUB_OUTPUT
+            echo "Using custom repository list: $INPUT_TARGET_REPOS"
           fi
 
       - name: Determine sync type
         id: sync-type
         run: |
-          SYNC_TYPE="${{ github.event.inputs.sync_type }}"
+          SYNC_TYPE="$INPUT_SYNC_TYPE"
 
           if [ -z "$SYNC_TYPE" ] || [ "$SYNC_TYPE" = "all" ]; then
             # Auto-detect based on changed files for push events
-            if [ "${{ github.event_name }}" = "push" ]; then
+            if [ "$EVENT_NAME" = "push" ]; then
               echo "Auto-detecting sync type based on changed files..."
 
               # Get changed files
-              CHANGED_FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.sha }})
+              CHANGED_FILES=$(git diff --name-only $BEFORE_SHA..$SOURCE_SHA)
               echo "Changed files: $CHANGED_FILES"
 
               if echo "$CHANGED_FILES" | grep -q "^\.github/workflows/"; then
@@ -128,19 +139,19 @@ jobs:
 
             echo "Dispatching to $repo..."
 
-            # Create repository dispatch event
+            # Create repository dispatch event using the PAT
             curl -X POST \
               -H "Accept: application/vnd.github.v3+json" \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Authorization: token $DISPATCH_TOKEN" \
               "https://api.github.com/repos/$repo/dispatches" \
               -d "{
                 \"event_type\": \"sync-from-ghcommon\",
                 \"client_payload\": {
                   \"sync_type\": \"$SYNC_TYPE\",
-                  \"source_repo\": \"${{ github.repository }}\",
-                  \"source_sha\": \"${{ github.sha }}\",
-                  \"triggered_by\": \"${{ github.event_name }}\",
-                  \"actor\": \"${{ github.actor }}\"
+                  \"source_repo\": \"$SOURCE_REPO\",
+                  \"source_sha\": \"$SOURCE_SHA\",
+                  \"triggered_by\": \"$EVENT_NAME\",
+                  \"actor\": \"$ACTOR\"
                 }
               }" || echo "Failed to dispatch to $repo (repository may not exist or may not have sync-receiver workflow)"
 
@@ -153,6 +164,6 @@ jobs:
           echo "## 🔄 Sync Dispatch Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Sync Type:** ${{ steps.sync-type.outputs.sync_type }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Target Repositories:** ${{ steps.repos.outputs.repos }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source SHA:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Triggered By:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source SHA:** $SOURCE_SHA" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered By:** $EVENT_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor:** $ACTOR" >> $GITHUB_STEP_SUMMARY
