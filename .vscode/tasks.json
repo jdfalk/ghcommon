@@ -276,6 +276,17 @@
 			],
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Git Commit Fix Sync",
+			"type": "shell",
+			"command": "copilot-agent-util",
+			"args": [
+				"git",
+				"commit",
+				"-m",
+				"fix(sync): exclude ghcommon from sync target repositories\n\nRemoved jdfalk/gcommon from the default repository list in the manager sync dispatcher to prevent ghcommon from syncing to itself.\n\nFiles changed:\n- .github/workflows/manager-sync-dispatcher.yml - Updated DEFAULT_REPOS to exclude jdfalk/gcommon\n- .github/workflows/reusable-matrix-build.yml - Removed obsolete workflow file"
+			]
 		}
 	],
 	"inputs": [
