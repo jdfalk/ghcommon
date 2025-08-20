@@ -63,8 +63,8 @@ jobs:
       - name: Create repositories list
         id: repos
         run: |
-          # Default repository list - include all target repositories
-          DEFAULT_REPOS="jdfalk/subtitle-manager,jdfalk/audiobook-organizer,jdfalk/copilot-agent-util-rust,jdfalk/gcommon,jdfalk/apt-cacher-go"
+          # Default repository list - include all target repositories except ghcommon itself
+          DEFAULT_REPOS="jdfalk/subtitle-manager,jdfalk/audiobook-organizer,jdfalk/copilot-agent-util-rust,jdfalk/apt-cacher-go"
 
           if [ "${{ github.event.inputs.target_repos }}" = "auto" ] || [ -z "${{ github.event.inputs.target_repos }}" ]; then
             echo "repos=$DEFAULT_REPOS" >> $GITHUB_OUTPUT
