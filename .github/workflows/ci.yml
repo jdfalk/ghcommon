@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# version: 1.8.0
+# version: 1.9.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -469,42 +469,28 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-changes]
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-      has-languages: ${{ steps.set-matrix.outputs.has-languages }}
+      matrix: ${{ steps.determine.outputs.matrix }}
+      has-languages: ${{ steps.determine.outputs.has-languages }}
+      language-count: ${{ steps.determine.outputs.language-count }}
+      languages: ${{ steps.determine.outputs.languages }}
     steps:
-      - name: Set security scan matrix
-        id: set-matrix
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine security scan languages
+        id: determine
+        env:
+          GO_CHANGED: ${{ needs.detect-changes.outputs.go }}
+          FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend }}
+          PYTHON_CHANGED: ${{ needs.detect-changes.outputs.python }}
+          RUST_CHANGED: ${{ needs.detect-changes.outputs.rust }}
         run: |
-          languages=()
-          if [[ "${{ needs.detect-changes.outputs.go }}" == "true" ]]; then
-            languages+=("go")
-          fi
-          if [[ "${{ needs.detect-changes.outputs.frontend }}" == "true" ]]; then
-            languages+=("javascript")
-          fi
-          if [[ "${{ needs.detect-changes.outputs.python }}" == "true" ]]; then
-            languages+=("python")
-          fi
-          if [[ "${{ needs.detect-changes.outputs.rust }}" == "true" ]]; then
-            languages+=("rust")
-          fi
-
-          if [ ${#languages[@]} -eq 0 ]; then
-            matrix='{"include":[]}'
-            has_languages="false"
-            echo "No languages with changes detected for security scanning"
-          else
-            # Build JSON array for matrix
-            language_json=$(printf '"%s",' "${languages[@]}")
-            language_json="[${language_json%,}]"
-            matrix="{\"language\":${language_json}}"
-            has_languages="true"
-            echo "Languages for security scanning: ${languages[*]}"
-          fi
-
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
-          echo "has-languages=$has_languages" >> $GITHUB_OUTPUT
-          echo "Generated matrix: $matrix"
+          python .github/scripts/determine-security-languages.py
 
   # Security scanning with CodeQL
   security-scan:
