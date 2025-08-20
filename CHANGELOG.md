@@ -4,7 +4,6 @@
 
 - [file: CHANGELOG.md](#file-changelog-md)
   - [Table of Contents](#table-of-contents)
-- [Changelog](#changelog)
   - [[Unreleased]](#-unreleased)
     - [Added](#added)
     - [Fixed](#fixed)

@@ -4,7 +4,6 @@
 
 - [file: CONTRIBUTING.md](#file-contributing-md)
   - [Table of Contents](#table-of-contents)
-- [Contributing to GitHub Common Workflows](#contributing-to-github-common-workflows)
   - [Code of Conduct](#code-of-conduct)
   - [How to Contribute](#how-to-contribute)
     - [Reporting Issues](#reporting-issues)
