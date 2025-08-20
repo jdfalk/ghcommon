@@ -488,7 +488,7 @@ jobs:
           if [[ "${{ needs.detect-changes.outputs.rust }}" == "true" ]]; then
             languages+=("rust")
           fi
-          
+
           if [ ${#languages[@]} -eq 0 ]; then
             matrix='{"include":[]}'
             has_languages="false"
@@ -501,7 +501,7 @@ jobs:
             has_languages="true"
             echo "Languages for security scanning: ${languages[*]}"
           fi
-          
+
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
           echo "has-languages=$has_languages" >> $GITHUB_OUTPUT
           echo "Generated matrix: $matrix"
