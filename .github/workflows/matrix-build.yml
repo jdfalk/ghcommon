@@ -208,11 +208,11 @@ jobs:
               print('No tests found in this repository. This is a configuration/shared repository.')
               print('Creating a placeholder test result to avoid failure.')
               with open('coverage.xml', 'w') as f:
-                  f.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n')
-                  f.write('<coverage version=\"0.0\" timestamp=\"0\" lines-valid=\"1\" lines-covered=\"1\" line-rate=\"1.0\">\n')
-                  f.write('  <sources><source>.</source></sources>\n')
-                  f.write('  <packages></packages>\n')
-                  f.write('</coverage>\n')
+                  f.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>' + '\\n')
+                  f.write('<coverage version=\"0.0\" timestamp=\"0\" lines-valid=\"1\" lines-covered=\"1\" line-rate=\"1.0\">' + '\\n')
+                  f.write('  <sources><source>.</source></sources>' + '\\n')
+                  f.write('  <packages></packages>' + '\\n')
+                  f.write('</coverage>' + '\\n')
           "
 
       - name: Upload coverage (primary only)
