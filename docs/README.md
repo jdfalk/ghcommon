@@ -80,6 +80,7 @@ This directory contains auto-generated documentation for this project.
 - [](repo-comparison-chart.md)
 - [Codex Rebase Quick Reference](scripts/CODEX-REBASE-GUIDE.md)
 - [Repository Cleanup Tool](scripts/README-cleanup-tool.md)
+- [file: scripts/README-notifications.md](scripts/README-notifications.md)
 - [Smart Rebase Automation Documentation](scripts/README-rebase.md)
 - [Unified GitHub Project Manager](scripts/README-unified-project-manager.md)
 - [Scripts Directory](scripts/README.md)
@@ -89,4 +90,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Wed Aug 20 14:50:31 UTC 2025_
+_Generated on Thu Aug 21 17:55:07 UTC 2025_
