@@ -57,7 +57,7 @@ jobs:
         run: |
           python3 -c "
           import os
-          
+
           # Check for Dockerfiles
           dockerfile_paths = ['Dockerfile', 'docker/Dockerfile', 'build/Dockerfile']
           dockerfile_path = 'Dockerfile'
@@ -65,7 +65,7 @@ jobs:
               if os.path.exists(path):
                   dockerfile_path = path
                   break
-          
+
           should_build = 'true'
           print(f'dockerfile-path={dockerfile_path}')
           print(f'should-build={should_build}')
