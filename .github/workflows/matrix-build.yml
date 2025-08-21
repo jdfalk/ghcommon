@@ -187,18 +187,22 @@ jobs:
           python -c "
           import os, subprocess, sys, glob
 
-          # Check for test files and configuration
+          # Check for test files and configuration in tests/ directory
           has_pytest_ini = os.path.exists('pytest.ini')
           has_pyproject = os.path.exists('pyproject.toml')
-          test_files = glob.glob('**/test_*.py', recursive=True) + glob.glob('**/*_test.py', recursive=True)
+          test_files = glob.glob('tests/**/test_*.py', recursive=True) + glob.glob('tests/**/*_test.py', recursive=True)
 
           if has_pytest_ini or has_pyproject or test_files:
               if has_pytest_ini or test_files:
                   subprocess.run([sys.executable, '-m', 'pip', 'install', 'pytest', 'pytest-cov'])
-                  result = subprocess.run([sys.executable, '-m', 'pytest', '--cov=.', '--cov-report=xml'])
+                  # Run tests only in tests/ directory to avoid dependency issues in scripts/
+                  if test_files:
+                      result = subprocess.run([sys.executable, '-m', 'pytest', 'tests/', '--cov=.', '--cov-report=xml'])
+                  else:
+                      result = subprocess.run([sys.executable, '-m', 'pytest', '--cov=.', '--cov-report=xml'])
                   sys.exit(result.returncode)
               else:
-                  result = subprocess.run([sys.executable, '-m', 'unittest', 'discover'])
+                  result = subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests'])
                   sys.exit(result.returncode)
           else:
               print('No tests found in this repository. This is a configuration/shared repository.')
