@@ -52,6 +52,7 @@ This directory contains auto-generated documentation for this project.
 - [Test Generation Prompt](.github/prompts/test-generation.prompt.md)
 - [GitHub Scripts](.github/scripts/README.md)
 - [Security Guidelines for Reusable Workflows](.github/security-guidelines.md)
+- [Last updated: Thu Aug 21 14:13:52 EDT 2025](.github/workflow-status.md)
 - [AGENTS.md](AGENTS.md)
 - [file: CHANGELOG.md](CHANGELOG.md)
 - [Commitlint Setup](COMMITLINT_SETUP.md)
@@ -90,4 +91,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Thu Aug 21 17:55:07 UTC 2025_
+_Generated on Thu Aug 21 18:14:30 UTC 2025_
