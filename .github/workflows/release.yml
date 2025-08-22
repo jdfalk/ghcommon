@@ -1,5 +1,5 @@
 # file: .github/workflows/release.yml
-# version: 3.0.0
+# version: 3.1.0
 # guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c
 
 name: Release Coordinator
@@ -182,6 +182,21 @@ jobs:
           go-version: "1.23"
           cache: false
 
+      - name: Install Protocol Buffers Compiler (protoc)
+        run: |
+          echo "Installing protoc..."
+          # Install protoc from GitHub releases
+          PROTOC_VERSION="28.2"
+          curl -LO "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip"
+          unzip -q protoc-${PROTOC_VERSION}-linux-x86_64.zip -d protoc
+          sudo mv protoc/bin/protoc /usr/local/bin/
+          sudo mv protoc/include/* /usr/local/include/
+          sudo chmod +x /usr/local/bin/protoc
+          rm -rf protoc protoc-${PROTOC_VERSION}-linux-x86_64.zip
+          
+          # Verify protoc installation
+          protoc --version
+
       - name: Set up Buf
         uses: bufbuild/buf-setup-action@v1
         with:
@@ -194,26 +209,76 @@ jobs:
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
+          # Add Go bin to PATH
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          
           # Verify installations
           which protoc-gen-go
           which protoc-gen-go-grpc
           protoc-gen-go --version
           protoc-gen-go-grpc --version
 
+      - name: Install Python protobuf plugins
+        if: needs.detect-languages.outputs.has-python == 'true'
+        run: |
+          echo "Installing Python protobuf plugins..."
+          python -m pip install --upgrade pip
+          python -m pip install grpcio-tools mypy-protobuf
+          
+          # Verify installations
+          which protoc-gen-python
+          which protoc-gen-pyi || echo "protoc-gen-pyi installed via mypy-protobuf"
+
       - name: Generate protobuf code
         run: |
           python3 -c "
           import os, subprocess
+          
+          # Debug environment
+          print('Environment check:')
+          print(f'Working directory: {os.getcwd()}')
+          print(f'buf.gen.yaml exists: {os.path.exists(\"buf.gen.yaml\")}')
+          print(f'buf.yaml exists: {os.path.exists(\"buf.yaml\")}')
+          
+          # Check PATH and installed tools
+          print('\\nInstalled tools:')
+          subprocess.run(['which', 'protoc'])
+          subprocess.run(['which', 'buf'])
+          subprocess.run(['protoc', '--version'])
+          subprocess.run(['buf', '--version'])
+          
           if os.path.exists('buf.gen.yaml'):
-              print('Generating protobuf code with buf...')
+              print('\\nGenerating protobuf code with buf...')
+              with open('buf.gen.yaml', 'r') as f:
+                  print('buf.gen.yaml content:')
+                  print(f.read())
+              
               result = subprocess.run(['buf', 'generate'], capture_output=True, text=True)
+              print(f'buf generate stdout: {result.stdout}')
+              print(f'buf generate stderr: {result.stderr}')
               if result.returncode != 0:
-                  print('buf generate failed:', result.stderr)
+                  print('buf generate failed!')
                   exit(1)
               print('Generated protobuf code successfully')
           else:
               print('No buf.gen.yaml found, skipping generation')
           "
+
+      - name: Upload generated protobuf artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: protobuf-generated
+          path: |
+            pkg/**/*.pb.go
+            pkg/**/*_grpc.pb.go
+            pkg/**/*.py
+            pkg/**/*.pyi
+            **/*.pb.go
+            **/*_grpc.pb.go
+            **/*.py
+            **/*.pyi
+          if-no-files-found: ignore
 
       - name: Upload workflow info
         if: needs.detect-languages.outputs.has-go == 'true' || needs.detect-languages.outputs.has-python == 'true' || needs.detect-languages.outputs.has-frontend == 'true' || needs.detect-languages.outputs.has-docker == 'true' || needs.detect-languages.outputs.has-rust == 'true'
