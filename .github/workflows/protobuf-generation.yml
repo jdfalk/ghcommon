@@ -1,5 +1,5 @@
 # file: .github/workflows/protobuf-generation.yml
-# version: 1.0.0
+# version: 1.5.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 name: Protobuf Generation
@@ -137,29 +137,40 @@ jobs:
               print('No buf.gen.yaml found, skipping generation')
           "
 
+      - name: Run post-generation processing
+        if: always()
+        run: |
+          if [ -f "scripts/post-buf-generate.py" ]; then
+            echo "Running post-buf-generate.py..."
+            python3 scripts/post-buf-generate.py
+          else
+            echo "No post-buf-generate.py script found, skipping post-processing"
+          fi
+
       - name: Upload generated protobuf artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: protobuf-generated
           path: |
-            pkg/**/*.pb.go
-            pkg/**/*_grpc.pb.go
-            pkg/**/*.py
-            pkg/**/*.pyi
-            **/*.pb.go
-            **/*_grpc.pb.go
-            **/*.py
-            **/*.pyi
+            sdks/go/**/*.pb.go
+            sdks/go/**/*_grpc.pb.go
+            sdks/python/**/*.py
+            sdks/python/**/*.pyi
           if-no-files-found: ignore
 
       - name: Set artifacts available
         id: set-artifacts
         run: |
-          # Check if any protobuf files were generated
-          if find . -name "*.pb.go" -o -name "*_grpc.pb.go" -o -name "*.py" | grep -E "\.(pb\.go|_grpc\.pb\.go|\.py)$" > /dev/null 2>&1; then
+          # Check if any protobuf files were generated in the correct directories
+          if find sdks/go -name "*.pb.go" -o -name "*_grpc.pb.go" 2>/dev/null | head -1 | grep -q . || \
+             find sdks/python -name "*.py" -o -name "*.pyi" 2>/dev/null | head -1 | grep -q .; then
             echo "artifacts-available=true" >> $GITHUB_OUTPUT
             echo "Protobuf artifacts were generated"
+            echo "Generated Go files:"
+            find sdks/go -name "*.pb.go" -o -name "*_grpc.pb.go" 2>/dev/null | head -5
+            echo "Generated Python files:"
+            find sdks/python -name "*.py" -o -name "*.pyi" 2>/dev/null | head -5
           else
             echo "artifacts-available=false" >> $GITHUB_OUTPUT
             echo "No protobuf artifacts were generated"
