@@ -1,7 +1,6 @@
 # AI Automation Instructions
 
-This document provides comprehensive guidelines for AI-driven development work
-in this repository.
+This document provides comprehensive guidelines for AI-driven development work in this repository.
 
 ## Git Operations
 
@@ -38,8 +37,8 @@ Files changed:
 [optional footer with issue references]
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
-`ci`, `chore`, `revert`
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`,
+`revert`
 
 **Rules:**
 

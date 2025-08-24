@@ -2,15 +2,14 @@
 
 # Unified Issue Management Workflow
 
-A comprehensive, reusable GitHub Actions workflow for automated issue management
-across repositories.
+A comprehensive, reusable GitHub Actions workflow for automated issue management across
+repositories.
 
 ## Overview
 
-The Unified Issue Management workflow provides centralized, automated issue
-management capabilities that can be shared across multiple repositories. It
-consolidates multiple issue management operations into a single, efficient
-workflow.
+The Unified Issue Management workflow provides centralized, automated issue management capabilities
+that can be shared across multiple repositories. It consolidates multiple issue management
+operations into a single, efficient workflow.
 
 ## Workflow Architecture
 
@@ -19,16 +18,14 @@ workflow.
 - **Documentation**: This file (`docs/unified-issue-management.md`)
 - **Examples**: `/examples/workflows/issue-management-basic.yml` and
   `/examples/workflows/issue-management-advanced.yml`
-- **Legacy Workflow**: `reusable-issue-management.yml` (deprecated, use unified
-  version)
+- **Legacy Workflow**: `reusable-issue-management.yml` (deprecated, use unified version)
 
-**Important**: Always use the `reusable-unified-issue-management.yml` workflow,
-which is the canonical implementation with full feature support.
+**Important**: Always use the `reusable-unified-issue-management.yml` workflow, which is the
+canonical implementation with full feature support.
 
 ## Core Operations
 
-- **Issue Updates**: Process issue updates from JSON files (create, update,
-  comment, close, delete)
+- **Issue Updates**: Process issue updates from JSON files (create, update, comment, close, delete)
 - **Copilot Tickets**: Manage tickets for GitHub Copilot review comments
 - **Duplicate Management**: Automatically close duplicate issues by title
 - **Security Alerts**: Generate tickets for CodeQL security alerts
@@ -36,17 +33,14 @@ which is the canonical implementation with full feature support.
 
 ### Key Features
 
-- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both
-  UUID and legacy GUID identifiers
+- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both UUID and legacy GUID
+  identifiers
 - **Matrix-based Parallel Execution**: Run multiple operations efficiently
-- **Auto-detection**: Automatically determine which operations to run based on
-  context
-- **Distributed File Support**: Process both legacy single-file and modern
-  distributed formats
+- **Auto-detection**: Automatically determine which operations to run based on context
+- **Distributed File Support**: Process both legacy single-file and modern distributed formats
 - **Comprehensive Logging**: Detailed summaries and progress tracking
 - **Flexible Configuration**: Extensive customization options
-- **Automatic Archiving**: Processed files are moved to archive directories with
-  PR tracking
+- **Automatic Archiving**: Processed files are moved to archive directories with PR tracking
 
 ## File Management
 
@@ -55,12 +49,10 @@ which is the canonical implementation with full feature support.
 - **Original files**: `.github/issue-updates/*.json`
 - **Processed files**: `.github/issue-updates/processed/*.json`
 - **Archive tracking**: Automatic via PR creation
-- **Format**: Both files support dual-GUID format for enhanced duplicate
-  prevention
+- **Format**: Both files support dual-GUID format for enhanced duplicate prevention
 
-When distributed files are processed, they are automatically moved to the
-`processed/` subdirectory to prevent reprocessing. Both pending and processed
-files support the dual-GUID format:
+When distributed files are processed, they are automatically moved to the `processed/` subdirectory
+to prevent reprocessing. Both pending and processed files support the dual-GUID format:
 
 **Pending file example** (`.github/issue-updates/feature-123.json`):
 
@@ -96,13 +88,11 @@ files support the dual-GUID format:
 
 ### Advanced Features
 
-- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both
-  UUID and legacy GUID identifiers
+- **Dual-GUID Duplicate Prevention**: Prevent duplicate operations with both UUID and legacy GUID
+  identifiers
 - **Matrix-based Parallel Execution**: Run multiple operations efficiently
-- **Auto-detection**: Automatically determine which operations to run based on
-  context
-- **Distributed File Support**: Process both legacy single-file and modern
-  distributed formats
+- **Auto-detection**: Automatically determine which operations to run based on context
+- **Distributed File Support**: Process both legacy single-file and modern distributed formats
 - **Comprehensive Logging**: Detailed summaries and progress tracking
 - **Flexible Configuration**: Extensive customization options
 
@@ -110,8 +100,7 @@ files support the dual-GUID format:
 
 ### Basic Setup
 
-1. **Copy the basic example** to `.github/workflows/issue-management.yml` in
-   your repository:
+1. **Copy the basic example** to `.github/workflows/issue-management.yml` in your repository:
 
 ```yaml
 name: Issue Management
@@ -147,8 +136,7 @@ jobs:
 
 ### Issue Updates Format
 
-The workflow supports both legacy single-file and modern distributed file
-formats:
+The workflow supports both legacy single-file and modern distributed file formats:
 
 #### Distributed Format (Recommended)
 
@@ -182,12 +170,12 @@ Store individual issue updates in `.github/issue-updates/` directory:
 }
 ```
 
-Use the `parent` field when the issue number is unknown. Keep the `number` field
-set to `null` so it can be filled in later. The workflow resolves the parent
-GUID to the created issue number and updates the file during processing.
+Use the `parent` field when the issue number is unknown. Keep the `number` field set to `null` so it
+can be filled in later. The workflow resolves the parent GUID to the created issue number and
+updates the file during processing.
 
-Add a `repo` field to target another repository under the `jdfalk` account. Each
-repository should include the same workflows to process its updates.
+Add a `repo` field to target another repository under the `jdfalk` account. Each repository should
+include the same workflows to process its updates.
 
 #### Legacy Single-File Format (Still Supported)
 
@@ -272,8 +260,7 @@ Create an `issue_updates.json` file in your repository root:
 
 ### Auto-Detection Behavior
 
-When `operations: "auto"` (default), the workflow automatically determines which
-operations to run:
+When `operations: "auto"` (default), the workflow automatically determines which operations to run:
 
 - **Issue Updates File Present**: Runs `update-issues`
 - **Pull Request Events**: Runs `copilot-tickets`
@@ -319,8 +306,7 @@ on:
     inputs:
       operation:
         type: choice
-        options:
-          [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
+        options: [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
         required: true
       dry_run:
         type: boolean
@@ -337,8 +323,8 @@ jobs:
 
 ## Dual-GUID Duplicate Prevention
 
-The workflow supports dual-GUID tracking for enhanced duplicate prevention and
-migration compatibility:
+The workflow supports dual-GUID tracking for enhanced duplicate prevention and migration
+compatibility:
 
 ### Modern Format (Dual-GUID)
 
@@ -400,16 +386,13 @@ The workflow uses both GUIDs for comprehensive duplicate detection:
 1. **Primary Check**: Compares `guid` field (UUID-based)
 2. **Fallback Check**: Compares `legacy_guid` field if primary GUID not found
 3. **Content Check**: Compares title and action type for additional safety
-4. **Migration Support**: Handles files being migrated from legacy to dual-GUID
-   format
+4. **Migration Support**: Handles files being migrated from legacy to dual-GUID format
 
 ### Dual-GUID Best Practices
 
 1. **Use UUIDs for new entries**: Generate UUID v4 for the `guid` field
-2. **Keep legacy GUIDs descriptive**: When migrating, preserve human-readable
-   legacy GUIDs
-3. **Migration strategy**: Use migration tools to convert legacy single-GUID to
-   dual-GUID format
+2. **Keep legacy GUIDs descriptive**: When migrating, preserve human-readable legacy GUIDs
+3. **Migration strategy**: Use migration tools to convert legacy single-GUID to dual-GUID format
 4. **Unique identifiers**: Never reuse either GUID across different operations
 5. **Backward compatibility**: Support both formats during transition periods
 
@@ -503,8 +486,8 @@ The workflow automatically creates pull requests for file management operations:
 
 #### Processed Files Archive PR
 
-When distributed issue update files are processed, they are automatically moved
-to a `processed/` subdirectory and a PR is created:
+When distributed issue update files are processed, they are automatically moved to a `processed/`
+subdirectory and a PR is created:
 
 ```
 📦 Archive processed issue update files
@@ -517,8 +500,7 @@ Summary:
 
 #### Legacy File Updates PR
 
-When using legacy `issue_updates.json` files, a separate PR is created with
-permalinks:
+When using legacy `issue_updates.json` files, a separate PR is created with permalinks:
 
 ```
 🔗 Update issue tracking with permalinks
@@ -557,8 +539,7 @@ Processed Files: 3 files moved to archive
 
 ## Sub-Issues Support
 
-The workflow supports creating sub-issues (child issues) that are linked to
-parent issues:
+The workflow supports creating sub-issues (child issues) that are linked to parent issues:
 
 ### Creating a Sub-Issue
 
@@ -621,13 +602,11 @@ Created sub-issue #456:
 
 For issues, questions, or contributions:
 
-1. **Check existing issues** in the
-   [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
+1. **Check existing issues** in the [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
 2. **Create a new issue** with the `issue-management` label
 3. **Include workflow logs** and configuration for debugging
 4. **Provide minimal reproduction** steps when possible
 
 ## License
 
-This workflow is part of the ghcommon repository and follows the same license
-terms.
+This workflow is part of the ghcommon repository and follows the same license terms.

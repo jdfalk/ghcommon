@@ -26,8 +26,8 @@
 
 ### Fixed
 
-- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs,
-  and validates entire codebase
+- Ensure Super Linter auto-fixes issues, pushes commits, runs before other jobs, and validates
+  entire codebase
 
 ### Added
 
@@ -40,8 +40,7 @@
 
 ### Changed
 
-- **BREAKING**: Super Linter now defaults to concise output mode (shows only
-  issues/changes)
+- **BREAKING**: Super Linter now defaults to concise output mode (shows only issues/changes)
 - Improved Super Linter error extraction and presentation
 - Restructured Super Linter PR comments to be more actionable
 - Updated Super Linter configuration to reduce verbose processing logs
@@ -50,8 +49,7 @@
 
 ### Fixed
 
-- Fixed verbose Super Linter output showing all processed files instead of just
-  issues
+- Fixed verbose Super Linter output showing all processed files instead of just issues
 - Fixed poor formatting in Super Linter summaries and comments
 - Fixed unhelpful configuration dumps in final summaries
 
@@ -64,8 +62,7 @@
 - Added initial queue module protobuf definitions
 - Added logging protobuf definitions
 - Added comprehensive manual unified automation workflow options
-- Added unified automation orchestrator workflow with extensive customization
-  options
+- Added unified automation orchestrator workflow with extensive customization options
 - Common system prompt file for AI rebase workflow
 - AI rebase workflow now uses file-based prompts to avoid long command lines
 - Added manual workflow_dispatch trigger for unified automation
@@ -86,8 +83,7 @@
 
 ### Removed
 
-- Deprecated custom add-to-project workflows in favor of GitHub's built-in
-  project automation
+- Deprecated custom add-to-project workflows in favor of GitHub's built-in project automation
 
 ## [1.0.0] - 2025-06-14
 

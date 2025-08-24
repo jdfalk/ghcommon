@@ -213,5 +213,14 @@ label_categories:
       "module:web",
       "module:ui",
     ]
-  workflows: ["workflow:automation", "workflow:github-actions", "workflow:ci-cd", "workflow:deployment"]
-  special: ["security", "performance", "breaking-change", "good first issue", "help wanted", "dependencies"]
+  workflows:
+    ["workflow:automation", "workflow:github-actions", "workflow:ci-cd", "workflow:deployment"]
+  special:
+    [
+      "security",
+      "performance",
+      "breaking-change",
+      "good first issue",
+      "help wanted",
+      "dependencies",
+    ]

@@ -1,21 +1,19 @@
 # Label Synchronization Workflow
 
-A comprehensive GitHub Actions workflow for standardizing labels across multiple
-repositories from a central configuration.
+A comprehensive GitHub Actions workflow for standardizing labels across multiple repositories from a
+central configuration.
 
 ## Overview
 
-The Label Synchronization workflow provides centralized label management that
-automatically syncs a standard set of labels from the ghcommon repository to
-target repositories. This ensures consistency across all your projects.
+The Label Synchronization workflow provides centralized label management that automatically syncs a
+standard set of labels from the ghcommon repository to target repositories. This ensures consistency
+across all your projects.
 
 ## Workflow Architecture
 
-- **Canonical Workflow**:
-  `jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main`
+- **Canonical Workflow**: `jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main`
 - **Configuration**: `labels.json` (JSON array of label definitions)
-- **Repository List**: `repositories.txt` (optional file listing target
-  repositories)
+- **Repository List**: `repositories.txt` (optional file listing target repositories)
 - **Examples**: `/examples/workflows/label-sync-basic.yml` and
   `/examples/workflows/label-sync-advanced.yml`
 
@@ -23,8 +21,7 @@ target repositories. This ensures consistency across all your projects.
 
 ### Basic Setup
 
-1. **Copy the basic example** to `.github/workflows/label-sync.yml` in your
-   repository:
+1. **Copy the basic example** to `.github/workflows/label-sync.yml` in your repository:
 
 ```yaml
 name: Sync Labels from ghcommon
@@ -204,8 +201,8 @@ permissions:
   pull-requests: read # For API access validation
 ```
 
-**Note**: The `GITHUB_TOKEN` automatically has sufficient permissions to manage
-labels in repositories where the workflow runs.
+**Note**: The `GITHUB_TOKEN` automatically has sufficient permissions to manage labels in
+repositories where the workflow runs.
 
 ## Operational Modes
 
@@ -312,8 +309,7 @@ The default configuration includes these categories:
 
 ## Integration with Issue Management
 
-The label sync workflow integrates well with the existing issue management
-system:
+The label sync workflow integrates well with the existing issue management system:
 
 ```yaml
 # Combined workflow example
@@ -378,13 +374,11 @@ delete-extra-labels: true
 
 For issues, questions, or contributions:
 
-1. **Check existing issues** in the
-   [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
+1. **Check existing issues** in the [ghcommon repository](https://github.com/jdfalk/ghcommon/issues)
 2. **Create a new issue** with the `label-sync` label
 3. **Include workflow logs** and configuration for debugging
 4. **Provide minimal reproduction** steps when possible
 
 ## License
 
-This workflow is part of the ghcommon repository and follows the same license
-terms.
+This workflow is part of the ghcommon repository and follows the same license terms.

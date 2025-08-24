@@ -6,8 +6,8 @@
 
 # Linter Configuration Files
 
-This directory contains configuration files for Super Linter, which provides
-comprehensive code quality checks across multiple languages.
+This directory contains configuration files for Super Linter, which provides comprehensive code
+quality checks across multiple languages.
 
 ## 🔧 Configuration Files
 
@@ -27,8 +27,7 @@ These configurations enforce the coding standards defined in our style guides:
 
 - **Python**: Follows Google Python Style Guide with 80-character line length
 - **Shell**: Follows Google Shell Style Guide
-- **Markdown**: Follows Google Markdown Style Guide with 100-character line
-  length
+- **Markdown**: Follows Google Markdown Style Guide with 100-character line length
 - **JavaScript/TypeScript**: Modern ES2022 standards with TypeScript support
 - **CSS**: Standard CSS formatting with consistent spacing and naming
 - **YAML**: Standard YAML formatting with proper indentation
@@ -36,8 +35,8 @@ These configurations enforce the coding standards defined in our style guides:
 
 ## 🚀 Usage in Workflows
 
-These files are automatically used by the Super Linter workflow
-(`reusable-super-linter.yml`) when linting is enabled in CI/CD pipelines.
+These files are automatically used by the Super Linter workflow (`reusable-super-linter.yml`) when
+linting is enabled in CI/CD pipelines.
 
 ### ✨ New: Improved Output Options
 
@@ -98,8 +97,7 @@ You can use these configurations locally by:
 
 ## Integration
 
-The Super Linter workflow integrates these configurations automatically and
-provides:
+The Super Linter workflow integrates these configurations automatically and provides:
 
 - ✅ Comprehensive multi-language linting
 - 🔧 **Auto-fixing for supported languages**

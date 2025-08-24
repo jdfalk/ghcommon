@@ -345,7 +345,15 @@ jobs:
   security-report:
     name: Security Report
     runs-on: ubuntu-latest
-    needs: [codeql-analysis, dependency-scan, docker-security, secret-scan, license-check, security-policy]
+    needs:
+      [
+        codeql-analysis,
+        dependency-scan,
+        docker-security,
+        secret-scan,
+        license-check,
+        security-policy,
+      ]
     if: always()
     steps:
       - name: Create security summary

@@ -4,8 +4,8 @@
 
 # Security Guidelines for Reusable Workflows
 
-This document provides security guidelines that GitHub Copilot should follow
-when recommending or implementing the reusable workflows in this repository.
+This document provides security guidelines that GitHub Copilot should follow when recommending or
+implementing the reusable workflows in this repository.
 
 ## General Security Principles
 

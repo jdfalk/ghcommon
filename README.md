@@ -100,40 +100,34 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 
 ### Supporting Tools
 
-- **Enhanced Documentation Update System**: Comprehensive JSON-driven
-  documentation update workflow with templates, automation, and conflict
-  resolution\n - Advanced Python script with multiple update modes and
-  templates\n - Automated workflow processing with PR creation and archival\n -
-  Support for changelogs, TODO lists, README sections, and badge updates\n -
-  Interactive mode and dry-run capabilities for safe operations\n - Complete
-  documentation and usage examples in
+- **Enhanced Documentation Update System**: Comprehensive JSON-driven documentation update workflow
+  with templates, automation, and conflict resolution\n - Advanced Python script with multiple
+  update modes and templates\n - Automated workflow processing with PR creation and archival\n -
+  Support for changelogs, TODO lists, README sections, and badge updates\n - Interactive mode and
+  dry-run capabilities for safe operations\n - Complete documentation and usage examples in
   [docs/documentation-updates.md](docs/documentation-updates.md)
 
 - **Setup Scripts**: Automated repository configuration
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project
-  workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been
+  removed.
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project
-  workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project
-  workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been
+  removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been
+  removed.
 - **Project Automation**: Script to create GitHub Projects via CLI
-- GitHub Projects automation now uses built-in features. Custom add-to-project
-  workflows have been removed.
-- GitHub Projects automation now uses built-in features. Custom add-to-project
-  workflows have been removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been
+  removed.
+- GitHub Projects automation now uses built-in features. Custom add-to-project workflows have been
+  removed.
 - **Validation Tools**: Repository readiness verification
 - **Copilot Instructions**: AI-assisted workflow implementation
 - **Security Guidelines**: Best practices and compliance
-- **Advanced CodeQL Configuration**: Centralized config with automatic language
-  detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language
-  detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language
-  detection
-- **Advanced CodeQL Configuration**: Centralized config with automatic language
-  detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
+- **Advanced CodeQL Configuration**: Centralized config with automatic language detection
 
 ## 🔧 Core Features
 
@@ -289,10 +283,9 @@ chmod +x scripts/create-issue-update.sh
 ./scripts/create-issue-update.sh comment 123 "Testing completed successfully"
 ````
 
-**Documentation**:
-[docs/unified-issue-management.md](docs/unified-issue-management.md)
-**Documentation**: [docs/unified-automation.md](docs/unified-automation.md)
-**Examples**: [examples/workflows/](examples/workflows/)
+**Documentation**: [docs/unified-issue-management.md](docs/unified-issue-management.md)
+**Documentation**: [docs/unified-automation.md](docs/unified-automation.md) **Examples**:
+[examples/workflows/](examples/workflows/)
 
 ## 🛡️ Security Features
 
@@ -322,20 +315,15 @@ chmod +x scripts/create-issue-update.sh
 
 ### Setup Guides
 
-- [Repository Setup Guide](.github/repository-setup.md) - Complete setup
-  instructions
-- [Security Guidelines](.github/security-guidelines.md) - Security best
-  practices
+- [Repository Setup Guide](.github/repository-setup.md) - Complete setup instructions
+- [Security Guidelines](.github/security-guidelines.md) - Security best practices
 - [Workflow Usage](.github/workflow-usage.md) - Detailed workflow documentation
 
 ### Templates
 
-- [Complete CI/CD](templates/workflows/complete-ci-cd.yml) - Full pipeline
-  template
-- [Container Only](templates/workflows/container-only.yml) - Container-focused
-  template
-- [Library Release](templates/workflows/library-release.yml) - Package release
-  template
+- [Complete CI/CD](templates/workflows/complete-ci-cd.yml) - Full pipeline template
+- [Container Only](templates/workflows/container-only.yml) - Container-focused template
+- [Library Release](templates/workflows/library-release.yml) - Package release template
 
 ## 🚦 Validation
 
@@ -355,8 +343,7 @@ This will check:
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our
-[Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -368,20 +355,18 @@ We welcome contributions! Please see our
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
-for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🆘 Support
 
 - **Issues**: [GitHub Issues](https://github.com/jdfalk/ghcommon/issues)
-- **Discussions**:
-  [GitHub Discussions](https://github.com/jdfalk/ghcommon/discussions)
+- **Discussions**: [GitHub Discussions](https://github.com/jdfalk/ghcommon/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting security issues
 
 ## 🏷️ Versioning
 
-This project uses [Semantic Versioning](https://semver.org/). See
-[CHANGELOG.md](CHANGELOG.md) for version history.
+This project uses [Semantic Versioning](https://semver.org/). See [CHANGELOG.md](CHANGELOG.md) for
+version history.
 
 ## 🙏 Acknowledgments
 
@@ -390,50 +375,45 @@ This project uses [Semantic Versioning](https://semver.org/). See
 - [Syft](https://github.com/anchore/syft) for SBOM generation
 - [Grype](https://github.com/anchore/grype) for vulnerability scanning
 - [Cosign](https://github.com/sigstore/cosign) for container signing
-- [Conventional Commits](https://www.conventionalcommits.org/) for commit
-  standards
+- [Conventional Commits](https://www.conventionalcommits.org/) for commit standards
 
-Automation note added Document built-in automation This repository now relies on
-GitHub's built-in project automation. Final automation note Builtin project
+Automation note added Document built-in automation This repository now relies on GitHub's built-in
+project automation. Final automation note Builtin project automation documented
+
+Doc update manager now supports `--ignore-errors` to continue processing even if an update fails.
+Automation note added Document built-in automation This repository now relies on GitHub's built-in
+project automation. Final automation note Builtin project automation documented
+
+- AI rebase workflow now uses file-based prompts for model inference
+
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
+Automation note added Document built-in automation This repository now relies on GitHub's built-in
+project automation. Final automation note Builtin project automation documented
+
+- AI rebase workflow now uses file-based prompts for model inference
+
+## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
+
+Automation note added Document built-in automation Added stale issue management workflow This
+repository now relies on GitHub's built-in project automation. Final automation note Builtin project
 automation documented
 
-Doc update manager now supports `--ignore-errors` to continue processing even if
-an update fails. Automation note added Document built-in automation This
-repository now relies on GitHub's built-in project automation. Final automation
-note Builtin project automation documented
-
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added Document built-in automation This repository now relies on
-GitHub's built-in project automation. Final automation note Builtin project
+Automation note added Document built-in automation Added stale issue management workflow This
+repository now relies on GitHub's built-in project automation. Final automation note Builtin project
 automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Automation note added Document built-in automation Added stale issue management
-workflow This repository now relies on GitHub's built-in project automation.
-Final automation note Builtin project automation documented
-
-- AI rebase workflow now uses file-based prompts for model inference
-
-## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-
-Automation note added Document built-in automation Added stale issue management
-workflow This repository now relies on GitHub's built-in project automation.
-Final automation note Builtin project automation documented
-
-- AI rebase workflow now uses file-based prompts for model inference
-
-## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
-
-Automation note added Document built-in automation Added stale issue management
-workflow This repository now relies on GitHub's built-in project automation.
-Final automation note Document shared AI rebase system prompt Builtin project
-automation documented
+Automation note added Document built-in automation Added stale issue management workflow This
+repository now relies on GitHub's built-in project automation. Final automation note Document shared
+AI rebase system prompt Builtin project automation documented
 
 - AI rebase workflow now uses file-based prompts for model inference
 
@@ -445,9 +425,9 @@ Added stale issue management workflow Document shared AI rebase system prompt
 
 ## AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase
 
-Fix doc update workflow syntax error Unified automation workflow can now be run
-manually via the Actions tab Added stale issue management workflow Document
-shared AI rebase system prompt Added auto-commit and push in rebase script
+Fix doc update workflow syntax error Unified automation workflow can now be run manually via the
+Actions tab Added stale issue management workflow Document shared AI rebase system prompt Added
+auto-commit and push in rebase script
 
 ## Protobuf Definitions
 

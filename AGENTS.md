@@ -4,13 +4,12 @@
 
 # AGENTS.md
 
-> **NOTE:** This is a pointer file. All detailed Copilot, agent, and workflow
-> instructions are in the [.github/](.github/) directory.
+> **NOTE:** This is a pointer file. All detailed Copilot, agent, and workflow instructions are in
+> the [.github/](.github/) directory.
 
 ## 🚨 CRITICAL: Documentation Update Protocol
 
-**NEVER edit markdown files directly. ALWAYS use the documentation update
-system:**
+**NEVER edit markdown files directly. ALWAYS use the documentation update system:**
 
 1. **Create GitHub Issue First** (if none exists):
 
@@ -37,8 +36,8 @@ system:**
    - Example: `--after "## Installation"` will insert content after that heading
    - **Malformed JSON error = missing `--after` parameter**
 
-4. **Link to Issue**: Every documentation change MUST reference a GitHub issue
-   for tracking and context.
+4. **Link to Issue**: Every documentation change MUST reference a GitHub issue for tracking and
+   context.
 
 **Common Modes:**
 
@@ -49,19 +48,15 @@ system:**
 - `changelog-entry` - Add changelog entry
 - `task-add` - Add TODO task
 
-**Failure to follow this protocol will result in workflow conflicts and lost
-changes.**
+**Failure to follow this protocol will result in workflow conflicts and lost changes.**
 
 ## ⚠️ CRITICAL: File Version Updates
 
-**When modifying any file with a version header, ALWAYS update the version
-number:**
+**When modifying any file with a version header, ALWAYS update the version number:**
 
 - **Patch version** (x.y.Z): Bug fixes, typos, minor formatting changes
-- **Minor version** (x.Y.z): New features, significant content additions,
-  template changes
-- **Major version** (X.y.z): Breaking changes, structural overhauls, format
-  changes
+- **Minor version** (x.Y.z): New features, significant content additions, template changes
+- **Major version** (X.y.z): Breaking changes, structural overhauls, format changes
 
 **Examples:**
 
@@ -69,8 +64,8 @@ number:**
 - Add new section: `1.2.3` → `1.3.0`
 - Change template structure: `1.2.3` → `2.0.0`
 
-**This applies to ALL files with version headers including documentation,
-templates, and configuration files.**
+**This applies to ALL files with version headers including documentation, templates, and
+configuration files.**
 
 ## Key Copilot/Agent Documents
 

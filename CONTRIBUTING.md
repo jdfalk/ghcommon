@@ -19,12 +19,11 @@
       - [Example Workflow Structure](#example-workflow-structure)
     - [Documentation Standards](#documentation-standards)
       - [File Headers](#file-headers)
-- [file: path/to/file.md](#file-path-to-file-md)
-      - [Structure](#structure)
-      - [Code Examples](#code-examples)
-    - [Testing](#testing)
-      - [Workflow Testing](#workflow-testing)
-      - [Script Testing](#script-testing)
+- [file: path/to/file.md](#file-path-to-file-md) - [Structure](#structure) -
+  [Code Examples](#code-examples)
+  - [Testing](#testing)
+    - [Workflow Testing](#workflow-testing)
+    - [Script Testing](#script-testing)
   - [Style Guidelines](#style-guidelines)
     - [YAML Workflows](#yaml-workflows)
     - [Shell Scripts](#shell-scripts)
@@ -43,8 +42,8 @@
 
 ## Code of Conduct
 
-This project adheres to a code of conduct that we expect all contributors to
-follow. Please be respectful and constructive in all interactions.
+This project adheres to a code of conduct that we expect all contributors to follow. Please be
+respectful and constructive in all interactions.
 
 ## How to Contribute
 

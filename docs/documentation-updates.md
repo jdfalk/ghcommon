@@ -4,27 +4,23 @@
 
 # Documentation Update System
 
-A comprehensive, automated system for managing documentation updates across
-repositories using JSON-driven update files and workflows.
+A comprehensive, automated system for managing documentation updates across repositories using
+JSON-driven update files and workflows.
 
 ## Overview
 
-The Documentation Update System provides a structured approach to updating
-documentation files like `README.md`, `CHANGELOG.md`, and `TODO.md` through
-automated workflows. Instead of directly editing documentation files, users
-create JSON update files that are processed by workflows.
+The Documentation Update System provides a structured approach to updating documentation files like
+`README.md`, `CHANGELOG.md`, and `TODO.md` through automated workflows. Instead of directly editing
+documentation files, users create JSON update files that are processed by workflows.
 
 ## System Architecture
 
 ### Components
 
-- **`create-doc-update.sh`**: Enhanced script for creating documentation update
-  files
-- **`doc_update_manager.py`**: Python processor that applies updates to target
-  files
+- **`create-doc-update.sh`**: Enhanced script for creating documentation update files
+- **`doc_update_manager.py`**: Python processor that applies updates to target files
 - **`reusable-docs-update.yml`**: Reusable GitHub Actions workflow
-- **`docs-update.yml`**: Repository-specific workflow that uses the reusable
-  workflow
+- **`docs-update.yml`**: Repository-specific workflow that uses the reusable workflow
 
 ### File Structure
 
@@ -115,8 +111,8 @@ Pre-built templates for common documentation patterns:
 
 ### For AI/Copilot Agents
 
-**AI agents and Copilot should ALWAYS use this system instead of directly
-editing documentation files.**
+**AI agents and Copilot should ALWAYS use this system instead of directly editing documentation
+files.**
 
 ```bash
 # Creating changelog entries during development

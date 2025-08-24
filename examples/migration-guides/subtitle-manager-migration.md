@@ -2,22 +2,20 @@
 
 # Migration Guide: subtitle-manager to Centralized Issue Management
 
-This guide shows how to migrate the subtitle-manager repository from its custom
-issue management workflow to the centralized reusable workflow in ghcommon.
+This guide shows how to migrate the subtitle-manager repository from its custom issue management
+workflow to the centralized reusable workflow in ghcommon.
 
 ## Overview
 
-The subtitle-manager repository currently has a sophisticated issue management
-system with:
+The subtitle-manager repository currently has a sophisticated issue management system with:
 
 - Advanced Python script (962 lines) with comprehensive functionality
 - Full workflow with matrix strategy and parallel execution
 - GUID-based duplicate prevention
-- Support for multiple operations (update-issues, copilot-tickets,
-  close-duplicates, codeql-alerts)
+- Support for multiple operations (update-issues, copilot-tickets, close-duplicates, codeql-alerts)
 
-We'll migrate this to use the centralized reusable workflow from ghcommon while
-preserving all functionality.
+We'll migrate this to use the centralized reusable workflow from ghcommon while preserving all
+functionality.
 
 ## Migration Steps
 
@@ -106,8 +104,7 @@ jobs:
 
 ### Step 3: Remove Local Script (Optional)
 
-Since the centralized workflow downloads its own copy of the script, you can
-remove the local copy:
+Since the centralized workflow downloads its own copy of the script, you can remove the local copy:
 
 ```bash
 # Remove the local script (it's now centralized in ghcommon)
@@ -152,8 +149,7 @@ rm -f .github/scripts/issue_manager.py
 Update any repository documentation that references the old workflow:
 
 1. **README.md**: Update any references to the issue management system
-2. **CONTRIBUTING.md**: Update contributor guidelines if they mention the
-   workflow
+2. **CONTRIBUTING.md**: Update contributor guidelines if they mention the workflow
 3. **docs/**: Update any technical documentation
 
 ## Benefits of Migration
@@ -248,7 +244,6 @@ If you encounter issues during migration:
 
 ## Conclusion
 
-This migration centralizes issue management while preserving all existing
-functionality. The subtitle-manager repository will now benefit from ongoing
-improvements to the centralized system while reducing its own maintenance
-burden.
+This migration centralizes issue management while preserving all existing functionality. The
+subtitle-manager repository will now benefit from ongoing improvements to the centralized system
+while reducing its own maintenance burden.

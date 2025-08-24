@@ -9,14 +9,13 @@ guid: 456e7890-f1a2-3b4c-5d6e-789012345678
 ## 🎯 Issues Addressed
 
 Based on feedback about the GitHub Action run at
-<https://github.com/jdfalk/subtitle-manager/actions/runs/16693240374>, the
-following improvements have been made to the reusable Super Linter workflow:
+<https://github.com/jdfalk/subtitle-manager/actions/runs/16693240374>, the following improvements
+have been made to the reusable Super Linter workflow:
 
 ### 1. **Verbose Output Problem**
 
 - **Issue**: Summary showed all processed files instead of just issues/changes
-- **Solution**: Added `show-detailed-summary` parameter (default: false) to
-  control verbosity
+- **Solution**: Added `show-detailed-summary` parameter (default: false) to control verbosity
 - **Result**: By default, only issues and changes are shown
 
 ### 2. **Poor Formatting**
@@ -128,11 +127,9 @@ lint:
 
 ## 📁 Example Workflows
 
-See `examples/workflows/super-linter-improved-example.yml` for complete examples
-of both modes.
+See `examples/workflows/super-linter-improved-example.yml` for complete examples of both modes.
 
 ## 🚀 Version History
 
-- **v2.4.0**: Added concise output mode, improved summaries, better error
-  presentation
+- **v2.4.0**: Added concise output mode, improved summaries, better error presentation
 - **v2.3.0**: Previous version with verbose output

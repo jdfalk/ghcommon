@@ -4,28 +4,23 @@
 
 # Dependency Submission and Pull Request Labeling
 
-This document explains how to use the enhanced CI workflows with dependency
-submission and automatic pull request labeling.
+This document explains how to use the enhanced CI workflows with dependency submission and automatic
+pull request labeling.
 
 ## Dependency Submission
 
-The reusable CI workflow now includes automatic dependency submission to
-GitHub's dependency graph, providing better security insights and Dependabot
-alerts.
+The reusable CI workflow now includes automatic dependency submission to GitHub's dependency graph,
+providing better security insights and Dependabot alerts.
 
 ### Features
 
-- **Go Dependency Submission**: Automatically detects and submits Go module
-  dependencies
-- **Conditional Execution**: Only runs on main branch pushes to avoid duplicate
-  submissions
-- **Flexible Configuration**: Can be enabled/disabled with the
-  `enable-dependency-submission` input
+- **Go Dependency Submission**: Automatically detects and submits Go module dependencies
+- **Conditional Execution**: Only runs on main branch pushes to avoid duplicate submissions
+- **Flexible Configuration**: Can be enabled/disabled with the `enable-dependency-submission` input
 
 ### Benefits
 
-1. **Security Insights**: Dependencies appear in your repository's dependency
-   graph
+1. **Security Insights**: Dependencies appear in your repository's dependency graph
 2. **Dependabot Alerts**: Get notified about vulnerable dependencies
 3. **Dependabot Updates**: Automatic pull requests for dependency updates
 4. **Compliance**: Better visibility into your software supply chain
@@ -82,8 +77,7 @@ The workflow supports enhanced authentication via Personal Access Token (PAT):
 
 - **Default**: Uses `github.token` (standard GitHub Actions token)
 - **Enhanced**: Uses `JF_CI_GH_PAT` repository secret if available
-- **Fallback**: Automatically falls back to `github.token` if PAT is not
-  configured
+- **Fallback**: Automatically falls back to `github.token` if PAT is not configured
 
 To use enhanced authentication:
 
@@ -101,8 +95,7 @@ Benefits of using PAT:
 
 ## Pull Request Labeling
 
-The new reusable labeler workflow automatically applies labels to pull requests
-based on:
+The new reusable labeler workflow automatically applies labels to pull requests based on:
 
 - Changed files (using glob patterns)
 - Branch names (using regex patterns)
@@ -111,22 +104,18 @@ based on:
 ### Features
 
 - **Automatic Labeling**: Labels are applied when PRs are opened or updated
-- **File-based Labels**: Different labels for documentation, backend, frontend,
-  etc.
+- **File-based Labels**: Different labels for documentation, backend, frontend, etc.
 - **Branch-based Labels**: Labels based on branch naming conventions
 - **Label Synchronization**: Optional removal of labels when files are reverted
-- **V5 Format**: Uses the latest labeler action with enhanced matching
-  capabilities
+- **V5 Format**: Uses the latest labeler action with enhanced matching capabilities
 
 ### Default Label Categories
 
 The included `.github/labeler.yml` provides labels for:
 
-- **File Types**: `documentation`, `config`, `backend`, `frontend`, `python`,
-  `tests`, `scripts`
+- **File Types**: `documentation`, `config`, `backend`, `frontend`, `python`, `tests`, `scripts`
 - **Dependencies**: `dependencies`, `security`
-- **Branch Types**: `feature`, `bugfix`, `release`, `maintenance`, `refactor`,
-  `performance`
+- **Branch Types**: `feature`, `bugfix`, `release`, `maintenance`, `refactor`, `performance`
 - **Special**: `breaking-change`, `release-ready`
 
 ### Usage
@@ -247,8 +236,7 @@ jobs:
 
 If upgrading from labeler v4, note these breaking changes:
 
-1. **Configuration Format**: New nested structure with `changed-files`,
-   `base-branch`, `head-branch`
+1. **Configuration Format**: New nested structure with `changed-files`, `base-branch`, `head-branch`
 2. **Default Dot Behavior**: Now includes dotfiles by default (`dot: true`)
 3. **Sync Labels**: Input name is now read correctly
 

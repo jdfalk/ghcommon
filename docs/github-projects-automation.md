@@ -4,28 +4,25 @@
 
 # GitHub Projects Automation
 
-This document describes the automated GitHub Projects integration setup across
-all repositories.
+This document describes the automated GitHub Projects integration setup across all repositories.
 
 ## Overview
 
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in
-project automation now handles issue and PR assignment. ⚠️ Note: Custom
-add-to-project workflows have been removed. GitHub's built-in project automation
-now handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows
-have been removed. GitHub's built-in project automation now handles issue and PR
-assignment. ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's
-built-in project automation now handles issue and PR assignment.
+⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now
+handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows have been removed.
+GitHub's built-in project automation now handles issue and PR assignment. ⚠️ Note: Custom
+add-to-project workflows have been removed. GitHub's built-in project automation now handles issue
+and PR assignment. ⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in
+project automation now handles issue and PR assignment.
 
-⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in
-project automation now handles issue and PR assignment. ⚠️ Note: Custom
-add-to-project workflows have been removed. GitHub's built-in project automation
-now handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows
-have been removed. GitHub's built-in project automation now handles issue and PR
-assignment.
+⚠️ Note: Custom add-to-project workflows have been removed. GitHub's built-in project automation now
+handles issue and PR assignment. ⚠️ Note: Custom add-to-project workflows have been removed.
+GitHub's built-in project automation now handles issue and PR assignment. ⚠️ Note: Custom
+add-to-project workflows have been removed. GitHub's built-in project automation now handles issue
+and PR assignment.
 
-We use a reusable workflow to automatically add issues and pull requests to
-GitHub Projects based on labels and repository context.
+We use a reusable workflow to automatically add issues and pull requests to GitHub Projects based on
+labels and repository context.
 
 ## Reusable Workflow
 
@@ -61,8 +58,7 @@ The main reusable workflow is located at:
 
 **Projects Used:**
 
-- **Subtitle Manager Development** (#5):
-  `https://github.com/users/jdfalk/projects/5`
+- **Subtitle Manager Development** (#5): `https://github.com/users/jdfalk/projects/5`
   - Triggers: All issues and PRs
 
 ### gcommon Repository
