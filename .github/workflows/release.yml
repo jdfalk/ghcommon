@@ -1,5 +1,5 @@
 # file: .github/workflows/release.yml
-# version: 3.2.1
+# version: 3.2.2
 # guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c
 
 name: Release Coordinator
@@ -78,69 +78,65 @@ env:
 jobs:
   # Detect what languages/technologies are present
   detect-languages:
-    name: Detect Project Languages
-    runs-on: ubuntu-latest
-    outputs:
-      has-go: ${{ steps.detect.outputs.has-go }}
-      has-python: ${{ steps.detect.outputs.has-python }}
-      has-frontend: ${{ steps.detect.outputs.has-frontend }}
-      has-docker: ${{ steps.detect.outputs.has-docker }}
-      has-rust: ${{ steps.detect.outputs.has-rust }}
-      protobuf-needed: ${{ steps.detect.outputs.protobuf-needed }}
-      primary-language: ${{ steps.detect.outputs.primary-language }}
-      go-matrix: ${{ steps.detect.outputs.go-matrix }}
-      python-matrix: ${{ steps.detect.outputs.python-matrix }}
-      frontend-matrix: ${{ steps.detect.outputs.frontend-matrix }}
-      docker-matrix: ${{ steps.detect.outputs.docker-matrix }}
-      registry: ${{ steps.env-setup.outputs.registry }}
-      image-name: ${{ steps.env-setup.outputs.image-name }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+    - name: Detect project languages and generate matrices
+    id: detect
+    run: |
+      # Enhanced detection logic with matrix generation (heredoc for clarity)
+      python3 <<'PYCODE' >> $GITHUB_OUTPUT
+import os, json
 
-      - name: Detect project languages and generate matrices
-        id: detect
-        run: |
-          # Enhanced detection logic with matrix generation
-          python3 -c "
-          import os, json, sys
+# Language detection
+has_go = os.path.exists('go.mod') or os.path.exists('main.go')
+has_python = (
+  os.path.exists('pyproject.toml') or os.path.exists('requirements.txt') or os.path.exists('setup.py') or os.path.exists('tests/test_*.py')
+)
+has_frontend = os.path.exists('package.json') or os.path.exists('yarn.lock') or os.path.exists('pnpm-lock.yaml')
+has_docker = os.path.exists('Dockerfile') or os.path.exists('docker-compose.yml') or os.path.exists('docker-compose.yaml')
 
-          # Language detection
-          has_go = os.path.exists('go.mod') or os.path.exists('main.go')
-          has_python = os.path.exists('pyproject.toml') or os.path.exists('requirements.txt') or os.path.exists('setup.py') or os.path.exists('tests/test_*.py')
-          has_frontend = os.path.exists('package.json') or os.path.exists('yarn.lock') or os.path.exists('pnpm-lock.yaml')
-          has_docker = os.path.exists('Dockerfile') or os.path.exists('docker-compose.yml') or os.path.exists('docker-compose.yaml')
-          has_rust = os.path.exists('Cargo.toml')
-          protobuf_needed = os.path.exists('buf.gen.yaml') or os.path.exists('buf.yaml') or os.path.exists('proto/')
+def has_rust_project():
+  """Stricter Rust detection: need Cargo.toml with [package] plus at least one src/*.rs file."""
+  if not os.path.exists('Cargo.toml'):
+    return False
+  try:
+    with open('Cargo.toml', 'r', encoding='utf-8') as f:
+      if '[package' not in f.read():
+        return False
+  except Exception:
+    return False
+  for root, _, files in os.walk('.'):
+    if root == 'src' or root.endswith('/src'):
+      if any(fn.endswith('.rs') for fn in files):
+        return True
+  return False
 
-          # Determine primary language
-          if has_rust:
-              primary = 'rust'
-          elif has_go:
-              primary = 'go'
-          elif has_python:
-              primary = 'python'
-          elif has_frontend:
-              primary = 'frontend'
-          else:
-              primary = 'unknown'
+has_rust = has_rust_project()
+protobuf_needed = os.path.exists('buf.gen.yaml') or os.path.exists('buf.yaml') or os.path.exists('proto/')
 
-          # Generate matrices (incorporating our matrix-build improvements)
-          go_matrix = {
-              'include': [
-                  {'os': 'ubuntu-latest', 'go-version': '1.23', 'primary': True},
-                  {'os': 'ubuntu-latest', 'go-version': '1.22', 'primary': False},
-                  {'os': 'macos-latest', 'go-version': '1.23', 'primary': False},
-                  {'os': 'windows-latest', 'go-version': '1.23', 'primary': False}
-              ]
-          } if has_go else {'include': []}
+if has_rust:
+  primary = 'rust'
+elif has_go:
+  primary = 'go'
+elif has_python:
+  primary = 'python'
+elif has_frontend:
+  primary = 'frontend'
+else:
+  primary = 'unknown'
+
+go_matrix = {
+  'include': [
+    {'os': 'ubuntu-latest', 'go-version': '1.23', 'primary': True},
+    {'os': 'ubuntu-latest', 'go-version': '1.22', 'primary': False},
+    {'os': 'macos-latest', 'go-version': '1.23', 'primary': False},
+    {'os': 'windows-latest', 'go-version': '1.23', 'primary': False},
+  ]
+} if has_go else {'include': []}
 
           python_matrix = {
               'include': [
                   {'os': 'ubuntu-latest', 'python-version': '3.12', 'primary': True},
                   {'os': 'ubuntu-latest', 'python-version': '3.11', 'primary': False},
                   {'os': 'ubuntu-latest', 'python-version': '3.13', 'primary': False},
-                  {'os': 'macos-latest', 'python-version': '3.12', 'primary': False},
                   {'os': 'windows-latest', 'python-version': '3.12', 'primary': False}
               ]
           } if has_python else {'include': []}
@@ -150,13 +146,30 @@ jobs:
                   {'os': 'ubuntu-latest', 'node-version': '20', 'primary': True},
                   {'os': 'ubuntu-latest', 'node-version': '18', 'primary': False},
                   {'os': 'ubuntu-latest', 'node-version': '22', 'primary': False},
-                  {'os': 'macos-latest', 'node-version': '20', 'primary': False},
                   {'os': 'windows-latest', 'node-version': '20', 'primary': False}
               ]
           } if has_frontend else {'include': []}
 
-          docker_matrix = {
-              'include': [
+docker_matrix = {
+  'include': [
+    {'platform': 'linux/amd64', 'os': 'ubuntu-latest', 'primary': True},
+    {'platform': 'linux/arm64', 'os': 'ubuntu-latest', 'primary': False},
+  ]
+} if has_docker else {'include': []}
+
+print(f'has-go={str(has_go).lower()}')
+print(f'has-python={str(has_python).lower()}')
+print(f'has-frontend={str(has_frontend).lower()}')
+print(f'has-docker={str(has_docker).lower()}')
+print(f'has-rust={str(has_rust).lower()}')
+print(f'protobuf-needed={str(protobuf_needed).lower()}')
+print(f'primary-language={primary}')
+print(f'project-type={primary}')
+print(f'go-matrix={json.dumps(go_matrix)}')
+print(f'python-matrix={json.dumps(python_matrix)}')
+print(f'frontend-matrix={json.dumps(frontend_matrix)}')
+print(f'docker-matrix={json.dumps(docker_matrix)}')
+PYCODE
                   {'platform': 'linux/amd64', 'os': 'ubuntu-latest', 'primary': True},
                   {'platform': 'linux/arm64', 'os': 'ubuntu-latest', 'primary': False}
               ]
