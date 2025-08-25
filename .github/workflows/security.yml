@@ -1,5 +1,5 @@
 # file: .github/workflows/security.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: s3c4r5t6-y7a8-b9c0-d1e2-f3a4b5c6d7e8
 
 # ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
@@ -75,9 +75,14 @@ jobs:
             has_python="true"
           fi
 
-          if [ -f "Cargo.toml" ] || find . -name "*.rs" | head -1 | grep -q .; then
+          # Refined Rust detection: require a real Cargo project AND at least one src/*.rs file.
+          # This avoids false positives from stray .rs files (e.g. examples, vendored tooling) that cause CodeQL warnings.
+          if [ -f "Cargo.toml" ] && grep -q '^\[package\]' Cargo.toml \
+             && find . -type f -path "*/src/*.rs" -not -path "*/target/*" -not -path "*/.git/*" -print -quit | grep -q .; then
             languages="${languages},rust"
             has_rust="true"
+          else
+            has_rust="false"
           fi
 
           if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
