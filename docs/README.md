@@ -71,6 +71,7 @@ This directory contains auto-generated documentation for this project.
 - [Dependency Submission and Pull Request Labeling](docs/dependency-submission-and-labeling.md)
 - [Documentation Update System](docs/documentation-updates.md)
 - [GitHub Projects Automation](docs/github-projects-automation.md)
+- [Go Module Tagging System](docs/go-module-tagging.md)
 - [Intelligent Issue Labeling](docs/intelligent-issue-labeling.md)
 - [Label Synchronization Workflow](docs/label-synchronization.md)
 - [Super Linter Improvements Summary](docs/super-linter-improvements.md)
@@ -91,4 +92,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Sun Aug 24 16:03:28 UTC 2025_
+_Generated on Mon Aug 25 00:16:50 UTC 2025_
