@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.3.0
+# version: 4.3.1
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
@@ -53,6 +53,37 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Detect project languages (for linter toolchain setup)
+        id: detect_langs
+        run: |
+          echo "go_present=$(test -f go.mod && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "rust_present=$(test -f Cargo.toml && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "node_present=$(test -f package.json || test -f webui/package.json && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Setup Go (if go.mod present)
+        if: steps.detect_langs.outputs.go_present == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Setup Rust (if Cargo.toml present)
+        if: steps.detect_langs.outputs.rust_present == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Setup Node.js (if package.json present)
+        if: steps.detect_langs.outputs.node_present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            **/package-lock.json
+            webui/package-lock.json
 
       - name: Setup Super Linter environment
         run: |

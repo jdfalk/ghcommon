@@ -1,5 +1,5 @@
 # file: .github/workflows/commit-override-handler.yml
-# version: 1.1.1
+# version: 1.1.2
 # guid: 7a8b9c0d-1e2f-3456-789a-bcdef0123456
 
 # ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
@@ -67,12 +67,25 @@ jobs:
         run: |
           echo "Checking commit messages for override keywords..."
 
-          # Get recent commit messages
+          # Determine base branch ref (prefer PR base if available)
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          if [ -z "$BASE_BRANCH" ] || [ "$BASE_BRANCH" = "null" ]; then
+            BASE_BRANCH="${{ github.event.repository.default_branch }}"
+          fi
+
+          # Attempt to gather commit messages relative to base; fall back gracefully on errors
+          set +e
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            COMMITS=$(git log --pretty=format:"%s" origin/${{ github.event.repository.default_branch }}..HEAD)
+            COMMITS=$(git log --pretty=format:"%s" origin/$BASE_BRANCH..HEAD 2>/dev/null)
+            STATUS=$?
+            if [ $STATUS -ne 0 ] || [ -z "$COMMITS" ]; then
+              echo "⚠️  Unable to compute commit range origin/$BASE_BRANCH..HEAD (exit $STATUS). Falling back to last 20 commits on HEAD."
+              COMMITS=$(git log --pretty=format:"%s" -n 20)
+            fi
           else
             COMMITS=$(git log --pretty=format:"%s" -1)
           fi
+          set -e
 
           echo "Commit messages to check:"
           echo "$COMMITS"
