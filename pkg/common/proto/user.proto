@@ -1,0 +1,36 @@
+// file: pkg/common/proto/user.proto
+// version: 1.0.0
+// guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+
+edition = "2023";
+
+
+import "buf/validate/validate.proto";
+
+package gcommon.v1.common;
+
+option go_package = "github.com/jdfalk/ghcommon/pkg/common/proto;commonpb";
+
+// User represents a user account in the system.
+message User {
+  // Unique identifier for the user account.
+  string user_id = 1 [(validate.rules).string.uuid = true];
+  
+  // User's email address.
+  string email = 2 [(validate.rules).string.email = true];
+  
+  // User's display name.
+  string display_name = 3 [(validate.rules).string.min_len = 1];
+  
+  // User's age (must be positive).
+  int32 age = 4;
+  
+  // User's profile image URL.
+  string avatar_url = 5 [(validate.rules).string.uri = true];
+  
+  // User's account balance (non-negative).
+  double account_balance = 6;
+  
+  // List of user's roles.
+  repeated string roles = 7 [(validate.rules).repeated.min_items = 1];
+}

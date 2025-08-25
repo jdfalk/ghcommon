@@ -1,0 +1,15 @@
+# file: buf.yaml
+# version: 1.0.0
+# guid: f1e2d3c4-b5a6-7c8d-9e0f-1a2b3c4d5e6f
+
+version: v1
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+deps:
+  - buf.build/bufbuild/protovalidate

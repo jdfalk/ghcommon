@@ -1,0 +1,36 @@
+// file: pkg/metrics/proto/metric_data.proto
+// version: 1.0.0
+// guid: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
+
+edition = "2023";
+
+
+import "buf/validate/validate.proto";
+
+package gcommon.v1.metrics;
+
+option go_package = "github.com/jdfalk/ghcommon/pkg/metrics/proto;metricspb";
+
+// MetricData represents a metric data point.
+message MetricData {
+  // Metric name identifier.
+  string metric_name = 1 [(validate.rules).string.min_len = 1];
+  
+  // Metric value.
+  double value = 2 [(validate.rules).double.gte = 0];
+  
+  // Timestamp when metric was recorded (Unix timestamp).
+  int64 timestamp = 3 [(validate.rules).int64.gt = 0];
+  
+  // Metric tags for categorization.
+  repeated string tags = 4 [(validate.rules).repeated.min_items = 1];
+  
+  // Sample rate (0.0 to 1.0).
+  double sample_rate = 5 [(validate.rules).double.gte = 0, lte = 100];
+  
+  // Source hostname.
+  string hostname = 6 [(validate.rules).string.hostname = true];
+  
+  // Metric unit.
+  string unit = 7 [(validate.rules).string.min_len = 1];
+}

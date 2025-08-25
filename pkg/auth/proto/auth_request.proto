@@ -1,0 +1,33 @@
+// file: pkg/auth/proto/auth_request.proto
+// version: 1.0.0
+// guid: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
+
+edition = "2023";
+
+
+import "buf/validate/validate.proto";
+
+package gcommon.v1.auth;
+
+option go_package = "github.com/jdfalk/ghcommon/pkg/auth/proto;authpb";
+
+// AuthRequest represents an authentication request.
+message AuthRequest {
+  // User's email address for authentication.
+  string email = 1 [(validate.rules).string.email = true];
+  
+  // User's password (minimum 8 characters).
+  string password = 2 [(validate.rules).string.min_len = 1];
+  
+  // Remember me flag.
+  bool remember_me = 3;
+  
+  // Session timeout in seconds.
+  int32 session_timeout = 4;
+  
+  // Client IP address.
+  string client_ip = 5 [(validate.rules).string.ip = true];
+  
+  // User agent string.
+  string user_agent = 6 [(validate.rules).string.min_len = 1];
+}
