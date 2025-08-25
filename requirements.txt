@@ -1,4 +1,8 @@
 # file: requirements.txt
-# Python dependencies for ghcommon workflow scripts
+# version: 1.0.0  
+# guid: f7e6d5c4-b3a2-1098-7654-321fedcba987
 
-requests>=2.31.0
+# Python dependencies for gcommon automation scripts
+
+# Required for setup_dependabot_all_repos.py
+PyYAML>=6.0
