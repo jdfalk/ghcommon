@@ -1,0 +1,119 @@
+# file: .github/workflows/release-protobuf.yml
+# version: 1.0.0
+# guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
+
+name: Release Protobuf Assets
+
+on:
+  workflow_call:
+    inputs:
+      build_target:
+        description: "Optional build target filter (all|protobuf)"
+        required: false
+        type: string
+      force:
+        description: "Force generation even if no proto changes"
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      artifacts-available:
+        description: "Indicates protobuf artifacts were generated (or existed)"
+        value: ${{ jobs.generate.outputs.artifacts_available }}
+
+env:
+  GO_VERSION: "1.23.x"
+  PYTHON_VERSION: "3.12"
+  BUF_VERSION: "1.56.0"
+  PROTOC_VERSION: "32.0"
+
+jobs:
+  generate:
+    name: Generate Protobuf
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts_available: ${{ steps.set-output.outputs.artifacts_available }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Quick change detection
+        id: changes
+        run: |
+          if git ls-files -m | grep -qE '(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$|scripts/setup-go-modules.py|scripts/setup-python-sdk.py'; then
+            echo "proto_changed=true" >> $GITHUB_OUTPUT
+          else
+            if git diff --name-only origin/${GITHUB_BASE_REF:-main} | grep -qE '(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$'; then
+              echo "proto_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "proto_changed=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+          echo "Build target input: '${{ inputs.build_target }}'"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install protoc
+        run: |
+          PROTOC_VERSION="${{ env.PROTOC_VERSION }}"
+          PB_REL="https://github.com/protocolbuffers/protobuf/releases"
+          echo "Downloading protoc ${PROTOC_VERSION}..."
+          curl -sSL -o protoc.zip $PB_REL/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip
+          unzip -q protoc.zip -d $HOME/protoc
+          sudo cp $HOME/protoc/bin/protoc /usr/local/bin/
+          sudo mkdir -p /usr/local/include
+          sudo cp -r $HOME/protoc/include/* /usr/local/include/
+          protoc --version
+
+      - name: Install buf CLI
+        run: |
+          BUF_VERSION="${{ env.BUF_VERSION }}"
+          echo "Installing buf ${BUF_VERSION}..."
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-$(uname -s)-$(uname -m)" -o /tmp/buf
+          sudo mv /tmp/buf /usr/local/bin/buf
+          sudo chmod +x /usr/local/bin/buf
+          buf --version
+
+      - name: Install Go protoc plugins
+        run: |
+          echo "Installing protoc-gen-go..." && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          echo "Installing protoc-gen-go-grpc..." && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          protoc-gen-go --version || echo "protoc-gen-go version not reported"
+          protoc-gen-go-grpc --version || echo "protoc-gen-go-grpc version not reported"
+
+      - name: Lint protobufs
+        run: |
+          if [ -f buf.yaml ]; then
+            echo "Running buf lint..."; buf lint
+          else
+            echo "No buf.yaml present, skipping lint"
+          fi
+
+      - name: Generate SDKs (make generate)
+        id: generate
+        run: |
+          if [ "${{ steps.changes.outputs.proto_changed }}" = "true" ] || [ "${{ inputs.force }}" = "true" ]; then
+            if make -n generate >/dev/null 2>&1; then
+              echo "Running make generate..."; make generate
+            else
+              echo "Makefile generate target missing; running fallback buf generate"
+              buf generate || exit 1
+            fi
+          else
+            echo "No proto changes detected and force not enabled; skipping generation"
+          fi
+
+      - name: Set artifacts output
+        id: set-output
+        run: echo "artifacts_available=true" >> $GITHUB_OUTPUT
