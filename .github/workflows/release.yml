@@ -153,96 +153,96 @@ go_matrix = {
 docker_matrix = {
   'include': [
     {'platform': 'linux/amd64', 'os': 'ubuntu-latest', 'primary': True},
-    {'platform': 'linux/arm64', 'os': 'ubuntu-latest', 'primary': False},
-  ]
-} if has_docker else {'include': []}
+              python3 <<'PYCODE' >> $GITHUB_OUTPUT
+              import os, json
 
-print(f'has-go={str(has_go).lower()}')
-print(f'has-python={str(has_python).lower()}')
-print(f'has-frontend={str(has_frontend).lower()}')
-print(f'has-docker={str(has_docker).lower()}')
-print(f'has-rust={str(has_rust).lower()}')
-print(f'protobuf-needed={str(protobuf_needed).lower()}')
-print(f'primary-language={primary}')
-print(f'project-type={primary}')
-print(f'go-matrix={json.dumps(go_matrix)}')
-print(f'python-matrix={json.dumps(python_matrix)}')
-print(f'frontend-matrix={json.dumps(frontend_matrix)}')
-print(f'docker-matrix={json.dumps(docker_matrix)}')
-PYCODE
+              # Language detection
+              has_go = os.path.exists('go.mod') or os.path.exists('main.go')
+              has_python = (
+                os.path.exists('pyproject.toml') or os.path.exists('requirements.txt') or os.path.exists('setup.py') or os.path.exists('tests/test_*.py')
+              )
+              has_frontend = os.path.exists('package.json') or os.path.exists('yarn.lock') or os.path.exists('pnpm-lock.yaml')
+              has_docker = os.path.exists('Dockerfile') or os.path.exists('docker-compose.yml') or os.path.exists('docker-compose.yaml')
+
+              def has_rust_project():
+                """Stricter Rust detection: need Cargo.toml with [package] plus at least one src/*.rs file."""
+                if not os.path.exists('Cargo.toml'):
+                  return False
+                try:
+                  with open('Cargo.toml', 'r', encoding='utf-8') as f:
+                    if '[package' not in f.read():
+                      return False
+                except Exception:
+                  return False
+                for root, _, files in os.walk('.'):
+                  if root == 'src' or root.endswith('/src'):
+                    if any(fn.endswith('.rs') for fn in files):
+                      return True
+                return False
+
+              has_rust = has_rust_project()
+              protobuf_needed = os.path.exists('buf.gen.yaml') or os.path.exists('buf.yaml') or os.path.exists('proto/')
+
+              if has_rust:
+                primary = 'rust'
+              elif has_go:
+                primary = 'go'
+              elif has_python:
+                primary = 'python'
+              elif has_frontend:
+                primary = 'frontend'
+              else:
+                primary = 'unknown'
+
+              go_matrix = {
+                'include': [
+                  {'os': 'ubuntu-latest', 'go-version': '1.23', 'primary': True},
+                  {'os': 'ubuntu-latest', 'go-version': '1.22', 'primary': False},
+                  {'os': 'macos-latest', 'go-version': '1.23', 'primary': False},
+                  {'os': 'windows-latest', 'go-version': '1.23', 'primary': False},
+                ]
+              } if has_go else {'include': []}
+
+              python_matrix = {
+                'include': [
+                  {'os': 'ubuntu-latest', 'python-version': '3.12', 'primary': True},
+                  {'os': 'ubuntu-latest', 'python-version': '3.11', 'primary': False},
+                  {'os': 'ubuntu-latest', 'python-version': '3.13', 'primary': False},
+                  {'os': 'macos-latest', 'python-version': '3.12', 'primary': False},
+                  {'os': 'windows-latest', 'python-version': '3.12', 'primary': False},
+                ]
+              } if has_python else {'include': []}
+
+              frontend_matrix = {
+                'include': [
+                  {'os': 'ubuntu-latest', 'node-version': '20', 'primary': True},
+                  {'os': 'ubuntu-latest', 'node-version': '18', 'primary': False},
+                  {'os': 'ubuntu-latest', 'node-version': '22', 'primary': False},
+                  {'os': 'macos-latest', 'node-version': '20', 'primary': False},
+                  {'os': 'windows-latest', 'node-version': '20', 'primary': False},
+                ]
+              } if has_frontend else {'include': []}
+
+              docker_matrix = {
+                'include': [
                   {'platform': 'linux/amd64', 'os': 'ubuntu-latest', 'primary': True},
-                  {'platform': 'linux/arm64', 'os': 'ubuntu-latest', 'primary': False}
-              ]
-          } if has_docker else {'include': []}
+                  {'platform': 'linux/arm64', 'os': 'ubuntu-latest', 'primary': False},
+                ]
+              } if has_docker else {'include': []}
 
-          # Output results
-          print(f'has-go={str(has_go).lower()}')
-          print(f'has-python={str(has_python).lower()}')
-          print(f'has-frontend={str(has_frontend).lower()}')
-          print(f'has-docker={str(has_docker).lower()}')
-          print(f'has-rust={str(has_rust).lower()}')
-          print(f'protobuf-needed={str(protobuf_needed).lower()}')
-          print(f'primary-language={primary}')
-          print(f'project-type={primary}')
-          print(f'go-matrix={json.dumps(go_matrix)}')
-          print(f'python-matrix={json.dumps(python_matrix)}')
-          print(f'frontend-matrix={json.dumps(frontend_matrix)}')
-          print(f'docker-matrix={json.dumps(docker_matrix)}')
-          " >> $GITHUB_OUTPUT
-
-      - name: Setup environment variables
-        id: env-setup
-        run: |
-          echo "registry=ghcr.io" >> $GITHUB_OUTPUT
-          echo "image-name=${{ github.repository }}" >> $GITHUB_OUTPUT
-
-  # Protobuf generation (if needed, runs first as dependency)
-  generate-protobuf:
-    name: Generate Protobuf
-    needs: detect-languages
-    if: needs.detect-languages.outputs.protobuf-needed == 'true'
-    uses: ./.github/workflows/protobuf-generation.yml
-    with:
-      has-go: ${{ needs.detect-languages.outputs.has-go }}
-      has-python: ${{ needs.detect-languages.outputs.has-python }}
-    secrets: inherit
-
-  # Call Go workflow if Go is detected
-  build-go:
-    name: Build Go Project
-    needs: [detect-languages, generate-protobuf]
-    if: always() && needs.detect-languages.outputs.has-go == 'true'
-    uses: ./.github/workflows/release-go.yml
-    with:
-      go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
-      protobuf-artifacts: ${{ needs.generate-protobuf.outputs.artifacts-available || 'false' }}
-    secrets: inherit
-
-  # Call Python workflow if Python is detected
-  build-python:
-    name: Build Python Project
-    needs: [detect-languages, generate-protobuf]
-    if: always() && needs.detect-languages.outputs.has-python == 'true'
-    uses: ./.github/workflows/release-python.yml
-    with:
-      python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
-      protobuf-artifacts: ${{ needs.generate-protobuf.outputs.artifacts-available || 'false' }}
-    secrets: inherit
-
-  # Call Frontend workflow if Frontend is detected
-  build-frontend:
-    name: Build Frontend Project
-    needs: [detect-languages, generate-protobuf]
-    if: always() && needs.detect-languages.outputs.has-frontend == 'true'
-    uses: ./.github/workflows/release-frontend.yml
-    with:
-      frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
-      protobuf-artifacts: ${{ needs.generate-protobuf.outputs.artifacts-available || 'false' }}
-    secrets: inherit
-
-  # Call Docker workflow if Docker is detected
-  build-docker:
-    name: Build Docker Project
+              print(f'has-go={str(has_go).lower()}')
+              print(f'has-python={str(has_python).lower()}')
+              print(f'has-frontend={str(has_frontend).lower()}')
+              print(f'has-docker={str(has_docker).lower()}')
+              print(f'has-rust={str(has_rust).lower()}')
+              print(f'protobuf-needed={str(protobuf_needed).lower()}')
+              print(f'primary-language={primary}')
+              print(f'project-type={primary}')
+              print(f'go-matrix={json.dumps(go_matrix)}')
+              print(f'python-matrix={json.dumps(python_matrix)}')
+              print(f'frontend-matrix={json.dumps(frontend_matrix)}')
+              print(f'docker-matrix={json.dumps(docker_matrix)}')
+              PYCODE
     needs: [detect-languages, generate-protobuf]
     if: always() && needs.detect-languages.outputs.has-docker == 'true'
     uses: ./.github/workflows/release-docker.yml
