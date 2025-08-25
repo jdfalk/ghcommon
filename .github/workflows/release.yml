@@ -1,184 +1,116 @@
 # file: .github/workflows/release.yml
 # version: 3.2.2
 # guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c
-
-name: Release Coordinator
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-  # Added workflow_call to allow reuse from CI (matrix-build job) – previous absence caused
-  # 'workflow is not reusable as it is missing a on.workflow_call trigger' error in ci.yml
-  workflow_call:
-    inputs:
-      release_type:
-        required: false
-        type: string
-        default: auto
-      build_target:
-        required: false
-        type: string
-        default: all
-      prerelease:
-        required: false
-        type: boolean
-        default: false
-      draft:
-        required: false
-        type: boolean
-        default: false
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: "Release type (auto, major, minor, patch)"
-        required: false
-        default: "auto"
-        type: choice
-        options:
-          - auto
-          - major
-          - minor
-          - patch
-      build_target:
-        description: "Build target"
-        required: false
-        default: "all"
-        type: choice
-        options:
-          - all
-          - go
-          - python
-          - frontend
-          - docker
-          - protobuf
-      prerelease:
-        description: "Create as prerelease"
-        required: false
-        default: false
-        type: boolean
-      draft:
-        description: "Create as draft"
-        required: false
-        default: false
-        type: boolean
-
-permissions:
-  contents: write
-  packages: write
-  attestations: write
-  id-token: write
-  security-events: write
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   # Detect what languages/technologies are present
   detect-languages:
+  name: Detect Project Languages
+  runs-on: ubuntu-latest
+  outputs:
+    has-go: ${{ steps.detect.outputs.has-go }}
+    has-python: ${{ steps.detect.outputs.has-python }}
+    has-frontend: ${{ steps.detect.outputs.has-frontend }}
+    has-docker: ${{ steps.detect.outputs.has-docker }}
+    has-rust: ${{ steps.detect.outputs.has-rust }}
+    protobuf-needed: ${{ steps.detect.outputs.protobuf-needed }}
+    primary-language: ${{ steps.detect.outputs.primary-language }}
+    go-matrix: ${{ steps.detect.outputs.go-matrix }}
+    python-matrix: ${{ steps.detect.outputs.python-matrix }}
+    frontend-matrix: ${{ steps.detect.outputs.frontend-matrix }}
+    docker-matrix: ${{ steps.detect.outputs.docker-matrix }}
+    registry: ${{ steps.env-setup.outputs.registry }}
+    image-name: ${{ steps.env-setup.outputs.image-name }}
+  steps:
+    - name: Checkout repository
+    uses: actions/checkout@v5
+
     - name: Detect project languages and generate matrices
     id: detect
     run: |
-      # Enhanced detection logic with matrix generation (heredoc for clarity)
-      python3 <<'PYCODE' >> $GITHUB_OUTPUT
-import os, json
+      python3 <<'PY' >> $GITHUB_OUTPUT
+      import os, json
 
-# Language detection
-has_go = os.path.exists('go.mod') or os.path.exists('main.go')
-has_python = (
-  os.path.exists('pyproject.toml') or os.path.exists('requirements.txt') or os.path.exists('setup.py') or os.path.exists('tests/test_*.py')
-)
-has_frontend = os.path.exists('package.json') or os.path.exists('yarn.lock') or os.path.exists('pnpm-lock.yaml')
-has_docker = os.path.exists('Dockerfile') or os.path.exists('docker-compose.yml') or os.path.exists('docker-compose.yaml')
+      has_go = os.path.exists('go.mod') or os.path.exists('main.go')
+      has_python = any(os.path.exists(p) for p in ['pyproject.toml','requirements.txt','setup.py'])
+      has_frontend = any(os.path.exists(p) for p in ['package.json','yarn.lock','pnpm-lock.yaml'])
+      has_docker = any(os.path.exists(p) for p in ['Dockerfile','docker-compose.yml','docker-compose.yaml'])
 
-def has_rust_project():
-  """Stricter Rust detection: need Cargo.toml with [package] plus at least one src/*.rs file."""
-  if not os.path.exists('Cargo.toml'):
-    return False
-  try:
-    with open('Cargo.toml', 'r', encoding='utf-8') as f:
-      if '[package' not in f.read():
+      def has_rust_project():
+        if not os.path.exists('Cargo.toml'):
+          return False
+        try:
+          with open('Cargo.toml','r',encoding='utf-8') as f:
+            if '[package' not in f.read():
+              return False
+        except Exception:
+          return False
+        for root,_,files in os.walk('.'):
+          if root == 'src' or root.endswith('/src'):
+            if any(fn.endswith('.rs') for fn in files):
+              return True
         return False
-  except Exception:
-    return False
-  for root, _, files in os.walk('.'):
-    if root == 'src' or root.endswith('/src'):
-      if any(fn.endswith('.rs') for fn in files):
-        return True
-  return False
 
-has_rust = has_rust_project()
-protobuf_needed = os.path.exists('buf.gen.yaml') or os.path.exists('buf.yaml') or os.path.exists('proto/')
+      has_rust = has_rust_project()
+      protobuf_needed = any(os.path.exists(p) for p in ['buf.gen.yaml','buf.yaml']) or os.path.isdir('proto')
 
-if has_rust:
-  primary = 'rust'
-elif has_go:
-  primary = 'go'
-elif has_python:
-  primary = 'python'
-elif has_frontend:
-  primary = 'frontend'
-else:
-  primary = 'unknown'
+      if has_rust:
+        primary = 'rust'
+      elif has_go:
+        primary = 'go'
+      elif has_python:
+        primary = 'python'
+      elif has_frontend:
+        primary = 'frontend'
+      else:
+        primary = 'unknown'
 
-go_matrix = {
-  'include': [
-    {'os': 'ubuntu-latest', 'go-version': '1.23', 'primary': True},
-    {'os': 'ubuntu-latest', 'go-version': '1.22', 'primary': False},
-    {'os': 'macos-latest', 'go-version': '1.23', 'primary': False},
-    {'os': 'windows-latest', 'go-version': '1.23', 'primary': False},
-  ]
-} if has_go else {'include': []}
+      go_matrix = {'include': [
+        {'os':'ubuntu-latest','go-version':'1.23','primary':True},
+        {'os':'ubuntu-latest','go-version':'1.22','primary':False},
+        {'os':'macos-latest','go-version':'1.23','primary':False},
+        {'os':'windows-latest','go-version':'1.23','primary':False},
+      ]} if has_go else {'include': []}
 
-          python_matrix = {
-              'include': [
-                  {'os': 'ubuntu-latest', 'python-version': '3.12', 'primary': True},
-                  {'os': 'ubuntu-latest', 'python-version': '3.11', 'primary': False},
-                  {'os': 'ubuntu-latest', 'python-version': '3.13', 'primary': False},
-                  {'os': 'windows-latest', 'python-version': '3.12', 'primary': False}
-              ]
-          } if has_python else {'include': []}
+      python_matrix = {'include': [
+        {'os':'ubuntu-latest','python-version':'3.12','primary':True},
+        {'os':'ubuntu-latest','python-version':'3.11','primary':False},
+        {'os':'ubuntu-latest','python-version':'3.13','primary':False},
+        {'os':'macos-latest','python-version':'3.12','primary':False},
+        {'os':'windows-latest','python-version':'3.12','primary':False},
+      ]} if has_python else {'include': []}
 
-          frontend_matrix = {
-              'include': [
-                  {'os': 'ubuntu-latest', 'node-version': '20', 'primary': True},
-                  {'os': 'ubuntu-latest', 'node-version': '18', 'primary': False},
-                  {'os': 'ubuntu-latest', 'node-version': '22', 'primary': False},
-                  {'os': 'windows-latest', 'node-version': '20', 'primary': False}
-              ]
-          } if has_frontend else {'include': []}
+      frontend_matrix = {'include': [
+        {'os':'ubuntu-latest','node-version':'20','primary':True},
+        {'os':'ubuntu-latest','node-version':'18','primary':False},
+        {'os':'ubuntu-latest','node-version':'22','primary':False},
+        {'os':'macos-latest','node-version':'20','primary':False},
+        {'os':'windows-latest','node-version':'20','primary':False},
+      ]} if has_frontend else {'include': []}
 
-docker_matrix = {
-  'include': [
-    {'platform': 'linux/amd64', 'os': 'ubuntu-latest', 'primary': True},
-              python3 <<'PYCODE' >> $GITHUB_OUTPUT
-              import os, json
+      docker_matrix = {'include': [
+        {'platform':'linux/amd64','os':'ubuntu-latest','primary':True},
+        {'platform':'linux/arm64','os':'ubuntu-latest','primary':False},
+      ]} if has_docker else {'include': []}
 
-              # Language detection
-              has_go = os.path.exists('go.mod') or os.path.exists('main.go')
-              has_python = (
-                os.path.exists('pyproject.toml') or os.path.exists('requirements.txt') or os.path.exists('setup.py') or os.path.exists('tests/test_*.py')
-              )
-              has_frontend = os.path.exists('package.json') or os.path.exists('yarn.lock') or os.path.exists('pnpm-lock.yaml')
-              has_docker = os.path.exists('Dockerfile') or os.path.exists('docker-compose.yml') or os.path.exists('docker-compose.yaml')
+      print(f"has-go={str(has_go).lower()}")
+      print(f"has-python={str(has_python).lower()}")
+      print(f"has-frontend={str(has_frontend).lower()}")
+      print(f"has-docker={str(has_docker).lower()}")
+      print(f"has-rust={str(has_rust).lower()}")
+      print(f"protobuf-needed={str(protobuf_needed).lower()}")
+      print(f"primary-language={primary}")
+      print(f"project-type={primary}")
+      print(f"go-matrix={json.dumps(go_matrix)}")
+      print(f"python-matrix={json.dumps(python_matrix)}")
+      print(f"frontend-matrix={json.dumps(frontend_matrix)}")
+      print(f"docker-matrix={json.dumps(docker_matrix)}")
+      PY
 
-              def has_rust_project():
-                """Stricter Rust detection: need Cargo.toml with [package] plus at least one src/*.rs file."""
-                if not os.path.exists('Cargo.toml'):
-                  return False
-                try:
-                  with open('Cargo.toml', 'r', encoding='utf-8') as f:
-                    if '[package' not in f.read():
-                      return False
-                except Exception:
-                  return False
-                for root, _, files in os.walk('.'):
-                  if root == 'src' or root.endswith('/src'):
-                    if any(fn.endswith('.rs') for fn in files):
-                      return True
-                return False
+    - name: Setup environment variables
+    id: env-setup
+    run: |
+      echo "registry=ghcr.io" >> $GITHUB_OUTPUT
+      echo "image-name=${{ github.repository }}" >> $GITHUB_OUTPUT
 
               has_rust = has_rust_project()
               protobuf_needed = os.path.exists('buf.gen.yaml') or os.path.exists('buf.yaml') or os.path.exists('proto/')
