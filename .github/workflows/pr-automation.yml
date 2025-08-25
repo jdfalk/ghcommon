@@ -78,7 +78,7 @@ jobs:
           VALIDATE_DOCKERFILE_HADOLINT: true
 
           # Auto-fix settings - use FIX_ as default behavior
-          FIX_ANSIBLE: true
+          # FIX_ANSIBLE: true
           FIX_CLANG_FORMAT: true
           FIX_CSHARP: true
           FIX_CSS_PRETTIER: true # Prettier for CSS formatting
