@@ -46,6 +46,9 @@ jobs:
       skip-build: ${{ steps.check.outputs.skip-build }}
       commit-message: ${{ steps.check.outputs.commit-message }}
     steps:
+  # NOTE: fetch-depth set to 0 and explicit base branch fetch added to prevent
+  # 'fatal: bad revision' / exit 128 errors when computing commit range
+  # on PRs. (Previously the job failed before producing outputs.)
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
