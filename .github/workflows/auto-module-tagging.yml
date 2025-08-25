@@ -1,0 +1,85 @@
+# file: .github/workflows/auto-module-tagging.yml
+# version: 1.0.0
+# guid: 8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d
+
+name: Automatic Module Tagging
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: "Version tag to create module tags for (e.g., v1.3.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-module-tags:
+    name: Create Module-Specific Tags
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Fetch all history for all tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine version tag
+        id: get-version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION_TAG="${{ inputs.version_tag }}"
+          else
+            # Extract from push event
+            VERSION_TAG="${GITHUB_REF#refs/tags/}"
+          fi
+
+          echo "version_tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
+          echo "📋 Processing version tag: ${VERSION_TAG}"
+
+      - name: Check if repository has Go SDK modules
+        id: check-sdk
+        run: |
+          if [ -d "sdks/go/v1" ]; then
+            echo "has_sdk=true" >> $GITHUB_OUTPUT
+            echo "✅ Go SDK modules found"
+          else
+            echo "has_sdk=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  No Go SDK modules found, skipping module tagging"
+          fi
+
+      - name: Create module-specific tags
+        if: steps.check-sdk.outputs.has_sdk == 'true'
+        run: |
+          VERSION_TAG="${{ steps.get-version.outputs.version_tag }}"
+
+          # Set environment variable for the script
+          export PUSH_TAGS=true
+
+          echo "🏷️  Creating module-specific tags for ${VERSION_TAG}"
+          python3 scripts/create-module-tags.py "${VERSION_TAG}"
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Module tagging completed successfully"
+          else
+            echo "❌ Module tagging failed"
+            exit 1
+          fi
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.check-sdk.outputs.has_sdk }}" = "true" ]; then
+            echo "🎉 Created module-specific tags for ${{ steps.get-version.outputs.version_tag }}"
+            echo "📋 Tags are now available for Go module resolution"
+          else
+            echo "ℹ️  No Go SDK modules found - this is normal for repositories without protobuf SDKs"
+          fi
