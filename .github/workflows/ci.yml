@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# version: 1.10.0
+# version: 1.11.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -69,6 +69,9 @@ jobs:
               - 'go.sum'
               - '**/go.mod'
               - '**/go.sum'
+              - 'proto/**/*.proto'
+              - 'buf.yaml'
+              - 'buf.gen.yaml'
             frontend:
               - '**/*.js'
               - '**/*.jsx'
@@ -555,6 +558,45 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
 
+      - name: Install buf
+        if: needs.detect-changes.outputs.go_files == 'true'
+        run: |
+          # Install buf CLI
+          BUF_VERSION="1.47.2"
+          curl -sSL \
+            "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-$(uname -s)-$(uname -m)" \
+            -o "/usr/local/bin/buf"
+          chmod +x "/usr/local/bin/buf"
+          buf --version
+
+      - name: Install protoc plugins
+        if: needs.detect-changes.outputs.go_files == 'true'
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Generate protocol buffers
+        if: needs.detect-changes.outputs.go_files == 'true'
+        run: |
+          echo "📦 Generating protocol buffers..."
+          if [ -f "buf.yaml" ] && [ -f "buf.gen.yaml" ]; then
+            buf generate
+
+            # Run post-generation processing if available
+            if [ -f "post-buf-generate.py" ]; then
+              echo "⚙️ Running post-generation processing..."
+              python3 post-buf-generate.py
+            fi
+
+            # Setup Go modules if available
+            if [ -f "setup-go-modules.py" ]; then
+              echo "🔧 Setting up Go modules..."
+              python3 setup-go-modules.py
+            fi
+          else
+            echo "ℹ️ No buf configuration found, skipping protobuf generation"
+          fi
+
       - name: Build Go binary
         if: needs.detect-changes.outputs.go_files == 'true'
         run: |
@@ -640,7 +682,7 @@ jobs:
     name: Matrix Build
     needs: [detect-changes]
     if: needs.detect-changes.outputs.should-build == 'true'
-    uses: ./.github/workflows/matrix-build.yml
+    uses: ./.github/workflows/release.yml
     secrets: inherit
 
   # Final status check
