@@ -1,0 +1,19 @@
+# file: buf.yaml
+# version: 1.0.0
+# guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+
+version: v1
+name: buf.build/jdfalk/ghcommon
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+  except:
+    - UNARY_RPC
+build:
+  excludes:
+    - vendor

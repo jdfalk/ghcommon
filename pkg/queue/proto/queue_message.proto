@@ -1,0 +1,32 @@
+// file: pkg/queue/proto/queue_message.proto
+// version: 1.0.0
+// guid: 6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c
+
+syntax = "proto3";
+
+package gcommon.v1.queue;
+
+
+import "buf/validate/validate.proto";
+option go_package = "github.com/jdfalk/ghcommon/pkg/queue/proto;queuepb";
+
+enum MessagePriority {
+  MESSAGE_PRIORITY_UNSPECIFIED = 0;
+  MESSAGE_PRIORITY_LOW = 1;
+  MESSAGE_PRIORITY_NORMAL = 2;
+  MESSAGE_PRIORITY_HIGH = 3;
+  MESSAGE_PRIORITY_CRITICAL = 4;
+}
+
+message QueueMessage {
+  string message_id = 1 [(validate.rules).string.min_len = 1];
+  string queue_name = 2 [(validate.rules).string.min_len = 1, string.max_len = 255];
+  bytes payload = 3;
+  MessagePriority priority = 4;
+  int32 retry_count = 5 [(validate.rules).int32.gte = 0];
+  int32 max_retries = 6 [(validate.rules).int32.gte = 0];
+  int64 created_timestamp = 7 [(validate.rules).int64.gte = 0];
+  int64 scheduled_timestamp = 8 [(validate.rules).int64.gte = 0];
+  repeated string tags = 9 [(validate.rules).repeated.min_items = 1];
+  double timeout_seconds = 10 [(validate.rules).double.gte = 0.0];
+}

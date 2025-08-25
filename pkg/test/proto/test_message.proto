@@ -1,0 +1,19 @@
+// file: pkg/test/proto/test_message.proto
+// version: 1.0.0
+// guid: a0b1c2d3-e4f5-6a7b-8c9d-0e1f2a3b4c5d
+
+syntax = "proto3";
+
+package gcommon.v1.test;
+
+
+// import "buf/validate/validate.proto"; // Commented out - add dependency first
+option go_package = "github.com/jdfalk/ghcommon/pkg/test/proto;testpb";
+
+message TestMessage {
+  string user_id = 1; // [(validate.rules).string.min_len = 1] // Add when protovalidate dependency is available
+  string email = 2; // [(validate.rules).string.pattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"] // Add when protovalidate dependency is available
+  int32 age = 3; // [(validate.rules).int32.gte = 0, int32.lte = 150] // Add when protovalidate dependency is available
+  repeated string tags = 4; // [(validate.rules).repeated.min_items = 1] // Add when protovalidate dependency is available
+  string api_url = 5; // [(validate.rules).string.uri = true] // Add when protovalidate dependency is available
+}

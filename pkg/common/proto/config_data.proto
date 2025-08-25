@@ -1,0 +1,22 @@
+// file: pkg/common/proto/config_data.proto
+// version: 1.0.0
+// guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+
+syntax = "proto3";
+
+import "buf/validate/validate.proto";
+
+package gcommon.v1.common;
+
+option go_package = "github.com/jdfalk/ghcommon/pkg/common/proto;commonpb";
+
+message ConfigData {
+  string config_id = 1 [(validate.rules).string.uuid = true];
+  string name = 2 [(validate.rules).string.min_len = 1, string.max_len = 255];
+  string description = 3 [(validate.rules).string.min_len = 1];
+  bool enabled = 4;
+  int32 port = 5 [(validate.rules).int32.gte = 1, int32.lte = 65535];
+  repeated string allowed_hosts = 6 [(validate.rules).repeated.min_items = 1];
+  string database_url = 7 [(validate.rules).string.uri = true];
+  string api_key = 8 [(validate.rules).string.min_len = 1];
+}

@@ -246,6 +246,66 @@
         "-m",
         "fix(workflows): comprehensive GitHub Actions workflow fixes\n\nFixed multiple critical issues preventing successful workflow execution across all repositories.\n\nIssues Addressed:\n\nfix(ci): resolve reserved keyword conflicts in workflow outputs\n- .github/workflows/ci.yml - Renamed outputs to avoid reserved keywords (go→go_files, frontend→frontend_files, python→python_files, rust→rust_files, docker→docker_files, docs→docs_files, workflows→workflows_files)\n- Fixed workflow startup failures caused by GitHub Actions reserved keyword conflicts\n- Updated all job dependencies to use new output names\n\nfix(matrix-build): resolve cross-platform shell compatibility issues\n- .github/workflows/matrix-build.yml - Replaced bash-specific conditional logic with Python-based cross-platform commands\n- Fixed PowerShell syntax errors on Windows runners where bash commands failed\n- Converted file existence checks from bash `if [ -f file ]` to Python `os.path.exists()`\n- Fixed protobuf generation, Python dependency installation, and Docker Compose validation\n- Removed trailing spaces and shell syntax incompatibilities\n\nfix(tests): add comprehensive test suite to prevent \"NO TESTS RAN\" failures\n- tests/test_basic.py - Created comprehensive test suite with TestBasicFunctionality and TestWorkflowIntegrity classes\n- tests/requirements.txt - Added unittest requirements\n- tests/__init__.py - Made tests directory a proper Python package\n- Fixed Python test discovery issues that caused exit code 5 failures\n\nfeat(scripts): add notification management utilities\n- scripts/README-notifications.md - Documentation for notification management system\n- scripts/cleanup-notifications.sh - Shell script for notification cleanup automation\n- scripts/mark_old_notifications_done.py - Python script for marking old notifications as done\n- scripts/requirements-notifications.txt - Dependencies for notification scripts"
       ]
+    },
+    {
+      "label": "Add Protovalidate - All Files",
+      "type": "shell",
+      "command": "python3",
+      "args": ["tools/protovalidate-adder.py"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Add Protovalidate - Dry Run",
+      "type": "shell",
+      "command": "python3",
+      "args": ["tools/protovalidate-adder.py", "--dry-run"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Add Protovalidate - Compatibility Mode",
+      "type": "shell",
+      "command": "python3",
+      "args": ["tools/protovalidate-adder.py", "--compatibility-mode"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Add Protovalidate - Specific File",
+      "type": "shell",
+      "command": "python3",
+      "args": ["tools/protovalidate-adder.py", "--file", "${input:protoFile}"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Add Protovalidate - Using Wrapper Script",
+      "type": "shell",
+      "command": "./scripts/add-protovalidate.sh",
+      "args": [],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -259,6 +319,12 @@
       "id": "filePattern",
       "description": "File pattern to add (e.g., '*.proto', 'pkg/auth/', '**/*.go')",
       "default": "*.proto",
+      "type": "promptString"
+    },
+    {
+      "id": "protoFile",
+      "description": "Proto file to process (e.g., 'pkg/auth/proto/auth_request.proto')",
+      "default": "pkg/auth/proto/auth_request.proto",
       "type": "promptString"
     }
   ]

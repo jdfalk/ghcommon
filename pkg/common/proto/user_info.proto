@@ -1,0 +1,24 @@
+// file: pkg/common/proto/user_info.proto
+// version: 1.0.0
+// guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
+
+syntax = "proto3";
+
+package gcommon.v1.common;
+
+
+import "buf/validate/validate.proto";
+option go_package = "github.com/jdfalk/ghcommon/pkg/common/proto;commonpb";
+
+message UserInfo {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string name = 2 [(validate.rules).string.min_len = 1, string.max_len = 255];
+  string email = 3 [(validate.rules).string.pattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"];
+  int32 age = 4 [(validate.rules).int32.gte = 0, int32.lte = 150];
+  string phone_number = 5 [(validate.rules).string.min_len = 1];
+  repeated string roles = 6 [(validate.rules).repeated.min_items = 1];
+  double rating = 7 [(validate.rules).double.gte = 0.0, double.lte = 10.0];
+  float percentage_complete = 8 [(validate.rules).float.gte = 0.0, float.lte = 100.0];
+  string profile_url = 9 [(validate.rules).string.uri = true];
+  uint32 login_count = 10 [(validate.rules).uint32.gte = 0];
+}
