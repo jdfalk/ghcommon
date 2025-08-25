@@ -65,7 +65,7 @@ jobs:
         if: steps.detect_langs.outputs.go_present == 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: "1.24"
           cache: true
 
       - name: Setup Rust (if Cargo.toml present)
@@ -79,7 +79,7 @@ jobs:
         if: steps.detect_langs.outputs.node_present == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
           cache-dependency-path: |
             **/package-lock.json
