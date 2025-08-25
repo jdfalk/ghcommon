@@ -6,6 +6,7 @@
 
 Prints lines suitable for appending directly to $GITHUB_OUTPUT.
 """
+
 from __future__ import annotations
 
 import json

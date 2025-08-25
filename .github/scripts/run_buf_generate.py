@@ -3,6 +3,7 @@
 # version: 1.0.0
 # guid: 8c5b2d4e-3f7a-45d1-9e2f-1b6c7d8e9f01
 """Run buf generate with basic safety checks and clearer logging."""
+
 from __future__ import annotations
 
 import os
