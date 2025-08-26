@@ -12,5 +12,4 @@
 jdfalk/apt-cacher-go
 jdfalk/audiobook-organizer
 jdfalk/gcommon
-jdfalk/merge-srt-subtitles
 jdfalk/subtitle-manager

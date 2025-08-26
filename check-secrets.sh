@@ -13,7 +13,6 @@ repos=(
     "jdfalk/copilot-agent-util-rust"
     "jdfalk/apt-cacher-go"
     "jdfalk/audiobook-organizer"
-    "jdfalk/merge-srt-subtitles"
     "jdfalk/public-scratch"
 )
 
