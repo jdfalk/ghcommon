@@ -4,11 +4,14 @@
 <!-- version: 1.0.0 -->
 <!-- guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d -->
 
-This document explains how the automatic Go module tagging system works and how to integrate it into your workflows.
+This document explains how the automatic Go module tagging system works and how to integrate it into
+your workflows.
 
 ## Overview
 
-When working with Go modules that are published to GitHub, each module needs its own version tag for proper module resolution. For a repository with multiple Go SDK packages like `gcommon`, we need module-specific tags such as:
+When working with Go modules that are published to GitHub, each module needs its own version tag for
+proper module resolution. For a repository with multiple Go SDK packages like `gcommon`, we need
+module-specific tags such as:
 
 - `sdks/go/v1/common/v1.3.0`
 - `sdks/go/v1/config/v1.3.0`
@@ -22,12 +25,14 @@ This system automatically creates these module-specific tags whenever a main ver
 ### 1. Core Script: `scripts/create-module-tags.py`
 
 This script:
+
 - Detects all Go SDK modules in `sdks/go/v1/`
 - Creates module-specific tags for each package
 - Can be run manually or from CI/CD
 - Supports both local and remote tag creation
 
 **Usage:**
+
 ```bash
 # Create module tags for v1.3.0
 python3 scripts/create-module-tags.py v1.3.0
@@ -39,6 +44,7 @@ PUSH_TAGS=true python3 scripts/create-module-tags.py v1.3.0
 ### 2. Automatic Workflow: `.github/workflows/auto-module-tagging.yml`
 
 This workflow:
+
 - Triggers when version tags are pushed (`v*.*.*`)
 - Can be manually triggered for existing tags
 - Automatically creates module-specific tags
@@ -47,6 +53,7 @@ This workflow:
 ### 3. Post-Tag Hook: `scripts/post-tag-hook.py`
 
 This script can be integrated into existing workflows:
+
 - Lightweight wrapper around the module tagging script
 - Gracefully handles repositories without Go SDK modules
 - Can be called as a step in existing release workflows
@@ -119,6 +126,7 @@ sdks/
 ### Required Scripts
 
 The following scripts must be present:
+
 - `scripts/create-module-tags.py` - Core tagging functionality
 - `scripts/post-tag-hook.py` - Workflow integration helper
 
@@ -137,6 +145,7 @@ Since this system is designed to work with the `ghcommon` sync system:
 ### For Non-Go Repositories
 
 The system gracefully handles repositories without Go SDK modules:
+
 - Scripts detect the absence of `sdks/go/v1/` and exit cleanly
 - Workflows skip execution if no SDK modules are found
 - No errors or failures occur
