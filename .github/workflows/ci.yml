@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# version: 1.11.2
+# version: 1.12.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -30,6 +30,9 @@ permissions:
   actions: write
   checks: write
   packages: write
+  security-events: write
+  id-token: write
+  attestations: write
 
 jobs:
   # Check for commit override flags
@@ -187,6 +190,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            **/requirements.txt
+            **/pyproject.toml
 
       - name: Set up Rust
         if: needs.detect-changes.outputs.rust_files == 'true'
@@ -382,6 +389,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            **/requirements.txt
+            **/pyproject.toml
 
       - name: Install dependencies
         run: |
