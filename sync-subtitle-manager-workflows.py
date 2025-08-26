@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: sync-subtitle-manager-workflows.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: 1a2b3c4d-5e6f-7890-abcd-ef1234567890
 
 """
@@ -13,12 +13,24 @@ import sys
 import subprocess
 import tempfile
 import shutil
+import shlex
+import re
 from pathlib import Path
+
+def validate_command(cmd):
+    """Validate command for security."""
+    dangerous_patterns = [';', '&&', '||', '|', '>', '<', '`', '$']
+    if any(pattern in cmd for pattern in dangerous_patterns):
+        raise ValueError(f"Potentially dangerous command: {cmd}")
+    return cmd
 
 def run_command(cmd, capture_output=True, check=True):
     """Run a command and return the result."""
     print(f"Running: {cmd}")
-    result = subprocess.run(cmd, shell=True, capture_output=capture_output, text=True, check=check)
+    # Use shlex.split for safe command parsing
+    import shlex
+    cmd_list = shlex.split(cmd) if isinstance(cmd, str) else cmd
+    result = subprocess.run(cmd_list, capture_output=capture_output, text=True, check=check)
     if capture_output:
         print(f"Output: {result.stdout}")
         if result.stderr:
@@ -47,7 +59,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.24"
+  GO_VERSION: "1.23"
   NODE_VERSION: "22"
   PYTHON_VERSION: "3.12"
   RUST_VERSION: "1.76"
@@ -55,10 +67,10 @@ env:
   CACHE_VERSION: "v1"
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
+  actions: read
   checks: write
-  packages: write
+  packages: read
 
 jobs:
   # Check for commit override flags
@@ -116,12 +128,12 @@ jobs:
       should-build: ${{ steps.determine.outputs.should-build }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
 
       - name: Check file changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         with:
           filters: |
@@ -219,16 +231,16 @@ jobs:
     if: needs.detect-changes.outputs.go_files == 'true' && needs.check-overrides.outputs.skip-tests != 'true'
     strategy:
       matrix:
-        go-version: ["1.23", "1.24"]
+        go-version: ["1.23", "1.23"]
         include:
-          - go-version: "1.24"
+          - go-version: "1.23"
             primary: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -275,7 +287,7 @@ jobs:
             primary: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -319,11 +331,11 @@ jobs:
     if: always() && needs.detect-changes.outputs.should-build == 'true' && needs.check-overrides.outputs.skip-build != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Go
         if: needs.detect-changes.outputs.go_files == 'true'
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
@@ -373,7 +385,7 @@ jobs:
     if: needs.detect-changes.outputs.docker_files == 'true' && needs.check-overrides.outputs.skip-build != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

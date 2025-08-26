@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: deploy-subtitle-manager-fixes.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: 9b8c7d6e-5f4a-3b2c-1d0e-9f8e7d6c5b4a
 
 """
@@ -12,7 +12,27 @@ import os
 import sys
 import tempfile
 import shutil
+import re
 from pathlib import Path
+
+def validate_path(path):
+    """Validate that a path is safe and within allowed boundaries."""
+    try:
+        resolved_path = Path(path).resolve()
+        # Ensure path doesn't contain dangerous patterns
+        if '..' in str(resolved_path) or str(resolved_path).startswith('/'):
+            raise ValueError(f"Unsafe path: {path}")
+        return resolved_path
+    except Exception as e:
+        raise ValueError(f"Invalid path {path}: {e}")
+
+def sanitize_filename(filename):
+    """Sanitize filename to prevent path traversal attacks."""
+    # Remove any path separators and dangerous characters
+    safe_name = re.sub(r'[^\w\-_\.]', '', filename)
+    if not safe_name or safe_name.startswith('.'):
+        raise ValueError(f"Invalid filename: {filename}")
+    return safe_name
 
 def create_fixed_ci_workflow():
     """Create a simplified, working CI workflow for subtitle-manager."""
@@ -34,14 +54,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.24"
+  GO_VERSION: "1.23"
   NODE_VERSION: "22"
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
+  actions: read
   checks: write
-  packages: write
+  packages: read
 
 jobs:
   # Check for commit override flags
@@ -87,12 +107,12 @@ jobs:
       should-build: ${{ steps.determine.outputs.should-build }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
 
       - name: Check file changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         with:
           filters: |
@@ -128,10 +148,10 @@ jobs:
     if: needs.detect-changes.outputs.go_files == 'true' && needs.check-overrides.outputs.skip-tests != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
@@ -153,10 +173,10 @@ jobs:
     if: needs.detect-changes.outputs.frontend_files == 'true' && needs.check-overrides.outputs.skip-build != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -173,7 +193,7 @@ jobs:
           npm run build
 
       - name: Upload frontend artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: frontend-dist
           path: webui/dist/
@@ -186,14 +206,14 @@ jobs:
     if: needs.detect-changes.outputs.should-build == 'true' && needs.check-overrides.outputs.skip-build != 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.6.1
 
       - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -211,7 +231,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@16ebe778df0e7752d2cfcbd924afdbbd89c1a755 # v6.6.1
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -246,17 +266,17 @@ jobs:
             goarch: amd64
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
       - name: Download frontend artifacts
         if: needs.build-frontend.result == 'success'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: frontend-dist
           path: webui/dist/
@@ -275,7 +295,7 @@ jobs:
           fi
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: subtitle-manager-${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/

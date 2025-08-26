@@ -1,25 +1,58 @@
 #!/bin/bash
 # file: fast-docker-build-subtitle-manager.sh
-# version: 1.0.0
+# version: 1.1.0
 # guid: 7a8b9c0d-1e2f-3456-7890-abcdef123456
 
 # Fast optimized Docker build for subtitle-manager with aggressive caching
 
-set -e
+set -euo pipefail
 
 echo "🚀 Starting optimized Docker build for subtitle-manager..."
 
-# Configuration
+# Input validation function
+validate_input() {
+    local var_name="$1"
+    local var_value="$2"
+    local pattern="$3"
+    
+    if [[ ! "$var_value" =~ $pattern ]]; then
+        echo "Error: Invalid $var_name: $var_value" >&2
+        exit 1
+    fi
+}
+
+# Configuration with input validation
 IMAGE_NAME=${IMAGE_NAME:-subtitle-manager}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 REGISTRY=${REGISTRY:-ghcr.io/jdfalk}
 BUILD_CONTEXT=${BUILD_CONTEXT:-.}
 DOCKERFILE=${DOCKERFILE:-Dockerfile}
 
-# Build arguments
+# Validate inputs
+validate_input "IMAGE_NAME" "$IMAGE_NAME" '^[a-zA-Z0-9][a-zA-Z0-9_.-]*$'
+validate_input "IMAGE_TAG" "$IMAGE_TAG" '^[a-zA-Z0-9][a-zA-Z0-9_.-]*$'
+validate_input "REGISTRY" "$REGISTRY" '^[a-zA-Z0-9][a-zA-Z0-9_.-]*(/[a-zA-Z0-9][a-zA-Z0-9_.-]*)*$'
+
+# Verify required files exist
+if [[ ! -f "$DOCKERFILE" ]]; then
+    echo "Error: Dockerfile not found at $DOCKERFILE" >&2
+    exit 1
+fi
+
+if [[ ! -d "$BUILD_CONTEXT" ]]; then
+    echo "Error: Build context directory not found at $BUILD_CONTEXT" >&2
+    exit 1
+fi
+
+# Build arguments - safely obtained
 VERSION=${VERSION:-$(git describe --tags --always --dirty 2>/dev/null || echo "dev")}
 BUILD_TIME=${BUILD_TIME:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}
 GIT_COMMIT=${GIT_COMMIT:-$(git rev-parse HEAD 2>/dev/null || echo "unknown")}
+
+# Sanitize build arguments to prevent injection
+VERSION=$(printf '%s' "$VERSION" | tr -cd '[:alnum:]._-')
+BUILD_TIME=$(printf '%s' "$BUILD_TIME" | tr -cd '[:alnum:].:T-')
+GIT_COMMIT=$(printf '%s' "$GIT_COMMIT" | tr -cd '[:alnum:]')
 
 # Enable BuildKit for better caching and performance
 export DOCKER_BUILDKIT=1
