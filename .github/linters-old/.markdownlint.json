@@ -1,14 +1,20 @@
 {
   "default": true,
-  "MD007": { "indent": 4 },
+  "MD007": { "indent": 2 },
   "MD013": {
-    "line_length": 100,
+    "line_length": 240,
     "code_blocks": false
   },
   "MD033": false,
   "MD041": false,
   "MD046": { "style": "fenced" },
   "MD040": true,
-  "MD024": { "siblings_only": true },
-  "TODO.md": false
+  "MD024": false,
+  "TODO.md": false,
+  "CHANGELOG.md": {
+    "MD024": false
+  },
+  "AGENTS.md": {
+    "MD013": { "line_length": 240 }
+  }
 }
