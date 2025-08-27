@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# version: 1.17.0
+# version: 1.18.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 name: Continuous Integration
@@ -323,14 +323,6 @@ jobs:
           echo "- **Mode**: Validation only (no auto-fixes)" >> $GITHUB_STEP_SUMMARY
           echo "- **Configuration**: super-linter-ci.env" >> $GITHUB_STEP_SUMMARY
           echo "- **Event**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          git add .
-          git commit -m "style: apply automated linting fixes
-
-          Auto-fixes applied by Super Linter during CI workflow.
-
-          Files changed:
-          $(git diff --name-only HEAD~1)"
-          git push
 
   # Go testing
   test-go:
