@@ -215,26 +215,68 @@ jobs:
             echo "Syft not installed; skipping SBOM generation" >&2
           fi
 
-      - name: Attempt artifact signing (cosign)
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
+        with:
+          cosign-release: "v2.4.1"
+
+      - name: Sign artifacts with Cosign
         env:
-          COSIGN_EXPERIMENTAL: "1"
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
-          curl -sSfL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 -o /usr/local/bin/cosign || true
-          chmod +x /usr/local/bin/cosign || true
-          if ! command -v cosign >/dev/null 2>&1; then
-            echo "Cosign not available; skipping signing"; exit 0; fi
-          echo "Signing aggregate artifacts (keyless if possible)" >&2
+
+          # Check if we have the private key for signing
+          if [ -z "${COSIGN_PRIVATE_KEY:-}" ]; then
+            echo "COSIGN_PRIVATE_KEY not set, skipping artifact signing" >&2
+            exit 0
+          fi
+
+          echo "Signing artifacts with cosign using repository certificate" >&2
+
+          # Sign aggregate artifacts
           for f in go-build-all.tar.gz go-build-all.zip; do
             [ -f "$f" ] || continue
-            cosign sign-blob --yes "$f" > "$f.sig" || echo "Failed to sign $f" >&2
+            echo "Signing $f..." >&2
+            cosign sign-blob --key env://COSIGN_PRIVATE_KEY --output-signature "$f.sig" "$f" || echo "Failed to sign $f" >&2
           done
+
+          # Sign per-os artifacts if they exist
           if [ -d per-os ]; then
             for f in per-os/*.{tar.gz,zip}; do
               [ -f "$f" ] || continue
-              cosign sign-blob --yes "$f" > "$f.sig" || true
+              echo "Signing $f..." >&2
+              cosign sign-blob --key env://COSIGN_PRIVATE_KEY --output-signature "$f.sig" "$f" || echo "Failed to sign $f" >&2
             done
           fi
+
+          echo "Artifact signing completed" >&2
+
+      - name: Upload signature files
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-signatures
+          path: |
+            *.sig
+            per-os/*.sig
+        continue-on-error: true
+
+      - name: Save public key for upload
+        env:
+          COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
+        run: |
+          if [ -n "${COSIGN_PUBLIC_KEY:-}" ]; then
+            echo "$COSIGN_PUBLIC_KEY" > cosign.pub
+          else
+            echo "COSIGN_PUBLIC_KEY secret not set, using repository file" >&2
+          fi
+
+      - name: Upload cosign public key
+        uses: actions/upload-artifact@v4
+        with:
+          name: cosign-public-key
+          path: cosign.pub
 
       - name: Upload checksum artifacts
         uses: actions/upload-artifact@v4
