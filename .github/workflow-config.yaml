@@ -1,5 +1,5 @@
 # file: .github/workflow-config.yaml
-# version: 1.0.0
+# version: 1.1.0
 # guid: e5f6a7b8-c9d0-1234-ef56-789012345678
 
 # Modern Workflow Configuration
@@ -30,17 +30,25 @@ build:
   operating_systems:
     - "ubuntu-latest"
     - "macos-latest"
-    - "windows-latest"
+    # - "windows-latest"
 
   # Feature flags
   enable_protobuf: true
   enable_docker: true
   enable_cross_compile: true
-  enable_coverage: true
+  enable_coverage: false
   enable_security_scan: true
 
 # Repository sync configuration
 repositories:
+  - name: "gcommon"
+    url: "https://github.com/jdfalk/gcommon"
+    sync_enabled: true
+    custom_build_config:
+      go_versions: ["1.23", "1.24"]
+      enable_protobuf: true
+      enable_docker: true
+
   - name: "subtitle-manager"
     url: "https://github.com/jdfalk/subtitle-manager"
     sync_enabled: true
