@@ -235,12 +235,62 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
 
-      - name: Load Super Linter Configuration
+      - name: Wait for PR Automation (for PR events)
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        run: |
+          echo "🔄 Waiting for PR automation to complete..."
+
+          # Wait up to 10 minutes for PR automation to complete
+          max_attempts=60
+          attempt=0
+
+          while [ $attempt -lt $max_attempts ]; do
+            # Check if PR automation workflow has completed
+            echo "Checking for PR automation completion (attempt $((attempt + 1))/$max_attempts)..."
+
+            # Use GitHub API to check if pr-automation workflow has completed
+            pr_automation_status=$(gh api repos/${{ github.repository }}/actions/runs \
+              --jq '.workflow_runs[] | select(.head_sha == "${{ github.event.pull_request.head.sha || github.sha }}" and .name == "PR Automation") | .status' \
+              | head -1)
+
+            if [ "$pr_automation_status" = "completed" ]; then
+              echo "✅ PR automation has completed, proceeding with CI"
+              break
+            elif [ -z "$pr_automation_status" ]; then
+              echo "ℹ️  No PR automation workflow found, proceeding with CI"
+              break
+            else
+              echo "⏳ PR automation status: $pr_automation_status, waiting..."
+              sleep 10
+              attempt=$((attempt + 1))
+            fi
+          done
+
+          if [ $attempt -ge $max_attempts ]; then
+            echo "⚠️  Timeout waiting for PR automation, proceeding with CI anyway"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load CI Super Linter Configuration
         id: super-linter-config
         run: |
-          # Load environment variables from super-linter.env file
-          if [ -f .github/linters/super-linter.env ]; then
-            echo "Loading Super Linter configuration from .github/linters/super-linter.env"
+          # Load environment variables from CI-specific config file
+          if [ -f .github/linters/super-linter-ci.env ]; then
+            echo "Loading CI Super Linter configuration from .github/linters/super-linter-ci.env"
+            # Export all variables from the env file to GitHub environment
+            while IFS='=' read -r key value; do
+              # Skip comments and empty lines
+              if [[ ! "$key" =~ ^[[:space:]]*# && -n "$key" ]]; then
+                # Remove any quotes and whitespace
+                key=$(echo "$key" | xargs)
+                value=$(echo "$value" | xargs)
+                # Export to GitHub environment for use in subsequent steps
+                echo "$key=$value" >> $GITHUB_ENV
+              fi
+            done < .github/linters/super-linter-ci.env
+          elif [ -f .github/linters/super-linter.env ]; then
+            echo "CI config not found, falling back to .github/linters/super-linter.env"
             # Export all variables from the env file to GitHub environment
             while IFS='=' read -r key value; do
               # Skip comments and empty lines
@@ -253,31 +303,26 @@ jobs:
               fi
             done < .github/linters/super-linter.env
           else
-            echo "Warning: .github/linters/super-linter.env not found"
+            echo "Warning: No Super Linter configuration found"
           fi
 
-      - name: Run Super Linter
-        uses: super-linter/super-linter@v8.1.0
+      - name: Run Super Linter (Validation Only)
+        uses: super-linter/super-linter@v7
         env:
           DEFAULT_BRANCH: ${{ env.GITHUB_REPOSITORY_DEFAULT_BRANCH }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check for auto-fixes
-        id: autofix
+      - name: Validation Summary
+        if: always()
         run: |
-          if git diff --quiet; then
-            echo "no_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "no_changes=false" >> $GITHUB_OUTPUT
-            echo "Found auto-fixable issues"
-            git diff --stat
-          fi
-
-      - name: Commit auto-fixes
-        if: steps.autofix.outputs.no_changes == 'false' && env.GITHUB_EVENT_NAME == 'push'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          echo "# 🔍 CI Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Code validation completed**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: Validation only (no auto-fixes)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Configuration**: super-linter-ci.env" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           git add .
           git commit -m "style: apply automated linting fixes
 
