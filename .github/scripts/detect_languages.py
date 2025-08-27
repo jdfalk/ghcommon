@@ -1,16 +1,103 @@
 #!/usr/bin/env python3
 # file: .github/scripts/detect_languages.py
-# version: 1.0.0
-# guid: 6f9d2c3b-1a4e-45c2-b7d8-2e9f4a1c7b56
+# version: 1.1.0
+# guid: 4f6c9d88-2d4b-4a1e-9c61-3e0b2b9a7f11
 """Detect project languages and emit key=value lines for GitHub Actions outputs.
 
-Prints lines suitable for appending directly to $GITHUB_OUTPUT.
+Enhanced to respect `.github/workflow-config.yaml` for language versions,
+platforms, operating systems, and feature flags. Falls back to sensible
+defaults when the config file or specific keys are absent.
+
+The output format remains backward compatible so existing workflow jobs
+(`release-*.yml`) continue to function without modification.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
+from typing import Any, Dict, List
+
+CONFIG_PATH = ".github/workflow-config.yaml"
+
+
+def _strip_quotes(value: str) -> str:
+    value = value.strip()
+    if value.startswith(("'", '"')) and value.endswith(("'", '"')):
+        return value[1:-1]
+    return value
+
+
+def load_build_config() -> Dict[str, Any]:
+    """Very small, dependency-free YAML subset parser for the build section.
+
+    We avoid PyYAML to keep the workflow zero-install. Only the needed keys
+    inside the top-level `build:` mapping are parsed. Commented lines or
+    commented-out blocks are ignored.
+    """
+    if not os.path.exists(CONFIG_PATH):
+        return {}
+
+    build: Dict[str, Any] = {}
+    in_build = False
+    current_list_key: str | None = None
+
+    with open(CONFIG_PATH, "r", encoding="utf-8") as fh:
+        for raw_line in fh:
+            line = raw_line.rstrip("\n")
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+
+            # Detect leaving build section (new top-level key)
+            if (
+                in_build
+                and not line.startswith(" ")
+                and not stripped.startswith("build:")
+            ):
+                # Reached a new top-level key; stop parsing build
+                break
+
+            if stripped.startswith("build:"):
+                in_build = True
+                continue
+
+            if not in_build:
+                continue
+
+            # Inside build section
+            # List entry
+            if current_list_key and stripped.startswith("- "):
+                val = _strip_quotes(stripped[2:].strip())
+                if val:
+                    build.setdefault(current_list_key, []).append(val)
+                continue
+
+            # New key (possibly list or scalar)
+            key_match = re.match(r"([A-Za-z0-9_]+):\s*(.*)$", stripped)
+            if not key_match:
+                continue
+            key, remainder = key_match.groups()
+
+            if remainder == "":  # list start or empty value
+                current_list_key = key if key.endswith("s") else None  # heuristic
+                if current_list_key:
+                    build.setdefault(current_list_key, [])
+                continue
+
+            # Scalar value
+            current_list_key = None
+            value_clean = _strip_quotes(remainder)
+            if value_clean.lower() in {"true", "false"}:
+                build[key] = value_clean.lower() == "true"
+            else:
+                build[key] = value_clean
+
+    return build
+
+
+build_cfg = load_build_config()
 
 
 def exists_any(*paths: str) -> bool:
@@ -20,14 +107,18 @@ def exists_any(*paths: str) -> bool:
 has_go = exists_any("go.mod", "main.go")
 has_python = (
     exists_any("pyproject.toml", "requirements.txt", "setup.py")
-    or any(f.startswith("tests/test_") for f in os.listdir("tests"))
+    or any(f.startswith("test_") for f in os.listdir("tests"))
     if os.path.isdir("tests")
     else False
 )
 has_frontend = exists_any("package.json", "yarn.lock", "pnpm-lock.yaml")
 has_docker = exists_any("Dockerfile", "docker-compose.yml", "docker-compose.yaml")
 has_rust = exists_any("Cargo.toml")
-protobuf_needed = exists_any("buf.gen.yaml", "buf.yaml") or os.path.isdir("proto")
+protobuf_needed = (
+    (build_cfg.get("enable_protobuf") is True)
+    or exists_any("buf.gen.yaml", "buf.yaml")
+    or os.path.isdir("proto")
+)
 
 if has_rust:
     primary = "rust"
@@ -40,43 +131,42 @@ elif has_frontend:
 else:
     primary = "unknown"
 
+
+def build_matrix(
+    kind: str, versions: List[str], os_list: List[str], version_key: str
+) -> Dict[str, Any]:
+    include: List[Dict[str, Any]] = []
+    if not versions or not os_list:
+        return {"include": include}
+    primary_set = False
+    for v in versions:
+        for os_name in os_list:
+            entry = {"os": os_name, version_key: v, "primary": False}
+            if not primary_set:
+                entry["primary"] = True
+                primary_set = True
+            include.append(entry)
+    return {"include": include}
+
+
+go_versions = build_cfg.get("go_versions") or ["1.23", "1.22"]
+python_versions = build_cfg.get("python_versions") or ["3.12", "3.11"]
+node_versions = build_cfg.get("node_versions") or ["20"]
+operating_systems = build_cfg.get("operating_systems") or ["ubuntu-latest"]
+platforms = build_cfg.get("platforms") or ["linux/amd64", "linux/arm64"]
+
 go_matrix = (
-    {
-        "include": [
-            {"os": "ubuntu-latest", "go-version": "1.23", "primary": True},
-            {"os": "ubuntu-latest", "go-version": "1.22", "primary": False},
-            {"os": "macos-latest", "go-version": "1.23", "primary": False},
-            {"os": "windows-latest", "go-version": "1.23", "primary": False},
-        ]
-    }
+    build_matrix("go", go_versions, operating_systems, "go-version")
     if has_go
     else {"include": []}
 )
-
 python_matrix = (
-    {
-        "include": [
-            {"os": "ubuntu-latest", "python-version": "3.12", "primary": True},
-            {"os": "ubuntu-latest", "python-version": "3.11", "primary": False},
-            {"os": "ubuntu-latest", "python-version": "3.13", "primary": False},
-            {"os": "macos-latest", "python-version": "3.12", "primary": False},
-            {"os": "windows-latest", "python-version": "3.12", "primary": False},
-        ]
-    }
+    build_matrix("python", python_versions, operating_systems, "python-version")
     if has_python
     else {"include": []}
 )
-
 frontend_matrix = (
-    {
-        "include": [
-            {"os": "ubuntu-latest", "node-version": "20", "primary": True},
-            {"os": "ubuntu-latest", "node-version": "18", "primary": False},
-            {"os": "ubuntu-latest", "node-version": "22", "primary": False},
-            {"os": "macos-latest", "node-version": "20", "primary": False},
-            {"os": "windows-latest", "node-version": "20", "primary": False},
-        ]
-    }
+    build_matrix("frontend", node_versions, operating_systems, "node-version")
     if has_frontend
     else {"include": []}
 )
@@ -84,8 +174,8 @@ frontend_matrix = (
 docker_matrix = (
     {
         "include": [
-            {"platform": "linux/amd64", "os": "ubuntu-latest", "primary": True},
-            {"platform": "linux/arm64", "os": "ubuntu-latest", "primary": False},
+            {"platform": p, "os": operating_systems[0], "primary": i == 0}
+            for i, p in enumerate(platforms)
         ]
     }
     if has_docker
