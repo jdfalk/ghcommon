@@ -18,7 +18,7 @@ on:
         default: "false"
 
 permissions:
-  contents: write   # needed for release asset upload
+  contents: write # needed for release asset upload
   packages: write
 
 jobs:
@@ -170,14 +170,14 @@ jobs:
       - name: Upload combined artifact (tar.gz)
         uses: actions/upload-artifact@v4
         with:
-            name: go-build-all-tar
-            path: go-build-all.tar.gz
+          name: go-build-all-tar
+          path: go-build-all.tar.gz
 
       - name: Upload combined artifact (zip)
         uses: actions/upload-artifact@v4
         with:
-            name: go-build-all-zip
-            path: go-build-all.zip
+          name: go-build-all-zip
+          path: go-build-all.zip
 
   publish-release:
     name: Publish GitHub Release
