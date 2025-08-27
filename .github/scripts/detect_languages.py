@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/detect_languages.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: 4f6c9d88-2d4b-4a1e-9c61-3e0b2b9a7f11
 """Detect project languages and emit key=value lines for GitHub Actions outputs.
 
@@ -98,6 +98,7 @@ def load_build_config() -> Dict[str, Any]:
 
 
 build_cfg = load_build_config()
+config_loaded = os.path.exists(CONFIG_PATH)
 
 
 def exists_any(*paths: str) -> bool:
@@ -151,7 +152,17 @@ def build_matrix(
 
 go_versions = build_cfg.get("go_versions") or ["1.23", "1.22"]
 python_versions = build_cfg.get("python_versions") or ["3.12", "3.11"]
-node_versions = build_cfg.get("node_versions") or ["20"]
+raw_node_versions = build_cfg.get("node_versions")
+if config_loaded:
+    if raw_node_versions is None:
+        has_frontend = False
+        node_versions: List[str] = []
+    else:
+        node_versions = raw_node_versions or []
+        if not node_versions:
+            has_frontend = False
+else:
+    node_versions = ["20"] if has_frontend else []
 operating_systems = build_cfg.get("operating_systems") or ["ubuntu-latest"]
 platforms = build_cfg.get("platforms") or ["linux/amd64", "linux/arm64"]
 
