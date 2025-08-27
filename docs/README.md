@@ -56,6 +56,7 @@ This directory contains auto-generated documentation for this project.
 - [file: CHANGELOG.md](CHANGELOG.md)
 - [Commitlint Setup](COMMITLINT_SETUP.md)
 - [file: CONTRIBUTING.md](CONTRIBUTING.md)
+- [Cosign Signature Verification](COSIGN_VERIFICATION.md)
 - [GitHub Projects Automation Setup Summary](GITHUB_PROJECTS_SETUP.md)
 - [GitHub Common Workflows](README.md)
 - [TODO - GitHub Common Workflows](TODO.md)
@@ -91,4 +92,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Wed Aug 27 00:06:09 UTC 2025_
+_Generated on Wed Aug 27 17:15:46 UTC 2025_
