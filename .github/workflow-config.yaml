@@ -1,5 +1,5 @@
 # file: .github/workflow-config.yaml
-# version: 1.1.0
+# version: 1.2.0
 # guid: e5f6a7b8-c9d0-1234-ef56-789012345678
 
 # Modern Workflow Configuration
@@ -81,25 +81,51 @@ sync:
 
   # Paths to sync across repositories
   sync_paths:
-    - ".github/workflows/matrix-build.yml"
-    - ".github/workflows/unified-automation.yml"
     - ".github/workflows/ci.yml"
+    - ".github/workflows/docs-automation.yml"
+    - ".github/workflows/release-go.yml"
+    - ".github/workflows/release-rust.yml"
+    - ".github/workflows/release-python.yml"
+    - ".github/workflows/release-javascript.yml"
+    - ".github/workflows/release-typescript.yml"
+    - ".github/workflows/release-docker.yml"
+    - ".github/workflows/release.yml"
     - ".github/workflows/pr-automation.yml"
     - ".github/workflows/commit-override-handler.yml"
-    - ".github/workflows/reusable-matrix-build.yml"
+    - ".github/workflows/unified-automation.yml"
+    - ".github/workflows/security.yml"
     - ".github/instructions/"
     - ".github/prompts/"
     - ".github/linters/"
+    - ".github/dependabot.yml"
+    - ".github/copilot-instructions.md"
     - ".pre-commit-config.yaml"
+    - "doc_update_manager.py"
+    - "scripts/create-doc-update.sh"
     - "scripts/workflow_manager.py"
     - "labels.json"
     - "labels.md"
+    - "COSIGN_VERIFICATION.md"
+    - "cosign.pub"
 
   # Files to explicitly exclude from sync (repo-specific configs)
   exclude_files:
     - ".github/workflow-config.yaml" # Each repo has its own config
     - ".github/super-linter.env" # Repo-specific linter config
     - ".github/unified-automation-config.json" # Repo-specific automation config
+    - "go.mod" # Language-specific dependency files
+    - "go.sum" # Language-specific dependency files
+    - "Cargo.toml" # Rust-specific config
+    - "Cargo.lock" # Rust-specific lockfile
+    - "package.json" # JavaScript/npm config
+    - "package-lock.json" # npm lockfile
+    - "requirements.txt" # Python dependencies (repo-specific)
+    - "pyproject.toml" # Python project config
+    - "buf.yaml" # Protocol buffer config (repo-specific)
+    - "buf.gen.yaml" # Protocol buffer generation config (repo-specific)
+    - ".github/doc-updates/" # Repository-specific documentation updates
+    - "proto/" # Protocol buffer definitions (repo-specific)
+    - "sdks/" # Generated SDK output (repo-specific)
 
   # Exclusions to prevent sync loops
   exclude_repos:
