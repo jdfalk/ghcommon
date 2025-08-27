@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 1.0.0
+# version: 1.2.0
 # guid: e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b
 
 name: Go Release Build
@@ -60,3 +60,75 @@ jobs:
         with:
           name: go-coverage-${{ matrix.os }}-${{ matrix.go-version }}
           path: coverage.out
+
+      - name: Package Go build artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          PKGS=$(go list -f '{{if eq .Name "main"}}{{.ImportPath}}{{end}}' ./... | grep -v '^$' || true)
+          if [ -z "${PKGS}" ]; then
+            echo "No main packages found; creating marker file so artifact upload still succeeds." >&2
+            echo "This module contains no main packages (library-only)." > dist/README.txt
+          else
+            echo "Building main packages: ${PKGS}" >&2
+            for pkg in ${PKGS}; do
+              name=$(basename "${pkg}")
+              out="dist/${name}-${{ matrix.os }}-${{ matrix.go-version }}"
+              case "${{ matrix.os }}" in
+                *windows*) out="${out}.exe" ;;
+              esac
+              echo "go build -o ${out} ${pkg}" >&2
+              go build -o "${out}" "${pkg}"
+            done
+          fi
+          echo "Contents of dist/:"
+          ls -l dist
+
+      - name: Upload Go build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-${{ matrix.os }}-${{ matrix.go-version }}
+          path: dist/
+
+  aggregate-artifacts:
+    name: Aggregate Go Build Artifacts
+    needs: build-go
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create workspace
+        run: mkdir -p combined
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: combined/raw
+      - name: Normalize structure
+        run: |
+          set -euo pipefail
+          cd combined/raw
+          echo "Downloaded artifact directories:" >&2
+          find . -maxdepth 2 -type f -print
+          mkdir -p ../final
+          for f in $(find . -type f -perm -u+x 2>/dev/null || true); do
+            base=$(basename "$f")
+            cp "$f" ../final/"$base"
+          done
+          for f in $(find . -name README.txt -type f || true); do
+            base="$(basename $(dirname "$f"))-README.txt"
+            cp "$f" ../final/"$base"
+          done
+          ls -l ../final
+      - name: Create tarball and zip
+        run: |
+          cd combined/final
+          tar -czf ../../go-build-all.tar.gz .
+          zip -r ../../go-build-all.zip .
+      - name: Upload combined artifact (tar.gz)
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-all-tar
+          path: go-build-all.tar.gz
+      - name: Upload combined artifact (zip)
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-all-zip
+          path: go-build-all.zip
