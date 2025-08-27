@@ -1,10 +1,6 @@
 # file: .github/workflows/docs-automation.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: e4f5a6b7-c8d9-e0f1-a2b3-c4d5e6f7a8b9
-
-# ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
-# All changes should be made in jdfalk/ghcommon and will be synced to other repositories
-# Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/docs-automation.yml
 
 name: Documentation Automation
 
@@ -74,12 +70,19 @@ jobs:
       - name: Check for pending doc updates
         id: check
         run: |
-          if [ -d ".github/doc-updates" ] && [ "$(find .github/doc-updates -name '*.json' | wc -l)" -gt 0 ]; then
-            echo "has_updates=true" >> $GITHUB_OUTPUT
-            echo "Found pending documentation updates"
+          if [ -d ".github/doc-updates" ]; then
+            # Only count JSON files that are not in failed or processed subdirectories
+            pending_count=$(find .github/doc-updates -name '*.json' -not -path '*/failed/*' -not -path '*/processed/*' | wc -l)
+            if [ "$pending_count" -gt 0 ]; then
+              echo "has_updates=true" >> $GITHUB_OUTPUT
+              echo "Found $pending_count pending documentation updates"
+            else
+              echo "has_updates=false" >> $GITHUB_OUTPUT
+              echo "No pending documentation updates (found $(find .github/doc-updates -name '*.json' | wc -l) total files, but all are processed/failed)"
+            fi
           else
             echo "has_updates=false" >> $GITHUB_OUTPUT
-            echo "No pending documentation updates"
+            echo "No doc-updates directory found"
           fi
 
       - name: Process documentation updates

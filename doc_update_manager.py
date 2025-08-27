@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/doc_update_manager.py
-# version: 2.1.0
+# version: 2.2.0
 # guid: 9e8d7c6b-5a49-3827-1605-4f3e2d1c0b9a
 
 """
@@ -323,6 +323,7 @@ class DocumentationUpdateManager:
         """Move successfully processed file to processed directory."""
         try:
             from datetime import datetime
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             processed_name = f"{timestamp}_{update_file.name}"
             processed_path = self.processed_dir / processed_name
@@ -342,12 +343,15 @@ class DocumentationUpdateManager:
 
         try:
             from datetime import datetime
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             malformed_name = f"{timestamp}_{update_file.name}"
             malformed_path = self.malformed_dir / malformed_name
 
             # Create error info file
-            error_file = self.malformed_dir / f"{timestamp}_{update_file.stem}_error.txt"
+            error_file = (
+                self.malformed_dir / f"{timestamp}_{update_file.stem}_error.txt"
+            )
             with open(error_file, "w", encoding="utf-8") as f:
                 f.write(f"File: {update_file.name}\n")
                 f.write(f"Error: {error_msg}\n")
@@ -367,8 +371,9 @@ class DocumentationUpdateManager:
         self.stats["errors"].append(f"Failed file {update_file.name}: {error_msg}")
 
         try:
-            from datetime import datetime
             import traceback
+            from datetime import datetime
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             failed_name = f"{timestamp}_{update_file.name}"
             failed_path = self.failed_dir / failed_name
@@ -392,11 +397,15 @@ class DocumentationUpdateManager:
         logger.info(f"   Files processed successfully: {self.stats['files_processed']}")
         logger.info(f"   Files with malformed data: {self.stats['files_malformed']}")
         logger.info(f"   Files that failed processing: {self.stats['files_failed']}")
-        logger.info(f"   Documentation files updated: {len(self.stats['files_updated'])}")
+        logger.info(
+            f"   Documentation files updated: {len(self.stats['files_updated'])}"
+        )
         logger.info(f"   Changes made to repository: {self.stats['changes_made']}")
 
         if self.stats["malformed_files"]:
-            logger.warning(f"   Malformed files: {', '.join(self.stats['malformed_files'])}")
+            logger.warning(
+                f"   Malformed files: {', '.join(self.stats['malformed_files'])}"
+            )
 
         if self.stats["failed_files"]:
             logger.warning(f"   Failed files: {', '.join(self.stats['failed_files'])}")
@@ -428,7 +437,9 @@ class DocumentationUpdateManager:
                 if not self.dry_run:
                     self._move_to_malformed(update_file, f"JSON parse error: {e}")
                 else:
-                    logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - JSON parse error: {e}")
+                    logger.warning(
+                        f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - JSON parse error: {e}"
+                    )
                 return
 
             # Step 2: Validate required fields
@@ -437,9 +448,13 @@ class DocumentationUpdateManager:
                 if field not in update_data:
                     # Don't move files in dry-run mode
                     if not self.dry_run:
-                        self._move_to_malformed(update_file, f"Missing required field: {field}")
+                        self._move_to_malformed(
+                            update_file, f"Missing required field: {field}"
+                        )
                     else:
-                        logger.warning(f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - Missing required field: {field}")
+                        logger.warning(
+                            f"⚠️ [DRY RUN] Would move to malformed: {update_file.name} - Missing required field: {field}"
+                        )
                     return
 
             # Step 3: Process the update
@@ -464,7 +479,9 @@ class DocumentationUpdateManager:
                 if not self.dry_run:
                     self._move_to_failed(update_file, error_msg)
                 else:
-                    logger.warning(f"❌ [DRY RUN] Would move to failed: {update_file.name} - {error_msg}")
+                    logger.warning(
+                        f"❌ [DRY RUN] Would move to failed: {update_file.name} - {error_msg}"
+                    )
             else:
                 self.stats["errors"].append(error_msg)
                 raise
@@ -484,7 +501,9 @@ class DocumentationUpdateManager:
             return
 
         # Apply the update
+        error_count_before = len(self.stats["errors"])
         success = self._apply_update(target_file, mode, content, options)
+        error_count_after = len(self.stats["errors"])
 
         if success:
             self.stats["files_processed"] += 1
@@ -492,9 +511,18 @@ class DocumentationUpdateManager:
             if str(target_file) not in self.stats["files_updated"]:
                 self.stats["files_updated"].append(str(target_file))
         else:
-            raise Exception("Update application failed")
+            # Check if _apply_update added any errors
+            if error_count_after > error_count_before:
+                # There were actual errors, this is a real failure
+                raise Exception("Update application failed")
+            else:
+                # No changes needed is not a failure
+                self.stats["files_processed"] += 1
+                logger.info(f"📄 No changes needed for {target_file}")
 
     # ...existing code...
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
