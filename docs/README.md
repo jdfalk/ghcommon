@@ -28,7 +28,6 @@ This directory contains auto-generated documentation for this project.
 - [Shell Script Coding Instructions](.github/instructions/shell.instructions.md)
 - [Test Generation Instructions](.github/instructions/test-generation.instructions.md)
 - [TypeScript Coding Instructions](.github/instructions/typescript.instructions.md)
-- [file: .github/linters/README.md](.github/linters-old/README.md)
 - [Linter Configuration Files](.github/linters/README.md)
 - [AI Architecture Review Prompt](.github/prompts/ai-architecture.prompt.md)
 - [AI Changelog Generation Prompt](.github/prompts/ai-changelog.prompt.md)
@@ -92,4 +91,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Tue Aug 26 11:20:47 UTC 2025_
+_Generated on Wed Aug 27 00:06:09 UTC 2025_
