@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 1.2.0
+# version: 1.3.0
 # guid: e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b
 
 name: Go Release Build
@@ -18,7 +18,7 @@ on:
         default: "false"
 
 permissions:
-  contents: read
+  contents: write   # needed for release asset upload
   packages: write
 
 jobs:
@@ -65,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
+          # Detect all main packages
           PKGS=$(go list -f '{{if eq .Name "main"}}{{.ImportPath}}{{end}}' ./... | grep -v '^$' || true)
           if [ -z "${PKGS}" ]; then
             echo "No main packages found; creating marker file so artifact upload still succeeds." >&2
@@ -74,12 +75,17 @@ jobs:
             for pkg in ${PKGS}; do
               name=$(basename "${pkg}")
               out="dist/${name}-${{ matrix.os }}-${{ matrix.go-version }}"
+              # Add .exe if a Windows runner is ever introduced
               case "${{ matrix.os }}" in
                 *windows*) out="${out}.exe" ;;
               esac
               echo "go build -o ${out} ${pkg}" >&2
               go build -o "${out}" "${pkg}"
             done
+          fi
+          # Mark primary builds so aggregator can filter (written only if matrix.primary==true)
+          if [ "${{ matrix.primary }}" = "true" ]; then
+            touch dist/_primary.marker
           fi
           echo "Contents of dist/:"
           ls -l dist
@@ -97,10 +103,12 @@ jobs:
     steps:
       - name: Create workspace
         run: mkdir -p combined
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
         with:
           path: combined/raw
+
       - name: Normalize structure
         run: |
           set -euo pipefail
@@ -108,27 +116,104 @@ jobs:
           echo "Downloaded artifact directories:" >&2
           find . -maxdepth 2 -type f -print
           mkdir -p ../final
-          for f in $(find . -type f -perm -u+x 2>/dev/null || true); do
-            base=$(basename "$f")
-            cp "$f" ../final/"$base"
-          done
-          for f in $(find . -name README.txt -type f || true); do
-            base="$(basename $(dirname "$f"))-README.txt"
-            cp "$f" ../final/"$base"
-          done
+          PRIMARY_DIRS=$(find . -name _primary.marker -exec dirname {} \; | sort | uniq || true)
+          if [ -n "$PRIMARY_DIRS" ]; then
+            echo "Primary marker directories detected; limiting aggregation to primary builds:" >&2
+            echo "$PRIMARY_DIRS" >&2
+            TARGET_DIRS="$PRIMARY_DIRS"
+          else
+            echo "No primary markers found; aggregating all build artifacts." >&2
+            TARGET_DIRS=$(find . -type d -mindepth 1 -maxdepth 3 | sort | uniq)
+          fi
+          copied=0
+            for d in $TARGET_DIRS; do
+              for f in $(find "$d" -maxdepth 1 -type f -perm -u+x 2>/dev/null || true); do
+                base=$(basename "$f")
+                cp "$f" ../final/"$base"
+                copied=$((copied+1))
+              done
+              # README marker capture
+              if [ -f "$d/README.txt" ]; then
+                base_dir=$(basename "$d")
+                cp "$d/README.txt" ../final/"${base_dir}-README.txt"
+              fi
+            done
+          if [ $copied -eq 0 ]; then
+            echo "No executable artifacts detected; creating placeholder." >&2
+            echo "No executables found in selected directories" > ../final/NO_EXECUTABLES.txt
+          fi
           ls -l ../final
+
       - name: Create tarball and zip
         run: |
           cd combined/final
           tar -czf ../../go-build-all.tar.gz .
           zip -r ../../go-build-all.zip .
+
+      - name: Generate checksums
+        run: |
+          set -euo pipefail
+          sha256sum go-build-all.tar.gz > go-build-all.tar.gz.sha256
+          sha256sum go-build-all.zip > go-build-all.zip.sha256
+          echo "Generated checksums:" >&2
+          cat go-build-all.tar.gz.sha256
+          cat go-build-all.zip.sha256
+
+      - name: Upload checksum artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-all-checksums
+          path: |
+            go-build-all.tar.gz.sha256
+            go-build-all.zip.sha256
+
       - name: Upload combined artifact (tar.gz)
         uses: actions/upload-artifact@v4
         with:
-          name: go-build-all-tar
-          path: go-build-all.tar.gz
+            name: go-build-all-tar
+            path: go-build-all.tar.gz
+
       - name: Upload combined artifact (zip)
         uses: actions/upload-artifact@v4
         with:
+            name: go-build-all-zip
+            path: go-build-all.zip
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: aggregate-artifacts
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download combined tar
+        uses: actions/download-artifact@v5
+        with:
+          name: go-build-all-tar
+          path: artifacts
+      - name: Download combined zip
+        uses: actions/download-artifact@v5
+        with:
           name: go-build-all-zip
-          path: go-build-all.zip
+          path: artifacts
+      - name: Download checksums
+        uses: actions/download-artifact@v5
+        with:
+          name: go-build-all-checksums
+          path: artifacts
+      - name: Prepare release assets
+        run: |
+          set -euo pipefail
+          ls -R artifacts
+          # Move files to workspace root for action upload simplicity
+          find artifacts -type f -name 'go-build-all*' -exec cp {} . \;
+          ls -l .
+      - name: Create / Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            go-build-all.tar.gz
+            go-build-all.zip
+            go-build-all.tar.gz.sha256
+            go-build-all.zip.sha256
+          draft: false
+          prerelease: false
