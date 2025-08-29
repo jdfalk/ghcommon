@@ -4,7 +4,8 @@
 
 # Cosign Signature Verification
 
-This repository uses [Cosign](https://docs.sigstore.dev/cosign/overview/) to sign release artifacts, providing cryptographic verification of their authenticity and integrity.
+This repository uses [Cosign](https://docs.sigstore.dev/cosign/overview/) to sign release artifacts,
+providing cryptographic verification of their authenticity and integrity.
 
 ## What is Signed
 
@@ -35,7 +36,8 @@ go install github.com/sigstore/cosign/v2/cmd/cosign@latest
 
 1. **Download the artifacts and signature files** from the GitHub release or workflow artifacts
 
-2. **Download the public key** (`cosign.pub`) from the GitHub release artifacts or from this repository
+2. **Download the public key** (`cosign.pub`) from the GitHub release artifacts or from this
+   repository
 
 3. **Verify a signature**:
 
@@ -104,4 +106,5 @@ else
 fi
 ```
 
-For more information about Cosign, visit the [official documentation](https://docs.sigstore.dev/cosign/overview/).
+For more information about Cosign, visit the
+[official documentation](https://docs.sigstore.dev/cosign/overview/).
