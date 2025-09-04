@@ -662,7 +662,7 @@ jobs:
           ls -l pr-automation-context.tar.gz
 
       - name: Attest SBOM
-        uses: actions/attest-sbom@v1
+        uses: actions/attest-sbom@v3
         with:
           subject-path: pr-automation-context.tar.gz
           sbom-path: sbom.spdx.json
