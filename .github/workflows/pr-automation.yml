@@ -668,7 +668,7 @@ jobs:
           sbom-path: sbom.spdx.json
 
       - name: Build Provenance Attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: pr-automation-context.tar.gz
 
