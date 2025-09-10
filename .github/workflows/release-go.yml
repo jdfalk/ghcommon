@@ -35,7 +35,7 @@ jobs:
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: protobuf-generated
 
@@ -105,7 +105,7 @@ jobs:
         run: mkdir -p combined
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: combined/raw
 
@@ -330,34 +330,34 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download combined tar
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-all-tar
           path: artifacts
       - name: Download combined zip
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-all-zip
           path: artifacts
       - name: Download checksums
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-all-checksums
           path: artifacts
       - name: Download per-OS archives
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-per-os
           path: artifacts/per-os
         continue-on-error: true
       - name: Download SBOMs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-sboms
           path: artifacts/sboms
         continue-on-error: true
       - name: Download signatures
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: go-build-signatures
           path: artifacts/signatures
