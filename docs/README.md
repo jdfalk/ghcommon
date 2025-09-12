@@ -92,4 +92,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Wed Sep  3 17:04:03 UTC 2025_
+_Generated on Fri Sep 12 18:51:29 UTC 2025_
