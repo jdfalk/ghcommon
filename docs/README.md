@@ -11,6 +11,7 @@ This directory contains auto-generated documentation for this project.
 - [file: .github/WORKFLOW_CONFIG_GUIDE.md](.github/WORKFLOW_CONFIG_GUIDE.md)
 - [Copilot/AI Agent Coding Instructions System](.github/copilot-instructions.md)
 - [Conventional Commit Message Instructions](.github/instructions/commit-messages.instructions.md)
+- [](.github/instructions/copilot-instructions.md)
 - [General Coding Instructions](.github/instructions/general-coding.instructions.md)
 - [GitHub Actions Workflow Coding Instructions](.github/instructions/github-actions.instructions.md)
 - [Go Coding Instructions](.github/instructions/go.instructions.md)
@@ -92,4 +93,4 @@ This directory contains auto-generated documentation for this project.
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_133609.md)
 - [Workflow Failure Analysis Report](scripts/workflow-debug-output/reports/summary_report_20250811_135842.md)
 
-_Generated on Fri Sep 12 18:51:29 UTC 2025_
+_Generated on Mon Sep 15 00:31:41 UTC 2025_
