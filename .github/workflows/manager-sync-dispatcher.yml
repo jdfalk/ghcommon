@@ -6,20 +6,21 @@
 # All changes should be made in jdfalk/ghcommon and will be synced to other repositories
 # Edit this file at: https://github.com/jdfalk/ghcommon/edit/main/.github/workflows/manager-sync-dispatcher.yml
 
-name: Manager Sync Dispatcher
+name: Manager Sync Dispatcher (DISABLED)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/**"
-      - ".github/instructions/**"
-      - ".github/prompts/**"
-      - ".github/scripts/**"
-      - "scripts/**"
-      - ".github/linters/**"
-      - "labels.json"
-      - "labels.md"
+  # DISABLED: Manual file management approach adopted
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - ".github/workflows/**"
+  #     - ".github/instructions/**"
+  #     - ".github/prompts/**"
+  #     - ".github/scripts/**"
+  #     - "scripts/**"
+  #     - ".github/linters/**"
+  #     - "labels.json"
+  #     - "labels.md"
   workflow_dispatch:
     inputs:
       sync_type:
