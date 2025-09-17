@@ -1,5 +1,5 @@
 # file: .github/dependabot.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: 9c950aa6-81f3-43f9-8f59-955ad5569369
 
 # Smart Dependabot configuration for ghcommon
@@ -11,8 +11,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
-      day: wednesday
-      time: "10:00"
+      day: friday
+      time: "09:00"
       timezone: America/New_York
     open-pull-requests-limit: 5
     commit-message:
@@ -20,8 +20,7 @@ updates:
       include: scope
     labels:
       - dependencies
-      - github-actions
-      - ci-cd
+      - priority-high
     groups:
       ci-dependencies:
         patterns:
