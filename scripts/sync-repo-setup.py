@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/sync-repo-setup.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 """
@@ -346,11 +346,11 @@ class DependabotGenerator:
     def _get_github_actions_config(self) -> Dict[str, Any]:
         """Get GitHub Actions dependabot configuration.
         
-        Includes two groups to consolidate GitHub Actions updates:
-        - ci-dependencies: Official GitHub actions (actions/*, github/*)
-        - external-actions: Third-party actions (everything else)
+        Includes groups to consolidate GitHub Actions updates:
+        - github-actions-minor-patch: All actions with minor/patch updates
+        - github-actions-major: All actions with major updates (separate PR)
         
-        Both groups only include minor/patch updates to avoid breaking changes.
+        This ensures all action updates are grouped while keeping major updates separate.
         """
         return {
             "package-ecosystem": "github-actions",
@@ -365,14 +365,13 @@ class DependabotGenerator:
             "commit-message": {"prefix": "ci", "include": "scope"},
             "labels": ["dependencies", "priority-high"],
             "groups": {
-                "ci-dependencies": {
-                    "patterns": ["actions/*", "github/*"],
+                "github-actions-minor-patch": {
+                    "patterns": ["*"],
                     "update-types": ["minor", "patch"],
                 },
-                "external-actions": {
+                "github-actions-major": {
                     "patterns": ["*"],
-                    "exclude-patterns": ["actions/*", "github/*"],
-                    "update-types": ["minor", "patch"],
+                    "update-types": ["major"],
                 },
             },
         }
