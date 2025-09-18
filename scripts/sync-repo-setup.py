@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/sync-repo-setup.py
-# version: 1.0.0
+# version: 1.2.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 """
@@ -344,7 +344,14 @@ class DependabotGenerator:
         }
 
     def _get_github_actions_config(self) -> Dict[str, Any]:
-        """Get GitHub Actions dependabot configuration."""
+        """Get GitHub Actions dependabot configuration.
+        
+        Includes groups to consolidate GitHub Actions updates:
+        - github-actions-minor-patch: All actions with minor/patch updates
+        - github-actions-major: All actions with major updates (separate PR)
+        
+        This ensures all action updates are grouped while keeping major updates separate.
+        """
         return {
             "package-ecosystem": "github-actions",
             "directory": "/",
@@ -357,6 +364,16 @@ class DependabotGenerator:
             "open-pull-requests-limit": 5,
             "commit-message": {"prefix": "ci", "include": "scope"},
             "labels": ["dependencies", "priority-high"],
+            "groups": {
+                "github-actions-minor-patch": {
+                    "patterns": ["*"],
+                    "update-types": ["minor", "patch"],
+                },
+                "github-actions-major": {
+                    "patterns": ["*"],
+                    "update-types": ["major"],
+                },
+            },
         }
 
 

@@ -58,7 +58,7 @@ class TestBasicFunctionality(unittest.TestCase):
 
         with open(requirements_path, "r") as f:
             content = f.read()
-            self.assertIn("requests", content)
+            self.assertIn("PyYAML", content)
 
 
 class TestWorkflowIntegrity(unittest.TestCase):
@@ -69,13 +69,61 @@ class TestWorkflowIntegrity(unittest.TestCase):
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         workflows_dir = os.path.join(repo_root, ".github", "workflows")
 
-        expected_workflows = ["ci.yml", "matrix-build.yml", "security.yml"]
+        expected_workflows = ["ci.yml", "security.yml", "release.yml"]
 
         for workflow in expected_workflows:
             workflow_path = os.path.join(workflows_dir, workflow)
             self.assertTrue(
                 os.path.exists(workflow_path), f"Expected workflow {workflow} not found"
             )
+
+    def test_dependabot_config(self):
+        """Test that dependabot.yml is valid and has groups configured."""
+        import yaml
+        
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dependabot_path = os.path.join(repo_root, ".github", "dependabot.yml")
+        
+        # Check file exists
+        self.assertTrue(os.path.exists(dependabot_path), "dependabot.yml not found")
+        
+        # Check it's valid YAML
+        with open(dependabot_path, "r") as f:
+            config = yaml.safe_load(f)
+        
+        # Check it has updates
+        self.assertIn("updates", config)
+        self.assertIsInstance(config["updates"], list)
+        
+        # Find GitHub Actions config
+        github_actions_config = None
+        for update in config["updates"]:
+            if update.get("package-ecosystem") == "github-actions":
+                github_actions_config = update
+                break
+        
+        self.assertIsNotNone(github_actions_config, "GitHub Actions config not found")
+        
+        # Check it has groups
+        self.assertIn("groups", github_actions_config, "Groups not configured for GitHub Actions")
+        groups = github_actions_config["groups"]
+        
+        # Check specific groups exist
+        self.assertIn("github-actions-minor-patch", groups, "github-actions-minor-patch group not found")
+        self.assertIn("github-actions-major", groups, "github-actions-major group not found")
+        
+        # Check github-actions-minor-patch group configuration
+        minor_patch = groups["github-actions-minor-patch"]
+        self.assertIn("patterns", minor_patch)
+        self.assertIn("*", minor_patch["patterns"])
+        self.assertIn("minor", minor_patch["update-types"])
+        self.assertIn("patch", minor_patch["update-types"])
+        
+        # Check github-actions-major group configuration
+        major = groups["github-actions-major"]
+        self.assertIn("patterns", major)
+        self.assertIn("*", major["patterns"])
+        self.assertIn("major", major["update-types"])
 
 
 if __name__ == "__main__":
