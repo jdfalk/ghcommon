@@ -85,9 +85,9 @@ jobs:
           import yaml
           import json
           import os
-          
+
           config_path = '${{ inputs.config-path }}'
-          
+
           # Default configuration
           config = {
               'languages': {
@@ -104,7 +104,7 @@ jobs:
                   'generate_docs': False
               }
           }
-          
+
           # Load actual configuration if available
           if os.path.exists(config_path):
               try:
@@ -114,11 +114,11 @@ jobs:
                           config.update(loaded_config)
               except Exception as e:
                   print(f'Error loading config: {e}')
-          
+
           # Extract values
           languages = config.get('languages', {})
           protobuf = config.get('protobuf', {})
-          
+
           # Set outputs
           print(f'protobuf-enabled={str(protobuf.get(\"enabled\", False)).lower()}')
           print(f'go-enabled={str(languages.get(\"go\", {}).get(\"enabled\", False)).lower()}')
@@ -170,7 +170,7 @@ jobs:
           sudo mv protoc/include/* /usr/local/include/
           sudo chmod +x /usr/local/bin/protoc
           rm -rf protoc protoc-${PROTOC_VERSION}-linux-x86_64.zip
-          
+
           # Verify installation
           protoc --version
 
@@ -186,10 +186,10 @@ jobs:
           echo "Installing Go protobuf plugins..."
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-          
+
           # Add Go bin to PATH
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          
+
           # Verify installations
           which protoc-gen-go
           which protoc-gen-go-grpc
@@ -202,7 +202,7 @@ jobs:
           echo "Installing Python protobuf plugins..."
           python -m pip install --upgrade pip
           python -m pip install grpcio-tools mypy-protobuf
-          
+
           # Verify installations
           python -c "import grpc_tools.protoc; print('grpc_tools.protoc available')"
           python -c "import mypy_protobuf; print('mypy-protobuf available')"
@@ -212,7 +212,7 @@ jobs:
         run: |
           echo "Installing Rust protobuf plugins..."
           cargo install protobuf-codegen
-          
+
           # Add cargo bin to PATH
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
@@ -222,11 +222,11 @@ jobs:
           echo "Working directory: $(pwd)"
           echo "Protobuf source path: ${{ inputs.protobuf-path }}"
           echo "Output path: ${{ inputs.output-path }}"
-          
+
           # Check for required files
           echo "buf.yaml exists: $(test -f buf.yaml && echo 'yes' || echo 'no')"
           echo "buf.gen.yaml exists: $(test -f buf.gen.yaml && echo 'yes' || echo 'no')"
-          
+
           # List protobuf files
           if [ -d "${{ inputs.protobuf-path }}" ]; then
             echo "Found protobuf files:"
@@ -234,7 +234,7 @@ jobs:
           else
             echo "No protobuf source directory found"
           fi
-          
+
           # Tool versions
           echo "Tool versions:"
           protoc --version
@@ -266,25 +266,25 @@ jobs:
         run: |
           # Look for post-processing scripts
           SCRIPTS_FOUND=false
-          
+
           if [ -f "scripts/post-buf-generate.py" ]; then
             echo "Running post-buf-generate.py..."
             python3 scripts/post-buf-generate.py
             SCRIPTS_FOUND=true
           fi
-          
+
           if [ -f "scripts/setup-go-modules.py" ]; then
             echo "Running setup-go-modules.py..."
             python3 scripts/setup-go-modules.py
             SCRIPTS_FOUND=true
           fi
-          
+
           if [ -f "scripts/setup-python-sdk.py" ]; then
             echo "Running setup-python-sdk.py..."
             python3 scripts/setup-python-sdk.py
             SCRIPTS_FOUND=true
           fi
-          
+
           if [ "$SCRIPTS_FOUND" = false ]; then
             echo "No post-processing scripts found"
           fi
@@ -317,17 +317,17 @@ jobs:
         id: check-artifacts
         run: |
           echo "=== Checking generated artifacts ==="
-          
+
           # Count Go files
           GO_FILES=$(find "${{ inputs.output-path }}" -name "*.pb.go" -o -name "*_grpc.pb.go" 2>/dev/null | wc -l)
           echo "go-files-generated=$GO_FILES" >> $GITHUB_OUTPUT
           echo "Generated Go files: $GO_FILES"
-          
+
           # Count Python files
           PYTHON_FILES=$(find "${{ inputs.output-path }}" -name "*.py" -o -name "*.pyi" 2>/dev/null | grep -v __pycache__ | wc -l)
           echo "python-files-generated=$PYTHON_FILES" >> $GITHUB_OUTPUT
           echo "Generated Python files: $PYTHON_FILES"
-          
+
           # Check for documentation
           if [ -d "proto-docs" ] && [ -n "$(find proto-docs -name "*.md" 2>/dev/null)" ]; then
             echo "docs-generated=true" >> $GITHUB_OUTPUT
@@ -336,7 +336,7 @@ jobs:
             echo "docs-generated=false" >> $GITHUB_OUTPUT
             echo "Documentation generated: no"
           fi
-          
+
           # Overall artifacts check
           if [ "$GO_FILES" -gt 0 ] || [ "$PYTHON_FILES" -gt 0 ]; then
             echo "artifacts-available=true" >> $GITHUB_OUTPUT
@@ -345,7 +345,7 @@ jobs:
             echo "artifacts-available=false" >> $GITHUB_OUTPUT
             echo "❌ No protobuf artifacts were generated"
           fi
-          
+
           # Show sample files
           echo "Sample generated files:"
           find "${{ inputs.output-path }}" -name "*.pb.go" 2>/dev/null | head -3
@@ -361,18 +361,18 @@ jobs:
         run: |
           echo "# 🔧 Protobuf Generation Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ needs.load-config.outputs.protobuf-enabled }}" = "true" ]; then
             echo "**Protobuf Enabled:** ✅ Yes" >> $GITHUB_STEP_SUMMARY
             echo "**Configuration Loaded:** ${{ needs.load-config.outputs.config-loaded }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
             echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
             echo "| Configuration | ${{ needs.load-config.result }} |" >> $GITHUB_STEP_SUMMARY
             echo "| Code Generation | ${{ needs.generate-protobuf.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             if [ "${{ needs.generate-protobuf.result }}" = "success" ]; then
               echo "**Generated Files:**" >> $GITHUB_STEP_SUMMARY
               echo "- Go files: ${{ needs.generate-protobuf.outputs.go-files-generated || 0 }}" >> $GITHUB_STEP_SUMMARY
