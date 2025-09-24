@@ -1,0 +1,194 @@
+# file: .github/workflows/reusable-security.yml
+# version: 1.0.0
+# guid: reusable-security-2025-09-24-core-workflow
+
+name: Reusable Security Workflow
+
+on:
+  workflow_call:
+    inputs:
+      skip-codeql:
+        description: "Skip CodeQL analysis"
+        required: false
+        type: boolean
+        default: false
+      skip-dependency-review:
+        description: "Skip dependency review"
+        required: false
+        type: boolean
+        default: false
+      skip-security-audit:
+        description: "Skip security audit"
+        required: false
+        type: boolean
+        default: false
+      languages:
+        description: "Languages for CodeQL analysis (JSON array)"
+        required: false
+        type: string
+        default: '["go", "javascript", "python"]'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # CodeQL Analysis
+  codeql-analysis:
+    name: CodeQL Analysis
+    if: '!inputs.skip-codeql'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(inputs.languages) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Set up language environment
+        run: |
+          case "${{ matrix.language }}" in
+            go)
+              if [ -f go.mod ]; then
+                go mod download
+              fi
+              ;;
+            javascript)
+              if [ -f package.json ]; then
+                npm ci || npm install
+              fi
+              ;;
+            python)
+              if [ -f requirements.txt ]; then
+                pip install -r requirements.txt
+              fi
+              ;;
+          esac
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # Dependency Review
+  dependency-review:
+    name: Dependency Review
+    if: '!inputs.skip-dependency-review && github.event_name == ''pull_request'''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          config-file: './.github/dependency-review-config.yml'
+          fail-on-severity: moderate
+
+  # Security Audit
+  security-audit:
+    name: Security Audit
+    if: '!inputs.skip-security-audit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Go security audit
+        if: hashFiles('go.mod') != ''
+        run: |
+          go install github.com/securecodewarrior/go-audit@latest
+          go list -json -deps ./... | go-audit
+
+      - name: Python security audit
+        if: hashFiles('requirements*.txt', 'pyproject.toml') != ''
+        run: |
+          pip install safety bandit
+          if [ -f requirements.txt ]; then
+            safety check -r requirements.txt
+          fi
+          if find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*" | head -1 | grep -q .; then
+            bandit -r . -x ./venv,./venv3,./.venv -f json -o bandit-report.json || true
+            if [ -f bandit-report.json ]; then
+              echo "Bandit security scan completed. Report:"
+              cat bandit-report.json
+            fi
+          fi
+
+      - name: Node.js security audit
+        if: hashFiles('package*.json') != ''
+        run: |
+          if [ -f package.json ]; then
+            npm audit --audit-level=moderate || true
+          fi
+
+      - name: Rust security audit
+        if: hashFiles('Cargo.toml') != ''
+        run: |
+          cargo install cargo-audit
+          cargo audit
+
+  # Trivy vulnerability scanning
+  trivy-scan:
+    name: Trivy Security Scan
+    if: '!inputs.skip-security-audit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Security summary
+  security-summary:
+    name: Security Summary
+    needs: [codeql-analysis, dependency-review, security-audit, trivy-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Review | ${{ needs.dependency-review.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ needs.security-audit.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy Scan | ${{ needs.trivy-scan.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+
+          # Set overall status
+          if [[ "${{ needs.codeql-analysis.result }}" == "failure" ||
+                "${{ needs.dependency-review.result }}" == "failure" ||
+                "${{ needs.security-audit.result }}" == "failure" ||
+                "${{ needs.trivy-scan.result }}" == "failure" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Security issues detected. Please review the scan results.**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All security scans passed.**" >> $GITHUB_STEP_SUMMARY
+          fi

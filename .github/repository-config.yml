@@ -1,0 +1,344 @@
+# file: .github/repository-config.yml
+# version: 1.0.0
+# guid: unified-repo-config-2025-09-24-comprehensive
+
+# Unified Repository Configuration Schema
+# This file consolidates all workflow configurations into a single source of truth.
+# It merges and replaces: release-config.yml, unified-automation-config.json, workflow-config.yaml
+#
+# Usage:
+# 1. Place repository-specific copy in each repo's .github/ directory
+# 2. Workflows automatically detect and use repo-specific configs with fallback to defaults
+# 3. All workflow_dispatch inputs can override these values at runtime
+
+# Repository Metadata
+repository:
+  name: "" # Auto-detected from GitHub context
+  type: "library" # Options: library, application, service, utility
+  primary_language: "auto" # Auto-detected or specify: go, rust, python, javascript, typescript
+  description: ""
+
+# Language Detection and Support
+languages:
+  # Detection patterns for automatic language identification
+  detection:
+    patterns:
+      go:
+        - "go.mod"
+        - "go.sum"
+        - "main.go"
+        - "cmd/"
+        - "pkg/"
+      rust:
+        - "Cargo.toml"
+        - "Cargo.lock"
+        - "src/main.rs"
+        - "src/lib.rs"
+      python:
+        - "pyproject.toml"
+        - "setup.py"
+        - "requirements.txt"
+        - "poetry.lock"
+        - "__init__.py"
+      javascript:
+        - "package.json"
+        - "package-lock.json"
+        - "yarn.lock"
+        - "index.js"
+      typescript:
+        - "tsconfig.json"
+        - "*.ts"
+        - "*.tsx"
+      protobuf:
+        - "buf.yaml"
+        - "buf.gen.yaml"
+        - "*.proto"
+      docker:
+        - "Dockerfile"
+        - "docker-compose.yml"
+        - ".dockerignore"
+
+    # Priority order when multiple languages are detected
+    priority:
+      - rust
+      - go
+      - typescript
+      - javascript
+      - python
+      - protobuf
+
+  # Version matrices for build testing
+  versions:
+    go: ["1.22", "1.23", "1.24"]
+    python: ["3.11", "3.12", "3.13"]
+    node: ["18", "20", "22", "24"]
+    rust: ["stable", "beta"]
+
+# Build Configuration
+build:
+  # Platform matrix
+  platforms:
+    os: ["ubuntu-latest", "macos-latest"]
+    arch: ["amd64", "arm64"]
+
+  # Docker configuration
+  docker:
+    enabled: true
+    platforms: ["linux/amd64", "linux/arm64"]
+    registries: ["ghcr.io"]
+
+  # Cross-compilation settings
+  cross_compile:
+    enabled: true
+    targets:
+      go: ["linux/amd64", "linux/arm64", "darwin/amd64", "darwin/arm64", "windows/amd64"]
+      rust: ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "x86_64-apple-darwin", "aarch64-apple-darwin", "x86_64-pc-windows-gnu"]
+
+# Testing Configuration
+testing:
+  # Coverage thresholds
+  coverage:
+    enabled: true
+    threshold: 80
+    fail_below_threshold: false
+    generate_report: true
+    upload_codecov: false
+
+  # Test categories
+  categories:
+    unit: true
+    integration: true
+    e2e: false
+    performance: false
+
+  # Test timeouts
+  timeouts:
+    unit: "5m"
+    integration: "15m"
+    e2e: "30m"
+
+# Security Configuration
+security:
+  # CodeQL Analysis
+  codeql:
+    enabled: true
+    languages: ["auto-detect"]
+    queries: "security-extended"
+
+  # Dependency scanning
+  dependency_review:
+    enabled: true
+    fail_on_severity: "moderate"
+    allow_licenses: ["MIT", "Apache-2.0", "BSD-3-Clause", "ISC"]
+
+  # Vulnerability scanning
+  vulnerability_scan:
+    enabled: true
+    tools: ["trivy", "nancy"]
+
+  # Secret scanning
+  secret_scan:
+    enabled: true
+    custom_patterns: []
+
+# Release Configuration
+release:
+  # Semantic versioning
+  versioning:
+    enabled: true
+    scheme: "semver" # Options: semver, date, custom
+
+    # Conventional commit types that trigger releases
+    triggers:
+      major: ["feat!", "fix!", "chore!", "breaking"]
+      minor: ["feat", "feature"]
+      patch: ["fix", "bug", "patch", "docs", "style", "refactor", "perf", "test", "chore"]
+
+    # Pre-release settings
+    prerelease:
+      enabled: false
+      pattern: "alpha|beta|rc"
+
+  # Release artifacts
+  artifacts:
+    enabled: true
+    types: ["binary", "archive", "checksum", "signature"]
+
+    # Binary configuration
+    binary:
+      strip: true
+      compress: true
+
+    # Archive formats
+    archives: ["tar.gz", "zip"]
+
+    # Checksums
+    checksums: ["sha256", "sha512"]
+
+    # Code signing
+    signing:
+      enabled: false
+      tool: "cosign"
+
+  # Changelog generation
+  changelog:
+    enabled: true
+    categories: ["Features", "Bug Fixes", "Documentation", "Dependencies"]
+
+# CI/CD Configuration
+ci:
+  # Change detection
+  change_detection:
+    enabled: true
+    patterns:
+      go: ["**/*.go", "go.mod", "go.sum"]
+      rust: ["**/*.rs", "Cargo.toml", "Cargo.lock"]
+      python: ["**/*.py", "requirements*.txt", "pyproject.toml", "setup.py"]
+      javascript: ["**/*.js", "**/*.ts", "package*.json", "yarn.lock"]
+      protobuf: ["**/*.proto", "buf.yaml", "buf.gen.yaml"]
+      docker: ["Dockerfile*", "docker-compose*.yml", ".dockerignore"]
+      docs: ["**/*.md", "docs/**/*"]
+      workflows: [".github/workflows/**/*", ".github/*.yml", ".github/*.yaml"]
+
+  # Validation steps
+  validation:
+    linting: true
+    formatting: true
+    type_checking: true
+    security_scan: true
+
+  # Build optimizations
+  caching:
+    enabled: true
+    paths:
+      go: ["~/go/pkg/mod"]
+      rust: ["~/.cargo", "target/"]
+      python: ["~/.cache/pip"]
+      node: ["~/.npm", "node_modules/"]
+
+# Issue and PR Automation
+automation:
+  # Issue management
+  issues:
+    auto_labeling: true
+    auto_assignment: true
+    stale_management: true
+    template_compliance: true
+
+    # Stale issue settings
+    stale:
+      days_before_stale: 60
+      days_before_close: 14
+      exempt_labels: ["keep-open", "bug", "security", "enhancement"]
+
+    # Auto-labeling rules
+    labels:
+      priority_detection: true
+      language_detection: true
+      category_detection: true
+      security_detection: true
+
+  # Pull request automation
+  pull_requests:
+    auto_merge: false
+    auto_labeling: true
+    size_labeling: true
+    conflict_detection: true
+
+    # Auto-merge criteria
+    auto_merge_criteria:
+      required_checks: ["ci", "security"]
+      required_reviews: 1
+      dismiss_stale_reviews: true
+
+# Maintenance Configuration
+maintenance:
+  # Dependency management
+  dependencies:
+    auto_update: false
+    security_updates: true
+    schedule: "weekly"
+
+    # Update strategies
+    strategies:
+      go: "go get -u && go mod tidy"
+      rust: "cargo update"
+      python: "pip-audit && safety check"
+      node: "npm audit && npm update"
+
+  # Repository cleanup
+  cleanup:
+    old_branches: true
+    old_tags: false
+    old_releases: false
+
+    # Cleanup thresholds
+    thresholds:
+      branch_age_days: 90
+      tag_keep_count: 50
+      release_keep_count: 10
+
+  # License compliance
+  license:
+    check_enabled: true
+    allowed_licenses: ["MIT", "Apache-2.0", "BSD-3-Clause", "ISC"]
+    report_format: "json"
+
+# Notification Configuration
+notifications:
+  # Channels
+  channels:
+    github_issues: true
+    github_discussions: false
+    slack: false
+    email: false
+
+  # Notification triggers
+  triggers:
+    security_alerts: true
+    build_failures: true
+    release_published: true
+    critical_issues: true
+
+# Integration Configuration
+integrations:
+  # External services
+  services:
+    codecov:
+      enabled: false
+      token_secret: "CODECOV_TOKEN"
+
+    sonarcloud:
+      enabled: false
+      token_secret: "SONAR_TOKEN"
+
+    snyk:
+      enabled: false
+      token_secret: "SNYK_TOKEN"
+
+  # GitHub Apps
+  apps:
+    dependabot: true
+    renovate: false
+
+# Environment-specific overrides
+environments:
+  development:
+    testing:
+      coverage:
+        threshold: 70
+    security:
+      vulnerability_scan:
+        enabled: false
+
+  staging:
+    release:
+      prerelease:
+        enabled: true
+
+  production:
+    security:
+      secret_scan:
+        enabled: true
+      dependency_review:
+        fail_on_severity: "low"
