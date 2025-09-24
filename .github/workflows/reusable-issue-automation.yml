@@ -1,0 +1,279 @@
+# file: .github/workflows/reusable-issue-automation.yml
+# version: 1.0.0
+# guid: reusable-issue-automation-2025-09-24-core-workflow
+
+name: Reusable Issue Automation Workflow
+
+on:
+  workflow_call:
+    inputs:
+      stale-days:
+        description: "Days before marking issues as stale"
+        required: false
+        type: number
+        default: 60
+      close-days:
+        description: "Days before closing stale issues"
+        required: false
+        type: number
+        default: 14
+      skip-stale-management:
+        description: "Skip stale issue management"
+        required: false
+        type: boolean
+        default: false
+      skip-auto-labeling:
+        description: "Skip automatic labeling"
+        required: false
+        type: boolean
+        default: false
+      skip-auto-assignment:
+        description: "Skip automatic assignment"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  # Stale issue management
+  stale-management:
+    name: Manage Stale Issues
+    if: '!inputs.skip-stale-management'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark and close stale issues
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had recent activity.
+            It will be closed if no further activity occurs within ${{ inputs.close-days }} days.
+
+            If you believe this issue is still relevant, please:
+            - Add a comment explaining why this should remain open
+            - Remove the "stale" label
+            - Add the "keep-open" label to prevent future stale marking
+
+            Thank you for your contributions!
+          close-issue-message: |
+            This issue has been automatically closed due to inactivity.
+
+            If you believe this issue should remain open, please reopen it and add the "keep-open" label
+            to prevent future automatic closure.
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had recent activity.
+            It will be closed if no further activity occurs within ${{ inputs.close-days }} days.
+
+            If this pull request is still relevant, please:
+            - Rebase or update the PR
+            - Add a comment explaining the current status
+            - Remove the "stale" label
+          close-pr-message: |
+            This pull request has been automatically closed due to inactivity.
+
+            If you'd like to continue with these changes, please reopen the PR or create a new one.
+          days-before-stale: ${{ inputs.stale-days }}
+          days-before-close: ${{ inputs.close-days }}
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          exempt-issue-labels: 'keep-open,bug,security,enhancement'
+          exempt-pr-labels: 'keep-open,work-in-progress,security'
+          exempt-draft-pr: true
+          operations-per-run: 100
+
+  # Automatic labeling
+  auto-labeling:
+    name: Auto Label Issues and PRs
+    if: '!inputs.skip-auto-labeling && (github.event_name == ''issues'' || github.event_name == ''pull_request'')'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Auto-label based on content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue || context.payload.pull_request;
+            if (!issue) return;
+
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            const labels = [];
+
+            // Bug detection
+            if (title.includes('bug') || title.includes('error') || title.includes('fail') ||
+                body.includes('error') || body.includes('exception') || body.includes('traceback')) {
+              labels.push('bug');
+            }
+
+            // Enhancement detection
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('improve') ||
+                body.includes('feature request') || body.includes('enhancement')) {
+              labels.push('enhancement');
+            }
+
+            // Documentation detection
+            if (title.includes('doc') || title.includes('readme') || title.includes('document') ||
+                body.includes('documentation') || body.includes('docs')) {
+              labels.push('documentation');
+            }
+
+            // Priority detection
+            if (title.includes('critical') || title.includes('urgent') || body.includes('critical')) {
+              labels.push('priority: high');
+            } else if (title.includes('minor') || body.includes('minor')) {
+              labels.push('priority: low');
+            } else {
+              labels.push('priority: medium');
+            }
+
+            // Security detection
+            if (title.includes('security') || title.includes('vuln') || title.includes('cve') ||
+                body.includes('security') || body.includes('vulnerability')) {
+              labels.push('security');
+            }
+
+            // Language-specific labels
+            if (body.includes('go.mod') || body.includes('golang') || body.includes('`.go`')) {
+              labels.push('language: go');
+            }
+            if (body.includes('requirements.txt') || body.includes('python') || body.includes('`.py`')) {
+              labels.push('language: python');
+            }
+            if (body.includes('cargo.toml') || body.includes('rust') || body.includes('`.rs`')) {
+              labels.push('language: rust');
+            }
+            if (body.includes('package.json') || body.includes('javascript') || body.includes('`.js`')) {
+              labels.push('language: javascript');
+            }
+
+            // CI/CD detection
+            if (body.includes('workflow') || body.includes('github action') || body.includes('ci/cd')) {
+              labels.push('ci/cd');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+
+              console.log(`Added labels: ${labels.join(', ')}`);
+            }
+
+  # Automatic assignment
+  auto-assignment:
+    name: Auto Assign Issues and PRs
+    if: '!inputs.skip-auto-assignment && (github.event_name == ''issues'' || github.event_name == ''pull_request'')'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-assign based on content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue || context.payload.pull_request;
+            if (!issue) return;
+
+            // Don't auto-assign if already assigned
+            if (issue.assignees && issue.assignees.length > 0) return;
+
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            let assignee = null;
+
+            // Repository owner/maintainer assignment logic
+            const repoOwner = context.repo.owner;
+
+            // Security issues get immediate attention
+            if (title.includes('security') || title.includes('vuln') || body.includes('security')) {
+              assignee = repoOwner;
+            }
+
+            // Critical bugs get immediate attention
+            if ((title.includes('bug') && title.includes('critical')) ||
+                (body.includes('critical') && body.includes('error'))) {
+              assignee = repoOwner;
+            }
+
+            // CI/CD issues for workflow maintainer
+            if (body.includes('workflow') || body.includes('github action') || title.includes('ci')) {
+              assignee = repoOwner;
+            }
+
+            if (assignee) {
+              try {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: [assignee]
+                });
+
+                console.log(`Auto-assigned to: ${assignee}`);
+              } catch (error) {
+                console.log(`Failed to assign to ${assignee}: ${error.message}`);
+              }
+            }
+
+  # Issue templates compliance
+  template-compliance:
+    name: Check Template Compliance
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check issue template compliance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue.body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Thank you for opening this issue!
+
+                It looks like this issue doesn't include much detail. To help us assist you better, could you please provide:
+
+                - **Description**: What is the issue or feature request?
+                - **Steps to reproduce** (for bugs): How can we reproduce this issue?
+                - **Expected behavior**: What did you expect to happen?
+                - **Actual behavior**: What actually happened?
+                - **Environment**: OS, version, etc. (if relevant)
+
+                The more information you provide, the faster we can help!`
+              });
+
+              // Add needs-info label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['needs-info']
+              });
+            }
+
+  # Issue automation summary
+  automation-summary:
+    name: Issue Automation Summary
+    needs: [stale-management, auto-labeling, auto-assignment, template-compliance]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Issue Automation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Stale Management | ${{ needs.stale-management.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Auto Labeling | ${{ needs.auto-labeling.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Auto Assignment | ${{ needs.auto-assignment.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Template Compliance | ${{ needs.template-compliance.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,296 @@
+# file: .github/workflows/reusable-maintenance.yml
+# version: 1.0.0
+# guid: reusable-maintenance-2025-09-24-core-workflow
+
+name: Reusable Maintenance Workflow
+
+on:
+  workflow_call:
+    inputs:
+      skip-dependency-updates:
+        description: "Skip dependency updates"
+        required: false
+        type: boolean
+        default: false
+      skip-cleanup:
+        description: "Skip cleanup tasks"
+        required: false
+        type: boolean
+        default: false
+      skip-license-check:
+        description: "Skip license compliance check"
+        required: false
+        type: boolean
+        default: false
+      auto-commit:
+        description: "Automatically commit maintenance changes"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Dependency Updates
+  dependency-updates:
+    name: Check Dependency Updates
+    if: '!inputs.skip-dependency-updates'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check Go dependencies
+        if: hashFiles('go.mod') != ''
+        run: |
+          echo "## Go Dependencies" >> maintenance-report.md
+          echo "" >> maintenance-report.md
+          if [ -f go.mod ]; then
+            go list -u -m all | grep '\[.*\]' || echo "All Go dependencies are up to date" >> maintenance-report.md
+          fi
+          echo "" >> maintenance-report.md
+
+      - name: Check Node.js dependencies
+        if: hashFiles('package*.json') != ''
+        run: |
+          echo "## Node.js Dependencies" >> maintenance-report.md
+          echo "" >> maintenance-report.md
+          if [ -f package.json ]; then
+            npm outdated --json > npm-outdated.json 2>/dev/null || true
+            if [ -s npm-outdated.json ] && [ "$(cat npm-outdated.json)" != "{}" ]; then
+              echo "Outdated npm packages detected:" >> maintenance-report.md
+              cat npm-outdated.json >> maintenance-report.md
+            else
+              echo "All npm dependencies are up to date" >> maintenance-report.md
+            fi
+          fi
+          echo "" >> maintenance-report.md
+
+      - name: Check Python dependencies
+        if: hashFiles('requirements*.txt', 'pyproject.toml') != ''
+        run: |
+          echo "## Python Dependencies" >> maintenance-report.md
+          echo "" >> maintenance-report.md
+          pip install pip-check-updates || pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip list --outdated --format=json > pip-outdated.json 2>/dev/null || true
+            if [ -s pip-outdated.json ] && [ "$(cat pip-outdated.json)" != "[]" ]; then
+              echo "Outdated pip packages:" >> maintenance-report.md
+              cat pip-outdated.json >> maintenance-report.md
+            else
+              echo "All pip dependencies are up to date" >> maintenance-report.md
+            fi
+          fi
+          echo "" >> maintenance-report.md
+
+      - name: Check Rust dependencies
+        if: hashFiles('Cargo.toml') != ''
+        run: |
+          echo "## Rust Dependencies" >> maintenance-report.md
+          echo "" >> maintenance-report.md
+          cargo install cargo-outdated || true
+          if command -v cargo-outdated >/dev/null 2>&1; then
+            cargo outdated --format json > cargo-outdated.json 2>/dev/null || true
+            if [ -s cargo-outdated.json ]; then
+              echo "Outdated Rust crates:" >> maintenance-report.md
+              cat cargo-outdated.json >> maintenance-report.md
+            else
+              echo "All Rust dependencies are up to date" >> maintenance-report.md
+            fi
+          fi
+          echo "" >> maintenance-report.md
+
+      - name: Upload dependency report
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-dependency-report
+          path: maintenance-report.md
+
+  # Repository Cleanup
+  cleanup-tasks:
+    name: Repository Cleanup
+    if: '!inputs.skip-cleanup'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Clean up temporary files
+        run: |
+          echo "## Cleanup Tasks" > cleanup-report.md
+          echo "" >> cleanup-report.md
+
+          # Remove common temporary files
+          CLEANED=0
+          for pattern in "*.tmp" "*.temp" "*.log" "*.cache" ".DS_Store" "Thumbs.db"; do
+            if find . -name "$pattern" -type f -not -path "./.git/*" | head -1 | grep -q .; then
+              echo "Removing $pattern files:" >> cleanup-report.md
+              find . -name "$pattern" -type f -not -path "./.git/*" -delete
+              CLEANED=1
+            fi
+          done
+
+          # Check for large files that shouldn't be in git
+          echo "" >> cleanup-report.md
+          echo "### Large Files Check" >> cleanup-report.md
+          find . -type f -size +10M -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./venv/*" -not -path "./target/*" | while read file; do
+            echo "Large file detected: $file ($(du -h "$file" | cut -f1))" >> cleanup-report.md
+          done
+
+          if [ $CLEANED -eq 0 ]; then
+            echo "No cleanup needed - repository is clean" >> cleanup-report.md
+          fi
+
+      - name: Check for unused dependencies
+        run: |
+          echo "" >> cleanup-report.md
+          echo "### Unused Dependencies Check" >> cleanup-report.md
+
+          # Go unused dependencies
+          if [ -f go.mod ]; then
+            go mod tidy
+            if git diff --quiet go.mod go.sum; then
+              echo "Go dependencies are clean" >> cleanup-report.md
+            else
+              echo "Go mod tidy made changes - consider reviewing dependencies" >> cleanup-report.md
+            fi
+          fi
+
+          # Python unused imports (basic check)
+          if command -v python3 >/dev/null && find . -name "*.py" -not -path "./venv/*" | head -1 | grep -q .; then
+            # This is a basic check - could be enhanced with proper tools
+            echo "Python files present - consider running tools like unimport or autoflake" >> cleanup-report.md
+          fi
+
+      - name: Upload cleanup report
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-cleanup-report
+          path: cleanup-report.md
+
+  # License Compliance Check
+  license-check:
+    name: License Compliance
+    if: '!inputs.skip-license-check'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check license files
+        run: |
+          echo "## License Compliance" > license-report.md
+          echo "" >> license-report.md
+
+          # Check for license file
+          if [ -f LICENSE ] || [ -f LICENSE.txt ] || [ -f LICENSE.md ]; then
+            echo "✅ License file found" >> license-report.md
+          else
+            echo "⚠️ No license file found in repository root" >> license-report.md
+          fi
+
+          # Check for copyright headers (basic check)
+          echo "" >> license-report.md
+          echo "### Copyright Header Check" >> license-report.md
+
+          # Check Go files
+          if find . -name "*.go" -not -path "./vendor/*" | head -1 | grep -q .; then
+            MISSING_GO=$(find . -name "*.go" -not -path "./vendor/*" -exec grep -L "Copyright" {} \; | wc -l)
+            TOTAL_GO=$(find . -name "*.go" -not -path "./vendor/*" | wc -l)
+            echo "Go files with copyright headers: $((TOTAL_GO - MISSING_GO))/$TOTAL_GO" >> license-report.md
+          fi
+
+          # Check Python files
+          if find . -name "*.py" -not -path "./venv/*" | head -1 | grep -q .; then
+            MISSING_PY=$(find . -name "*.py" -not -path "./venv/*" -exec grep -L "Copyright\|copyright" {} \; | wc -l)
+            TOTAL_PY=$(find . -name "*.py" -not -path "./venv/*" | wc -l)
+            echo "Python files with copyright headers: $((TOTAL_PY - MISSING_PY))/$TOTAL_PY" >> license-report.md
+          fi
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-license-report
+          path: license-report.md
+
+  # Commit maintenance changes if requested
+  commit-changes:
+    name: Commit Maintenance Changes
+    needs: [dependency-updates, cleanup-tasks, license-check]
+    if: inputs.auto-commit && always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if ! git diff --quiet; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.changes.outputs.changes == 'true'
+        run: |
+          git add .
+          git commit -m "chore(maintenance): automated repository maintenance
+
+          - Updated dependencies
+          - Cleaned up temporary files
+          - Ran maintenance tasks
+
+          Generated by automated maintenance workflow"
+          git push
+
+  # Maintenance summary
+  maintenance-summary:
+    name: Maintenance Summary
+    needs: [dependency-updates, cleanup-tasks, license-check, commit-changes]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: maintenance-*-report
+          merge-multiple: true
+
+      - name: Generate summary
+        run: |
+          echo "## Maintenance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Updates | ${{ needs.dependency-updates.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cleanup Tasks | ${{ needs.cleanup-tasks.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Auto Commit | ${{ needs.commit-changes.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Include report contents if they exist
+          if [ -f maintenance-report.md ]; then
+            echo "### Dependency Report" >> $GITHUB_STEP_SUMMARY
+            cat maintenance-report.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -f cleanup-report.md ]; then
+            echo "### Cleanup Report" >> $GITHUB_STEP_SUMMARY
+            cat cleanup-report.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -f license-report.md ]; then
+            echo "### License Report" >> $GITHUB_STEP_SUMMARY
+            cat license-report.md >> $GITHUB_STEP_SUMMARY
+          fi
