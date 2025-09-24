@@ -192,9 +192,9 @@ The `reusable-matrix-build.yml` workflow can be called with custom parameters:
 # In any repository's workflow
 uses: jdfalk/gcommon/.github/workflows/reusable-matrix-build.yml@main
 with:
-  go-versions: '["1.23", "1.24"]' # Override default
+  go-versions: '["1.24"]' # Override default
   rust-versions: '["1.76", "1.77"]' # Rust support added
-  python-versions: '["3.12", "3.13"]' # Subset of versions
+  python-versions: '["3.13"]' # Subset of versions
   enable-protobuf: true
   enable-docker: true
   skip-tests: false

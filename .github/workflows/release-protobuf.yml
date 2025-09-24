@@ -23,9 +23,9 @@ on:
 
 env:
   GO_VERSION: "1.23.x"
-  PYTHON_VERSION: "3.12"
-  BUF_VERSION: "1.56.0"
-  PROTOC_VERSION: "32.0"
+  PYTHON_VERSION: "3.13"
+  BUF_VERSION: "1.57.2"
+  PROTOC_VERSION: "32.1"
 
 jobs:
   generate:

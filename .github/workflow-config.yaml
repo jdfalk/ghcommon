@@ -8,13 +8,10 @@
 build:
   # Language version matrices
   go_versions:
-    - "1.22"
-    - "1.23"
     - "1.24"
 
   python_versions:
-    - "3.11"
-    - "3.12"
+
     - "3.13"
 
   node_versions:
@@ -45,7 +42,7 @@ repositories:
     url: "https://github.com/jdfalk/gcommon"
     sync_enabled: true
     custom_build_config:
-      go_versions: ["1.23", "1.24"]
+      go_versions: ["1.24"]
       enable_protobuf: true
       enable_docker: true
 
@@ -53,7 +50,7 @@ repositories:
     url: "https://github.com/jdfalk/subtitle-manager"
     sync_enabled: true
     custom_build_config:
-      go_versions: ["1.23", "1.24"]
+      go_versions: ["1.24"]
       enable_protobuf: true
       enable_docker: true
 
@@ -61,7 +58,7 @@ repositories:
     url: "https://github.com/jdfalk/audiobook-organizer"
     sync_enabled: true
     custom_build_config:
-      go_versions: ["1.23", "1.24"]
+      go_versions: ["1.24"]
       enable_protobuf: false
       enable_docker: true
 

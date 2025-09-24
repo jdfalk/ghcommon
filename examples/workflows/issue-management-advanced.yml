@@ -122,7 +122,7 @@ jobs:
       force_update: ${{ github.event.inputs.force_update == 'true' }}
       issue_updates_file: ${{ needs.detect-issue-updates.outputs.issue_updates_file }}
       cleanup_issue_updates: ${{ github.event.inputs.cleanup_after_processing != 'false' }}
-      python_version: "3.11"
+      python_version: "3.13"
     secrets: inherit
 
   # Post-processing notifications (optional)

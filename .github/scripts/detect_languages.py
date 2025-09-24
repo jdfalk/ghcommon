@@ -150,8 +150,8 @@ def build_matrix(
     return {"include": include}
 
 
-go_versions = build_cfg.get("go_versions") or ["1.23", "1.22"]
-python_versions = build_cfg.get("python_versions") or ["3.12", "3.11"]
+go_versions = build_cfg.get("go_versions") or ["1.24"]
+python_versions = build_cfg.get("python_versions") or ["3.13"]
 raw_node_versions = build_cfg.get("node_versions")
 if config_loaded:
     if raw_node_versions is None:

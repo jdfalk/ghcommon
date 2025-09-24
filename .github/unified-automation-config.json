@@ -11,7 +11,7 @@
     "issue_updates_file": "issue_updates.json",
     "issue_updates_directory": ".github/issue-updates",
     "cleanup_issue_updates": true,
-    "python_version": "3.11",
+    "python_version": "3.13",
     "enable_duplicate_prevention": true,
     "enable_duplicate_closure": true,
     "duplicate_prevention_method": "guid_and_title",
@@ -23,7 +23,7 @@
   "docs_update": {
     "updates_directory": ".github/doc-updates",
     "dry_run": false,
-    "python_version": "3.11",
+    "python_version": "3.13",
     "cleanup_processed_files": true,
     "create_pr": false,
     "auto_merge": false,
@@ -66,7 +66,7 @@
     "max_labels_per_issue": 8,
     "preserve_existing_labels": true,
     "label_config_path": ".github/intelligent-labeling.yml",
-    "python_version": "3.11"
+    "python_version": "3.13"
   },
 
   "workflow_settings": {

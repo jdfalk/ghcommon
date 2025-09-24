@@ -247,7 +247,7 @@ Create an `issue_updates.json` file in your repository root:
 | `force_update`          | boolean | `false`                | Force update existing tickets                 |
 | `issue_updates_file`    | string  | `"issue_updates.json"` | Path to issue updates file                    |
 | `cleanup_issue_updates` | boolean | `true`                 | Clean up file after processing                |
-| `python_version`        | string  | `"3.11"`               | Python version to use                         |
+| `python_version`        | string  | `"3.13"`               | Python version to use                         |
 
 ### Operations
 

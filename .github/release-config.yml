@@ -117,9 +117,9 @@ release:
 
       python:
         - os: ubuntu-latest
-          python-version: "3.12"
+          python-version: "3.13"
         - os: windows-latest
-          python-version: "3.12"
+          python-version: "3.13"
 
       javascript:
         - os: ubuntu-latest
@@ -230,7 +230,7 @@ environment:
     RUST_BACKTRACE: 1
     GO_VERSION: "1.24"
     NODE_VERSION: "22"
-    PYTHON_VERSION: "3.12"
+    PYTHON_VERSION: "3.13"
 # Override Examples (place in repository root as .release-config.yml)
 # ---
 # plugins:
