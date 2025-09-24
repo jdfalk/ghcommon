@@ -1,5 +1,5 @@
 # file: .github/workflows/release.yml
-# version: 3.3.0
+# version: 3.4.0
 # guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c
 
 name: Release Coordinator

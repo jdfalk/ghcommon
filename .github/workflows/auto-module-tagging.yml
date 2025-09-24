@@ -1,5 +1,5 @@
 # file: .github/workflows/auto-module-tagging.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: 8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d
 
 name: Automatic Module Tagging

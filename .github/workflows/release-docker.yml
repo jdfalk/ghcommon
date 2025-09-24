@@ -1,5 +1,5 @@
 # file: .github/workflows/release-docker.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: a4b5c6d7-e8f9-0a1b-2c3d-4e5f6a7b8c9d
 
 name: Docker Release Build

@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.4.0
+# version: 4.5.0
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos

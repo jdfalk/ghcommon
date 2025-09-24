@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.0.1
+# version: 1.1.0
 # guid: f3a4b5c6-d7e8-9f0a-1b2c-3d4e5f6a7b8c
 
 name: Frontend Release Build

@@ -1,5 +1,5 @@
 # file: .github/workflows/release-protobuf.yml
-# version: 1.0.0
+# version: 1.2.0
 # guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
 
 name: Release Protobuf Assets
