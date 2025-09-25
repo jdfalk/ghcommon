@@ -1,5 +1,5 @@
 # file: .github/workflows/protobuf-generation.yml
-# version: 2.1.0
+# version: 2.2.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 name: Protocol Buffer Generation & Versioning
@@ -17,10 +17,6 @@ on:
         required: false
         type: boolean
         default: false
-    secrets:
-      GITHUB_TOKEN:
-        required: true
-        description: "GitHub token for API access"
   push:
     branches: [main, develop]
     paths:
