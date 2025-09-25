@@ -13,6 +13,16 @@ on:
     - cron: "0 0 * * 0" # Weekly on Sunday
   workflow_dispatch:
 
+
+permissions:
+  contents: write
+  actions: write
+  checks: write
+  packages: write
+  security-events: write
+  id-token: write
+  attestations: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
