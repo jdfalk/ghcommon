@@ -1,10 +1,26 @@
 # file: .github/workflows/protobuf-generation.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 name: Protocol Buffer Generation & Versioning
 
 on:
+  workflow_call:
+    inputs:
+      version-bump:
+        description: "Type of version bump (patch, minor, major)"
+        required: false
+        type: string
+        default: "patch"
+      force-generation:
+        description: "Force protobuf generation even if no changes detected"
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+        description: "GitHub token for API access"
   push:
     branches: [main, develop]
     paths:

@@ -149,7 +149,7 @@ jobs:
       (contains(github.event.head_commit.message, '[protobuf]') ||
        contains(github.event.head_commit.message, '[generate]') ||
        contains(github.event.head_commit.message, '[buf]'))
-    uses: ./.github/workflows/protobuf-generation.yml
+    uses: ./.github/workflows/reusable-protobuf.yml
     secrets: inherit
 
   # Language-specific build and test jobs
@@ -176,14 +176,14 @@ jobs:
           fi
 
       - name: Test Go project
-        if: '!inputs.skip-tests'
+        if: "!inputs.skip-tests"
         run: |
           if [ -f go.mod ]; then
             go test -v -race -coverprofile=coverage.out ./...
           fi
 
       - name: Check Go coverage
-        if: '!inputs.skip-tests'
+        if: "!inputs.skip-tests"
         run: |
           if [ -f coverage.out ]; then
             COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
@@ -223,7 +223,7 @@ jobs:
           fi
 
       - name: Lint Python code
-        if: '!inputs.skip-linting'
+        if: "!inputs.skip-linting"
         run: |
           pip install flake8 black isort
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -231,7 +231,7 @@ jobs:
           isort --check-only .
 
       - name: Test Python code
-        if: '!inputs.skip-tests'
+        if: "!inputs.skip-tests"
         run: |
           pip install pytest pytest-cov
           if [ -d tests ]; then
@@ -265,18 +265,18 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Format Rust code
-        if: '!inputs.skip-linting'
+        if: "!inputs.skip-linting"
         run: cargo fmt --all -- --check
 
       - name: Lint Rust code
-        if: '!inputs.skip-linting'
+        if: "!inputs.skip-linting"
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Build Rust project
         run: cargo build --verbose
 
       - name: Test Rust project
-        if: '!inputs.skip-tests'
+        if: "!inputs.skip-tests"
         run: cargo test --verbose
 
   frontend-ci:
@@ -301,7 +301,7 @@ jobs:
           fi
 
       - name: Lint frontend code
-        if: '!inputs.skip-linting'
+        if: "!inputs.skip-linting"
         run: |
           if [ -f package.json ] && npm run lint 2>/dev/null; then
             npm run lint
@@ -314,7 +314,7 @@ jobs:
           fi
 
       - name: Test frontend
-        if: '!inputs.skip-tests'
+        if: "!inputs.skip-tests"
         run: |
           if [ -f package.json ] && npm run test 2>/dev/null; then
             npm run test

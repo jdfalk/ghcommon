@@ -180,7 +180,7 @@ jobs:
           echo "- **Auto-commit**: true" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Super Linter results
-        if: always()
+        if: always() && hashFiles('super-linter-output/**/*') != ''
         uses: actions/upload-artifact@v4
         with:
           name: super-linter-output-${{ github.run_id }}-${{ github.run_attempt }}
