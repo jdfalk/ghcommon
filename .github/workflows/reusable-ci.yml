@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -81,13 +81,13 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      go-files: ${{ steps.changes.outputs.go == 'true' }}
-      python-files: ${{ steps.changes.outputs.python == 'true' }}
-      rust-files: ${{ steps.changes.outputs.rust == 'true' }}
-      frontend-files: ${{ steps.changes.outputs.frontend == 'true' }}
-      docker-files: ${{ steps.changes.outputs.docker == 'true' }}
-      docs-files: ${{ steps.changes.outputs.docs == 'true' }}
-      workflows-files: ${{ steps.changes.outputs.workflows == 'true' }}
+      go-files: ${{ steps.changes.outputs.go_files }}
+      python-files: ${{ steps.changes.outputs.python_files }}
+      rust-files: ${{ steps.changes.outputs.rust_files }}
+      frontend-files: ${{ steps.changes.outputs.frontend_files }}
+      docker-files: ${{ steps.changes.outputs.docker_files }}
+      docs-files: ${{ steps.changes.outputs.docs_files }}
+      workflows-files: ${{ steps.changes.outputs.workflow_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -99,21 +99,21 @@ jobs:
         id: changes
         with:
           filters: |
-            go:
+            go_files:
               - '**/*.go'
               - 'go.mod'
               - 'go.sum'
-            python:
+            python_files:
               - '**/*.py'
               - 'requirements*.txt'
               - 'pyproject.toml'
               - 'setup.py'
               - 'setup.cfg'
-            rust:
+            rust_files:
               - '**/*.rs'
               - 'Cargo.toml'
               - 'Cargo.lock'
-            frontend:
+            frontend_files:
               - '**/*.js'
               - '**/*.ts'
               - '**/*.jsx'
@@ -128,16 +128,16 @@ jobs:
               - 'package*.json'
               - 'yarn.lock'
               - 'pnpm-lock.yaml'
-            docker:
+            docker_files:
               - 'Dockerfile*'
               - 'docker-compose*.yml'
               - 'docker-compose*.yaml'
               - '.dockerignore'
-            docs:
+            docs_files:
               - '**/*.md'
               - 'docs/**'
               - '*.md'
-            workflows:
+            workflow_files:
               - '.github/workflows/**'
               - '.github/actions/**'
 
@@ -176,14 +176,14 @@ jobs:
           fi
 
       - name: Test Go project
-        if: "!inputs.skip-tests"
+        if: ${{ !inputs.skip-tests }}
         run: |
           if [ -f go.mod ]; then
             go test -v -race -coverprofile=coverage.out ./...
           fi
 
       - name: Check Go coverage
-        if: "!inputs.skip-tests"
+        if: ${{ !inputs.skip-tests }}
         run: |
           if [ -f coverage.out ]; then
             COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
@@ -223,7 +223,7 @@ jobs:
           fi
 
       - name: Lint Python code
-        if: "!inputs.skip-linting"
+        if: ${{ !inputs.skip-linting }}
         run: |
           pip install flake8 black isort
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -231,7 +231,7 @@ jobs:
           isort --check-only .
 
       - name: Test Python code
-        if: "!inputs.skip-tests"
+        if: ${{ !inputs.skip-tests }}
         run: |
           pip install pytest pytest-cov
           if [ -d tests ]; then
@@ -265,18 +265,18 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Format Rust code
-        if: "!inputs.skip-linting"
+        if: ${{ !inputs.skip-linting }}
         run: cargo fmt --all -- --check
 
       - name: Lint Rust code
-        if: "!inputs.skip-linting"
+        if: ${{ !inputs.skip-linting }}
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Build Rust project
         run: cargo build --verbose
 
       - name: Test Rust project
-        if: "!inputs.skip-tests"
+        if: ${{ !inputs.skip-tests }}
         run: cargo test --verbose
 
   frontend-ci:
@@ -301,7 +301,7 @@ jobs:
           fi
 
       - name: Lint frontend code
-        if: "!inputs.skip-linting"
+        if: ${{ !inputs.skip-linting }}
         run: |
           if [ -f package.json ] && npm run lint 2>/dev/null; then
             npm run lint
@@ -314,7 +314,7 @@ jobs:
           fi
 
       - name: Test frontend
-        if: "!inputs.skip-tests"
+        if: ${{ !inputs.skip-tests }}
         run: |
           if [ -f package.json ] && npm run test 2>/dev/null; then
             npm run test
