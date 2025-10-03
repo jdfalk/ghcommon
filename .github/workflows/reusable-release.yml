@@ -135,6 +135,9 @@ jobs:
       registry: ${{ steps.env-setup.outputs.registry }}
       image-name: ${{ steps.env-setup.outputs.image-name }}
       release-tag: ${{ steps.version.outputs.tag }}
+      release-branch-strategy: ${{ steps.release-strategy.outputs.strategy }}
+      auto-prerelease: ${{ steps.release-strategy.outputs.auto-prerelease }}
+      auto-draft: ${{ steps.release-strategy.outputs.auto-draft }}
 
     steps:
       - name: Checkout repository
@@ -219,17 +222,112 @@ jobs:
           echo 'frontend-matrix={"node-version":["18","20","22"],"os":["ubuntu-latest"]}' >> $GITHUB_OUTPUT
           echo 'docker-matrix={"platform":["linux/amd64","linux/arm64"]}' >> $GITHUB_OUTPUT
 
-      - name: Generate release version
+      - name: Determine release strategy based on branch
+        id: release-strategy
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+
+          # Determine release strategy based on branch and manual inputs
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            STRATEGY="stable"
+            AUTO_PRERELEASE="false"
+            AUTO_DRAFT="false"
+          elif [[ "$BRANCH_NAME" == "develop" ]]; then
+            STRATEGY="prerelease"
+            AUTO_PRERELEASE="true"
+            AUTO_DRAFT="false"
+          else
+            STRATEGY="draft"
+            AUTO_PRERELEASE="false"
+            AUTO_DRAFT="true"
+          fi
+
+          # Override with manual inputs if provided
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            AUTO_PRERELEASE="true"
+          fi
+          if [[ "${{ inputs.draft }}" == "true" ]]; then
+            AUTO_DRAFT="true"
+          fi
+
+          echo "strategy=$STRATEGY" >> $GITHUB_OUTPUT
+          echo "auto-prerelease=$AUTO_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "auto-draft=$AUTO_DRAFT" >> $GITHUB_OUTPUT
+
+          echo "🔄 Release strategy for branch '$BRANCH_NAME': $STRATEGY"
+          echo "📋 Auto-prerelease: $AUTO_PRERELEASE"
+          echo "📋 Auto-draft: $AUTO_DRAFT"
+
+      - name: Generate semantic release version
         id: version
         run: |
-          # Simple version generation - in real implementation, use semantic versioning
-          if [[ "${{ inputs.release-type }}" == "major" ]]; then
-            echo "tag=v$(date +%Y).0.0" >> $GITHUB_OUTPUT
-          elif [[ "${{ inputs.release-type }}" == "minor" ]]; then
-            echo "tag=v$(date +%Y.%m).0" >> $GITHUB_OUTPUT
+          # Get the latest tag to determine version increment
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+
+          # Extract version numbers (remove 'v' prefix and any suffix)
+          VERSION_CORE=$(echo "$LATEST_TAG" | sed 's/^v//' | sed 's/-.*//')
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_CORE"
+
+          # Default to 0 if any version component is missing
+          MAJOR=${MAJOR:-0}
+          MINOR=${MINOR:-0}
+          PATCH=${PATCH:-0}
+
+          echo "Current version: $MAJOR.$MINOR.$PATCH"
+
+          # Determine version increment based on release type and branch
+          RELEASE_TYPE="${{ inputs.release-type || 'auto' }}"
+          BRANCH_NAME="${{ github.ref_name }}"
+
+          if [[ "$RELEASE_TYPE" == "major" ]]; then
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_MINOR=0
+            NEW_PATCH=0
+          elif [[ "$RELEASE_TYPE" == "minor" ]]; then
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          elif [[ "$RELEASE_TYPE" == "patch" ]]; then
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$MINOR
+            NEW_PATCH=$((PATCH + 1))
           else
-            echo "tag=v$(date +%Y.%m.%d)" >> $GITHUB_OUTPUT
+            # Auto versioning based on branch and commits
+            if [[ "$BRANCH_NAME" == "main" ]]; then
+              # Stable release: increment patch
+              NEW_MAJOR=$MAJOR
+              NEW_MINOR=$MINOR
+              NEW_PATCH=$((PATCH + 1))
+            elif [[ "$BRANCH_NAME" == "develop" ]]; then
+              # Pre-release: increment minor
+              NEW_MAJOR=$MAJOR
+              NEW_MINOR=$((MINOR + 1))
+              NEW_PATCH=0
+            else
+              # Draft/feature branch: increment patch with branch suffix
+              NEW_MAJOR=$MAJOR
+              NEW_MINOR=$MINOR
+              NEW_PATCH=$((PATCH + 1))
+            fi
           fi
+
+          # Build version string with appropriate suffixes
+          if [[ "${{ steps.release-strategy.outputs.auto-prerelease }}" == "true" ]]; then
+            if [[ "$BRANCH_NAME" == "develop" ]]; then
+              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-beta.$(date +%Y%m%d%H%M)"
+            else
+              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-alpha.$(date +%Y%m%d%H%M)"
+            fi
+          elif [[ "${{ steps.release-strategy.outputs.auto-draft }}" == "true" ]]; then
+            SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
+          else
+            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
+          fi
+
+          echo "Generated version tag: $VERSION_TAG"
+          echo "tag=$VERSION_TAG" >> $GITHUB_OUTPUT
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -337,10 +435,35 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # Simple changelog generation
-          echo "## Changes" > changelog.md
+          # Generate changelog based on conventional commits and branch strategy
+          echo "## 🚀 What's Changed" > changelog.md
           echo "" >> changelog.md
-          git log --oneline --since="1 day ago" >> changelog.md || echo "No recent changes" >> changelog.md
+
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [[ -n "$LAST_TAG" ]]; then
+            echo "### 📋 Commits since $LAST_TAG:" >> changelog.md
+            git log ${LAST_TAG}..HEAD --oneline --format="- %s (%h)" >> changelog.md
+          else
+            echo "### 📋 Initial Release Commits:" >> changelog.md
+            git log --oneline --format="- %s (%h)" >> changelog.md
+          fi
+
+          echo "" >> changelog.md
+          echo "### 🎯 Release Information" >> changelog.md
+          echo "- **Branch:** ${{ github.ref_name }}" >> changelog.md
+          echo "- **Release Type:** ${{ needs.detect-languages.outputs.release-branch-strategy }}" >> changelog.md
+          echo "- **Primary Language:** ${{ needs.detect-languages.outputs.primary-language }}" >> changelog.md
+
+          if [[ "${{ needs.detect-languages.outputs.auto-prerelease }}" == "true" ]]; then
+            echo "" >> changelog.md
+            echo "⚠️ **This is a pre-release version** - use for testing purposes." >> changelog.md
+          fi
+
+          if [[ "${{ needs.detect-languages.outputs.auto-draft }}" == "true" ]]; then
+            echo "" >> changelog.md
+            echo "📝 **This is a draft release** - review before making public." >> changelog.md
+          fi
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
@@ -449,8 +572,8 @@ jobs:
 
             ---
             *Generated automatically from commit ${{ github.sha }}*
-          draft: ${{ inputs.draft }}
-          prerelease: ${{ inputs.prerelease }}
+          draft: ${{ needs.detect-languages.outputs.auto-draft }}
+          prerelease: ${{ needs.detect-languages.outputs.auto-prerelease }}
           files: |
             release-assets/**/*
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -485,6 +608,8 @@ jobs:
           echo "**Project Type:** ${{ needs.detect-languages.outputs.primary-language }}" >> $GITHUB_STEP_SUMMARY
           echo "**Build Target:** ${{ inputs.build-target }}" >> $GITHUB_STEP_SUMMARY
           echo "**Release Tag:** ${{ needs.detect-languages.outputs.release-tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Strategy:** ${{ needs.detect-languages.outputs.release-branch-strategy }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
@@ -509,6 +634,14 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "✅ **All components completed successfully**" >> $GITHUB_STEP_SUMMARY
             if [[ "${{ needs.create-release.outputs.release-created }}" == "true" ]]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
               echo "🎉 **Release created: ${{ needs.detect-languages.outputs.release-tag }}**" >> $GITHUB_STEP_SUMMARY
+              if [[ "${{ needs.detect-languages.outputs.auto-prerelease }}" == "true" ]]; then
+                echo "⚠️ **Pre-release** - for testing purposes" >> $GITHUB_STEP_SUMMARY
+              elif [[ "${{ needs.detect-languages.outputs.auto-draft }}" == "true" ]]; then
+                echo "📝 **Draft release** - review before publishing" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "🚀 **Stable release** - ready for production" >> $GITHUB_STEP_SUMMARY
+              fi
             fi
           fi
