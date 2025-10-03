@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-protobuf.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: f1e2d3c4-b5a6-9788-c0d1-2e3f4a5b6c7d
 
 name: Reusable Protobuf Generation
@@ -261,6 +261,53 @@ jobs:
             exit 1
           fi
 
+      - name: Create protobuf SDK packages
+        id: create-packages
+        run: |
+          # Create SDK packages for distribution
+          echo "📦 Creating SDK packages..."
+
+          PACKAGES_CREATED=false
+
+          # Create Go SDK package
+          if [ -d "${{ inputs.output-path }}/go" ]; then
+            cd "${{ inputs.output-path }}/go"
+            tar -czf "../../gcommon-go-sdk.tar.gz" .
+            zip -r "../../gcommon-go-sdk.zip" .
+            cd ../..
+            echo "✅ Go SDK package created"
+            PACKAGES_CREATED=true
+          fi
+
+          # Create Python SDK package
+          if [ -d "${{ inputs.output-path }}/python" ]; then
+            cd "${{ inputs.output-path }}/python"
+            tar -czf "../../gcommon-python-sdk.tar.gz" .
+            zip -r "../../gcommon-python-sdk.zip" .
+            cd ../..
+            echo "✅ Python SDK package created"
+            PACKAGES_CREATED=true
+          fi
+
+          # Create documentation package
+          if [ -d "proto-docs" ]; then
+            tar -czf gcommon-docs.tar.gz proto-docs/
+            zip -r gcommon-docs.zip proto-docs/
+            echo "✅ Documentation package created"
+            PACKAGES_CREATED=true
+          fi
+
+          # Set output for later steps
+          echo "packages-created=$PACKAGES_CREATED" >> $GITHUB_OUTPUT
+
+          # List created packages
+          if [ "$PACKAGES_CREATED" = true ]; then
+            echo "Created packages:"
+            ls -la *.tar.gz *.zip 2>/dev/null || echo "No package files visible"
+          else
+            echo "No packages created"
+          fi
+
       - name: Run post-generation processing
         if: ${{ !inputs.skip-post-processing }}
         run: |
@@ -303,8 +350,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: protobuf-artifacts
+          name: protobuf-sdk-packages
           path: |
+            gcommon-go-sdk.tar.gz
+            gcommon-go-sdk.zip
+            gcommon-python-sdk.tar.gz
+            gcommon-python-sdk.zip
+            gcommon-docs.tar.gz
+            gcommon-docs.zip
             ${{ inputs.output-path }}/**/*.pb.go
             ${{ inputs.output-path }}/**/*_grpc.pb.go
             ${{ inputs.output-path }}/**/*.py
@@ -312,6 +365,7 @@ jobs:
             ${{ inputs.output-path }}/**/*.rs
             proto-docs/**/*.md
           if-no-files-found: ignore
+          retention-days: 30
 
       - name: Check generated artifacts
         id: check-artifacts
