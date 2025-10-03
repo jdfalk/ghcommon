@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: reusable-release-2025-09-24-coordinator
 
 name: Reusable Release Coordinator
@@ -342,18 +342,118 @@ jobs:
           echo "" >> changelog.md
           git log --oneline --since="1 day ago" >> changelog.md || echo "No recent changes" >> changelog.md
 
-      - name: Create Release
-        id: release
-        uses: actions/create-release@v1
-        if: github.event_name != 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v5
         with:
-          tag_name: ${{ needs.detect-languages.outputs.release-tag }}
-          release_name: Release ${{ needs.detect-languages.outputs.release-tag }}
-          body_path: changelog.md
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: Package and organize release artifacts
+        id: package-artifacts
+        run: |
+          echo "📦 Organizing and packaging release artifacts..."
+          
+          # Create release directory structure
+          mkdir -p release-assets/{sdks,binaries,packages,documentation}
+          
+          # Move and organize SDK packages
+          if find ./artifacts -name "*-sdk.*" -type f | grep -q .; then
+            echo "Moving SDK packages..."
+            find ./artifacts -name "*-sdk.*" -type f -exec mv {} release-assets/sdks/ \;
+            ls -la release-assets/sdks/
+          fi
+          
+          # Move documentation packages
+          if find ./artifacts -name "*docs.*" -type f | grep -q .; then
+            echo "Moving documentation packages..."
+            find ./artifacts -name "*docs.*" -type f -exec mv {} release-assets/documentation/ \;
+          fi
+          
+          # Move binary files (executables)
+          if find ./artifacts -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" | grep -q .; then
+            echo "Moving binary packages..."
+            find ./artifacts \( -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" \) -type f -exec mv {} release-assets/binaries/ \;
+          fi
+          
+          # Move other packages (wheels, containers, etc.)
+          if find ./artifacts -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" | grep -q .; then
+            echo "Moving other packages..."
+            find ./artifacts \( -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" \) -type f -exec mv {} release-assets/packages/ \;
+          fi
+          
+          # Create a comprehensive release manifest
+          echo "Creating release manifest..."
+          {
+            echo "# Release Manifest - ${{ steps.version.outputs.version }}"
+            echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+            echo "## SDK Packages"
+            if [ -d "release-assets/sdks" ] && [ "$(ls -A release-assets/sdks 2>/dev/null)" ]; then
+              ls -la release-assets/sdks/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
+            else
+              echo "- No SDK packages"
+            fi
+            echo ""
+            echo "## Documentation"
+            if [ -d "release-assets/documentation" ] && [ "$(ls -A release-assets/documentation 2>/dev/null)" ]; then
+              ls -la release-assets/documentation/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
+            else
+              echo "- No documentation packages"
+            fi
+            echo ""
+            echo "## Binaries"
+            if [ -d "release-assets/binaries" ] && [ "$(ls -A release-assets/binaries 2>/dev/null)" ]; then
+              ls -la release-assets/binaries/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
+            else
+              echo "- No binary packages"
+            fi
+            echo ""
+            echo "## Other Packages"
+            if [ -d "release-assets/packages" ] && [ "$(ls -A release-assets/packages 2>/dev/null)" ]; then
+              ls -la release-assets/packages/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
+            else
+              echo "- No other packages"
+            fi
+          } > release-assets/MANIFEST.md
+          
+          # Show summary
+          echo "Release assets organized:"
+          find release-assets -type f | wc -l | xargs echo "Total files:"
+          du -sh release-assets/ | awk '{print "Total size: " $1}'
+          
+          # Set output indicating packaging completion
+          echo "packaging-complete=true" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name != 'pull_request'
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body: |
+            $(cat changelog.md)
+            
+            ## 📦 Release Assets
+            
+            This release includes organized packages for easy consumption:
+            
+            ### SDKs
+            - **Go SDK**: `gcommon-go-sdk.tar.gz` / `gcommon-go-sdk.zip`
+            - **Python SDK**: `gcommon-python-sdk.tar.gz` / `gcommon-python-sdk.zip`
+            
+            ### Documentation
+            - **API Documentation**: `gcommon-docs.tar.gz` / `gcommon-docs.zip`
+            
+            See `MANIFEST.md` for a complete list of all assets and their sizes.
+            
+            ---
+            *Generated automatically from commit ${{ github.sha }}*
           draft: ${{ inputs.draft }}
           prerelease: ${{ inputs.prerelease }}
+          files: |
+            release-assets/**/*
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check release created
         id: check-release
