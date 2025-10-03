@@ -352,35 +352,35 @@ jobs:
         id: package-artifacts
         run: |
           echo "📦 Organizing and packaging release artifacts..."
-          
+
           # Create release directory structure
           mkdir -p release-assets/{sdks,binaries,packages,documentation}
-          
+
           # Move and organize SDK packages
           if find ./artifacts -name "*-sdk.*" -type f | grep -q .; then
             echo "Moving SDK packages..."
             find ./artifacts -name "*-sdk.*" -type f -exec mv {} release-assets/sdks/ \;
             ls -la release-assets/sdks/
           fi
-          
+
           # Move documentation packages
           if find ./artifacts -name "*docs.*" -type f | grep -q .; then
             echo "Moving documentation packages..."
             find ./artifacts -name "*docs.*" -type f -exec mv {} release-assets/documentation/ \;
           fi
-          
+
           # Move binary files (executables)
           if find ./artifacts -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" | grep -q .; then
             echo "Moving binary packages..."
             find ./artifacts \( -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" \) -type f -exec mv {} release-assets/binaries/ \;
           fi
-          
+
           # Move other packages (wheels, containers, etc.)
           if find ./artifacts -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" | grep -q .; then
             echo "Moving other packages..."
             find ./artifacts \( -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" \) -type f -exec mv {} release-assets/packages/ \;
           fi
-          
+
           # Create a comprehensive release manifest
           echo "Creating release manifest..."
           {
@@ -415,12 +415,12 @@ jobs:
               echo "- No other packages"
             fi
           } > release-assets/MANIFEST.md
-          
+
           # Show summary
           echo "Release assets organized:"
           find release-assets -type f | wc -l | xargs echo "Total files:"
           du -sh release-assets/ | awk '{print "Total size: " $1}'
-          
+
           # Set output indicating packaging completion
           echo "packaging-complete=true" >> $GITHUB_OUTPUT
 
@@ -433,20 +433,20 @@ jobs:
           name: ${{ steps.version.outputs.version }}
           body: |
             $(cat changelog.md)
-            
+
             ## 📦 Release Assets
-            
+
             This release includes organized packages for easy consumption:
-            
+
             ### SDKs
             - **Go SDK**: `gcommon-go-sdk.tar.gz` / `gcommon-go-sdk.zip`
             - **Python SDK**: `gcommon-python-sdk.tar.gz` / `gcommon-python-sdk.zip`
-            
+
             ### Documentation
             - **API Documentation**: `gcommon-docs.tar.gz` / `gcommon-docs.zip`
-            
+
             See `MANIFEST.md` for a complete list of all assets and their sizes.
-            
+
             ---
             *Generated automatically from commit ${{ github.sha }}*
           draft: ${{ inputs.draft }}
