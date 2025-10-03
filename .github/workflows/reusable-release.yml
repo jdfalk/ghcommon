@@ -1,8 +1,6 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.1.0
-# guid: reusable-release-2025-09-24-coordinatorile: .github/workflows/reusable-release.yml
-# version: 1.1.0
-# guid: reusable-release-2025-09-24-coordinator
+# version: 2.2.0
+# guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
 
@@ -242,8 +240,9 @@ jobs:
             AUTO_PRERELEASE="true"
             AUTO_DRAFT="false"
           else
+            # Feature branches should create draft releases
             STRATEGY="draft"
-            AUTO_PRERELEASE="false"
+            AUTO_PRERELEASE="true"  # Also mark as prerelease
             AUTO_DRAFT="true"
           fi
 
@@ -320,13 +319,15 @@ jobs:
           # Build version string with appropriate suffixes
           if [[ "${{ steps.release-strategy.outputs.auto-prerelease }}" == "true" ]]; then
             if [[ "$BRANCH_NAME" == "develop" ]]; then
-              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-beta.$(date +%Y%m%d%H%M)"
+              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev.$(date +%Y%m%d%H%M)"
             else
-              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-alpha.$(date +%Y%m%d%H%M)"
+              # Feature branches get dev pre-release versions
+              SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
             fi
           elif [[ "${{ steps.release-strategy.outputs.auto-draft }}" == "true" ]]; then
             SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
+            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-draft-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
           else
             VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
           fi
@@ -440,34 +441,39 @@ jobs:
         id: changelog
         run: |
           # Generate changelog based on conventional commits and branch strategy
-          echo "## 🚀 What's Changed" > changelog.md
-          echo "" >> changelog.md
+          CHANGELOG="## 🚀 What's Changed\n\n"
 
           # Get commits since last tag
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [[ -n "$LAST_TAG" ]]; then
-            echo "### 📋 Commits since $LAST_TAG:" >> changelog.md
-            git log ${LAST_TAG}..HEAD --oneline --format="- %s (%h)" >> changelog.md
+            CHANGELOG+="### 📋 Commits since $LAST_TAG:\n"
+            while IFS= read -r commit; do
+              CHANGELOG+="- $commit\n"
+            done < <(git log ${LAST_TAG}..HEAD --oneline --format="%s (%h)")
           else
-            echo "### 📋 Initial Release Commits:" >> changelog.md
-            git log --oneline --format="- %s (%h)" >> changelog.md
+            CHANGELOG+="### 📋 Initial Release Commits:\n"
+            while IFS= read -r commit; do
+              CHANGELOG+="- $commit\n"
+            done < <(git log --oneline --format="%s (%h)")
           fi
 
-          echo "" >> changelog.md
-          echo "### 🎯 Release Information" >> changelog.md
-          echo "- **Branch:** ${{ github.ref_name }}" >> changelog.md
-          echo "- **Release Type:** ${{ needs.detect-languages.outputs.release-branch-strategy }}" >> changelog.md
-          echo "- **Primary Language:** ${{ needs.detect-languages.outputs.primary-language }}" >> changelog.md
+          CHANGELOG+="\n### 🎯 Release Information\n"
+          CHANGELOG+="- **Branch:** ${{ github.ref_name }}\n"
+          CHANGELOG+="- **Release Type:** ${{ needs.detect-languages.outputs.release-branch-strategy }}\n"
+          CHANGELOG+="- **Primary Language:** ${{ needs.detect-languages.outputs.primary-language }}\n"
 
           if [[ "${{ needs.detect-languages.outputs.auto-prerelease }}" == "true" ]]; then
-            echo "" >> changelog.md
-            echo "⚠️ **This is a pre-release version** - use for testing purposes." >> changelog.md
+            CHANGELOG+="\n⚠️ **This is a pre-release version** - use for testing purposes.\n"
           fi
 
           if [[ "${{ needs.detect-languages.outputs.auto-draft }}" == "true" ]]; then
-            echo "" >> changelog.md
-            echo "📝 **This is a draft release** - review before making public." >> changelog.md
+            CHANGELOG+="\n📝 **This is a draft release** - review before making public.\n"
           fi
+
+          # Store changelog content for use in release
+          echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
@@ -559,7 +565,7 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }}
           body: |
-            $(cat changelog.md)
+            ${{ steps.changelog.outputs.changelog_content }}
 
             ## 📦 Release Assets
 
