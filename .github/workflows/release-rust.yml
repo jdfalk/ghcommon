@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.4.0
+# version: 1.4.1
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -58,6 +58,7 @@ jobs:
 
       - name: Align crate version with release tag
         if: inputs.release-version != ''
+        shell: bash
         run: |
           VERSION="${{ inputs.release-version }}"
           VERSION="${VERSION#v}"
