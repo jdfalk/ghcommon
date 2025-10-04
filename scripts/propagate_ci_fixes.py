@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# file: scripts/propagate_ci_fixes.py
+# file: scripts/propagat    # Source linter configs are now in root directory\n    source_linters = GHCOMMON_PATH_ci_fixes.py
 # version: 1.0.0
 # guid: 8a7b6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d
 
@@ -45,8 +45,8 @@ def copy_ci_workflow(target_repo: Path):
 
 def copy_super_linter_configs(target_repo: Path):
     """Copy Super Linter config files from ghcommon to target repository."""
-    source_linters = GHCOMMON_PATH / ".github/linters"
-    target_linters = target_repo / ".github/linters"
+    source_linters = GHCOMMON_PATH
+    target_linters = target_repo
 
     # Ensure target directory exists
     target_linters.mkdir(parents=True, exist_ok=True)
