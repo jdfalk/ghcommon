@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/generate-version.sh
-# version: 1.2.0
+# version: 1.3.0
 # guid: 0c1d2e3f-4a5b-6c7d-8e9f-0a1b2c3d4e5f
 
 set -euo pipefail
@@ -118,4 +118,62 @@ else
 fi
 
 echo "Generated version tag: $VERSION_TAG"
+
+# Check if the tag already exists and handle conflicts
+echo "🔍 Checking for existing tag conflicts..."
+if git tag -l | grep -q "^${VERSION_TAG}$"; then
+    echo "⚠️ Tag $VERSION_TAG already exists!"
+
+    # For workflow_dispatch or manual releases, we'll force overwrite
+    if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+        echo "🔄 Manual release detected, will force-overwrite existing tag"
+
+        # Delete local tag if it exists
+        if git tag -l | grep -q "^${VERSION_TAG}$"; then
+            echo "🗑️ Deleting local tag $VERSION_TAG"
+            git tag -d "$VERSION_TAG" || echo "⚠️ Could not delete local tag"
+        fi
+
+        # Delete remote tag if it exists (requires GITHUB_TOKEN)
+        if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+            echo "🗑️ Deleting remote tag $VERSION_TAG"
+            git push origin ":refs/tags/$VERSION_TAG" 2>/dev/null || echo "⚠️ Remote tag may not exist or could not be deleted"
+        fi
+
+        echo "✅ Tag cleanup complete, will create fresh tag"
+    else
+        # For automatic releases, increment to avoid conflicts
+        echo "🔢 Automatic release detected, incrementing to avoid conflict"
+        CONFLICT_COUNTER=1
+        ORIGINAL_VERSION_TAG="$VERSION_TAG"
+
+        while git tag -l | grep -q "^${VERSION_TAG}$"; do
+            if [[ "$AUTO_PRERELEASE" == "true" ]]; then
+                # For prerelease, add to the suffix
+                if [[ "$BRANCH_NAME" == "develop" ]]; then
+                    VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev.$(date +%Y%m%d%H%M).${CONFLICT_COUNTER}"
+                else
+                    VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-alpha.$(date +%Y%m%d%H%M).${CONFLICT_COUNTER}"
+                fi
+            else
+                # For stable release, increment patch
+                NEW_PATCH=$((NEW_PATCH + 1))
+                VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
+            fi
+            CONFLICT_COUNTER=$((CONFLICT_COUNTER + 1))
+
+            # Safety valve to prevent infinite loops
+            if [[ $CONFLICT_COUNTER -gt 10 ]]; then
+                echo "❌ Too many tag conflicts, using timestamp-based version"
+                VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-build.$(date +%Y%m%d%H%M%S)"
+                break
+            fi
+        done
+
+        echo "🆕 Resolved to new version: $VERSION_TAG"
+    fi
+else
+    echo "✅ No tag conflicts found"
+fi
+
 echo "tag=$VERSION_TAG" >> $GITHUB_OUTPUT
