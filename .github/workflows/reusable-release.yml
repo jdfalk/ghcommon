@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.5.0
+# version: 2.5.1
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -148,6 +148,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v5
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ github.workflow_sha }}
+          path: ghcommon-workflow-scripts
+          sparse-checkout: |
+            .github/workflows/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Configure workflow script path
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> $GITHUB_ENV
+
       - name: Setup environment variables
         id: env-setup
         run: |
@@ -165,7 +179,7 @@ jobs:
           DOCKER_ENABLED: ${{ inputs.docker-enabled }}
           PROTOBUF_ENABLED: ${{ inputs.protobuf-enabled }}
         run: |
-          ./.github/workflows/scripts/detect-languages.sh
+          bash "$GHCOMMON_SCRIPTS_DIR/detect-languages.sh"
 
       - name: Determine release strategy based on branch
         id: release-strategy
@@ -174,7 +188,7 @@ jobs:
           INPUT_PRERELEASE: ${{ inputs.prerelease }}
           INPUT_DRAFT: ${{ inputs.draft }}
         run: |
-          ./.github/workflows/scripts/release-strategy.sh
+          bash "$GHCOMMON_SCRIPTS_DIR/release-strategy.sh"
 
       - name: Generate semantic release version
         id: version
@@ -184,7 +198,7 @@ jobs:
           AUTO_PRERELEASE: ${{ steps.release-strategy.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ steps.release-strategy.outputs.auto-draft }}
         run: |
-          ./.github/workflows/scripts/generate-version.sh
+          bash "$GHCOMMON_SCRIPTS_DIR/generate-version.sh"
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -282,6 +296,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v5
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ github.workflow_sha }}
+          path: ghcommon-workflow-scripts
+          sparse-checkout: |
+            .github/workflows/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Configure workflow script path
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> $GITHUB_ENV
+
       - name: Get version
         id: version
         run: |
@@ -297,7 +325,7 @@ jobs:
           AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft }}
         run: |
-          ./.github/workflows/scripts/generate-changelog.sh
+          bash "$GHCOMMON_SCRIPTS_DIR/generate-changelog.sh"
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
