@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/security-review.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 74b067af-466e-48b9-ab34-c34ea5f26b85 -->
+
+<!-- file: .github/prompts/security-review.prompt.md -->
 
 # Security Review Prompt
 

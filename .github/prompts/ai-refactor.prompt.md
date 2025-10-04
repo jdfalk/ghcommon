@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/ai-refactor.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 033f8e46-04db-4c72-895c-3cfa8b89a35d -->
+
+<!-- file: .github/prompts/ai-refactor.prompt.md -->
 
 # AI Refactor Prompt
 

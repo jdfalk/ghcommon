@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/test-generation.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 19ae3536-4f87-44cf-bccd-86e47732e005 -->
+
+<!-- file: .github/prompts/test-generation.prompt.md -->
 
 # Test Generation Prompt
 

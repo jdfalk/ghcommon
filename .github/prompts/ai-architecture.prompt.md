@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/ai-architecture.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 142399ee-fc87-4888-9f2e-5da584e93a50 -->
+
+<!-- file: .github/prompts/ai-architecture.prompt.md -->
 
 # AI Architecture Review Prompt
 

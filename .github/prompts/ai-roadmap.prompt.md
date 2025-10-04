@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/ai-roadmap.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: e6a1c73e-5f47-4458-a8b1-d08f11a55fa8 -->
+
+<!-- file: .github/prompts/ai-roadmap.prompt.md -->
 
 # AI Roadmap Generation Prompt
 

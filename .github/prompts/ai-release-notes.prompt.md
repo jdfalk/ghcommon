@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/ai-release-notes.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: dab2fd75-1afd-497d-b53f-9e598fe6bbed -->
+
+<!-- file: .github/prompts/ai-release-notes.prompt.md -->
 
 # AI Release Notes Prompt
 

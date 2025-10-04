@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/pull-request.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 031b01c4-5985-4caa-89a6-0a91c211703a -->
+
+<!-- file: .github/prompts/pull-request.prompt.md -->
 
 # Pull Request Description Generation Prompt
 

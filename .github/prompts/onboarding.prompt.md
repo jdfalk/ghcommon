@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/onboarding.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 201ab032-5551-4658-b532-2a43fe65a77b -->
+
+<!-- file: .github/prompts/onboarding.prompt.md -->
 
 # Onboarding Prompt
 

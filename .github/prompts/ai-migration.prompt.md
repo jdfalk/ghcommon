@@ -1,4 +1,8 @@
 <!-- file: .github/prompts/ai-migration.prompt.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: bd8f93f7-c275-4966-8953-899b50f6d1cb -->
+
+<!-- file: .github/prompts/ai-migration.prompt.md -->
 
 # AI Migration Prompt
 
