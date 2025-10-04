@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.5.1
+# version: 2.5.2
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -152,7 +152,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: jdfalk/ghcommon
-          ref: ${{ github.workflow_sha }}
+          ref: ${{ github.action_ref || 'refs/heads/main' }}
           path: ghcommon-workflow-scripts
           sparse-checkout: |
             .github/workflows/scripts
@@ -300,7 +300,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: jdfalk/ghcommon
-          ref: ${{ github.workflow_sha }}
+          ref: ${{ github.action_ref || 'refs/heads/main' }}
           path: ghcommon-workflow-scripts
           sparse-checkout: |
             .github/workflows/scripts
