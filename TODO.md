@@ -1,3 +1,7 @@
+<!-- file: TODO.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: df8dd6d3-44cc-4658-b6b5-14c42a2f0bfa -->
+
 # TODO - GitHub Common Workflows
 
 <!-- file: TODO.md -->

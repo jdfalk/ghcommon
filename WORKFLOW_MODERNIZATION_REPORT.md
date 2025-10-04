@@ -1,3 +1,7 @@
+<!-- file: WORKFLOW_MODERNIZATION_REPORT.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 24662996-f013-4721-b089-a1d1c5179893 -->
+
 # Workflow Modernization Report
 
 Generated: Fri Aug 15 15:45:25 EDT 2025

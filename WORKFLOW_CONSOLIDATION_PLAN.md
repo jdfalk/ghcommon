@@ -1,3 +1,7 @@
+<!-- file: WORKFLOW_CONSOLIDATION_PLAN.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: ced2dd01-2645-4c87-a2da-a7eaf5387137 -->
+
 # Workflow Consolidation and Reusable Architecture Plan
 
 <!-- file: WORKFLOW_CONSOLIDATION_PLAN.md -->

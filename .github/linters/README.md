@@ -1,3 +1,7 @@
+<!-- file: .github/linters/README.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 3b308b3b-7f15-4a57-9c4b-65b6c5eed7bd -->
+
 # Linter Configuration Files
 
 This directory contains configuration files for various linters used by Super Linter in the CI/CD

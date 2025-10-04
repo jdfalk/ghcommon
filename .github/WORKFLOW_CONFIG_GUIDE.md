@@ -1,8 +1,6 @@
-# file: .github/WORKFLOW_CONFIG_GUIDE.md
-
-# version: 1.0.0
-
-# guid: 8b9c0d1e-2f34-5678-9abc-def012345678
+<!-- file: .github/WORKFLOW_CONFIG_GUIDE.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 8b9c0d1e-2f34-5678-9abc-def012345678 -->
 
 # Workflow Configuration System Guide
 

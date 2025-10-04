@@ -1,3 +1,7 @@
+<!-- file: README.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 1eaf4c01-aed3-438a-8df9-6904adba092c -->
+
 # GitHub Common Workflows
 
 ## Table of Contents

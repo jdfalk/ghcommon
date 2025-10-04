@@ -1,3 +1,7 @@
+<!-- file: CHANGELOG.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 0d24d528-8ab2-4c81-8180-135f3bd46173 -->
+
 # file: CHANGELOG.md
 
 ## Table of Contents
