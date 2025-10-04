@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.4.1
+# version: 1.5.0
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -57,31 +57,47 @@ jobs:
           name: protobuf-generated
 
       - name: Align crate version with release tag
-        if: inputs.release-version != ''
         shell: bash
         run: |
+          echo "🔍 Debug: inputs.release-version = '${{ inputs.release-version }}'"
           VERSION="${{ inputs.release-version }}"
-          VERSION="${VERSION#v}"
 
-          # Validate version format
-          if [[ -z "$VERSION" || "$VERSION" == "--workspace" ]]; then
-            echo "❌ Invalid or empty version: '$VERSION'"
-            echo "❌ Skipping version alignment"
-            exit 0
+          if [[ -z "$VERSION" ]]; then
+            echo "⚠️ No release version provided, generating default version"
+            # Generate a fallback version based on current date/time
+            VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
+          else
+            echo "✅ Using provided version: $VERSION"
+            # Remove 'v' prefix if present
+            VERSION="${VERSION#v}"
           fi
 
-          # Check if version is valid semver format
+          # Validate version format
+          if [[ "$VERSION" == "--workspace" ]]; then
+            echo "❌ Invalid version '--workspace' detected, using fallback"
+            VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
+          fi
+
+          # Check if version is valid semver format (allow dev versions)
           if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "❌ Invalid semver format: '$VERSION'"
-            echo "❌ Skipping version alignment"
-            exit 0
+            echo "⚠️ Non-standard semver format: '$VERSION', using fallback"
+            VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
           fi
 
           echo "✅ Setting crate version to: $VERSION"
           if ! command -v cargo-set-version >/dev/null 2>&1; then
+            echo "📦 Installing cargo-set-version..."
             cargo install cargo-set-version --locked
           fi
+
+          echo "🔧 Running: cargo set-version --workspace \"$VERSION\""
           cargo set-version --workspace "$VERSION"
+
+          echo "✅ Version set successfully"
+          echo "📋 Verifying Cargo.toml version:"
+          if [[ -f "Cargo.toml" ]]; then
+            grep "^version" Cargo.toml || echo "No version line found in Cargo.toml"
+          fi
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
