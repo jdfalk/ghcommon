@@ -328,7 +328,7 @@ def sync_linters():
         return
 
     # List linter files to copy first
-    src_dir = Path("ghcommon-source/.github/linters")
+    src_dir = Path("ghcommon-source")
     if src_dir.exists():
         linter_files = list(src_dir.glob("*"))
         print(f"📋 Copying {len(linter_files)} linter files...")

@@ -119,7 +119,7 @@ sync:
     - '.github/workflows/ci.yml'
     - '.github/workflows/pr-automation.yml'
     - '.github/instructions/'
-    - '.github/linters/'
+    - Root directory linter configuration files (*.yml, *.toml, *.json, etc.)
     - '.pre-commit-config.yaml'
 
   # Files explicitly excluded from sync (repo-specific)

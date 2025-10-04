@@ -102,7 +102,7 @@ jobs:
 
             # Fallback to manual sync if Python script fails
             echo "📁 Creating directory structure..."
-            mkdir -p .github/workflows .github/instructions .github/prompts scripts .github/linters .github/scripts
+            mkdir -p .github/workflows .github/instructions .github/prompts scripts .github/scripts
 
             case "$sync_type" in
               "all"|"workflows")
@@ -158,11 +158,18 @@ jobs:
                 ;;&
               "all"|"linters")
                 echo "🔄 Processing linters section..."
-                if [ -d "ghcommon-source/.github/linters" ]; then
-                  for file in ghcommon-source/.github/linters/*; do
+                # Copy linter files to root directory (new standard location)
+                if [ -d "ghcommon-source" ]; then
+                  for file in ghcommon-source/*.{yml,yaml,toml,json,env} ghcommon-source/.??*{yml,yaml,toml,json,env,rc} 2>/dev/null; do
                     if [ -f "$file" ]; then
-                      cp "$file" ".github/linters/"
-                      echo "✅ Copied $(basename "$file")"
+                      filename=$(basename "$file")
+                      # Only copy known linter configuration files
+                      case "$filename" in
+                        .markdownlint.json|.yaml-lint.yml|.eslintrc.yml|.pylintrc|.golangci.yml|clippy.toml|rustfmt.toml|.python-black|.isort.cfg|.prettierrc.json|super-linter-*.env)
+                          cp "$file" "."
+                          echo "✅ Copied $filename to root directory"
+                          ;;
+                      esac
                     fi
                   done
                 fi
@@ -196,12 +203,14 @@ jobs:
             esac
           }
 
-          # Create symlinks for linters
+          # Create symlinks for linters in root directory
           echo "🔗 Setting up linter symlinks..."
           mkdir -p .vscode
-          if [ -d ".github/linters" ] && [ ! -e ".vscode/linters" ]; then
-            ln -sf ../.github/linters .vscode/linters
-            echo "✅ Created symlink: .vscode/linters -> ../.github/linters"
+          if [ -f ".markdownlint.json" ] || [ -f ".eslintrc.yml" ] || [ -f ".pylintrc" ]; then
+            if [ ! -e ".vscode/linters" ]; then
+              ln -sf .. .vscode/linters
+              echo "✅ Created symlink: .vscode/linters -> .. (root directory)"
+            fi
           fi
 
           # Clean up the source directory

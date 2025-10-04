@@ -18,7 +18,7 @@ on:
   #     - ".github/prompts/**"
   #     - ".github/scripts/**"
   #     - "scripts/**"
-  #     - ".github/linters/**"
+  #     - "*.{yml,yaml,toml,json,env,md,txt}"
   #     - "labels.json"
   #     - "labels.md"
   workflow_dispatch:
@@ -110,7 +110,7 @@ jobs:
                 SYNC_TYPE="github-scripts"
               elif echo "$CHANGED_FILES" | grep -q "^scripts/"; then
                 SYNC_TYPE="scripts"
-              elif echo "$CHANGED_FILES" | grep -q "^\.github/linters/"; then
+              elif echo "$CHANGED_FILES" | grep -qE "\.(yml|yaml|toml|json|env|md|txt)$" | grep -v "\.github/"; then
                 SYNC_TYPE="linters"
               elif echo "$CHANGED_FILES" | grep -q "labels\."; then
                 SYNC_TYPE="labels"
