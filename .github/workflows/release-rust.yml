@@ -61,21 +61,21 @@ jobs:
         run: |
           VERSION="${{ inputs.release-version }}"
           VERSION="${VERSION#v}"
-          
+
           # Validate version format
           if [[ -z "$VERSION" || "$VERSION" == "--workspace" ]]; then
             echo "❌ Invalid or empty version: '$VERSION'"
             echo "❌ Skipping version alignment"
             exit 0
           fi
-          
+
           # Check if version is valid semver format
           if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
             echo "❌ Invalid semver format: '$VERSION'"
             echo "❌ Skipping version alignment"
             exit 0
           fi
-          
+
           echo "✅ Setting crate version to: $VERSION"
           if ! command -v cargo-set-version >/dev/null 2>&1; then
             cargo install cargo-set-version --locked
