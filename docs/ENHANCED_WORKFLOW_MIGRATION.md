@@ -1,3 +1,7 @@
+<!-- file: docs/ENHANCED_WORKFLOW_MIGRATION.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 87e859a1-b605-4a0b-b111-37a31a623bfe -->
+
 # Migration Guide: Enhanced Workflows with Timestamp Lifecycle Tracking
 
 This guide explains how to migrate from the original workflow automation to the enhanced version

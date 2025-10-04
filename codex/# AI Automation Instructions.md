@@ -1,3 +1,7 @@
+<!-- file: codex/# AI Automation Instructions.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: cdcb7ddd-0f5c-440f-8364-c07e65180333 -->
+
 # AI Automation Instructions
 
 This document provides comprehensive guidelines for AI-driven development work in this repository.

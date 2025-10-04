@@ -1,3 +1,7 @@
+<!-- file: docs/go-module-tagging.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: ea924a0a-fd0a-4c41-b625-96ed70992c5d -->
+
 # Go Module Tagging System
 
 <!-- file: docs/go-module-tagging.md -->

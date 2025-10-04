@@ -1,3 +1,7 @@
+<!-- file: .github/scripts/README.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 2e6f66ca-86aa-46dc-b806-e5ad95dee9fb -->
+
 # GitHub Scripts
 
 This directory contains standalone scripts used by GitHub Actions workflows.

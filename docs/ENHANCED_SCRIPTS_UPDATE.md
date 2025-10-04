@@ -1,3 +1,7 @@
+<!-- file: docs/ENHANCED_SCRIPTS_UPDATE.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 0b2eae8e-30cf-4f6b-a483-854807120e62 -->
+
 # Enhanced Scripts Update Summary
 
 ## Overview

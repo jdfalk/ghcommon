@@ -1,3 +1,7 @@
+<!-- file: docs/label-synchronization.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 4a2a4a66-7b30-4256-b4ff-9a9551884ebe -->
+
 # Label Synchronization Workflow
 
 A comprehensive GitHub Actions workflow for standardizing labels across multiple repositories from a

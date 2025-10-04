@@ -1,3 +1,7 @@
+<!-- file: docs/README.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: ed5f7a3f-12c8-41a8-9ac4-01e4f6993c4c -->
+
 # Documentation Index
 
 This directory contains auto-generated documentation for this project.
