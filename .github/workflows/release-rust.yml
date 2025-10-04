@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.7.0
+# version: 1.8.0
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -159,15 +159,35 @@ jobs:
           # Set the version with explicit validation
           echo "🔧 Setting crate version to: $VERSION"
 
-          # Double-check the command we're about to run
-          echo "🔍 Command to execute: cargo set-version --workspace \"$VERSION\""
-
-          # Execute the command
-          if cargo set-version --workspace "$VERSION"; then
-            echo "✅ Version set successfully"
+          # Method 1: Try cargo-set-version with correct syntax
+          echo "🔍 Attempting Method 1: cargo set-version $VERSION"
+          if cargo set-version "$VERSION"; then
+            echo "✅ Method 1 successful"
           else
-            echo "❌ Failed to set version"
-            exit 1
+            echo "⚠️ Method 1 failed, trying Method 2"
+
+            # Method 2: Use sed to directly update Cargo.toml
+            echo "🔍 Method 2: Direct sed replacement"
+            if [[ -f "Cargo.toml" ]]; then
+              # Backup original
+              cp Cargo.toml Cargo.toml.backup
+
+              # Update version line
+              sed -i.tmp "s/^version = .*/version = \"$VERSION\"/" Cargo.toml
+
+              # Check if it worked
+              if grep -q "^version = \"$VERSION\"" Cargo.toml; then
+                echo "✅ Method 2 successful"
+                rm -f Cargo.toml.tmp Cargo.toml.backup
+              else
+                echo "❌ Method 2 failed, restoring backup"
+                mv Cargo.toml.backup Cargo.toml
+                exit 1
+              fi
+            else
+              echo "❌ No Cargo.toml found"
+              exit 1
+            fi
           fi
 
           # Verify the change
