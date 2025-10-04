@@ -77,10 +77,12 @@ export BRANCH_NAME="main"
 export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
-if grep -q "strategy=stable" "$GITHUB_OUTPUT"; then
-    echo "✅ Main branch strategy working"
+if grep -q "strategy=stable" "$GITHUB_OUTPUT" && grep -q "auto-draft=true" "$GITHUB_OUTPUT"; then
+    echo "✅ Main branch strategy working (stable release as draft)"
 else
     echo "❌ Main branch strategy failed"
+    echo "Expected: strategy=stable, auto-draft=true"
+    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 rm -f "$GITHUB_OUTPUT"
@@ -88,10 +90,12 @@ export BRANCH_NAME="develop"
 export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
-if grep -q "strategy=prerelease" "$GITHUB_OUTPUT"; then
-    echo "✅ Develop branch strategy working"
+if grep -q "strategy=prerelease" "$GITHUB_OUTPUT" && grep -q "auto-draft=false" "$GITHUB_OUTPUT"; then
+    echo "✅ Develop branch strategy working (prerelease published directly)"
 else
     echo "❌ Develop branch strategy failed"
+    echo "Expected: strategy=prerelease, auto-draft=false"
+    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 rm -f "$GITHUB_OUTPUT"
@@ -99,10 +103,12 @@ export BRANCH_NAME="feature/test"
 export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
-if grep -q "strategy=draft" "$GITHUB_OUTPUT"; then
-    echo "✅ Feature branch strategy working"
+if grep -q "strategy=prerelease" "$GITHUB_OUTPUT" && grep -q "auto-draft=false" "$GITHUB_OUTPUT"; then
+    echo "✅ Feature branch strategy working (prerelease published directly)"
 else
     echo "❌ Feature branch strategy failed"
+    echo "Expected: strategy=prerelease, auto-draft=false"
+    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 # Create a test commit and tag for version testing

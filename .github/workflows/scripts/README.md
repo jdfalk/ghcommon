@@ -34,9 +34,9 @@ Determines release strategy based on branch name and manual inputs.
 
 **Strategy Logic:**
 
-- `main` branch → Stable release
-- `develop` branch → Pre-release
-- Feature branches → Draft release
+- `main` branch → Stable release (created as DRAFT for review)
+- `develop` branch → Pre-release (published DIRECTLY)
+- Feature branches → Pre-release (published DIRECTLY)
 
 ### `generate-version.sh`
 
@@ -51,9 +51,9 @@ Generates semantic version tags based on release type, branch, and strategy.
 
 **Version Logic:**
 
-- `main` branch: `v1.2.3` (stable)
-- `develop` branch: `v1.3.0-dev.202510031234` (pre-release)
-- Feature branches: `v1.2.4-dev-feature-name.202510031234` (draft)
+- `main` branch: `v1.2.3` (stable, created as draft)
+- `develop` branch: `v1.3.0-dev.202510031234` (pre-release, published directly)
+- Feature branches: `v1.2.4-alpha.202510031234` (pre-release, published directly)
 
 ### `generate-changelog.sh`
 

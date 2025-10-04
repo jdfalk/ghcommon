@@ -66,14 +66,12 @@ if [[ "$AUTO_PRERELEASE" == "true" ]]; then
     if [[ "$BRANCH_NAME" == "develop" ]]; then
         VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev.$(date +%Y%m%d%H%M)"
     else
-        # Feature branches get dev pre-release versions
+        # Feature branches get alpha pre-release versions
         SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-        VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
+        VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-alpha.$(date +%Y%m%d%H%M)"
     fi
-elif [[ "$AUTO_DRAFT" == "true" ]]; then
-    SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-    VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-draft-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
 else
+    # Stable release (will be created as draft)
     VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
 fi
 

@@ -16,16 +16,16 @@ INPUT_DRAFT="${INPUT_DRAFT:-false}"
 if [[ "$BRANCH_NAME" == "main" ]]; then
     STRATEGY="stable"
     AUTO_PRERELEASE="false"
-    AUTO_DRAFT="false"
+    AUTO_DRAFT="true"  # Stable releases are drafts for review
 elif [[ "$BRANCH_NAME" == "develop" ]]; then
     STRATEGY="prerelease"
     AUTO_PRERELEASE="true"
-    AUTO_DRAFT="false"
+    AUTO_DRAFT="false"  # Pre-releases are published directly
 else
-    # Feature branches should create draft releases
-    STRATEGY="draft"
-    AUTO_PRERELEASE="true"  # Also mark as prerelease
-    AUTO_DRAFT="true"
+    # Feature branches should create pre-releases (published directly)
+    STRATEGY="prerelease"
+    AUTO_PRERELEASE="true"
+    AUTO_DRAFT="false"  # Pre-releases are published directly
 fi
 
 # Override with manual inputs if provided
