@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.2.0
+# version: 1.3.0
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -12,6 +12,10 @@ on:
         required: false
         type: string
         default: "false"
+      release-version:
+        description: "Release tag (e.g., v1.2.3) used to align crate metadata"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -51,6 +55,16 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: protobuf-generated
+
+      - name: Align crate version with release tag
+        if: inputs.release-version != ''
+        run: |
+          VERSION="${{ inputs.release-version }}"
+          VERSION="${VERSION#v}"
+          if ! command -v cargo-set-version >/dev/null 2>&1; then
+            cargo install cargo-set-version --locked
+          fi
+          cargo set-version --workspace "$VERSION"
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
