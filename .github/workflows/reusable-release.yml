@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.5.3
+# version: 2.5.4
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -330,8 +330,10 @@ jobs:
 
       - name: Get version
         id: version
+        env:
+          DETECTED_RELEASE_TAG: ${{ needs.detect-languages.outputs.release-tag }}
         run: |
-          VERSION="${{ needs.detect-languages.outputs.release-tag }}"
+          VERSION="$DETECTED_RELEASE_TAG"
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
@@ -353,6 +355,8 @@ jobs:
 
       - name: Package and organize release artifacts
         id: package-artifacts
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
           echo "📦 Organizing and packaging release artifacts..."
 
@@ -387,7 +391,7 @@ jobs:
           # Create a comprehensive release manifest
           echo "Creating release manifest..."
           {
-            echo "# Release Manifest - ${{ steps.version.outputs.version }}"
+            echo "# Release Manifest - ${RELEASE_VERSION}"
             echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             echo ""
             echo "## SDK Packages"
@@ -460,15 +464,14 @@ jobs:
 
       - name: Check release created
         id: check-release
+        env:
+          RELEASE_OUTCOME: ${{ steps.release.outcome }}
         run: |
-          if [ "${{ steps.release.outcome }}" = "success" ]; then
+          if [ "$RELEASE_OUTCOME" = "success" ]; then
             echo "created=true" >> $GITHUB_OUTPUT
-          else
-            echo "created=false" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{ steps.release.outcome }}" == "success" ]]; then
             echo "release-created=true" >> $GITHUB_OUTPUT
           else
+            echo "created=false" >> $GITHUB_OUTPUT
             echo "release-created=false" >> $GITHUB_OUTPUT
           fi
 
@@ -482,43 +485,58 @@ jobs:
       release-created: ${{ needs.create-release.outputs.release-created || 'false' }}
     steps:
       - name: Generate release summary
+        env:
+          SUMMARY_PRIMARY_LANGUAGE: ${{ needs.detect-languages.outputs.primary-language }}
+          SUMMARY_BUILD_TARGET: ${{ inputs.build-target }}
+          SUMMARY_RELEASE_TAG: ${{ needs.detect-languages.outputs.release-tag }}
+          SUMMARY_RELEASE_STRATEGY: ${{ needs.detect-languages.outputs.release-branch-strategy }}
+          SUMMARY_BRANCH: ${{ github.ref_name }}
+          SUMMARY_GO_RESULT: ${{ needs.build-go.result || 'skipped' }}
+          SUMMARY_PYTHON_RESULT: ${{ needs.build-python.result || 'skipped' }}
+          SUMMARY_RUST_RESULT: ${{ needs.build-rust.result || 'skipped' }}
+          SUMMARY_FRONTEND_RESULT: ${{ needs.build-frontend.result || 'skipped' }}
+          SUMMARY_DOCKER_RESULT: ${{ needs.build-docker.result || 'skipped' }}
+          SUMMARY_RELEASE_RESULT: ${{ needs.create-release.result || 'skipped' }}
+          SUMMARY_RELEASE_CREATED: ${{ needs.create-release.outputs.release-created || 'false' }}
+          SUMMARY_AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease || 'false' }}
+          SUMMARY_AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft || 'false' }}
         run: |
           echo "# 🚀 Release Build Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Project Type:** ${{ needs.detect-languages.outputs.primary-language }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Build Target:** ${{ inputs.build-target }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Release Tag:** ${{ needs.detect-languages.outputs.release-tag }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Release Strategy:** ${{ needs.detect-languages.outputs.release-branch-strategy }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Project Type:** $SUMMARY_PRIMARY_LANGUAGE" >> $GITHUB_STEP_SUMMARY
+          echo "**Build Target:** $SUMMARY_BUILD_TARGET" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Tag:** $SUMMARY_RELEASE_TAG" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Strategy:** $SUMMARY_RELEASE_STRATEGY" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** $SUMMARY_BRANCH" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Go | ${{ needs.build-go.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Python | ${{ needs.build-python.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Rust | ${{ needs.build-rust.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Frontend | ${{ needs.build-frontend.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker | ${{ needs.build-docker.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Release | ${{ needs.create-release.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Go | $SUMMARY_GO_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python | $SUMMARY_PYTHON_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Rust | $SUMMARY_RUST_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | $SUMMARY_FRONTEND_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker | $SUMMARY_DOCKER_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release | $SUMMARY_RELEASE_RESULT |" >> $GITHUB_STEP_SUMMARY
 
           # Check for any failures
-          if [[ "${{ needs.build-go.result }}" == "failure" ||
-                "${{ needs.build-python.result }}" == "failure" ||
-                "${{ needs.build-rust.result }}" == "failure" ||
-                "${{ needs.build-frontend.result }}" == "failure" ||
-                "${{ needs.build-docker.result }}" == "failure" ||
-                "${{ needs.create-release.result }}" == "failure" ]]; then
+          if [[ "$SUMMARY_GO_RESULT" == "failure" ||
+                "$SUMMARY_PYTHON_RESULT" == "failure" ||
+                "$SUMMARY_RUST_RESULT" == "failure" ||
+                "$SUMMARY_FRONTEND_RESULT" == "failure" ||
+                "$SUMMARY_DOCKER_RESULT" == "failure" ||
+                "$SUMMARY_RELEASE_RESULT" == "failure" ]]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ **Some components failed**" >> $GITHUB_STEP_SUMMARY
             exit 1
           else
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "✅ **All components completed successfully**" >> $GITHUB_STEP_SUMMARY
-            if [[ "${{ needs.create-release.outputs.release-created }}" == "true" ]]; then
+            if [[ "$SUMMARY_RELEASE_CREATED" == "true" ]]; then
               echo "" >> $GITHUB_STEP_SUMMARY
-              echo "🎉 **Release created: ${{ needs.detect-languages.outputs.release-tag }}**" >> $GITHUB_STEP_SUMMARY
-              if [[ "${{ needs.detect-languages.outputs.auto-prerelease }}" == "true" ]]; then
+              echo "🎉 **Release created: $SUMMARY_RELEASE_TAG**" >> $GITHUB_STEP_SUMMARY
+              if [[ "$SUMMARY_AUTO_PRERELEASE" == "true" ]]; then
                 echo "⚠️ **Pre-release** - for testing purposes" >> $GITHUB_STEP_SUMMARY
-              elif [[ "${{ needs.detect-languages.outputs.auto-draft }}" == "true" ]]; then
+              elif [[ "$SUMMARY_AUTO_DRAFT" == "true" ]]; then
                 echo "📝 **Draft release** - review before publishing" >> $GITHUB_STEP_SUMMARY
               else
                 echo "🚀 **Stable release** - ready for production" >> $GITHUB_STEP_SUMMARY
