@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 2.1.0 -->
+<!-- version: 2.3.0 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
 
 # GitHub Common Workflows Repository - AI Agent Instructions
@@ -36,12 +36,9 @@ This repository serves as the **central infrastructure hub** for reusable GitHub
 "Git Commit" - Prompts for message, logs to logs/ directory
 "Git Push" - Logs push results and handles authentication
 ```
-
-### Issue Management (Distributed System)
-- Issues are managed via JSON files in `.github/issue-updates/` directory
-- Use `scripts/create-issue-update.sh` to create properly formatted issue files
-- `scripts/issue_manager.py` processes these files and handles Copilot ticket management
-- Supports operations: create, update, comment, close with GUID-based deduplication
+- **CRITICAL**: All commits MUST use conventional commit format: `type(scope): description`
+- See `.github/instructions/commit-messages.instructions.md` for detailed commit message rules
+- Use `Git Commit` task which integrates with commit message validation
 
 ## 🎯 Multi-Repository Management Patterns
 
@@ -83,15 +80,11 @@ python scripts/workflow-debugger.py --org jdfalk --scan-all --fix-tasks
 1. **Workflow reliability** - Use workflow debugger to identify and fix cross-repo workflow issues
 2. **Protobuf tooling** - Buf integration, cycle detection, and cross-repo protobuf synchronization
 3. **Configuration propagation** - Ensure changes sync correctly to target repositories
-4. **Issue automation** - Distributed issue management with JSON file processing
-5. **Agent task generation** - Workflow debugger creates structured tasks for AI agents
+4. **Agent task generation** - Workflow debugger creates structured tasks for AI agents
 
 **Common Operations**:
 - Analyze workflow failures: `scripts/workflow-debugger.py`
 - Sync to repositories: `scripts/intelligent_sync_to_repos.py`
-- Manage issues: `scripts/create-issue-update.sh` + `scripts/issue_manager.py`
-- Fix protobuf cycles: `tools/protobuf-cycle-fixer.py`
-
-Always check `logs/` directory after running VS Code tasks for execution details and debugging information.
+- Fix protobuf cycles: `tools/protobuf-cycle-fixer.py`Always check `logs/` directory after running VS Code tasks for execution details and debugging information.
 
 For detailed coding rules, see `.github/instructions/general-coding.instructions.md` and language-specific instruction files.
