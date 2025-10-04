@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.6.0
+# version: 1.7.0
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -56,55 +56,98 @@ jobs:
         with:
           name: protobuf-generated
 
-      - name: Detect and set version using GitHub API
+      - name: Debug environment and detect version
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔍 Detecting version using GitHub API..."
+          echo "🔍 Environment Debug Information"
+          echo "================================="
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Input release-version: '${{ inputs.release-version }}'"
+          echo ""
+
+          # Check if Cargo.toml exists and show its content
+          if [[ -f "Cargo.toml" ]]; then
+            echo "📋 Found existing Cargo.toml:"
+            echo "---"
+            head -10 Cargo.toml
+            echo "---"
+          else
+            echo "❌ No Cargo.toml found - this might be the wrong repository type"
+            echo "� Contents of current directory:"
+            ls -la
+            exit 1
+          fi
+
+          echo ""
+          echo "�🔍 Detecting version using GitHub API..."
 
           # Try to get version from input first
           INPUT_VERSION="${{ inputs.release-version }}"
           echo "📥 Input version: '$INPUT_VERSION'"
 
-          if [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "--workspace" ]]; then
+          if [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "--workspace" && "$INPUT_VERSION" != "" ]]; then
             VERSION="${INPUT_VERSION#v}"
             echo "✅ Using input version: $VERSION"
           else
             echo "🌐 Querying GitHub API for latest release..."
 
-            # Get latest release from GitHub API
-            LATEST_RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
-              | grep '"tag_name"' | cut -d'"' -f4 || echo "")
+            # Get latest release from GitHub API with better error handling
+            API_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/latest")
 
-            if [[ -n "$LATEST_RELEASE" ]]; then
-              # Increment patch version
-              LATEST_VERSION="${LATEST_RELEASE#v}"
-              echo "🏷️ Latest release: $LATEST_VERSION"
+            HTTP_STATUS=$(echo "$API_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            BODY=$(echo "$API_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
 
-              # Parse version components
-              IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
-              MAJOR=${MAJOR:-0}
-              MINOR=${MINOR:-0}
-              PATCH=${PATCH:-0}
+            echo "📡 API HTTP Status: $HTTP_STATUS"
 
-              # Increment patch for new version
-              NEW_PATCH=$((PATCH + 1))
-              VERSION="$MAJOR.$MINOR.$NEW_PATCH"
-              echo "🆙 Generated new version: $VERSION"
+            if [[ "$HTTP_STATUS" == "200" ]]; then
+              LATEST_RELEASE=$(echo "$BODY" | grep '"tag_name"' | cut -d'"' -f4 || echo "")
+
+              if [[ -n "$LATEST_RELEASE" ]]; then
+                # Increment patch version
+                LATEST_VERSION="${LATEST_RELEASE#v}"
+                echo "🏷️ Latest release: $LATEST_VERSION"
+
+                # Parse version components
+                IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
+                MAJOR=${MAJOR:-0}
+                MINOR=${MINOR:-0}
+                PATCH=${PATCH:-0}
+
+                # Increment patch for new version
+                NEW_PATCH=$((PATCH + 1))
+                VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+                echo "🆙 Generated new version: $VERSION"
+              else
+                echo "⚠️ No tag_name found in API response"
+                VERSION="0.1.0"
+              fi
             else
-              echo "⚠️ No releases found, using default version"
+              echo "⚠️ API call failed with status $HTTP_STATUS"
+              if [[ "$HTTP_STATUS" == "404" ]]; then
+                echo "📦 No releases found, starting with 0.1.0"
+              fi
               VERSION="0.1.0"
             fi
           fi
 
-          # Final validation
-          if [[ "$VERSION" == "--workspace" || ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "❌ Invalid version '$VERSION', using fallback"
+          # Final validation and cleanup
+          if [[ "$VERSION" == "--workspace" ]]; then
+            echo "❌ CRITICAL: Version is '--workspace', this should never happen!"
+            VERSION="0.1.0-emergency.$(date +%Y%m%d%H%M%S)"
+          elif [[ -z "$VERSION" ]]; then
+            echo "❌ CRITICAL: Version is empty!"
+            VERSION="0.1.0-emergency.$(date +%Y%m%d%H%M%S)"
+          elif ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "⚠️ Version '$VERSION' doesn't match semver, fixing..."
             VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
           fi
 
+          echo ""
           echo "✅ Final version: $VERSION"
 
           # Install cargo-set-version if needed
@@ -113,11 +156,30 @@ jobs:
             cargo install cargo-set-version --locked
           fi
 
-          # Set the version
+          # Set the version with explicit validation
           echo "🔧 Setting crate version to: $VERSION"
-          cargo set-version --workspace "$VERSION"
+
+          # Double-check the command we're about to run
+          echo "🔍 Command to execute: cargo set-version --workspace \"$VERSION\""
+
+          # Execute the command
+          if cargo set-version --workspace "$VERSION"; then
+            echo "✅ Version set successfully"
+          else
+            echo "❌ Failed to set version"
+            exit 1
+          fi
 
           # Verify the change
+          echo ""
+          echo "📋 Verifying Cargo.toml after version update:"
+          if [[ -f "Cargo.toml" ]]; then
+            echo "Version line:"
+            grep "^version" Cargo.toml || echo "❌ No version line found!"
+            echo ""
+            echo "First 10 lines of Cargo.toml:"
+            head -10 Cargo.toml
+          fi
           echo "📋 Verifying Cargo.toml version:"
           if [[ -f "Cargo.toml" ]]; then
             grep "^version" Cargo.toml || echo "❌ No version line found in Cargo.toml"
