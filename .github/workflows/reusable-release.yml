@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.2.0
+# version: 2.3.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -157,183 +157,31 @@ jobs:
       - name: Detect project languages and generate matrices
         id: detect
         run: |
-          # Use input overrides if language detection is skipped
-          if [[ "${{ inputs.skip-language-detection }}" == "true" ]]; then
-            echo "has-go=${{ inputs.go-enabled }}" >> $GITHUB_OUTPUT
-            echo "has-python=${{ inputs.python-enabled }}" >> $GITHUB_OUTPUT
-            echo "has-rust=${{ inputs.rust-enabled }}" >> $GITHUB_OUTPUT
-            echo "has-frontend=${{ inputs.frontend-enabled }}" >> $GITHUB_OUTPUT
-            echo "has-docker=${{ inputs.docker-enabled }}" >> $GITHUB_OUTPUT
-            echo "protobuf-needed=${{ inputs.protobuf-enabled }}" >> $GITHUB_OUTPUT
-          else
-            # Auto-detect languages
-            has_go="false"
-            has_python="false"
-            has_rust="false"
-            has_frontend="false"
-            has_docker="false"
-            protobuf_needed="false"
-            primary_lang="unknown"
-
-            # Go detection
-            if [[ -f "go.mod" || -f "main.go" || -d "cmd" || -d "pkg" ]]; then
-              has_go="true"
-              primary_lang="go"
-            fi
-
-            # Python detection
-            if [[ -f "setup.py" || -f "pyproject.toml" || -f "requirements.txt" || -f "poetry.lock" ]]; then
-              has_python="true"
-              [[ "$primary_lang" == "unknown" ]] && primary_lang="python"
-            fi
-
-            # Rust detection
-            if [[ -f "Cargo.toml" || -f "Cargo.lock" ]]; then
-              has_rust="true"
-              [[ "$primary_lang" == "unknown" ]] && primary_lang="rust"
-            fi
-
-            # Frontend detection
-            if [[ -f "package.json" || -d "webui" || -d "frontend" || -d "ui" ]]; then
-              has_frontend="true"
-              [[ "$primary_lang" == "unknown" ]] && primary_lang="frontend"
-            fi
-
-            # Docker detection
-            if [[ -f "Dockerfile" || -f "docker-compose.yml" || -f "docker-compose.yaml" ]]; then
-              has_docker="true"
-            fi
-
-            # Protobuf detection
-            if [[ -f "buf.yaml" || -f "buf.gen.yaml" || -n "$(find . -name '*.proto' -type f 2>/dev/null | head -1)" ]]; then
-              protobuf_needed="true"
-            fi
-
-            echo "has-go=$has_go" >> $GITHUB_OUTPUT
-            echo "has-python=$has_python" >> $GITHUB_OUTPUT
-            echo "has-rust=$has_rust" >> $GITHUB_OUTPUT
-            echo "has-frontend=$has_frontend" >> $GITHUB_OUTPUT
-            echo "has-docker=$has_docker" >> $GITHUB_OUTPUT
-            echo "protobuf-needed=$protobuf_needed" >> $GITHUB_OUTPUT
-            echo "primary-language=$primary_lang" >> $GITHUB_OUTPUT
-          fi
-
-          # Generate build matrices (simplified for reusable workflow)
-          echo 'go-matrix={"go-version":["1.22","1.23","1.24"],"os":["ubuntu-latest","macos-latest"]}' >> $GITHUB_OUTPUT
-          echo 'python-matrix={"python-version":["3.11","3.12","3.13"],"os":["ubuntu-latest","macos-latest"]}' >> $GITHUB_OUTPUT
-          echo 'rust-matrix={"rust-version":["stable","beta"],"os":["ubuntu-latest","macos-latest"]}' >> $GITHUB_OUTPUT
-          echo 'frontend-matrix={"node-version":["18","20","22"],"os":["ubuntu-latest"]}' >> $GITHUB_OUTPUT
-          echo 'docker-matrix={"platform":["linux/amd64","linux/arm64"]}' >> $GITHUB_OUTPUT
+          ./.github/workflows/scripts/detect-languages.sh \
+            "${{ inputs.skip-language-detection }}" \
+            "${{ inputs.go-enabled }}" \
+            "${{ inputs.python-enabled }}" \
+            "${{ inputs.rust-enabled }}" \
+            "${{ inputs.frontend-enabled }}" \
+            "${{ inputs.docker-enabled }}" \
+            "${{ inputs.protobuf-enabled }}"
 
       - name: Determine release strategy based on branch
         id: release-strategy
         run: |
-          BRANCH_NAME="${{ github.ref_name }}"
-
-          # Determine release strategy based on branch and manual inputs
-          if [[ "$BRANCH_NAME" == "main" ]]; then
-            STRATEGY="stable"
-            AUTO_PRERELEASE="false"
-            AUTO_DRAFT="false"
-          elif [[ "$BRANCH_NAME" == "develop" ]]; then
-            STRATEGY="prerelease"
-            AUTO_PRERELEASE="true"
-            AUTO_DRAFT="false"
-          else
-            # Feature branches should create draft releases
-            STRATEGY="draft"
-            AUTO_PRERELEASE="true"  # Also mark as prerelease
-            AUTO_DRAFT="true"
-          fi
-
-          # Override with manual inputs if provided
-          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-            AUTO_PRERELEASE="true"
-          fi
-          if [[ "${{ inputs.draft }}" == "true" ]]; then
-            AUTO_DRAFT="true"
-          fi
-
-          echo "strategy=$STRATEGY" >> $GITHUB_OUTPUT
-          echo "auto-prerelease=$AUTO_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "auto-draft=$AUTO_DRAFT" >> $GITHUB_OUTPUT
-
-          echo "🔄 Release strategy for branch '$BRANCH_NAME': $STRATEGY"
-          echo "📋 Auto-prerelease: $AUTO_PRERELEASE"
-          echo "📋 Auto-draft: $AUTO_DRAFT"
+          ./.github/workflows/scripts/release-strategy.sh \
+            "${{ github.ref_name }}" \
+            "${{ inputs.prerelease }}" \
+            "${{ inputs.draft }}"
 
       - name: Generate semantic release version
         id: version
         run: |
-          # Get the latest tag to determine version increment
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "Latest tag: $LATEST_TAG"
-
-          # Extract version numbers (remove 'v' prefix and any suffix)
-          VERSION_CORE=$(echo "$LATEST_TAG" | sed 's/^v//' | sed 's/-.*//')
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_CORE"
-
-          # Default to 0 if any version component is missing
-          MAJOR=${MAJOR:-0}
-          MINOR=${MINOR:-0}
-          PATCH=${PATCH:-0}
-
-          echo "Current version: $MAJOR.$MINOR.$PATCH"
-
-          # Determine version increment based on release type and branch
-          RELEASE_TYPE="${{ inputs.release-type || 'auto' }}"
-          BRANCH_NAME="${{ github.ref_name }}"
-
-          if [[ "$RELEASE_TYPE" == "major" ]]; then
-            NEW_MAJOR=$((MAJOR + 1))
-            NEW_MINOR=0
-            NEW_PATCH=0
-          elif [[ "$RELEASE_TYPE" == "minor" ]]; then
-            NEW_MAJOR=$MAJOR
-            NEW_MINOR=$((MINOR + 1))
-            NEW_PATCH=0
-          elif [[ "$RELEASE_TYPE" == "patch" ]]; then
-            NEW_MAJOR=$MAJOR
-            NEW_MINOR=$MINOR
-            NEW_PATCH=$((PATCH + 1))
-          else
-            # Auto versioning based on branch and commits
-            if [[ "$BRANCH_NAME" == "main" ]]; then
-              # Stable release: increment patch
-              NEW_MAJOR=$MAJOR
-              NEW_MINOR=$MINOR
-              NEW_PATCH=$((PATCH + 1))
-            elif [[ "$BRANCH_NAME" == "develop" ]]; then
-              # Pre-release: increment minor
-              NEW_MAJOR=$MAJOR
-              NEW_MINOR=$((MINOR + 1))
-              NEW_PATCH=0
-            else
-              # Draft/feature branch: increment patch with branch suffix
-              NEW_MAJOR=$MAJOR
-              NEW_MINOR=$MINOR
-              NEW_PATCH=$((PATCH + 1))
-            fi
-          fi
-
-          # Build version string with appropriate suffixes
-          if [[ "${{ steps.release-strategy.outputs.auto-prerelease }}" == "true" ]]; then
-            if [[ "$BRANCH_NAME" == "develop" ]]; then
-              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev.$(date +%Y%m%d%H%M)"
-            else
-              # Feature branches get dev pre-release versions
-              SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-              VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
-            fi
-          elif [[ "${{ steps.release-strategy.outputs.auto-draft }}" == "true" ]]; then
-            SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-draft-${SAFE_BRANCH}.$(date +%Y%m%d%H%M)"
-          else
-            VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
-          fi
-
-          echo "Generated version tag: $VERSION_TAG"
-          echo "tag=$VERSION_TAG" >> $GITHUB_OUTPUT
+          ./.github/workflows/scripts/generate-version.sh \
+            "${{ inputs.release-type || 'auto' }}" \
+            "${{ github.ref_name }}" \
+            "${{ steps.release-strategy.outputs.auto-prerelease }}" \
+            "${{ steps.release-strategy.outputs.auto-draft }}"
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -440,40 +288,12 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # Generate changelog based on conventional commits and branch strategy
-          CHANGELOG="## 🚀 What's Changed\n\n"
-
-          # Get commits since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [[ -n "$LAST_TAG" ]]; then
-            CHANGELOG+="### 📋 Commits since $LAST_TAG:\n"
-            while IFS= read -r commit; do
-              CHANGELOG+="- $commit\n"
-            done < <(git log ${LAST_TAG}..HEAD --oneline --format="%s (%h)")
-          else
-            CHANGELOG+="### 📋 Initial Release Commits:\n"
-            while IFS= read -r commit; do
-              CHANGELOG+="- $commit\n"
-            done < <(git log --oneline --format="%s (%h)")
-          fi
-
-          CHANGELOG+="\n### 🎯 Release Information\n"
-          CHANGELOG+="- **Branch:** ${{ github.ref_name }}\n"
-          CHANGELOG+="- **Release Type:** ${{ needs.detect-languages.outputs.release-branch-strategy }}\n"
-          CHANGELOG+="- **Primary Language:** ${{ needs.detect-languages.outputs.primary-language }}\n"
-
-          if [[ "${{ needs.detect-languages.outputs.auto-prerelease }}" == "true" ]]; then
-            CHANGELOG+="\n⚠️ **This is a pre-release version** - use for testing purposes.\n"
-          fi
-
-          if [[ "${{ needs.detect-languages.outputs.auto-draft }}" == "true" ]]; then
-            CHANGELOG+="\n📝 **This is a draft release** - review before making public.\n"
-          fi
-
-          # Store changelog content for use in release
-          echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          ./.github/workflows/scripts/generate-changelog.sh \
+            "${{ github.ref_name }}" \
+            "${{ needs.detect-languages.outputs.primary-language }}" \
+            "${{ needs.detect-languages.outputs.release-branch-strategy }}" \
+            "${{ needs.detect-languages.outputs.auto-prerelease }}" \
+            "${{ needs.detect-languages.outputs.auto-draft }}"
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
