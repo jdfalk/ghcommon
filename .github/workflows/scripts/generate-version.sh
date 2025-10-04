@@ -6,12 +6,12 @@
 set -euo pipefail
 
 # Generate semantic release version
-# Arguments: release_type, branch_name, auto_prerelease, auto_draft
+# Uses environment variables: RELEASE_TYPE, BRANCH_NAME, AUTO_PRERELEASE, AUTO_DRAFT
 
-RELEASE_TYPE="${1:-auto}"
-BRANCH_NAME="${2}"
-AUTO_PRERELEASE="${3:-false}"
-AUTO_DRAFT="${4:-false}"
+RELEASE_TYPE="${RELEASE_TYPE:-auto}"
+BRANCH_NAME="${BRANCH_NAME}"
+AUTO_PRERELEASE="${AUTO_PRERELEASE:-false}"
+AUTO_DRAFT="${AUTO_DRAFT:-false}"
 
 # Get the latest tag to determine version increment
 LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")

@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.3.0
+# version: 2.4.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -156,32 +156,35 @@ jobs:
 
       - name: Detect project languages and generate matrices
         id: detect
+        env:
+          SKIP_LANGUAGE_DETECTION: ${{ inputs.skip-language-detection }}
+          GO_ENABLED: ${{ inputs.go-enabled }}
+          PYTHON_ENABLED: ${{ inputs.python-enabled }}
+          RUST_ENABLED: ${{ inputs.rust-enabled }}
+          FRONTEND_ENABLED: ${{ inputs.frontend-enabled }}
+          DOCKER_ENABLED: ${{ inputs.docker-enabled }}
+          PROTOBUF_ENABLED: ${{ inputs.protobuf-enabled }}
         run: |
-          ./.github/workflows/scripts/detect-languages.sh \
-            "${{ inputs.skip-language-detection }}" \
-            "${{ inputs.go-enabled }}" \
-            "${{ inputs.python-enabled }}" \
-            "${{ inputs.rust-enabled }}" \
-            "${{ inputs.frontend-enabled }}" \
-            "${{ inputs.docker-enabled }}" \
-            "${{ inputs.protobuf-enabled }}"
+          ./.github/workflows/scripts/detect-languages.sh
 
       - name: Determine release strategy based on branch
         id: release-strategy
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+          INPUT_PRERELEASE: ${{ inputs.prerelease }}
+          INPUT_DRAFT: ${{ inputs.draft }}
         run: |
-          ./.github/workflows/scripts/release-strategy.sh \
-            "${{ github.ref_name }}" \
-            "${{ inputs.prerelease }}" \
-            "${{ inputs.draft }}"
+          ./.github/workflows/scripts/release-strategy.sh
 
       - name: Generate semantic release version
         id: version
+        env:
+          RELEASE_TYPE: ${{ inputs.release-type || 'auto' }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          AUTO_PRERELEASE: ${{ steps.release-strategy.outputs.auto-prerelease }}
+          AUTO_DRAFT: ${{ steps.release-strategy.outputs.auto-draft }}
         run: |
-          ./.github/workflows/scripts/generate-version.sh \
-            "${{ inputs.release-type || 'auto' }}" \
-            "${{ github.ref_name }}" \
-            "${{ steps.release-strategy.outputs.auto-prerelease }}" \
-            "${{ steps.release-strategy.outputs.auto-draft }}"
+          ./.github/workflows/scripts/generate-version.sh
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -287,13 +290,14 @@ jobs:
 
       - name: Generate changelog
         id: changelog
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+          PRIMARY_LANGUAGE: ${{ needs.detect-languages.outputs.primary-language }}
+          RELEASE_STRATEGY: ${{ needs.detect-languages.outputs.release-branch-strategy }}
+          AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease }}
+          AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft }}
         run: |
-          ./.github/workflows/scripts/generate-changelog.sh \
-            "${{ github.ref_name }}" \
-            "${{ needs.detect-languages.outputs.primary-language }}" \
-            "${{ needs.detect-languages.outputs.release-branch-strategy }}" \
-            "${{ needs.detect-languages.outputs.auto-prerelease }}" \
-            "${{ needs.detect-languages.outputs.auto-draft }}"
+          ./.github/workflows/scripts/generate-changelog.sh
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5

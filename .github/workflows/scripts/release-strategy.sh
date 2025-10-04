@@ -6,11 +6,11 @@
 set -euo pipefail
 
 # Determine release strategy based on branch
-# Arguments: branch_name, input_prerelease, input_draft
+# Uses environment variables: BRANCH_NAME, INPUT_PRERELEASE, INPUT_DRAFT
 
-BRANCH_NAME="${1}"
-INPUT_PRERELEASE="${2:-false}"
-INPUT_DRAFT="${3:-false}"
+BRANCH_NAME="${BRANCH_NAME}"
+INPUT_PRERELEASE="${INPUT_PRERELEASE:-false}"
+INPUT_DRAFT="${INPUT_DRAFT:-false}"
 
 # Determine release strategy based on branch and manual inputs
 if [[ "$BRANCH_NAME" == "main" ]]; then

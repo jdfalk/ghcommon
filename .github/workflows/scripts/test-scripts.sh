@@ -32,8 +32,17 @@ echo "Testing language detection..."
 GITHUB_OUTPUT="$TEST_DIR/github_output"
 export GITHUB_OUTPUT
 
+# Set environment variables for testing
+export SKIP_LANGUAGE_DETECTION="false"
+export GO_ENABLED="false"
+export PYTHON_ENABLED="false"
+export RUST_ENABLED="false"
+export FRONTEND_ENABLED="false"
+export DOCKER_ENABLED="false"
+export PROTOBUF_ENABLED="false"
+
 # Run the detect-languages script
-bash "$OLDPWD/.github/workflows/scripts/detect-languages.sh" "false" "false" "false" "false" "false" "false" "false"
+bash "$OLDPWD/.github/workflows/scripts/detect-languages.sh"
 
 # Check output
 if grep -q "has-go=true" "$GITHUB_OUTPUT"; then
@@ -64,7 +73,10 @@ fi
 echo "Testing release strategy..."
 rm -f "$GITHUB_OUTPUT"
 
-bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh" "main" "false" "false"
+export BRANCH_NAME="main"
+export INPUT_PRERELEASE="false"
+export INPUT_DRAFT="false"
+bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=stable" "$GITHUB_OUTPUT"; then
     echo "✅ Main branch strategy working"
 else
@@ -72,7 +84,10 @@ else
 fi
 
 rm -f "$GITHUB_OUTPUT"
-bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh" "develop" "false" "false"
+export BRANCH_NAME="develop"
+export INPUT_PRERELEASE="false"
+export INPUT_DRAFT="false"
+bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=prerelease" "$GITHUB_OUTPUT"; then
     echo "✅ Develop branch strategy working"
 else
@@ -80,7 +95,10 @@ else
 fi
 
 rm -f "$GITHUB_OUTPUT"
-bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh" "feature/test" "false" "false"
+export BRANCH_NAME="feature/test"
+export INPUT_PRERELEASE="false"
+export INPUT_DRAFT="false"
+bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=draft" "$GITHUB_OUTPUT"; then
     echo "✅ Feature branch strategy working"
 else
@@ -97,7 +115,11 @@ git tag v1.0.0
 echo "Testing version generation..."
 rm -f "$GITHUB_OUTPUT"
 
-bash "$OLDPWD/.github/workflows/scripts/generate-version.sh" "auto" "main" "false" "false"
+export RELEASE_TYPE="auto"
+export BRANCH_NAME="main"
+export AUTO_PRERELEASE="false"
+export AUTO_DRAFT="false"
+bash "$OLDPWD/.github/workflows/scripts/generate-version.sh"
 if grep -q "tag=v1.0.1" "$GITHUB_OUTPUT"; then
     echo "✅ Main branch version increment working"
 else
@@ -109,7 +131,12 @@ fi
 echo "Testing changelog generation..."
 rm -f "$GITHUB_OUTPUT"
 
-bash "$OLDPWD/.github/workflows/scripts/generate-changelog.sh" "main" "go" "stable" "false" "false"
+export BRANCH_NAME="main"
+export PRIMARY_LANGUAGE="go"
+export RELEASE_STRATEGY="stable"
+export AUTO_PRERELEASE="false"
+export AUTO_DRAFT="false"
+bash "$OLDPWD/.github/workflows/scripts/generate-changelog.sh"
 if grep -q "changelog_content" "$GITHUB_OUTPUT"; then
     echo "✅ Changelog generation working"
 else

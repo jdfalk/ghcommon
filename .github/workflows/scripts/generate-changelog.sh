@@ -6,13 +6,13 @@
 set -euo pipefail
 
 # Generate changelog based on conventional commits and branch strategy
-# Arguments: branch_name, primary_language, release_strategy, auto_prerelease, auto_draft
+# Uses environment variables: BRANCH_NAME, PRIMARY_LANGUAGE, RELEASE_STRATEGY, AUTO_PRERELEASE, AUTO_DRAFT
 
-BRANCH_NAME="${1}"
-PRIMARY_LANGUAGE="${2:-unknown}"
-RELEASE_STRATEGY="${3:-stable}"
-AUTO_PRERELEASE="${4:-false}"
-AUTO_DRAFT="${5:-false}"
+BRANCH_NAME="${BRANCH_NAME}"
+PRIMARY_LANGUAGE="${PRIMARY_LANGUAGE:-unknown}"
+RELEASE_STRATEGY="${RELEASE_STRATEGY:-stable}"
+AUTO_PRERELEASE="${AUTO_PRERELEASE:-false}"
+AUTO_DRAFT="${AUTO_DRAFT:-false}"
 
 CHANGELOG="## 🚀 What's Changed\n\n"
 

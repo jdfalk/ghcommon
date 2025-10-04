@@ -6,15 +6,15 @@
 set -euo pipefail
 
 # Detect project languages and generate matrices
-# Arguments: skip_detection, go_enabled, python_enabled, rust_enabled, frontend_enabled, docker_enabled, protobuf_enabled
+# Uses environment variables: SKIP_LANGUAGE_DETECTION, GO_ENABLED, PYTHON_ENABLED, RUST_ENABLED, FRONTEND_ENABLED, DOCKER_ENABLED, PROTOBUF_ENABLED
 
-SKIP_DETECTION="${1:-false}"
-GO_ENABLED="${2:-false}"
-PYTHON_ENABLED="${3:-false}"
-RUST_ENABLED="${4:-false}"
-FRONTEND_ENABLED="${5:-false}"
-DOCKER_ENABLED="${6:-false}"
-PROTOBUF_ENABLED="${7:-false}"
+SKIP_DETECTION="${SKIP_LANGUAGE_DETECTION:-false}"
+GO_ENABLED="${GO_ENABLED:-false}"
+PYTHON_ENABLED="${PYTHON_ENABLED:-false}"
+RUST_ENABLED="${RUST_ENABLED:-false}"
+FRONTEND_ENABLED="${FRONTEND_ENABLED:-false}"
+DOCKER_ENABLED="${DOCKER_ENABLED:-false}"
+PROTOBUF_ENABLED="${PROTOBUF_ENABLED:-false}"
 
 # Use input overrides if language detection is skipped
 if [[ "$SKIP_DETECTION" == "true" ]]; then
