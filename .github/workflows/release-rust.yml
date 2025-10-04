@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.5.0
+# version: 1.6.0
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -56,47 +56,71 @@ jobs:
         with:
           name: protobuf-generated
 
-      - name: Align crate version with release tag
+      - name: Detect and set version using GitHub API
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔍 Debug: inputs.release-version = '${{ inputs.release-version }}'"
-          VERSION="${{ inputs.release-version }}"
+          echo "🔍 Detecting version using GitHub API..."
 
-          if [[ -z "$VERSION" ]]; then
-            echo "⚠️ No release version provided, generating default version"
-            # Generate a fallback version based on current date/time
-            VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
+          # Try to get version from input first
+          INPUT_VERSION="${{ inputs.release-version }}"
+          echo "📥 Input version: '$INPUT_VERSION'"
+
+          if [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "--workspace" ]]; then
+            VERSION="${INPUT_VERSION#v}"
+            echo "✅ Using input version: $VERSION"
           else
-            echo "✅ Using provided version: $VERSION"
-            # Remove 'v' prefix if present
-            VERSION="${VERSION#v}"
+            echo "🌐 Querying GitHub API for latest release..."
+
+            # Get latest release from GitHub API
+            LATEST_RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
+              | grep '"tag_name"' | cut -d'"' -f4 || echo "")
+
+            if [[ -n "$LATEST_RELEASE" ]]; then
+              # Increment patch version
+              LATEST_VERSION="${LATEST_RELEASE#v}"
+              echo "🏷️ Latest release: $LATEST_VERSION"
+
+              # Parse version components
+              IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
+              MAJOR=${MAJOR:-0}
+              MINOR=${MINOR:-0}
+              PATCH=${PATCH:-0}
+
+              # Increment patch for new version
+              NEW_PATCH=$((PATCH + 1))
+              VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+              echo "🆙 Generated new version: $VERSION"
+            else
+              echo "⚠️ No releases found, using default version"
+              VERSION="0.1.0"
+            fi
           fi
 
-          # Validate version format
-          if [[ "$VERSION" == "--workspace" ]]; then
-            echo "❌ Invalid version '--workspace' detected, using fallback"
+          # Final validation
+          if [[ "$VERSION" == "--workspace" || ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "❌ Invalid version '$VERSION', using fallback"
             VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
           fi
 
-          # Check if version is valid semver format (allow dev versions)
-          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "⚠️ Non-standard semver format: '$VERSION', using fallback"
-            VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
-          fi
+          echo "✅ Final version: $VERSION"
 
-          echo "✅ Setting crate version to: $VERSION"
+          # Install cargo-set-version if needed
           if ! command -v cargo-set-version >/dev/null 2>&1; then
             echo "📦 Installing cargo-set-version..."
             cargo install cargo-set-version --locked
           fi
 
-          echo "🔧 Running: cargo set-version --workspace \"$VERSION\""
+          # Set the version
+          echo "🔧 Setting crate version to: $VERSION"
           cargo set-version --workspace "$VERSION"
 
-          echo "✅ Version set successfully"
+          # Verify the change
           echo "📋 Verifying Cargo.toml version:"
           if [[ -f "Cargo.toml" ]]; then
-            grep "^version" Cargo.toml || echo "No version line found in Cargo.toml"
+            grep "^version" Cargo.toml || echo "❌ No version line found in Cargo.toml"
           fi
 
       - name: Set up Rust
@@ -123,19 +147,26 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
 
       - name: Cache cargo index
         uses: actions/cache@v4
         with:
           path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
 
       - name: Cache cargo build
         uses: actions/cache@v4
         with:
           path: target
-          key: ${{ runner.os }}-cargo-build-target-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-${{ matrix.target }}-
+            ${{ runner.os }}-cargo-build-
 
       - name: Run Clippy
         if: matrix.primary
