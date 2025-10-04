@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.5.2
+# version: 2.5.3
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -148,11 +148,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Determine ghcommon workflow ref
+        id: ghcommon-ref
+        run: |
+          ref="${GITHUB_WORKFLOW_REF##*@}"
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+            ref="refs/heads/main"
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       - name: Checkout ghcommon workflow scripts
         uses: actions/checkout@v5
         with:
           repository: jdfalk/ghcommon
-          ref: ${{ github.action_ref || 'refs/heads/main' }}
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
           path: ghcommon-workflow-scripts
           sparse-checkout: |
             .github/workflows/scripts
@@ -296,11 +305,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Determine ghcommon workflow ref
+        id: ghcommon-ref
+        run: |
+          ref="${GITHUB_WORKFLOW_REF##*@}"
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+            ref="refs/heads/main"
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       - name: Checkout ghcommon workflow scripts
         uses: actions/checkout@v5
         with:
           repository: jdfalk/ghcommon
-          ref: ${{ github.action_ref || 'refs/heads/main' }}
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
           path: ghcommon-workflow-scripts
           sparse-checkout: |
             .github/workflows/scripts
