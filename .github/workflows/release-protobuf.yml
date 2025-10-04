@@ -1,5 +1,5 @@
 # file: .github/workflows/release-protobuf.yml
-# version: 1.2.0
+# version: 1.2.1
 # guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
 
 name: Release Protobuf Assets
@@ -32,7 +32,7 @@ jobs:
     name: Generate Protobuf
     runs-on: ubuntu-latest
     outputs:
-      artifacts_available: ${{ steps.set-output.outputs.artifacts_available }}
+      artifacts_available: ${{ steps.artifact-status.outputs.artifacts_available }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -113,6 +113,11 @@ jobs:
             echo "No proto changes detected and force not enabled; skipping generation"
           fi
 
-      - name: Set artifacts output
-        id: set-output
-        run: echo "artifacts_available=true" >> $GITHUB_OUTPUT
+      - name: Determine artifact availability
+        id: artifact-status
+        run: |
+          if [ "${{ steps.changes.outputs.proto_changed }}" = "true" ] || [ "${{ inputs.force }}" = "true" ]; then
+            echo "artifacts_available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "artifacts_available=false" >> "$GITHUB_OUTPUT"
+          fi
