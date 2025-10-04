@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/test-scripts.sh
-# version: 1.0.0
+# version: 1.1.0
 # guid: 2e3f4a5b-6c7d-8e9f-0a1b-2c3d4e5f6a7b
 
 set -euo pipefail
