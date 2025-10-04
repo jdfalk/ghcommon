@@ -1,3 +1,7 @@
+<!-- file: scripts/README-unified-project-manager.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: e08ffd6b-8758-4911-a8ea-d11e1ba15486 -->
+
 # Unified GitHub Project Manager
 
 <!-- file: scripts/README-unified-project-manager.md -->

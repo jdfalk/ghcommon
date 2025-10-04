@@ -1,3 +1,7 @@
+<!-- file: scripts/README.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 7e0e17a5-1b07-45a3-925d-500d1745f6a8 -->
+
 # Scripts Directory
 
 <!-- file: scripts/README.md -->

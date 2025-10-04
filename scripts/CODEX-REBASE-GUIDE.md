@@ -1,3 +1,7 @@
+<!-- file: scripts/CODEX-REBASE-GUIDE.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 1b7de21e-7315-4e37-a2af-dd62d2af7b76 -->
+
 # Codex Rebase Quick Reference
 
 ## When to Use

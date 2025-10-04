@@ -1,3 +1,7 @@
+<!-- file: docs/super-linter-improvements.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: c466e071-d55a-4278-af25-96a2b1571341 -->
+
 <!--
 file: docs/super-linter-improvements.md
 version: 1.0.0

@@ -1,4 +1,8 @@
 <!-- file: examples/migration-guides/subtitle-manager-migration.md -->
+<!-- version: 1.0.0 -->
+<!-- guid: 53f1c794-3dad-4f3d-88af-614dc62facf5 -->
+
+<!-- file: examples/migration-guides/subtitle-manager-migration.md -->
 
 # Migration Guide: subtitle-manager to Centralized Issue Management
 
