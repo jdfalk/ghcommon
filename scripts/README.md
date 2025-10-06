@@ -4,7 +4,8 @@
 
 # Scripts Directory
 
-This directory contains reusable scripts for GitHub automation, workflow debugging, and multi-repository management.
+This directory contains reusable scripts for GitHub automation, workflow debugging, and
+multi-repository management.
 
 ## Available Scripts
 
@@ -66,11 +67,13 @@ GitHub label synchronization and management across repositories:
 
 ### For Repositories Using ghcommon
 
-These scripts are primarily used by the central ghcommon repository for managing other repositories. Individual repositories typically don't need to copy these scripts locally.
+These scripts are primarily used by the central ghcommon repository for managing other repositories.
+Individual repositories typically don't need to copy these scripts locally.
 
 ### Version Checking
 
-Each script includes version information in the header comments. Check the version to see if updates are available:
+Each script includes version information in the header comments. Check the version to see if updates
+are available:
 
 ```bash
 head -n 10 scripts/script-name.py | grep "version:"
