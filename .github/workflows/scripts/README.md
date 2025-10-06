@@ -4,13 +4,15 @@
 
 # Workflow Scripts
 
-This directory contains modular shell scripts extracted from the reusable release workflow for better maintainability, testing, and linting.
+This directory contains modular shell scripts extracted from the reusable release workflow for
+better maintainability, testing, and linting.
 
 ## Scripts
 
 ### `detect-languages.sh`
 
-Detects project languages and technologies (Go, Python, Rust, Frontend, Docker, Protobuf) and generates build matrices.
+Detects project languages and technologies (Go, Python, Rust, Frontend, Docker, Protobuf) and
+generates build matrices.
 
 **Environment Variables:**
 
@@ -108,7 +110,8 @@ All scripts are thoroughly tested with the included test suite. The tests valida
 
 ## Integration
 
-These scripts are called from the main `reusable-release.yml` workflow with environment variables set from the GitHub Actions context.
+These scripts are called from the main `reusable-release.yml` workflow with environment variables
+set from the GitHub Actions context.
 
 Example workflow integration:
 
