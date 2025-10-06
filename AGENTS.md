@@ -9,8 +9,8 @@
 
 ## 🚨 CRITICAL: Documentation Update Protocol
 
-This repository uses a direct-edit documentation workflow. The legacy doc-update scripts
-and workflows are retired.
+This repository uses a direct-edit documentation workflow. The legacy doc-update scripts and
+workflows are retired.
 
 - Edit documentation directly in the target files.
 - Always keep the required header (file path, version, guid) and bump the version on any change.

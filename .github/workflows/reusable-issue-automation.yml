@@ -42,7 +42,7 @@ jobs:
   # Stale issue management
   stale-management:
     name: Manage Stale Issues
-    if: '!inputs.skip-stale-management'
+    if: "!inputs.skip-stale-management"
     runs-on: ubuntu-latest
     steps:
       - name: Mark and close stale issues
@@ -78,17 +78,17 @@ jobs:
             If you'd like to continue with these changes, please reopen the PR or create a new one.
           days-before-stale: ${{ inputs.stale-days }}
           days-before-close: ${{ inputs.close-days }}
-          stale-issue-label: 'stale'
-          stale-pr-label: 'stale'
-          exempt-issue-labels: 'keep-open,bug,security,enhancement'
-          exempt-pr-labels: 'keep-open,work-in-progress,security'
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "keep-open,bug,security,enhancement"
+          exempt-pr-labels: "keep-open,work-in-progress,security"
           exempt-draft-pr: true
           operations-per-run: 100
 
   # Automatic labeling
   auto-labeling:
     name: Auto Label Issues and PRs
-    if: '!inputs.skip-auto-labeling && (github.event_name == ''issues'' || github.event_name == ''pull_request'')'
+    if: "!inputs.skip-auto-labeling && (github.event_name == 'issues' || github.event_name == 'pull_request')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -171,7 +171,7 @@ jobs:
   # Automatic assignment
   auto-assignment:
     name: Auto Assign Issues and PRs
-    if: '!inputs.skip-auto-assignment && (github.event_name == ''issues'' || github.event_name == ''pull_request'')'
+    if: "!inputs.skip-auto-assignment && (github.event_name == 'issues' || github.event_name == 'pull_request')"
     runs-on: ubuntu-latest
     steps:
       - name: Auto-assign based on content

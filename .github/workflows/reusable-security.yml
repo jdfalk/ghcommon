@@ -93,7 +93,7 @@ jobs:
   codeql-analysis:
     name: CodeQL Analysis
     needs: detect-languages
-    if: '!inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null'
+    if: "!inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -141,7 +141,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     needs: detect-languages
-    if: '!inputs.skip-dependency-review && github.event_name == ''pull_request'''
+    if: "!inputs.skip-dependency-review && github.event_name == 'pull_request'"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -150,14 +150,14 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          config-file: './.github/dependency-review-config.yml'
+          config-file: "./.github/dependency-review-config.yml"
           fail-on-severity: moderate
 
   # Security Audit
   security-audit:
     name: Security Audit
     needs: detect-languages
-    if: '!inputs.skip-security-audit'
+    if: "!inputs.skip-security-audit"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -201,7 +201,7 @@ jobs:
   trivy-scan:
     name: Trivy Security Scan
     needs: detect-languages
-    if: '!inputs.skip-security-audit'
+    if: "!inputs.skip-security-audit"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -210,16 +210,16 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
   # Security summary
   security-summary:
