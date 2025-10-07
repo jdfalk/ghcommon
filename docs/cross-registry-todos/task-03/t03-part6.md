@@ -352,7 +352,7 @@ Add debugging to API calls:
       -H "Accept: application/vnd.github.v3+json" \
       "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME" \
       > /tmp/package-debug.json 2>&1
-    
+
     # Show response
     cat /tmp/package-debug.json
 ```

@@ -139,66 +139,66 @@ on:
         required: false
         default: 'ghcr.io'
         type: string
-      
+
       image-name:
         description: 'Docker image name'
         required: true
         type: string
-      
+
       dockerfile:
         description: 'Path to Dockerfile'
         required: false
         default: 'Dockerfile'
         type: string
-      
+
       context:
         description: 'Build context directory'
         required: false
         default: '.'
         type: string
-      
+
       platforms:
         description: 'Target platforms'
         required: false
         default: 'linux/amd64,linux/arm64'
         type: string
-      
+
       build-args:
         description: 'Build arguments'
         required: false
         default: ''
         type: string
-      
+
       enable-security-scan:
         description: 'Enable security scanning'
         required: false
         default: true
         type: boolean
-      
+
       scan-severity:
         description: 'Scan severity threshold'
         required: false
         default: 'CRITICAL,HIGH'
         type: string
-      
+
       enable-sbom:
         description: 'Enable SBOM generation'
         required: false
         default: true
         type: boolean
-      
+
       enable-provenance:
         description: 'Enable provenance attestation'
         required: false
         default: true
         type: boolean
-      
+
       enable-signing:
         description: 'Enable image signing with Cosign'
         required: false
         default: false
         type: boolean
-      
+
       cache-mode:
         description: 'Cache mode (min/max)'
         required: false
@@ -214,16 +214,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
           platforms: 'arm64,arm'
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -237,14 +237,14 @@ jobs:
               max-parallelism = 4
             [registry."docker.io"]
               mirrors = ["mirror.gcr.io"]
-      
+
       - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.registry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -269,7 +269,7 @@ jobs:
             org.opencontainers.image.created=${{ steps.meta.outputs.created }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
-      
+
       - name: Build and push
         id: build
         uses: docker/build-push-action@v5
@@ -288,13 +288,13 @@ jobs:
           outputs: |
             type=image,push=true
             type=image,push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
-      
+
       - name: Update Trivy database
         if: inputs.enable-security-scan
         run: |
           echo "Updating Trivy vulnerability database..."
           docker run --rm aquasec/trivy:latest image --download-db-only
-      
+
       - name: Run Trivy security scanner
         if: inputs.enable-security-scan
         uses: aquasecurity/trivy-action@0.16.1
@@ -308,14 +308,14 @@ jobs:
           scanners: 'vuln,secret,config,license'
           ignore-unfixed: false
           timeout: '10m'
-      
+
       - name: Upload Trivy results
         if: always() && inputs.enable-security-scan
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy-${{ inputs.image-name }}'
-      
+
       - name: Generate SBOM with Syft
         if: inputs.enable-sbom
         uses: anchore/sbom-action@v0
@@ -325,11 +325,11 @@ jobs:
           output-file: sbom-${{ inputs.image-name }}.spdx.json
           upload-artifact: true
           upload-release-assets: ${{ github.event_name == 'release' }}
-      
+
       - name: Install Cosign
         if: inputs.enable-signing
         uses: sigstore/cosign-installer@v3
-      
+
       - name: Sign image with Cosign
         if: inputs.enable-signing && github.event_name != 'pull_request'
         env:
@@ -337,22 +337,22 @@ jobs:
         run: |
           cosign sign --yes \
             ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{ steps.build.outputs.digest }}
-      
+
       - name: Generate build summary
         if: always()
         run: |
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## Docker Build Summary
-          
+
           **Image**: `${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}`
           **Digest**: `${{ steps.build.outputs.digest }}`
           **Platforms**: `${{ inputs.platforms }}`
-          
+
           ### Tags
           ```
           ${{ steps.meta.outputs.tags }}
           ```
-          
+
           ### Security Scan
           - Trivy: ${{ inputs.enable-security-scan && '✅ Enabled' || '❌ Disabled' }}
           - SBOM: ${{ inputs.enable-sbom && '✅ Generated' || '❌ Skipped' }}
@@ -548,7 +548,7 @@ cosign download attestation "$IMAGE" > provenance.json
 echo ""
 echo "Provenance Summary:"
 jq -r '
-  .payload | @base64d | fromjson | 
+  .payload | @base64d | fromjson |
   "Builder: \(.builder.id)",
   "Build Type: \(.buildType)",
   "Invocation ID: \(.invocation.configSource.entryPoint)"
@@ -646,19 +646,19 @@ permissions:
 jobs:
   health-check:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install tools
         run: |
           brew install trivy
-      
+
       - name: Run health check
         run: |
           .github/monitoring/check-image-health.sh
-      
+
       - name: Create issue on failure
         if: failure()
         uses: actions/github-script@v7

@@ -355,7 +355,7 @@ platforms: windows/amd64
 ```yaml
 # Daily vulnerability scan
 - schedule: '0 0 * * *'
-  
+
 # Weekly image cleanup
 - schedule: '0 0 * * 0'
 

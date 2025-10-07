@@ -22,14 +22,14 @@ Add the publishing step to the workflow (continuing from Part 2):
           echo "Version: ${{ steps.crate-info.outputs.crate-version }}"
           echo "Registry: https://api.github.com/${{ github.repository }}/cargo/"
           echo ""
-          
+
           # Publish to GitHub registry
           cargo publish \
             --registry github \
             --verbose \
             --allow-dirty \
             --no-verify
-          
+
           echo ""
           echo "✅ Crate published successfully!"
           echo "📦 Package: https://github.com/${{ github.repository }}/packages"
@@ -67,23 +67,23 @@ Verify the package is accessible after publishing:
         run: |
           CRATE_NAME="${{ steps.crate-info.outputs.crate-name }}"
           CRATE_VERSION="${{ steps.crate-info.outputs.crate-version }}"
-          
+
           echo "🔍 Verifying package is accessible in registry..."
           echo ""
-          
+
           # Wait for package to be indexed
           echo "⏳ Waiting 10 seconds for package indexing..."
           sleep 10
-          
+
           # Try to fetch package metadata via API
           for i in {1..5}; do
             echo "Attempt $i/5: Checking package availability..."
-            
+
             HTTP_STATUS=$(curl -s -o /tmp/package-info.json -w "%{http_code}" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME")
-            
+
             if [ "$HTTP_STATUS" = "200" ]; then
               echo ""
               echo "✅ Package verified in GitHub Package Registry"
@@ -96,7 +96,7 @@ Verify the package is accessible after publishing:
                 "  URL: \(.html_url)",
                 "  Total Downloads: \(.download_count // 0)"
               '
-              
+
               echo ""
               echo "🏷️  Available Versions:"
               curl -s \
@@ -104,18 +104,18 @@ Verify the package is accessible after publishing:
                 -H "Accept: application/vnd.github.v3+json" \
                 "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME/versions" \
                 | jq -r '.[] | "  - \(.name) (published \(.created_at))"' | head -10
-              
+
               echo ""
               echo "✅ Verification complete"
               exit 0
             fi
-            
+
             if [ $i -lt 5 ]; then
               echo "Package not yet available, waiting 10 seconds..."
               sleep 10
             fi
           done
-          
+
           echo ""
           echo "⚠️  Package published but not yet searchable (this can take a few minutes)"
           echo "🔗 Check: https://github.com/${{ github.repository }}/packages"
@@ -173,7 +173,7 @@ Add a summary that appears in the GitHub Actions UI:
           echo "**Repository**: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Tag**: \`${GITHUB_REF#refs/tags/}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ steps.check-published.outputs.already-published }}" = "true" ]; then
             echo "**Status**: ⏭️ **Skipped** (version already published)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -187,14 +187,14 @@ Add a summary that appears in the GitHub Actions UI:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Check the job logs for error details." >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📍 Package Links" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Packages**: https://github.com/${{ github.repository }}/packages" >> $GITHUB_STEP_SUMMARY
           echo "- **Registry Index**: https://api.github.com/${{ github.repository }}/cargo/" >> $GITHUB_STEP_SUMMARY
           echo "- **This Release**: https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📚 Using This Crate" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

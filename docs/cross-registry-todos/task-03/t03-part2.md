@@ -72,10 +72,10 @@ Use dynamic configuration to support any repository calling this reusable workfl
 env:
   # Dynamic registry URL based on current repository
   CARGO_REGISTRY_URL: 'sparse+https://api.github.com/${{ github.repository }}/cargo/'
-  
+
   # Use GitHub's automatic token (requires packages:write permission)
   CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
   # Extract repository information
   REPO_OWNER: ${{ github.repository_owner }}
   REPO_NAME: ${{ github.event.repository.name }}
@@ -97,14 +97,14 @@ publish-rust-crate:
   name: Publish Rust Crate  # Human-readable name in UI
   runs-on: ubuntu-latest    # Linux for cargo publish
   needs: build-rust         # Wait for all builds
-  
+
   # Only publish on tag pushes (releases)
   if: startsWith(github.ref, 'refs/tags/v')
-  
+
   permissions:
     contents: read    # Read repository code
     packages: write   # Write to GitHub Packages
-  
+
   steps:
     # ... (implementation steps)
 ```
@@ -320,25 +320,25 @@ Add the complete job after the documentation comment:
     name: Publish Rust Crate
     runs-on: ubuntu-latest
     needs: build-rust
-    
+
     # Only publish on tag pushes (releases)
     if: startsWith(github.ref, 'refs/tags/v')
-    
+
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      
+
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
           components: rustfmt
-      
+
       - name: Detect crate information
         id: crate-info
         run: |
@@ -347,7 +347,7 @@ Add the complete job after the documentation comment:
             echo "❌ No Cargo.toml found in repository root"
             exit 1
           fi
-          
+
           # Use toml-cli if available, otherwise use grep/sed
           if command -v toml >/dev/null 2>&1; then
             CRATE_NAME=$(toml get Cargo.toml package.name -r)
@@ -356,19 +356,19 @@ Add the complete job after the documentation comment:
             CRATE_NAME=$(grep -m1 '^name =' Cargo.toml | sed 's/name = "\(.*\)"/\1/')
             CRATE_VERSION=$(grep -m1 '^version =' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
           fi
-          
+
           if [ -z "$CRATE_NAME" ] || [ -z "$CRATE_VERSION" ]; then
             echo "❌ Could not extract crate name or version from Cargo.toml"
             exit 1
           fi
-          
+
           echo "📦 Crate: $CRATE_NAME"
           echo "🏷️  Version: $CRATE_VERSION"
-          
+
           # Export to GitHub outputs
           echo "crate-name=$CRATE_NAME" >> $GITHUB_OUTPUT
           echo "crate-version=$CRATE_VERSION" >> $GITHUB_OUTPUT
-          
+
           # Verify tag matches crate version
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
           if [ "$TAG_VERSION" != "$CRATE_VERSION" ]; then
@@ -377,35 +377,35 @@ Add the complete job after the documentation comment:
           else
             echo "✅ Git tag matches Cargo.toml version"
           fi
-      
+
       - name: Configure Cargo for GitHub Registry
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create .cargo directory if it doesn't exist
           mkdir -p ~/.cargo
-          
+
           # Configure the GitHub registry
           cat > ~/.cargo/config.toml << EOF
           [registries.github]
           index = "sparse+https://api.github.com/${{ github.repository }}/cargo/"
-          
+
           [registry]
           default = "github"
-          
+
           [net]
           git-fetch-with-cli = true
           EOF
-          
+
           # Configure authentication
           cat > ~/.cargo/credentials.toml << EOF
           [registries.github]
           token = "${CARGO_REGISTRY_TOKEN}"
           EOF
-          
+
           # Set restrictive permissions on credentials
           chmod 600 ~/.cargo/credentials.toml
-          
+
           echo "✅ Cargo configured for GitHub Package Registry"
           echo "📍 Registry: https://api.github.com/${{ github.repository }}/cargo/"
 ```
@@ -419,10 +419,10 @@ Continue the job with validation steps:
         run: |
           # Check for required fields
           REQUIRED_FIELDS=("name" "version" "edition" "authors" "description" "license" "repository")
-          
+
           echo "🔍 Verifying Cargo.toml has required fields for publishing..."
           echo ""
-          
+
           MISSING_COUNT=0
           for field in "${REQUIRED_FIELDS[@]}"; do
             if grep -q "^$field =" Cargo.toml; then
@@ -431,7 +431,7 @@ Continue the job with validation steps:
             else
               echo "❌ $field: MISSING"
               MISSING_COUNT=$((MISSING_COUNT + 1))
-              
+
               # Provide fix instructions
               case $field in
                 authors)
@@ -449,7 +449,7 @@ Continue the job with validation steps:
               esac
             fi
           done
-          
+
           echo ""
           if [ $MISSING_COUNT -eq 0 ]; then
             echo "✅ All required fields present in Cargo.toml"
@@ -459,36 +459,36 @@ Continue the job with validation steps:
             echo "Add the missing fields to the [package] section and try again."
             exit 1
           fi
-      
+
       - name: Check if version already published
         id: check-published
         continue-on-error: true
         run: |
           CRATE_NAME="${{ steps.crate-info.outputs.crate-name }}"
           CRATE_VERSION="${{ steps.crate-info.outputs.crate-version }}"
-          
+
           echo "🔍 Checking if $CRATE_NAME@$CRATE_VERSION is already published..."
-          
+
           # Try to get package info from GitHub API
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME/versions")
-          
+
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "📦 Package exists, checking versions..."
-            
+
             # Get all versions
             VERSIONS=$(curl -s \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME/versions" \
               | jq -r '.[].name // empty' 2>/dev/null)
-            
+
             if [ -n "$VERSIONS" ]; then
               echo "Found versions:"
               echo "$VERSIONS" | head -5
-              
+
               if echo "$VERSIONS" | grep -q "^${CRATE_VERSION}$"; then
                 echo ""
                 echo "⚠️  Version $CRATE_VERSION already published"
@@ -496,7 +496,7 @@ Continue the job with validation steps:
                 exit 0
               fi
             fi
-            
+
             echo "✅ Version $CRATE_VERSION not yet published"
             echo "already-published=false" >> $GITHUB_OUTPUT
           else

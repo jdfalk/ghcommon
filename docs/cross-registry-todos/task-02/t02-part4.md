@@ -172,7 +172,7 @@ gh api "/users/$OWNER/packages/container/$IMAGE" > /tmp/package-info.json
 
 if [ $? -eq 0 ]; then
   echo "  ✅ Package found on ghcr.io"
-  
+
   # Get package details
   echo ""
   echo "Package Details:"
@@ -183,7 +183,7 @@ if [ $? -eq 0 ]; then
     "Created: \(.created_at)",
     "Updated: \(.updated_at)"
   ' /tmp/package-info.json
-  
+
   # Get versions
   echo ""
   echo "Available Versions:"
@@ -234,7 +234,7 @@ docker images "$IMAGE"
 echo ""
 echo "Image details:"
 docker inspect "$FULL_IMAGE" | jq -r '
-  .[0] | 
+  .[0] |
   "Created: \(.Created)",
   "Architecture: \(.Architecture)",
   "OS: \(.Os)",
@@ -291,7 +291,7 @@ jq -r '.manifests[] | "  - \(.platform.os)/\(.platform.architecture)"' /tmp/mani
 # Detailed platform info
 echo ""
 echo "Detailed Platform Information:"
-jq -r '.manifests[] | 
+jq -r '.manifests[] |
   "Platform: \(.platform.os)/\(.platform.architecture)",
   "  Digest: \(.digest)",
   "  Size: \(.size) bytes",
@@ -459,13 +459,13 @@ gh run download "$RUN_ID" --name trivy-results || echo "No trivy-results artifac
 if [ -f "trivy-results.sarif" ]; then
   echo ""
   echo "Trivy SARIF Results:"
-  
+
   # Parse SARIF
   jq -r '
-    .runs[0].results[] | 
+    .runs[0].results[] |
     "\(.ruleId): \(.message.text) (Severity: \(.level))"
   ' trivy-results.sarif | head -20
-  
+
   # Count by severity
   echo ""
   echo "Vulnerability Count by Severity:"
@@ -513,16 +513,16 @@ gh run download "$RUN_ID" --name sbom-test-app || echo "No SBOM artifact"
 if [ -f "sbom-test-app.spdx.json" ]; then
   echo ""
   echo "SBOM Summary:"
-  
+
   # Count packages
   PACKAGES=$(jq '.packages | length' sbom-test-app.spdx.json)
   echo "  Total packages: $PACKAGES"
-  
+
   # Package types
   echo ""
   echo "  Package types:"
   jq -r '.packages[].type' sbom-test-app.spdx.json | sort | uniq -c
-  
+
   # License summary
   echo ""
   echo "  License summary:"
@@ -573,13 +573,13 @@ for run in runs:
     run_id = run['databaseId']
     started = datetime.fromisoformat(run['startedAt'].replace('Z', '+00:00'))
     updated = datetime.fromisoformat(run['updatedAt'].replace('Z', '+00:00'))
-    
+
     duration = (updated - started).total_seconds()
     durations.append(duration)
-    
+
     minutes = int(duration // 60)
     seconds = int(duration % 60)
-    
+
     print(f"| {run_id} | {minutes}m {seconds}s | {started.strftime('%Y-%m-%d %H:%M')} |")
 
 if durations:

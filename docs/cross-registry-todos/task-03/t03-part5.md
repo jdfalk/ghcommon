@@ -55,13 +55,13 @@ The publishing job already runs in parallel with the build-rust job's matrix bui
     (
       # Check 1: Verify Cargo.toml in background
       grep -q "^name =" Cargo.toml && echo "✅ Name present" &
-      
+
       # Check 2: Verify git status
       git diff --exit-code && echo "✅ Clean working tree" &
-      
+
       # Check 3: Verify no uncommitted changes
       git status --porcelain | wc -l | grep -q "^0$" && echo "✅ No changes" &
-      
+
       # Wait for all background checks
       wait
     )
@@ -92,11 +92,11 @@ Reduce API calls by combining operations:
       -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
       -H "Accept: application/vnd.github.v3+json" \
       "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME")
-    
+
     # Extract multiple fields from single response
     PACKAGE_EXISTS=$(echo "$PACKAGE_INFO" | jq -r '.name != null')
     VERSION_COUNT=$(echo "$PACKAGE_INFO" | jq -r '.version_count // 0')
-    
+
     echo "package-exists=$PACKAGE_EXISTS" >> $GITHUB_OUTPUT
     echo "version-count=$VERSION_COUNT" >> $GITHUB_OUTPUT
 ```
@@ -123,10 +123,10 @@ Publish to both GitHub Packages and crates.io:
   run: |
     # Publish to GitHub Packages
     cargo publish --registry github --verbose --allow-dirty --no-verify
-    
+
     # Wait a bit to avoid rate limiting
     sleep 5
-    
+
     # Publish to crates.io (if token available)
     if [ -n "$CRATES_IO_TOKEN" ]; then
       cargo publish --registry crates-io --verbose --allow-dirty --no-verify
@@ -160,12 +160,12 @@ For Cargo workspaces with multiple crates:
   run: |
     if grep -q '\[workspace\]' Cargo.toml; then
       echo "is-workspace=true" >> $GITHUB_OUTPUT
-      
+
       # List workspace members
       MEMBERS=$(grep -A 10 '\[workspace\]' Cargo.toml | \
         grep 'members = ' | \
         sed 's/members = \[//' | sed 's/\]//' | sed 's/"//g')
-      
+
       echo "members=$MEMBERS" >> $GITHUB_OUTPUT
     else
       echo "is-workspace=false" >> $GITHUB_OUTPUT
@@ -407,10 +407,10 @@ Add security checks before publishing:
   run: |
     # Install cargo-audit if not present
     cargo install cargo-audit --quiet
-    
+
     # Run security audit
     cargo audit
-    
+
     # Fail if high/critical vulnerabilities found
     cargo audit --deny warnings --deny high --deny critical
 ```
@@ -489,12 +489,12 @@ jobs:
       - name: Check package status
         run: |
           CRATE_NAME="ubuntu-autoinstall-agent"
-          
+
           # Get package info
           HTTP_STATUS=$(curl -s -o /tmp/package.json -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME")
-          
+
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "✅ Package is accessible"
             cat /tmp/package.json | jq .
@@ -502,20 +502,20 @@ jobs:
             echo "❌ Package not accessible (HTTP $HTTP_STATUS)"
             exit 1
           fi
-      
+
       - name: Verify latest version
         run: |
           # Get Cargo.toml version from main branch
           EXPECTED_VERSION=$(curl -s https://raw.githubusercontent.com/${{ github.repository }}/main/Cargo.toml | \
             grep -m1 '^version =' | sed 's/version = "\(.*\)"/\1/')
-          
+
           # Get latest published version
           LATEST_VERSION=$(gh api repos/${{ github.repository }}/packages/cargo/ubuntu-autoinstall-agent/versions \
             --jq '.[0].name')
-          
+
           echo "Expected version (from Cargo.toml): $EXPECTED_VERSION"
           echo "Latest published version: $LATEST_VERSION"
-          
+
           if [ "$EXPECTED_VERSION" = "$LATEST_VERSION" ]; then
             echo "✅ Versions match"
           else
@@ -539,23 +539,23 @@ Add alerting to the publishing job:
         title: `🚨 Rust Crate Publishing Failed for ${context.ref}`,
         body: `
         ## Publishing Failure
-        
+
         The Rust crate publishing job failed during release.
-        
+
         **Tag**: \`${context.ref}\`
         **Workflow Run**: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
-        
+
         **Next Steps**:
         1. Review the workflow logs
         2. Check Cargo.toml completeness
         3. Verify GITHUB_TOKEN permissions
         4. Re-run the workflow or create a new tag
-        
+
         cc @${context.actor}
         `,
         labels: ['ci', 'publishing', 'urgent']
       });
-      
+
       console.log('Created issue:', issue.data.html_url);
 ```
 
