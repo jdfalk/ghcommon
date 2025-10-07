@@ -124,7 +124,7 @@ ENTRYPOINT ["/app/binary"]
 
 ### Enhanced Build Configuration
 
-```yaml
+````yaml
 # file: .github/workflows/release-docker-enhanced.yml
 # version: 1.0.0
 # guid: release-docker-enhanced
@@ -208,8 +208,8 @@ on:
 permissions:
   contents: read
   packages: write
-  id-token: write  # For Cosign
-  security-events: write  # For SARIF upload
+  id-token: write # For Cosign
+  security-events: write # For SARIF upload
 
 jobs:
   build:
@@ -299,11 +299,13 @@ jobs:
         if: inputs.enable-security-scan
         uses: aquasecurity/trivy-action@0.16.1
         with:
-          image-ref: ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{ steps.build.outputs.digest }}
+          image-ref:
+            ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{
+            steps.build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: ${{ inputs.scan-severity }}
-          exit-code: '0'  # Don't fail build, just report
+          exit-code: '0' # Don't fail build, just report
           vuln-type: 'os,library'
           scanners: 'vuln,secret,config,license'
           ignore-unfixed: false
@@ -320,7 +322,9 @@ jobs:
         if: inputs.enable-sbom
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{ steps.build.outputs.digest }}
+          image:
+            ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{
+            steps.build.outputs.digest }}
           format: spdx-json
           output-file: sbom-${{ inputs.image-name }}.spdx.json
           upload-artifact: true
@@ -333,7 +337,7 @@ jobs:
       - name: Sign image with Cosign
         if: inputs.enable-signing && github.event_name != 'pull_request'
         env:
-          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_EXPERIMENTAL: 'true'
         run: |
           cosign sign --yes \
             ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}@${{ steps.build.outputs.digest }}
@@ -359,7 +363,7 @@ jobs:
           - Provenance: ${{ inputs.enable-provenance && '✅ Attested' || '❌ Skipped' }}
           - Signing: ${{ inputs.enable-signing && '✅ Signed' || '❌ Unsigned' }}
           EOF
-```
+````
 
 ## Advanced Caching Strategies
 
@@ -635,7 +639,7 @@ name: Image Health Check
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
+    - cron: '0 */6 * * *' # Every 6 hours
   workflow_dispatch:
 
 permissions:

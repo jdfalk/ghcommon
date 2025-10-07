@@ -10,13 +10,16 @@
 
 **What**: Verify and optimize Docker image publishing to GitHub Container Registry (ghcr.io)
 
-**Why**: Ensure Docker images are correctly published with proper tagging, security scanning, SBOM generation, and provenance attestation
+**Why**: Ensure Docker images are correctly published with proper tagging, security scanning, SBOM
+generation, and provenance attestation
 
 **Where**:
+
 - Primary: `.github/workflows/release-docker.yml`
 - Related: `Dockerfile`, `.dockerignore`, container scanning configs
 
 **Expected Outcome**: Confirmed working Docker image publishing with:
+
 - ✅ Correct multi-platform builds (linux/amd64, linux/arm64)
 - ✅ Proper semantic version tagging
 - ✅ Security scanning (Trivy/Grype)
@@ -33,6 +36,7 @@
 ### ghcr.io Registry
 
 **GitHub Container Registry provides:**
+
 - Free unlimited public packages
 - Private packages (limited by organization plan)
 - Docker Hub compatibility
@@ -41,6 +45,7 @@
 - Automatic cleanup policies
 
 **ghcr.io URL structure:**
+
 ```
 ghcr.io/<owner>/<repo>/<image>:<tag>
 
@@ -55,6 +60,7 @@ ghcr.io/jdfalk/ghcommon/example-app:sha-abc1234
 From `.github/workflows/release-docker.yml`:
 
 **Workflow Features:**
+
 - ✅ Reusable workflow design
 - ✅ Multi-platform builds (linux/amd64, linux/arm64)
 - ✅ Semantic version tagging
@@ -65,6 +71,7 @@ From `.github/workflows/release-docker.yml`:
 - ⚠️ Provenance attestation (needs verification)
 
 **Inputs:**
+
 ```yaml
 inputs:
   registry:
@@ -108,6 +115,7 @@ inputs:
 ### Issue 1: Verify Push to ghcr.io
 
 **Current State:**
+
 ```yaml
 - name: Log in to Container Registry
   uses: docker/login-action@v3
@@ -118,12 +126,14 @@ inputs:
 ```
 
 **Analysis:**
+
 - ✅ Uses `docker/login-action@v3` (correct)
 - ✅ Supports both docker.io and ghcr.io via input
 - ✅ Uses `GITHUB_TOKEN` for authentication (correct for ghcr.io)
 - ⚠️ Username `github.actor` works for ghcr.io but requires different approach for docker.io
 
 **Verification Needed:**
+
 1. Confirm images appear in GitHub Packages UI
 2. Verify pull access without authentication (for public images)
 3. Test multi-platform manifest correctness
@@ -132,6 +142,7 @@ inputs:
 ### Issue 2: Tagging Strategy
 
 **Current Tags:**
+
 ```yaml
 tags: |
   type=semver,pattern={{version}}
@@ -142,6 +153,7 @@ tags: |
 ```
 
 **Analysis:**
+
 - ✅ Semantic versioning support (v1.2.3 → 1.2.3, 1.2, 1)
 - ✅ SHA-based tags for commit tracking
 - ✅ Latest tag only on default branch
@@ -149,6 +161,7 @@ tags: |
 - ⚠️ No date-based tags for debugging
 
 **Recommended Additions:**
+
 ```yaml
 tags: |
   type=semver,pattern={{version}}
@@ -165,12 +178,14 @@ tags: |
 ### Issue 3: Multi-Platform Builds
 
 **Current Configuration:**
+
 ```yaml
 platforms: ${{ inputs.platforms }}
 # Default: 'linux/amd64,linux/arm64'
 ```
 
 **Analysis:**
+
 - ✅ Supports linux/amd64 (Intel/AMD x86_64)
 - ✅ Supports linux/arm64 (ARM 64-bit, Apple Silicon, AWS Graviton)
 - ❌ Missing linux/arm/v7 (32-bit ARM, Raspberry Pi)
@@ -180,13 +195,14 @@ platforms: ${{ inputs.platforms }}
 
 | Platform      | Support | Use Cases                                       |
 | ------------- | ------- | ----------------------------------------------- |
-| linux/amd64   | ✅       | Standard x86_64 servers, most cloud instances   |
-| linux/arm64   | ✅       | Apple Silicon, AWS Graviton, modern ARM servers |
-| linux/arm/v7  | ❌       | Raspberry Pi, older ARM devices                 |
-| linux/arm/v6  | ❌       | Older Raspberry Pi models                       |
-| windows/amd64 | ❌       | Windows containers                              |
+| linux/amd64   | ✅      | Standard x86_64 servers, most cloud instances   |
+| linux/arm64   | ✅      | Apple Silicon, AWS Graviton, modern ARM servers |
+| linux/arm/v7  | ❌      | Raspberry Pi, older ARM devices                 |
+| linux/arm/v6  | ❌      | Older Raspberry Pi models                       |
+| windows/amd64 | ❌      | Windows containers                              |
 
 **Recommendation:**
+
 - Keep current platforms for most use cases
 - Add linux/arm/v7 only if Raspberry Pi support needed
 - Windows containers require separate Dockerfile
@@ -194,6 +210,7 @@ platforms: ${{ inputs.platforms }}
 ### Issue 4: Build Optimization
 
 **Layer Caching:**
+
 ```yaml
 - name: Set up Docker Buildx
   uses: docker/setup-buildx-action@v3
@@ -202,12 +219,14 @@ platforms: ${{ inputs.platforms }}
 ```
 
 **Analysis:**
+
 - ✅ BuildKit enabled (modern Docker build engine)
 - ✅ Debug flags for troubleshooting
 - ⚠️ Missing GitHub Actions cache integration
 - ⚠️ No local cache optimization
 
 **Recommended Cache Configuration:**
+
 ```yaml
 - name: Set up Docker Buildx
   uses: docker/setup-buildx-action@v3
@@ -231,6 +250,7 @@ platforms: ${{ inputs.platforms }}
 ### Issue 5: Security Scanning
 
 **Current Implementation:**
+
 ```yaml
 - name: Run Trivy security scanner
   if: inputs.enable-security-scan
@@ -242,6 +262,7 @@ platforms: ${{ inputs.platforms }}
 ```
 
 **Analysis:**
+
 - ✅ Trivy scanner integration
 - ✅ SARIF output format (GitHub Security tab compatible)
 - ⚠️ Uses `@master` (should pin to version)
@@ -251,6 +272,7 @@ platforms: ${{ inputs.platforms }}
 - ❌ Missing Grype alternative scanner
 
 **Enhanced Security Configuration:**
+
 ```yaml
 - name: Update Trivy DB
   if: inputs.enable-security-scan
@@ -259,13 +281,13 @@ platforms: ${{ inputs.platforms }}
 
 - name: Run Trivy security scanner
   if: inputs.enable-security-scan
-  uses: aquasecurity/trivy-action@0.16.1  # Pinned version
+  uses: aquasecurity/trivy-action@0.16.1 # Pinned version
   with:
     image-ref: ${{ inputs.registry }}/${{ inputs.image-name }}:${{ steps.meta.outputs.version }}
     format: 'sarif'
     output: 'trivy-results.sarif'
     severity: 'CRITICAL,HIGH'
-    exit-code: '1'  # Fail on critical vulnerabilities
+    exit-code: '1' # Fail on critical vulnerabilities
     vuln-type: 'os,library'
     scanners: 'vuln,secret,config'
 
@@ -288,16 +310,18 @@ platforms: ${{ inputs.platforms }}
 ### Issue 6: SBOM Generation
 
 **Current Implementation:**
+
 - ❌ No SBOM generation found in workflow
 
-**Analysis:**
-SBOM (Software Bill of Materials) provides:
+**Analysis:** SBOM (Software Bill of Materials) provides:
+
 - Complete dependency inventory
 - License compliance tracking
 - Supply chain security
 - Vulnerability tracking
 
 **Recommended SBOM Configuration:**
+
 ```yaml
 - name: Generate SBOM with Syft
   uses: anchore/sbom-action@v0
@@ -318,16 +342,18 @@ SBOM (Software Bill of Materials) provides:
 ### Issue 7: Provenance Attestation
 
 **Current Implementation:**
+
 - ❌ No provenance attestation found
 
-**Analysis:**
-Provenance attestation provides:
+**Analysis:** Provenance attestation provides:
+
 - Build reproducibility
 - Supply chain verification
 - SLSA compliance
 - Cosign signing support
 
 **Recommended Provenance Configuration:**
+
 ```yaml
 - name: Generate provenance
   uses: docker/build-push-action@v5
@@ -339,7 +365,7 @@ Provenance attestation provides:
 - name: Sign image with Cosign
   if: github.event_name != 'pull_request'
   env:
-    COSIGN_EXPERIMENTAL: "true"
+    COSIGN_EXPERIMENTAL: 'true'
   run: |
     cosign sign --yes \
       ${{ inputs.registry }}/${{ inputs.image-name }}@${{ steps.build.outputs.digest }}
@@ -410,16 +436,19 @@ echo "✅ All tools installed"
 ### Required Permissions
 
 **Repository Settings:**
+
 - Actions: Read and write permissions
 - Packages: Read and write permissions
 - Security: Write access for SARIF upload
 
 **Secrets Required:**
+
 - `GITHUB_TOKEN` - Automatic (for ghcr.io)
 - `DOCKERHUB_TOKEN` - Optional (for Docker Hub)
 - `COSIGN_PASSWORD` - Optional (for image signing)
 
 **Environment Variables:**
+
 - `DOCKER_BUILDKIT=1` - BuildKit enabled
 - `BUILDX_NO_DEFAULT_ATTESTATIONS=1` - Control attestations
 

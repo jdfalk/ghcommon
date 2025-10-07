@@ -6,14 +6,14 @@
 
 ## Task Overview
 
-**Priority:** 3 (High)
-**Estimated Lines:** ~3,500 lines (6 parts)
-**Complexity:** High
+**Priority:** 3 (High) **Estimated Lines:** ~3,500 lines (6 parts) **Complexity:** High
 **Dependencies:** Task 08 (Consolidated CI Workflow)
 
 ## Objective
 
-Complete the migration of all repositories from legacy CI workflows to the consolidated reusable workflow. Ensure thorough testing at each step, validate functionality, and verify that all features work correctly across different repository types.
+Complete the migration of all repositories from legacy CI workflows to the consolidated reusable
+workflow. Ensure thorough testing at each step, validate functionality, and verify that all features
+work correctly across different repository types.
 
 ## What This Task Accomplishes
 
@@ -30,9 +30,8 @@ Complete the migration of all repositories from legacy CI workflows to the conso
 
 #### Phase 1: ghcommon (Self-Migration)
 
-**Repository:** `jdfalk/ghcommon`
-**Rationale:** Test consolidated workflow in its home repository first
-**Risk:** Low (can iterate quickly)
+**Repository:** `jdfalk/ghcommon` **Rationale:** Test consolidated workflow in its home repository
+first **Risk:** Low (can iterate quickly)
 
 **Steps:**
 
@@ -45,9 +44,8 @@ Complete the migration of all repositories from legacy CI workflows to the conso
 
 #### Phase 2: ubuntu-autoinstall-agent (Complex Migration)
 
-**Repository:** `jdfalk/ubuntu-autoinstall-agent`
-**Rationale:** Most complex CI implementation, best test case
-**Risk:** Medium (has advanced features)
+**Repository:** `jdfalk/ubuntu-autoinstall-agent` **Rationale:** Most complex CI implementation,
+best test case **Risk:** Medium (has advanced features)
 
 **Steps:**
 
@@ -61,9 +59,8 @@ Complete the migration of all repositories from legacy CI workflows to the conso
 
 #### Phase 3: Remaining Repositories
 
-**Repositories:** All other repos using ghcommon workflows
-**Rationale:** Apply lessons learned from Phases 1-2
-**Risk:** Low (proven pattern)
+**Repositories:** All other repos using ghcommon workflows **Rationale:** Apply lessons learned from
+Phases 1-2 **Risk:** Low (proven pattern)
 
 **Steps:**
 
@@ -142,9 +139,7 @@ Complete the migration of all repositories from legacy CI workflows to the conso
 
 #### 1. Smoke Tests (Quick Validation)
 
-**Purpose:** Verify basic functionality
-**Duration:** 5-10 minutes
-**Frequency:** After every change
+**Purpose:** Verify basic functionality **Duration:** 5-10 minutes **Frequency:** After every change
 
 **Tests:**
 
@@ -185,9 +180,8 @@ fi
 
 #### 2. Integration Tests (Feature Validation)
 
-**Purpose:** Verify all features work together
-**Duration:** 20-30 minutes
-**Frequency:** After significant changes
+**Purpose:** Verify all features work together **Duration:** 20-30 minutes **Frequency:** After
+significant changes
 
 **Tests:**
 
@@ -227,8 +221,7 @@ fi
 
 #### 3. Comparison Tests (Feature Parity)
 
-**Purpose:** Ensure new workflow matches old workflow behavior
-**Duration:** 30-60 minutes
+**Purpose:** Ensure new workflow matches old workflow behavior **Duration:** 30-60 minutes
 **Frequency:** Before migration
 
 **Tests:**
@@ -280,9 +273,8 @@ echo "New duration: $((new_time / 60000)) minutes"
 
 #### 4. Load Tests (Scalability)
 
-**Purpose:** Verify performance under load
-**Duration:** 1-2 hours
-**Frequency:** Before production deployment
+**Purpose:** Verify performance under load **Duration:** 1-2 hours **Frequency:** Before production
+deployment
 
 **Tests:**
 
@@ -356,9 +348,8 @@ if __name__ == "__main__":
 
 #### 5. Regression Tests (No Breaking Changes)
 
-**Purpose:** Ensure no functionality lost
-**Duration:** 30-45 minutes
-**Frequency:** Before each migration
+**Purpose:** Ensure no functionality lost **Duration:** 30-45 minutes **Frequency:** Before each
+migration
 
 **Tests:**
 

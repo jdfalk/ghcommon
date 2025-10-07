@@ -502,23 +502,29 @@ The repository's PR template (`.github/pull-request-descriptions.instructions.md
 
 ```markdown
 ## Summary
+
 Brief description of changes
 
 ## Changes Made
+
 Detailed bullet list with context
 
 ## Impact
+
 - Risk assessment
 - Functionality changes
 - Testing performed
 
 ## Validation
+
 - [ ] Checklist items
 
 ## Files Changed
+
 - List of modified files
 
 ## Related
+
 - Related issues/PRs
 - Documentation updates
 ```

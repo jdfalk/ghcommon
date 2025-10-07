@@ -7,209 +7,209 @@
 ## Completing reusable-ci-consolidated.yml - Final Job
 
 ```yaml
-  # ============================================================================
-  # Job 11: Aggregate Results and Report
-  # ============================================================================
-  report-results:
-    name: Aggregate Results
-    if: always()
-    needs:
-      - load-config
-      - detect-changes
-      - super-lint
-      - test-go
-      - test-python
-      - test-typescript
-      - test-rust
-      - build-docker
-      - security-scan
-      - build-protobuf
-    runs-on: ubuntu-latest
-    outputs:
-      all-tests-passed: ${{ steps.aggregate.outputs.all-passed }}
-      coverage-percentage: ${{ steps.aggregate.outputs.coverage }}
-      security-issues: ${{ steps.aggregate.outputs.security-issues }}
+# ============================================================================
+# Job 11: Aggregate Results and Report
+# ============================================================================
+report-results:
+  name: Aggregate Results
+  if: always()
+  needs:
+    - load-config
+    - detect-changes
+    - super-lint
+    - test-go
+    - test-python
+    - test-typescript
+    - test-rust
+    - build-docker
+    - security-scan
+    - build-protobuf
+  runs-on: ubuntu-latest
+  outputs:
+    all-tests-passed: ${{ steps.aggregate.outputs.all-passed }}
+    coverage-percentage: ${{ steps.aggregate.outputs.coverage }}
+    security-issues: ${{ steps.aggregate.outputs.security-issues }}
 
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
+  steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
 
-      - name: Aggregate test results
-        id: aggregate
-        run: |
-          echo "### 📊 CI Results Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+    - name: Aggregate test results
+      id: aggregate
+      run: |
+        echo "### 📊 CI Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Check job statuses
-          all_passed=true
+        # Check job statuses
+        all_passed=true
 
-          # Go results
-          if [ "${{ needs.test-go.result }}" != "skipped" ]; then
-            echo "**Go Tests:** ${{ needs.test-go.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.test-go.result }}" != "success" ]; then
-              all_passed=false
+        # Go results
+        if [ "${{ needs.test-go.result }}" != "skipped" ]; then
+          echo "**Go Tests:** ${{ needs.test-go.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-go.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # Python results
+        if [ "${{ needs.test-python.result }}" != "skipped" ]; then
+          echo "**Python Tests:** ${{ needs.test-python.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-python.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # TypeScript results
+        if [ "${{ needs.test-typescript.result }}" != "skipped" ]; then
+          echo "**TypeScript Tests:** ${{ needs.test-typescript.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-typescript.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # Rust results
+        if [ "${{ needs.test-rust.result }}" != "skipped" ]; then
+          echo "**Rust Tests:** ${{ needs.test-rust.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-rust.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # Docker results
+        if [ "${{ needs.build-docker.result }}" != "skipped" ]; then
+          echo "**Docker Build:** ${{ needs.build-docker.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-docker.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # Security scan results
+        if [ "${{ needs.security-scan.result }}" != "skipped" ]; then
+          echo "**Security Scan:** ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.security-scan.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        # Super-linter results
+        if [ "${{ needs.super-lint.result }}" != "skipped" ]; then
+          echo "**Super-Linter:** ${{ needs.super-lint.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.super-lint.result }}" != "success" ]; then
+            all_passed=false
+          fi
+        fi
+
+        echo "all-passed=$all_passed" >> $GITHUB_OUTPUT
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$all_passed" = "true" ]; then
+          echo "✅ **All Tests Passed!**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Some Tests Failed**" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Calculate combined coverage
+      id: coverage
+      run: |
+        total_coverage=0
+        count=0
+
+        # Aggregate coverage from all languages
+        if [ -d "artifacts/go-test-results"* ]; then
+          for dir in artifacts/go-test-results-*; do
+            if [ -f "$dir/coverage.out" ]; then
+              cov=$(go tool cover -func="$dir/coverage.out" 2>/dev/null | tail -1 | awk '{print $3}' | sed 's/%//' || echo "0")
+              total_coverage=$(echo "$total_coverage + $cov" | bc)
+              count=$((count + 1))
             fi
-          fi
-
-          # Python results
-          if [ "${{ needs.test-python.result }}" != "skipped" ]; then
-            echo "**Python Tests:** ${{ needs.test-python.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.test-python.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          # TypeScript results
-          if [ "${{ needs.test-typescript.result }}" != "skipped" ]; then
-            echo "**TypeScript Tests:** ${{ needs.test-typescript.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.test-typescript.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          # Rust results
-          if [ "${{ needs.test-rust.result }}" != "skipped" ]; then
-            echo "**Rust Tests:** ${{ needs.test-rust.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.test-rust.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          # Docker results
-          if [ "${{ needs.build-docker.result }}" != "skipped" ]; then
-            echo "**Docker Build:** ${{ needs.build-docker.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.build-docker.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          # Security scan results
-          if [ "${{ needs.security-scan.result }}" != "skipped" ]; then
-            echo "**Security Scan:** ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.security-scan.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          # Super-linter results
-          if [ "${{ needs.super-lint.result }}" != "skipped" ]; then
-            echo "**Super-Linter:** ${{ needs.super-lint.result }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.super-lint.result }}" != "success" ]; then
-              all_passed=false
-            fi
-          fi
-
-          echo "all-passed=$all_passed" >> $GITHUB_OUTPUT
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "$all_passed" = "true" ]; then
-            echo "✅ **All Tests Passed!**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Some Tests Failed**" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Calculate combined coverage
-        id: coverage
-        run: |
-          total_coverage=0
-          count=0
-
-          # Aggregate coverage from all languages
-          if [ -d "artifacts/go-test-results"* ]; then
-            for dir in artifacts/go-test-results-*; do
-              if [ -f "$dir/coverage.out" ]; then
-                cov=$(go tool cover -func="$dir/coverage.out" 2>/dev/null | tail -1 | awk '{print $3}' | sed 's/%//' || echo "0")
-                total_coverage=$(echo "$total_coverage + $cov" | bc)
-                count=$((count + 1))
-              fi
-            done
-          fi
-
-          if [ -d "artifacts/python-test-results"* ]; then
-            for dir in artifacts/python-test-results-*; do
-              if [ -f "$dir/coverage.xml" ]; then
-                cov=$(python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('$dir/coverage.xml'); print(float(tree.getroot().attrib.get('line-rate', 0)) * 100)" 2>/dev/null || echo "0")
-                total_coverage=$(echo "$total_coverage + $cov" | bc)
-                count=$((count + 1))
-              fi
-            done
-          fi
-
-          if [ -d "artifacts/rust-test-results"* ]; then
-            for dir in artifacts/rust-test-results-*; do
-              if [ -f "$dir/lcov.info" ]; then
-                total=$(grep -o "LF:[0-9]*" "$dir/lcov.info" | cut -d: -f2 | awk '{s+=$1} END {print s}')
-                covered=$(grep -o "LH:[0-9]*" "$dir/lcov.info" | cut -d: -f2 | awk '{s+=$1} END {print s}')
-                if [ "$total" -gt 0 ]; then
-                  cov=$(echo "scale=2; $covered * 100 / $total" | bc)
-                  total_coverage=$(echo "$total_coverage + $cov" | bc)
-                  count=$((count + 1))
-                fi
-              fi
-            done
-          fi
-
-          if [ "$count" -gt 0 ]; then
-            avg_coverage=$(echo "scale=2; $total_coverage / $count" | bc)
-          else
-            avg_coverage=0
-          fi
-
-          echo "coverage=$avg_coverage" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Overall Coverage:** ${avg_coverage}%" >> $GITHUB_STEP_SUMMARY
-
-      - name: Count security issues
-        id: security
-        run: |
-          security_issues=0
-
-          # Count Trivy issues
-          if [ -f "artifacts/docker-security-results/trivy-results.sarif" ]; then
-            trivy_count=$(jq '.runs[0].results | length' artifacts/docker-security-results/trivy-results.sarif)
-            security_issues=$((security_issues + trivy_count))
-          fi
-
-          # Count Grype issues
-          if [ -f "artifacts/docker-security-results/grype-results.json" ]; then
-            grype_count=$(jq '.matches | length' artifacts/docker-security-results/grype-results.json)
-            security_issues=$((security_issues + grype_count))
-          fi
-
-          echo "security-issues=$security_issues" >> $GITHUB_OUTPUT
-          echo "**Security Issues Found:** $security_issues" >> $GITHUB_STEP_SUMMARY
-
-      - name: Generate final report
-        run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📋 Detailed Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # List all artifacts
-          echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
-          find artifacts/ -type f | sort | while read file; do
-            size=$(du -h "$file" | cut -f1)
-            echo "- \`${file#artifacts/}\` ($size)" >> $GITHUB_STEP_SUMMARY
           done
+        fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Workflow Configuration:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Coverage enabled: ${{ inputs.enable-coverage }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Security scan enabled: ${{ inputs.enable-security-scan }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Super-linter enabled: ${{ inputs.enable-super-linter }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Benchmarks enabled: ${{ inputs.enable-benchmarks }}" >> $GITHUB_STEP_SUMMARY
+        if [ -d "artifacts/python-test-results"* ]; then
+          for dir in artifacts/python-test-results-*; do
+            if [ -f "$dir/coverage.xml" ]; then
+              cov=$(python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('$dir/coverage.xml'); print(float(tree.getroot().attrib.get('line-rate', 0)) * 100)" 2>/dev/null || echo "0")
+              total_coverage=$(echo "$total_coverage + $cov" | bc)
+              count=$((count + 1))
+            fi
+          done
+        fi
 
-      - name: Upload combined report
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-summary-report
-          path: |
-            ${{ github.step_summary }}
-          retention-days: 90
+        if [ -d "artifacts/rust-test-results"* ]; then
+          for dir in artifacts/rust-test-results-*; do
+            if [ -f "$dir/lcov.info" ]; then
+              total=$(grep -o "LF:[0-9]*" "$dir/lcov.info" | cut -d: -f2 | awk '{s+=$1} END {print s}')
+              covered=$(grep -o "LH:[0-9]*" "$dir/lcov.info" | cut -d: -f2 | awk '{s+=$1} END {print s}')
+              if [ "$total" -gt 0 ]; then
+                cov=$(echo "scale=2; $covered * 100 / $total" | bc)
+                total_coverage=$(echo "$total_coverage + $cov" | bc)
+                count=$((count + 1))
+              fi
+            fi
+          done
+        fi
+
+        if [ "$count" -gt 0 ]; then
+          avg_coverage=$(echo "scale=2; $total_coverage / $count" | bc)
+        else
+          avg_coverage=0
+        fi
+
+        echo "coverage=$avg_coverage" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Overall Coverage:** ${avg_coverage}%" >> $GITHUB_STEP_SUMMARY
+
+    - name: Count security issues
+      id: security
+      run: |
+        security_issues=0
+
+        # Count Trivy issues
+        if [ -f "artifacts/docker-security-results/trivy-results.sarif" ]; then
+          trivy_count=$(jq '.runs[0].results | length' artifacts/docker-security-results/trivy-results.sarif)
+          security_issues=$((security_issues + trivy_count))
+        fi
+
+        # Count Grype issues
+        if [ -f "artifacts/docker-security-results/grype-results.json" ]; then
+          grype_count=$(jq '.matches | length' artifacts/docker-security-results/grype-results.json)
+          security_issues=$((security_issues + grype_count))
+        fi
+
+        echo "security-issues=$security_issues" >> $GITHUB_OUTPUT
+        echo "**Security Issues Found:** $security_issues" >> $GITHUB_STEP_SUMMARY
+
+    - name: Generate final report
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Detailed Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # List all artifacts
+        echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
+        find artifacts/ -type f | sort | while read file; do
+          size=$(du -h "$file" | cut -f1)
+          echo "- \`${file#artifacts/}\` ($size)" >> $GITHUB_STEP_SUMMARY
+        done
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Workflow Configuration:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Coverage enabled: ${{ inputs.enable-coverage }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Security scan enabled: ${{ inputs.enable-security-scan }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Super-linter enabled: ${{ inputs.enable-super-linter }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Benchmarks enabled: ${{ inputs.enable-benchmarks }}" >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload combined report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-summary-report
+        path: |
+          ${{ github.step_summary }}
+        retention-days: 90
 ```
 
 ## Complete Workflow Footer
@@ -264,14 +264,14 @@ ci:
   languages:
     go:
       enabled: true
-      versions: ["1.21", "1.22"]
-      test-command: "go test -v -race -coverprofile=coverage.out ./..."
+      versions: ['1.21', '1.22']
+      test-command: 'go test -v -race -coverprofile=coverage.out ./...'
       coverage-threshold: 80
 
     python:
       enabled: true
-      versions: ["3.11", "3.12"]
-      test-command: "pytest -v --cov --cov-report=xml"
+      versions: ['3.11', '3.12']
+      test-command: 'pytest -v --cov --cov-report=xml'
       coverage-threshold: 85
 
     typescript:
@@ -287,7 +287,7 @@ ci:
     benchmarks: false
 
   docker:
-    platforms: ["linux/amd64", "linux/arm64"]
+    platforms: ['linux/amd64', 'linux/arm64']
     scan-security: true
 ```
 
@@ -436,7 +436,7 @@ jobs:
 
 **Update repository README.md:**
 
-```markdown
+````markdown
 ## CI/CD Pipeline
 
 This repository uses the consolidated CI workflow from `jdfalk/ghcommon`.
@@ -448,11 +448,14 @@ CI configuration is defined in `.github/repository-config.yml`.
 ### Running Tests Locally
 
 **Go:**
+
 ```bash
 go test -v -race -coverprofile=coverage.out ./...
 ```
+````
 
 **Python:**
+
 ```bash
 pytest -v --cov --cov-report=xml
 ```
@@ -461,16 +464,19 @@ pytest -v --cov --cov-report=xml
 
 Coverage reports are uploaded to Codecov automatically on each push.
 
-Current coverage: [![codecov](https://codecov.io/gh/ORG/REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/ORG/REPO)
+Current coverage:
+[![codecov](https://codecov.io/gh/ORG/REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/ORG/REPO)
 
 ### Security Scanning
 
 Security scanning includes:
+
 - CodeQL for code analysis
 - Trivy for container vulnerabilities
 - Grype for dependency vulnerabilities
 - Dependency review on pull requests
-```
+
+````
 
 ### Step 7: Remove Old Workflows
 
@@ -498,13 +504,14 @@ if ! grep -q "workflows-archive" .gitignore; then
 fi
 
 echo "✅ Cleanup complete!"
-```
+````
 
 ## Comparison: Before vs After
 
 ### Before (Multiple Workflows)
 
 **File Structure:**
+
 ```
 .github/
   workflows/
@@ -513,6 +520,7 @@ echo "✅ Cleanup complete!"
 ```
 
 **Problems:**
+
 - Duplication between repositories
 - Missing features in reusable workflow
 - Inconsistent coverage reporting
@@ -522,6 +530,7 @@ echo "✅ Cleanup complete!"
 ### After (Consolidated Workflow)
 
 **File Structure:**
+
 ```
 .github/
   workflows/
@@ -534,6 +543,7 @@ ghcommon/
 ```
 
 **Benefits:**
+
 - Single source of truth
 - All features available everywhere
 - Consistent coverage/security across repos
@@ -557,6 +567,7 @@ ghcommon/
 ## Continue to Part 6
 
 Final part will cover:
+
 - Troubleshooting guide
 - Performance optimization
 - Advanced configuration

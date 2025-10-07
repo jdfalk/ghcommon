@@ -6,10 +6,8 @@
 
 ## Phase 1 Overview
 
-**Repository:** `jdfalk/ghcommon`
-**Migration Date:** Week 1-2
-**Risk Level:** Low
-**Rollback Complexity:** Low
+**Repository:** `jdfalk/ghcommon` **Migration Date:** Week 1-2 **Risk Level:** Low **Rollback
+Complexity:** Low
 
 ## Pre-Migration State
 
@@ -156,15 +154,15 @@ echo "✅ Consolidated workflow created"
 ci:
   languages:
     go:
-      enabled: false  # ghcommon doesn't have Go code
+      enabled: false # ghcommon doesn't have Go code
       versions: []
 
     python:
       enabled: true
-      versions: ["3.10", "3.11", "3.12"]
-      test-command: "pytest -v --cov --cov-report=xml"
-      lint-command: "ruff check ."
-      type-check-command: "mypy scripts/ --ignore-missing-imports"
+      versions: ['3.10', '3.11', '3.12']
+      test-command: 'pytest -v --cov --cov-report=xml'
+      lint-command: 'ruff check .'
+      type-check-command: 'mypy scripts/ --ignore-missing-imports'
       coverage-threshold: 75
 
     typescript:
@@ -182,19 +180,19 @@ ci:
 
   change-detection:
     python:
-      - "**/*.py"
-      - "scripts/**/*.py"
-      - "requirements*.txt"
-      - "pyproject.toml"
-      - ".github/workflows/*python*.yml"
+      - '**/*.py'
+      - 'scripts/**/*.py'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/*python*.yml'
 
     workflows:
-      - ".github/workflows/**"
-      - ".github/actions/**"
+      - '.github/workflows/**'
+      - '.github/actions/**'
 
     docs:
-      - "**/*.md"
-      - "docs/**"
+      - '**/*.md'
+      - 'docs/**'
 ```
 
 **Script to create config:**
@@ -480,8 +478,7 @@ fi
 
 ### Step 6: Parallel Execution Period
 
-**Duration:** 1 week
-**Purpose:** Run both workflows side-by-side to validate behavior
+**Duration:** 1 week **Purpose:** Run both workflows side-by-side to validate behavior
 
 **Parallel Workflow Setup:**
 

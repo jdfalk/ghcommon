@@ -9,127 +9,127 @@
 ### Step 1: BSR Publishing Job
 
 ```yaml
-  publish-buf-bsr:
-    name: Publish to Buf Schema Registry
-    runs-on: ubuntu-latest
-    needs: [detect-protobuf, validate-protobuf]
-    if: |
-      needs.detect-protobuf.outputs.has-proto == 'true' &&
-      env.PUBLISH_TO_BSR == 'true' &&
-      env.DRY_RUN == 'false'
-    environment:
-      name: buf-registry
-      url: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}
+publish-buf-bsr:
+  name: Publish to Buf Schema Registry
+  runs-on: ubuntu-latest
+  needs: [detect-protobuf, validate-protobuf]
+  if: |
+    needs.detect-protobuf.outputs.has-proto == 'true' &&
+    env.PUBLISH_TO_BSR == 'true' &&
+    env.DRY_RUN == 'false'
+  environment:
+    name: buf-registry
+    url: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Install Buf
-        run: |
-          echo "=== Installing Buf CLI ==="
+    - name: Install Buf
+      run: |
+        echo "=== Installing Buf CLI ==="
 
-          VERSION="${{ env.BUF_VERSION }}"
-          curl -sSL \
-            "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-Linux-x86_64" \
-            -o /usr/local/bin/buf
-          chmod +x /usr/local/bin/buf
+        VERSION="${{ env.BUF_VERSION }}"
+        curl -sSL \
+          "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-Linux-x86_64" \
+          -o /usr/local/bin/buf
+        chmod +x /usr/local/bin/buf
 
-          buf --version
+        buf --version
 
-      - name: Authenticate with BSR
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: |
-          echo "=== Authenticating with Buf Schema Registry ==="
-          echo ""
+    - name: Authenticate with BSR
+      env:
+        BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+      run: |
+        echo "=== Authenticating with Buf Schema Registry ==="
+        echo ""
 
-          if [ -z "$BUF_TOKEN" ]; then
-              echo "❌ ERROR: BUF_TOKEN not set"
-              exit 1
-          fi
+        if [ -z "$BUF_TOKEN" ]; then
+            echo "❌ ERROR: BUF_TOKEN not set"
+            exit 1
+        fi
 
-          # Login to BSR
-          echo "$BUF_TOKEN" | buf registry login buf.build --username ${{ github.repository_owner }} --token-stdin
+        # Login to BSR
+        echo "$BUF_TOKEN" | buf registry login buf.build --username ${{ github.repository_owner }} --token-stdin
 
-          # Verify authentication
-          buf registry whoami
+        # Verify authentication
+        buf registry whoami
 
-          echo "✅ Authenticated with BSR"
+        echo "✅ Authenticated with BSR"
 
-      - name: Push to BSR
-        run: |
-          echo "=== Publishing to Buf Schema Registry ==="
-          echo ""
+    - name: Push to BSR
+      run: |
+        echo "=== Publishing to Buf Schema Registry ==="
+        echo ""
 
-          VERSION="${{ needs.detect-protobuf.outputs.version }}"
-          TAG="proto-v${VERSION}"
+        VERSION="${{ needs.detect-protobuf.outputs.version }}"
+        TAG="proto-v${VERSION}"
 
-          echo "Module: ${{ env.BUF_MODULE_NAME }}"
-          echo "Version: $VERSION"
-          echo "Tag: $TAG"
-          echo ""
+        echo "Module: ${{ env.BUF_MODULE_NAME }}"
+        echo "Version: $VERSION"
+        echo "Tag: $TAG"
+        echo ""
 
-          # Push to BSR with tag
-          if buf push --tag "$TAG"; then
-              echo ""
-              echo "✅ Published to BSR successfully"
-          else
-              echo ""
-              echo "❌ Failed to publish to BSR"
-              exit 1
-          fi
+        # Push to BSR with tag
+        if buf push --tag "$TAG"; then
+            echo ""
+            echo "✅ Published to BSR successfully"
+        else
+            echo ""
+            echo "❌ Failed to publish to BSR"
+            exit 1
+        fi
 
-      - name: Verify BSR publication
-        continue-on-error: true
-        run: |
-          echo "=== Verifying BSR Publication ==="
-          echo ""
+    - name: Verify BSR publication
+      continue-on-error: true
+      run: |
+        echo "=== Verifying BSR Publication ==="
+        echo ""
 
-          VERSION="${{ needs.detect-protobuf.outputs.version }}"
-          MODULE="${{ env.BUF_MODULE_NAME }}"
+        VERSION="${{ needs.detect-protobuf.outputs.version }}"
+        MODULE="${{ env.BUF_MODULE_NAME }}"
 
-          # Wait for propagation
-          sleep 5
+        # Wait for propagation
+        sleep 5
 
-          # Try to pull the module
-          if buf pull "$MODULE:proto-v${VERSION}"; then
-              echo "✅ Module accessible on BSR"
-          else
-              echo "⚠️  Module not yet accessible (may need time to propagate)"
-          fi
+        # Try to pull the module
+        if buf pull "$MODULE:proto-v${VERSION}"; then
+            echo "✅ Module accessible on BSR"
+        else
+            echo "⚠️  Module not yet accessible (may need time to propagate)"
+        fi
 
-      - name: Generate BSR URLs
-        run: |
-          MODULE="${{ env.BUF_MODULE_NAME }}"
-          VERSION="${{ needs.detect-protobuf.outputs.version }}"
+    - name: Generate BSR URLs
+      run: |
+        MODULE="${{ env.BUF_MODULE_NAME }}"
+        VERSION="${{ needs.detect-protobuf.outputs.version }}"
 
-          cat > bsr-urls.txt << EOF
-          Buf Schema Registry Links:
+        cat > bsr-urls.txt << EOF
+        Buf Schema Registry Links:
 
-          Repository: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}
-          Version: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/proto-v${VERSION}
-          Documentation: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}/docs
+        Repository: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}
+        Version: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/proto-v${VERSION}
+        Documentation: https://buf.build/${{ github.repository_owner }}/${{ github.event.repository.name }}/docs
 
-          Import in buf.yaml:
-          deps:
-            - ${MODULE}
+        Import in buf.yaml:
+        deps:
+          - ${MODULE}
 
-          Import in buf.gen.yaml:
-          managed:
-            enabled: true
-          inputs:
-            - ${MODULE}
-          EOF
+        Import in buf.gen.yaml:
+        managed:
+          enabled: true
+        inputs:
+          - ${MODULE}
+        EOF
 
-          cat bsr-urls.txt
+        cat bsr-urls.txt
 
-      - name: Upload BSR info
-        uses: actions/upload-artifact@v4
-        with:
-          name: bsr-publication-info
-          path: bsr-urls.txt
-          retention-days: 90
+    - name: Upload BSR info
+      uses: actions/upload-artifact@v4
+      with:
+        name: bsr-publication-info
+        path: bsr-urls.txt
+        retention-days: 90
 ```
 
 ## Stage 2: Generate Multi-Language SDKs
@@ -137,413 +137,413 @@
 ### Step 1: SDK Generation Job
 
 ```yaml
-  generate-sdks:
-    name: Generate SDKs
-    runs-on: ubuntu-latest
-    needs: [detect-protobuf, validate-protobuf, publish-buf-bsr]
-    if: needs.detect-protobuf.outputs.has-proto == 'true'
-    strategy:
-      matrix:
-        language: [go, python, typescript, rust]
+generate-sdks:
+  name: Generate SDKs
+  runs-on: ubuntu-latest
+  needs: [detect-protobuf, validate-protobuf, publish-buf-bsr]
+  if: needs.detect-protobuf.outputs.has-proto == 'true'
+  strategy:
+    matrix:
+      language: [go, python, typescript, rust]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Install Buf
-        run: |
-          VERSION="${{ env.BUF_VERSION }}"
-          curl -sSL \
-            "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-Linux-x86_64" \
-            -o /usr/local/bin/buf
-          chmod +x /usr/local/bin/buf
+    - name: Install Buf
+      run: |
+        VERSION="${{ env.BUF_VERSION }}"
+        curl -sSL \
+          "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-Linux-x86_64" \
+          -o /usr/local/bin/buf
+        chmod +x /usr/local/bin/buf
 
-      - name: Setup language tools
-        run: |
-          case "${{ matrix.language }}" in
-            go)
-              # Go is pre-installed
-              go version
-              ;;
-            python)
-              python3 --version
-              pip3 install grpcio-tools mypy-protobuf
-              ;;
-            typescript)
-              node --version
-              npm --version
-              ;;
-            rust)
-              # Rust is pre-installed on GitHub runners
-              rustc --version
-              cargo --version
-              ;;
-          esac
+    - name: Setup language tools
+      run: |
+        case "${{ matrix.language }}" in
+          go)
+            # Go is pre-installed
+            go version
+            ;;
+          python)
+            python3 --version
+            pip3 install grpcio-tools mypy-protobuf
+            ;;
+          typescript)
+            node --version
+            npm --version
+            ;;
+          rust)
+            # Rust is pre-installed on GitHub runners
+            rustc --version
+            cargo --version
+            ;;
+        esac
 
-      - name: Create buf.gen.yaml for language
-        run: |
-          echo "=== Creating buf.gen.yaml for ${{ matrix.language }} ==="
-          echo ""
+    - name: Create buf.gen.yaml for language
+      run: |
+        echo "=== Creating buf.gen.yaml for ${{ matrix.language }} ==="
+        echo ""
 
-          case "${{ matrix.language }}" in
-            go)
-              cat > buf.gen.yaml << 'EOF'
-          version: v2
-          managed:
-            enabled: true
-            override:
-              - file_option: go_package_prefix
-                value: github.com/${{ github.repository }}/gen/go
-          plugins:
-            - remote: buf.build/protocolbuffers/go
-              out: gen/go
-              opt:
-                - paths=source_relative
-            - remote: buf.build/grpc/go
-              out: gen/go
-              opt:
-                - paths=source_relative
-                - require_unimplemented_servers=false
-          EOF
-              ;;
+        case "${{ matrix.language }}" in
+          go)
+            cat > buf.gen.yaml << 'EOF'
+        version: v2
+        managed:
+          enabled: true
+          override:
+            - file_option: go_package_prefix
+              value: github.com/${{ github.repository }}/gen/go
+        plugins:
+          - remote: buf.build/protocolbuffers/go
+            out: gen/go
+            opt:
+              - paths=source_relative
+          - remote: buf.build/grpc/go
+            out: gen/go
+            opt:
+              - paths=source_relative
+              - require_unimplemented_servers=false
+        EOF
+            ;;
 
-            python)
-              cat > buf.gen.yaml << 'EOF'
-          version: v2
-          plugins:
-            - remote: buf.build/protocolbuffers/python
-              out: gen/python
-            - remote: buf.build/grpc/python
-              out: gen/python
-            - remote: buf.build/protocolbuffers/pyi
-              out: gen/python
-          EOF
-              ;;
+          python)
+            cat > buf.gen.yaml << 'EOF'
+        version: v2
+        plugins:
+          - remote: buf.build/protocolbuffers/python
+            out: gen/python
+          - remote: buf.build/grpc/python
+            out: gen/python
+          - remote: buf.build/protocolbuffers/pyi
+            out: gen/python
+        EOF
+            ;;
 
-            typescript)
-              cat > buf.gen.yaml << 'EOF'
-          version: v2
-          plugins:
-            - remote: buf.build/connectrpc/es
-              out: gen/typescript
-              opt:
-                - target=ts
-            - remote: buf.build/bufbuild/es
-              out: gen/typescript
-              opt:
-                - target=ts
-          EOF
-              ;;
+          typescript)
+            cat > buf.gen.yaml << 'EOF'
+        version: v2
+        plugins:
+          - remote: buf.build/connectrpc/es
+            out: gen/typescript
+            opt:
+              - target=ts
+          - remote: buf.build/bufbuild/es
+            out: gen/typescript
+            opt:
+              - target=ts
+        EOF
+            ;;
 
-            rust)
-              cat > buf.gen.yaml << 'EOF'
-          version: v2
-          plugins:
-            - remote: buf.build/community/neoeinstein-prost
-              out: gen/rust
-            - remote: buf.build/community/neoeinstein-tonic
-              out: gen/rust
-          EOF
-              ;;
-          esac
+          rust)
+            cat > buf.gen.yaml << 'EOF'
+        version: v2
+        plugins:
+          - remote: buf.build/community/neoeinstein-prost
+            out: gen/rust
+          - remote: buf.build/community/neoeinstein-tonic
+            out: gen/rust
+        EOF
+            ;;
+        esac
 
-          cat buf.gen.yaml
+        cat buf.gen.yaml
 
-      - name: Generate code
-        run: |
-          echo "=== Generating ${{ matrix.language }} SDK ==="
-          echo ""
+    - name: Generate code
+      run: |
+        echo "=== Generating ${{ matrix.language }} SDK ==="
+        echo ""
 
-          # Generate
-          buf generate
+        # Generate
+        buf generate
 
-          # Check output
-          if [ -d "gen/${{ matrix.language }}" ]; then
-              echo "✅ Code generated successfully"
-              echo ""
-              echo "Generated files:"
-              find gen/${{ matrix.language }} -type f | head -20
-          else
-              echo "❌ No code generated"
-              exit 1
-          fi
+        # Check output
+        if [ -d "gen/${{ matrix.language }}" ]; then
+            echo "✅ Code generated successfully"
+            echo ""
+            echo "Generated files:"
+            find gen/${{ matrix.language }} -type f | head -20
+        else
+            echo "❌ No code generated"
+            exit 1
+        fi
 
-      - name: Create SDK package structure
-        run: |
-          echo "=== Creating SDK Package Structure ==="
-          echo ""
+    - name: Create SDK package structure
+      run: |
+        echo "=== Creating SDK Package Structure ==="
+        echo ""
 
-          LANG="${{ matrix.language }}"
-          SDK_DIR="sdk/$LANG"
+        LANG="${{ matrix.language }}"
+        SDK_DIR="sdk/$LANG"
 
-          mkdir -p "$SDK_DIR"
+        mkdir -p "$SDK_DIR"
 
-          case "$LANG" in
-            go)
-              # Go module structure
-              cp -r gen/go/* "$SDK_DIR/"
+        case "$LANG" in
+          go)
+            # Go module structure
+            cp -r gen/go/* "$SDK_DIR/"
 
-              # Create go.mod
-              cat > "$SDK_DIR/go.mod" << EOF
-          module github.com/${{ github.repository }}/sdk/go
+            # Create go.mod
+            cat > "$SDK_DIR/go.mod" << EOF
+        module github.com/${{ github.repository }}/sdk/go
 
-          go ${{ env.GO_VERSION }}
+        go ${{ env.GO_VERSION }}
 
-          require (
-              google.golang.org/grpc v1.59.0
-              google.golang.org/protobuf v1.31.0
-          )
-          EOF
+        require (
+            google.golang.org/grpc v1.59.0
+            google.golang.org/protobuf v1.31.0
+        )
+        EOF
 
-              # Create README
-              cat > "$SDK_DIR/README.md" << EOF
-          # Go SDK
+            # Create README
+            cat > "$SDK_DIR/README.md" << EOF
+        # Go SDK
 
-          Generated from protobuf schemas.
+        Generated from protobuf schemas.
 
-          ## Installation
+        ## Installation
 
-          \`\`\`bash
-          go get github.com/${{ github.repository }}/sdk/go@v${{ needs.detect-protobuf.outputs.version }}
-          \`\`\`
+        \`\`\`bash
+        go get github.com/${{ github.repository }}/sdk/go@v${{ needs.detect-protobuf.outputs.version }}
+        \`\`\`
 
-          ## Usage
+        ## Usage
 
-          \`\`\`go
-          import pb "github.com/${{ github.repository }}/sdk/go/ghcommon/v1"
-          \`\`\`
-          EOF
-              ;;
+        \`\`\`go
+        import pb "github.com/${{ github.repository }}/sdk/go/ghcommon/v1"
+        \`\`\`
+        EOF
+            ;;
 
-            python)
-              # Python package structure
-              cp -r gen/python/* "$SDK_DIR/"
+          python)
+            # Python package structure
+            cp -r gen/python/* "$SDK_DIR/"
 
-              # Create setup.py
-              cat > "$SDK_DIR/setup.py" << EOF
-          from setuptools import setup, find_packages
+            # Create setup.py
+            cat > "$SDK_DIR/setup.py" << EOF
+        from setuptools import setup, find_packages
 
-          setup(
-              name="${{ github.repository_owner }}-${{ github.event.repository.name }}-proto",
-              version="${{ needs.detect-protobuf.outputs.version }}",
-              description="Generated protobuf stubs",
-              author="${{ github.repository_owner }}",
-              packages=find_packages(),
-              install_requires=[
-                  "grpcio>=1.59.0",
-                  "protobuf>=4.25.0",
-              ],
-              python_requires=">=3.8",
-          )
-          EOF
-
-              # Create pyproject.toml
-              cat > "$SDK_DIR/pyproject.toml" << EOF
-          [build-system]
-          requires = ["setuptools>=61.0", "wheel"]
-          build-backend = "setuptools.build_meta"
-
-          [project]
-          name = "${{ github.repository_owner }}-${{ github.event.repository.name }}-proto"
-          version = "${{ needs.detect-protobuf.outputs.version }}"
-          description = "Generated protobuf stubs"
-          readme = "README.md"
-          requires-python = ">=3.8"
-          dependencies = [
-              "grpcio>=1.59.0",
-              "protobuf>=4.25.0",
-          ]
-          EOF
-
-              # Create __init__.py
-              touch "$SDK_DIR/__init__.py"
-
-              # Create README
-              cat > "$SDK_DIR/README.md" << EOF
-          # Python SDK
-
-          Generated from protobuf schemas.
-
-          ## Installation
-
-          \`\`\`bash
-          pip install ${{ github.repository_owner }}-${{ github.event.repository.name }}-proto
-          \`\`\`
-
-          ## Usage
-
-          \`\`\`python
-          from ghcommon.v1 import api_pb2
-          \`\`\`
-          EOF
-              ;;
-
-            typescript)
-              # TypeScript package structure
-              cp -r gen/typescript/* "$SDK_DIR/"
-
-              # Create package.json
-              cat > "$SDK_DIR/package.json" << EOF
-          {
-            "name": "@${{ github.repository_owner }}/${{ github.event.repository.name }}-proto",
-            "version": "${{ needs.detect-protobuf.outputs.version }}",
-            "description": "Generated protobuf stubs",
-            "main": "./dist/index.js",
-            "types": "./dist/index.d.ts",
-            "files": [
-              "dist/"
+        setup(
+            name="${{ github.repository_owner }}-${{ github.event.repository.name }}-proto",
+            version="${{ needs.detect-protobuf.outputs.version }}",
+            description="Generated protobuf stubs",
+            author="${{ github.repository_owner }}",
+            packages=find_packages(),
+            install_requires=[
+                "grpcio>=1.59.0",
+                "protobuf>=4.25.0",
             ],
-            "scripts": {
-              "build": "tsc",
-              "prepare": "npm run build"
-            },
-            "dependencies": {
-              "@bufbuild/protobuf": "^1.4.0",
-              "@connectrpc/connect": "^1.1.0"
-            },
-            "devDependencies": {
-              "typescript": "^5.2.0"
-            },
-            "publishConfig": {
-              "access": "public"
-            }
+            python_requires=">=3.8",
+        )
+        EOF
+
+            # Create pyproject.toml
+            cat > "$SDK_DIR/pyproject.toml" << EOF
+        [build-system]
+        requires = ["setuptools>=61.0", "wheel"]
+        build-backend = "setuptools.build_meta"
+
+        [project]
+        name = "${{ github.repository_owner }}-${{ github.event.repository.name }}-proto"
+        version = "${{ needs.detect-protobuf.outputs.version }}"
+        description = "Generated protobuf stubs"
+        readme = "README.md"
+        requires-python = ">=3.8"
+        dependencies = [
+            "grpcio>=1.59.0",
+            "protobuf>=4.25.0",
+        ]
+        EOF
+
+            # Create __init__.py
+            touch "$SDK_DIR/__init__.py"
+
+            # Create README
+            cat > "$SDK_DIR/README.md" << EOF
+        # Python SDK
+
+        Generated from protobuf schemas.
+
+        ## Installation
+
+        \`\`\`bash
+        pip install ${{ github.repository_owner }}-${{ github.event.repository.name }}-proto
+        \`\`\`
+
+        ## Usage
+
+        \`\`\`python
+        from ghcommon.v1 import api_pb2
+        \`\`\`
+        EOF
+            ;;
+
+          typescript)
+            # TypeScript package structure
+            cp -r gen/typescript/* "$SDK_DIR/"
+
+            # Create package.json
+            cat > "$SDK_DIR/package.json" << EOF
+        {
+          "name": "@${{ github.repository_owner }}/${{ github.event.repository.name }}-proto",
+          "version": "${{ needs.detect-protobuf.outputs.version }}",
+          "description": "Generated protobuf stubs",
+          "main": "./dist/index.js",
+          "types": "./dist/index.d.ts",
+          "files": [
+            "dist/"
+          ],
+          "scripts": {
+            "build": "tsc",
+            "prepare": "npm run build"
+          },
+          "dependencies": {
+            "@bufbuild/protobuf": "^1.4.0",
+            "@connectrpc/connect": "^1.1.0"
+          },
+          "devDependencies": {
+            "typescript": "^5.2.0"
+          },
+          "publishConfig": {
+            "access": "public"
           }
-          EOF
+        }
+        EOF
 
-              # Create tsconfig.json
-              cat > "$SDK_DIR/tsconfig.json" << EOF
-          {
-            "compilerOptions": {
-              "target": "ES2020",
-              "module": "commonjs",
-              "declaration": true,
-              "outDir": "./dist",
-              "strict": true,
-              "esModuleInterop": true
-            },
-            "include": ["**/*.ts"],
-            "exclude": ["node_modules", "dist"]
-          }
-          EOF
+            # Create tsconfig.json
+            cat > "$SDK_DIR/tsconfig.json" << EOF
+        {
+          "compilerOptions": {
+            "target": "ES2020",
+            "module": "commonjs",
+            "declaration": true,
+            "outDir": "./dist",
+            "strict": true,
+            "esModuleInterop": true
+          },
+          "include": ["**/*.ts"],
+          "exclude": ["node_modules", "dist"]
+        }
+        EOF
 
-              # Create README
-              cat > "$SDK_DIR/README.md" << EOF
-          # TypeScript SDK
+            # Create README
+            cat > "$SDK_DIR/README.md" << EOF
+        # TypeScript SDK
 
-          Generated from protobuf schemas.
+        Generated from protobuf schemas.
 
-          ## Installation
+        ## Installation
 
-          \`\`\`bash
-          npm install @${{ github.repository_owner }}/${{ github.event.repository.name }}-proto
-          \`\`\`
+        \`\`\`bash
+        npm install @${{ github.repository_owner }}/${{ github.event.repository.name }}-proto
+        \`\`\`
 
-          ## Usage
+        ## Usage
 
-          \`\`\`typescript
-          import { User } from '@${{ github.repository_owner }}/${{ github.event.repository.name }}-proto';
-          \`\`\`
-          EOF
-              ;;
+        \`\`\`typescript
+        import { User } from '@${{ github.repository_owner }}/${{ github.event.repository.name }}-proto';
+        \`\`\`
+        EOF
+            ;;
 
-            rust)
-              # Rust crate structure
-              mkdir -p "$SDK_DIR/src"
-              cp -r gen/rust/* "$SDK_DIR/src/" 2>/dev/null || true
+          rust)
+            # Rust crate structure
+            mkdir -p "$SDK_DIR/src"
+            cp -r gen/rust/* "$SDK_DIR/src/" 2>/dev/null || true
 
-              # Create Cargo.toml
-              cat > "$SDK_DIR/Cargo.toml" << EOF
-          [package]
-          name = "${{ github.repository_owner }}-${{ github.event.repository.name }}-proto"
-          version = "${{ needs.detect-protobuf.outputs.version }}"
-          edition = "2021"
-          description = "Generated protobuf stubs"
+            # Create Cargo.toml
+            cat > "$SDK_DIR/Cargo.toml" << EOF
+        [package]
+        name = "${{ github.repository_owner }}-${{ github.event.repository.name }}-proto"
+        version = "${{ needs.detect-protobuf.outputs.version }}"
+        edition = "2021"
+        description = "Generated protobuf stubs"
 
-          [dependencies]
-          prost = "0.12"
-          tonic = "0.10"
+        [dependencies]
+        prost = "0.12"
+        tonic = "0.10"
 
-          [build-dependencies]
-          tonic-build = "0.10"
-          EOF
+        [build-dependencies]
+        tonic-build = "0.10"
+        EOF
 
-              # Create lib.rs
-              cat > "$SDK_DIR/src/lib.rs" << EOF
-          // Generated protobuf code
-          pub mod proto {
-              include!("mod.rs");
-          }
-          EOF
+            # Create lib.rs
+            cat > "$SDK_DIR/src/lib.rs" << EOF
+        // Generated protobuf code
+        pub mod proto {
+            include!("mod.rs");
+        }
+        EOF
 
-              # Create README
-              cat > "$SDK_DIR/README.md" << EOF
-          # Rust SDK
+            # Create README
+            cat > "$SDK_DIR/README.md" << EOF
+        # Rust SDK
 
-          Generated from protobuf schemas.
+        Generated from protobuf schemas.
 
-          ## Installation
+        ## Installation
 
-          \`\`\`toml
-          [${{ github.repository_owner }}-${{ github.event.repository.name }}-proto = "${{ needs.detect-protobuf.outputs.version }}"
-          \`\`\`
+        \`\`\`toml
+        [${{ github.repository_owner }}-${{ github.event.repository.name }}-proto = "${{ needs.detect-protobuf.outputs.version }}"
+        \`\`\`
 
-          ## Usage
+        ## Usage
 
-          \`\`\`rust
-          use ${{ github.repository_owner }}_${{ github.event.repository.name }}_proto::proto::*;
-          \`\`\`
-          EOF
-              ;;
-          esac
+        \`\`\`rust
+        use ${{ github.repository_owner }}_${{ github.event.repository.name }}_proto::proto::*;
+        \`\`\`
+        EOF
+            ;;
+        esac
 
-          echo "✅ SDK package structure created"
+        echo "✅ SDK package structure created"
 
-      - name: Package SDK
-        run: |
-          echo "=== Packaging SDK ==="
-          echo ""
+    - name: Package SDK
+      run: |
+        echo "=== Packaging SDK ==="
+        echo ""
 
-          LANG="${{ matrix.language }}"
-          SDK_DIR="sdk/$LANG"
+        LANG="${{ matrix.language }}"
+        SDK_DIR="sdk/$LANG"
 
-          cd "$SDK_DIR"
+        cd "$SDK_DIR"
 
-          case "$LANG" in
-            go)
-              # Go doesn't need packaging (uses git tags)
-              echo "Go SDK ready (no packaging needed)"
-              ;;
+        case "$LANG" in
+          go)
+            # Go doesn't need packaging (uses git tags)
+            echo "Go SDK ready (no packaging needed)"
+            ;;
 
-            python)
-              # Build Python package
-              python3 -m pip install --upgrade build
-              python3 -m build
-              echo "✅ Python package built"
-              ls -lh dist/
-              ;;
+          python)
+            # Build Python package
+            python3 -m pip install --upgrade build
+            python3 -m build
+            echo "✅ Python package built"
+            ls -lh dist/
+            ;;
 
-            typescript)
-              # Install dependencies and build
-              npm install
-              npm run build
-              npm pack
-              echo "✅ TypeScript package built"
-              ls -lh *.tgz
-              ;;
+          typescript)
+            # Install dependencies and build
+            npm install
+            npm run build
+            npm pack
+            echo "✅ TypeScript package built"
+            ls -lh *.tgz
+            ;;
 
-            rust)
-              # Verify Cargo.toml
-              cargo check 2>/dev/null || echo "Cargo check skipped"
-              echo "✅ Rust package ready"
-              ;;
-          esac
+          rust)
+            # Verify Cargo.toml
+            cargo check 2>/dev/null || echo "Cargo check skipped"
+            echo "✅ Rust package ready"
+            ;;
+        esac
 
-      - name: Upload SDK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sdk-${{ matrix.language }}-${{ needs.detect-protobuf.outputs.version }}
-          path: sdk/${{ matrix.language }}
-          retention-days: 90
+    - name: Upload SDK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sdk-${{ matrix.language }}-${{ needs.detect-protobuf.outputs.version }}
+        path: sdk/${{ matrix.language }}
+        retention-days: 90
 ```
 
 ## Local Testing Scripts
@@ -679,4 +679,5 @@ Files changed:
 
 ## Next Steps
 
-**Continue to Part 4:** Publishing SDKs to language-specific registries (Go tags, PyPI, npm, crates.io).
+**Continue to Part 4:** Publishing SDKs to language-specific registries (Go tags, PyPI, npm,
+crates.io).

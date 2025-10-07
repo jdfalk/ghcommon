@@ -290,7 +290,8 @@ Package build fails during verification (usually due to missing files or platfor
 cargo publish --registry github --no-verify
 ```
 
-Justification: The `build-rust` job already verified the build works on all platforms. Re-verifying during publish is redundant and can fail on cross-compilation edge cases.
+Justification: The `build-rust` job already verified the build works on all platforms. Re-verifying
+during publish is redundant and can fail on cross-compilation edge cases.
 
 **Option 2: Fix Build Issues**
 
@@ -556,7 +557,8 @@ grep -i "error\|fail\|debug" workflow-debug.log
 
 **Summary:**
 
-Rust crate publishing to GitHub Package Registry has been successfully implemented in the `release-rust.yml` workflow.
+Rust crate publishing to GitHub Package Registry has been successfully implemented in the
+`release-rust.yml` workflow.
 
 **Key Achievements:**
 

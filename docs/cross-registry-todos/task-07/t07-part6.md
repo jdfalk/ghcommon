@@ -9,11 +9,13 @@
 ### Issue 1: Buf Authentication Failed
 
 **Symptoms:**
+
 - `buf push` returns 401 Unauthorized
 - "authentication required" errors
 - Cannot login to BSR
 
 **Causes:**
+
 1. BUF_TOKEN not set or invalid
 2. Token expired
 3. Wrong username
@@ -54,11 +56,13 @@ buf registry whoami
 ### Issue 2: Code Generation Failed
 
 **Symptoms:**
+
 - `buf generate` produces no output
 - Plugin errors
 - Missing generated files
 
 **Causes:**
+
 1. buf.gen.yaml misconfigured
 2. Plugin not available on BSR
 3. Output directory permissions
@@ -101,11 +105,13 @@ plugins:
 ### Issue 3: Go Module Tag Conflicts
 
 **Symptoms:**
+
 - "tag already exists"
-- Cannot create go-v* tag
+- Cannot create go-v\* tag
 - Version mismatch errors
 
 **Causes:**
+
 1. Tag already pushed
 2. Local tag not pushed
 3. Version collision
@@ -130,14 +136,16 @@ git push origin go-v1.0.1
 ### Issue 4: Python Package Build Failed
 
 **Symptoms:**
+
 - `python -m build` fails
 - Missing dependencies
 - setup.py errors
 
 **Causes:**
+
 1. Missing build dependencies
 2. Invalid setup.py
-3. Missing __init__.py files
+3. Missing **init**.py files
 4. Import errors
 
 **Solutions:**
@@ -178,11 +186,13 @@ sdk/python/
 ### Issue 5: TypeScript Build Errors
 
 **Symptoms:**
+
 - `npm run build` fails
 - TypeScript compilation errors
 - Missing type declarations
 
 **Causes:**
+
 1. Missing dependencies
 2. tsconfig.json misconfigured
 3. Import path errors
@@ -229,11 +239,13 @@ npx tsc --strict
 ### Issue 6: Rust Crate Publishing Failed
 
 **Symptoms:**
+
 - `cargo publish` fails
 - "crate name already exists"
 - Version conflict
 
 **Causes:**
+
 1. Crate name taken
 2. Version already published
 3. CARGO_REGISTRY_TOKEN invalid
@@ -278,12 +290,14 @@ tonic = "0.10"
 ### Issue 7: Breaking Changes Not Detected
 
 **Symptoms:**
+
 - Major breaking changes not flagged
 - `buf breaking` passes incorrectly
 - Missing previous tag
 
 **Causes:**
-1. No previous proto-v* tag
+
+1. No previous proto-v\* tag
 2. Wrong comparison target
 3. Buf breaking rules too lenient
 
@@ -312,11 +326,13 @@ EOF
 ### Issue 8: BSR Module Not Accessible
 
 **Symptoms:**
+
 - Cannot import from BSR
 - `buf pull` fails after publish
 - 404 errors
 
 **Causes:**
+
 1. Module name mismatch in buf.yaml
 2. Propagation delay
 3. Module not public
@@ -346,11 +362,13 @@ buf pull buf.build/your-org/your-repo:proto-v1.0.0
 ### Issue 9: Multi-Language SDK Version Mismatch
 
 **Symptoms:**
+
 - Different versions across languages
 - Tags out of sync
 - Import errors between SDKs
 
 **Causes:**
+
 1. Parallel publishing race conditions
 2. Manual version updates
 3. Failed job but partial completion
@@ -378,11 +396,13 @@ git push origin :go-v1.0.1
 ### Issue 10: Workflow Permission Denied
 
 **Symptoms:**
+
 - "Resource not accessible"
 - Cannot create tags
 - Cannot push commits
 
 **Causes:**
+
 1. GITHUB_TOKEN permissions insufficient
 2. Branch protection rules
 3. Workflow permissions not set
@@ -392,8 +412,8 @@ git push origin :go-v1.0.1
 ```yaml
 # In workflow file, ensure permissions set:
 permissions:
-  contents: write    # For tags and commits
-  packages: write    # For GitHub Packages
+  contents: write # For tags and commits
+  packages: write # For GitHub Packages
 
 # Or in repository settings:
 # Settings > Actions > General > Workflow permissions
@@ -710,6 +730,7 @@ Total: ~4,000 lines of detailed protobuf publishing documentation"
 ## Task 07 Complete! ✅
 
 **Summary:**
+
 - ✅ Complete workflow for protobuf package publishing
 - ✅ Buf Schema Registry integration
 - ✅ Multi-language SDK generation (4 languages)
@@ -718,6 +739,7 @@ Total: ~4,000 lines of detailed protobuf publishing documentation"
 - ✅ Comprehensive troubleshooting guide
 - ✅ ~4,000 lines of detailed documentation
 
-**Next Task:** Task 08 - CI Workflow Consolidation (Analyze and merge reusable-ci.yml implementations)
+**Next Task:** Task 08 - CI Workflow Consolidation (Analyze and merge reusable-ci.yml
+implementations)
 
 This completes the protobuf publishing task with everything needed for copy-paste execution!

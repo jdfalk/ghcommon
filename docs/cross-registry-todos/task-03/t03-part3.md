@@ -11,28 +11,28 @@
 Add the publishing step to the workflow (continuing from Part 2):
 
 ```yaml
-      - name: Publish crate
-        if: steps.check-published.outputs.already-published != 'true'
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "📤 Publishing crate to GitHub Package Registry..."
-          echo ""
-          echo "Crate: ${{ steps.crate-info.outputs.crate-name }}"
-          echo "Version: ${{ steps.crate-info.outputs.crate-version }}"
-          echo "Registry: https://api.github.com/${{ github.repository }}/cargo/"
-          echo ""
+- name: Publish crate
+  if: steps.check-published.outputs.already-published != 'true'
+  env:
+    CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    echo "📤 Publishing crate to GitHub Package Registry..."
+    echo ""
+    echo "Crate: ${{ steps.crate-info.outputs.crate-name }}"
+    echo "Version: ${{ steps.crate-info.outputs.crate-version }}"
+    echo "Registry: https://api.github.com/${{ github.repository }}/cargo/"
+    echo ""
 
-          # Publish to GitHub registry
-          cargo publish \
-            --registry github \
-            --verbose \
-            --allow-dirty \
-            --no-verify
+    # Publish to GitHub registry
+    cargo publish \
+      --registry github \
+      --verbose \
+      --allow-dirty \
+      --no-verify
 
-          echo ""
-          echo "✅ Crate published successfully!"
-          echo "📦 Package: https://github.com/${{ github.repository }}/packages"
+    echo ""
+    echo "✅ Crate published successfully!"
+    echo "📦 Package: https://github.com/${{ github.repository }}/packages"
 ```
 
 **Key flags explained:**
@@ -62,65 +62,65 @@ Running verification again during publish would:
 Verify the package is accessible after publishing:
 
 ```yaml
-      - name: Verify publication
-        if: steps.check-published.outputs.already-published != 'true'
-        run: |
-          CRATE_NAME="${{ steps.crate-info.outputs.crate-name }}"
-          CRATE_VERSION="${{ steps.crate-info.outputs.crate-version }}"
+- name: Verify publication
+  if: steps.check-published.outputs.already-published != 'true'
+  run: |
+    CRATE_NAME="${{ steps.crate-info.outputs.crate-name }}"
+    CRATE_VERSION="${{ steps.crate-info.outputs.crate-version }}"
 
-          echo "🔍 Verifying package is accessible in registry..."
-          echo ""
+    echo "🔍 Verifying package is accessible in registry..."
+    echo ""
 
-          # Wait for package to be indexed
-          echo "⏳ Waiting 10 seconds for package indexing..."
-          sleep 10
+    # Wait for package to be indexed
+    echo "⏳ Waiting 10 seconds for package indexing..."
+    sleep 10
 
-          # Try to fetch package metadata via API
-          for i in {1..5}; do
-            echo "Attempt $i/5: Checking package availability..."
+    # Try to fetch package metadata via API
+    for i in {1..5}; do
+      echo "Attempt $i/5: Checking package availability..."
 
-            HTTP_STATUS=$(curl -s -o /tmp/package-info.json -w "%{http_code}" \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME")
+      HTTP_STATUS=$(curl -s -o /tmp/package-info.json -w "%{http_code}" \
+        -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME")
 
-            if [ "$HTTP_STATUS" = "200" ]; then
-              echo ""
-              echo "✅ Package verified in GitHub Package Registry"
-              echo ""
-              echo "📦 Package Details:"
-              cat /tmp/package-info.json | jq -r '
-                "  Name: \(.name)",
-                "  Package Type: \(.package_type)",
-                "  Visibility: \(.visibility)",
-                "  URL: \(.html_url)",
-                "  Total Downloads: \(.download_count // 0)"
-              '
+      if [ "$HTTP_STATUS" = "200" ]; then
+        echo ""
+        echo "✅ Package verified in GitHub Package Registry"
+        echo ""
+        echo "📦 Package Details:"
+        cat /tmp/package-info.json | jq -r '
+          "  Name: \(.name)",
+          "  Package Type: \(.package_type)",
+          "  Visibility: \(.visibility)",
+          "  URL: \(.html_url)",
+          "  Total Downloads: \(.download_count // 0)"
+        '
 
-              echo ""
-              echo "🏷️  Available Versions:"
-              curl -s \
-                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME/versions" \
-                | jq -r '.[] | "  - \(.name) (published \(.created_at))"' | head -10
+        echo ""
+        echo "🏷️  Available Versions:"
+        curl -s \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/orgs/${{ github.repository_owner }}/packages/cargo/$CRATE_NAME/versions" \
+          | jq -r '.[] | "  - \(.name) (published \(.created_at))"' | head -10
 
-              echo ""
-              echo "✅ Verification complete"
-              exit 0
-            fi
+        echo ""
+        echo "✅ Verification complete"
+        exit 0
+      fi
 
-            if [ $i -lt 5 ]; then
-              echo "Package not yet available, waiting 10 seconds..."
-              sleep 10
-            fi
-          done
+      if [ $i -lt 5 ]; then
+        echo "Package not yet available, waiting 10 seconds..."
+        sleep 10
+      fi
+    done
 
-          echo ""
-          echo "⚠️  Package published but not yet searchable (this can take a few minutes)"
-          echo "🔗 Check: https://github.com/${{ github.repository }}/packages"
-          echo ""
-          echo "This is normal for new packages. The package will appear shortly."
+    echo ""
+    echo "⚠️  Package published but not yet searchable (this can take a few minutes)"
+    echo "🔗 Check: https://github.com/${{ github.repository }}/packages"
+    echo ""
+    echo "This is normal for new packages. The package will appear shortly."
 ```
 
 **Verification approach:**
@@ -136,19 +136,19 @@ Verify the package is accessible after publishing:
 Add a skip message for duplicate versions:
 
 ```yaml
-      - name: Skip publication (already published)
-        if: steps.check-published.outputs.already-published == 'true'
-        run: |
-          echo "ℹ️  Skipping publication: version already exists"
-          echo ""
-          echo "📦 Crate: ${{ steps.crate-info.outputs.crate-name }}"
-          echo "🏷️  Version: ${{ steps.crate-info.outputs.crate-version }}"
-          echo "🔗 Package: https://github.com/${{ github.repository }}/packages"
-          echo ""
-          echo "To publish a new version:"
-          echo "1. Update version in Cargo.toml"
-          echo "2. Commit the change"
-          echo "3. Create and push a new tag: git tag v<new-version> && git push --tags"
+- name: Skip publication (already published)
+  if: steps.check-published.outputs.already-published == 'true'
+  run: |
+    echo "ℹ️  Skipping publication: version already exists"
+    echo ""
+    echo "📦 Crate: ${{ steps.crate-info.outputs.crate-name }}"
+    echo "🏷️  Version: ${{ steps.crate-info.outputs.crate-version }}"
+    echo "🔗 Package: https://github.com/${{ github.repository }}/packages"
+    echo ""
+    echo "To publish a new version:"
+    echo "1. Update version in Cargo.toml"
+    echo "2. Commit the change"
+    echo "3. Create and push a new tag: git tag v<new-version> && git push --tags"
 ```
 
 **Why this step:**
@@ -163,53 +163,53 @@ Add a skip message for duplicate versions:
 Add a summary that appears in the GitHub Actions UI:
 
 ```yaml
-      - name: Create publication summary
-        if: always()
-        run: |
-          echo "# 📦 Rust Crate Publication Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Crate**: \`${{ steps.crate-info.outputs.crate-name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Version**: \`${{ steps.crate-info.outputs.crate-version }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Repository**: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag**: \`${GITHUB_REF#refs/tags/}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+- name: Create publication summary
+  if: always()
+  run: |
+    echo "# 📦 Rust Crate Publication Summary" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "**Crate**: \`${{ steps.crate-info.outputs.crate-name }}\`" >> $GITHUB_STEP_SUMMARY
+    echo "**Version**: \`${{ steps.crate-info.outputs.crate-version }}\`" >> $GITHUB_STEP_SUMMARY
+    echo "**Repository**: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
+    echo "**Tag**: \`${GITHUB_REF#refs/tags/}\`" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ steps.check-published.outputs.already-published }}" = "true" ]; then
-            echo "**Status**: ⏭️ **Skipped** (version already published)" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "This version already exists in the package registry." >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ job.status }}" = "success" ]; then
-            echo "**Status**: ✅ **Published successfully**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "The crate has been published to GitHub Package Registry." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "**Status**: ❌ **Publication failed**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Check the job logs for error details." >> $GITHUB_STEP_SUMMARY
-          fi
+    if [ "${{ steps.check-published.outputs.already-published }}" = "true" ]; then
+      echo "**Status**: ⏭️ **Skipped** (version already published)" >> $GITHUB_STEP_SUMMARY
+      echo "" >> $GITHUB_STEP_SUMMARY
+      echo "This version already exists in the package registry." >> $GITHUB_STEP_SUMMARY
+    elif [ "${{ job.status }}" = "success" ]; then
+      echo "**Status**: ✅ **Published successfully**" >> $GITHUB_STEP_SUMMARY
+      echo "" >> $GITHUB_STEP_SUMMARY
+      echo "The crate has been published to GitHub Package Registry." >> $GITHUB_STEP_SUMMARY
+    else
+      echo "**Status**: ❌ **Publication failed**" >> $GITHUB_STEP_SUMMARY
+      echo "" >> $GITHUB_STEP_SUMMARY
+      echo "Check the job logs for error details." >> $GITHUB_STEP_SUMMARY
+    fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📍 Package Links" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Packages**: https://github.com/${{ github.repository }}/packages" >> $GITHUB_STEP_SUMMARY
-          echo "- **Registry Index**: https://api.github.com/${{ github.repository }}/cargo/" >> $GITHUB_STEP_SUMMARY
-          echo "- **This Release**: https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "## 📍 Package Links" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "- **Packages**: https://github.com/${{ github.repository }}/packages" >> $GITHUB_STEP_SUMMARY
+    echo "- **Registry Index**: https://api.github.com/${{ github.repository }}/cargo/" >> $GITHUB_STEP_SUMMARY
+    echo "- **This Release**: https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📚 Using This Crate" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Add to your \`Cargo.toml\`:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`toml" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.crate-info.outputs.crate-name }} = \"${{ steps.crate-info.outputs.crate-version }}\"" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Configure the registry in \`.cargo/config.toml\`:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`toml" >> $GITHUB_STEP_SUMMARY
-          echo "[registries.github]" >> $GITHUB_STEP_SUMMARY
-          echo "index = \"sparse+https://api.github.com/${{ github.repository }}/cargo/\"" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "## 📚 Using This Crate" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "Add to your \`Cargo.toml\`:" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "\`\`\`toml" >> $GITHUB_STEP_SUMMARY
+    echo "${{ steps.crate-info.outputs.crate-name }} = \"${{ steps.crate-info.outputs.crate-version }}\"" >> $GITHUB_STEP_SUMMARY
+    echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "Configure the registry in \`.cargo/config.toml\`:" >> $GITHUB_STEP_SUMMARY
+    echo "" >> $GITHUB_STEP_SUMMARY
+    echo "\`\`\`toml" >> $GITHUB_STEP_SUMMARY
+    echo "[registries.github]" >> $GITHUB_STEP_SUMMARY
+    echo "index = \"sparse+https://api.github.com/${{ github.repository }}/cargo/\"" >> $GITHUB_STEP_SUMMARY
+    echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 ```
 
 **Summary features:**
@@ -535,6 +535,7 @@ git log --oneline -1
 
 ---
 
-**Part 3 Complete**: Publishing implementation, verification steps, local testing procedures, workflow validation, and commit process. ✅
+**Part 3 Complete**: Publishing implementation, verification steps, local testing procedures,
+workflow validation, and commit process. ✅
 
 **Continue to Part 4** for post-merge verification, testing with actual releases, and monitoring.

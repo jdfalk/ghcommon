@@ -43,54 +43,54 @@ sed -n '250,260p' .github/workflows/release-rust.yml
 ### Expected Output - First Occurrence (Lines 230-240)
 
 ```yaml
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}-
+      ${{ runner.os }}-cargo-
 ```
 
 ### Expected Output - Second Occurrence (Lines 240-250)
 
 ```yaml
-      - name: Cache Cargo dependencies (aarch64)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies (aarch64)
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}-
+      ${{ runner.os }}-cargo-
 ```
 
 ### Expected Output - Third Occurrence (Lines 250-260)
 
 ```yaml
-      - name: Cache Cargo dependencies (macOS)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies (macOS)
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-
 ```
 
 ## Making the Changes
@@ -180,20 +180,21 @@ $1
 **Before:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+restore-keys: |
+  ${{ runner.os }}-cargo-${{ matrix.rust }}-
+  ${{ runner.os }}-cargo-
 ```
 
 **After:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}
-            ${{ runner.os }}-cargo
+restore-keys: |
+  ${{ runner.os }}-cargo-${{ matrix.rust }}
+  ${{ runner.os }}-cargo
 ```
 
 **Changes:**
+
 - Line 234: Remove trailing `-`
 - Line 235: Remove trailing `-`
 
@@ -202,20 +203,21 @@ $1
 **Before:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+restore-keys: |
+  ${{ runner.os }}-cargo-${{ matrix.rust }}-
+  ${{ runner.os }}-cargo-
 ```
 
 **After:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}
-            ${{ runner.os }}-cargo
+restore-keys: |
+  ${{ runner.os }}-cargo-${{ matrix.rust }}
+  ${{ runner.os }}-cargo
 ```
 
 **Changes:**
+
 - Line 244: Remove trailing `-`
 - Line 245: Remove trailing `-`
 
@@ -224,18 +226,19 @@ $1
 **Before:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+restore-keys: |
+  ${{ runner.os }}-cargo-
 ```
 
 **After:**
 
 ```yaml
-          restore-keys: |
-            ${{ runner.os }}-cargo
+restore-keys: |
+  ${{ runner.os }}-cargo
 ```
 
 **Changes:**
+
 - Line 254: Remove trailing `-`
 
 ## Complete Before/After Comparison
@@ -245,47 +248,47 @@ $1
 **Before (Lines 225-240):**
 
 ```yaml
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+- name: Install Rust
+  uses: dtolnay/rust-toolchain@stable
+  with:
+    targets: ${{ matrix.target }}
 
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}-
+      ${{ runner.os }}-cargo-
 ```
 
 **After (Lines 225-240):**
 
 ```yaml
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+- name: Install Rust
+  uses: dtolnay/rust-toolchain@stable
+  with:
+    targets: ${{ matrix.target }}
 
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}
-            ${{ runner.os }}-cargo
+- name: Cache Cargo dependencies
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}
+      ${{ runner.os }}-cargo
 ```
 
 **Diff:**
@@ -304,39 +307,39 @@ $1
 **Before (Lines 238-252):**
 
 ```yaml
-      - name: Cache Cargo dependencies (aarch64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}-
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies (aarch64)
+  if: matrix.target == 'aarch64-unknown-linux-gnu'
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}-
+      ${{ runner.os }}-cargo-
 ```
 
 **After (Lines 238-252):**
 
 ```yaml
-      - name: Cache Cargo dependencies (aarch64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust }}
-            ${{ runner.os }}-cargo
+- name: Cache Cargo dependencies (aarch64)
+  if: matrix.target == 'aarch64-unknown-linux-gnu'
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-${{ matrix.rust }}
+      ${{ runner.os }}-cargo
 ```
 
 **Diff:**
@@ -355,37 +358,37 @@ $1
 **Before (Lines 250-262):**
 
 ```yaml
-      - name: Cache Cargo dependencies (macOS)
-        if: startsWith(matrix.os, 'macos')
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+- name: Cache Cargo dependencies (macOS)
+  if: startsWith(matrix.os, 'macos')
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-
 ```
 
 **After (Lines 250-262):**
 
 ```yaml
-      - name: Cache Cargo dependencies (macOS)
-        if: startsWith(matrix.os, 'macos')
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo
+- name: Cache Cargo dependencies (macOS)
+  if: startsWith(matrix.os, 'macos')
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/bin/
+      ~/.cargo/registry/index/
+      ~/.cargo/registry/cache/
+      ~/.cargo/git/db/
+      target/
+    key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo
 ```
 
 **Diff:**

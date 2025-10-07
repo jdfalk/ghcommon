@@ -6,7 +6,9 @@
 
 ## Task Objective
 
-Integrate comprehensive security scanning into CI/CD pipelines across all repositories using GitHub-native and third-party security tools. This includes vulnerability scanning for dependencies, container images, code secrets, and Infrastructure-as-Code (IaC) configurations.
+Integrate comprehensive security scanning into CI/CD pipelines across all repositories using
+GitHub-native and third-party security tools. This includes vulnerability scanning for dependencies,
+container images, code secrets, and Infrastructure-as-Code (IaC) configurations.
 
 ## Security Scanning Architecture
 
@@ -53,24 +55,28 @@ Integrate comprehensive security scanning into CI/CD pipelines across all reposi
 ### Integration Strategy
 
 **Phase 1: GitHub Native Tools (Week 1)**
+
 - Enable Dependabot security updates
 - Configure Dependabot version updates
 - Enable GitHub Secret Scanning
 - Enable GitHub Code Scanning (CodeQL)
 
 **Phase 2: Container Security (Week 2)**
+
 - Integrate Trivy scanning into Docker workflows
 - Add Grype for redundant vulnerability detection
 - Implement SBOM generation with Syft
 - Configure Docker Scout for GitHub Packages
 
 **Phase 3: Language-Specific Tools (Week 3)**
+
 - Add `cargo audit` to Rust CI
 - Add `pip-audit` to Python CI
 - Add `npm audit` to JavaScript/TypeScript CI
 - Add `govulncheck` to Go CI
 
 **Phase 4: Advanced Scanning (Week 4)**
+
 - Implement Gitleaks pre-commit hooks
 - Add Semgrep custom rules
 - Configure IaC scanning for repos with infrastructure code
@@ -83,6 +89,7 @@ Integrate comprehensive security scanning into CI/CD pipelines across all reposi
 **Repository: ghcommon**
 
 Current security tools in use:
+
 ```yaml
 # .github/workflows/ci.yml (excerpt)
 jobs:
@@ -106,6 +113,7 @@ jobs:
 ```
 
 **Gap Analysis:**
+
 - ✅ Trivy filesystem scanning enabled
 - ❌ No container image scanning
 - ❌ No Dependabot configuration
@@ -118,6 +126,7 @@ jobs:
 **Repository: ubuntu-autoinstall-agent**
 
 Current security tools in use:
+
 ```yaml
 # .github/workflows/ci.yml (excerpt)
 jobs:
@@ -131,6 +140,7 @@ jobs:
 ```
 
 **Gap Analysis:**
+
 - ✅ Cargo audit for Rust dependencies
 - ❌ No Trivy scanning
 - ❌ No container scanning (despite building Docker images)
@@ -208,137 +218,137 @@ Create `.github/dependabot.yml` for each repository:
 version: 2
 updates:
   # Rust (Cargo) dependencies
-  - package-ecosystem: "cargo"
-    directory: "/"
+  - package-ecosystem: 'cargo'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "America/Los_Angeles"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Los_Angeles'
     open-pull-requests-limit: 10
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     assignees:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "rust"
+      - 'dependencies'
+      - 'rust'
     commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
+      prefix: 'chore(deps)'
+      include: 'scope'
     # Group minor and patch updates
     groups:
       rust-dependencies:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
     # Ignore major updates for sensitive packages
     ignore:
-      - dependency-name: "tokio"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "serde"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: 'tokio'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'serde'
+        update-types: ['version-update:semver-major']
 
   # Python (pip) dependencies
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: 'pip'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
     open-pull-requests-limit: 10
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "python"
+      - 'dependencies'
+      - 'python'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
 
   # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
     open-pull-requests-limit: 5
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "github-actions"
+      - 'dependencies'
+      - 'github-actions'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
     # Group all action updates together
     groups:
       github-actions:
         patterns:
-          - "*"
+          - '*'
 
   # Docker dependencies
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: 'docker'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
     open-pull-requests-limit: 5
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "docker"
+      - 'dependencies'
+      - 'docker'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
 
   # Go modules
-  - package-ecosystem: "gomod"
-    directory: "/"
+  - package-ecosystem: 'gomod'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
     open-pull-requests-limit: 10
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "go"
+      - 'dependencies'
+      - 'go'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
     groups:
       go-dependencies:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
 
   # npm dependencies
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
     open-pull-requests-limit: 10
     reviewers:
-      - "jdfalk"
+      - 'jdfalk'
     labels:
-      - "dependencies"
-      - "npm"
+      - 'dependencies'
+      - 'npm'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
     groups:
       npm-dependencies:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
 ```
 
 **Dependabot Configuration Best Practices:**
@@ -346,7 +356,8 @@ updates:
 1. **Scheduling**: Run updates on Monday mornings to allow time for review during the week
 2. **Grouping**: Group minor/patch updates to reduce PR noise
 3. **Limits**: Set reasonable PR limits (5-10) to avoid overwhelming reviewers
-4. **Ignore Policies**: Ignore major updates for critical dependencies that require extensive testing
+4. **Ignore Policies**: Ignore major updates for critical dependencies that require extensive
+   testing
 5. **Commit Messages**: Use conventional commits format for consistency
 6. **Reviewers**: Assign specific reviewers for faster triage
 
@@ -389,6 +400,7 @@ echo "✅ Push protection enabled for $REPO"
 ```
 
 **Secret Scanning Configuration:**
+
 - **GitHub Secret Scanning**: Automatically scans for known secret patterns
 - **Push Protection**: Prevents pushing commits containing secrets
 - **Custom Patterns**: Define organization-specific secret patterns
@@ -402,7 +414,7 @@ Create `.github/workflows/codeql.yml`:
 # version: 1.0.0
 # guid: codeql-workflow
 
-name: "CodeQL Security Scanning"
+name: 'CodeQL Security Scanning'
 
 on:
   push:
@@ -450,7 +462,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{ matrix.language }}"
+          category: '/language:${{ matrix.language }}'
 ```
 
 **CodeQL Configuration Best Practices:**
@@ -463,6 +475,7 @@ jobs:
 
 ---
 
-**Part 1 Complete**: Security scanning overview, risk assessment, GitHub native tools configuration. ✅
+**Part 1 Complete**: Security scanning overview, risk assessment, GitHub native tools configuration.
+✅
 
 **Continue to Part 2** for container scanning, Trivy/Grype integration, and SBOM generation.

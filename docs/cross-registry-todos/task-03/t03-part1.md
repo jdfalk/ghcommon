@@ -8,11 +8,13 @@
 
 **What**: Implement Rust crate publishing to GitHub Package Registry in release-rust.yml
 
-**Why**: Rust binaries are built but crates are not published to a package registry, making it hard for other projects to depend on them as libraries
+**Why**: Rust binaries are built but crates are not published to a package registry, making it hard
+for other projects to depend on them as libraries
 
 **Where**: `ghcommon` repository, file `.github/workflows/release-rust.yml`
 
-**Expected Outcome**: Rust crates automatically published to GitHub Package Registry during releases, enabling dependency management across projects
+**Expected Outcome**: Rust crates automatically published to GitHub Package Registry during
+releases, enabling dependency management across projects
 
 **Estimated Time**: 45-60 minutes
 
@@ -22,7 +24,8 @@
 
 ### Registry Architecture
 
-GitHub provides a Cargo-compatible registry that integrates with the GitHub Packages ecosystem. Unlike crates.io (the default public Rust registry), GitHub Packages provides:
+GitHub provides a Cargo-compatible registry that integrates with the GitHub Packages ecosystem.
+Unlike crates.io (the default public Rust registry), GitHub Packages provides:
 
 - **Private crates**: Control access to your crates
 - **Organization-level packages**: Share across repos in an org
@@ -47,7 +50,8 @@ Packages: https://github.com/jdfalk/ghcommon/packages
 API: https://api.github.com/orgs/jdfalk/packages/cargo/ubuntu-autoinstall-agent
 ```
 
-The "sparse" protocol is the modern, efficient index format that Cargo uses by default since version 1.68.0.
+The "sparse" protocol is the modern, efficient index format that Cargo uses by default since version
+1.68.0.
 
 ### Authentication Methods
 
@@ -61,12 +65,14 @@ env:
 ```
 
 **Pros:**
+
 - Automatically available in GitHub Actions
 - No manual token creation needed
 - Scoped to the current repository
 - Secure by default
 
 **Cons:**
+
 - Limited to repository scope
 - Cannot publish to other org's packages
 
@@ -84,11 +90,13 @@ env:
 ```
 
 **Pros:**
+
 - Can work across repositories
 - Can publish to multiple orgs
 - Full control over permissions
 
 **Cons:**
+
 - Manual creation required
 - Must be stored securely
 - Expires and needs renewal
@@ -105,11 +113,13 @@ env:
 ```
 
 **Pros:**
+
 - Fine-grained permissions
 - Better audit trail
 - Can be org-wide
 
 **Cons:**
+
 - Complex setup
 - Overkill for simple use cases
 
@@ -137,6 +147,7 @@ git-fetch-with-cli = true  # Use git CLI for better auth
 ```
 
 **Key points:**
+
 - `registries.github` defines a named registry
 - `index` points to the GitHub API endpoint
 - `sparse+` prefix enables efficient sparse index
@@ -155,6 +166,7 @@ token = "ghp_xxxxxxxxxxxxxxxxxxxx"
 ```
 
 **Security considerations:**
+
 - File permissions must be 600 (owner read/write only)
 - Never commit this file
 - Token should have minimal required scopes
@@ -263,6 +275,7 @@ code .github/workflows/release-rust.yml
 **What to look for:**
 
 1. **Workflow triggers**: When does it run?
+
    ```yaml
    on:
      push:
@@ -271,6 +284,7 @@ code .github/workflows/release-rust.yml
    ```
 
 2. **Jobs structure**: What jobs exist?
+
    ```yaml
    jobs:
      build-rust:
@@ -292,29 +306,34 @@ code .github/workflows/release-rust.yml
 **Current workflow includes:**
 
 ✅ **Multi-platform Rust builds**
+
 - linux/amd64, linux/arm64
 - Windows, macOS
 - Cross-compilation setup with cross-rs
 
 ✅ **Clippy linting**
+
 ```yaml
 - name: Run Clippy
   run: cargo clippy -- -D warnings
 ```
 
 ✅ **Test execution**
+
 ```yaml
 - name: Run tests
   run: cargo test --verbose
 ```
 
 ✅ **Binary artifact creation**
+
 ```yaml
 - name: Build release binary
   run: cargo build --release --target ${{ matrix.target }}
 ```
 
 ✅ **Binary upload to GitHub releases**
+
 ```yaml
 - name: Upload to release
   uses: actions/upload-release-asset@v1
@@ -323,18 +342,22 @@ code .github/workflows/release-rust.yml
 **Missing components:**
 
 ❌ **Cargo publish to registry**
+
 - No `cargo publish` command
 - No registry configuration
 
 ❌ **Crate publishing configuration**
+
 - No `.cargo/config.toml` setup in workflow
 - No credentials configuration
 
 ❌ **Registry authentication**
+
 - No token configuration for publishing
 - No permissions specified for packages
 
 ❌ **Version verification**
+
 - No check for duplicate versions
 - No validation that tag matches Cargo.toml version
 
@@ -349,6 +372,7 @@ grep -n "cargo publish" .github/workflows/release-rust.yml
 ```
 
 **If matches found:**
+
 1. Review the existing publish step
 2. Check if it's commented out or active
 3. Determine if it conflicts with our new implementation
@@ -478,34 +502,37 @@ chmod +x /tmp/check-cargo-toml.sh
 
 **Proceed if:**
 
-✅ No existing `cargo publish` steps in workflow (or they're clearly outdated/disabled)
-✅ Target repositories have valid Cargo.toml with ALL required fields
-✅ You understand GitHub Package Registry for Cargo authentication
-✅ You can create/use GitHub PAT tokens (or will use GITHUB_TOKEN)
+✅ No existing `cargo publish` steps in workflow (or they're clearly outdated/disabled) ✅ Target
+repositories have valid Cargo.toml with ALL required fields ✅ You understand GitHub Package
+Registry for Cargo authentication ✅ You can create/use GitHub PAT tokens (or will use GITHUB_TOKEN)
 ✅ Workflow syntax is valid (no YAML errors)
 
 **Stop and fix if:**
 
 ❌ **Cargo.toml is missing required fields**
-  - Fix in the target repository first
-  - Add authors, description, license, repository fields
-  - Commit and push changes
-  - Then return to this task
+
+- Fix in the target repository first
+- Add authors, description, license, repository fields
+- Commit and push changes
+- Then return to this task
 
 ❌ **Unclear about registry authentication**
-  - Review "Authentication Methods" section above
-  - Test local authentication first
-  - Create test PAT token if needed
+
+- Review "Authentication Methods" section above
+- Test local authentication first
+- Create test PAT token if needed
 
 ❌ **Existing publish steps that might conflict**
-  - Document existing behavior
-  - Determine if migration is needed
-  - Plan for backward compatibility
+
+- Document existing behavior
+- Determine if migration is needed
+- Plan for backward compatibility
 
 ❌ **Workflow has YAML syntax errors**
-  - Fix syntax errors first
-  - Validate with yamllint
-  - Test with actionlint
+
+- Fix syntax errors first
+- Validate with yamllint
+- Test with actionlint
 
 **Example fix for missing Cargo.toml fields:**
 
@@ -533,10 +560,12 @@ git push
 
 ## Next Steps
 
-Once all prerequisites are met and decision point checks pass, proceed to **Part 2: Implementation Design and Workflow Configuration** to begin adding the publishing job to the workflow.
+Once all prerequisites are met and decision point checks pass, proceed to **Part 2: Implementation
+Design and Workflow Configuration** to begin adding the publishing job to the workflow.
 
 ---
 
-**Part 1 Complete**: Overview, prerequisites, authentication methods, current state analysis, and decision point verification. ✅
+**Part 1 Complete**: Overview, prerequisites, authentication methods, current state analysis, and
+decision point verification. ✅
 
 **Continue to Part 2** for detailed implementation design and workflow configuration steps.

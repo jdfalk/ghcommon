@@ -16,6 +16,7 @@ restore-keys: |
 ```
 
 **Cause:**
+
 - Copy-paste from old documentation
 - Editor auto-formatting
 - Template files not updated
@@ -189,8 +190,7 @@ echo "✅ Automated fixes complete"
 
 ### Issue 4: Workflow Not Triggering
 
-**Symptom:**
-Workflow doesn't run after push
+**Symptom:** Workflow doesn't run after push
 
 **Diagnosis:**
 
@@ -333,6 +333,7 @@ path: |
 ### 1. YAML Syntax Standards
 
 **Always:**
+
 - Use `yamllint` before committing
 - Avoid trailing hyphens on list items
 - Use consistent indentation (2 spaces)
@@ -375,6 +376,7 @@ restore-keys: |
 ```
 
 **Naming Convention:**
+
 - `{os}-{tool}-{version}-{hash}` for cache keys
 - Always include OS to prevent cross-platform cache collisions
 - Include version for granular cache invalidation
@@ -383,11 +385,13 @@ restore-keys: |
 ### 3. Testing Workflow Changes
 
 **Pre-Commit:**
+
 - Run `yamllint` on all changed workflow files
 - Test with `gh workflow view` to validate syntax
 - Review diffs carefully
 
 **Post-Commit:**
+
 - Monitor first workflow run after change
 - Check cache hit rates
 - Verify build times
@@ -396,6 +400,7 @@ restore-keys: |
 ### 4. Documentation Standards
 
 **Always Document:**
+
 - Why changes were made (not just what)
 - Impact assessment (risk, affected systems)
 - Testing performed
@@ -403,30 +408,36 @@ restore-keys: |
 
 **Example:**
 
-```markdown
+````markdown
 ## Change: Remove YAML Trailing Hyphens
 
 ### Why
-YAML best practices recommend avoiding trailing hyphens as they can cause
-parser ambiguity and reduce readability.
+
+YAML best practices recommend avoiding trailing hyphens as they can cause parser ambiguity and
+reduce readability.
 
 ### Impact
+
 - Risk: Very Low
 - Systems: CI/CD workflows
 - Behavior: No functional change
 
 ### Testing
+
 - yamllint validation: Passed
 - GH Actions syntax: Valid
 - Cache functionality: Verified
 - Build times: Unchanged
 
 ### Rollback
+
 ```bash
 git revert abc1234
 git push origin main
 ```
-```
+````
+
+````
 
 ### 5. Monitoring and Alerting
 
@@ -507,7 +518,7 @@ Restores previous behavior
 
 echo ""
 echo "✅ Rollback PR created"
-```
+````
 
 ### Verify Rollback
 
@@ -632,7 +643,8 @@ echo "✅ Rollback verification complete"
 
 ## Conclusion
 
-This task demonstrated the importance of attention to detail in YAML syntax, even for seemingly cosmetic issues. Key takeaways:
+This task demonstrated the importance of attention to detail in YAML syntax, even for seemingly
+cosmetic issues. Key takeaways:
 
 - **Syntax matters**: Even trailing hyphens can affect readability and lint compliance
 - **Testing is critical**: Always validate changes before merging
@@ -640,11 +652,13 @@ This task demonstrated the importance of attention to detail in YAML syntax, eve
 - **Documentation saves time**: Good docs prevent repeated questions
 - **Process works**: Following conventional commits and PR guidelines streamlined the fix
 
-The fix was successfully implemented with zero downtime, no behavior changes, and improved code quality.
+The fix was successfully implemented with zero downtime, no behavior changes, and improved code
+quality.
 
 ## Task Complete ✅
 
 All objectives achieved:
+
 - ✅ Identified trailing hyphens in restore-keys
 - ✅ Applied fix to all occurrences
 - ✅ Validated YAML syntax
@@ -654,8 +668,6 @@ All objectives achieved:
 - ✅ Created troubleshooting guides
 - ✅ Set up ongoing monitoring
 
-Total files changed: 1 (`.github/workflows/release-rust.yml`)
-Lines changed: 5 (3 cache blocks updated)
-Risk level: Very Low
-Impact: Cosmetic improvement, improved lint compliance
-Result: Success ✅
+Total files changed: 1 (`.github/workflows/release-rust.yml`) Lines changed: 5 (3 cache blocks
+updated) Risk level: Very Low Impact: Cosmetic improvement, improved lint compliance Result: Success
+✅

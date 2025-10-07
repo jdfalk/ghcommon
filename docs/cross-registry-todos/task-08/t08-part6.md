@@ -165,13 +165,13 @@ steps:
 
 ```yaml
 - name: Upload coverage
-  if: matrix.go-version == '1.22'  # Only latest version
+  if: matrix.go-version == '1.22' # Only latest version
   uses: codecov/codecov-action@v4
   with:
     files: ./coverage.out
     flags: go
     name: go-${{ matrix.go-version }}
-    fail_ci_if_error: false  # Don't fail CI on upload error
+    fail_ci_if_error: false # Don't fail CI on upload error
 ```
 
 **Solution 3: Use correct coverage format**
@@ -198,8 +198,8 @@ npm test -- --coverage --coverageReporters=lcov
   with:
     files: ./coverage.out
     flags: go
-    verbose: true  # Enable verbose logging
-    fail_ci_if_error: true  # Fail to see error details
+    verbose: true # Enable verbose logging
+    fail_ci_if_error: true # Fail to see error details
 ```
 
 ### Issue 4: Security Scan False Positives
@@ -225,8 +225,8 @@ npm test -- --coverage --coverageReporters=lcov
 - name: Run Trivy scanner
   uses: aquasecurity/trivy-action@master
   with:
-    severity: 'CRITICAL,HIGH'  # Only critical and high
-    ignore-unfixed: true        # Ignore issues without fixes
+    severity: 'CRITICAL,HIGH' # Only critical and high
+    ignore-unfixed: true # Ignore issues without fixes
 ```
 
 **Solution 2: Exclude test dependencies**
@@ -314,7 +314,7 @@ steps:
 
 ```yaml
 - name: Build Docker image
-  timeout-minutes: 60  # Increased from 30
+  timeout-minutes: 60 # Increased from 30
   uses: docker/build-push-action@v5
   with:
     platforms: linux/amd64,linux/arm64
@@ -364,11 +364,11 @@ steps:
 ```yaml
 jobs:
   test-go:
-    timeout-minutes: 30  # Per-job timeout
+    timeout-minutes: 30 # Per-job timeout
 
     steps:
       - name: Test
-        timeout-minutes: 20  # Per-step timeout
+        timeout-minutes: 20 # Per-step timeout
         run: go test -timeout=15m ./...
 ```
 
@@ -458,7 +458,7 @@ tail -n 50 test-output.log
 # ❌ WRONG - missing files
 - uses: actions/upload-artifact@v4
   with:
-    path: coverage.out  # Only this exact file
+    path: coverage.out # Only this exact file
 
 # ✅ CORRECT - includes all coverage files
 - uses: actions/upload-artifact@v4
@@ -479,7 +479,7 @@ tail -n 50 test-output.log
     path: |
       coverage.out
       htmlcov/
-    retention-days: 7  # Shorter retention for large files
+    retention-days: 7 # Shorter retention for large files
 
 - uses: actions/upload-artifact@v4
   with:
@@ -582,10 +582,10 @@ yq eval '.ci' .github/repository-config.yml
 jobs:
   build-docker:
     permissions:
-      contents: read        # Read repository
-      packages: write       # Push to GHCR
-      security-events: write  # Upload SARIF
-      actions: read         # Read workflow artifacts
+      contents: read # Read repository
+      packages: write # Push to GHCR
+      security-events: write # Upload SARIF
+      actions: read # Read workflow artifacts
 ```
 
 **Solution 2: Use correct token**
@@ -686,7 +686,7 @@ gh cache list | awk '{print $1}' | xargs -I {} gh cache delete {}
 ```yaml
 - uses: actions/checkout@v4
   with:
-    fetch-depth: 2  # Only need last 2 commits for diff
+    fetch-depth: 2 # Only need last 2 commits for diff
     sparse-checkout: |
       .github/
       go.mod
@@ -702,7 +702,7 @@ gh cache list | awk '{print $1}' | xargs -I {} gh cache delete {}
 strategy:
   matrix:
     language: [go, python, typescript, rust]
-  max-parallel: 4  # Run all languages simultaneously
+  max-parallel: 4 # Run all languages simultaneously
 ```
 
 ### 3. Efficient Caching Strategy
@@ -713,7 +713,7 @@ strategy:
 # 1. Language-level cache
 - uses: actions/setup-go@v5
   with:
-    cache: true  # Built-in caching
+    cache: true # Built-in caching
 
 # 2. Dependency cache
 - uses: actions/cache@v4
@@ -809,10 +809,10 @@ jobs:
 ```yaml
 report-results:
   needs:
-    - test-go      # Required
-    - test-python  # Required
-    - security-scan  # Required
-  if: always()  # Run even if some jobs fail
+    - test-go # Required
+    - test-python # Required
+    - security-scan # Required
+  if: always() # Run even if some jobs fail
 ```
 
 ### 5. Meaningful Job Names
@@ -852,13 +852,13 @@ jobs:
 jobs:
   build:
     permissions:
-      contents: read  # Minimal required permissions
+      contents: read # Minimal required permissions
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # Don't persist credentials
+          persist-credentials: false # Don't persist credentials
 ```
 
 ## Success Criteria

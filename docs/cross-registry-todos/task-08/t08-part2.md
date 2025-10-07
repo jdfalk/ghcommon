@@ -509,10 +509,10 @@ super-lint:
         VALIDATE_DOCKERFILE: true
         VALIDATE_DOCKERFILE_HADOLINT: true
         # Disable linters handled elsewhere
-        VALIDATE_GO: false  # Using golangci-lint
-        VALIDATE_PYTHON: false  # Using ruff
-        VALIDATE_JAVASCRIPT: false  # Using eslint
-        VALIDATE_TYPESCRIPT: false  # Using eslint
+        VALIDATE_GO: false # Using golangci-lint
+        VALIDATE_PYTHON: false # Using ruff
+        VALIDATE_JAVASCRIPT: false # Using eslint
+        VALIDATE_TYPESCRIPT: false # Using eslint
 ```
 
 **Strengths:**

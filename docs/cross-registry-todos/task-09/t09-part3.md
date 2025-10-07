@@ -6,7 +6,8 @@
 
 ## Phase 2: ubuntu-autoinstall-agent Migration
 
-After successfully migrating ghcommon, proceed with ubuntu-autoinstall-agent, which has more complex requirements.
+After successfully migrating ghcommon, proceed with ubuntu-autoinstall-agent, which has more complex
+requirements.
 
 ### Step 1: Analyze ubuntu-autoinstall-agent CI Workflow
 
@@ -662,6 +663,8 @@ gh run watch
 
 ---
 
-**Part 3 Complete**: Phase 2 ubuntu-autoinstall-agent migration with Rust-specific configuration, PR creation, comparison testing, and issue resolution. ✅
+**Part 3 Complete**: Phase 2 ubuntu-autoinstall-agent migration with Rust-specific configuration, PR
+creation, comparison testing, and issue resolution. ✅
 
-**Continue to Part 4** for batch repository migration strategies, template generation, and automated migration tools.
+**Continue to Part 4** for batch repository migration strategies, template generation, and automated
+migration tools.

@@ -9,17 +9,20 @@
 ### 1. Planning Phase Lessons
 
 **What Went Well:**
+
 - Created comprehensive repository inventory before starting migration
 - Identified all repositories with CI workflows upfront
 - Established clear success criteria and rollback procedures
 - Created detailed migration documentation for each repository
 
 **What Could Be Improved:**
+
 - Should have analyzed workflow complexity scores earlier
 - Could have created language-specific templates before bulk migration
 - Should have set up monitoring dashboard before first migration
 
 **Recommendations for Future Migrations:**
+
 - Always create inventory with complexity scoring
 - Set up monitoring first, then migrate
 - Create language-specific templates and test them thoroughly
@@ -28,18 +31,21 @@
 ### 2. Execution Phase Lessons
 
 **What Went Well:**
+
 - Phased approach (proof of concept → pilot → batch) worked well
 - Backup branches prevented data loss
 - PR-based approach allowed for review and validation
 - Automated tools reduced manual effort significantly
 
 **What Could Be Improved:**
+
 - Some repositories had unique CI requirements not covered by templates
 - Initial PR feedback led to template improvements
 - Some workflows needed custom configuration beyond standard templates
 - Repository-specific quirks required manual intervention
 
 **Recommendations:**
+
 - Always include "custom requirements" field in inventory
 - Create fallback mechanisms for edge cases
 - Document all repository-specific customizations
@@ -48,18 +54,21 @@
 ### 3. Technical Lessons
 
 **What Went Well:**
+
 - Reusable workflow pattern scales well across repositories
 - Centralized configuration in `repository-config.yml` simplifies maintenance
 - Matrix builds handle multi-platform requirements effectively
 - Caching strategies improved CI performance
 
 **What Could Be Improved:**
+
 - Some language-specific tooling required additional configuration
 - Cross-platform compatibility needed more attention (Windows/macOS)
 - Cache key strategies needed refinement for optimal hit rates
 - Some third-party actions had version compatibility issues
 
 **Recommendations:**
+
 - Test on all target platforms (Linux, macOS, Windows) before rollout
 - Document cache key strategies for each language/framework
 - Pin action versions for stability, but have update strategy
@@ -70,21 +79,24 @@
 ### Pitfall 1: Missing Repository-Config.yml
 
 **Problem:**
+
 - Repository calls reusable workflow but doesn't have `repository-config.yml`
 - CI fails with "Config file not found" error
 
 **Solution:**
+
 ```yaml
 # .github/workflows/ci.yml
 jobs:
   call-reusable-ci:
     uses: jdfalk/ghcommon/.github/workflows/reusable-ci.yml@main
     with:
-      config-file: .github/repository-config.yml  # Explicit path
+      config-file: .github/repository-config.yml # Explicit path
     secrets: inherit
 ```
 
 **Prevention:**
+
 - Always create `repository-config.yml` before updating `ci.yml`
 - Use validation script to check for config file before PR
 - Add pre-commit hook to verify config exists
@@ -92,26 +104,29 @@ jobs:
 ### Pitfall 2: Incorrect Language Detection
 
 **Problem:**
+
 - Repository has multiple languages but config only specifies one
 - CI skips important build/test steps
 
 **Solution:**
+
 ```yaml
 # .github/repository-config.yml
 repository:
   languages:
     - rust
-    - python  # Don't forget secondary languages!
+    - python # Don't forget secondary languages!
   language_metadata:
     rust:
       has_tests: true
-      test_command: "cargo test"
+      test_command: 'cargo test'
     python:
       has_tests: true
-      test_command: "pytest"
+      test_command: 'pytest'
 ```
 
 **Prevention:**
+
 - Use automated language detection script
 - Review generated config carefully
 - Test CI on feature branch before merging
@@ -119,10 +134,12 @@ repository:
 ### Pitfall 3: Platform-Specific Build Failures
 
 **Problem:**
+
 - CI passes on Linux but fails on macOS/Windows
 - Platform-specific dependencies not installed
 
 **Solution:**
+
 ```yaml
 # .github/repository-config.yml
 ci:
@@ -133,14 +150,15 @@ ci:
       - os: macos-latest
         target: x86_64-apple-darwin
         setup_commands:
-          - brew install llvm  # macOS-specific
+          - brew install llvm # macOS-specific
       - os: windows-latest
         target: x86_64-pc-windows-msvc
         setup_commands:
-          - choco install llvm  # Windows-specific
+          - choco install llvm # Windows-specific
 ```
 
 **Prevention:**
+
 - Always test on all target platforms
 - Document platform-specific requirements
 - Create platform-specific setup scripts
@@ -148,10 +166,12 @@ ci:
 ### Pitfall 4: Secrets Not Available
 
 **Problem:**
+
 - Reusable workflow needs secrets that aren't passed from caller
 - Deployment steps fail due to missing credentials
 
 **Solution:**
+
 ```yaml
 # .github/workflows/ci.yml (caller workflow)
 jobs:
@@ -168,6 +188,7 @@ jobs:
 ```
 
 **Prevention:**
+
 - Use `secrets: inherit` for maximum compatibility
 - Document which secrets are required
 - Validate secrets availability before deployment steps
@@ -177,17 +198,18 @@ jobs:
 ### 1. Repository Configuration
 
 **Standard Structure:**
+
 ```yaml
 repository:
-  name: "repo-name"
-  languages: ["rust", "python"]
+  name: 'repo-name'
+  languages: ['rust', 'python']
   language_metadata:
     rust:
       has_tests: true
-      test_command: "cargo test --all-features"
+      test_command: 'cargo test --all-features'
     python:
       has_tests: true
-      test_command: "pytest tests/"
+      test_command: 'pytest tests/'
 
 ci:
   build:
@@ -205,12 +227,13 @@ ci:
     enabled: true
     tools:
       - name: rustfmt
-        command: "cargo fmt -- --check"
+        command: 'cargo fmt -- --check'
       - name: clippy
-        command: "cargo clippy -- -D warnings"
+        command: 'cargo clippy -- -D warnings'
 ```
 
 **Guidelines:**
+
 - Always specify `has_tests` and `test_command` for each language
 - Enable coverage for all repositories
 - Set reasonable coverage thresholds (70-90%)
@@ -219,6 +242,7 @@ ci:
 ### 2. Workflow Structure
 
 **Standard Pattern:**
+
 ```yaml
 name: CI
 
@@ -238,6 +262,7 @@ jobs:
 ```
 
 **Guidelines:**
+
 - Keep caller workflow minimal (< 20 lines)
 - Use `workflow_dispatch` for manual testing
 - Trigger on push to main and PRs
@@ -246,6 +271,7 @@ jobs:
 ### 3. Testing Strategy
 
 **Multi-Phase Testing:**
+
 1. **Local Testing**: Use workflow validation tools before commit
 2. **Feature Branch**: Test on feature branch with full CI run
 3. **PR Review**: Have team review PR and CI results
@@ -253,6 +279,7 @@ jobs:
 5. **Production**: Merge to main after validation
 
 **Guidelines:**
+
 - Never merge without green CI
 - Review CI logs even for passing runs
 - Compare performance metrics before/after
@@ -336,12 +363,15 @@ jobs:
 ### Repositories Migrated
 
 **Phase 1 (Proof of Concept):**
+
 - ✅ `ghcommon` - Successfully migrated, all jobs passing
 
 **Phase 2 (Pilot):**
+
 - ✅ `ubuntu-autoinstall-agent` - Successfully migrated, Rust-specific config working
 
 **Phase 3 (Batch Migration):**
+
 - Status: Ready to proceed with remaining repositories
 - Estimated timeline: 2-4 weeks depending on repository count
 - Risk level: Low (templates validated, rollback procedures in place)
@@ -366,6 +396,7 @@ jobs:
 ## Task 09 Complete ✅
 
 **Summary:**
+
 - Created comprehensive CI migration strategy with phased rollout
 - Developed automation tools for repository inventory, config generation, and validation
 - Established monitoring dashboard and performance tracking
@@ -373,6 +404,7 @@ jobs:
 - Successfully migrated proof-of-concept and pilot repositories
 
 **Deliverables:**
+
 1. Migration inventory script
 2. Config generation tool with language detection
 3. Bulk migration automation
@@ -382,6 +414,7 @@ jobs:
 7. Lessons learned and best practices guide
 
 **Next Steps:**
+
 1. Proceed with batch migration of remaining repositories
 2. Continue monitoring CI metrics and performance
 3. Refine templates based on additional repository requirements

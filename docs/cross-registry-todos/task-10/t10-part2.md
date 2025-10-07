@@ -87,7 +87,7 @@ jobs:
           image-ref: ${{ inputs.image-ref }}
           format: 'table'
           severity: ${{ inputs.severity }}
-          exit-code: '0'  # Don't fail, just report
+          exit-code: '0' # Don't fail, just report
           vuln-type: 'os,library'
           scanners: 'vuln,secret,config'
 
@@ -115,52 +115,52 @@ Update `.github/workflows/reusable-docker.yml`:
 
 ```yaml
 # Add to reusable-docker.yml after build job
-  trivy-scan:
-    name: Trivy Security Scan
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
+trivy-scan:
+  name: Trivy Security Scan
+  needs: build
+  runs-on: ubuntu-latest
+  permissions:
+    contents: read
+    security-events: write
 
-    strategy:
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+  strategy:
+    matrix:
+      platform:
+        - linux/amd64
+        - linux/arm64
 
-    steps:
-      - name: Download Docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image-${{ matrix.platform }}
-          path: /tmp
+  steps:
+    - name: Download Docker image
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image-${{ matrix.platform }}
+        path: /tmp
 
-      - name: Load Docker image
-        run: docker load -i /tmp/image.tar
+    - name: Load Docker image
+      run: docker load -i /tmp/image.tar
 
-      - name: Get image reference
-        id: image-ref
-        run: |
-          IMAGE_REF=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n1)
-          echo "image-ref=${IMAGE_REF}" >> $GITHUB_OUTPUT
+    - name: Get image reference
+      id: image-ref
+      run: |
+        IMAGE_REF=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n1)
+        echo "image-ref=${IMAGE_REF}" >> $GITHUB_OUTPUT
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: 'image'
-          image-ref: ${{ steps.image-ref.outputs.image-ref }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: 'image'
+        image-ref: ${{ steps.image-ref.outputs.image-ref }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+        exit-code: '1'
 
-      - name: Upload Trivy results to GitHub Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-          category: 'trivy-${{ matrix.platform }}'
+    - name: Upload Trivy results to GitHub Security
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+        category: 'trivy-${{ matrix.platform }}'
 ```
 
 ## Grype Integration for Redundant Scanning
@@ -325,48 +325,48 @@ For repositories using GitHub Container Registry:
 
 ```yaml
 # Add to Docker workflow after push to ghcr.io
-  docker-scout:
-    name: Docker Scout Analysis
-    needs: push
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-      security-events: write
+docker-scout:
+  name: Docker Scout Analysis
+  needs: push
+  runs-on: ubuntu-latest
+  permissions:
+    contents: read
+    packages: read
+    security-events: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker Scout CVE Analysis
-        uses: docker/scout-action@v1
-        with:
-          command: cves
-          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
-          only-severities: critical,high
-          exit-code: true
-          sarif-file: docker-scout-results.sarif
+    - name: Docker Scout CVE Analysis
+      uses: docker/scout-action@v1
+      with:
+        command: cves
+        image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+        only-severities: critical,high
+        exit-code: true
+        sarif-file: docker-scout-results.sarif
 
-      - name: Upload Docker Scout results to GitHub Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'docker-scout-results.sarif'
-          category: 'docker-scout'
+    - name: Upload Docker Scout results to GitHub Security
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'docker-scout-results.sarif'
+        category: 'docker-scout'
 
-      - name: Docker Scout Recommendations
-        if: always()
-        uses: docker/scout-action@v1
-        with:
-          command: recommendations
-          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    - name: Docker Scout Recommendations
+      if: always()
+      uses: docker/scout-action@v1
+      with:
+        command: recommendations
+        image: ghcr.io/${{ github.repository }}:${{ github.sha }}
 ```
 
 ## Multi-Stage Security Scanning Strategy
@@ -494,7 +494,7 @@ jobs:
         with:
           command: cves
           image: jdfalk/test:latest
-          exit-code: false  # Don't fail, just report
+          exit-code: false # Don't fail, just report
 
   # Stage 5: Security summary
   security-summary:
@@ -546,6 +546,8 @@ jobs:
 
 ---
 
-**Part 2 Complete**: Trivy/Grype integration, SBOM generation, Docker Scout, multi-stage container security scanning. ✅
+**Part 2 Complete**: Trivy/Grype integration, SBOM generation, Docker Scout, multi-stage container
+security scanning. ✅
 
-**Continue to Part 3** for language-specific dependency scanning tools (cargo-audit, pip-audit, npm audit, govulncheck).
+**Continue to Part 3** for language-specific dependency scanning tools (cargo-audit, pip-audit, npm
+audit, govulncheck).

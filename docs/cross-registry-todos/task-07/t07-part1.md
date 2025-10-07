@@ -6,9 +6,7 @@
 
 ## Task Overview
 
-**Priority:** 2 (High)
-**Estimated Lines:** ~3,500 lines (6 parts)
-**Complexity:** High
+**Priority:** 2 (High) **Estimated Lines:** ~3,500 lines (6 parts) **Complexity:** High
 **Dependencies:** Tasks 01, 03 (Rust), 04 (Go), 05 (Python), 06 (npm)
 
 ## Objective
@@ -75,11 +73,11 @@ protobuf-release.yml
 
 ```yaml
 # In repository settings > Secrets and variables > Actions
-BUF_TOKEN:                    # Buf Schema Registry authentication
-CARGO_REGISTRY_TOKEN:         # crates.io publishing
-NPM_TOKEN:                    # npm registry publishing
-PYPI_TOKEN:                   # PyPI publishing
-GITHUB_TOKEN:                 # Automatic (GitHub Packages, releases)
+BUF_TOKEN: # Buf Schema Registry authentication
+CARGO_REGISTRY_TOKEN: # crates.io publishing
+NPM_TOKEN: # npm registry publishing
+PYPI_TOKEN: # PyPI publishing
+GITHUB_TOKEN: # Automatic (GitHub Packages, releases)
 ```
 
 ### Repository Structure
@@ -121,6 +119,7 @@ repository/
 ### BSR vs Traditional Protobuf
 
 **Traditional Approach:**
+
 - Protobuf files in git repository
 - Manual dependency management
 - Copy/paste across repositories
@@ -128,6 +127,7 @@ repository/
 - Per-repository code generation
 
 **BSR Approach:**
+
 - Centralized schema registry
 - Automatic dependency resolution
 - Import from BSR (`buf.build/org/repo`)
@@ -139,6 +139,7 @@ repository/
 **Format:** `buf.build/{owner}/{repository}`
 
 **Example:**
+
 ```
 buf.build/jdfalk/ghcommon
 ├── proto/v1/           # Module: proto/v1
@@ -149,6 +150,7 @@ buf.build/jdfalk/ghcommon
 ```
 
 **Commits and Tags:**
+
 - **Commits**: Immutable SHA references (like git)
 - **Tags**: Human-readable version labels (v1.0.0)
 - **Branches**: Not supported (BSR is append-only)
@@ -285,22 +287,25 @@ Examples:
 on:
   push:
     tags:
-      - 'proto-v*'      # Trigger on protobuf version tags
+      - 'proto-v*' # Trigger on protobuf version tags
 ```
 
 ### Semantic Versioning for Protobuf
 
 **Patch (x.y.Z):**
+
 - Documentation changes
 - New optional fields
 - New RPC methods (backward compatible)
 
 **Minor (x.Y.z):**
+
 - New message types
 - New service definitions
 - New enum values (backward compatible)
 
 **Major (X.y.z):**
+
 - Removed fields
 - Changed field types
 - Removed RPCs

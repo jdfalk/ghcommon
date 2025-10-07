@@ -452,7 +452,7 @@ fi
 2. **pyproject.toml** or **setup.py**
    - Read version from package configuration
 
-3. ****version**.py**
+3. \***\*version**.py\*\*
    - Read from version module
 
 **Version Synchronization:**

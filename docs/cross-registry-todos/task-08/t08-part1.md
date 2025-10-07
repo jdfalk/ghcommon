@@ -6,9 +6,7 @@
 
 ## Task Overview
 
-**Priority:** 3 (High)
-**Estimated Lines:** ~3,500 lines (6 parts)
-**Complexity:** High
+**Priority:** 3 (High) **Estimated Lines:** ~3,500 lines (6 parts) **Complexity:** High
 **Dependencies:** Tasks 01-07
 
 ## Objective
@@ -18,7 +16,8 @@ Consolidate and merge the two CI workflow implementations:
 1. **ghcommon/reusable-ci.yml** - Reusable workflow for cross-repository use
 2. **ubuntu-autoinstall-agent/ci.yml** - Specific implementation with advanced features
 
-Create a unified, feature-complete reusable CI workflow that can be used across all repositories while maintaining backward compatibility and adding missing features.
+Create a unified, feature-complete reusable CI workflow that can be used across all repositories
+while maintaining backward compatibility and adding missing features.
 
 ## What This Task Accomplishes
 
@@ -36,6 +35,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 #### ghcommon/reusable-ci.yml (Reusable)
 
 **Current Features:**
+
 - Reusable workflow design (`workflow_call`)
 - Change detection with intelligent file filtering
 - Multi-language support (Go, Python, TypeScript, Rust)
@@ -44,6 +44,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 - Basic matrix strategy
 
 **Missing Features:**
+
 - Code coverage reporting
 - Security scanning (Trivy, Snyk)
 - Super-linter integration
@@ -55,6 +56,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 #### ubuntu-autoinstall-agent/ci.yml (Specific)
 
 **Current Features:**
+
 - Comprehensive change detection
 - Super-linter integration
 - Code coverage (codecov, llvm-cov)
@@ -66,6 +68,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 - Detailed job outputs
 
 **Limitations:**
+
 - Not reusable across repositories
 - Hard-coded repository-specific values
 - Duplication with reusable workflow
@@ -73,6 +76,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 ## Consolidation Strategy
 
 ### Phase 1: Analysis
+
 1. Extract all features from both workflows
 2. Create feature matrix comparison
 3. Identify overlapping functionality
@@ -80,6 +84,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 5. Plan integration approach
 
 ### Phase 2: Design
+
 1. Design unified workflow structure
 2. Define reusable inputs/outputs
 3. Plan backward compatibility
@@ -87,6 +92,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 5. Document migration path
 
 ### Phase 3: Implementation
+
 1. Merge workflows into single reusable workflow
 2. Add missing features from ubuntu-autoinstall-agent
 3. Implement repository-config.yml integration
@@ -94,6 +100,7 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 5. Enhance test reporting
 
 ### Phase 4: Migration
+
 1. Update ghcommon to use consolidated workflow
 2. Update ubuntu-autoinstall-agent to use consolidated workflow
 3. Update other repositories
@@ -106,109 +113,109 @@ Create a unified, feature-complete reusable CI workflow that can be used across 
 
 | Feature                           | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | --------------------------------- | ------------------------ | ------------------------------- |
-| Go files detection                | ✅                        | ✅                               |
-| Python files detection            | ✅                        | ✅                               |
-| TypeScript/Frontend detection     | ✅                        | ✅                               |
-| Rust files detection              | ✅                        | ✅                               |
-| Docker files detection            | ✅                        | ✅                               |
-| Documentation detection           | ❌                        | ✅                               |
-| GitHub Actions workflow detection | ❌                        | ✅                               |
-| Configuration file detection      | ❌                        | ✅                               |
-| Test file detection               | ✅ Basic                  | ✅ Advanced                      |
-| Output variables                  | ✅                        | ✅                               |
+| Go files detection                | ✅                       | ✅                              |
+| Python files detection            | ✅                       | ✅                              |
+| TypeScript/Frontend detection     | ✅                       | ✅                              |
+| Rust files detection              | ✅                       | ✅                              |
+| Docker files detection            | ✅                       | ✅                              |
+| Documentation detection           | ❌                       | ✅                              |
+| GitHub Actions workflow detection | ❌                       | ✅                              |
+| Configuration file detection      | ❌                       | ✅                              |
+| Test file detection               | ✅ Basic                 | ✅ Advanced                     |
+| Output variables                  | ✅                       | ✅                              |
 
 ### Go Jobs
 
 | Feature              | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | -------------------- | ------------------------ | ------------------------------- |
-| Build                | ✅                        | ✅                               |
-| Test                 | ✅                        | ✅                               |
-| Lint (golangci-lint) | ✅                        | ✅                               |
-| Code coverage        | ❌                        | ✅ (codecov)                     |
-| Multiple Go versions | ❌                        | ✅ Matrix                        |
-| Dependency caching   | ✅ Basic                  | ✅ Advanced                      |
-| Build artifacts      | ✅                        | ✅                               |
-| Benchmarks           | ❌                        | ✅                               |
-| Race detection       | ❌                        | ✅                               |
+| Build                | ✅                       | ✅                              |
+| Test                 | ✅                       | ✅                              |
+| Lint (golangci-lint) | ✅                       | ✅                              |
+| Code coverage        | ❌                       | ✅ (codecov)                    |
+| Multiple Go versions | ❌                       | ✅ Matrix                       |
+| Dependency caching   | ✅ Basic                 | ✅ Advanced                     |
+| Build artifacts      | ✅                       | ✅                              |
+| Benchmarks           | ❌                       | ✅                              |
+| Race detection       | ❌                       | ✅                              |
 
 ### Python Jobs
 
 | Feature                  | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | ------------------------ | ------------------------ | ------------------------------- |
-| Build/Install            | ✅                        | ✅                               |
-| Test (pytest)            | ✅                        | ✅                               |
-| Lint (flake8/black)      | ✅                        | ✅ (ruff)                        |
-| Type checking (mypy)     | ❌                        | ✅                               |
-| Code coverage            | ❌                        | ✅ (pytest-cov)                  |
-| Multiple Python versions | ❌                        | ✅ Matrix                        |
-| Virtual environment      | ✅                        | ✅                               |
-| Requirements caching     | ✅                        | ✅                               |
-| Test reports             | ❌                        | ✅                               |
+| Build/Install            | ✅                       | ✅                              |
+| Test (pytest)            | ✅                       | ✅                              |
+| Lint (flake8/black)      | ✅                       | ✅ (ruff)                       |
+| Type checking (mypy)     | ❌                       | ✅                              |
+| Code coverage            | ❌                       | ✅ (pytest-cov)                 |
+| Multiple Python versions | ❌                       | ✅ Matrix                       |
+| Virtual environment      | ✅                       | ✅                              |
+| Requirements caching     | ✅                       | ✅                              |
+| Test reports             | ❌                       | ✅                              |
 
 ### TypeScript/Frontend Jobs
 
 | Feature                | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | ---------------------- | ------------------------ | ------------------------------- |
-| Build                  | ✅                        | ✅                               |
-| Test                   | ✅                        | ✅                               |
-| Lint (eslint)          | ✅                        | ✅                               |
-| Type checking (tsc)    | ✅                        | ✅                               |
-| Code coverage          | ❌                        | ✅ (jest/vitest)                 |
-| Multiple Node versions | ❌                        | ✅ Matrix                        |
-| npm/yarn/pnpm support  | ✅                        | ✅                               |
-| Build artifact upload  | ✅                        | ✅                               |
-| Bundle size analysis   | ❌                        | ✅                               |
+| Build                  | ✅                       | ✅                              |
+| Test                   | ✅                       | ✅                              |
+| Lint (eslint)          | ✅                       | ✅                              |
+| Type checking (tsc)    | ✅                       | ✅                              |
+| Code coverage          | ❌                       | ✅ (jest/vitest)                |
+| Multiple Node versions | ❌                       | ✅ Matrix                       |
+| npm/yarn/pnpm support  | ✅                       | ✅                              |
+| Build artifact upload  | ✅                       | ✅                              |
+| Bundle size analysis   | ❌                       | ✅                              |
 
 ### Rust Jobs
 
 | Feature                | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | ---------------------- | ------------------------ | ------------------------------- |
-| Build                  | ✅                        | ✅                               |
-| Test                   | ✅                        | ✅                               |
-| Clippy linting         | ✅                        | ✅                               |
-| Rustfmt checking       | ✅                        | ✅                               |
-| Code coverage          | ❌                        | ✅ (llvm-cov)                    |
-| Multiple Rust versions | ❌                        | ✅ Matrix                        |
-| Cargo caching          | ✅                        | ✅ Advanced                      |
-| Cross-compilation      | ❌                        | ✅                               |
-| Benchmarks             | ❌                        | ✅                               |
+| Build                  | ✅                       | ✅                              |
+| Test                   | ✅                       | ✅                              |
+| Clippy linting         | ✅                       | ✅                              |
+| Rustfmt checking       | ✅                       | ✅                              |
+| Code coverage          | ❌                       | ✅ (llvm-cov)                   |
+| Multiple Rust versions | ❌                       | ✅ Matrix                       |
+| Cargo caching          | ✅                       | ✅ Advanced                     |
+| Cross-compilation      | ❌                       | ✅                              |
+| Benchmarks             | ❌                       | ✅                              |
 
 ### Docker Jobs
 
 | Feature               | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | --------------------- | ------------------------ | ------------------------------- |
-| Image building        | ✅                        | ✅                               |
-| Multi-platform builds | ✅                        | ✅                               |
-| Security scanning     | ❌                        | ✅ (Trivy)                       |
-| SBOM generation       | ❌                        | ✅ (syft)                        |
-| Image signing         | ❌                        | ✅ (Cosign)                      |
-| Layer caching         | ✅                        | ✅                               |
-| Registry push         | ✅                        | ✅                               |
-| Size optimization     | ❌                        | ✅                               |
+| Image building        | ✅                       | ✅                              |
+| Multi-platform builds | ✅                       | ✅                              |
+| Security scanning     | ❌                       | ✅ (Trivy)                      |
+| SBOM generation       | ❌                       | ✅ (syft)                       |
+| Image signing         | ❌                       | ✅ (Cosign)                     |
+| Layer caching         | ✅                       | ✅                              |
+| Registry push         | ✅                       | ✅                              |
+| Size optimization     | ❌                       | ✅                              |
 
 ### Quality & Security
 
 | Feature            | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | ------------------ | ------------------------ | ------------------------------- |
-| Super-linter       | ❌                        | ✅                               |
-| CodeQL             | ❌                        | ✅                               |
-| Dependency review  | ❌                        | ✅                               |
-| License checking   | ❌                        | ✅                               |
-| Secret scanning    | ❌                        | ✅                               |
-| SARIF upload       | ❌                        | ✅                               |
-| Security reporting | ❌                        | ✅                               |
+| Super-linter       | ❌                       | ✅                              |
+| CodeQL             | ❌                       | ✅                              |
+| Dependency review  | ❌                       | ✅                              |
+| License checking   | ❌                       | ✅                              |
+| Secret scanning    | ❌                       | ✅                              |
+| SARIF upload       | ❌                       | ✅                              |
+| Security reporting | ❌                       | ✅                              |
 
 ### Reporting & Artifacts
 
 | Feature             | ghcommon/reusable-ci.yml | ubuntu-autoinstall-agent/ci.yml |
 | ------------------- | ------------------------ | ------------------------------- |
-| Test result upload  | ❌                        | ✅                               |
-| Coverage reports    | ❌                        | ✅                               |
-| Build artifacts     | ✅                        | ✅                               |
-| Performance metrics | ❌                        | ✅                               |
-| Job summaries       | ❌                        | ✅                               |
-| Badge generation    | ❌                        | ✅                               |
-| Retention policies  | ✅ Basic                  | ✅ Advanced                      |
+| Test result upload  | ❌                       | ✅                              |
+| Coverage reports    | ❌                       | ✅                              |
+| Build artifacts     | ✅                       | ✅                              |
+| Performance metrics | ❌                       | ✅                              |
+| Job summaries       | ❌                       | ✅                              |
+| Badge generation    | ❌                       | ✅                              |
+| Retention policies  | ✅ Basic                 | ✅ Advanced                     |
 
 ## Proposed Consolidated Workflow Structure
 
@@ -353,34 +360,34 @@ ci:
   languages:
     go:
       enabled: true
-      versions: ["1.21", "1.22"]
-      test-command: "go test -v -race -coverprofile=coverage.out ./..."
-      lint-command: "golangci-lint run"
-      benchmark-command: "go test -bench=. -benchmem"
+      versions: ['1.21', '1.22']
+      test-command: 'go test -v -race -coverprofile=coverage.out ./...'
+      lint-command: 'golangci-lint run'
+      benchmark-command: 'go test -bench=. -benchmem'
       coverage-threshold: 80
 
     python:
       enabled: true
-      versions: ["3.10", "3.11", "3.12"]
-      test-command: "pytest -v --cov --cov-report=xml"
-      lint-command: "ruff check ."
-      type-check-command: "mypy ."
+      versions: ['3.10', '3.11', '3.12']
+      test-command: 'pytest -v --cov --cov-report=xml'
+      lint-command: 'ruff check .'
+      type-check-command: 'mypy .'
       coverage-threshold: 85
 
     typescript:
       enabled: true
-      versions: ["18", "20"]
-      test-command: "npm test"
-      lint-command: "npm run lint"
-      build-command: "npm run build"
+      versions: ['18', '20']
+      test-command: 'npm test'
+      lint-command: 'npm run lint'
+      build-command: 'npm run build'
       coverage-threshold: 75
 
     rust:
       enabled: true
-      versions: ["stable", "nightly"]
-      test-command: "cargo test --all-features"
-      lint-command: "cargo clippy -- -D warnings"
-      coverage-command: "cargo llvm-cov --all-features --lcov"
+      versions: ['stable', 'nightly']
+      test-command: 'cargo test --all-features'
+      lint-command: 'cargo clippy -- -D warnings'
+      coverage-command: 'cargo llvm-cov --all-features --lcov'
       coverage-threshold: 90
 
   # Feature flags
@@ -393,33 +400,33 @@ ci:
 
   # Docker configuration
   docker:
-    platforms: ["linux/amd64", "linux/arm64"]
-    registry: "ghcr.io"
+    platforms: ['linux/amd64', 'linux/arm64']
+    registry: 'ghcr.io'
     scan-security: true
     generate-sbom: true
 
   # Change detection patterns
   change-detection:
     go:
-      - "**/*.go"
-      - "go.mod"
-      - "go.sum"
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
     python:
-      - "**/*.py"
-      - "requirements*.txt"
-      - "pyproject.toml"
-      - "setup.py"
+      - '**/*.py'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+      - 'setup.py'
     typescript:
-      - "**/*.ts"
-      - "**/*.tsx"
-      - "**/*.js"
-      - "**/*.jsx"
-      - "package.json"
-      - "package-lock.json"
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - 'package.json'
+      - 'package-lock.json'
     rust:
-      - "**/*.rs"
-      - "Cargo.toml"
-      - "Cargo.lock"
+      - '**/*.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
 ```
 
 ## Migration Path

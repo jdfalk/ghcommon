@@ -6,16 +6,16 @@
 
 ## Task Overview
 
-**Priority:** 1 (Critical - Syntax Error)
-**Estimated Lines:** ~3,500 lines (6 parts)
-**Complexity:** Low (Simple fix, but comprehensive documentation)
-**Impact:** High (Affects cache performance across all Rust releases)
+**Priority:** 1 (Critical - Syntax Error) **Estimated Lines:** ~3,500 lines (6 parts)
+**Complexity:** Low (Simple fix, but comprehensive documentation) **Impact:** High (Affects cache
+performance across all Rust releases)
 
 ## What We're Fixing
 
 ### The Problem
 
-The `release-rust.yml` workflow contains YAML syntax errors in the cache `restore-keys` configuration. Trailing hyphens in YAML sequences cause:
+The `release-rust.yml` workflow contains YAML syntax errors in the cache `restore-keys`
+configuration. Trailing hyphens in YAML sequences cause:
 
 1. **Cache restoration failures** - Keys may not match properly
 2. **GitHub Actions warnings** - Syntax validation issues
@@ -63,16 +63,19 @@ The `release-rust.yml` workflow contains YAML syntax errors in the cache `restor
 GitHub Actions cache matching works with prefix matching:
 
 **Primary Key:**
+
 ```
 linux-cargo-abc123def456
 ```
 
 **Restore Keys (Incorrect with trailing hyphen):**
+
 ```
 linux-cargo-
 ```
 
 **Restore Keys (Correct without trailing hyphen):**
+
 ```
 linux-cargo
 ```
@@ -117,6 +120,7 @@ restore-keys: |
 **Purpose:** Multi-platform Rust binary release workflow
 
 **Key Features:**
+
 - Cross-compilation for Linux (x86_64, aarch64)
 - macOS builds (Intel, Apple Silicon)
 - Windows builds
@@ -132,6 +136,7 @@ The workflow uses a hierarchical cache key strategy:
 3. **Generic fallback:** `{os}-cargo`
 
 This allows:
+
 - Reusing cache when Cargo.lock unchanged
 - Falling back to rust-version cache when dependencies change
 - Ultimate fallback to any Rust cache for that OS
@@ -251,7 +256,8 @@ restore-keys: |
   ${{ runner.os }}-cargo-
 ```
 
-The trailing hyphen in `cargo-` is part of the STRING value, not YAML syntax. However, it looks ambiguous:
+The trailing hyphen in `cargo-` is part of the STRING value, not YAML syntax. However, it looks
+ambiguous:
 
 1. Is it the start of another list item?
 2. Is it part of the string?
@@ -275,11 +281,13 @@ Any repository using ghcommon workflows as templates or examples.
 ### Build Impact
 
 **Before Fix:**
+
 - Cache may or may not restore properly (parser-dependent)
 - Potential warnings in Actions logs
 - Inconsistent cache hit rates
 
 **After Fix:**
+
 - Clean YAML syntax
 - Consistent cache restoration
 - No ambiguity in cache key matching
@@ -296,6 +304,7 @@ Any repository using ghcommon workflows as templates or examples.
 - Backward compatible (cache keys still match)
 
 **Testing Required:**
+
 - YAML syntax validation
 - Cache key matching verification
 - Test workflow execution

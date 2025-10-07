@@ -648,6 +648,8 @@ jobs:
 
 ---
 
-**Part 3 Complete**: Language-specific dependency scanning (Rust, Python, JavaScript, Go) with cargo-audit, pip-audit, npm audit, govulncheck, and more. ✅
+**Part 3 Complete**: Language-specific dependency scanning (Rust, Python, JavaScript, Go) with
+cargo-audit, pip-audit, npm audit, govulncheck, and more. ✅
 
-**Continue to Part 4** for secret scanning (Gitleaks, TruffleHog), SAST (Semgrep), and IaC scanning (Checkov, tfsec).
+**Continue to Part 4** for secret scanning (Gitleaks, TruffleHog), SAST (Semgrep), and IaC scanning
+(Checkov, tfsec).

@@ -15,6 +15,7 @@ ERROR: failed to solve: executor failed running [/bin/sh -c cargo build --releas
 ```
 
 **Cause:**
+
 - ARM64 emulation on x86_64 is slower
 - Large Rust/Go projects take longer to compile
 - Default timeout too short
@@ -30,7 +31,7 @@ ERROR: failed to solve: executor failed running [/bin/sh -c cargo build --releas
       BUILDKIT_STEP_LOG_MAX_SIZE=50000000
     env:
       DOCKER_BUILDKIT: 1
-    timeout-minutes: 60  # Extended timeout
+    timeout-minutes: 60 # Extended timeout
 ```
 
 **Or build platforms separately:**
@@ -101,11 +102,13 @@ echo "✅ Diagnosis complete"
 **Solutions:**
 
 1. **Use cache-mode=max:**
+
 ```yaml
 cache-to: type=gha,mode=max
 ```
 
 2. **Pin base image versions:**
+
 ```dockerfile
 # Bad - changes frequently
 FROM alpine:latest
@@ -115,6 +118,7 @@ FROM alpine:3.18
 ```
 
 3. **Order Dockerfile efficiently:**
+
 ```dockerfile
 # Install deps first (cached)
 COPY package.json package-lock.json ./
@@ -133,6 +137,7 @@ ERROR: failed to push: unexpected status from POST request to https://ghcr.io/v2
 ```
 
 **Cause:**
+
 - Multi-platform manifest incompatibility
 - Registry doesn't support OCI format
 
@@ -144,8 +149,8 @@ ERROR: failed to push: unexpected status from POST request to https://ghcr.io/v2
   with:
     platforms: linux/amd64,linux/arm64
     push: true
-    provenance: false  # Disable if causing issues
-    outputs: type=image,push=true,oci-mediatypes=false  # Use Docker format
+    provenance: false # Disable if causing issues
+    outputs: type=image,push=true,oci-mediatypes=false # Use Docker format
 ```
 
 ### Issue 4: Authentication Failed
@@ -191,19 +196,22 @@ echo "✅ Authentication working"
 **Solutions:**
 
 1. **Check workflow permissions:**
+
 ```yaml
 permissions:
   contents: read
-  packages: write  # Required
+  packages: write # Required
 ```
 
 2. **Verify token scope:**
+
 ```bash
 # Token needs: write:packages, delete:packages
 gh auth status
 ```
 
 3. **Check repository settings:**
+
 - Settings → Actions → General → Workflow permissions
 - Set to "Read and write permissions"
 
@@ -216,6 +224,7 @@ FATAL: failed to scan image: unable to initialize scanner: repository not found
 ```
 
 **Cause:**
+
 - Image not pushed yet
 - Wrong image reference
 - Network issues
@@ -277,6 +286,7 @@ tags: |
 ```
 
 **Benefits:**
+
 - Users can pin to major version: `image:1`
 - Or minor version: `image:1.2`
 - Or exact version: `image:1.2.3`
@@ -377,7 +387,7 @@ platforms: windows/amd64
 
 **Example README.md:**
 
-```markdown
+````markdown
 # Docker Image: test-app
 
 ## Quick Start
@@ -386,6 +396,7 @@ platforms: windows/amd64
 docker pull ghcr.io/jdfalk/ghcommon/test-app:latest
 docker run -p 8080:8080 ghcr.io/jdfalk/ghcommon/test-app:latest
 ```
+````
 
 ## Supported Platforms
 
@@ -401,6 +412,7 @@ docker run -p 8080:8080 ghcr.io/jdfalk/ghcommon/test-app:latest
 ## Security
 
 Images are:
+
 - ✅ Scanned with Trivy
 - ✅ Signed with Cosign
 - ✅ SBOM included
@@ -424,6 +436,7 @@ curl http://localhost:8080/health
 ## License
 
 MIT
+
 ```
 
 ## Lessons Learned
@@ -537,3 +550,4 @@ Docker package publishing to GitHub Container Registry (ghcr.io) has been verifi
 - Update documentation as needed
 
 Total Task 02 lines: ~3,600 lines (6 parts) ✅
+```

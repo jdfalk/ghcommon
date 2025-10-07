@@ -42,11 +42,13 @@ The publishing job can benefit from Cargo's build cache to speed up verification
 - May not be needed if using `--no-verify`
 - Adds complexity to workflow
 
-**Recommendation**: Skip caching for publishing job since we use `--no-verify` and the build-rust job already validates everything.
+**Recommendation**: Skip caching for publishing job since we use `--no-verify` and the build-rust
+job already validates everything.
 
 ### Parallel Execution
 
-The publishing job already runs in parallel with the build-rust job's matrix builds by design. However, we can optimize the verification steps:
+The publishing job already runs in parallel with the build-rust job's matrix builds by design.
+However, we can optimize the verification steps:
 
 ```yaml
 - name: Parallel verification checks
@@ -77,7 +79,8 @@ The publishing job already runs in parallel with the build-rust job's matrix bui
 - More complex error handling
 - Harder to debug failures
 
-**Recommendation**: Current sequential approach is clear and fast enough. Parallel optimization provides minimal benefit (< 5 seconds).
+**Recommendation**: Current sequential approach is clear and fast enough. Parallel optimization
+provides minimal benefit (< 5 seconds).
 
 ### Network Optimization
 
@@ -276,7 +279,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 Create a comprehensive README for package users:
 
-```markdown
+````markdown
 # Ubuntu Autoinstall Agent
 
 [![Crates.io](https://img.shields.io/crates/v/ubuntu-autoinstall-agent.svg)](https://crates.io/crates/ubuntu-autoinstall-agent)
@@ -295,6 +298,7 @@ Add to your `Cargo.toml`:
 [dependencies]
 ubuntu-autoinstall-agent = { version = "0.1.0", registry = "github" }
 ```
+````
 
 Configure the registry in `.cargo/config.toml`:
 
@@ -330,7 +334,8 @@ fn main() {
 ## License
 
 MIT
-```
+
+````
 
 ### Badges and Metadata
 
@@ -340,7 +345,7 @@ Add status badges to your repository README and crate documentation:
 [![CI](https://github.com/jdfalk/ubuntu-autoinstall-agent/workflows/CI/badge.svg)](https://github.com/jdfalk/ubuntu-autoinstall-agent/actions)
 [![Release](https://github.com/jdfalk/ubuntu-autoinstall-agent/workflows/Release/badge.svg)](https://github.com/jdfalk/ubuntu-autoinstall-agent/actions)
 [![Packages](https://img.shields.io/badge/packages-GitHub-blue)](https://github.com/jdfalk/ubuntu-autoinstall-agent/packages)
-```
+````
 
 ## Security Considerations
 
@@ -425,7 +430,7 @@ Sign packages with Cosign (if supported by registry):
 
 - name: Sign crate
   env:
-    COSIGN_EXPERIMENTAL: "true"
+    COSIGN_EXPERIMENTAL: 'true'
   run: |
     # Sign the package tarball
     cosign sign-blob \
@@ -561,6 +566,7 @@ Add alerting to the publishing job:
 
 ---
 
-**Part 5 Complete**: Performance optimization strategies, advanced configuration options, package metadata enhancement, security considerations, and monitoring setup. ✅
+**Part 5 Complete**: Performance optimization strategies, advanced configuration options, package
+metadata enhancement, security considerations, and monitoring setup. ✅
 
 **Continue to Part 6** for troubleshooting guide, lessons learned, and task completion checklist.
