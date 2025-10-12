@@ -145,4 +145,3 @@ jobs:
           echo "| Rust | ${{ needs.rust-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Node.js | ${{ needs.node-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Python | ${{ needs.python-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
-
