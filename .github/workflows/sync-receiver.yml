@@ -63,250 +63,54 @@ jobs:
 
       - name: Set sync parameters
         id: params
-        run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "sync_type=${{ github.event.client_payload.sync_type }}" >> $GITHUB_OUTPUT
-            echo "source_repo=${{ github.event.client_payload.source_repo }}" >> $GITHUB_OUTPUT
-            echo "source_sha=${{ github.event.client_payload.source_sha }}" >> $GITHUB_OUTPUT
-            echo "force_sync=${{ github.event.client_payload.force_sync || 'false' }}" >> $GITHUB_OUTPUT
-            echo "verbose_logging=${{ github.event.client_payload.verbose_logging || 'true' }}" >> $GITHUB_OUTPUT
-          else
-            echo "sync_type=${{ inputs.sync_type }}" >> $GITHUB_OUTPUT
-            echo "source_repo=jdfalk/ghcommon" >> $GITHUB_OUTPUT
-            echo "source_sha=manual-dispatch" >> $GITHUB_OUTPUT
-            echo "force_sync=${{ inputs.force_sync }}" >> $GITHUB_OUTPUT
-            echo "verbose_logging=${{ inputs.verbose_logging }}" >> $GITHUB_OUTPUT
-          fi
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          CLIENT_PAYLOAD_SYNC_TYPE: ${{ github.event.client_payload.sync_type }}
+          CLIENT_PAYLOAD_SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
+          CLIENT_PAYLOAD_SOURCE_SHA: ${{ github.event.client_payload.source_sha }}
+          CLIENT_PAYLOAD_FORCE_SYNC: ${{ github.event.client_payload.force_sync }}
+          CLIENT_PAYLOAD_VERBOSE_LOGGING: ${{ github.event.client_payload.verbose_logging }}
+          INPUT_SYNC_TYPE: ${{ inputs.sync_type }}
+          INPUT_FORCE_SYNC: ${{ inputs.force_sync }}
+          INPUT_VERBOSE_LOGGING: ${{ inputs.verbose_logging }}
+        run: python3 .github/workflows/scripts/sync_receiver.py set-parameters
 
       - name: Install Python dependencies
-        run: |
-          echo "🐍 Installing Python dependencies for sync script..."
-          pip3 install pyyaml
+        run: python3 .github/workflows/scripts/sync_receiver.py install-python-deps
 
       - name: Sync files based on type
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          sync_type="${{ steps.params.outputs.sync_type }}"
-          verbose="${{ steps.params.outputs.verbose_logging }}"
-          echo "🔄 Performing sync of type: $sync_type"
-          echo "📊 Verbose logging: $verbose"
-          echo "📁 Source directory contents:"
-          ls -la ghcommon-source/
-
-          # Use the Python sync script for better file handling
-          echo "🔄 Running Python sync script..."
-          python3 .github/scripts/sync-receiver-sync-files.py "$sync_type" || {
-            echo "❌ Python sync script failed, trying manual sync..."
-
-            # Fallback to manual sync if Python script fails
-            echo "📁 Creating directory structure..."
-            mkdir -p .github/workflows .github/instructions .github/prompts scripts .github/scripts
-
-            case "$sync_type" in
-              "all"|"workflows")
-                echo "🔄 Processing workflows section..."
-                echo "⚠️  Skipping workflow files due to GitHub App permission limitations"
-                ;;&
-              "all"|"instructions")
-                echo "🔄 Processing instructions section..."
-                if [ -f "ghcommon-source/.github/copilot-instructions.md" ]; then
-                  cp "ghcommon-source/.github/copilot-instructions.md" ".github/"
-                  echo "✅ Copied copilot-instructions.md"
-                fi
-
-                if [ -d "ghcommon-source/.github/instructions" ]; then
-                  for file in ghcommon-source/.github/instructions/*; do
-                    if [ -f "$file" ]; then
-                      cp "$file" ".github/instructions/"
-                      echo "✅ Copied $(basename "$file")"
-                    fi
-                  done
-                fi
-                ;;&
-              "all"|"prompts")
-                echo "🔄 Processing prompts section..."
-                if [ -d "ghcommon-source/.github/prompts" ]; then
-                  for file in ghcommon-source/.github/prompts/*; do
-                    if [ -f "$file" ]; then
-                      cp "$file" ".github/prompts/"
-                      echo "✅ Copied $(basename "$file")"
-                    fi
-                  done
-                fi
-                ;;&
-              "all"|"scripts"|"github-scripts")
-                echo "🔄 Processing scripts section..."
-                if [ -d "ghcommon-source/scripts" ]; then
-                  for file in ghcommon-source/scripts/*; do
-                    if [ -f "$file" ]; then
-                      cp "$file" "scripts/"
-                      echo "✅ Copied $(basename "$file")"
-                    fi
-                  done
-                fi
-
-                if [ -d "ghcommon-source/.github/scripts" ]; then
-                  for file in ghcommon-source/.github/scripts/*; do
-                    if [ -f "$file" ]; then
-                      cp "$file" ".github/scripts/"
-                      echo "✅ Copied $(basename "$file")"
-                    fi
-                  done
-                fi
-                ;;&
-              "all"|"linters")
-                echo "🔄 Processing linters section..."
-                # Copy linter files to root directory (new standard location)
-                if [ -d "ghcommon-source" ]; then
-                  for file in ghcommon-source/*.{yml,yaml,toml,json,env} ghcommon-source/.??*{yml,yaml,toml,json,env,rc} 2>/dev/null; do
-                    if [ -f "$file" ]; then
-                      filename=$(basename "$file")
-                      # Only copy known linter configuration files
-                      case "$filename" in
-                        .markdownlint.json|.yaml-lint.yml|.eslintrc.yml|.pylintrc|.golangci.yml|clippy.toml|rustfmt.toml|.python-black|.isort.cfg|.prettierrc.json|super-linter-*.env)
-                          cp "$file" "."
-                          echo "✅ Copied $filename to root directory"
-                          ;;
-                      esac
-                    fi
-                  done
-                fi
-                ;;&
-              "all"|"labels")
-                echo "🔄 Processing labels section..."
-                if [ -f "ghcommon-source/labels.json" ]; then
-                  cp "ghcommon-source/labels.json" "."
-                  echo "✅ Copied labels.json"
-                fi
-                if [ -f "ghcommon-source/labels.md" ]; then
-                  cp "ghcommon-source/labels.md" "."
-                  echo "✅ Copied labels.md"
-                fi
-                if [ -f "ghcommon-source/scripts/sync-github-labels.py" ]; then
-                  cp "ghcommon-source/scripts/sync-github-labels.py" "scripts/"
-                  echo "✅ Copied sync-github-labels.py"
-                fi
-
-                # Optional: Actually sync GitHub repository labels if token is available
-                if [ "$sync_type" = "labels" ] || [ "$sync_type" = "all" ]; then
-                  echo "🏷️  Attempting to sync GitHub repository labels..."
-                  if python3 scripts/sync-github-labels.py ${{ github.repository_owner }} ${{ github.event.repository.name }} 2>&1; then
-                    echo "✅ Successfully synced GitHub repository labels"
-                  else
-                    echo "⚠️  GitHub label sync failed, but file sync completed"
-                    echo "💡 This may be due to insufficient token permissions"
-                  fi
-                fi
-                ;;
-            esac
-          }
-
-          # Create symlinks for linters in root directory
-          echo "🔗 Setting up linter symlinks..."
-          mkdir -p .vscode
-          if [ -f ".markdownlint.json" ] || [ -f ".eslintrc.yml" ] || [ -f ".pylintrc" ]; then
-            if [ ! -e ".vscode/linters" ]; then
-              ln -sf .. .vscode/linters
-              echo "✅ Created symlink: .vscode/linters -> .. (root directory)"
-            fi
-          fi
-
-          # Clean up the source directory
-          echo "🧹 Cleaning up source directory..."
-          rm -rf ghcommon-source
-
-          echo "✅ Sync operation completed"
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SYNC_TYPE: ${{ steps.params.outputs.sync_type }}
+          SYNC_VERBOSE: ${{ steps.params.outputs.verbose_logging }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: python3 .github/workflows/scripts/sync_receiver.py sync-files
 
       - name: Check for changes
         id: changes
-        run: |
-          force_sync="${{ steps.params.outputs.force_sync }}"
-
-          echo "🔍 Checking for changes..."
-          echo "🔧 Force sync enabled: $force_sync"
-
-          if git diff --quiet && [ "$force_sync" != "true" ]; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "ℹ️  No changes detected and force sync not enabled"
-            echo "📊 Git status:"
-            git status --porcelain
-          else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            if [ "$force_sync" = "true" ]; then
-              echo "🔧 Force sync enabled - proceeding with commit"
-            else
-              echo "✅ Changes detected - proceeding with commit"
-            fi
-            echo "📋 Files that will be committed:"
-            git diff --name-only
-            echo "📊 Detailed git status:"
-            git status --porcelain
-            echo "📝 Git diff summary:"
-            git diff --stat
-          fi
+        env:
+          FORCE_SYNC: ${{ steps.params.outputs.force_sync }}
+        run: python3 .github/workflows/scripts/sync_receiver.py check-changes
 
       - name: Commit and push changes
         if: steps.changes.outputs.has_changes == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          # Pull latest changes first to avoid conflicts
-          echo "🔄 Pulling latest changes from remote..."
-          git pull origin main || {
-            echo "⚠️  Pull failed, checking if we need to handle conflicts..."
-            # If pull fails due to conflicts, try to resolve by favoring our changes
-            git status
-            echo "🔧 Attempting to resolve by rebasing our changes..."
-            git pull --rebase origin main || {
-              echo "❌ Rebase failed, trying merge strategy..."
-              git pull --no-rebase --strategy-option=ours origin main || {
-                echo "❌ All pull strategies failed. Manual intervention may be required."
-                exit 1
-              }
-            }
-          }
-
-          git add .
-          git commit -m "sync: update files from ghcommon
-
-          Source: ${{ steps.params.outputs.source_repo }}
-          SHA: ${{ steps.params.outputs.source_sha }}
-          Sync type: ${{ steps.params.outputs.sync_type }}"
-
-          # Push with retry logic
-          echo "⬆️  Pushing changes to remote..."
-          for i in {1..3}; do
-            if git push; then
-              echo "✅ Successfully pushed changes"
-              break
-            else
-              echo "⚠️  Push attempt $i failed, pulling latest changes and retrying..."
-              git pull --rebase origin main || git pull origin main
-              if [ $i -eq 3 ]; then
-                echo "❌ Failed to push after 3 attempts"
-                exit 1
-              fi
-              sleep 2
-            fi
-          done
+        env:
+          SOURCE_REPO: ${{ steps.params.outputs.source_repo }}
+          SOURCE_SHA: ${{ steps.params.outputs.source_sha }}
+          SYNC_TYPE: ${{ steps.params.outputs.sync_type }}
+        run: python3 .github/workflows/scripts/sync_receiver.py commit-and-push
 
       - name: Summary
-        run: |
-          echo "## 📊 Sync Receiver Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Sync Type:** ${{ steps.params.outputs.sync_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source Repo:** ${{ steps.params.outputs.source_repo }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source SHA:** ${{ steps.params.outputs.source_sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Force Sync:** ${{ steps.params.outputs.force_sync }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Verbose Logging:** ${{ steps.params.outputs.verbose_logging }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Changes Made:** ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ steps.changes.outputs.has_changes }}" = "true" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 📋 Files Modified:" >> $GITHUB_STEP_SUMMARY
-            git diff --name-only | while read file; do
-              echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
-            done
-          fi
+        env:
+          SYNC_TYPE: ${{ steps.params.outputs.sync_type }}
+          SOURCE_REPO: ${{ steps.params.outputs.source_repo }}
+          SOURCE_SHA: ${{ steps.params.outputs.source_sha }}
+          FORCE_SYNC: ${{ steps.params.outputs.force_sync }}
+          VERBOSE_LOGGING: ${{ steps.params.outputs.verbose_logging }}
+          HAS_CHANGES: ${{ steps.changes.outputs.has_changes }}
+        run: python3 .github/workflows/scripts/sync_receiver.py write-summary

@@ -69,6 +69,9 @@ on:
       workflows-files:
         description: "Whether workflow files were detected"
         value: ${{ jobs.detect-changes.outputs.workflows-files }}
+      lint-files:
+        description: "Whether linter configuration files were detected"
+        value: ${{ jobs.detect-changes.outputs.lint-files }}
 
 permissions:
   contents: write
@@ -92,6 +95,7 @@ jobs:
       docker-files: ${{ steps.changes.outputs.docker_files }}
       docs-files: ${{ steps.changes.outputs.docs_files }}
       workflows-files: ${{ steps.changes.outputs.workflow_files }}
+      lint-files: ${{ steps.changes.outputs.lint_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -144,6 +148,29 @@ jobs:
             workflow_files:
               - '.github/workflows/**'
               - '.github/actions/**'
+            lint_files:
+              - 'super-linter-*.env'
+              - '.markdownlint.json'
+              - '.yaml-lint.yml'
+              - 'clippy.toml'
+              - 'rustfmt.toml'
+              - '.eslintrc.*'
+              - '.pylintrc'
+              - '.python-black'
+              - '.prettierrc*'
+              - '.flake8'
+
+      - name: Debug change outputs
+        env:
+          CI_GO_FILES: ${{ steps.changes.outputs.go_files }}
+          CI_PYTHON_FILES: ${{ steps.changes.outputs.python_files }}
+          CI_RUST_FILES: ${{ steps.changes.outputs.rust_files }}
+          CI_FRONTEND_FILES: ${{ steps.changes.outputs.frontend_files }}
+          CI_DOCKER_FILES: ${{ steps.changes.outputs.docker_files }}
+          CI_DOCS_FILES: ${{ steps.changes.outputs.docs_files }}
+          CI_WORKFLOW_FILES: ${{ steps.changes.outputs.workflow_files }}
+          CI_LINT_FILES: ${{ steps.changes.outputs.lint_files }}
+        run: python3 .github/workflows/scripts/ci_workflow.py debug-filter
 
   # Protobuf generation (if applicable)
   protobuf-generation:
@@ -173,30 +200,13 @@ jobs:
           cache: true
 
       - name: Build Go project
-        run: |
-          if [ -f go.mod ]; then
-            go mod download
-            go build -v ./...
-          fi
+        run: python3 .github/workflows/scripts/ci_workflow.py go-setup
 
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
-        run: |
-          if [ -f go.mod ]; then
-            go test -v -race -coverprofile=coverage.out ./...
-          fi
-
-      - name: Check Go coverage
-        if: ${{ !inputs.skip-tests }}
-        run: |
-          if [ -f coverage.out ]; then
-            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-            echo "Coverage: ${COVERAGE}%"
-            if (( $(echo "$COVERAGE < ${{ inputs.coverage-threshold }}" | bc -l) )); then
-              echo "Coverage ${COVERAGE}% is below threshold ${{ inputs.coverage-threshold }}%"
-              exit 1
-            fi
-          fi
+        env:
+          COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+        run: python3 .github/workflows/scripts/ci_workflow.py go-test
 
   python-ci:
     name: Python CI
@@ -214,33 +224,15 @@ jobs:
           cache: pip
 
       - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
-          fi
-          if [ -f pyproject.toml ] || [ -f setup.py ]; then
-            pip install -e .
-          fi
+        run: python3 .github/workflows/scripts/ci_workflow.py python-install
 
       - name: Lint Python code
         if: ${{ !inputs.skip-linting }}
-        run: |
-          pip install flake8 black isort
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          black --check .
-          isort --check-only .
+        run: python3 .github/workflows/scripts/ci_workflow.py python-lint
 
       - name: Test Python code
         if: ${{ !inputs.skip-tests }}
-        run: |
-          pip install pytest pytest-cov
-          if [ -d tests ]; then
-            pytest --cov --cov-report=xml --cov-report=term-missing
-          fi
+        run: python3 .github/workflows/scripts/ci_workflow.py python-run-tests
 
   rust-ci:
     name: Rust CI
@@ -270,18 +262,18 @@ jobs:
 
       - name: Format Rust code
         if: ${{ !inputs.skip-linting }}
-        run: cargo fmt --all -- --check
+        run: python3 .github/workflows/scripts/ci_workflow.py rust-format
 
       - name: Lint Rust code
         if: ${{ !inputs.skip-linting }}
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: python3 .github/workflows/scripts/ci_workflow.py rust-clippy
 
       - name: Build Rust project
-        run: cargo build --verbose
+        run: python3 .github/workflows/scripts/ci_workflow.py rust-build
 
       - name: Test Rust project
         if: ${{ !inputs.skip-tests }}
-        run: cargo test --verbose
+        run: python3 .github/workflows/scripts/ci_workflow.py rust-test
 
   frontend-ci:
     name: Frontend CI
@@ -299,30 +291,30 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm ci
-          fi
+        run: python3 .github/workflows/scripts/ci_workflow.py frontend-install
 
       - name: Lint frontend code
         if: ${{ !inputs.skip-linting }}
-        run: |
-          if [ -f package.json ] && npm run lint 2>/dev/null; then
-            npm run lint
-          fi
+        env:
+          FRONTEND_SCRIPT: lint
+          FRONTEND_SUCCESS_MESSAGE: "✅ Linting passed"
+          FRONTEND_FAILURE_MESSAGE: "❌ Linting failed or not configured"
+        run: python3 .github/workflows/scripts/ci_workflow.py frontend-run
 
       - name: Build frontend
-        run: |
-          if [ -f package.json ] && npm run build 2>/dev/null; then
-            npm run build
-          fi
+        env:
+          FRONTEND_SCRIPT: build
+          FRONTEND_SUCCESS_MESSAGE: "✅ Build successful"
+          FRONTEND_FAILURE_MESSAGE: "ℹ️ No build script configured"
+        run: python3 .github/workflows/scripts/ci_workflow.py frontend-run
 
       - name: Test frontend
         if: ${{ !inputs.skip-tests }}
-        run: |
-          if [ -f package.json ] && npm run test 2>/dev/null; then
-            npm run test
-          fi
+        env:
+          FRONTEND_SCRIPT: test
+          FRONTEND_SUCCESS_MESSAGE: "✅ Tests passed"
+          FRONTEND_FAILURE_MESSAGE: "ℹ️ No tests configured"
+        run: python3 .github/workflows/scripts/ci_workflow.py frontend-run
 
   # Summary job
   ci-summary:
@@ -332,12 +324,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate summary
-        run: |
-          echo "## CI Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Language | Status | Files Changed |" >> $GITHUB_STEP_SUMMARY
-          echo "|----------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Go | ${{ needs.go-ci.result || 'skipped' }} | ${{ needs.detect-changes.outputs.go-files }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Python | ${{ needs.python-ci.result || 'skipped' }} | ${{ needs.detect-changes.outputs.python-files }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Rust | ${{ needs.rust-ci.result || 'skipped' }} | ${{ needs.detect-changes.outputs.rust-files }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Frontend | ${{ needs.frontend-ci.result || 'skipped' }} | ${{ needs.detect-changes.outputs.frontend-files }} |" >> $GITHUB_STEP_SUMMARY
+        env:
+          JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
+          JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
+          JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
+          JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
+          CI_GO_FILES: ${{ needs.detect-changes.outputs.go-files }}
+          CI_PYTHON_FILES: ${{ needs.detect-changes.outputs.python-files }}
+          CI_RUST_FILES: ${{ needs.detect-changes.outputs.rust-files }}
+          CI_FRONTEND_FILES: ${{ needs.detect-changes.outputs.frontend-files }}
+          CI_DOCKER_FILES: ${{ needs.detect-changes.outputs.docker-files }}
+          CI_DOCS_FILES: ${{ needs.detect-changes.outputs.docs-files }}
+          CI_WORKFLOW_FILES: ${{ needs.detect-changes.outputs.workflow-files }}
+        run: python3 .github/workflows/scripts/ci_workflow.py generate-ci-summary
+
+      - name: Check overall status
+        env:
+          JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
+          JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
+          JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
+          JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
+        run: python3 .github/workflows/scripts/ci_workflow.py check-ci-status
