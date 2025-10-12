@@ -13,7 +13,9 @@ import subprocess
 
 def run_command(cmd, capture_output=True):
     """Run a shell command."""
-    result = subprocess.run(cmd, shell=True, capture_output=capture_output, text=True)
+    result = subprocess.run(
+        cmd, shell=True, capture_output=capture_output, text=True
+    )
     if result.returncode != 0 and capture_output:
         print(f"Error running command: {cmd}")
         print(f"Error: {result.stderr}")

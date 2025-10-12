@@ -17,7 +17,10 @@ def main():
     try:
         # Check git status for changes
         result = subprocess.run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=True,
         )
 
         if result.stdout.strip():

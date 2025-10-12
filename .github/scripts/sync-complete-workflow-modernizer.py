@@ -46,7 +46,9 @@ class WorkflowModernizer:
             ]
 
             if cleaned_lines:
-                script_replacements.append((indent, script_content, cleaned_lines))
+                script_replacements.append(
+                    (indent, script_content, cleaned_lines)
+                )
 
         return script_replacements
 
@@ -105,7 +107,9 @@ class WorkflowModernizer:
             modernized = re.sub(pattern, replacement, modernized)
 
         # Add environment variables at the job level if not present
-        if "env:" not in modernized and any("${{ env." in modernized for _ in [None]):
+        if "env:" not in modernized and any(
+            "${{ env." in modernized for _ in [None]
+        ):
             # Find the first job and add env section
             job_pattern = r"(jobs:\s*\n\s+\w+:\s*\n)"
             modernized = re.sub(
@@ -128,7 +132,9 @@ class WorkflowModernizer:
                 return False
 
             workflow_name = workflow_path.stem
-            modernized_content = self.modernize_workflow_content(content, workflow_name)
+            modernized_content = self.modernize_workflow_content(
+                content, workflow_name
+            )
 
             # Only write if there were changes
             if modernized_content != content:
@@ -268,7 +274,9 @@ if __name__ == "__main__":
 
 def main():
     """Main entry point."""
-    workflow_dir = "/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows"
+    workflow_dir = (
+        "/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows"
+    )
 
     if not os.path.exists(workflow_dir):
         print(f"Workflow directory {workflow_dir} does not exist")
@@ -303,14 +311,17 @@ Modernized {modernizer.modernized_count} additional workflows to use Python scri
 Part of comprehensive workflow system overhaul."""
 
         result = subprocess.run(
-            ["git", "commit", "-m", commit_msg], cwd=os.path.dirname(workflow_dir)
+            ["git", "commit", "-m", commit_msg],
+            cwd=os.path.dirname(workflow_dir),
         )
 
         if result.returncode == 0:
             print("✓ Changes committed successfully")
 
             # Push changes
-            result = subprocess.run(["git", "push"], cwd=os.path.dirname(workflow_dir))
+            result = subprocess.run(
+                ["git", "push"], cwd=os.path.dirname(workflow_dir)
+            )
             if result.returncode == 0:
                 print("✓ Changes pushed successfully")
             else:

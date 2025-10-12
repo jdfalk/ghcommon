@@ -76,7 +76,9 @@ def dispatch_event(repo, event_type, client_payload):
     ]
 
     try:
-        result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            curl_cmd, capture_output=True, text=True, timeout=30
+        )
 
         if result.returncode == 0:
             status = (result.stdout or "").strip()
@@ -124,7 +126,9 @@ def main():
     print(f"Dispatching '{event_type}' events to target repositories...")
     print(f"Source: {source_repo}@{source_sha}")
     try:
-        print(f"Client payload: {json.dumps(client_payload, separators=(',', ':'))}")
+        print(
+            f"Client payload: {json.dumps(client_payload, separators=(',', ':'))}"
+        )
     except Exception:
         pass
 
@@ -145,7 +149,9 @@ def main():
 
     print(f"✅ Successfully dispatched to {successful} repositories")
     if failed > 0:
-        print(f"❌ Failed to dispatch to {failed} repositories", file=sys.stderr)
+        print(
+            f"❌ Failed to dispatch to {failed} repositories", file=sys.stderr
+        )
         sys.exit(1)
 
     print("All repository dispatch events sent successfully")
