@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.1.0
+# version: 1.3.1
 # guid: f3a4b5c6-d7e8-9f0a-1b2c-3d4e5f6a7b8c
 
 name: Frontend Release Build
@@ -104,3 +104,248 @@ jobs:
         if: steps.detect.outputs.found == 'false'
         run: |
           echo "No frontend project detected (no package.json). Job treated as success." >> $GITHUB_STEP_SUMMARY
+
+  detect-frontend-package:
+    name: Detect Frontend Package
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    if: startsWith(github.ref, 'refs/tags/v')
+    outputs:
+      has-package: ${{ steps.detect.outputs.has-package }}
+      package-dir: ${{ steps.detect.outputs.package-dir }}
+      package-name: ${{ steps.detect.outputs.package-name }}
+      package-version: ${{ steps.detect.outputs.package-version }}
+      package-manager: ${{ steps.detect.outputs.package-manager }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect npm package metadata
+        id: detect
+        run: |
+          python3 .github/workflows/scripts/detect_frontend_package.py
+
+      - name: Detection summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "# Frontend Package Detection"
+            echo ""
+          if [[ "${{ steps.detect.outputs.has-package }}" == "true" ]]; then
+            DIR="${{ steps.detect.outputs.package-dir }}"
+            [ -z "${DIR}" ] && DIR="."
+            VERSION="${{ steps.detect.outputs.package-version }}"
+            [ -z "${VERSION}" ] && VERSION="unknown"
+            echo "- Package: \`${{ steps.detect.outputs.package-name }}\`"
+            echo "- Version: \`${VERSION}\`"
+            echo "- Directory: \`$DIR\`"
+            echo "- Package manager: \`${{ steps.detect.outputs.package-manager }}\`"
+            else
+              echo "- No package.json located for publishing."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  package-frontend:
+    name: Package Frontend Artifact
+    runs-on: ubuntu-latest
+    needs: [build-frontend, detect-frontend-package]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.detect-frontend-package.outputs.has-package == 'true'
+    outputs:
+      tarball: ${{ steps.pack.outputs.tarball }}
+      package-name: ${{ needs.detect-frontend-package.outputs.package-name }}
+      package-version: ${{ needs.detect-frontend-package.outputs.package-version }}
+      package-dir: ${{ needs.detect-frontend-package.outputs.package-dir }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        working-directory: ${{ needs.detect-frontend-package.outputs.package-dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANAGER="${{ needs.detect-frontend-package.outputs.package-manager }}"
+          case "$MANAGER" in
+            pnpm)
+              corepack pnpm install --frozen-lockfile
+              ;;
+            yarn)
+              corepack yarn install --frozen-lockfile
+              ;;
+            *)
+              npm ci --legacy-peer-deps
+              ;;
+          esac
+
+      - name: Verify version matches tag
+        working-directory: ${{ needs.detect-frontend-package.outputs.package-dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          DECLARED_VERSION="${{ needs.detect-frontend-package.outputs.package-version }}"
+          if [[ -n "$DECLARED_VERSION" && "$DECLARED_VERSION" != "$TAG_VERSION" ]]; then
+            echo "::error::package.json declares version $DECLARED_VERSION but tag is v${TAG_VERSION}"
+            exit 1
+          fi
+
+      - name: Create npm pack tarball
+        id: pack
+        working-directory: ${{ needs.detect-frontend-package.outputs.package-dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST="../.tmp-pack"
+          mkdir -p "$DEST"
+          MANAGER="${{ needs.detect-frontend-package.outputs.package-manager }}"
+          TAR_PATH=""
+          case "$MANAGER" in
+            pnpm)
+              TAR_PATH=$(corepack pnpm pack --pack-destination "$DEST" --silent)
+              ;;
+            yarn)
+              corepack yarn pack --filename "$DEST/package.tgz" >/dev/null
+              TAR_PATH="$DEST/package.tgz"
+              ;;
+            *)
+              RESULT=$(npm pack --pack-destination "$DEST" --json)
+              TAR_NAME=$(echo "$RESULT" | jq -r '.[0].filename // empty')
+              TAR_PATH="$DEST/${TAR_NAME:-package.tgz}"
+              ;;
+          esac
+
+          if [[ ! -f "$TAR_PATH" ]]; then
+            echo "::error::npm pack did not produce a tarball"
+            exit 1
+          fi
+
+          TAR_ABS=$(realpath "$TAR_PATH")
+          echo "tarball=$TAR_ABS" >> "$GITHUB_OUTPUT"
+          echo "Generated tarball: $TAR_ABS"
+
+      - name: Upload frontend package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-package-${{ needs.detect-frontend-package.outputs.package-name }}-${{ github.ref_name }}
+          path: ${{ steps.pack.outputs.tarball }}
+          retention-days: 30
+
+      - name: Packaging summary
+        shell: bash
+        run: |
+          TAR="${{ steps.pack.outputs.tarball }}"
+          {
+            echo "## Frontend Packaging"
+            echo ""
+            echo "- Package: \`${{ needs.detect-frontend-package.outputs.package-name }}\`"
+            echo "- Version: \`${{ needs.detect-frontend-package.outputs.package-version }}\`"
+            echo "- Tarball: \`$TAR\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-frontend-package:
+    name: Publish Frontend Package
+    runs-on: ubuntu-latest
+    needs: [package-frontend, detect-frontend-package]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.detect-frontend-package.outputs.has-package == 'true'
+    permissions:
+      contents: read
+      packages: write
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Download packaged artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-package-${{ needs.detect-frontend-package.outputs.package-name }}-${{ github.ref_name }}
+          path: publish
+
+      - name: Locate tarball
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAR=$(find publish -maxdepth 1 -name '*.tgz' | head -1)
+          if [[ -z "$TAR" ]]; then
+            echo "::error::Unable to locate npm tarball in publish/"
+            exit 1
+          fi
+          echo "tarball=$TAR" >> "$GITHUB_OUTPUT"
+
+      - name: Configure npm authentication
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$NPM_TOKEN" ]]; then
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          fi
+          SCOPE="${{ needs.detect-frontend-package.outputs.package-name }}"
+          if [[ "$SCOPE" == @*/* ]]; then
+            SCOPE=${SCOPE%%/*}
+          else
+            SCOPE="@${{ github.repository_owner }}"
+          fi
+          echo "${SCOPE}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
+
+      - name: Publish to npm registry
+        if: env.NPM_TOKEN != ''
+        shell: bash
+        run: |
+          npm publish "${{ steps.locate.outputs.tarball }}" --access public
+
+      - name: Publish to GitHub Packages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm publish "${{ steps.locate.outputs.tarball }}" \
+            --registry https://npm.pkg.github.com \
+            --access public || echo "GitHub Packages publish skipped or failed"
+
+      - name: Publishing summary
+        shell: bash
+        run: |
+          {
+            echo "## Frontend Publishing"
+            echo ""
+            echo "- Package: \`${{ needs.detect-frontend-package.outputs.package-name }}\`"
+            echo "- Version: \`${{ needs.detect-frontend-package.outputs.package-version }}\`"
+            if [[ "$NPM_TOKEN" != "" ]]; then
+              echo "- npm registry: ✅ publish attempted"
+            else
+              echo "- npm registry: ⏭️ NPM_TOKEN not provided"
+            fi
+            echo "- GitHub Packages: publish attempted"
+          } >> "$GITHUB_STEP_SUMMARY"
