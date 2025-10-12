@@ -72,7 +72,9 @@ MANAGED_FILES = {
     ".github/commit-messages.md",
     ".github/pull-request-descriptions.md",
     ".github/test-generation.md",
-    ".github/AGENTS.md",
+    # Pointer files in root
+    "AGENTS.md",
+    "CLAUDE.md",
 }
 
 # Old files that should be cleaned up (moved to new structure)

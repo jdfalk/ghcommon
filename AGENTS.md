@@ -1,5 +1,5 @@
 <!-- file: AGENTS.md -->
-<!-- version: 2.2.1 -->
+<!-- version: 2.2.2 -->
 <!-- guid: 2e7c1a4b-5d3f-4b8c-9e1f-7a6b2c3d4e5f -->
 
 # AGENTS.md
@@ -16,6 +16,9 @@ workflows are retired.
 - Always keep the required header (file path, version, guid) and bump the version on any change.
 - Do not use create-doc-update.sh, doc_update_manager.py, or .github/doc-updates/.
 - Prefer VS Code tasks for git operations (Git Add All, Git Commit, Git Push) when available.
+  - These tasks use the `copilot-agent-util` Rust utility for enhanced logging, error handling,
+    and safety.
+  - Download: <https://github.com/jdfalk/copilot-agent-util-rust/releases/latest>
 
 ## ⚠️ CRITICAL: File Version Updates
 

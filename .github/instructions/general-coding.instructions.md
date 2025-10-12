@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/general-coding.instructions.md -->
-<!-- version: 2.1.0 -->
+<!-- version: 2.2.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -198,6 +198,14 @@ containing:
   # version: 1.1.0
   # guid: 123e4567-e89b-12d3-a456-426614174000
   ```
+  For executable R scripts:
+  ```r
+  #!/usr/bin/env Rscript
+  # file: path/to/script.R
+  # version: 1.1.0
+  # guid: 123e4567-e89b-12d3-a456-426614174000
+  ```
+  (Header must come after the shebang line)
 - **JSON:**
   ```jsonc
   // file: path/to/file.json

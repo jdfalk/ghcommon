@@ -1,8 +1,38 @@
 <!-- file: docs/documentation-updates.md -->
-<!-- version: 2.0.0 -->
+<!-- version: 3.0.0 -->
 <!-- guid: 4e5f6789-0123-4567-8901-2345678901ab -->
 
-# Documentation Update System
+# ⚠️ DEPRECATED: Documentation Update System
+
+> **🚨 DEPRECATION NOTICE - October 2025**
+>
+> This documentation update system has been **DEPRECATED** and is no longer in use.
+>
+> **New Approach**: Edit documentation files directly in their repositories.
+>
+> - Keep file headers (file path, version, guid) and bump versions on changes
+> - Follow `.github/instructions/general-coding.instructions.md` for formatting rules
+> - Use VS Code tasks for git operations (Git Add All, Git Commit, Git Push) - these tasks use `copilot-agent-util` for enhanced logging and safety
+> - See `AGENTS.md` and `CLAUDE.md` in repository root for workflow details
+>
+> **What was removed**:
+>
+> - `create-doc-update.sh` and `create-issue-update.sh` scripts
+> - `doc_update_manager.py` processor
+> - `.github/doc-updates/` directory and workflow system
+> - JSON-based update file approach
+>
+> **Why it was deprecated**: The indirect JSON-based update system added unnecessary
+> complexity. Direct editing with version tracking in file headers provides better
+> transparency and simpler workflows.
+>
+> ---
+>
+> _The content below is preserved for historical reference only._
+
+---
+
+## Documentation Update System (Legacy)
 
 A comprehensive, automated system for managing documentation updates across repositories using
 JSON-driven update files and workflows.

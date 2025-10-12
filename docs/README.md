@@ -33,7 +33,6 @@ This directory contains auto-generated documentation for this project.
 - [Shell Script Coding Instructions](.github/instructions/shell.instructions.md)
 - [Test Generation Instructions](.github/instructions/test-generation.instructions.md)
 - [TypeScript Coding Instructions](.github/instructions/typescript.instructions.md)
-- [Linter Configuration Files](.github/linters/README.md)
 - [AI Architecture Review Prompt](.github/prompts/ai-architecture.prompt.md)
 - [AI Changelog Generation Prompt](.github/prompts/ai-changelog.prompt.md)
 - [AI Contribution Guidelines Prompt](.github/prompts/ai-contribution.prompt.md)

@@ -407,8 +407,8 @@ class RepoSetupSyncer:
         # Files and directories to sync
         self.sync_files = [
             ".github/copilot-instructions.md",
-            ".github/AGENTS.md",
-            ".github/CLAUDE.md",
+            "AGENTS.md",
+            "CLAUDE.md",
             ".github/repository-setup.md",
             ".github/security-guidelines.md",
             ".github/workflow-usage.md",

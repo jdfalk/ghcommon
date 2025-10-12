@@ -56,7 +56,8 @@ class RepoSynchronizer:
 
     # Files to track and synchronize
     TRACKED_FILES = [
-        ".github/AGENTS.md",
+        "AGENTS.md",
+        "CLAUDE.md",
         ".github/commit-messages.md",
         ".github/copilot-instructions.md",
         ".github/instructions/general-coding.instructions.md",

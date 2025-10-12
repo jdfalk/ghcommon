@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: commit-workflow-updates.sh
-# version: 2.0.0
+# version: 2.0.1
 # guid: 123e4567-e89b-12d3-a456-426614174001
 
 set -e
@@ -48,26 +48,15 @@ customization best practices.
 
 ## 🚨 CRITICAL: Documentation Update Protocol
 
-**NEVER edit markdown files directly. ALWAYS use the documentation update
-system:**
+This repository no longer uses doc-update scripts. Follow these rules instead:
 
-1. **Create GitHub Issue First** (if none exists):
-
-   ```bash
-   ./scripts/create-issue-update.sh "Update [filename] - [description]" "Detailed description of what needs to be updated"
-   ```
-
-2. **Create Documentation Update**:
-
-   ```bash
-   ./scripts/create-doc-update.sh [filename] "[content]" [mode] --issue [issue-number]
-   ```
-
-3. **Link to Issue**: Every documentation change MUST reference a GitHub issue
-   for tracking and context.
-
-**Failure to follow this protocol will result in workflow conflicts and lost
-changes.**
+- Edit documentation directly in the files within this repository.
+- Keep the required file header (file path, version, guid) and bump the version on any change.
+- Do not use create-doc-update.sh or related scripts; they are retired.
+- Follow \`.github/instructions/general-coding.instructions.md\` and language-specific instruction files for rules.
+- Prefer VS Code tasks for git operations (Git Add All, Git Commit, Git Push).
+  - These tasks use copilot-agent-util for enhanced logging and safety.
+  - Download: https://github.com/jdfalk/copilot-agent-util-rust/releases/latest
 
 ## System Overview
 
