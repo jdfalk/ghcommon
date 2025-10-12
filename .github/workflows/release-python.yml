@@ -1,5 +1,5 @@
 # file: .github/workflows/release-python.yml
-# version: 1.1.0
+# version: 1.3.1
 # guid: d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a
 
 name: Python Release Build
@@ -47,41 +47,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -c "import os; os.system('pip install -r requirements.txt') if os.path.exists('requirements.txt') else None"
-          python -c "import os; os.system('pip install -e .') if os.path.exists('pyproject.toml') else None"
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          fi
+          if [ -f pyproject.toml ]; then
+            python -m pip install -e .
+          fi
 
       - name: Test Python project
         run: |
-          python -c "
-          import os, subprocess, sys, glob
-
-          # Check for test files and configuration in tests/ directory
-          has_pytest_ini = os.path.exists('pytest.ini')
-          has_pyproject = os.path.exists('pyproject.toml')
-          test_files = glob.glob('tests/**/test_*.py', recursive=True) + glob.glob('tests/**/*_test.py', recursive=True)
-
-          if has_pytest_ini or has_pyproject or test_files:
-              if has_pytest_ini or test_files:
-                  subprocess.run([sys.executable, '-m', 'pip', 'install', 'pytest', 'pytest-cov'])
-                  # Run tests only in tests/ directory to avoid dependency issues in scripts/
-                  if test_files:
-                      result = subprocess.run([sys.executable, '-m', 'pytest', 'tests/', '--cov=.', '--cov-report=xml'])
-                  else:
-                      result = subprocess.run([sys.executable, '-m', 'pytest', '--cov=.', '--cov-report=xml'])
-                  sys.exit(result.returncode)
-              else:
-                  result = subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests'])
-                  sys.exit(result.returncode)
-          else:
-              print('No tests found in this repository. This is a configuration/shared repository.')
-              print('Creating a placeholder test result to avoid failure.')
-              with open('coverage.xml', 'w') as f:
-                  f.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>' + '\\n')
-                  f.write('<coverage version=\"0.0\" timestamp=\"0\" lines-valid=\"1\" lines-covered=\"1\" line-rate=\"1.0\">' + '\\n')
-                  f.write('  <sources><source>.</source></sources>' + '\\n')
-                  f.write('  <packages></packages>' + '\\n')
-                  f.write('</coverage>' + '\\n')
-          "
+          python3 .github/workflows/scripts/run_python_release_tests.py
 
       - name: Upload coverage (primary only)
         if: matrix.primary
@@ -89,3 +64,212 @@ jobs:
         with:
           name: python-coverage-${{ matrix.os }}-${{ matrix.python-version }}
           path: coverage.xml
+
+  detect-python-package:
+    name: Detect Python Package
+    runs-on: ubuntu-latest
+    needs: build-python
+    if: startsWith(github.ref, 'refs/tags/v')
+    outputs:
+      has-package: ${{ steps.detect.outputs.has-package }}
+      package-name: ${{ steps.detect.outputs.package-name }}
+      package-version: ${{ steps.detect.outputs.package-version }}
+      build-system: ${{ steps.detect.outputs.build-system }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect package metadata
+        id: detect
+        run: |
+          python3 .github/workflows/scripts/detect_python_package.py
+
+      - name: Detection summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "# Python Package Detection"
+            echo ""
+            if [[ "${{ steps.detect.outputs.has-package }}" == "true" ]]; then
+              echo "- Package: \`${{ steps.detect.outputs.package-name }}\`"
+              if [[ -n "${{ steps.detect.outputs.package-version }}" ]]; then
+                echo "- Version: \`${{ steps.detect.outputs.package-version }}\`"
+              else
+                echo "- Version: *(not declared; will rely on build output)*"
+              fi
+              echo "- Build system: \`${{ steps.detect.outputs.build-system }}\`"
+            else
+              echo "- No Python package configuration detected. Publishing will be skipped."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build-python-distribution:
+    name: Build Python Distribution
+    runs-on: ubuntu-latest
+    needs: [build-python, detect-python-package]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.detect-python-package.outputs.has-package == 'true'
+    outputs:
+      package-name: ${{ steps.version-check.outputs.package-name }}
+      package-version: ${{ steps.version-check.outputs.package-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Ensure version matches tag
+        id: version-check
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          DECLARED_VERSION="${{ needs.detect-python-package.outputs.package-version }}"
+          PACKAGE_NAME="${{ needs.detect-python-package.outputs.package-name }}"
+
+          if [[ -z "${PACKAGE_NAME}" ]]; then
+            echo "::error::Unable to determine package name from detection step"
+            exit 1
+          fi
+
+          if [[ -n "${DECLARED_VERSION}" ]]; then
+            if [[ "${DECLARED_VERSION}" != "${TAG_VERSION}" ]]; then
+              echo "::error::Version mismatch: tag v${TAG_VERSION} vs metadata ${DECLARED_VERSION}"
+              exit 1
+            fi
+          else
+            echo "::warning::Package version not declared; using tag version ${TAG_VERSION}."
+          fi
+
+          {
+            echo "package-name=${PACKAGE_NAME}"
+            echo "package-version=${TAG_VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build distributions (sdist and wheel)
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          python -m build --sdist --wheel --outdir dist
+          ls -l dist
+
+      - name: Validate distributions with twine
+        run: |
+          python -m twine check dist/*
+
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist-${{ github.ref_name }}
+          path: dist/
+          retention-days: 30
+
+      - name: Build summary
+        shell: bash
+        run: |
+          {
+            echo "## Python Package Build"
+            echo ""
+            echo "- Package: \`${{ steps.version-check.outputs.package-name }}\`"
+            echo "- Version: \`${{ steps.version-check.outputs.package-version }}\`"
+            echo "- Artifacts:"
+            ls dist | sed 's/^/  - /'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-python-package:
+    name: Publish Python Package
+    runs-on: ubuntu-latest
+    needs: [build-python-distribution, detect-python-package]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.detect-python-package.outputs.has-package == 'true'
+    permissions:
+      contents: write
+      packages: write
+    env:
+      PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install publishing tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install twine
+
+      - name: Download built distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: python-dist-${{ github.ref_name }}
+          path: dist
+
+      - name: Configure authentication
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_TOKEN: ${{ env.PYPI_TOKEN }}
+        run: |
+          python3 .github/workflows/scripts/write_pypirc.py
+
+      - name: Publish to PyPI
+        if: env.PYPI_TOKEN != ''
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m twine upload --repository pypi --skip-existing dist/*
+
+      - name: Publish to GitHub Packages
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -m twine upload \
+            --repository-url https://upload.pypi.org/legacy/ \
+            --skip-existing \
+            dist/* || {
+              echo "GitHub Packages upload did not succeed; continuing."
+            }
+
+      - name: Publishing summary
+        shell: bash
+        run: |
+          {
+            echo "## Python Package Publishing"
+            echo ""
+            echo "- Package: \`${{ needs.build-python-distribution.outputs.package-name }}\`"
+            echo "- Version: \`${{ needs.build-python-distribution.outputs.package-version }}\`"
+            if [[ "$PYPI_TOKEN" != "" ]]; then
+              echo "- PyPI: ✅ Attempted upload"
+            else
+              echo "- PyPI: ⏭️ Token not provided"
+            fi
+            echo "- GitHub Packages: Upload attempted"
+            echo ""
+            echo "Install with:"
+            echo '```bash'
+            echo "pip install ${{ needs.build-python-distribution.outputs.package-name }}==${{ needs.build-python-distribution.outputs.package-version }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
