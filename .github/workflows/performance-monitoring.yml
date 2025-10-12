@@ -1,0 +1,148 @@
+# file: .github/workflows/performance-monitoring.yml
+# version: 1.0.0
+# guid: performance-monitoring-workflow-2025
+
+name: Performance Monitoring
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "benchmarks/**"
+      - "scripts/**"
+      - ".github/workflows/performance-monitoring.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust-benchmarks:
+    name: Rust Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Restore cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run cargo bench
+        id: rust-bench
+        continue-on-error: true
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo bench -- --output-format bencher | tee rust-benchmark.txt
+          else
+            echo "No Cargo.toml detected; skipping Rust benchmarks." > rust-benchmark.txt
+          fi
+
+      - name: Upload rust benchmarks
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-benchmarks
+          path: rust-benchmark.txt
+
+  node-benchmarks:
+    name: Node.js Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          else
+            echo "No package.json detected; skipping install."
+          fi
+
+      - name: Run npm benchmarks
+        id: node-bench
+        continue-on-error: true
+        run: |
+          if [ -f package.json ] && npm run | grep -q "benchmark"; then
+            npm run benchmark | tee node-benchmark.txt
+          else
+            echo "No benchmark script defined; skipping." > node-benchmark.txt
+          fi
+
+      - name: Upload node benchmarks
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-benchmarks
+          path: node-benchmark.txt
+
+  python-benchmarks:
+    name: Python Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install benchmark tooling
+        run: |
+          pip install --upgrade pip
+          pip install pytest pytest-benchmark
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt || true
+          fi
+
+      - name: Run pytest benchmarks
+        id: python-bench
+        continue-on-error: true
+        run: |
+          if find tests -name "test_*.py" | head -1 | grep -q .; then
+            pytest --benchmark-only --benchmark-save=python-benchmark || true
+          else
+            echo "No Python benchmark tests found." > python-benchmark.txt
+          fi
+
+      - name: Collect benchmark output
+        if: steps.python-bench.outcome != 'skipped'
+        run: |
+          if [ -d .benchmarks ]; then
+            tar -czf python-benchmarks.tgz .benchmarks
+          elif [ -f python-benchmark.txt ]; then
+            cp python-benchmark.txt python-benchmarks.txt
+          else
+            echo "No benchmark artifacts generated." > python-benchmarks.txt
+          fi
+
+      - name: Upload python benchmarks
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-benchmarks
+          path: |
+            python-benchmarks.tgz
+            python-benchmarks.txt
+          if-no-files-found: ignore
+
+  benchmark-summary:
+    name: Benchmark Summary
+    needs: [rust-benchmarks, node-benchmarks, python-benchmarks]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize results
+        run: |
+          echo "## Benchmark Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Suite | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rust | ${{ needs.rust-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Node.js | ${{ needs.node-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Python | ${{ needs.python-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
+
