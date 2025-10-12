@@ -690,3 +690,6 @@ logs/
 # Exclude test harness assets
 .github/test-files/
 .github/test-configs/
+
+# Workflow debugging output (should not be committed)
+scripts/workflow-debug-output/
