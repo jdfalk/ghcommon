@@ -13,7 +13,9 @@
     "**/build/**",
     "**/.git/**",
     "**/target/**",
-    "**/pkg/**"
+    "**/pkg/**",
+    "**/workflow-debug-output/**",
+    "**/scripts/workflow-debug-output/**"
   ],
   "format": ["**/*.md", "**/*.js", "**/*.ts", "**/*.go", "**/*.py", "**/*.rs"],
   "minLines": 5,
