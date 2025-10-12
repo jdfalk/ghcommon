@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 1.6.0
+# version: 2.2.1
 # guid: e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b
 
 name: Go Release Build
@@ -20,6 +20,12 @@ on:
 permissions:
   contents: write # needed for release asset upload
   packages: write
+
+env:
+  GOPROXY: https://proxy.golang.org,direct
+  GOSUMDB: sum.golang.org
+  GOPRIVATE: github.com/${{ github.repository_owner }}/*
+  GONOSUMDB: github.com/${{ github.repository_owner }}/*
 
 jobs:
   # Go matrix build with all our improvements from matrix-build.yml
@@ -95,6 +101,292 @@ jobs:
         with:
           name: go-build-${{ matrix.os }}-${{ matrix.go-version }}
           path: dist/
+
+  detect-go-module:
+    name: Detect Go Module
+    runs-on: ubuntu-latest
+    needs: build-go
+    if: startsWith(github.ref, 'refs/tags/v')
+    outputs:
+      has-module: ${{ steps.detect.outputs.has-module }}
+      module-path: ${{ steps.detect.outputs.module-path }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect module
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -f "go.mod" ]]; then
+            MODULE_PATH=$(awk '/^module[[:space:]]+/ {print $2; exit}' go.mod)
+            if [[ -n "$MODULE_PATH" ]]; then
+              echo "has-module=true" >> "$GITHUB_OUTPUT"
+              echo "module-path=${MODULE_PATH}" >> "$GITHUB_OUTPUT"
+              echo "✅ Detected Go module: ${MODULE_PATH}"
+            else
+              echo "has-module=false" >> "$GITHUB_OUTPUT"
+              echo "::warning::go.mod present but module path missing."
+            fi
+          else
+            echo "has-module=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No go.mod found; skipping Go module publishing."
+          fi
+
+      - name: Detection summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "# Go Module Detection"
+            echo ""
+            if [[ "${{ steps.detect.outputs.has-module }}" == "true" ]]; then
+              echo "- Module detected: \`${{ steps.detect.outputs.module-path }}\`"
+            else
+              echo "- No Go module detected. Publishing jobs will be skipped."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  validate-go-module:
+    name: Validate Go Module
+    runs-on: ubuntu-latest
+    needs: [build-go, detect-go-module]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.detect-go-module.outputs.has-module == 'true'
+    outputs:
+      is-valid: ${{ steps.validation-result.outputs.is-valid }}
+      module-path: ${{ steps.extract-info.outputs.module-path }}
+      module-version: ${{ steps.extract-info.outputs.module-version }}
+      major-version: ${{ steps.extract-info.outputs.major-version }}
+      validation-errors: ${{ steps.validation-result.outputs.errors }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Extract module information
+        id: extract-info
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE_PATH=$(awk '/^module[[:space:]]+/ {print $2; exit}' go.mod)
+          if [[ -z "${MODULE_PATH}" ]]; then
+            echo "::error::Unable to determine module path from go.mod"
+            exit 1
+          fi
+
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ -z "${TAG_VERSION}" ]]; then
+            echo "::error::Unable to determine version from tag ${GITHUB_REF}"
+            exit 1
+          fi
+
+          MAJOR_VERSION="${TAG_VERSION%%.*}"
+
+          {
+            echo "module-path=${MODULE_PATH}"
+            echo "module-version=${TAG_VERSION}"
+            echo "major-version=${MAJOR_VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "# Go Module Validation"
+            echo ""
+            echo "- Module path: \`${MODULE_PATH}\`"
+            echo "- Version tag: \`v${TAG_VERSION}\`"
+            echo "- Major version: \`${MAJOR_VERSION}\`"
+            echo ""
+            echo "go.mod:"
+            sed 's/^/    /' go.mod
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate module path
+        id: validate-path
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE_PATH="${{ steps.extract-info.outputs.module-path }}"
+          EXPECTED_PREFIX="github.com/${{ github.repository }}"
+
+          if [[ "${MODULE_PATH}" == "${EXPECTED_PREFIX}"* ]]; then
+            echo "path-valid=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Module path matches repository: ${MODULE_PATH}"
+          else
+            echo "path-valid=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Module path ${MODULE_PATH} does not reside under ${EXPECTED_PREFIX}"
+            exit 1
+          fi
+
+          if [[ "${MODULE_PATH}" =~ [A-Z] ]]; then
+            echo "::warning::Module path contains uppercase characters. Go module paths should be lowercase."
+          fi
+
+      - name: Validate semantic version
+        id: validate-version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.extract-info.outputs.module-version }}"
+          if [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "version-valid=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Version ${VERSION} is a valid semantic version"
+          else
+            echo "version-valid=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Version ${VERSION} is not a valid semantic version (expected X.Y.Z)"
+            exit 1
+          fi
+
+      - name: Validate major version alignment
+        id: validate-major-version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE_PATH="${{ steps.extract-info.outputs.module-path }}"
+          MAJOR="${{ steps.extract-info.outputs.major-version }}"
+
+          if [[ "${MAJOR}" =~ ^[0-9]+$ ]]; then
+            if (( MAJOR >= 2 )); then
+              if [[ "${MODULE_PATH}" == *"/v${MAJOR}" ]]; then
+                echo "aligned=true" >> "$GITHUB_OUTPUT"
+                echo "✅ Module path includes /v${MAJOR} for major version ${MAJOR}"
+              else
+                echo "aligned=false" >> "$GITHUB_OUTPUT"
+                echo "::error::Major version ${MAJOR} requires module path to end with /v${MAJOR}"
+                exit 1
+              fi
+            else
+              if [[ "${MODULE_PATH}" == *"/v"?(0|1)* ]]; then
+                echo "::warning::Module path includes version suffix but major version is ${MAJOR}; verify module path."
+              fi
+              echo "aligned=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "aligned=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Unable to determine numeric major version from ${MAJOR}"
+            exit 1
+          fi
+
+      - name: Validate go.mod and dependencies
+        id: validate-gomod
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Running go mod verify..."
+          go mod verify
+
+          if [[ ! -f go.sum ]]; then
+            echo "::warning::go.sum not found; generating..."
+            go mod tidy
+          fi
+
+          echo "Downloading dependencies..."
+          go mod download
+
+          echo "Checking for tidy go.mod/go.sum..."
+          go mod tidy
+          if git diff --quiet -- go.mod go.sum; then
+            echo "tidy=true" >> "$GITHUB_OUTPUT"
+            echo "✅ go.mod and go.sum are tidy"
+          else
+            echo "tidy=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::go.mod or go.sum would change after go mod tidy. Please run go mod tidy locally."
+            git --no-pager diff -- go.mod go.sum
+          fi
+
+          echo "gomod-valid=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test module
+        id: check-compat
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Building module..."
+          if go build ./...; then
+            echo "build-success=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Module builds successfully"
+          else
+            echo "build-success=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Module build failed"
+            exit 1
+          fi
+
+          echo "Running tests..."
+          if go test ./... -short; then
+            echo "tests-pass=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Tests passed"
+          else
+            echo "tests-pass=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Some tests failed"
+          fi
+
+          echo "Running go vet..."
+          if go vet ./...; then
+            echo "vet-pass=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "vet-pass=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::go vet reported issues"
+          fi
+
+      - name: Validation summary
+        id: validation-result
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ERRORS=""
+          WARNINGS=""
+
+          [[ "${{ steps.validate-path.outputs.path-valid }}" == "true" ]] || ERRORS+="Module path invalid. "
+          [[ "${{ steps.validate-version.outputs.version-valid }}" == "true" ]] || ERRORS+="Version format invalid. "
+          [[ "${{ steps.validate-major-version.outputs.aligned }}" == "true" ]] || ERRORS+="Major version misalignment. "
+          [[ "${{ steps.validate-gomod.outputs.gomod-valid }}" == "true" ]] || ERRORS+="go.mod verification failed. "
+          [[ "${{ steps.check-compat.outputs.build-success }}" == "true" ]] || ERRORS+="Module build failed. "
+
+          [[ "${{ steps.validate-gomod.outputs.tidy }}" == "true" ]] || WARNINGS+="go mod tidy changes detected. "
+          [[ "${{ steps.check-compat.outputs.tests-pass }}" == "true" ]] || WARNINGS+="Tests did not pass. "
+          [[ "${{ steps.check-compat.outputs.vet-pass }}" == "true" ]] || WARNINGS+="go vet reported issues. "
+
+          echo "errors=${ERRORS}" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "${ERRORS}" ]]; then
+            echo "is-valid=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Go module validation failed: ${ERRORS}"
+            exit 1
+          fi
+
+          if [[ -n "${WARNINGS}" ]]; then
+            echo "::warning::Go module validation warnings: ${WARNINGS}"
+          fi
+
+          echo "is-valid=true" >> "$GITHUB_OUTPUT"
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-module-validation-report
+          path: |
+            go.mod
+            go.sum
+          retention-days: 30
 
   aggregate-artifacts:
     name: Aggregate Go Build Artifacts
@@ -323,9 +615,184 @@ jobs:
           name: go-build-per-os
           path: per-os/
 
+  publish-go-module:
+    name: Publish Go Module
+    runs-on: ubuntu-latest
+    needs: [build-go, validate-go-module]
+    if: |
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.validate-go-module.outputs.is-valid == 'true'
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Display publishing context
+        id: context
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODULE_PATH="${{ needs.validate-go-module.outputs.module-path }}"
+          MODULE_VERSION="${{ needs.validate-go-module.outputs.module-version }}"
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+
+          echo "module-path=${MODULE_PATH}" >> "$GITHUB_OUTPUT"
+          echo "module-version=${MODULE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag-name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "# Go Module Publishing"
+            echo ""
+            echo "- Module: \`${MODULE_PATH}\`"
+            echo "- Version: \`${TAG_NAME}\`"
+            echo "- Repository: \`${{ github.repository }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify Git tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "✅ Tag ${TAG} exists at $(git rev-parse "${TAG}")"
+          else
+            echo "::error::Tag ${TAG} not found in repository"
+            exit 1
+          fi
+
+      - name: Create module archive
+        id: create-archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODULE_PATH="${{ steps.context.outputs.module-path }}"
+          VERSION="${{ steps.context.outputs.module-version }}"
+          SAFE_MODULE="${MODULE_PATH//\//_}"
+          ZIP_NAME="${SAFE_MODULE}@v${VERSION}.zip"
+
+          echo "Creating archive ${ZIP_NAME}"
+          zip -qr "${ZIP_NAME}" . \
+            -x ".git/*" \
+            -x ".github/workflows/*" \
+            -x "*.zip" \
+            -x "dist/*" \
+            -x "target/*" \
+            -x "node_modules/*"
+
+          if [[ ! -f "${ZIP_NAME}" ]]; then
+            echo "::error::Failed to create module archive ${ZIP_NAME}"
+            exit 1
+          fi
+
+          echo "zip-name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
+          echo "✅ Module archive created: ${ZIP_NAME}"
+
+      - name: Generate module metadata
+        id: metadata
+        env:
+          MODULE_PATH: ${{ steps.context.outputs.module-path }}
+          MODULE_VERSION: ${{ steps.context.outputs.module-version }}
+          REPOSITORY: ${{ github.repository }}
+          TAG_NAME: ${{ steps.context.outputs.tag-name }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          python3 .github/workflows/scripts/write_go_module_metadata.py
+
+      - name: Test module discoverability
+        id: discoverability
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE="${{ steps.context.outputs.module-path }}"
+          VERSION="${{ steps.context.outputs.tag-name }}"
+
+          echo "Checking module availability for ${MODULE}@${VERSION}"
+          if GOPRIVATE=github.com/${{ github.repository_owner }}/* GONOSUMDB=off GOPROXY=direct go list -m "${MODULE}@${VERSION}"; then
+            echo "discoverable=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Module is discoverable via go list"
+          else
+            echo "discoverable=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Module may require additional propagation time before it is discoverable."
+          fi
+
+      - name: Publish to GitHub Packages (best effort)
+        id: gh-packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE="${{ steps.context.outputs.module-path }}"
+          VERSION="v${{ steps.context.outputs.module-version }}"
+          ZIP="${{ steps.create-archive.outputs.zip-name }}"
+          PACKAGE_ENDPOINT="https://api.github.com/repos/${{ github.repository }}/packages/go/${{ github.event.repository.name }}/versions"
+
+          echo "Attempting to publish ${ZIP} to GitHub Packages (${PACKAGE_ENDPOINT})"
+          RESPONSE=$(curl -sS -X POST \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -F "package=@${ZIP}" \
+            "${PACKAGE_ENDPOINT}" \
+            -w "\nHTTP_STATUS:%{http_code}" || true)
+
+          STATUS=$(echo "${RESPONSE}" | awk -F: '/HTTP_STATUS/ {print $2}')
+
+          if [[ "${STATUS}" == "200" || "${STATUS}" == "201" ]]; then
+            echo "uploaded=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Package upload reported success (HTTP ${STATUS})"
+          else
+            echo "uploaded=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::GitHub Packages upload returned HTTP ${STATUS}. Go modules rely primarily on Git tags; continuing."
+          fi
+
+      - name: Upload publishing artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-module-${{ steps.context.outputs.tag-name }}
+          path: |
+            ${{ steps.create-archive.outputs.zip-name }}
+            ${{ steps.metadata.outputs.metadata-file }}
+          retention-days: 90
+
+      - name: Publishing summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo ""
+            echo "## Go Module Publishing Status"
+            echo ""
+            echo "- Module: \`${{ steps.context.outputs.module-path }}\`"
+            echo "- Version: \`${{ steps.context.outputs.tag-name }}\`"
+            echo "- Archive: \`${{ steps.create-archive.outputs.zip-name }}\`"
+            echo "- Discoverable: ${{ steps.discoverability.outputs.discoverable == 'true' && '✅ Yes' || '⏳ Pending' }}"
+            echo "- GitHub Packages upload: ${{ steps.gh-packages.outputs.uploaded == 'true' && '✅ Succeeded' || '⚠️ Skipped/Failed' }}"
+            echo ""
+            echo "Install with:"
+            echo ""
+            echo '```bash'
+            echo "go get ${{ steps.context.outputs.module-path }}@${{ steps.context.outputs.tag-name }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   publish-release:
     name: Publish GitHub Release
-    needs: aggregate-artifacts
+    needs:
+      - aggregate-artifacts
+      - publish-go-module
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -362,6 +829,12 @@ jobs:
           name: go-build-signatures
           path: artifacts/signatures
         continue-on-error: true
+      - name: Download module artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: go-module-${{ github.ref_name }}
+          path: artifacts/module
+        continue-on-error: true
       - name: Prepare release assets
         run: |
           set -euo pipefail
@@ -385,5 +858,7 @@ jobs:
             go-build-*.zip.sha256
             go-build-*.sbom.spdx.json
             go-build-*.sig
+            go-module-*.zip
+            module-metadata.json
           draft: false
           prerelease: false
