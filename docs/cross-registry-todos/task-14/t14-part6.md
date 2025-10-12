@@ -6,9 +6,11 @@
 
 ## DOCUMENTATION.md Guide
 
-```markdown
+````markdown
 # file: DOCUMENTATION.md
+
 # version: 1.0.0
+
 # guid: documentation-guide
 
 # Documentation Guide
@@ -28,13 +30,15 @@ Our documentation is organized into four main categories:
 - **JavaScript**: Generated with TypeDoc from JSDoc/TSDoc comments
 
 **Requirements:**
+
 - All public APIs must have documentation
 - Include examples in documentation
 - Document parameters, return values, and errors
 - Add usage examples for complex functions
 
 **Example (Rust):**
-```rust
+
+````rust
 /// Creates a new disk image for installation.
 ///
 /// # Arguments
@@ -61,9 +65,11 @@ Our documentation is organized into four main categories:
 pub fn create_disk(path: &Path, size: u64) -> Result<DiskImage, Error> {
     // Implementation
 }
-```
+````
+````
 
 **Example (Python):**
+
 ```python
 def create_installation(config: Dict[str, Any]) -> Installation:
     """Create a new Ubuntu installation.
@@ -102,6 +108,7 @@ def create_installation(config: Dict[str, Any]) -> Installation:
 Located in `docs/src/` for mdBook or `docs/user-guide/` for MkDocs.
 
 **Content includes:**
+
 - Getting started tutorials
 - Installation instructions
 - Configuration guides
@@ -109,6 +116,7 @@ Located in `docs/src/` for mdBook or `docs/user-guide/` for MkDocs.
 - Troubleshooting tips
 
 **Writing Guidelines:**
+
 - Use clear, concise language
 - Include code examples that can be copy-pasted
 - Add screenshots for UI-heavy features
@@ -120,6 +128,7 @@ Located in `docs/src/` for mdBook or `docs/user-guide/` for MkDocs.
 **Architecture and contribution guides**
 
 **Content includes:**
+
 - Architecture overview
 - Development setup
 - Coding standards
@@ -127,6 +136,7 @@ Located in `docs/src/` for mdBook or `docs/user-guide/` for MkDocs.
 - Release process
 
 **Writing Guidelines:**
+
 - Assume reader has programming experience
 - Include diagrams for complex systems (use Mermaid)
 - Document design decisions and rationale
@@ -137,6 +147,7 @@ Located in `docs/src/` for mdBook or `docs/user-guide/` for MkDocs.
 **Deployment and maintenance guides**
 
 **Content includes:**
+
 - Deployment procedures
 - Configuration reference
 - Monitoring setup
@@ -180,6 +191,7 @@ make docs-serve     # Serves on http://localhost:8000
 ### Automated Builds
 
 Documentation is automatically built and deployed on:
+
 - Push to `main` branch → Updates "latest" version
 - New tag (`v*.*.*`) → Creates versioned documentation
 - Pull requests → Creates preview deployment
@@ -196,6 +208,7 @@ Documentation is automatically built and deployed on:
 ### Code Examples
 
 All code examples must:
+
 - Be syntactically correct
 - Be runnable (when applicable)
 - Include imports/setup code
@@ -212,6 +225,7 @@ All code examples must:
 ### Diagrams
 
 Prefer Mermaid diagrams for:
+
 - Architecture diagrams
 - Sequence diagrams
 - State machines
@@ -229,6 +243,7 @@ graph TD
 ## Versioned Documentation
 
 We maintain documentation for:
+
 - **latest**: Current main branch
 - **stable**: Most recent stable release
 - **vX.Y.Z**: Specific version documentation
@@ -268,17 +283,20 @@ Before submitting documentation changes:
 ### Regular Tasks
 
 **Weekly:**
+
 - Review and merge documentation PRs
 - Check for broken links
 - Review spelling/grammar issues from CI
 
 **Monthly:**
+
 - Update screenshots if UI changed
 - Review outdated content
 - Check external links still valid
 - Update version compatibility matrix
 
 **Per Release:**
+
 - Create versioned documentation
 - Update changelog
 - Update installation instructions
@@ -288,6 +306,7 @@ Before submitting documentation changes:
 ### Documentation Debt
 
 Track documentation debt in issues with `documentation` label:
+
 - Missing API documentation
 - Outdated tutorials
 - Unclear sections reported by users
@@ -299,6 +318,7 @@ Track documentation debt in issues with `documentation` label:
 ### Small Changes
 
 For typos, grammar fixes, or small clarifications:
+
 1. Edit directly on GitHub
 2. Submit pull request
 3. Wait for automated checks
@@ -306,6 +326,7 @@ For typos, grammar fixes, or small clarifications:
 ### Large Changes
 
 For new sections, restructuring, or major rewrites:
+
 1. Open issue to discuss approach
 2. Create feature branch
 3. Make changes incrementally
@@ -318,21 +339,25 @@ For new sections, restructuring, or major rewrites:
 Follow these conventions:
 
 **Headings:**
+
 - Use sentence case (not title case)
 - Maximum 3 levels deep
 - No punctuation at end
 
 **Lists:**
+
 - Use `-` for unordered lists
 - Use `1.` for ordered lists
 - Indent nested lists by 2 spaces
 
 **Code:**
+
 - Use triple backticks with language
 - Keep lines under 80 characters when possible
 - Include comments for clarity
 
 **Emphasis:**
+
 - Use `**bold**` for important terms
 - Use `*italics*` for emphasis
 - Use `` `code` `` for inline code
@@ -351,7 +376,8 @@ Follow these conventions:
 - [Rust Documentation Guidelines](https://doc.rust-lang.org/rustdoc/)
 - [NumPy Docstring Guide](https://numpydoc.readthedocs.io/)
 - [JSDoc Reference](https://jsdoc.app/)
-```
+
+````
 
 ## Documentation Makefile
 
@@ -420,7 +446,7 @@ docs-check:
 docs-watch:
 	@echo "Watching for documentation changes..."
 	mdbook serve --open
-```
+````
 
 ## Documentation Maintenance Workflow
 
@@ -743,7 +769,8 @@ jobs:
 
 ## Summary
 
-**Task 14: Documentation Generation and Publishing Automation** is now complete with comprehensive automation covering:
+**Task 14: Documentation Generation and Publishing Automation** is now complete with comprehensive
+automation covering:
 
 1. **Multi-Language API Documentation**: Rust (rustdoc), Python (Sphinx), JavaScript (TypeDoc)
 2. **User Guide Systems**: mdBook and MkDocs with full feature sets
@@ -754,6 +781,7 @@ jobs:
 7. **Maintenance Tools**: Metrics collection, stale doc detection, automated updates
 
 **Total Documentation Coverage:**
+
 - 6 parts completed
 - ~3,900 lines of comprehensive documentation
 - All languages supported (Rust, Python, JavaScript)

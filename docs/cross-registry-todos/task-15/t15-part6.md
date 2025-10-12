@@ -8,19 +8,22 @@
 
 ### The Four Golden Signals
 
-```markdown
+````markdown
 # Golden Signals Monitoring Strategy
 
 ## 1. Latency
+
 **Definition**: Time taken to service a request
 
 **Implementation**:
+
 - Track request duration with histograms, not averages
 - Monitor percentiles: p50, p95, p99, p99.9
 - Separate successful vs failed request latency
 - Set SLOs based on user experience requirements
 
 **Metrics to collect**:
+
 ```prometheus
 # Request duration histogram
 http_request_duration_seconds_bucket{le="0.1"} 245
@@ -32,22 +35,27 @@ http_request_duration_seconds_sum 342.5
 # Query for P95
 histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
 ```
+````
 
 **Alerts**:
+
 - P95 latency > 500ms for 5 minutes
 - P99 latency > 1s for 5 minutes
 - Latency spike: >150% of baseline
 
 ## 2. Traffic
+
 **Definition**: Demand on your system
 
 **Implementation**:
+
 - Monitor requests per second (RPS)
 - Track by endpoint, method, status code
 - Understand normal traffic patterns
 - Detect traffic anomalies (spikes/drops)
 
 **Metrics to collect**:
+
 ```prometheus
 # Request rate
 rate(http_requests_total[5m])
@@ -60,20 +68,24 @@ sum by (status) (rate(http_requests_total[5m]))
 ```
 
 **Alerts**:
+
 - Traffic drop >50% for 5 minutes (possible outage)
 - Traffic spike >200% of normal (potential attack)
 - Unusual endpoint traffic patterns
 
 ## 3. Errors
+
 **Definition**: Rate of failed requests
 
 **Implementation**:
+
 - Track error rate as percentage
 - Separate client errors (4xx) from server errors (5xx)
 - Monitor error types and patterns
 - Correlate errors with deployments
 
 **Metrics to collect**:
+
 ```prometheus
 # Error rate
 sum(rate(http_requests_total{status=~"5.."}[5m])) /
@@ -84,20 +96,24 @@ sum by (status) (rate(http_requests_total{status=~"5.."}[5m]))
 ```
 
 **Alerts**:
+
 - Error rate >1% for 5 minutes
 - Any 5xx errors in critical endpoints
 - Error budget exhaustion (<10% remaining)
 
 ## 4. Saturation
+
 **Definition**: How full your service is
 
 **Implementation**:
+
 - Monitor resource utilization: CPU, memory, disk, network
 - Track queue depths and thread pool utilization
 - Identify bottlenecks before they cause failures
 - Set capacity planning alerts
 
 **Metrics to collect**:
+
 ```prometheus
 # CPU usage
 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
@@ -113,11 +129,13 @@ queue_depth / queue_capacity
 ```
 
 **Alerts**:
+
 - CPU >80% for 10 minutes
 - Memory >80% for 10 minutes
 - Disk >85% (warning), >95% (critical)
 - Queue >70% capacity
-```
+
+````
 
 ### USE Method (Utilization, Saturation, Errors)
 
@@ -149,18 +167,21 @@ rate(node_network_transmit_bytes_total[5m]) /
 
 # Disk utilization
 rate(node_disk_io_time_seconds_total[5m])
-```
+````
 
 ### 2. Saturation
+
 **Definition**: Amount of work resource cannot service (queued)
 
 **Indicators**:
+
 - Load average (CPU queue)
 - Swap usage (memory saturation)
 - Network packet drops
 - Disk I/O wait time
 
 **Prometheus queries**:
+
 ```prometheus
 # CPU saturation (load average)
 node_load1 / count(node_cpu_seconds_total{mode="idle"})
@@ -177,15 +198,18 @@ node_disk_io_time_weighted_seconds_total
 ```
 
 ### 3. Errors
+
 **Definition**: Count of error events
 
 **Examples**:
+
 - Failed disk operations
 - Network errors
 - Memory allocation failures
 - CPU thermal throttling
 
 **Prometheus queries**:
+
 ```prometheus
 # Disk errors
 rate(node_disk_read_errors_total[5m]) +
@@ -195,7 +219,8 @@ rate(node_disk_write_errors_total[5m])
 rate(node_network_receive_errs_total[5m]) +
 rate(node_network_transmit_errs_total[5m])
 ```
-```
+
+````
 
 ### RED Method (Rate, Errors, Duration)
 
@@ -222,17 +247,20 @@ sum by (endpoint) (rate(http_requests_total[5m]))
 
 # By method
 sum by (method) (rate(http_requests_total[5m]))
-```
+````
 
 ### 2. Errors
+
 **Definition**: Number of failed requests per second
 
 **Why it matters**:
+
 - Service health indicator
 - SLO compliance
 - User impact assessment
 
 **Implementation**:
+
 ```prometheus
 # Error count
 sum(rate(http_requests_total{status=~"5.."}[5m]))
@@ -246,14 +274,17 @@ sum by (endpoint) (rate(http_requests_total{status=~"5.."}[5m]))
 ```
 
 ### 3. Duration
+
 **Definition**: Time each request takes
 
 **Why it matters**:
+
 - User experience
 - Performance degradation detection
 - SLO compliance
 
 **Implementation**:
+
 ```prometheus
 # P50 (median)
 histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))
@@ -271,15 +302,17 @@ rate(http_request_duration_seconds_count[5m])
 
 ## Dashboard Best Practices
 
-```markdown
+````markdown
 # Grafana Dashboard Design Guidelines
 
 ## 1. Dashboard Organization
 
 ### High-Level Overview Dashboard
+
 **Purpose**: Quick health check for entire system
 
 **Panels**:
+
 - Overall SLO compliance (availability, latency, error budget)
 - Request rate and error rate trends
 - Resource utilization summary (CPU, memory)
@@ -289,9 +322,11 @@ rate(http_request_duration_seconds_count[5m])
 **Refresh**: 30s-1m
 
 ### Service-Specific Dashboards
+
 **Purpose**: Deep dive into individual service metrics
 
 **Panels**:
+
 - RED metrics (Rate, Errors, Duration) for the service
 - Resource utilization specific to service
 - Database query performance
@@ -302,9 +337,11 @@ rate(http_request_duration_seconds_count[5m])
 **Refresh**: 30s
 
 ### Resource Dashboards
+
 **Purpose**: Infrastructure and resource monitoring
 
 **Panels**:
+
 - CPU, memory, disk, network per host
 - Container/pod resource usage
 - Database performance
@@ -316,6 +353,7 @@ rate(http_request_duration_seconds_count[5m])
 ## 2. Panel Design Best Practices
 
 ### Use Appropriate Visualization Types
+
 - **Time series graphs**: Trends over time (latency, traffic)
 - **Stat panels**: Current values (error rate, active connections)
 - **Gauges**: Percentage metrics (CPU usage, SLO compliance)
@@ -323,27 +361,33 @@ rate(http_request_duration_seconds_count[5m])
 - **Heatmaps**: Distribution over time (latency distribution)
 
 ### Color Coding
+
 - **Green**: Good state, within SLO
 - **Yellow**: Warning state, approaching threshold
 - **Red**: Critical state, SLO breach
 
 ### Thresholds
+
 Always set meaningful thresholds:
+
 ```json
 {
   "thresholds": {
     "mode": "absolute",
     "steps": [
-      {"value": null, "color": "green"},
-      {"value": 80, "color": "yellow"},
-      {"value": 90, "color": "red"}
+      { "value": null, "color": "green" },
+      { "value": 80, "color": "yellow" },
+      { "value": 90, "color": "red" }
     ]
   }
 }
 ```
+````
 
 ### Units
+
 Always specify units:
+
 - Time: `s` (seconds), `ms` (milliseconds)
 - Data: `bytes`, `Bps` (bytes per second)
 - Percentage: `percent` or `percentunit` (0-1)
@@ -352,6 +396,7 @@ Always specify units:
 ## 3. Dashboard Variables
 
 ### Use template variables for flexibility:
+
 ```yaml
 variables:
   - name: cluster
@@ -368,10 +413,12 @@ variables:
 ```
 
 ### Benefits:
+
 - Single dashboard for multiple environments
 - Filter by service, region, cluster
 - Reduce dashboard sprawl
-```
+
+````
 
 ## Alert Design Best Practices
 
@@ -421,9 +468,10 @@ expr: |
   ) > (3 * 0.001)  # 3x 0.1% error rate
 for: 1h
 severity: warning
-```
+````
 
 ### Alert Grouping
+
 Group related alerts to avoid alert storms:
 
 ```yaml
@@ -438,7 +486,9 @@ route:
 ## 3. Alert Fatigue Prevention
 
 ### Strategies:
+
 1. **Use inhibition rules**: Suppress redundant alerts
+
    ```yaml
    inhibit_rules:
      - source_match:
@@ -449,6 +499,7 @@ route:
    ```
 
 2. **Silence during maintenance**: Use Alertmanager silences
+
    ```bash
    amtool silence add \
      alertname=HighLatency \
@@ -462,6 +513,7 @@ route:
    - Identify false positives
 
 4. **Progressive severity**: Start with warnings, escalate to critical
+
    ```yaml
    - alert: HighErrorRate
      expr: error_rate > 0.01
@@ -475,7 +527,8 @@ route:
      labels:
        severity: critical
    ```
-```
+
+````
 
 ## Monitoring Maturity Model
 
@@ -525,14 +578,15 @@ route:
 - Incident-less operations
 
 **Goal**: Autonomous reliability
-```
+````
 
 ## Runbook Template
 
-```markdown
+````markdown
 # Service Runbook Template
 
 ## Service Overview
+
 - **Name**: ubuntu-autoinstall-agent
 - **Purpose**: Ubuntu automated installation orchestration
 - **Architecture**: Rust web service with QEMU integration
@@ -542,20 +596,25 @@ route:
 ## Common Alerts and Responses
 
 ### High Error Rate
+
 **Alert**: `error_rate > 0.05 for 5 minutes`
 
 **Symptoms**:
+
 - Users experiencing failures
 - Increased 5xx response codes
 - Error logs increasing
 
 **Investigation**:
+
 1. Check service logs for error patterns
    ```bash
    kubectl logs -l app=ubuntu-autoinstall-agent --tail=100 | grep ERROR
    ```
+````
 
 2. Verify dependencies
+
    ```bash
    curl http://qemu-service:8080/health
    ```
@@ -566,6 +625,7 @@ route:
    - Disk full? Clean up old images
 
 **Resolution**:
+
 - If dependency down: Wait for recovery or fail over
 - If resource exhaustion: Scale horizontally
 - If application bug: Roll back to previous version
@@ -573,10 +633,13 @@ route:
 **Escalation**: If unresolved in 30 minutes, page on-call engineer
 
 ### High Latency
+
 **Alert**: `p95_latency > 1s for 5 minutes`
 
 **Investigation**:
+
 1. Identify slow endpoints
+
    ```promql
    topk(5, histogram_quantile(0.95,
      rate(http_request_duration_seconds_bucket[5m])))
@@ -591,21 +654,26 @@ route:
    - CPU-intensive operations?
 
 **Resolution**:
+
 - Add caching for expensive operations
 - Optimize slow queries
 - Increase timeout for external calls
 - Scale service if under heavy load
 
 ### Service Down
+
 **Alert**: `up{service="ubuntu-autoinstall-agent"} == 0`
 
 **Investigation**:
+
 1. Check if service is running
+
    ```bash
    kubectl get pods -l app=ubuntu-autoinstall-agent
    ```
 
 2. Check recent deployments
+
    ```bash
    kubectl rollout history deployment/ubuntu-autoinstall-agent
    ```
@@ -616,6 +684,7 @@ route:
    ```
 
 **Resolution**:
+
 - If deployment failed: Roll back
   ```bash
   kubectl rollout undo deployment/ubuntu-autoinstall-agent
@@ -624,6 +693,7 @@ route:
 - If crash loop: Fix application bug
 
 ## Deployment Procedures
+
 1. Deploy to staging first
 2. Run smoke tests
 3. Monitor error rates and latency for 10 minutes
@@ -631,6 +701,7 @@ route:
 5. Monitor for 30 minutes before marking complete
 
 ## Rollback Procedures
+
 ```bash
 # Kubernetes
 kubectl rollout undo deployment/ubuntu-autoinstall-agent
@@ -640,11 +711,13 @@ kubectl rollout status deployment/ubuntu-autoinstall-agent
 ```
 
 ## Emergency Contacts
+
 - **On-call Engineer**: PagerDuty
 - **Team Lead**: Slack #team-infrastructure
 - **Database Team**: For query optimization issues
 - **Platform Team**: For infrastructure issues
-```
+
+````
 
 ## Monitoring Completion Checklist
 
@@ -733,16 +806,16 @@ kubectl rollout status deployment/ubuntu-autoinstall-agent
 - [ ] Performance test schedule established (weekly)
 - [ ] Monitoring metrics review process defined
 - [ ] Continuous improvement process documented
-```
+````
 
 ---
 
-**Task 15 Complete**: Comprehensive performance monitoring and profiling automation covering monitoring
-strategy with Golden Signals/USE Method/RED Method, Prometheus/Alertmanager configuration, Grafana
-dashboards for application performance/system resources/SLO tracking, distributed tracing with Jaeger,
-continuous profiling with Pyroscope, performance testing with k6/Criterion/pytest-benchmark, regression
-detection, monitoring best practices, alert design principles, runbook templates, and completion
-checklist. Total: ~3,900 lines across 6 parts. ✅
+**Task 15 Complete**: Comprehensive performance monitoring and profiling automation covering
+monitoring strategy with Golden Signals/USE Method/RED Method, Prometheus/Alertmanager
+configuration, Grafana dashboards for application performance/system resources/SLO tracking,
+distributed tracing with Jaeger, continuous profiling with Pyroscope, performance testing with
+k6/Criterion/pytest-benchmark, regression detection, monitoring best practices, alert design
+principles, runbook templates, and completion checklist. Total: ~3,900 lines across 6 parts. ✅
 
 **Next**: Begin Task 16 - Deployment Automation and Orchestration with Kubernetes, Helm, GitOps, and
 progressive delivery strategies.

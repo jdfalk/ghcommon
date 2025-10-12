@@ -1,8 +1,14 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t05-python-packages-part1-d5e6f7a8-b9c0 -->
 
 # Task 05: Add Python Package Publishing to GitHub Packages
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-python.yml` v1.3.0 introduces detection, distribution
+> build, and publishing jobs targeting PyPI and GitHub Packages.  
+> **Verification:** Packaging workflow checks tag/version alignment, runs `twine check`, and uploads
+> built distributions before publishing.
 
 ## Task Overview
 

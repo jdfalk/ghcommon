@@ -8,7 +8,7 @@
 
 ### Metrics with prom-client
 
-```typescript
+````typescript
 // file: src/metrics.ts
 // version: 1.0.0
 // guid: typescript-metrics-implementation
@@ -94,11 +94,7 @@ setInterval(() => {
  * app.use(metricsMiddleware);
  * ```
  */
-export function metricsMiddleware(
-  req: any,
-  res: any,
-  next: any
-): void {
+export function metricsMiddleware(req: any, res: any, next: any): void {
   const start = Date.now();
 
   // Increment active connections
@@ -115,10 +111,7 @@ export function metricsMiddleware(
       status: res.statusCode,
     });
 
-    httpRequestDuration.observe(
-      { method: req.method, route },
-      duration
-    );
+    httpRequestDuration.observe({ method: req.method, route }, duration);
 
     // Decrement active connections
     activeConnections.dec();
@@ -143,15 +136,8 @@ export function metricsMiddleware(
  * }
  * ```
  */
-export function timeFunction(
-  histogram: Histogram<string>,
-  labels: Record<string, string>
-) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+export function timeFunction(histogram: Histogram<string>, labels: Record<string, string>) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
@@ -206,11 +192,11 @@ export function trackCustomMetric(
     gauge.set(value);
   }
 }
-```
+````
 
 ### OpenTelemetry Tracing for Node.js
 
-```typescript
+````typescript
 // file: src/tracing.ts
 // version: 1.0.0
 // guid: typescript-tracing-implementation
@@ -285,13 +271,10 @@ export async function shutdownTracing(sdk: NodeSDK): Promise<void> {
  * });
  * ```
  */
-export function traced<T extends (...args: any[]) => Promise<any>>(
-  name: string,
-  fn: T
-): T {
+export function traced<T extends (...args: any[]) => Promise<any>>(name: string, fn: T): T {
   return (async (...args: any[]) => {
     const tracer = trace.getTracer('default');
-    return tracer.startActiveSpan(name, async (span) => {
+    return tracer.startActiveSpan(name, async span => {
       try {
         const result = await fn(...args);
         span.setStatus({ code: SpanStatusCode.OK });
@@ -341,7 +324,7 @@ export function getCurrentTraceContext(): Record<string, string> {
     'x-span-id': spanContext.spanId,
   };
 }
-```
+````
 
 ## System-Level Metrics Collection
 
@@ -609,34 +592,34 @@ if __name__ == '__main__':
 
 # Pyroscope agent configuration
 server:
-  address: "pyroscope-server:4040"
+  address: 'pyroscope-server:4040'
 
 # Application targets
 targets:
-  - application-name: "ubuntu-autoinstall-agent"
-    spy-name: "ebpfspy"
+  - application-name: 'ubuntu-autoinstall-agent'
+    spy-name: 'ebpfspy'
     targets:
-      - "localhost:8080"
+      - 'localhost:8080'
     labels:
-      environment: "production"
-      region: "us-west-2"
+      environment: 'production'
+      region: 'us-west-2'
 
-  - application-name: "python-service"
-    spy-name: "pyspy"
+  - application-name: 'python-service'
+    spy-name: 'pyspy'
     targets:
-      - "localhost:8000"
+      - 'localhost:8000'
     sample-rate: 100
     detect-subprocesses: true
 
-  - application-name: "node-service"
-    spy-name: "nodespy"
+  - application-name: 'node-service'
+    spy-name: 'nodespy'
     targets:
-      - "localhost:3000"
+      - 'localhost:3000'
 
 # Tags for all profiles
 tags:
-  cluster: "production"
-  version: "v1.2.3"
+  cluster: 'production'
+  version: 'v1.2.3'
 ```
 
 ### Pyroscope SDK Integration (Python)
@@ -738,7 +721,7 @@ if __name__ == "__main__":
 
 ### Pyroscope SDK Integration (Node.js)
 
-```typescript
+````typescript
 // file: src/profiling.ts
 // version: 1.0.0
 // guid: typescript-profiling-integration
@@ -812,12 +795,12 @@ export async function profileSection<T>(
 ): Promise<T> {
   return Pyroscope.wrapWithLabels(tags, fn);
 }
-```
+````
 
 ---
 
-**Part 2 Complete**: JavaScript/TypeScript metrics with prom-client, OpenTelemetry tracing for Node.js,
-system-level metrics collection with custom collector, node_exporter configuration, continuous profiling
-setup with Pyroscope for Python and Node.js. ✅
+**Part 2 Complete**: JavaScript/TypeScript metrics with prom-client, OpenTelemetry tracing for
+Node.js, system-level metrics collection with custom collector, node_exporter configuration,
+continuous profiling setup with Pyroscope for Python and Node.js. ✅
 
 **Continue to Part 3** for Prometheus configuration, alerting rules, and Grafana dashboards.

@@ -565,20 +565,20 @@ resource "helm_release" "ubuntu_autoinstall_agent" {
 // version: 1.0.0
 // guid: pulumi-program
 
-import * as pulumi from "@pulumi/pulumi";
-import * as k8s from "@pulumi/kubernetes";
-import * as aws from "@pulumi/aws";
+import * as pulumi from '@pulumi/pulumi';
+import * as k8s from '@pulumi/kubernetes';
+import * as aws from '@pulumi/aws';
 
 const config = new pulumi.Config();
 const environment = pulumi.getStack();
 
 // Configuration
-const appName = "ubuntu-autoinstall-agent";
-const namespace = config.require("namespace");
-const appVersion = config.require("appVersion");
-const replicaCount = config.getNumber("replicaCount") || 3;
-const ingressHost = config.require("ingressHost");
-const databaseUrl = config.requireSecret("databaseUrl");
+const appName = 'ubuntu-autoinstall-agent';
+const namespace = config.require('namespace');
+const appVersion = config.require('appVersion');
+const replicaCount = config.getNumber('replicaCount') || 3;
+const ingressHost = config.require('ingressHost');
+const databaseUrl = config.requireSecret('databaseUrl');
 
 // Create namespace
 const ns = new k8s.core.v1.Namespace(appName, {
@@ -586,7 +586,7 @@ const ns = new k8s.core.v1.Namespace(appName, {
     name: namespace,
     labels: {
       environment: environment,
-      "managed-by": "pulumi",
+      'managed-by': 'pulumi',
     },
   },
 });
@@ -598,21 +598,21 @@ const configMap = new k8s.core.v1.ConfigMap(`${appName}-config`, {
     namespace: ns.metadata.name,
   },
   data: {
-    "config.yaml": JSON.stringify({
+    'config.yaml': JSON.stringify({
       server: {
-        host: "0.0.0.0",
+        host: '0.0.0.0',
         port: 8080,
         workers: 4,
       },
       iso: {
-        cacheDir: "/var/cache/ubuntu-autoinstall/isos",
-        versions: ["20.04", "22.04", "24.04"],
-        architectures: ["amd64", "arm64"],
+        cacheDir: '/var/cache/ubuntu-autoinstall/isos',
+        versions: ['20.04', '22.04', '24.04'],
+        architectures: ['amd64', 'arm64'],
       },
       logging: {
-        level: environment === "production" ? "warn" : "info",
-        format: "json",
-        output: "stdout",
+        level: environment === 'production' ? 'warn' : 'info',
+        format: 'json',
+        output: 'stdout',
       },
     }),
   },
@@ -625,7 +625,7 @@ const secret = new k8s.core.v1.Secret(`${appName}-secret`, {
     namespace: ns.metadata.name,
   },
   stringData: {
-    "database-url": databaseUrl,
+    'database-url': databaseUrl,
   },
 });
 
@@ -641,9 +641,9 @@ const deployment = new k8s.apps.v1.Deployment(appName, {
   spec: {
     replicas: replicaCount,
     strategy: {
-      type: "RollingUpdate",
+      type: 'RollingUpdate',
       rollingUpdate: {
-        maxSurge: "25%",
+        maxSurge: '25%',
         maxUnavailable: 0,
       },
     },
@@ -659,9 +659,9 @@ const deployment = new k8s.apps.v1.Deployment(appName, {
           version: appVersion,
         },
         annotations: {
-          "prometheus.io/scrape": "true",
-          "prometheus.io/port": "9090",
-          "prometheus.io/path": "/metrics",
+          'prometheus.io/scrape': 'true',
+          'prometheus.io/port': '9090',
+          'prometheus.io/path': '/metrics',
         },
       },
       spec: {
@@ -675,51 +675,51 @@ const deployment = new k8s.apps.v1.Deployment(appName, {
             name: appName,
             image: `ghcr.io/jdfalk/ubuntu-autoinstall-agent:${appVersion}`,
             ports: [
-              { name: "http", containerPort: 8080 },
-              { name: "metrics", containerPort: 9090 },
+              { name: 'http', containerPort: 8080 },
+              { name: 'metrics', containerPort: 9090 },
             ],
             env: [
-              { name: "RUST_LOG", value: "info" },
+              { name: 'RUST_LOG', value: 'info' },
               {
-                name: "DATABASE_URL",
+                name: 'DATABASE_URL',
                 valueFrom: {
                   secretKeyRef: {
                     name: secret.metadata.name,
-                    key: "database-url",
+                    key: 'database-url',
                   },
                 },
               },
             ],
             resources: {
               limits: {
-                cpu: "500m",
-                memory: "512Mi",
+                cpu: '500m',
+                memory: '512Mi',
               },
               requests: {
-                cpu: "250m",
-                memory: "256Mi",
+                cpu: '250m',
+                memory: '256Mi',
               },
             },
             livenessProbe: {
               httpGet: {
-                path: "/health",
-                port: "http",
+                path: '/health',
+                port: 'http',
               },
               initialDelaySeconds: 30,
               periodSeconds: 10,
             },
             readinessProbe: {
               httpGet: {
-                path: "/ready",
-                port: "http",
+                path: '/ready',
+                port: 'http',
               },
               initialDelaySeconds: 10,
               periodSeconds: 5,
             },
             volumeMounts: [
               {
-                name: "config",
-                mountPath: "/etc/ubuntu-autoinstall",
+                name: 'config',
+                mountPath: '/etc/ubuntu-autoinstall',
                 readOnly: true,
               },
             ],
@@ -727,7 +727,7 @@ const deployment = new k8s.apps.v1.Deployment(appName, {
         ],
         volumes: [
           {
-            name: "config",
+            name: 'config',
             configMap: {
               name: configMap.metadata.name,
             },
@@ -748,13 +748,13 @@ const service = new k8s.core.v1.Service(appName, {
     },
   },
   spec: {
-    type: "ClusterIP",
+    type: 'ClusterIP',
     selector: {
       app: appName,
     },
     ports: [
-      { name: "http", port: 80, targetPort: "http" },
-      { name: "metrics", port: 9090, targetPort: "metrics" },
+      { name: 'http', port: 80, targetPort: 'http' },
+      { name: 'metrics', port: 9090, targetPort: 'metrics' },
     ],
   },
 });
@@ -765,9 +765,9 @@ const ingress = new k8s.networking.v1.Ingress(appName, {
     name: appName,
     namespace: ns.metadata.name,
     annotations: {
-      "kubernetes.io/ingress.class": "nginx",
-      "cert-manager.io/cluster-issuer": "letsencrypt-prod",
-      "nginx.ingress.kubernetes.io/ssl-redirect": "true",
+      'kubernetes.io/ingress.class': 'nginx',
+      'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
+      'nginx.ingress.kubernetes.io/ssl-redirect': 'true',
     },
   },
   spec: {
@@ -783,12 +783,12 @@ const ingress = new k8s.networking.v1.Ingress(appName, {
         http: {
           paths: [
             {
-              path: "/",
-              pathType: "Prefix",
+              path: '/',
+              pathType: 'Prefix',
               backend: {
                 service: {
                   name: service.metadata.name,
-                  port: { name: "http" },
+                  port: { name: 'http' },
                 },
               },
             },
@@ -807,29 +807,29 @@ const hpa = new k8s.autoscaling.v2.HorizontalPodAutoscaler(appName, {
   },
   spec: {
     scaleTargetRef: {
-      apiVersion: "apps/v1",
-      kind: "Deployment",
+      apiVersion: 'apps/v1',
+      kind: 'Deployment',
       name: deployment.metadata.name,
     },
     minReplicas: 3,
     maxReplicas: 10,
     metrics: [
       {
-        type: "Resource",
+        type: 'Resource',
         resource: {
-          name: "cpu",
+          name: 'cpu',
           target: {
-            type: "Utilization",
+            type: 'Utilization',
             averageUtilization: 70,
           },
         },
       },
       {
-        type: "Resource",
+        type: 'Resource',
         resource: {
-          name: "memory",
+          name: 'memory',
           target: {
-            type: "Utilization",
+            type: 'Utilization',
             averageUtilization: 80,
           },
         },
@@ -872,14 +872,14 @@ config:
   ubuntu-autoinstall-agent:replicaCount: 5
   ubuntu-autoinstall-agent:ingressHost: ubuntu-autoinstall.example.com
   ubuntu-autoinstall-agent:databaseUrl:
-    secure: AAABAMfVNXXXXXXXXXXXXXXXXXXXXXX  # Encrypted
+    secure: AAABAMfVNXXXXXXXXXXXXXXXXXXXXXX # Encrypted
 ```
 
 ---
 
-**Part 5 Complete**: Infrastructure as Code with Terraform (providers, variables, Kubernetes deployment
-module with namespace/configmap/secret/deployment/service/ingress/HPA, Helm release integration) and
-Pulumi TypeScript program (complete Kubernetes resources with type safety, stack-based configuration,
-encrypted secrets). ✅
+**Part 5 Complete**: Infrastructure as Code with Terraform (providers, variables, Kubernetes
+deployment module with namespace/configmap/secret/deployment/service/ingress/HPA, Helm release
+integration) and Pulumi TypeScript program (complete Kubernetes resources with type safety,
+stack-based configuration, encrypted secrets). ✅
 
 **Continue to Part 6** for deployment best practices, rollback strategies, and completion checklist.

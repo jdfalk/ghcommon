@@ -54,9 +54,9 @@ spec:
         app: ubuntu-autoinstall-agent
         version: v1.0.0
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+        prometheus.io/path: '/metrics'
     spec:
       serviceAccountName: ubuntu-autoinstall-agent
       securityContext:
@@ -64,72 +64,72 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-      - name: ubuntu-autoinstall-agent
-        image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: http
-          containerPort: 8080
-          protocol: TCP
-        - name: metrics
-          containerPort: 9090
-          protocol: TCP
-        env:
-        - name: RUST_LOG
-          value: "info"
-        - name: SERVER_PORT
-          value: "8080"
-        - name: METRICS_PORT
-          value: "9090"
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: ubuntu-autoinstall-secrets
-              key: database-url
-        - name: QEMU_SOCKET
-          value: "/var/run/libvirt/libvirt-sock"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        volumeMounts:
-        - name: config
-          mountPath: /etc/ubuntu-autoinstall
-          readOnly: true
-        - name: cache
-          mountPath: /var/cache/ubuntu-autoinstall
-        - name: libvirt-socket
-          mountPath: /var/run/libvirt
+        - name: ubuntu-autoinstall-agent
+          image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: RUST_LOG
+              value: 'info'
+            - name: SERVER_PORT
+              value: '8080'
+            - name: METRICS_PORT
+              value: '9090'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ubuntu-autoinstall-secrets
+                  key: database-url
+            - name: QEMU_SOCKET
+              value: '/var/run/libvirt/libvirt-sock'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: config
+              mountPath: /etc/ubuntu-autoinstall
+              readOnly: true
+            - name: cache
+              mountPath: /var/cache/ubuntu-autoinstall
+            - name: libvirt-socket
+              mountPath: /var/run/libvirt
       volumes:
-      - name: config
-        configMap:
-          name: ubuntu-autoinstall-config
-      - name: cache
-        emptyDir:
-          sizeLimit: 10Gi
-      - name: libvirt-socket
-        hostPath:
-          path: /var/run/libvirt
-          type: Directory
+        - name: config
+          configMap:
+            name: ubuntu-autoinstall-config
+        - name: cache
+          emptyDir:
+            sizeLimit: 10Gi
+        - name: libvirt-socket
+          hostPath:
+            path: /var/run/libvirt
+            type: Directory
 ```
 
 ### Service Definition
@@ -151,14 +151,14 @@ spec:
   selector:
     app: ubuntu-autoinstall-agent
   ports:
-  - name: http
-    port: 80
-    targetPort: http
-    protocol: TCP
-  - name: metrics
-    port: 9090
-    targetPort: metrics
-    protocol: TCP
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
   sessionAffinity: None
 ```
 
@@ -175,30 +175,30 @@ metadata:
   name: ubuntu-autoinstall-agent
   namespace: ubuntu-autoinstall
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    kubernetes.io/ingress.class: 'nginx'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/rate-limit: '100'
+    nginx.ingress.kubernetes.io/proxy-body-size: '10m'
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
 spec:
   tls:
-  - hosts:
-    - ubuntu-autoinstall.example.com
-    secretName: ubuntu-autoinstall-tls
+    - hosts:
+        - ubuntu-autoinstall.example.com
+      secretName: ubuntu-autoinstall-tls
   rules:
-  - host: ubuntu-autoinstall.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ubuntu-autoinstall-agent
-            port:
-              name: http
+    - host: ubuntu-autoinstall.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ubuntu-autoinstall-agent
+                port:
+                  name: http
 ```
 
 ### ConfigMap
@@ -282,9 +282,9 @@ metadata:
   namespace: ubuntu-autoinstall
 type: Opaque
 stringData:
-  database-url: "postgresql://user:password@postgres:5432/ubuntu_autoinstall"
-  api-key: "your-api-key-here"
-  jwt-secret: "your-jwt-secret-here"
+  database-url: 'postgresql://user:password@postgres:5432/ubuntu_autoinstall'
+  api-key: 'your-api-key-here'
+  jwt-secret: 'your-jwt-secret-here'
 ```
 
 ### ServiceAccount and RBAC
@@ -308,12 +308,12 @@ metadata:
   name: ubuntu-autoinstall-agent
   namespace: ubuntu-autoinstall
 rules:
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get"]
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -325,9 +325,9 @@ roleRef:
   kind: Role
   name: ubuntu-autoinstall-agent
 subjects:
-- kind: ServiceAccount
-  name: ubuntu-autoinstall-agent
-  namespace: ubuntu-autoinstall
+  - kind: ServiceAccount
+    name: ubuntu-autoinstall-agent
+    namespace: ubuntu-autoinstall
 ```
 
 ## HorizontalPodAutoscaler
@@ -350,41 +350,41 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Pods
-    pods:
-      metric:
-        name: http_requests_per_second
-      target:
-        type: AverageValue
-        averageValue: "1000"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Pods
+      pods:
+        metric:
+          name: http_requests_per_second
+        target:
+          type: AverageValue
+          averageValue: '1000'
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 50
-        periodSeconds: 60
+        - type: Percent
+          value: 50
+          periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
       policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 30
-      - type: Pods
-        value: 2
-        periodSeconds: 30
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 2
+          periodSeconds: 30
       selectPolicy: Max
 ```
 
@@ -424,43 +424,43 @@ spec:
     matchLabels:
       app: ubuntu-autoinstall-agent
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    ports:
-    - protocol: TCP
-      port: 8080
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    ports:
-    - protocol: TCP
-      port: 9090
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - namespaceSelector: {}
-    ports:
-    - protocol: TCP
-      port: 53
-    - protocol: UDP
-      port: 53
-  - to:
-    - podSelector: {}
-    ports:
-    - protocol: TCP
-      port: 443
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
 ```
 
 ## StatefulSet for Database
@@ -487,61 +487,61 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:15-alpine
-        ports:
-        - containerPort: 5432
-          name: postgres
-        env:
-        - name: POSTGRES_DB
-          value: "ubuntu_autoinstall"
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secrets
-              key: username
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secrets
-              key: password
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        volumeMounts:
-        - name: postgres-data
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: 'ubuntu_autoinstall'
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 10
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: 'fast-ssd'
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - postgres
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - postgres
-          initialDelaySeconds: 10
-          periodSeconds: 5
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: "fast-ssd"
-      resources:
-        requests:
-          storage: 10Gi
+            storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
@@ -552,8 +552,8 @@ spec:
   selector:
     app: postgres
   ports:
-  - port: 5432
-    targetPort: postgres
+    - port: 5432
+      targetPort: postgres
   clusterIP: None
 ```
 
@@ -626,10 +626,10 @@ images:
 
 ---
 
-**Part 1 Complete**: Kubernetes deployment manifests including Deployment with rolling updates, Service
-with ClusterIP, Ingress with TLS and rate limiting, ConfigMap with application configuration,
-ServiceAccount with RBAC, HorizontalPodAutoscaler with CPU/memory/custom metrics, PodDisruptionBudget
-for availability, NetworkPolicy for security, StatefulSet for PostgreSQL, PersistentVolumeClaim for
-cache, and Kustomization base configuration. ✅
+**Part 1 Complete**: Kubernetes deployment manifests including Deployment with rolling updates,
+Service with ClusterIP, Ingress with TLS and rate limiting, ConfigMap with application
+configuration, ServiceAccount with RBAC, HorizontalPodAutoscaler with CPU/memory/custom metrics,
+PodDisruptionBudget for availability, NetworkPolicy for security, StatefulSet for PostgreSQL,
+PersistentVolumeClaim for cache, and Kustomization base configuration. ✅
 
 **Continue to Part 2** for Helm chart configuration and templating.

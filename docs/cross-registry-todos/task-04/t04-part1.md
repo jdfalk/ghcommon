@@ -1,8 +1,14 @@
 <!-- file: docs/cross-registry-todos/task-04/t04-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t04-go-packages-part1-d4e5f6a7-b8c9 -->
 
 # Task 04: Add Go Module Publishing to GitHub Packages
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-go.yml` v2.2.0 now detects Go modules, validates tag
+> alignment, builds metadata, and publishes artifacts to GitHub Packages.  
+> **Verification:** Validation and publishing jobs confirm module readiness before execution and
+> upload build outputs for review.
 
 ## Task Overview
 

@@ -8,10 +8,11 @@
 
 ### Scenario 1: High Error Rate
 
-```markdown
+````markdown
 # Troubleshooting: High Error Rate Alert
 
 ## Symptoms
+
 - Alert: "HighErrorRate" firing
 - Error rate > 10 errors/sec or >1% of requests
 - Users reporting 500 errors
@@ -20,17 +21,21 @@
 ## Diagnostic Workflow
 
 ### Step 1: Identify Affected Services
+
 ```bash
 # Query Prometheus for error rates by service
 curl -G 'http://prometheus:9090/api/v1/query' \
   --data-urlencode 'query=sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)'
 ```
+````
 
 **Expected Output**:
+
 - Identify which service(s) have elevated error rates
 - Note the baseline vs. current error rate
 
 ### Step 2: Examine Recent Logs
+
 ```bash
 # Query Loki for recent error logs
 curl -G 'http://loki:3100/loki/api/v1/query' \
@@ -39,12 +44,14 @@ curl -G 'http://loki:3100/loki/api/v1/query' \
 ```
 
 **Look for**:
+
 - Common error messages
 - Stack traces
 - Error patterns (database, network, timeout)
 - Trace IDs for correlation
 
 ### Step 3: Check Recent Deployments
+
 ```bash
 # List recent deployments
 kubectl get deployments -n production -o json | \
@@ -52,11 +59,13 @@ kubectl get deployments -n production -o json | \
 ```
 
 **If recent deployment found**:
+
 1. Check deployment diff: `kubectl rollout history deployment/api-service`
 2. Review release notes
 3. Consider rollback: `kubectl rollout undo deployment/api-service`
 
 ### Step 4: Investigate Dependency Health
+
 ```bash
 # Check database connectivity
 kubectl exec -it deployment/api-service -- psql -U user -d database -c "SELECT 1;"
@@ -69,12 +78,14 @@ curl -I https://external-api.example.com/health
 ```
 
 ### Step 5: Analyze Distributed Traces
+
 1. Navigate to Jaeger UI: http://jaeger:16686
 2. Search for failed traces: Service="api-service", Tags="error=true"
 3. Identify common failure points in trace timeline
 4. Check span duration for performance bottlenecks
 
 ### Step 6: Review Resource Utilization
+
 ```bash
 # Check pod resource usage
 kubectl top pods -n production --selector=app=api-service
@@ -84,6 +95,7 @@ kubectl top nodes
 ```
 
 **Red flags**:
+
 - CPU > 80%
 - Memory > 85%
 - Pod restart count increasing
@@ -91,49 +103,56 @@ kubectl top nodes
 ## Common Root Causes
 
 ### Database Connection Exhaustion
-**Symptoms**: "connection pool exhausted" errors
-**Fix**:
+
+**Symptoms**: "connection pool exhausted" errors **Fix**:
+
 ```yaml
 # Increase connection pool size
 env:
   - name: DATABASE_MAX_CONNECTIONS
-    value: "100"  # From 20
+    value: '100' # From 20
 ```
 
 ### Memory Leak
-**Symptoms**: Gradual memory increase, OOMKilled pods
-**Fix**:
+
+**Symptoms**: Gradual memory increase, OOMKilled pods **Fix**:
+
 1. Identify leak with heap profiling
 2. Apply fix and redeploy
 3. Increase memory limits temporarily:
+
 ```yaml
 resources:
   limits:
-    memory: 2Gi  # From 512Mi
+    memory: 2Gi # From 512Mi
 ```
 
 ### Downstream Service Failure
-**Symptoms**: Timeout errors, cascading failures
-**Fix**:
+
+**Symptoms**: Timeout errors, cascading failures **Fix**:
+
 1. Enable circuit breaker
 2. Implement fallback responses
 3. Add retry with exponential backoff
 
 ### Configuration Error
-**Symptoms**: Sudden errors after deployment
-**Fix**:
+
+**Symptoms**: Sudden errors after deployment **Fix**:
+
 1. Review ConfigMap changes: `kubectl diff -f config.yaml`
 2. Restore previous configuration
 3. Redeploy
 
 ## Resolution Checklist
+
 - [ ] Root cause identified
 - [ ] Fix applied or mitigation implemented
 - [ ] Error rate returned to normal
 - [ ] Alert resolved
 - [ ] Post-mortem scheduled
 - [ ] Documentation updated
-```
+
+````
 
 ### Scenario 2: High Latency
 
@@ -156,9 +175,10 @@ topk(10,
     sum(rate(http_request_duration_seconds_bucket[5m])) by (endpoint, le)
   )
 )
-```
+````
 
 ### Step 2: Analyze Slow Traces
+
 1. Navigate to Jaeger
 2. Search traces with duration > 500ms
 3. Identify slowest spans in trace
@@ -169,6 +189,7 @@ topk(10,
    - Lock contention
 
 ### Step 3: Check Database Performance
+
 ```bash
 # Slow query log
 kubectl exec -it postgres-0 -- psql -U user -d database -c "
@@ -185,6 +206,7 @@ kubectl exec -it postgres-0 -- psql -U user -d database -c "
 ```
 
 ### Step 4: Review Cache Hit Rate
+
 ```promql
 # Cache hit rate
 sum(rate(cache_hits_total[5m])) /
@@ -192,11 +214,13 @@ sum(rate(cache_hits_total[5m])) /
 ```
 
 **If < 80%**:
+
 - Check cache expiration settings
 - Verify cache warming strategy
 - Increase cache size if memory available
 
 ### Step 5: Check for Resource Contention
+
 ```bash
 # CPU throttling
 kubectl get pods -n production -o json | \
@@ -209,32 +233,37 @@ kubectl exec -it deployment/api-service -- top -b -n 1
 ## Resolution Strategies
 
 ### Optimize Database Queries
+
 1. Add missing indexes
 2. Rewrite N+1 queries
 3. Implement query result caching
 4. Use connection pooling
 
 ### Scale Horizontally
+
 ```bash
 # Increase replica count
 kubectl scale deployment/api-service --replicas=10
 ```
 
 ### Enable Caching
+
 ```yaml
 # Add Redis caching layer
 env:
   - name: CACHE_ENABLED
-    value: "true"
+    value: 'true'
   - name: CACHE_TTL
-    value: "300"  # 5 minutes
+    value: '300' # 5 minutes
 ```
 
 ### Implement Async Processing
+
 - Move slow operations to background jobs
 - Use message queue for async tasks
 - Return immediate response with job ID
-```
+
+````
 
 ### Scenario 3: Service Down
 
@@ -259,15 +288,17 @@ kubectl describe pod <pod-name> -n production
 
 # Check events
 kubectl get events -n production --sort-by='.lastTimestamp' | tail -20
-```
+````
 
 **Common issues**:
+
 - ImagePullBackOff: Image doesn't exist or auth failed
 - CrashLoopBackOff: Application crashes on startup
 - Pending: Insufficient resources
 - OOMKilled: Out of memory
 
 ### Step 2: Check Logs
+
 ```bash
 # Current logs
 kubectl logs deployment/api-service -n production --tail=100
@@ -277,6 +308,7 @@ kubectl logs deployment/api-service -n production --previous
 ```
 
 ### Step 3: Check Resource Availability
+
 ```bash
 # Node resources
 kubectl describe nodes | grep -A 5 "Allocated resources"
@@ -286,6 +318,7 @@ kubectl get events -n kube-system | grep cluster-autoscaler
 ```
 
 ### Step 4: Verify Configuration
+
 ```bash
 # Check ConfigMap
 kubectl get configmap api-service-config -n production -o yaml
@@ -296,6 +329,7 @@ kubectl get secret api-service-secrets -n production -o json | \
 ```
 
 ### Step 5: Test Connectivity
+
 ```bash
 # DNS resolution
 kubectl exec -it deployment/api-service -- nslookup postgres-service
@@ -310,11 +344,13 @@ kubectl exec -it deployment/api-service -- curl -I https://external-api.example.
 ## Resolution Actions
 
 ### Restart Deployment
+
 ```bash
 kubectl rollout restart deployment/api-service -n production
 ```
 
 ### Rollback to Previous Version
+
 ```bash
 # View history
 kubectl rollout history deployment/api-service -n production
@@ -324,6 +360,7 @@ kubectl rollout undo deployment/api-service -n production --to-revision=5
 ```
 
 ### Scale Up Resources
+
 ```yaml
 # Increase resource limits
 resources:
@@ -336,6 +373,7 @@ resources:
 ```
 
 ### Fix Configuration
+
 ```bash
 # Update ConfigMap
 kubectl edit configmap api-service-config -n production
@@ -343,7 +381,8 @@ kubectl edit configmap api-service-config -n production
 # Restart to pick up changes
 kubectl rollout restart deployment/api-service -n production
 ```
-```
+
+````
 
 ## Diagnostic Commands Reference
 
@@ -393,7 +432,7 @@ k-check-config() {
   kubectl get configmap "$1" -n production -o yaml
   kubectl get secret "$1-secrets" -n production -o json | jq '.data | keys'
 }
-```
+````
 
 ### Prometheus Queries for Troubleshooting
 

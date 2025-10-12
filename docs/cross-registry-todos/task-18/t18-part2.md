@@ -32,13 +32,13 @@
               "defaults": {
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "red"},
-                    {"value": 1, "color": "green"}
+                    { "value": 0, "color": "red" },
+                    { "value": 1, "color": "green" }
                   ]
                 },
                 "mappings": [
-                  {"value": 0, "text": "Down"},
-                  {"value": 1, "text": "Up"}
+                  { "value": 0, "text": "Down" },
+                  { "value": 1, "text": "Up" }
                 ]
               }
             }
@@ -55,9 +55,9 @@
               "defaults": {
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 1, "color": "yellow"},
-                    {"value": 5, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 1, "color": "yellow" },
+                    { "value": 5, "color": "red" }
                   ]
                 }
               }
@@ -76,8 +76,8 @@
               "name": "High Error Rate",
               "conditions": [
                 {
-                  "evaluator": {"params": [10], "type": "gt"},
-                  "query": {"params": ["A", "5m", "now"]},
+                  "evaluator": { "params": [10], "type": "gt" },
+                  "query": { "params": ["A", "5m", "now"] },
                   "type": "query"
                 }
               ]
@@ -92,9 +92,7 @@
                 "legendFormat": "{{service}}"
               }
             ],
-            "yaxes": [
-              {"format": "s", "label": "Latency"}
-            ]
+            "yaxes": [{ "format": "s", "label": "Latency" }]
           }
         ]
       },
@@ -114,9 +112,9 @@
                 "unit": "percent",
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "red"},
-                    {"value": 90, "color": "yellow"},
-                    {"value": 95, "color": "green"}
+                    { "value": 0, "color": "red" },
+                    { "value": 90, "color": "yellow" },
+                    { "value": 95, "color": "green" }
                   ]
                 }
               }
@@ -150,9 +148,9 @@
                 "unit": "m",
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 30, "color": "yellow"},
-                    {"value": 60, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 30, "color": "yellow" },
+                    { "value": 60, "color": "red" }
                   ]
                 }
               }
@@ -171,9 +169,9 @@
                 "unit": "percent",
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 15, "color": "yellow"},
-                    {"value": 30, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 15, "color": "yellow" },
+                    { "value": 30, "color": "red" }
                   ]
                 }
               }
@@ -199,9 +197,9 @@
                 "max": 100,
                 "thresholds": {
                   "steps": [
-                    {"value": 99, "color": "red"},
-                    {"value": 99.5, "color": "yellow"},
-                    {"value": 99.9, "color": "green"}
+                    { "value": 99, "color": "red" },
+                    { "value": 99.5, "color": "yellow" },
+                    { "value": 99.9, "color": "green" }
                   ]
                 }
               }
@@ -222,9 +220,9 @@
                 "max": 1000,
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 500, "color": "yellow"},
-                    {"value": 800, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 500, "color": "yellow" },
+                    { "value": 800, "color": "red" }
                   ]
                 }
               }
@@ -243,9 +241,9 @@
                 "unit": "percent",
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "red"},
-                    {"value": 25, "color": "yellow"},
-                    {"value": 50, "color": "green"}
+                    { "value": 0, "color": "red" },
+                    { "value": 25, "color": "yellow" },
+                    { "value": 50, "color": "green" }
                   ]
                 }
               }
@@ -309,13 +307,7 @@
               }
             ],
             "options": {
-              "columns": [
-                "Service",
-                "Operation",
-                "Duration",
-                "Start Time",
-                "Trace ID"
-              ]
+              "columns": ["Service", "Operation", "Duration", "Start Time", "Trace ID"]
             }
           }
         ]
@@ -374,7 +366,7 @@
 // version: 1.0.0
 // guid: drill-down-navigation
 
-import {DataLink, DataFrame} from '@grafana/data';
+import { DataLink, DataFrame } from '@grafana/data';
 
 /**
  * Create data link from log to trace
@@ -390,16 +382,11 @@ export function createLogToTraceLink(traceId: string): DataLink {
 /**
  * Create data link from metric to logs
  */
-export function createMetricToLogsLink(
-  service: string,
-  timestamp: number
-): DataLink {
+export function createMetricToLogsLink(service: string, timestamp: number): DataLink {
   const start = timestamp - 300000; // 5 minutes before
   const end = timestamp + 300000; // 5 minutes after
 
-  const lokiQuery = encodeURIComponent(
-    `{service="${service}"}`
-  );
+  const lokiQuery = encodeURIComponent(`{service="${service}"}`);
 
   return {
     title: 'View Logs in Grafana',
@@ -411,13 +398,8 @@ export function createMetricToLogsLink(
 /**
  * Create data link from trace to logs
  */
-export function createTraceToLogsLink(
-  traceId: string,
-  spanId: string
-): DataLink {
-  const lokiQuery = encodeURIComponent(
-    `{} |= "${traceId}"`
-  );
+export function createTraceToLogsLink(traceId: string, spanId: string): DataLink {
+  const lokiQuery = encodeURIComponent(`{} |= "${traceId}"`);
 
   return {
     title: 'View Related Logs',
@@ -475,9 +457,9 @@ export function addExemplarLinks(dataFrame: DataFrame): DataFrame {
                 "decimals": 3,
                 "thresholds": {
                   "steps": [
-                    {"value": 99, "color": "red"},
-                    {"value": 99.9, "color": "yellow"},
-                    {"value": 99.99, "color": "green"}
+                    { "value": 99, "color": "red" },
+                    { "value": 99.9, "color": "yellow" },
+                    { "value": 99.99, "color": "green" }
                   ]
                 }
               }
@@ -512,9 +494,9 @@ export function addExemplarLinks(dataFrame: DataFrame): DataFrame {
                 "decimals": 0,
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 200, "color": "yellow"},
-                    {"value": 500, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 200, "color": "yellow" },
+                    { "value": 500, "color": "red" }
                   ]
                 }
               }
@@ -534,9 +516,9 @@ export function addExemplarLinks(dataFrame: DataFrame): DataFrame {
                 "decimals": 2,
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 0.5, "color": "yellow"},
-                    {"value": 1, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 0.5, "color": "yellow" },
+                    { "value": 1, "color": "red" }
                   ]
                 }
               }
@@ -667,8 +649,8 @@ export function addExemplarLinks(dataFrame: DataFrame): DataFrame {
               "defaults": {
                 "thresholds": {
                   "steps": [
-                    {"value": 0, "color": "green"},
-                    {"value": 1, "color": "red"}
+                    { "value": 0, "color": "green" },
+                    { "value": 1, "color": "red" }
                   ]
                 }
               }
@@ -702,8 +684,8 @@ export function addExemplarLinks(dataFrame: DataFrame): DataFrame {
 ---
 
 **Part 2 Complete**: Unified monitoring dashboard with single pane of glass Grafana configuration
-showing system health (service status, active alerts, error rate, latency P95), CI/CD pipeline health
-(build success rate >95%, deployment frequency, MTTR <30min, change failure rate <15%), SLO
+showing system health (service status, active alerts, error rate, latency P95), CI/CD pipeline
+health (build success rate >95%, deployment frequency, MTTR <30min, change failure rate <15%), SLO
 compliance (availability 99.9%, latency <500ms P95, error budget remaining), integrated log panel
 with trace correlation links, active traces panel with search capabilities, drill-down navigation
 with log-to-trace links using trace IDs, metric-to-logs links with time range context, trace-to-logs

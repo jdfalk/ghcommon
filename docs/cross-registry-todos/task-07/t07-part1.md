@@ -1,8 +1,14 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t07-protobuf-packages-part1-l5m6n7o8-p9q0 -->
 
 # Task 07 Part 1: Protobuf Package Publishing - Overview
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-protobuf.yml` v1.3.0 now pushes modules to Buf Schema
+> Registry (when `BUF_TOKEN` is configured) after artifacts are generated.  
+> **Verification:** Job summaries report publish outcomes, and Buf pushes occur only on tagged
+> releases with the secret present.
 
 ## Task Overview
 

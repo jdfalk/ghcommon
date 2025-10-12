@@ -95,7 +95,7 @@ jobs:
         run: |
           cargo doc --no-deps --all-features --document-private-items
         env:
-          RUSTDOCFLAGS: "-D warnings"
+          RUSTDOCFLAGS: '-D warnings'
 
       - name: Check for broken intra-doc links
         run: |
@@ -409,17 +409,18 @@ jobs:
   summary:
     name: Documentation CI Summary
     if: always()
-    needs: [
-      build-rust-docs,
-      build-python-docs,
-      build-js-docs,
-      build-mdbook,
-      build-mkdocs,
-      lint-markdown,
-      check-spelling,
-      validate-examples,
-      documentation-coverage
-    ]
+    needs:
+      [
+        build-rust-docs,
+        build-python-docs,
+        build-js-docs,
+        build-mdbook,
+        build-mkdocs,
+        lint-markdown,
+        check-spelling,
+        validate-examples,
+        documentation-coverage,
+      ]
     runs-on: ubuntu-latest
     steps:
       - name: Generate summary
@@ -441,7 +442,7 @@ jobs:
 
 ## Example Validation Script
 
-```python
+````python
 #!/usr/bin/env python3
 # file: scripts/validate-examples.py
 # version: 1.0.0
@@ -684,7 +685,7 @@ def main():
 
 if __name__ == '__main__':
     main()
-```
+````
 
 ## Typos Configuration
 
@@ -865,6 +866,10 @@ if __name__ == '__main__':
 
 ---
 
-**Part 5 Complete**: Documentation CI/CD with intelligent change detection, multi-language doc building (Rust/Python/JavaScript), mdBook and MkDocs integration, markdown linting, spell checking, code example validation, documentation coverage checks, PR preview deployments, and metrics collection. ✅
+**Part 5 Complete**: Documentation CI/CD with intelligent change detection, multi-language doc
+building (Rust/Python/JavaScript), mdBook and MkDocs integration, markdown linting, spell checking,
+code example validation, documentation coverage checks, PR preview deployments, and metrics
+collection. ✅
 
-**Continue to Part 6** for documentation best practices, maintenance workflows, and Task 14 completion summary.
+**Continue to Part 6** for documentation best practices, maintenance workflows, and Task 14
+completion summary.

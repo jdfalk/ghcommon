@@ -26,9 +26,9 @@ groups:
           severity: critical
           category: application
         annotations:
-          summary: "High error rate detected"
-          description: "Service {{ $labels.service }} has error rate of {{ $value }} errors/sec"
-          runbook: "https://runbooks.example.com/high-error-rate"
+          summary: 'High error rate detected'
+          description: 'Service {{ $labels.service }} has error rate of {{ $value }} errors/sec'
+          runbook: 'https://runbooks.example.com/high-error-rate'
 
       # Error spike alert
       - alert: ErrorSpike
@@ -43,8 +43,8 @@ groups:
           severity: warning
           category: application
         annotations:
-          summary: "Error spike detected"
-          description: "Service {{ $labels.service }} has 5x increase in errors"
+          summary: 'Error spike detected'
+          description: 'Service {{ $labels.service }} has 5x increase in errors'
 
       # Critical error pattern
       - alert: CriticalErrorPattern
@@ -55,9 +55,9 @@ groups:
           severity: critical
           category: fatal_error
         annotations:
-          summary: "Critical error detected"
-          description: "Service {{ $labels.service }} has critical errors"
-          action: "Immediate investigation required"
+          summary: 'Critical error detected'
+          description: 'Service {{ $labels.service }} has critical errors'
+          action: 'Immediate investigation required'
 
   - name: security_alerts
     interval: 1m
@@ -71,9 +71,9 @@ groups:
           severity: warning
           category: security
         annotations:
-          summary: "High authentication failure rate"
-          description: "{{ $value }} authentication failures per second"
-          action: "Check for brute force attack"
+          summary: 'High authentication failure rate'
+          description: '{{ $value }} authentication failures per second'
+          action: 'Check for brute force attack'
 
       # Unauthorized access attempts
       - alert: UnauthorizedAccessAttempts
@@ -83,9 +83,9 @@ groups:
           severity: warning
           category: security
         annotations:
-          summary: "Multiple unauthorized access attempts"
-          description: "IP {{ $labels.remote_addr }} attempted {{ $value }} unauthorized accesses"
-          action: "Consider blocking IP address"
+          summary: 'Multiple unauthorized access attempts'
+          description: 'IP {{ $labels.remote_addr }} attempted {{ $value }} unauthorized accesses'
+          action: 'Consider blocking IP address'
 
       # SQL injection attempts
       - alert: SQLInjectionAttempt
@@ -95,9 +95,9 @@ groups:
           severity: critical
           category: security
         annotations:
-          summary: "Possible SQL injection attempt detected"
-          description: "{{ $value }} potential SQL injection attempts"
-          action: "Review security logs immediately"
+          summary: 'Possible SQL injection attempt detected'
+          description: '{{ $value }} potential SQL injection attempts'
+          action: 'Review security logs immediately'
 
   - name: performance_alerts
     interval: 1m
@@ -111,8 +111,8 @@ groups:
           severity: warning
           category: performance
         annotations:
-          summary: "Slow database queries detected"
-          description: "Service {{ $labels.service }} has {{ $value }} slow queries/sec (>1s)"
+          summary: 'Slow database queries detected'
+          description: 'Service {{ $labels.service }} has {{ $value }} slow queries/sec (>1s)'
 
       # High latency
       - alert: HighRequestLatency
@@ -123,8 +123,8 @@ groups:
           severity: warning
           category: performance
         annotations:
-          summary: "High request latency"
-          description: "Endpoint {{ $labels.endpoint }} has P95 latency of {{ $value }}ms"
+          summary: 'High request latency'
+          description: 'Endpoint {{ $labels.endpoint }} has P95 latency of {{ $value }}ms'
 
   - name: availability_alerts
     interval: 1m
@@ -137,9 +137,9 @@ groups:
           severity: critical
           category: availability
         annotations:
-          summary: "Service stopped logging"
-          description: "No logs from critical-service for 5 minutes"
-          action: "Check service health immediately"
+          summary: 'Service stopped logging'
+          description: 'No logs from critical-service for 5 minutes'
+          action: 'Check service health immediately'
 
       # Pod restart loop
       - alert: PodRestartLoop
@@ -149,9 +149,9 @@ groups:
           severity: critical
           category: availability
         annotations:
-          summary: "Pod restart loop detected"
-          description: "Pod {{ $labels.pod }} restarted {{ $value }} times in 10 minutes"
-          action: "Check pod logs and events"
+          summary: 'Pod restart loop detected'
+          description: 'Pod {{ $labels.pod }} restarted {{ $value }} times in 10 minutes'
+          action: 'Check pod logs and events'
 
   - name: business_alerts
     interval: 5m
@@ -169,9 +169,9 @@ groups:
           severity: critical
           category: business
         annotations:
-          summary: "High payment failure rate"
-          description: "{{ $value }}% of payments are failing"
-          action: "Contact payment provider immediately"
+          summary: 'High payment failure rate'
+          description: '{{ $value }}% of payments are failing'
+          action: 'Contact payment provider immediately'
 
       # Order processing delays
       - alert: OrderProcessingDelay
@@ -182,8 +182,8 @@ groups:
           severity: warning
           category: business
         annotations:
-          summary: "Order processing delays"
-          description: "P95 order processing time is {{ $value }}ms (>1 minute)"
+          summary: 'Order processing delays'
+          description: 'P95 order processing time is {{ $value }}ms (>1 minute)'
 ```
 
 ## Prometheus Alertmanager Integration
@@ -564,7 +564,7 @@ if __name__ == '__main__':
 
 ### Alert Grouping Strategy
 
-```yaml
+````yaml
 # file: docs/alerting-strategy.md
 # version: 1.0.0
 # guid: alerting-strategy-doc
@@ -580,7 +580,7 @@ route:
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 12h
-```
+````
 
 - **group_wait**: Wait 10s before sending initial notification (allows grouping)
 - **group_interval**: Wait 10s before sending updates on same group
@@ -589,16 +589,19 @@ route:
 ### Time-Based Throttling
 
 **Critical Alerts**:
+
 - First notification: Immediate (10s group_wait)
 - Updates: Every 5 minutes
 - Repeat: Every 1 hour if unresolved
 
 **Warning Alerts**:
+
 - First notification: After 30s
 - Updates: Every 5 minutes
 - Repeat: Every 4 hours if unresolved
 
 **Info Alerts**:
+
 - First notification: After 5 minutes
 - Updates: Every 30 minutes
 - Repeat: Every 24 hours if unresolved
@@ -606,12 +609,15 @@ route:
 ## Deduplication
 
 ### By Fingerprint
+
 Alertmanager automatically deduplicates alerts with same:
+
 - Alert name
 - Label set
 - Annotations (optional)
 
 ### Custom Deduplication
+
 ```python
 # file: scripts/alert_deduplication.py
 
@@ -654,6 +660,7 @@ class AlertDeduplicator:
 ## Alert Silencing
 
 ### Maintenance Windows
+
 ```yaml
 # file: config/alertmanager/silences.yml
 # version: 1.0.0
@@ -662,19 +669,19 @@ class AlertDeduplicator:
 # Silence alerts during maintenance
 - matchers:
     - service="payment-service"
-  startsAt: "2024-01-15T02:00:00Z"
-  endsAt: "2024-01-15T04:00:00Z"
-  createdBy: "ops-team"
-  comment: "Scheduled database maintenance"
+  startsAt: '2024-01-15T02:00:00Z'
+  endsAt: '2024-01-15T04:00:00Z'
+  createdBy: 'ops-team'
+  comment: 'Scheduled database maintenance'
 
 # Silence known issue
 - matchers:
     - alertname="HighLatency"
     - endpoint="/legacy-api"
-  startsAt: "2024-01-10T00:00:00Z"
-  endsAt: "2024-02-01T00:00:00Z"
-  createdBy: "dev-team"
-  comment: "Known issue - migration in progress"
+  startsAt: '2024-01-10T00:00:00Z'
+  endsAt: '2024-02-01T00:00:00Z'
+  createdBy: 'dev-team'
+  comment: 'Known issue - migration in progress'
 ```
 
 ---
@@ -684,10 +691,11 @@ class AlertDeduplicator:
 security alerts (authentication failures, unauthorized access attempts, SQL injection detection),
 performance alerts (slow database queries >1s, high request latency P95>1s), availability alerts
 (ServiceNotLogging, PodRestartLoop), business alerts (payment failures >5%, order processing delays
->1min), Alertmanager integration with routing by severity (critical to PagerDuty, warnings to Slack,
-info to email), inhibition rules to prevent alert storms, receiver configurations for multiple
-channels, statistical anomaly detection using Z-score with configurable baseline window (7 days) and
-threshold (3 sigma), alert throttling with time-based grouping (critical: 1h repeat, warning: 4h,
-info: 24h), deduplication by fingerprint, alert silencing for maintenance windows. ✅
+
+> 1min), Alertmanager integration with routing by severity (critical to PagerDuty, warnings to
+> Slack, info to email), inhibition rules to prevent alert storms, receiver configurations for
+> multiple channels, statistical anomaly detection using Z-score with configurable baseline window
+> (7 days) and threshold (3 sigma), alert throttling with time-based grouping (critical: 1h repeat,
+> warning: 4h, info: 24h), deduplication by fingerprint, alert silencing for maintenance windows. ✅
 
 **Continue to Part 6** for logging best practices, retention policies, and completion checklist.

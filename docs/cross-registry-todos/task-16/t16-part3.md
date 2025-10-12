@@ -112,19 +112,19 @@ spec:
   template:
     spec:
       containers:
-      - name: ubuntu-autoinstall-agent
-        resources:
-          limits:
-            cpu: 200m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        env:
-        - name: RUST_LOG
-          value: debug
-        - name: RUST_BACKTRACE
-          value: "1"
+        - name: ubuntu-autoinstall-agent
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          env:
+            - name: RUST_LOG
+              value: debug
+            - name: RUST_BACKTRACE
+              value: '1'
 ```
 
 ### Dev Ingress Patch
@@ -142,20 +142,20 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   tls:
-  - hosts:
-    - ubuntu-autoinstall-dev.example.com
-    secretName: ubuntu-autoinstall-dev-tls
+    - hosts:
+        - ubuntu-autoinstall-dev.example.com
+      secretName: ubuntu-autoinstall-dev-tls
   rules:
-  - host: ubuntu-autoinstall-dev.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ubuntu-autoinstall-agent
-            port:
-              name: http
+    - host: ubuntu-autoinstall-dev.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ubuntu-autoinstall-agent
+                port:
+                  name: http
 ```
 
 ## Staging Overlay
@@ -230,21 +230,21 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9090"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9090'
     spec:
       containers:
-      - name: ubuntu-autoinstall-agent
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 250m
-            memory: 256Mi
-        env:
-        - name: RUST_LOG
-          value: info
+        - name: ubuntu-autoinstall-agent
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          env:
+            - name: RUST_LOG
+              value: info
 ```
 
 ### Staging Resources Patch
@@ -262,18 +262,18 @@ spec:
   minReplicas: 2
   maxReplicas: 5
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 ## Production Overlay
@@ -364,30 +364,30 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9090"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "ubuntu-autoinstall-agent"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9090'
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'ubuntu-autoinstall-agent'
     spec:
       nodeSelector:
         workload: production
         node.kubernetes.io/instance-type: c5.xlarge
       containers:
-      - name: ubuntu-autoinstall-agent
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
-        env:
-        - name: RUST_LOG
-          value: warn
-        - name: RUST_BACKTRACE
-          value: "0"
-        - name: MAX_CONNECTIONS
-          value: "1000"
+        - name: ubuntu-autoinstall-agent
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: RUST_LOG
+              value: warn
+            - name: RUST_BACKTRACE
+              value: '0'
+            - name: MAX_CONNECTIONS
+              value: '1000'
 ```
 
 ### Production HPA Patch
@@ -405,41 +405,41 @@ spec:
   minReplicas: 5
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 60
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Pods
-    pods:
-      metric:
-        name: http_requests_per_second
-      target:
-        type: AverageValue
-        averageValue: "2000"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Pods
+      pods:
+        metric:
+          name: http_requests_per_second
+        target:
+          type: AverageValue
+          averageValue: '2000'
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 50
-        periodSeconds: 60
+        - type: Percent
+          value: 50
+          periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
       policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 30
-      - type: Pods
-        value: 4
-        periodSeconds: 30
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 4
+          periodSeconds: 30
       selectPolicy: Max
 ```
 
@@ -459,46 +459,46 @@ spec:
     matchLabels:
       app: ubuntu-autoinstall-agent
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - namespaceSelector:
-        matchLabels:
-          name: istio-system
-    ports:
-    - protocol: TCP
-      port: 8080
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    ports:
-    - protocol: TCP
-      port: 9090
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: istio-system
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector: {}
-    ports:
-    - protocol: TCP
-      port: 53
-    - protocol: UDP
-      port: 53
-  - to:
-    - podSelector: {}
-    ports:
-    - protocol: TCP
-      port: 443
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
 ```
 
 ### Production Affinity Patch (JSON6902)
@@ -513,21 +513,21 @@ spec:
   value:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - ubuntu-autoinstall-agent
-        topologyKey: kubernetes.io/hostname
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ubuntu-autoinstall-agent
+          topologyKey: kubernetes.io/hostname
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-        - matchExpressions:
-          - key: workload
-            operator: In
-            values:
-            - production
+          - matchExpressions:
+              - key: workload
+                operator: In
+                values:
+                  - production
 ```
 
 ## Kustomize Components
@@ -563,9 +563,9 @@ spec:
     matchLabels:
       app: ubuntu-autoinstall-agent
   endpoints:
-  - port: metrics
-    interval: 30s
-    path: /metrics
+    - port: metrics
+      interval: 30s
+      path: /metrics
 ```
 
 ```yaml
@@ -579,31 +579,31 @@ metadata:
   name: ubuntu-autoinstall-agent
 spec:
   groups:
-  - name: ubuntu-autoinstall-agent
-    interval: 30s
-    rules:
-    - alert: HighErrorRate
-      expr: |
-        sum(rate(http_requests_total{status=~"5..", job="ubuntu-autoinstall-agent"}[5m])) /
-        sum(rate(http_requests_total{job="ubuntu-autoinstall-agent"}[5m])) > 0.05
-      for: 5m
-      labels:
-        severity: critical
-      annotations:
-        summary: High error rate detected
-        description: Error rate is {{ $value | humanizePercentage }} for the last 5 minutes
+    - name: ubuntu-autoinstall-agent
+      interval: 30s
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            sum(rate(http_requests_total{status=~"5..", job="ubuntu-autoinstall-agent"}[5m])) /
+            sum(rate(http_requests_total{job="ubuntu-autoinstall-agent"}[5m])) > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: High error rate detected
+            description: Error rate is {{ $value | humanizePercentage }} for the last 5 minutes
 
-    - alert: HighLatency
-      expr: |
-        histogram_quantile(0.95,
-          sum(rate(http_request_duration_seconds_bucket{job="ubuntu-autoinstall-agent"}[5m])) by (le)
-        ) > 1
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: High latency detected
-        description: P95 latency is {{ $value }}s
+        - alert: HighLatency
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket{job="ubuntu-autoinstall-agent"}[5m])) by (le)
+            ) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: High latency detected
+            description: P95 latency is {{ $value }}s
 ```
 
 ### Istio Component
@@ -632,22 +632,22 @@ metadata:
   name: ubuntu-autoinstall-agent
 spec:
   hosts:
-  - ubuntu-autoinstall-agent
+    - ubuntu-autoinstall-agent
   http:
-  - match:
-    - headers:
-        canary:
-          exact: "true"
-    route:
-    - destination:
-        host: ubuntu-autoinstall-agent
-        subset: canary
-      weight: 100
-  - route:
-    - destination:
-        host: ubuntu-autoinstall-agent
-        subset: stable
-      weight: 100
+    - match:
+        - headers:
+            canary:
+              exact: 'true'
+      route:
+        - destination:
+            host: ubuntu-autoinstall-agent
+            subset: canary
+          weight: 100
+    - route:
+        - destination:
+            host: ubuntu-autoinstall-agent
+            subset: stable
+          weight: 100
 ```
 
 ```yaml
@@ -677,12 +677,12 @@ spec:
       baseEjectionTime: 30s
       maxEjectionPercent: 50
   subsets:
-  - name: stable
-    labels:
-      version: v1
-  - name: canary
-    labels:
-      version: v2
+    - name: stable
+      labels:
+        version: v1
+    - name: canary
+      labels:
+        version: v2
 ```
 
 ## ArgoCD Application Configuration
@@ -812,10 +812,10 @@ spec:
   revisionHistoryLimit: 20
 
   ignoreDifferences:
-  - group: apps
-    kind: Deployment
-    jsonPointers:
-    - /spec/replicas
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
 ```
 
 ### ArgoCD AppProject for Production
@@ -834,42 +834,42 @@ spec:
   description: Production environment applications
 
   sourceRepos:
-  - https://github.com/jdfalk/ubuntu-autoinstall-agent.git
+    - https://github.com/jdfalk/ubuntu-autoinstall-agent.git
 
   destinations:
-  - namespace: ubuntu-autoinstall-production
-    server: https://kubernetes.default.svc
-  - namespace: ubuntu-autoinstall-canary
-    server: https://kubernetes.default.svc
+    - namespace: ubuntu-autoinstall-production
+      server: https://kubernetes.default.svc
+    - namespace: ubuntu-autoinstall-canary
+      server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:
-  - group: ''
-    kind: Namespace
-  - group: 'rbac.authorization.k8s.io'
-    kind: ClusterRole
-  - group: 'rbac.authorization.k8s.io'
-    kind: ClusterRoleBinding
+    - group: ''
+      kind: Namespace
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRole
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRoleBinding
 
   namespaceResourceWhitelist:
-  - group: '*'
-    kind: '*'
+    - group: '*'
+      kind: '*'
 
   roles:
-  - name: admin
-    description: Admin privileges
-    policies:
-    - p, proj:production:admin, applications, *, production/*, allow
-    - p, proj:production:admin, repositories, *, production/*, allow
-    groups:
-    - sre-team
+    - name: admin
+      description: Admin privileges
+      policies:
+        - p, proj:production:admin, applications, *, production/*, allow
+        - p, proj:production:admin, repositories, *, production/*, allow
+      groups:
+        - sre-team
 
-  - name: deployer
-    description: Deployment privileges
-    policies:
-    - p, proj:production:deployer, applications, sync, production/*, allow
-    - p, proj:production:deployer, applications, get, production/*, allow
-    groups:
-    - deployment-team
+    - name: deployer
+      description: Deployment privileges
+      policies:
+        - p, proj:production:deployer, applications, sync, production/*, allow
+        - p, proj:production:deployer, applications, get, production/*, allow
+      groups:
+        - deployment-team
 ```
 
 ---

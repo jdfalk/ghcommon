@@ -8,7 +8,7 @@
 
 ### Zero-Downtime Deployment Strategy
 
-```markdown
+````markdown
 # Zero-Downtime Deployment Checklist
 
 ## Pre-Deployment
@@ -43,6 +43,7 @@
        maxSurge: 25%
        maxUnavailable: 0
    ```
+````
 
 2. **Monitor Key Metrics**
    - Request rate
@@ -71,7 +72,8 @@
    - Previous version images available
    - Rollback command documented
    - On-call team notified
-```
+
+````
 
 ### Deployment Rollback Strategy
 
@@ -108,11 +110,11 @@
 - Minor performance improvements possible
 - Feature flags can disable problematic features
 - Issues can be hot-fixed quickly
-```
+````
 
 ### Deployment Runbook
 
-```markdown
+````markdown
 # Deployment Runbook: ubuntu-autoinstall-agent
 
 ## Pre-Deployment Checklist
@@ -130,6 +132,7 @@
 ## Deployment Steps
 
 ### Step 1: Deploy to Development
+
 ```bash
 # Update image tag
 kubectl set image deployment/ubuntu-autoinstall-agent \
@@ -140,13 +143,16 @@ kubectl set image deployment/ubuntu-autoinstall-agent \
 kubectl rollout status deployment/ubuntu-autoinstall-agent \
   -n ubuntu-autoinstall-dev
 ```
+````
 
 **Verify**:
+
 - [ ] Health endpoint responding
 - [ ] Logs show no errors
 - [ ] Smoke tests passing
 
 ### Step 2: Deploy to Staging
+
 ```bash
 # Update ArgoCD application
 argocd app set ubuntu-autoinstall-staging \
@@ -160,11 +166,13 @@ argocd app wait ubuntu-autoinstall-staging
 ```
 
 **Verify**:
+
 - [ ] Integration tests passing
 - [ ] Performance tests within bounds
 - [ ] No anomalies in metrics
 
 ### Step 3: Deploy to Production (Canary)
+
 ```bash
 # Start canary deployment
 kubectl argo rollouts set image ubuntu-autoinstall-agent \
@@ -177,6 +185,7 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 ```
 
 **Monitoring during canary** (30-60 minutes):
+
 - [ ] Error rate <0.1%
 - [ ] P95 latency <500ms
 - [ ] No increase in error logs
@@ -184,6 +193,7 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 - [ ] No user complaints
 
 ### Step 4: Promote to Production
+
 ```bash
 # Promote canary
 kubectl argo rollouts promote ubuntu-autoinstall-agent \
@@ -195,6 +205,7 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 ```
 
 **Final verification**:
+
 - [ ] All pods running new version
 - [ ] Health checks passing
 - [ ] Metrics stable
@@ -203,6 +214,7 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 ## Rollback Procedure
 
 ### Automatic Rollback (Triggered by Failure)
+
 ```bash
 # Rollback will happen automatically
 # Monitor rollback progress
@@ -211,6 +223,7 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 ```
 
 ### Manual Rollback
+
 ```bash
 # Abort current rollout
 kubectl argo rollouts abort ubuntu-autoinstall-agent \
@@ -239,7 +252,8 @@ kubectl argo rollouts status ubuntu-autoinstall-agent \
 - **Team Lead**: Slack #team-infrastructure
 - **Database Admin**: Slack #team-database (if migration issues)
 - **Security Team**: Slack #team-security (if security issues)
-```
+
+````
 
 ## Disaster Recovery
 
@@ -297,11 +311,11 @@ spec:
             - pg_dump -U $POSTGRES_USER $POSTGRES_DB > /tmp/backup.sql
             onError: Fail
             timeout: 5m
-```
+````
 
 ### Disaster Recovery Runbook
 
-```markdown
+````markdown
 # Disaster Recovery Runbook
 
 ## Scenario 1: Complete Cluster Failure
@@ -315,8 +329,10 @@ spec:
    terraform init
    terraform apply -var-file=production.tfvars
    ```
+````
 
 2. **Install Velero**
+
    ```bash
    velero install \
      --provider aws \
@@ -327,6 +343,7 @@ spec:
    ```
 
 3. **Restore from Backup**
+
    ```bash
    # List available backups
    velero backup get
@@ -339,6 +356,7 @@ spec:
    ```
 
 4. **Verify Application**
+
    ```bash
    # Check pods
    kubectl get pods -n ubuntu-autoinstall-production
@@ -355,6 +373,7 @@ spec:
 ### Recovery Steps
 
 1. **Identify Corruption Scope**
+
    ```bash
    # Check database logs
    kubectl logs -n ubuntu-autoinstall-production postgres-0 --tail=100
@@ -364,6 +383,7 @@ spec:
    ```
 
 2. **Stop Writes**
+
    ```bash
    # Scale deployment to 0
    kubectl scale deployment ubuntu-autoinstall-agent \
@@ -372,6 +392,7 @@ spec:
    ```
 
 3. **Restore Database**
+
    ```bash
    # Restore from latest backup
    kubectl exec -n ubuntu-autoinstall-production postgres-0 -- \
@@ -395,7 +416,8 @@ spec:
 | Configuration    | 5 min   | 1 hour   | Git-based, can redeploy anytime |
 | Persistent Data  | 1 hour  | 24 hours | Volume snapshots daily          |
 | Complete Cluster | 4 hours | 24 hours | IaC + Velero restore            |
-```
+
+````
 
 ## Multi-Region Deployment
 
@@ -456,7 +478,7 @@ spec:
     clusterOverrides:
     - path: "/spec/replicas"
       value: 3
-```
+````
 
 ## Security Best Practices
 
@@ -613,11 +635,12 @@ spec:
 
 ---
 
-**Task 16 Complete**: Comprehensive deployment automation covering Kubernetes manifests, Helm charts with
-multi-environment values, Kustomize overlays with components, GitOps with ArgoCD, progressive delivery
-with Flagger canary and Argo Rollouts blue-green strategies, Infrastructure as Code with Terraform and
-Pulumi, zero-downtime deployment strategies, rollback procedures, disaster recovery plans, multi-region
-deployment, security best practices, and complete deployment runbook. Total: ~3,900 lines across 6 parts. ✅
+**Task 16 Complete**: Comprehensive deployment automation covering Kubernetes manifests, Helm charts
+with multi-environment values, Kustomize overlays with components, GitOps with ArgoCD, progressive
+delivery with Flagger canary and Argo Rollouts blue-green strategies, Infrastructure as Code with
+Terraform and Pulumi, zero-downtime deployment strategies, rollback procedures, disaster recovery
+plans, multi-region deployment, security best practices, and complete deployment runbook. Total:
+~3,900 lines across 6 parts. ✅
 
-**Next**: Begin Task 17 - Observability and Centralized Logging with structured logging, log aggregation,
-correlation with traces and metrics, and log-based alerting.
+**Next**: Begin Task 17 - Observability and Centralized Logging with structured logging, log
+aggregation, correlation with traces and metrics, and log-based alerting.

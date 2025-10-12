@@ -12,62 +12,62 @@
 # Logging Level Guidelines
 
 ## TRACE
-**Purpose**: Extremely detailed diagnostic information
-**Use cases**:
+
+**Purpose**: Extremely detailed diagnostic information **Use cases**:
+
 - Function entry/exit with parameters
 - Loop iterations with values
-- Detailed state transitions
-**Environment**: Development/debugging only
-**Example**: "Entering process_request with user_id=123, request_id=abc-456"
+- Detailed state transitions **Environment**: Development/debugging only **Example**: "Entering
+  process_request with user_id=123, request_id=abc-456"
 
 ## DEBUG
-**Purpose**: Detailed information for debugging
-**Use cases**:
+
+**Purpose**: Detailed information for debugging **Use cases**:
+
 - Variable values at key points
 - Conditional branch taken
 - Cache hits/misses
-- Database query parameters
-**Environment**: Development, staging
-**Example**: "Cache miss for key 'user:123', fetching from database"
+- Database query parameters **Environment**: Development, staging **Example**: "Cache miss for key
+  'user:123', fetching from database"
 
 ## INFO
-**Purpose**: General informational messages
-**Use cases**:
+
+**Purpose**: General informational messages **Use cases**:
+
 - Application startup/shutdown
 - Configuration loaded
 - Successful operations
-- Business event milestones
-**Environment**: All environments
-**Example**: "Application started on port 8080 with 4 workers"
+- Business event milestones **Environment**: All environments **Example**: "Application started on
+  port 8080 with 4 workers"
 
 ## WARN
-**Purpose**: Potentially harmful situations
-**Use cases**:
+
+**Purpose**: Potentially harmful situations **Use cases**:
+
 - Deprecated API usage
 - Suboptimal performance
 - Recoverable errors
-- Approaching resource limits
-**Environment**: All environments
-**Example**: "Connection pool at 80% capacity (40/50 connections used)"
+- Approaching resource limits **Environment**: All environments **Example**: "Connection pool at 80%
+  capacity (40/50 connections used)"
 
 ## ERROR
-**Purpose**: Error events that might still allow application to continue
-**Use cases**:
+
+**Purpose**: Error events that might still allow application to continue **Use cases**:
+
 - Handled exceptions
 - Failed external API calls with retry
 - Validation failures
-- Resource not found
-**Environment**: All environments
-**Example**: "Failed to fetch user profile from API: timeout after 30s, will retry"
+- Resource not found **Environment**: All environments **Example**: "Failed to fetch user profile
+  from API: timeout after 30s, will retry"
 
 ## FATAL/CRITICAL
-**Purpose**: Severe errors that cause application termination
-**Use cases**:
+
+**Purpose**: Severe errors that cause application termination **Use cases**:
+
 - Database connection lost
 - Critical configuration missing
-- Unrecoverable system errors
-**Environment**: All environments
-**Example**: "Cannot connect to database after 5 retries, shutting down"
+- Unrecoverable system errors **Environment**: All environments **Example**: "Cannot connect to
+  database after 5 retries, shutting down"
 ```
 
 ## Rust Structured Logging
@@ -573,9 +573,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 ---
 
 **Part 1 Complete**: Structured logging standards with comprehensive logging level guidelines (TRACE
-through FATAL), Rust tracing configuration with JSON formatting and daily rotation, Actix-Web logging
-middleware with request IDs and span tracking, Python structlog configuration with JSON output and
-context managers, FastAPI logging middleware with automatic context binding and request ID propagation. ✅
+through FATAL), Rust tracing configuration with JSON formatting and daily rotation, Actix-Web
+logging middleware with request IDs and span tracking, Python structlog configuration with JSON
+output and context managers, FastAPI logging middleware with automatic context binding and request
+ID propagation. ✅
 
 **Continue to Part 2** for JavaScript/TypeScript logging with Winston and Pino, log correlation with
 trace IDs, and log enrichment strategies.

@@ -23,8 +23,8 @@ datasources:
     isDefault: true
     editable: false
     jsonData:
-      timeInterval: "15s"
-      queryTimeout: "60s"
+      timeInterval: '15s'
+      queryTimeout: '60s'
       httpMethod: POST
 
   - name: Jaeger
@@ -81,41 +81,35 @@ providers:
         "id": 1,
         "title": "Request Rate",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
         "targets": [
           {
             "expr": "rate(http_requests_total[5m])",
             "legendFormat": "{{service}} - {{method}} {{route}}"
           }
         ],
-        "yaxes": [
-          {"format": "reqps", "label": "Requests/s"},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "reqps", "label": "Requests/s" }, { "format": "short" }]
       },
       {
         "id": 2,
         "title": "Error Rate",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
         "targets": [
           {
             "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m])",
             "legendFormat": "{{service}} error rate"
           }
         ],
-        "yaxes": [
-          {"format": "percentunit", "label": "Error Rate"},
-          {"format": "short"}
-        ],
+        "yaxes": [{ "format": "percentunit", "label": "Error Rate" }, { "format": "short" }],
         "alert": {
           "name": "High Error Rate",
           "conditions": [
             {
-              "evaluator": {"type": "gt", "params": [0.05]},
-              "operator": {"type": "and"},
-              "query": {"params": ["A", "5m", "now"]},
-              "reducer": {"type": "avg"}
+              "evaluator": { "type": "gt", "params": [0.05] },
+              "operator": { "type": "and" },
+              "query": { "params": ["A", "5m", "now"] },
+              "reducer": { "type": "avg" }
             }
           ]
         }
@@ -124,7 +118,7 @@ providers:
         "id": 3,
         "title": "Latency Percentiles",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
         "targets": [
           {
             "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
@@ -139,16 +133,13 @@ providers:
             "legendFormat": "P99"
           }
         ],
-        "yaxes": [
-          {"format": "s", "label": "Duration"},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "s", "label": "Duration" }, { "format": "short" }]
       },
       {
         "id": 4,
         "title": "Active Connections",
         "type": "stat",
-        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
         "targets": [
           {
             "expr": "active_connections",
@@ -158,14 +149,14 @@ providers:
         "options": {
           "colorMode": "value",
           "graphMode": "area",
-          "reduceOptions": {"values": false, "calcs": ["lastNotNull"]}
+          "reduceOptions": { "values": false, "calcs": ["lastNotNull"] }
         }
       },
       {
         "id": 5,
         "title": "Throughput",
         "type": "stat",
-        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 16},
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
         "targets": [
           {
             "expr": "sum(rate(http_requests_total[5m]))",
@@ -181,7 +172,7 @@ providers:
         "id": 6,
         "title": "Success Rate",
         "type": "stat",
-        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 16},
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 16 },
         "targets": [
           {
             "expr": "sum(rate(http_requests_total{status!~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
@@ -194,9 +185,9 @@ providers:
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"value": null, "color": "red"},
-              {"value": 0.95, "color": "yellow"},
-              {"value": 0.99, "color": "green"}
+              { "value": null, "color": "red" },
+              { "value": 0.95, "color": "yellow" },
+              { "value": 0.99, "color": "green" }
             ]
           }
         }
@@ -205,7 +196,7 @@ providers:
         "id": 7,
         "title": "Apdex Score",
         "type": "stat",
-        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 16},
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 16 },
         "targets": [
           {
             "expr": "(sum(rate(http_request_duration_seconds_bucket{le=\"0.5\"}[5m])) + sum(rate(http_request_duration_seconds_bucket{le=\"2.0\"}[5m])) / 2) / sum(rate(http_request_duration_seconds_count[5m]))",
@@ -217,9 +208,9 @@ providers:
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"value": null, "color": "red"},
-              {"value": 0.85, "color": "yellow"},
-              {"value": 0.95, "color": "green"}
+              { "value": null, "color": "red" },
+              { "value": 0.85, "color": "yellow" },
+              { "value": 0.95, "color": "green" }
             ]
           }
         }
@@ -228,7 +219,7 @@ providers:
         "id": 8,
         "title": "Top Slow Endpoints",
         "type": "table",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
         "targets": [
           {
             "expr": "topk(10, histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])))",
@@ -240,7 +231,7 @@ providers:
           {
             "id": "organize",
             "options": {
-              "excludeByName": {"Time": true},
+              "excludeByName": { "Time": true },
               "indexByName": {
                 "route": 0,
                 "method": 1,
@@ -257,7 +248,7 @@ providers:
         "id": 9,
         "title": "Requests by Status Code",
         "type": "piechart",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
         "targets": [
           {
             "expr": "sum by (status) (rate(http_requests_total[5m]))",
@@ -265,7 +256,7 @@ providers:
           }
         ],
         "options": {
-          "legend": {"displayMode": "table", "placement": "right"},
+          "legend": { "displayMode": "table", "placement": "right" },
           "pieType": "donut"
         }
       }
@@ -292,55 +283,46 @@ providers:
         "id": 1,
         "title": "CPU Usage",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
         "targets": [
           {
             "expr": "100 - (avg by(instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
             "legendFormat": "{{instance}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
       },
       {
         "id": 2,
         "title": "Memory Usage",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
         "targets": [
           {
             "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
             "legendFormat": "{{instance}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
       },
       {
         "id": 3,
         "title": "Disk Usage",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
         "targets": [
           {
             "expr": "(1 - (node_filesystem_avail_bytes{fstype!~\"tmpfs|fuse.*\"} / node_filesystem_size_bytes)) * 100",
             "legendFormat": "{{instance}} {{mountpoint}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
       },
       {
         "id": 4,
         "title": "Network Bandwidth",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
         "targets": [
           {
             "expr": "rate(node_network_receive_bytes_total[5m])",
@@ -351,19 +333,14 @@ providers:
             "legendFormat": "{{instance}} {{device}} TX"
           }
         ],
-        "yaxes": [
-          {"format": "Bps"},
-          {"format": "short"}
-        ],
-        "seriesOverrides": [
-          {"alias": "/TX/", "transform": "negative-Y"}
-        ]
+        "yaxes": [{ "format": "Bps" }, { "format": "short" }],
+        "seriesOverrides": [{ "alias": "/TX/", "transform": "negative-Y" }]
       },
       {
         "id": 5,
         "title": "Load Average",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
         "targets": [
           {
             "expr": "node_load1",
@@ -383,7 +360,7 @@ providers:
         "id": 6,
         "title": "Disk I/O",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
         "targets": [
           {
             "expr": "rate(node_disk_read_bytes_total[5m])",
@@ -394,13 +371,8 @@ providers:
             "legendFormat": "{{instance}} {{device}} write"
           }
         ],
-        "yaxes": [
-          {"format": "Bps"},
-          {"format": "short"}
-        ],
-        "seriesOverrides": [
-          {"alias": "/write/", "transform": "negative-Y"}
-        ]
+        "yaxes": [{ "format": "Bps" }, { "format": "short" }],
+        "seriesOverrides": [{ "alias": "/write/", "transform": "negative-Y" }]
       }
     ]
   }
@@ -425,7 +397,7 @@ providers:
         "id": 1,
         "title": "Availability (30-day)",
         "type": "stat",
-        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 0},
+        "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
         "targets": [
           {
             "expr": "sum(rate(http_requests_total{status!~\"5..\"}[30d])) / sum(rate(http_requests_total[30d]))",
@@ -440,8 +412,8 @@ providers:
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"value": null, "color": "red"},
-              {"value": 0.999, "color": "green"}
+              { "value": null, "color": "red" },
+              { "value": 0.999, "color": "green" }
             ]
           }
         },
@@ -457,7 +429,7 @@ providers:
         "id": 2,
         "title": "Latency SLO (30-day P95)",
         "type": "stat",
-        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 0},
+        "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
         "targets": [
           {
             "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[30d])) by (le))",
@@ -472,8 +444,8 @@ providers:
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"value": null, "color": "green"},
-              {"value": 0.5, "color": "red"}
+              { "value": null, "color": "green" },
+              { "value": 0.5, "color": "red" }
             ]
           }
         }
@@ -482,7 +454,7 @@ providers:
         "id": 3,
         "title": "Error Budget Remaining",
         "type": "gauge",
-        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 0},
+        "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
         "targets": [
           {
             "expr": "1 - ((sum(rate(http_requests_total{status=~\"5..\"}[30d])) / sum(rate(http_requests_total[30d]))) / 0.001)",
@@ -496,9 +468,9 @@ providers:
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"value": 0, "color": "red"},
-              {"value": 0.2, "color": "yellow"},
-              {"value": 0.5, "color": "green"}
+              { "value": 0, "color": "red" },
+              { "value": 0.2, "color": "yellow" },
+              { "value": 0.5, "color": "green" }
             ]
           }
         }
@@ -507,7 +479,7 @@ providers:
         "id": 4,
         "title": "Error Budget Burn Rate (1h)",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
         "targets": [
           {
             "expr": "(sum(rate(http_requests_total{status=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001",
@@ -518,16 +490,13 @@ providers:
             "legendFormat": "Target (1x)"
           }
         ],
-        "yaxes": [
-          {"format": "none", "label": "Burn Rate (x)"},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "none", "label": "Burn Rate (x)" }, { "format": "short" }]
       },
       {
         "id": 5,
         "title": "SLO Compliance Trend (7 days)",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
         "targets": [
           {
             "expr": "avg_over_time((sum(rate(http_requests_total{status!~\"5..\"}[1h])) / sum(rate(http_requests_total[1h])))[7d:1h])",
@@ -538,16 +507,13 @@ providers:
             "legendFormat": "SLO Target (99.9%)"
           }
         ],
-        "yaxes": [
-          {"format": "percentunit", "min": 0.995, "max": 1.0},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "percentunit", "min": 0.995, "max": 1.0 }, { "format": "short" }]
       },
       {
         "id": 6,
         "title": "Request Success Rate by Service",
         "type": "table",
-        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
         "targets": [
           {
             "expr": "sum by (service) (rate(http_requests_total{status!~\"5..\"}[30d])) / sum by (service) (rate(http_requests_total[30d]))",
@@ -559,7 +525,7 @@ providers:
           {
             "id": "organize",
             "options": {
-              "excludeByName": {"Time": true},
+              "excludeByName": { "Time": true },
               "renameByName": {
                 "Value": "Success Rate"
               }
@@ -572,18 +538,16 @@ providers:
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": null, "color": "red"},
-                {"value": 0.995, "color": "yellow"},
-                {"value": 0.999, "color": "green"}
+                { "value": null, "color": "red" },
+                { "value": 0.995, "color": "yellow" },
+                { "value": 0.999, "color": "green" }
               ]
             }
           },
           "overrides": [
             {
-              "matcher": {"id": "byName", "options": "Success Rate"},
-              "properties": [
-                {"id": "custom.displayMode", "value": "gradient-gauge"}
-              ]
+              "matcher": { "id": "byName", "options": "Success Rate" },
+              "properties": [{ "id": "custom.displayMode", "value": "gradient-gauge" }]
             }
           ]
         }
@@ -610,7 +574,7 @@ providers:
         "id": 1,
         "title": "Trace Search",
         "type": "jaeger-search",
-        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
         "datasource": "Jaeger",
         "options": {
           "service": "",
@@ -625,7 +589,7 @@ providers:
         "id": 2,
         "title": "Service Dependency Graph",
         "type": "nodeGraph",
-        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 12},
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
         "datasource": "Jaeger",
         "targets": [
           {
@@ -656,7 +620,7 @@ providers:
         "id": 1,
         "title": "CPU Profile Flamegraph",
         "type": "flamegraph",
-        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
         "datasource": "Pyroscope",
         "targets": [
           {
@@ -671,7 +635,7 @@ providers:
         "id": 2,
         "title": "Memory Profile",
         "type": "flamegraph",
-        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 12},
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
         "datasource": "Pyroscope",
         "targets": [
           {
@@ -686,7 +650,7 @@ providers:
         "id": 3,
         "title": "Profile Comparison (CPU)",
         "type": "flamegraph-diff",
-        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 24},
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 24 },
         "datasource": "Pyroscope",
         "targets": [
           {
@@ -703,10 +667,10 @@ providers:
 
 ---
 
-**Part 4 Complete**: Grafana configuration with datasource provisioning (Prometheus, Jaeger, Pyroscope),
-comprehensive dashboards for application performance (request rate, error rate, latency percentiles,
-active connections, throughput, Apdex), system resources (CPU, memory, disk, network, load average),
-SLO monitoring (availability, latency, error budget burn rate, compliance trends), distributed tracing
-integration, and continuous profiling with flamegraphs. ✅
+**Part 4 Complete**: Grafana configuration with datasource provisioning (Prometheus, Jaeger,
+Pyroscope), comprehensive dashboards for application performance (request rate, error rate, latency
+percentiles, active connections, throughput, Apdex), system resources (CPU, memory, disk, network,
+load average), SLO monitoring (availability, latency, error budget burn rate, compliance trends),
+distributed tracing integration, and continuous profiling with flamegraphs. ✅
 
 **Continue to Part 5** for performance testing automation and benchmarking workflows.

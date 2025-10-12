@@ -2,7 +2,9 @@
 
 ## Overview
 
-This section provides comprehensive dashboards for tracking project health, cost efficiency, and team productivity. These dashboards complement the operational monitoring covered in previous parts by focusing on business metrics, development velocity, and resource optimization.
+This section provides comprehensive dashboards for tracking project health, cost efficiency, and
+team productivity. These dashboards complement the operational monitoring covered in previous parts
+by focusing on business metrics, development velocity, and resource optimization.
 
 ---
 
@@ -10,7 +12,8 @@ This section provides comprehensive dashboards for tracking project health, cost
 
 ### Build Success Rate Over Time
 
-Track the overall health of your CI/CD pipeline by monitoring build success rates across all repositories and branches.
+Track the overall health of your CI/CD pipeline by monitoring build success rates across all
+repositories and branches.
 
 **Grafana Dashboard Panel - Build Success Rate**
 
@@ -79,6 +82,7 @@ Track the overall health of your CI/CD pipeline by monitoring build success rate
 ```
 
 **Success Criteria:**
+
 - Overall success rate > 95%
 - CI workflow success rate > 98%
 - Release workflow success rate > 90%
@@ -156,6 +160,7 @@ topk(5, avg(github_workflow_run_duration_seconds{conclusion="success"}) by (work
 ```
 
 **Performance Targets:**
+
 - Average build duration < 5 minutes
 - P95 build duration < 10 minutes
 - No builds > 15 minutes
@@ -228,6 +233,7 @@ Track test suite performance to identify slow tests and optimize test execution.
 | Go         | Integration | 75s          | 110s         | 45         | 1.8%       |
 
 **Optimization Priorities:**
+
 1. JavaScript E2E tests (4.5% flaky rate - highest)
 2. Python integration tests (90s average - optimize database setup)
 3. Rust integration tests (120s average - consider parallelization)
@@ -349,6 +355,7 @@ print(f"DORA Level: {example_metrics.dora_level}")
 ```
 
 **Deployment Frequency Targets by Environment:**
+
 - **Production**: 10+ deployments per week (Elite)
 - **Staging**: 20+ deployments per week
 - **Development**: 50+ deployments per week
@@ -428,6 +435,7 @@ sum(rate(deployment_rollback_total[7d])) / sum(rate(deployment_total[7d])) * 100
 ```
 
 **DORA Change Failure Rate Targets:**
+
 - **Elite**: < 5%
 - **High**: 5-10%
 - **Medium**: 10-15%
@@ -446,7 +454,7 @@ interface LeadTimeMetrics {
   mergeToStaging: number; // Time from merge to staging deployment (minutes)
   stagingToProduction: number; // Time from staging to production (minutes)
   totalLeadTime: number; // Total time commit to production (minutes)
-  doraLevel: "Elite" | "High" | "Medium" | "Low";
+  doraLevel: 'Elite' | 'High' | 'Medium' | 'Low';
 }
 
 function calculateLeadTime(
@@ -455,26 +463,24 @@ function calculateLeadTime(
   stagingTimestamp: Date,
   productionTimestamp: Date
 ): LeadTimeMetrics {
-  const commitToMerge =
-    (mergeTimestamp.getTime() - commitTimestamp.getTime()) / 1000 / 60;
-  const mergeToStaging =
-    (stagingTimestamp.getTime() - mergeTimestamp.getTime()) / 1000 / 60;
+  const commitToMerge = (mergeTimestamp.getTime() - commitTimestamp.getTime()) / 1000 / 60;
+  const mergeToStaging = (stagingTimestamp.getTime() - mergeTimestamp.getTime()) / 1000 / 60;
   const stagingToProduction =
     (productionTimestamp.getTime() - stagingTimestamp.getTime()) / 1000 / 60;
   const totalLeadTime = commitToMerge + mergeToStaging + stagingToProduction;
 
-  let doraLevel: "Elite" | "High" | "Medium" | "Low";
+  let doraLevel: 'Elite' | 'High' | 'Medium' | 'Low';
   if (totalLeadTime < 60) {
     // < 1 hour
-    doraLevel = "Elite";
+    doraLevel = 'Elite';
   } else if (totalLeadTime < 1440) {
     // < 1 day
-    doraLevel = "High";
+    doraLevel = 'High';
   } else if (totalLeadTime < 10080) {
     // < 1 week
-    doraLevel = "Medium";
+    doraLevel = 'Medium';
   } else {
-    doraLevel = "Low";
+    doraLevel = 'Low';
   }
 
   return {
@@ -499,7 +505,7 @@ const exampleLeadTime: LeadTimeMetrics = {
   mergeToStaging: 10, // 10 minutes to deploy to staging
   stagingToProduction: 30, // 30 minutes for validation + prod deploy
   totalLeadTime: 85, // 1 hour 25 minutes total
-  doraLevel: "High",
+  doraLevel: 'High',
 };
 ```
 
@@ -542,6 +548,7 @@ const exampleLeadTime: LeadTimeMetrics = {
 ```
 
 **Lead Time Targets:**
+
 - **Total lead time**: < 2 hours (Elite)
 - **Code review time**: < 30 minutes
 - **CI/CD pipeline**: < 10 minutes
@@ -614,6 +621,7 @@ Track deployment stability by monitoring rollback frequency and reasons.
 ```
 
 **Common Rollback Reasons:**
+
 - High error rate (> 1%)
 - Performance degradation (P95 latency > 1000ms)
 - Failed health checks
@@ -662,11 +670,11 @@ Monitor cloud spending to identify cost optimization opportunities.
 | Service Category | Monthly Cost | % of Total | Trend    | Optimization Opportunity  |
 | ---------------- | ------------ | ---------- | -------- | ------------------------- |
 | Compute (EC2)    | $4,200       | 35%        | ↑ 5%     | Rightsize instances       |
-| Kubernetes (EKS) | $3,800       | 32%        | ↔ 0%     | None                      |
+| Kubernetes (EKS) | $3,800       | 32%        | ↔ 0%    | None                      |
 | Database (RDS)   | $2,100       | 17%        | ↓ 3%     | Read replica optimization |
 | Storage (S3/EBS) | $1,200       | 10%        | ↑ 8%     | Lifecycle policies        |
-| Networking       | $500         | 4%         | ↔ 0%     | None                      |
-| Monitoring       | $200         | 2%         | ↔ 0%     | None                      |
+| Networking       | $500         | 4%         | ↔ 0%    | None                      |
+| Monitoring       | $200         | 2%         | ↔ 0%    | None                      |
 | **Total**        | **$12,000**  | **100%**   | **↑ 2%** |                           |
 
 ### Cost Per Request Calculation
@@ -804,6 +812,7 @@ Monitor CPU and memory utilization to identify underutilized resources.
 ```
 
 **Efficiency Targets:**
+
 - **Optimal range**: 50-70% utilization
 - **Underutilized**: < 30% (candidate for rightsizing)
 - **Overutilized**: > 80% (candidate for scaling up)
@@ -917,6 +926,7 @@ print(f"Alert Level: {example_alert.alert_level}")
 ```
 
 **Budget Alert Thresholds:**
+
 - **INFO**: 80% of budget consumed
 - **WARNING**: 90% of budget consumed or projected overspend
 - **CRITICAL**: 100% of budget consumed
@@ -965,9 +975,9 @@ avg(github_pull_request_changed_lines) by (repository)
           "unit": "short",
           "thresholds": {
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 20},
-              {"color": "green", "value": 40}
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 20 },
+              { "color": "green", "value": 40 }
             ]
           }
         }
@@ -988,9 +998,9 @@ avg(github_pull_request_changed_lines) by (repository)
           "unit": "short",
           "thresholds": {
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 300},
-              {"color": "red", "value": 500}
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 300 },
+              { "color": "red", "value": 500 }
             ]
           }
         }
@@ -1048,6 +1058,7 @@ Monitor code review efficiency to identify bottlenecks in development workflow.
 ```
 
 **Review Turnaround Targets:**
+
 - **P50**: < 4 hours
 - **P95**: < 24 hours
 - **Critical PRs**: < 2 hours
@@ -1116,6 +1127,7 @@ Monitor on-call burden and identify opportunities to reduce after-hours incident
 | **Team Avg** | **13.5**    | **8.75 (65%)** | **4 (30%)** | **0.75 (5%)** | **3.2 min**       |
 
 **Goals for On-Call Health:**
+
 - < 5 pages per week per engineer
 - < 20% of pages after business hours
 - < 5% of pages on weekends
@@ -1144,9 +1156,9 @@ Track individual and team velocity to identify high performers and coaching oppo
       "unit": "m",
       "thresholds": {
         "steps": [
-          {"color": "green", "value": null},
-          {"color": "yellow", "value": 120},
-          {"color": "red", "value": 240}
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 120 },
+          { "color": "red", "value": 240 }
         ]
       }
     }
@@ -1170,10 +1182,15 @@ Track individual and team velocity to identify high performers and coaching oppo
 
 Task 18 Part 5 provides comprehensive project dashboards covering:
 
-1. **CI/CD Health Metrics**: Build success rates, duration trends, test execution times, deployment frequency, change failure rates, lead time, and rollback tracking
-2. **Cost Efficiency**: Infrastructure cost breakdowns, cost per request calculations, resource utilization monitoring, and budget forecasting with alerts
-3. **Team Productivity**: PR merge rates, issue resolution tracking, code review turnaround times, incident response metrics (MTTR/MTBF), on-call statistics, and deployment velocity
+1. **CI/CD Health Metrics**: Build success rates, duration trends, test execution times, deployment
+   frequency, change failure rates, lead time, and rollback tracking
+2. **Cost Efficiency**: Infrastructure cost breakdowns, cost per request calculations, resource
+   utilization monitoring, and budget forecasting with alerts
+3. **Team Productivity**: PR merge rates, issue resolution tracking, code review turnaround times,
+   incident response metrics (MTTR/MTBF), on-call statistics, and deployment velocity
 
-These dashboards enable data-driven decision making for optimizing development processes, controlling costs, and improving team performance.
+These dashboards enable data-driven decision making for optimizing development processes,
+controlling costs, and improving team performance.
 
-**Next**: Part 6 will provide the completion summary covering all 18 tasks with line counts and success criteria validation.
+**Next**: Part 6 will provide the completion summary covering all 18 tasks with line counts and
+success criteria validation.

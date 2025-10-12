@@ -14,6 +14,7 @@
 ## Application Events
 
 ### MUST Log (P0 - Critical)
+
 1. **Application Lifecycle**
    - Startup/shutdown events
    - Configuration loaded
@@ -43,12 +44,14 @@
    - Example: `logger.info("Payment processed", order_id=123, amount=99.99, status="success")`
 
 ### SHOULD Log (P1 - Important)
+
 1. **API Requests/Responses**
    - HTTP method, path, status code
    - Request ID for correlation
    - Response time
    - User ID (if authenticated)
-   - Example: `logger.info("HTTP request", method="POST", path="/api/users", status=201, duration_ms=45)`
+   - Example:
+     `logger.info("HTTP request", method="POST", path="/api/users", status=201, duration_ms=45)`
 
 2. **State Changes**
    - Entity creation/update/deletion
@@ -61,7 +64,8 @@
    - Request/response times
    - Success/failure
    - Retry attempts
-   - Example: `logger.info("External API call", service="payment-gateway", duration_ms=230, status="success")`
+   - Example:
+     `logger.info("External API call", service="payment-gateway", duration_ms=230, status="success")`
 
 4. **Resource Operations**
    - Database queries (slow queries only)
@@ -70,6 +74,7 @@
    - Example: `logger.warning("Slow database query", query=sql, duration_ms=2500, table="orders")`
 
 ### MAY Log (P2 - Nice to Have)
+
 1. **Debug Information**
    - Function entry/exit (in debug mode only)
    - Variable values at key points
@@ -376,7 +381,9 @@ export function createSamplingLogger(
 }
 
 // Example usage
-const logger = winston.createLogger({/* ... */});
+const logger = winston.createLogger({
+  /* ... */
+});
 
 // Sample 10% of info logs, but always log errors
 const samplingLogger = createSamplingLogger(logger, {
@@ -387,7 +394,7 @@ const samplingLogger = createSamplingLogger(logger, {
 
 // High-frequency logging
 for (let i = 0; i < 1000; i++) {
-  samplingLogger.info('Processing item', {item_id: i});
+  samplingLogger.info('Processing item', { item_id: i });
 }
 // Only ~100 logs will be written
 ```
@@ -408,11 +415,11 @@ retention_policies:
   security:
     category: security
     retention_days: 365
-    compliance: "SOC2, GDPR"
-    storage_tier: "cold"
+    compliance: 'SOC2, GDPR'
+    storage_tier: 'cold'
     indices:
-      - "logs-security-*"
-      - "logs-auth-*"
+      - 'logs-security-*'
+      - 'logs-auth-*'
     description: |
       Security-related logs including authentication, authorization,
       and security events. Required for compliance audits.
@@ -421,10 +428,10 @@ retention_policies:
   application:
     category: application
     retention_days: 90
-    storage_tier: "warm"
+    storage_tier: 'warm'
     indices:
-      - "logs-api-*"
-      - "logs-worker-*"
+      - 'logs-api-*'
+      - 'logs-worker-*'
     description: |
       Application logs for debugging and troubleshooting.
       Moved to cold storage after 30 days.
@@ -437,9 +444,9 @@ retention_policies:
   debug:
     category: debug
     retention_days: 7
-    storage_tier: "hot"
+    storage_tier: 'hot'
     indices:
-      - "logs-debug-*"
+      - 'logs-debug-*'
     description: |
       Debug-level logs for active development and troubleshooting.
       Short retention due to high volume.
@@ -448,21 +455,21 @@ retention_policies:
   access:
     category: access
     retention_days: 30
-    storage_tier: "warm"
+    storage_tier: 'warm'
     indices:
-      - "logs-nginx-*"
-      - "logs-access-*"
+      - 'logs-nginx-*'
+      - 'logs-access-*'
     description: |
       HTTP access logs for traffic analysis and debugging.
 
   # Audit logs - 7 years
   audit:
     category: audit
-    retention_days: 2555  # 7 years
-    compliance: "HIPAA, SOX"
-    storage_tier: "glacier"
+    retention_days: 2555 # 7 years
+    compliance: 'HIPAA, SOX'
+    storage_tier: 'glacier'
     indices:
-      - "logs-audit-*"
+      - 'logs-audit-*'
     description: |
       Audit logs for regulatory compliance.
       Immutable and long-term retention required.
@@ -690,9 +697,9 @@ performance/business alerts and Alertmanager for routing to PagerDuty/Slack/emai
 and deduplication, logging best practices covering what to log (errors, security events, business
 operations) and what NOT to log (PII, secrets, high-cardinality data), sensitive data protection
 with automatic masking of passwords/emails/credit cards/SSNs, log sampling for high-frequency logs
-with configurable rates, retention policies aligned with compliance requirements (SOC2, GDPR, HIPAA),
-async logging for performance optimization with batching and non-blocking writes. Total: ~3,900
-lines across 6 parts. ✅
+with configurable rates, retention policies aligned with compliance requirements (SOC2, GDPR,
+HIPAA), async logging for performance optimization with batching and non-blocking writes. Total:
+~3,900 lines across 6 parts. ✅
 
 **Proceed to Task 18** for final integration bringing together all 18 tasks with unified
 observability dashboards, comprehensive troubleshooting guides, on-call playbooks, and project

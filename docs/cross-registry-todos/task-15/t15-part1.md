@@ -1,8 +1,15 @@
 <!-- file: docs/cross-registry-todos/task-15/t15-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t15-performance-monitoring-part1-q4r5s6t7-u8v9 -->
 
 # Task 15 Part 1: Performance Monitoring and Profiling Strategy
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/performance-monitoring.yml` v1.0.0 executes scheduled Rust,
+> Node.js, and Python benchmarks, captures artifacts, and posts a unified summary for regression
+> tracking.  
+> **Verification:** Benchmark results are retained as artifacts for offline comparison, and nightly
+> runs ensure continuous performance visibility.
 
 ## Performance Monitoring Overview
 
@@ -61,23 +68,27 @@ graph TD
 ### Technology Stack
 
 **Metrics Collection:**
+
 - **Prometheus**: Time-series metrics database
 - **StatsD**: Application-level metrics aggregation
 - **OpenTelemetry**: Vendor-neutral instrumentation
 - **Node Exporter**: System-level metrics
 
 **Distributed Tracing:**
+
 - **Jaeger**: Distributed tracing platform
 - **Tempo**: Scalable tracing backend
 - **OpenTelemetry SDK**: Standardized tracing
 
 **Continuous Profiling:**
+
 - **Pyroscope**: Continuous profiling platform
 - **pprof**: Go profiling format
 - **perf**: Linux profiling tool
 - **flamegraph**: Visualization tool
 
 **Visualization & Alerting:**
+
 - **Grafana**: Dashboards and visualization
 - **Alertmanager**: Alert routing and grouping
 - **PagerDuty**: Incident management
@@ -655,6 +666,8 @@ if __name__ == "__main__":
 
 ---
 
-**Part 1 Complete**: Performance monitoring strategy, SLOs/KPIs definition, monitoring architecture with Prometheus/Jaeger/Pyroscope, Rust metrics and tracing implementation with OpenTelemetry, Python metrics implementation with prometheus_client and ASGI middleware. ✅
+**Part 1 Complete**: Performance monitoring strategy, SLOs/KPIs definition, monitoring architecture
+with Prometheus/Jaeger/Pyroscope, Rust metrics and tracing implementation with OpenTelemetry, Python
+metrics implementation with prometheus_client and ASGI middleware. ✅
 
 **Continue to Part 2** for JavaScript instrumentation, system-level metrics, and profiling setup.

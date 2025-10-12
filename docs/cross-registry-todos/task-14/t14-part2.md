@@ -539,15 +539,9 @@ class WorkflowDebugger:
   "includeVersion": true,
 
   "readme": "README.md",
-  "exclude": [
-    "**/*+(index|.spec|.test).ts",
-    "**/node_modules/**"
-  ],
+  "exclude": ["**/*+(index|.spec|.test).ts", "**/node_modules/**"],
 
-  "plugin": [
-    "typedoc-plugin-markdown",
-    "typedoc-plugin-mermaid"
-  ],
+  "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mermaid"],
 
   "excludePrivate": false,
   "excludeProtected": false,
@@ -555,12 +549,7 @@ class WorkflowDebugger:
   "categorizeByGroup": true,
   "defaultCategory": "Other",
 
-  "categoryOrder": [
-    "Core",
-    "API",
-    "Utils",
-    "*"
-  ],
+  "categoryOrder": ["Core", "API", "Utils", "*"],
 
   "sort": ["source-order"],
   "visibilityFilters": {
@@ -590,7 +579,7 @@ class WorkflowDebugger:
 
 ### TypeScript Documentation Example
 
-```typescript
+````typescript
 // file: src/workflow-parser.ts
 // version: 1.0.0
 // guid: typescript-documentation-example
@@ -781,7 +770,9 @@ export class WorkflowParser {
       const parsed = yaml.load(yamlContent) as WorkflowConfig;
       return parsed;
     } catch (error) {
-      throw new Error(`Failed to parse YAML: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to parse YAML: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -875,10 +866,12 @@ export class WorkflowParser {
     return Array.from(secrets);
   }
 }
-```
+````
 
 ---
 
-**Part 2 Complete**: Python documentation with Sphinx (comprehensive configuration and docstring examples), JavaScript/TypeScript documentation with TypeDoc (configuration and TSDoc examples). ✅
+**Part 2 Complete**: Python documentation with Sphinx (comprehensive configuration and docstring
+examples), JavaScript/TypeScript documentation with TypeDoc (configuration and TSDoc examples). ✅
 
-**Continue to Part 3** for documentation sites (mdBook, MkDocs, Docusaurus) and changelog automation.
+**Continue to Part 3** for documentation sites (mdBook, MkDocs, Docusaurus) and changelog
+automation.

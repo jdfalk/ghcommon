@@ -1,8 +1,15 @@
 <!-- file: docs/cross-registry-todos/task-14/t14-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t14-documentation-automation-part1-r4s5t6u7-v8w9 -->
 
 # Task 14: Documentation Generation and Publishing Automation
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/documentation.yml` v1.0.0 now auto-builds MkDocs/Sphinx/npm-based
+> docs, validates Markdown links, and optionally deploys to GitHub Pages when `DOCS_DEPLOY_TOKEN` is
+> present.  
+> **Verification:** Documentation builds are uploaded as workflow artifacts for review prior to
+> optional publication.
 
 ## Overview and Strategy
 
@@ -42,24 +49,28 @@ graph TD
 ### Documentation Types
 
 **API Documentation**
+
 - Auto-generated from code comments
 - Language-specific tools (rustdoc, Sphinx, TypeDoc)
 - Versioned documentation
 - Search functionality
 
 **User Documentation**
+
 - Getting started guides
 - Tutorial walkthroughs
 - Feature documentation
 - Troubleshooting guides
 
 **Developer Documentation**
+
 - Architecture diagrams
 - Contributing guidelines
 - Code style guides
 - Development setup
 
 **Operations Documentation**
+
 - Deployment guides
 - Configuration reference
 - Monitoring and alerting
@@ -68,21 +79,25 @@ graph TD
 ### Documentation Toolchain
 
 **Rust Documentation**
+
 - Tool: `cargo doc`, `mdBook`
 - Features: Inline doc tests, cross-references, examples
 - Output: Static HTML with search
 
 **Python Documentation**
+
 - Tool: `Sphinx`, `mkdocs`, `pydoc`
 - Features: Autodoc, Napoleon docstrings, extensions
 - Output: HTML, PDF, ePub
 
 **JavaScript/TypeScript Documentation**
+
 - Tool: `TypeDoc`, `JSDoc`, `Docusaurus`
 - Features: Type annotations, React components, MDX
 - Output: Interactive website
 
 **Markdown Documentation**
+
 - Tool: `mdBook`, `MkDocs`, `Docusaurus`
 - Features: Multi-page docs, theming, plugins
 - Output: Static site with search
@@ -90,6 +105,7 @@ graph TD
 ### Current State Analysis
 
 **ghcommon Repository**:
+
 - Basic README.md
 - No automated API docs
 - Manual changelog maintenance
@@ -97,6 +113,7 @@ graph TD
 - Scattered instruction files
 
 **ubuntu-autoinstall-agent Repository**:
+
 - README with examples
 - Inline Rust doc comments
 - No published documentation
@@ -105,24 +122,28 @@ graph TD
 ### Implementation Roadmap
 
 **Phase 1: API Documentation (Weeks 1-2)**
+
 - Set up rustdoc generation
 - Configure Sphinx for Python
 - Set up TypeDoc for JavaScript
 - Automated doc building in CI
 
 **Phase 2: Documentation Sites (Weeks 3-4)**
+
 - Choose site generator (mdBook/MkDocs/Docusaurus)
 - Create documentation structure
 - Import existing docs
 - Set up search functionality
 
 **Phase 3: Automation (Weeks 5-6)**
+
 - Automated changelog generation (git-cliff)
 - Release notes from commit history
 - README badge automation
 - Doc link validation
 
 **Phase 4: Publishing (Weeks 7-8)**
+
 - GitHub Pages deployment
 - Versioned documentation
 - Custom domain setup
@@ -172,7 +193,7 @@ criterion = "0.5"
 
 ### Comprehensive Doc Comments
 
-```rust
+````rust
 // file: src/disk_manager.rs
 // version: 1.0.0
 // guid: rustdoc-example
@@ -459,7 +480,7 @@ mod tests {
 
     // More tests...
 }
-```
+````
 
 ### Building Rustdoc
 
@@ -491,6 +512,7 @@ echo "Open with: open target/doc/ubuntu_autoinstall_agent/index.html"
 
 ---
 
-**Part 1 Complete**: Documentation strategy overview, Rust documentation with comprehensive rustdoc examples and configuration. ✅
+**Part 1 Complete**: Documentation strategy overview, Rust documentation with comprehensive rustdoc
+examples and configuration. ✅
 
 **Continue to Part 2** for Python and JavaScript documentation automation.

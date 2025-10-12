@@ -1,8 +1,14 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t06-frontend-packages-part1-j1k2l3m4-n5o6 -->
 
 # Task 06 Part 1: Frontend Package Publishing Overview
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-frontend.yml` v1.3.0 adds detection, packaging, and
+> publishing jobs for npm and GitHub Package Registry.  
+> **Verification:** Workflow stages capture npm tarballs as artifacts and report registry publish
+> attempts in the job summary.
 
 ## Task Summary
 

@@ -1,8 +1,15 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t08-ci-consolidation-part1-b7c8d9e0-f1g2 -->
 
 # Task 08 Part 1: CI Workflow Consolidation - Overview
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/reusable-ci.yml` v1.1.0 unifies change-detection,
+> language-specific lint/test gates, coverage enforcement, protobuf generation hooks, and CI
+> summaries for downstream callers.  
+> **Verification:** Reusable CI entries now provide per-language jobs with shared inputs and
+> guardrails, replacing bespoke logic present in downstream repositories.
 
 ## Task Overview
 

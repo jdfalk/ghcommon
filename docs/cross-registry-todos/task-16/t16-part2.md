@@ -43,7 +43,7 @@ name: ubuntu-autoinstall-agent
 description: A Helm chart for Ubuntu Autoinstall Agent
 type: application
 version: 1.0.0
-appVersion: "1.0.0"
+appVersion: '1.0.0'
 
 keywords:
   - ubuntu
@@ -82,21 +82,21 @@ replicaCount: 3
 image:
   repository: ghcr.io/jdfalk/ubuntu-autoinstall-agent
   pullPolicy: IfNotPresent
-  tag: "1.0.0"
+  tag: '1.0.0'
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 serviceAccount:
   create: true
   annotations: {}
-  name: ""
+  name: ''
 
 podAnnotations:
-  prometheus.io/scrape: "true"
-  prometheus.io/port: "9090"
-  prometheus.io/path: "/metrics"
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: '9090'
+  prometheus.io/path: '/metrics'
 
 podSecurityContext:
   runAsNonRoot: true
@@ -106,7 +106,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
 
@@ -121,8 +121,8 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/rate-limit: '100'
   hosts:
     - host: ubuntu-autoinstall.example.com
       paths:
@@ -154,7 +154,7 @@ autoscaling:
           name: http_requests_per_second
         target:
           type: AverageValue
-          averageValue: "1000"
+          averageValue: '1000'
 
 nodeSelector: {}
 
@@ -199,12 +199,12 @@ config:
   iso:
     cacheDir: /var/cache/ubuntu-autoinstall/isos
     versions:
-      - "20.04"
-      - "22.04"
-      - "24.04"
+      - '20.04'
+      - '22.04'
+      - '24.04'
     architectures:
-      - "amd64"
-      - "arm64"
+      - 'amd64'
+      - 'arm64'
   qemu:
     socket: /var/run/libvirt/libvirt-sock
     defaultMemory: 2048
@@ -216,9 +216,9 @@ config:
     output: stdout
 
 secrets:
-  databaseUrl: ""
-  apiKey: ""
-  jwtSecret: ""
+  databaseUrl: ''
+  apiKey: ''
+  jwtSecret: ''
 
 podDisruptionBudget:
   enabled: true
@@ -231,17 +231,17 @@ networkPolicy:
     - Egress
   ingress:
     - from:
-      - namespaceSelector:
-          matchLabels:
-            name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
       ports:
         - protocol: TCP
           port: 8080
   egress:
     - to:
-      - namespaceSelector:
-          matchLabels:
-            name: database
+        - namespaceSelector:
+            matchLabels:
+              name: database
       ports:
         - protocol: TCP
           port: 5432
@@ -256,7 +256,7 @@ postgresql:
   enabled: true
   auth:
     username: ubuntu_autoinstall
-    password: ""
+    password: ''
     database: ubuntu_autoinstall
   primary:
     persistence:
@@ -277,7 +277,7 @@ postgresql:
 replicaCount: 1
 
 image:
-  tag: "latest"
+  tag: 'latest'
   pullPolicy: Always
 
 ingress:
@@ -322,7 +322,7 @@ postgresql:
 replicaCount: 2
 
 image:
-  tag: "staging"
+  tag: 'staging'
   pullPolicy: IfNotPresent
 
 ingress:
@@ -356,13 +356,13 @@ config:
 replicaCount: 5
 
 image:
-  tag: "1.0.0"
+  tag: '1.0.0'
   pullPolicy: IfNotPresent
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/rate-limit: "200"
-    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/rate-limit: '200'
+    nginx.ingress.kubernetes.io/enable-modsecurity: 'true'
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
       SecRuleEngine On
       SecRequestBodyAccess On
@@ -421,7 +421,7 @@ postgresql:
 
 ## Helm Templates
 
-### _helpers.tpl
+### \_helpers.tpl
 
 ```yaml
 {{/*
@@ -709,9 +709,9 @@ guid: helm-notes-txt
 
 ---
 
-**Part 2 Complete**: Helm chart with Chart.yaml metadata, comprehensive values.yaml with all configuration
-options, environment-specific values files (dev/staging/production), helper templates for name generation
-and labels, deployment template with checksums and conditional autoscaling, HPA template with version
-compatibility, and NOTES.txt for post-install instructions. ✅
+**Part 2 Complete**: Helm chart with Chart.yaml metadata, comprehensive values.yaml with all
+configuration options, environment-specific values files (dev/staging/production), helper templates
+for name generation and labels, deployment template with checksums and conditional autoscaling, HPA
+template with version compatibility, and NOTES.txt for post-install instructions. ✅
 
 **Continue to Part 3** for Kustomize overlays and GitOps configuration with ArgoCD.

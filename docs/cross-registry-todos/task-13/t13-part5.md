@@ -21,7 +21,7 @@ on:
   pull_request:
     branches: [main, develop]
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight
+    - cron: '0 0 * * *' # Daily at midnight
   workflow_dispatch:
     inputs:
       test_level:
@@ -143,10 +143,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       DATABASE_URL: postgres://test:test@localhost:5432/test
     steps:
@@ -214,7 +211,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: python-${{ matrix.test-type }}-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          name:
+            python-${{ matrix.test-type }}-results-${{ matrix.os }}-py${{ matrix.python-version }}
           path: test-results/
           retention-days: 7
 
@@ -548,7 +546,7 @@ name: Test Notifications
 
 on:
   workflow_run:
-    workflows: ["Automated Testing Suite"]
+    workflows: ['Automated Testing Suite']
     types: [completed]
 
 jobs:
@@ -760,6 +758,8 @@ if __name__ == "__main__":
 
 ---
 
-**Part 5 Complete**: Comprehensive test automation workflows (intelligent test matrix with change detection, parallel execution, test sharding), test result aggregation and reporting, quality gates, Slack notifications, and test data management. ✅
+**Part 5 Complete**: Comprehensive test automation workflows (intelligent test matrix with change
+detection, parallel execution, test sharding), test result aggregation and reporting, quality gates,
+Slack notifications, and test data management. ✅
 
 **Continue to Part 6** for best practices, testing documentation, and Task 13 completion checklist.

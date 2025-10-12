@@ -161,9 +161,9 @@ groups:
           severity: critical
           category: performance
         annotations:
-          summary: "High error rate detected"
-          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.service }}"
-          runbook: "https://runbooks.example.com/high-error-rate"
+          summary: 'High error rate detected'
+          description: 'Error rate is {{ $value | humanizePercentage }} for {{ $labels.service }}'
+          runbook: 'https://runbooks.example.com/high-error-rate'
 
       # High latency (P95)
       - alert: HighLatencyP95
@@ -176,8 +176,9 @@ groups:
           severity: warning
           category: performance
         annotations:
-          summary: "High P95 latency detected"
-          description: "P95 latency is {{ $value }}s for {{ $labels.service }} on route {{ $labels.route }}"
+          summary: 'High P95 latency detected'
+          description:
+            'P95 latency is {{ $value }}s for {{ $labels.service }} on route {{ $labels.route }}'
 
       # High latency (P99)
       - alert: HighLatencyP99
@@ -190,8 +191,8 @@ groups:
           severity: critical
           category: performance
         annotations:
-          summary: "High P99 latency detected"
-          description: "P99 latency is {{ $value }}s for {{ $labels.service }}"
+          summary: 'High P99 latency detected'
+          description: 'P99 latency is {{ $value }}s for {{ $labels.service }}'
 
       # Low throughput
       - alert: LowThroughput
@@ -202,8 +203,8 @@ groups:
           severity: warning
           category: traffic
         annotations:
-          summary: "Low request throughput"
-          description: "Request rate is {{ $value }} req/s for {{ $labels.service }}"
+          summary: 'Low request throughput'
+          description: 'Request rate is {{ $value }} req/s for {{ $labels.service }}'
 
       # Database query slow
       - alert: SlowDatabaseQueries
@@ -216,8 +217,9 @@ groups:
           severity: warning
           category: database
         annotations:
-          summary: "Slow database queries detected"
-          description: "P95 query duration is {{ $value }}s for {{ $labels.operation }} on {{ $labels.table }}"
+          summary: 'Slow database queries detected'
+          description:
+            'P95 query duration is {{ $value }}s for {{ $labels.operation }} on {{ $labels.table }}'
 
       # Memory leak detection (increasing memory over time)
       - alert: PossibleMemoryLeak
@@ -231,8 +233,10 @@ groups:
           severity: warning
           category: resource
         annotations:
-          summary: "Possible memory leak detected"
-          description: "Memory usage increased by {{ $value | humanize }}B in the last hour for {{ $labels.service }}"
+          summary: 'Possible memory leak detected'
+          description:
+            'Memory usage increased by {{ $value | humanize }}B in the last hour for {{
+            $labels.service }}'
 ```
 
 ### System Resource Alerts
@@ -257,8 +261,8 @@ groups:
           severity: warning
           category: cpu
         annotations:
-          summary: "High CPU usage"
-          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+          summary: 'High CPU usage'
+          description: 'CPU usage is {{ $value }}% on {{ $labels.instance }}'
 
       # Critical CPU usage
       - alert: CriticalCPUUsage
@@ -271,8 +275,8 @@ groups:
           severity: critical
           category: cpu
         annotations:
-          summary: "Critical CPU usage"
-          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+          summary: 'Critical CPU usage'
+          description: 'CPU usage is {{ $value }}% on {{ $labels.instance }}'
 
       # High memory usage
       - alert: HighMemoryUsage
@@ -285,8 +289,8 @@ groups:
           severity: warning
           category: memory
         annotations:
-          summary: "High memory usage"
-          description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+          summary: 'High memory usage'
+          description: 'Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}'
 
       # Out of memory imminent
       - alert: OutOfMemory
@@ -299,8 +303,9 @@ groups:
           severity: critical
           category: memory
         annotations:
-          summary: "Out of memory imminent"
-          description: "Only {{ $value | humanizePercentage }} memory available on {{ $labels.instance }}"
+          summary: 'Out of memory imminent'
+          description:
+            'Only {{ $value | humanizePercentage }} memory available on {{ $labels.instance }}'
 
       # High disk usage
       - alert: HighDiskUsage
@@ -313,8 +318,10 @@ groups:
           severity: warning
           category: disk
         annotations:
-          summary: "High disk usage"
-          description: "Disk usage is {{ $value | humanizePercentage }} on {{ $labels.instance }} at {{ $labels.mountpoint }}"
+          summary: 'High disk usage'
+          description:
+            'Disk usage is {{ $value | humanizePercentage }} on {{ $labels.instance }} at {{
+            $labels.mountpoint }}'
 
       # Disk will fill in 4 hours (prediction)
       - alert: DiskWillFillSoon
@@ -325,8 +332,10 @@ groups:
           severity: warning
           category: disk
         annotations:
-          summary: "Disk will fill in 4 hours"
-          description: "Disk {{ $labels.mountpoint }} on {{ $labels.instance }} will fill in approximately 4 hours"
+          summary: 'Disk will fill in 4 hours'
+          description:
+            'Disk {{ $labels.mountpoint }} on {{ $labels.instance }} will fill in approximately 4
+            hours'
 
       # High disk I/O
       - alert: HighDiskIO
@@ -337,8 +346,10 @@ groups:
           severity: warning
           category: disk
         annotations:
-          summary: "High disk I/O"
-          description: "Disk I/O utilization is {{ $value | humanizePercentage }} on {{ $labels.instance }} device {{ $labels.device }}"
+          summary: 'High disk I/O'
+          description:
+            'Disk I/O utilization is {{ $value | humanizePercentage }} on {{ $labels.instance }}
+            device {{ $labels.device }}'
 
       # Network bandwidth high
       - alert: HighNetworkBandwidth
@@ -349,8 +360,10 @@ groups:
           severity: warning
           category: network
         annotations:
-          summary: "High network receive bandwidth"
-          description: "Network receive is {{ $value | humanize }}B/s on {{ $labels.instance }} interface {{ $labels.device }}"
+          summary: 'High network receive bandwidth'
+          description:
+            'Network receive is {{ $value | humanize }}B/s on {{ $labels.instance }} interface {{
+            $labels.device }}'
 ```
 
 ### Service Level Objective (SLO) Alerts
@@ -378,9 +391,9 @@ groups:
           category: slo
           slo: availability
         annotations:
-          summary: "Availability SLO breach"
-          description: "30-day availability is {{ $value | humanizePercentage }} (SLO: 99.9%)"
-          impact: "Service reliability below acceptable threshold"
+          summary: 'Availability SLO breach'
+          description: '30-day availability is {{ $value | humanizePercentage }} (SLO: 99.9%)'
+          impact: 'Service reliability below acceptable threshold'
 
       # Latency SLO (95% < 500ms)
       - alert: LatencySLOBreach
@@ -396,8 +409,8 @@ groups:
           category: slo
           slo: latency
         annotations:
-          summary: "Latency SLO breach"
-          description: "30-day P95 latency is {{ $value }}s (SLO: <500ms)"
+          summary: 'Latency SLO breach'
+          description: '30-day P95 latency is {{ $value }}s (SLO: <500ms)'
 
       # Error budget burn rate (fast)
       - alert: FastErrorBudgetBurn
@@ -412,9 +425,9 @@ groups:
           severity: critical
           category: slo
         annotations:
-          summary: "Fast error budget burn"
-          description: "Burning through error budget at 14.4x rate"
-          action: "Page on-call engineer immediately"
+          summary: 'Fast error budget burn'
+          description: 'Burning through error budget at 14.4x rate'
+          action: 'Page on-call engineer immediately'
 
       # Error budget burn rate (slow)
       - alert: SlowErrorBudgetBurn
@@ -429,8 +442,8 @@ groups:
           severity: warning
           category: slo
         annotations:
-          summary: "Slow error budget burn"
-          description: "Burning through error budget at 3x rate"
+          summary: 'Slow error budget burn'
+          description: 'Burning through error budget at 3x rate'
 ```
 
 ## Alertmanager Configuration
@@ -589,8 +602,8 @@ receivers:
 
 ---
 
-**Part 3 Complete**: Prometheus server configuration with service discovery, comprehensive alert rules
-(application performance, system resources, SLO monitoring), Alertmanager configuration with routing,
-inhibition rules, and multi-channel notifications (PagerDuty, Slack), alert templates. ✅
+**Part 3 Complete**: Prometheus server configuration with service discovery, comprehensive alert
+rules (application performance, system resources, SLO monitoring), Alertmanager configuration with
+routing, inhibition rules, and multi-channel notifications (PagerDuty, Slack), alert templates. ✅
 
 **Continue to Part 4** for Grafana dashboards and visualization.

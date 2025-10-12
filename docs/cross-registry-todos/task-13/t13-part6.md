@@ -8,7 +8,7 @@
 
 ### TESTING.md - Comprehensive Testing Guide
 
-```markdown
+````markdown
 <!-- file: TESTING.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: testing-documentation -->
@@ -45,6 +45,7 @@ fn test_example() {
     assert_eq!(result, expected);
 }
 ```
+````
 
 ### Test Naming Convention
 
@@ -67,6 +68,7 @@ fn test_example() {
 **Purpose**: Test individual functions/methods in isolation
 
 **Characteristics**:
+
 - Fast (< 1ms per test)
 - No external dependencies
 - Mock all I/O operations
@@ -92,6 +94,7 @@ def test_calculate_score_with_valid_inputs():
 **Purpose**: Test interactions between components
 
 **Characteristics**:
+
 - Moderate speed (< 1s per test)
 - Use real dependencies when possible
 - Test critical paths
@@ -125,6 +128,7 @@ async fn test_api_workflow_integration() {
 **Purpose**: Test complete user workflows
 
 **Characteristics**:
+
 - Slow (< 30s per test)
 - Production-like environment
 - Test happy paths and critical errors
@@ -145,9 +149,7 @@ test('complete workflow creation flow', async ({ page }) => {
 
   // Assert: Workflow created and visible
   await expect(page.locator('.success-toast')).toBeVisible();
-  await expect(
-    page.locator('[data-testid="workflow-list"]')
-  ).toContainText('E2E Test Workflow');
+  await expect(page.locator('[data-testid="workflow-list"]')).toContainText('E2E Test Workflow');
 });
 ```
 
@@ -192,6 +194,7 @@ npm run test:coverage -- --coverage.lines=80
 ### When to Mock
 
 Mock external dependencies:
+
 - HTTP/API calls
 - Database connections
 - File system operations
@@ -201,6 +204,7 @@ Mock external dependencies:
 ### When NOT to Mock
 
 Don't mock:
+
 - Pure functions (no side effects)
 - Simple data structures
 - Internal application logic
@@ -369,6 +373,7 @@ test('async operation completes', async () => {
 ### Benchmark Writing
 
 Write benchmarks for:
+
 - Critical path operations
 - Database queries
 - API endpoints
@@ -399,7 +404,7 @@ Configure performance alerts:
   with:
     tool: 'cargo'
     output-file-path: benchmark-results.txt
-    alert-threshold: '150%'  # Alert if 50% slower
+    alert-threshold: '150%' # Alert if 50% slower
     fail-on-alert: false
     comment-on-alert: true
 ```
@@ -472,6 +477,7 @@ Before release:
 **Issue: Tests pass locally but fail in CI**
 
 Solution:
+
 - Check for environment differences (paths, env vars)
 - Ensure deterministic behavior (no random data/times)
 - Verify CI has necessary dependencies
@@ -479,6 +485,7 @@ Solution:
 **Issue: Slow test execution**
 
 Solution:
+
 - Profile test suite to find slow tests
 - Parallelize test execution
 - Use test sharding for E2E tests
@@ -487,6 +494,7 @@ Solution:
 **Issue: Intermittent failures**
 
 Solution:
+
 - Add logging to identify failure point
 - Increase timeouts for async operations
 - Check for race conditions
@@ -499,6 +507,7 @@ Solution:
 - [Vitest Documentation](https://vitest.dev/)
 - [Playwright Best Practices](https://playwright.dev/docs/best-practices)
 - [Test Driven Development](https://martinfowler.com/bliki/TestDrivenDevelopment.html)
+
 ```
 
 ## Task 13 Completion Checklist
@@ -637,3 +646,4 @@ Task 13 provides a **comprehensive testing and quality assurance automation syst
 **Task 13 Complete**: Testing and Quality Assurance Automation system fully documented with ~3,900 lines across 6 parts. ✅
 
 **Ready for Task 14**: Documentation Generation and Publishing Automation
+```

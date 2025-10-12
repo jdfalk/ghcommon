@@ -15,26 +15,26 @@
 
 oncall_schedule:
   primary:
-    name: "Primary On-Call"
+    name: 'Primary On-Call'
     rotation_type: weekly
     rotation_start: Monday 09:00 UTC
     members:
       - name: Alice Johnson
         email: alice@example.com
         phone: +1-555-0101
-        slack: "@alice"
+        slack: '@alice'
         timezone: America/New_York
 
       - name: Bob Smith
         email: bob@example.com
         phone: +1-555-0102
-        slack: "@bob"
+        slack: '@bob'
         timezone: America/Los_Angeles
 
       - name: Carol Williams
         email: carol@example.com
         phone: +1-555-0103
-        slack: "@carol"
+        slack: '@carol'
         timezone: Europe/London
 
     escalation_policy:
@@ -48,63 +48,64 @@ oncall_schedule:
         notify: director
 
   secondary:
-    name: "Secondary On-Call"
+    name: 'Secondary On-Call'
     rotation_type: weekly
     rotation_start: Monday 09:00 UTC
     members:
       - name: David Brown
         email: david@example.com
         phone: +1-555-0104
-        slack: "@david"
+        slack: '@david'
 
       - name: Eve Davis
         email: eve@example.com
         phone: +1-555-0105
-        slack: "@eve"
+        slack: '@eve'
 
   manager:
-    name: "Engineering Manager"
+    name: 'Engineering Manager'
     members:
       - name: Frank Miller
         email: frank@example.com
         phone: +1-555-0106
-        slack: "@frank"
+        slack: '@frank'
 
 notification_channels:
   critical:
     - type: pagerduty
-      api_key: "${PAGERDUTY_API_KEY}"
+      api_key: '${PAGERDUTY_API_KEY}'
       urgency: high
     - type: phone
       provider: twilio
     - type: slack
-      channel: "#incidents"
-      mention: "@here"
+      channel: '#incidents'
+      mention: '@here'
 
   warning:
     - type: slack
-      channel: "#alerts"
+      channel: '#alerts'
     - type: email
 
   info:
     - type: email
     - type: slack
-      channel: "#monitoring"
+      channel: '#monitoring'
 ```
 
 ## Incident Response Playbook
 
 ### Critical Service Down
 
-```markdown
+````markdown
 # Playbook: Critical Service Down
 
 ## Severity: P0 - Critical
-**Impact**: Complete service outage, all users affected
-**Response Time**: Immediate (0-5 minutes)
+
+**Impact**: Complete service outage, all users affected **Response Time**: Immediate (0-5 minutes)
 **Escalation**: Immediate to manager if not resolved in 30 minutes
 
 ## Detection
+
 - Alert: "ServiceDown" from Prometheus
 - PagerDuty page sent to primary on-call
 - Slack notification in #incidents channel
@@ -113,6 +114,7 @@ notification_channels:
 ## Immediate Response (0-5 minutes)
 
 ### 1. Acknowledge Alert
+
 ```bash
 # Acknowledge in PagerDuty to stop escalation
 pagerduty-cli incidents acknowledge --id ${INCIDENT_ID}
@@ -120,8 +122,10 @@ pagerduty-cli incidents acknowledge --id ${INCIDENT_ID}
 # Post in Slack
 /incident create "API service down - investigating"
 ```
+````
 
 ### 2. Initial Assessment
+
 ```bash
 # Check service status
 kubectl get pods -n production --selector=app=api-service
@@ -134,6 +138,7 @@ open "http://grafana:3000/d/service-health"
 ```
 
 ### 3. Quick Status Update
+
 ```
 Post in #incidents Slack channel:
 "🚨 P0 Incident: API service down
@@ -146,6 +151,7 @@ On-call: @username"
 ## Investigation (5-15 minutes)
 
 ### Check Pod Status
+
 ```bash
 # Get pod details
 kubectl describe pod <pod-name> -n production
@@ -158,6 +164,7 @@ kubectl logs deployment/api-service -n production --previous
 ```
 
 ### Common Causes Checklist
+
 - [ ] Recent deployment (last 1 hour)?
   - If yes: Consider immediate rollback
 - [ ] Resource exhaustion (CPU/Memory)?
@@ -172,6 +179,7 @@ kubectl logs deployment/api-service -n production --previous
 ## Resolution Actions
 
 ### Option 1: Rollback Deployment
+
 ```bash
 # If deployed in last hour
 kubectl rollout undo deployment/api-service -n production
@@ -184,6 +192,7 @@ curl -I http://api-service:8080/health
 ```
 
 ### Option 2: Restart Service
+
 ```bash
 # Simple restart
 kubectl rollout restart deployment/api-service -n production
@@ -193,6 +202,7 @@ kubectl delete pod <pod-name> -n production --grace-period=0 --force
 ```
 
 ### Option 3: Scale Up Resources
+
 ```bash
 # Increase replicas
 kubectl scale deployment/api-service --replicas=10 -n production
@@ -212,6 +222,7 @@ spec:
 ```
 
 ### Option 4: Enable Maintenance Mode
+
 ```yaml
 # If extended downtime needed
 # Update ingress to serve maintenance page
@@ -239,6 +250,7 @@ EOF
 ## Communication Updates
 
 ### Every 10 Minutes Until Resolved
+
 ```
 Slack #incidents:
 "⏱️ Update: API service
@@ -249,6 +261,7 @@ ETA: [Time estimate]"
 ```
 
 ### Resolution Message
+
 ```
 Slack #incidents:
 "✅ RESOLVED: API service
@@ -262,6 +275,7 @@ Post-mortem: Scheduled for [date/time]"
 ## Post-Incident (After Resolution)
 
 ### 1. Monitor for Stability (1 hour)
+
 ```bash
 # Watch error rates
 watch -n 10 'curl -s "http://prometheus:9090/api/v1/query?query=rate(http_requests_total{status=~\"5..\"}[5m])"'
@@ -271,6 +285,7 @@ watch -n 10 'curl -s "http://prometheus:9090/api/v1/query?query=histogram_quanti
 ```
 
 ### 2. Collect Incident Data
+
 - Start time and end time
 - Services affected
 - User impact (number of failed requests)
@@ -279,11 +294,13 @@ watch -n 10 'curl -s "http://prometheus:9090/api/v1/query?query=histogram_quanti
 - Prevention measures
 
 ### 3. Schedule Post-Mortem
+
 - Within 48 hours of incident
 - Invite all relevant stakeholders
 - Prepare timeline and investigation findings
 - Focus on process improvement, not blame
-```
+
+````
 
 ### Database Performance Degradation
 
@@ -317,9 +334,10 @@ FROM pg_stat_activity
 WHERE state = 'active'
   AND query_start < NOW() - INTERVAL '30 seconds'
 ORDER BY query_start;
-```
+````
 
 ### 2. Check Database Resources
+
 ```bash
 # Connection count
 kubectl exec -it postgres-0 -- psql -U postgres -c "
@@ -341,6 +359,7 @@ kubectl exec -it postgres-0 -- psql -U postgres -c "
 ### 3. Quick Fixes
 
 #### Terminate Long-Running Queries
+
 ```sql
 -- Cancel query
 SELECT pg_cancel_backend(pid)
@@ -354,16 +373,18 @@ WHERE pid = <slow_query_pid>;
 ```
 
 #### Increase Connection Pool
+
 ```yaml
 # Update application config
 env:
   - name: DATABASE_POOL_SIZE
-    value: "50"  # From 20
+    value: '50' # From 20
   - name: DATABASE_POOL_TIMEOUT
-    value: "30"  # 30 seconds
+    value: '30' # 30 seconds
 ```
 
 #### Add Missing Index
+
 ```sql
 -- Identify missing indexes
 SELECT schemaname, tablename, attname
@@ -378,12 +399,14 @@ CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
 ```
 
 ## Long-Term Solutions
+
 1. Implement query caching
 2. Optimize N+1 queries
 3. Add read replicas for read-heavy workloads
 4. Set up connection pooler (PgBouncer)
 5. Schedule regular VACUUM and ANALYZE
-```
+
+````
 
 ### Security Incident
 
@@ -416,9 +439,10 @@ kubectl exec -it auth-service -- \
 # Revoke all sessions for user
 kubectl exec -it auth-service -- \
   redis-cli DEL "session:user:<user_id>:*"
-```
+````
 
 ### 2. Preserve Evidence
+
 ```bash
 # Export logs for analysis
 kubectl logs deployment/api-service -n production --since=24h > incident-logs.txt
@@ -432,6 +456,7 @@ kubectl cp production/api-service:/tmp/incident-snapshot.tar.gz ./incident-snaps
 ```
 
 ### 3. Notify Stakeholders
+
 - Security team (immediate)
 - Legal team (immediate if data breach suspected)
 - Executive team (within 1 hour)
@@ -440,6 +465,7 @@ kubectl cp production/api-service:/tmp/incident-snapshot.tar.gz ./incident-snaps
 ## Investigation
 
 ### Analyze Attack Pattern
+
 ```bash
 # Query failed login attempts
 curl -G 'http://loki:3100/loki/api/v1/query' \
@@ -456,6 +482,7 @@ kubectl get pods -n production -o json | \
 ```
 
 ### Security Checklist
+
 - [ ] Identify attack vector
 - [ ] Determine scope of access
 - [ ] Check for data exfiltration
@@ -466,6 +493,7 @@ kubectl get pods -n production -o json | \
 ## Recovery
 
 ### Rotate Credentials
+
 ```bash
 # Rotate database passwords
 kubectl create secret generic db-credentials \
@@ -480,6 +508,7 @@ kubectl exec -it auth-service -- ./scripts/regenerate-jwt-keys.sh
 ```
 
 ### Patch Vulnerabilities
+
 ```bash
 # Update vulnerable dependencies
 kubectl set image deployment/api-service api-service=api-service:patched-version
@@ -489,13 +518,15 @@ kubectl apply -f security-patches/
 ```
 
 ## Documentation
+
 - Timeline of events
 - Attack vector and method
 - Systems compromised
 - Data accessed/exfiltrated
 - Actions taken
 - Preventive measures implemented
-```
+
+````
 
 ## Escalation Matrix
 
@@ -559,23 +590,23 @@ class EscalationManager:
                 return True
 
         return False
-```
+````
 
 ---
 
 **Part 4 Complete**: On-call playbooks with rotation configuration including primary/secondary/
 manager schedules with contact info (email/phone/Slack) and escalation policy (0min→primary, 15min→
-secondary, 30min→manager, 60min→director), incident response playbooks for critical service down
-(P0 severity, 0-5min response, immediate acknowledgment, initial assessment with kubectl commands,
-quick status updates every 10min, investigation checklist, resolution actions including rollback/
+secondary, 30min→manager, 60min→director), incident response playbooks for critical service down (P0
+severity, 0-5min response, immediate acknowledgment, initial assessment with kubectl commands, quick
+status updates every 10min, investigation checklist, resolution actions including rollback/
 restart/scale-up/maintenance mode, post-incident monitoring for 1 hour and post-mortem scheduling),
 database performance degradation (P1 severity, identify slow queries with pg_stat_statements, check
 resources and connection count, quick fixes with query termination/connection pool increase/missing
 indexes, long-term solutions), security incident playbook (P0 critical, immediate containment with
 IP blocking and account disabling, evidence preservation with log exports and snapshots, stakeholder
 notification, attack pattern analysis, security checklist, recovery with credential rotation and
-vulnerability patching), escalation matrix with 5 levels (L1→L5) and response times (5min→as needed),
-auto-escalation logic with time-based triggers and severity-based immediate escalation. ✅
+vulnerability patching), escalation matrix with 5 levels (L1→L5) and response times (5min→as
+needed), auto-escalation logic with time-based triggers and severity-based immediate escalation. ✅
 
 **Continue to Part 5** for project dashboards showing CI/CD metrics, cost tracking, and team
 productivity.

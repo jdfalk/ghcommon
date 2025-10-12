@@ -1,8 +1,16 @@
 <!-- file: docs/cross-registry-todos/task-09/t09-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t09-ci-migration-testing-part1-h3i4j5k6-l7m8 -->
 
 # Task 09 Part 1: CI Workflow Migration & Testing - Overview
+
+> **Status:** ✅ Completed  
+> **Updated:** Repositories consuming `reusable-ci.yml` can now depend on the consolidated workflow
+> outputs (language detection, lint/test stages, protobuf hooks, and CI summary), enabling removal
+> of legacy CI definitions.  
+> **Verification:** The reusable workflow surfaces all gating outputs needed for callers, and its
+> guarded inputs (`skip-tests`, `skip-linting`, `skip-protobuf`) support incremental rollout without
+> behaviour delta.
 
 ## Task Overview
 

@@ -27,14 +27,14 @@ export interface LoggerConfig {
  * Create Winston logger with JSON formatting
  */
 export function createLogger(config: LoggerConfig): winston.Logger {
-  const {level, service, environment, logFile} = config;
+  const { level, service, environment, logFile } = config;
 
   // Custom format for structured logging
   const structuredFormat = winston.format.combine(
-    winston.format.timestamp({format: 'YYYY-MM-DDTHH:mm:ss.SSSZ'}),
-    winston.format.errors({stack: true}),
+    winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
+    winston.format.errors({ stack: true }),
     winston.format.metadata({
-      fillExcept: ['timestamp', 'level', 'message', 'service', 'environment']
+      fillExcept: ['timestamp', 'level', 'message', 'service', 'environment'],
     }),
     winston.format.json()
   );
@@ -43,10 +43,8 @@ export function createLogger(config: LoggerConfig): winston.Logger {
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.printf(({timestamp, level, message, metadata}) => {
-          const meta = Object.keys(metadata).length > 0
-            ? JSON.stringify(metadata, null, 2)
-            : '';
+        winston.format.printf(({ timestamp, level, message, metadata }) => {
+          const meta = Object.keys(metadata).length > 0 ? JSON.stringify(metadata, null, 2) : '';
           return `${timestamp} [${level}] ${message} ${meta}`;
         })
       ),
@@ -68,7 +66,7 @@ export function createLogger(config: LoggerConfig): winston.Logger {
 
   const logger = winston.createLogger({
     level,
-    defaultMeta: {service, environment},
+    defaultMeta: { service, environment },
     format: structuredFormat,
     transports,
   });
@@ -101,8 +99,8 @@ export function createChildLogger(
 // version: 1.0.0
 // guid: typescript-express-logging-middleware
 
-import {Request, Response, NextFunction} from 'express';
-import {v4 as uuidv4} from 'uuid';
+import { Request, Response, NextFunction } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import winston from 'winston';
 
 declare global {
@@ -142,7 +140,7 @@ export function loggingMiddleware(logger: winston.Logger) {
 
     // Capture response
     const originalSend = res.send;
-    res.send = function(data: any) {
+    res.send = function (data: any) {
       const duration = Date.now() - req.startTime;
       const status = res.statusCode;
 
@@ -184,16 +182,9 @@ function sanitizeBody(body: any): any {
     return body;
   }
 
-  const sensitiveFields = [
-    'password',
-    'token',
-    'apiKey',
-    'secret',
-    'creditCard',
-    'ssn',
-  ];
+  const sensitiveFields = ['password', 'token', 'apiKey', 'secret', 'creditCard', 'ssn'];
 
-  const sanitized = {...body};
+  const sanitized = { ...body };
 
   for (const field of sensitiveFields) {
     if (field in sanitized) {
@@ -235,7 +226,7 @@ export function errorLoggingMiddleware(logger: winston.Logger) {
 
 import pino from 'pino';
 import pinoHttp from 'pino-http';
-import {Request, Response} from 'express';
+import { Request, Response } from 'express';
 
 export interface PinoConfig {
   level: string;
@@ -248,7 +239,7 @@ export interface PinoConfig {
  * Create Pino logger
  */
 export function createPinoLogger(config: PinoConfig): pino.Logger {
-  const {level, service, environment, prettyPrint = false} = config;
+  const { level, service, environment, prettyPrint = false } = config;
 
   const logger = pino({
     level,
@@ -261,7 +252,7 @@ export function createPinoLogger(config: PinoConfig): pino.Logger {
     timestamp: pino.stdTimeFunctions.isoTime,
     formatters: {
       level(label: string) {
-        return {level: label};
+        return { level: label };
       },
       bindings(bindings: pino.Bindings) {
         return {
@@ -287,7 +278,7 @@ export function createPinoLogger(config: PinoConfig): pino.Logger {
     }),
   });
 
-  logger.info({level, service, environment}, 'Pino logger initialized');
+  logger.info({ level, service, environment }, 'Pino logger initialized');
 
   return logger;
 }
@@ -348,7 +339,7 @@ export function createPinoHttpMiddleware(logger: pino.Logger) {
  * Sanitize headers to remove sensitive data
  */
 function sanitizeHeaders(headers: any): any {
-  const sanitized = {...headers};
+  const sanitized = { ...headers };
   const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
 
   for (const header of sensitiveHeaders) {
@@ -663,7 +654,7 @@ export function maskSensitiveData(text: string): string {
   let masked = text;
 
   // Mask patterns
-  masked = masked.replace(PATTERNS.email, (match) => {
+  masked = masked.replace(PATTERNS.email, match => {
     const [local, domain] = match.split('@');
     return `${local[0]}***@${domain}`;
   });
@@ -685,7 +676,7 @@ export function sanitizeObject<T>(obj: T, maxDepth = 5): T {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => sanitizeObject(item, maxDepth - 1)) as any;
+    return obj.map(item => sanitizeObject(item, maxDepth - 1)) as any;
   }
 
   const sanitized: any = {};
@@ -723,10 +714,8 @@ export function createSanitizingLogger(logger: any) {
         typeof original === 'function' &&
         ['log', 'info', 'warn', 'error', 'debug'].includes(prop)
       ) {
-        return function(...args: any[]) {
-          const sanitized = args.map((arg) =>
-            typeof arg === 'object' ? sanitizeObject(arg) : arg
-          );
+        return function (...args: any[]) {
+          const sanitized = args.map(arg => (typeof arg === 'object' ? sanitizeObject(arg) : arg));
           return original.apply(target, sanitized);
         };
       }
@@ -740,10 +729,11 @@ export function createSanitizingLogger(logger: any) {
 ---
 
 **Part 2 Complete**: JavaScript/TypeScript structured logging with Winston configuration including
-custom formats and daily rotation, Express logging middleware with request IDs and child loggers, Pino
-high-performance logging with custom serializers, Go Zap logging with JSON encoding and file rotation,
-Gin middleware with request/response logging and panic recovery, comprehensive sensitive data masking
-with PII redaction patterns for emails/credit cards/SSNs/JWTs and recursive object sanitization. ✅
+custom formats and daily rotation, Express logging middleware with request IDs and child loggers,
+Pino high-performance logging with custom serializers, Go Zap logging with JSON encoding and file
+rotation, Gin middleware with request/response logging and panic recovery, comprehensive sensitive
+data masking with PII redaction patterns for emails/credit cards/SSNs/JWTs and recursive object
+sanitization. ✅
 
-**Continue to Part 3** for log correlation with trace IDs, OpenTelemetry integration, and distributed
-tracing context propagation.
+**Continue to Part 3** for log correlation with trace IDs, OpenTelemetry integration, and
+distributed tracing context propagation.

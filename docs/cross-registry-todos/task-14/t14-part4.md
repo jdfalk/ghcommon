@@ -44,7 +44,7 @@ jobs:
 
       - name: Build rustdoc
         env:
-          RUSTDOCFLAGS: "--enable-index-page -Zunstable-options"
+          RUSTDOCFLAGS: '--enable-index-page -Zunstable-options'
         run: |
           cargo doc --no-deps --all-features --document-private-items
 
@@ -316,7 +316,7 @@ version: 2
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.12"
+    python: '3.12'
   jobs:
     pre_build:
       - pip install poetry
@@ -897,6 +897,7 @@ if __name__ == '__main__':
 
 ---
 
-**Part 4 Complete**: GitHub Pages deployment with multi-version support, Read the Docs configuration, versioned documentation management script, and unified API index generator. ✅
+**Part 4 Complete**: GitHub Pages deployment with multi-version support, Read the Docs
+configuration, versioned documentation management script, and unified API index generator. ✅
 
 **Continue to Part 5** for documentation CI/CD integration and automation workflows.

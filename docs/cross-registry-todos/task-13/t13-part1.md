@@ -1,8 +1,14 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part1.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t13-testing-automation-part1-l4m5n6o7-p8q9 -->
 
 # Task 13: Testing and Quality Assurance Automation
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/ci-tests.yml` v1.0.0 adds multi-language matrices, nightly rust
+> canaries, scheduled test runs, and benchmark capture with artifacts.  
+> **Verification:** Test summary output in the workflow step log highlights per-language pass/fail
+> states and preserves benchmark artifacts for further analysis.
 
 ## Overview and Strategy
 

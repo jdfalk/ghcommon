@@ -300,14 +300,14 @@ class TraceContextMiddleware(BaseHTTPMiddleware):
 // version: 1.0.0
 // guid: typescript-trace-correlation
 
-import {NodeTracerProvider} from '@opentelemetry/sdk-trace-node';
-import {Resource} from '@opentelemetry/resources';
-import {SemanticResourceAttributes} from '@opentelemetry/semantic-conventions';
-import {OTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
-import {BatchSpanProcessor} from '@opentelemetry/sdk-trace-base';
-import {trace, context, propagation, SpanContext} from '@opentelemetry/api';
-import {W3CTraceContextPropagator} from '@opentelemetry/core';
-import {Request, Response, NextFunction} from 'express';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { trace, context, propagation, SpanContext } from '@opentelemetry/api';
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import { Request, Response, NextFunction } from 'express';
 import winston from 'winston';
 
 /**
@@ -336,7 +336,7 @@ export function initTracer(serviceName: string): void {
 /**
  * Get current trace context
  */
-export function getTraceContext(): {traceId: string; spanId: string} | null {
+export function getTraceContext(): { traceId: string; spanId: string } | null {
   const span = trace.getActiveSpan();
 
   if (!span) {
@@ -358,7 +358,7 @@ export function getTraceContext(): {traceId: string; spanId: string} | null {
 /**
  * Winston format to add trace context
  */
-export const traceContextFormat = winston.format((info) => {
+export const traceContextFormat = winston.format(info => {
   const traceContext = getTraceContext();
 
   if (traceContext) {
@@ -379,11 +379,7 @@ export function traceContextMiddleware() {
 
     // Create span for request
     const tracer = trace.getTracer('http-server');
-    const span = tracer.startSpan(
-      `${req.method} ${req.path}`,
-      undefined,
-      ctx
-    );
+    const span = tracer.startSpan(`${req.method} ${req.path}`, undefined, ctx);
 
     // Set context for this request
     context.with(trace.setSpan(ctx, span), () => {
@@ -427,7 +423,9 @@ Format: `00-{trace-id}-{parent-id}-{trace-flags}`
 
 Example:
 ```
+
 traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+
 ```
 
 Components:
@@ -444,7 +442,9 @@ Format: `key1=value1,key2=value2`
 
 Example:
 ```
+
 tracestate: vendor1=opaque_value1,vendor2=opaque_value2
+
 ```
 
 Purpose:
@@ -538,12 +538,12 @@ datasources:
         - datasourceUid: tempo
           matcherRegex: "trace_id=(\\w+)"
           name: TraceID
-          url: "$${__value.raw}"
+          url: '$${__value.raw}'
         # Extract from JSON logs
         - datasourceUid: tempo
           matcherRegex: '"trace_id":"(\\w+)"'
           name: TraceID
-          url: "$${__value.raw}"
+          url: '$${__value.raw}'
 
   # Tempo for traces
   - name: Tempo

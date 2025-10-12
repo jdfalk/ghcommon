@@ -137,51 +137,51 @@ spec:
         app: loki
     spec:
       containers:
-      - name: loki
-        image: grafana/loki:2.9.3
-        args:
-        - -config.file=/etc/loki/loki.yaml
-        ports:
-        - containerPort: 3100
-          name: http
-        - containerPort: 9096
-          name: grpc
-        volumeMounts:
+        - name: loki
+          image: grafana/loki:2.9.3
+          args:
+            - -config.file=/etc/loki/loki.yaml
+          ports:
+            - containerPort: 3100
+              name: http
+            - containerPort: 9096
+              name: grpc
+          volumeMounts:
+            - name: config
+              mountPath: /etc/loki
+            - name: storage
+              mountPath: /loki
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2
+              memory: 4Gi
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 3100
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3100
+            initialDelaySeconds: 45
+            periodSeconds: 10
+      volumes:
         - name: config
-          mountPath: /etc/loki
-        - name: storage
-          mountPath: /loki
+          configMap:
+            name: loki-config
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
-            cpu: 500m
-            memory: 1Gi
-          limits:
-            cpu: 2
-            memory: 4Gi
-        livenessProbe:
-          httpGet:
-            path: /ready
-            port: 3100
-          initialDelaySeconds: 45
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3100
-          initialDelaySeconds: 45
-          periodSeconds: 10
-      volumes:
-      - name: config
-        configMap:
-          name: loki-config
-  volumeClaimTemplates:
-  - metadata:
-      name: storage
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 50Gi
+            storage: 50Gi
 ---
 apiVersion: v1
 kind: Service
@@ -191,14 +191,14 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 3100
-    targetPort: 3100
-    protocol: TCP
-    name: http
-  - port: 9096
-    targetPort: 9096
-    protocol: TCP
-    name: grpc
+    - port: 3100
+      targetPort: 3100
+      protocol: TCP
+      name: http
+    - port: 9096
+      targetPort: 9096
+      protocol: TCP
+      name: grpc
   selector:
     app: loki
 ```
@@ -298,7 +298,9 @@ scrape_configs:
           selector: '{job="varlogs"}'
           stages:
             - regex:
-                expression: '(?P<timestamp>\w+ +\d+ \d+:\d+:\d+) (?P<hostname>\S+) (?P<process>\S+)(\[(?P<pid>\d+)\])?: (?P<message>.+)'
+                expression:
+                  '(?P<timestamp>\w+ +\d+ \d+:\d+:\d+) (?P<hostname>\S+)
+                  (?P<process>\S+)(\[(?P<pid>\d+)\])?: (?P<message>.+)'
             - timestamp:
                 source: timestamp
                 format: Jan 02 15:04:05
@@ -356,14 +358,14 @@ kind: ClusterRole
 metadata:
   name: promtail
 rules:
-  - apiGroups: [""]
+  - apiGroups: ['']
     resources:
       - nodes
       - nodes/proxy
       - services
       - endpoints
       - pods
-    verbs: ["get", "watch", "list"]
+    verbs: ['get', 'watch', 'list']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -403,52 +405,52 @@ spec:
     spec:
       serviceAccountName: promtail
       containers:
-      - name: promtail
-        image: grafana/promtail:2.9.3
-        args:
-        - -config.file=/etc/promtail/promtail.yaml
-        env:
-        - name: HOSTNAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        ports:
-        - containerPort: 9080
-          name: http
-        volumeMounts:
-        - name: config
-          mountPath: /etc/promtail
-        - name: positions
-          mountPath: /tmp
-        - name: varlog
-          mountPath: /var/log
-          readOnly: true
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
+        - name: promtail
+          image: grafana/promtail:2.9.3
+          args:
+            - -config.file=/etc/promtail/promtail.yaml
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          ports:
+            - containerPort: 9080
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/promtail
+            - name: positions
+              mountPath: /tmp
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
       volumes:
-      - name: config
-        configMap:
-          name: promtail-config
-      - name: positions
-        hostPath:
-          path: /tmp/promtail-positions
-      - name: varlog
-        hostPath:
-          path: /var/log
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
+        - name: config
+          configMap:
+            name: promtail-config
+        - name: positions
+          hostPath:
+            path: /tmp/promtail-positions
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
       tolerations:
-      - effect: NoSchedule
-        operator: Exists
+        - effect: NoSchedule
+          operator: Exists
 ```
 
 ## ELK Stack Alternative
@@ -460,7 +462,7 @@ spec:
 # version: 1.0.0
 # guid: elasticsearch-configuration
 
-cluster.name: "logging-cluster"
+cluster.name: 'logging-cluster'
 network.host: 0.0.0.0
 
 # Disable X-Pack security for development
@@ -468,7 +470,7 @@ xpack.security.enabled: false
 xpack.monitoring.collection.enabled: true
 
 # Node roles
-node.roles: [ master, data, ingest ]
+node.roles: [master, data, ingest]
 
 # Discovery
 discovery.type: single-node
@@ -663,10 +665,10 @@ output {
 # guid: kibana-configuration
 
 server.name: kibana
-server.host: "0.0.0.0"
+server.host: '0.0.0.0'
 server.port: 5601
 
-elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.hosts: ['http://elasticsearch:9200']
 elasticsearch.requestTimeout: 30000
 
 # Monitoring
@@ -677,14 +679,14 @@ logging.dest: stdout
 logging.verbose: false
 
 # Index patterns
-kibana.index: ".kibana"
-kibana.defaultAppId: "discover"
+kibana.index: '.kibana'
+kibana.defaultAppId: 'discover'
 
 # Security (disable for development)
 xpack.security.enabled: false
 
 # Saved objects
-xpack.encryptedSavedObjects.encryptionKey: "something_at_least_32_characters_long"
+xpack.encryptedSavedObjects.encryptionKey: 'something_at_least_32_characters_long'
 
 # Alerting
 xpack.alerting.enabled: true
@@ -699,10 +701,10 @@ xpack.graph.enabled: true
 **Part 4 Complete**: Log aggregation infrastructure with Loki configuration for log storage using
 BoltDB shipper and filesystem, retention policies for 30-day log retention, compactor for index
 optimization, ruler for alerting rules, query frontend with caching, Loki Kubernetes StatefulSet
-with 3 replicas and persistent volumes, Promtail configuration for scraping Kubernetes pod logs
-with pipeline stages for JSON parsing and label extraction, system log collection, trace ID
-correlation, Promtail DaemonSet with RBAC for cluster-wide log collection, ELK stack alternative
-with Elasticsearch cluster configuration including index lifecycle management (hot/warm/cold/delete
+with 3 replicas and persistent volumes, Promtail configuration for scraping Kubernetes pod logs with
+pipeline stages for JSON parsing and label extraction, system log collection, trace ID correlation,
+Promtail DaemonSet with RBAC for cluster-wide log collection, ELK stack alternative with
+Elasticsearch cluster configuration including index lifecycle management (hot/warm/cold/delete
 phases), Logstash pipeline for log parsing with JSON decoding, GeoIP enrichment, user-agent parsing,
 error categorization, and Elasticsearch output with daily indices, Kibana configuration for log
 visualization and analysis. ✅

@@ -25,18 +25,18 @@ const throughput = new Counter('throughput');
 // Test configuration
 export const options = {
   stages: [
-    { duration: '2m', target: 10 },   // Ramp up to 10 users
-    { duration: '5m', target: 10 },   // Stay at 10 users
-    { duration: '2m', target: 50 },   // Ramp to 50 users
-    { duration: '5m', target: 50 },   // Stay at 50 users
-    { duration: '2m', target: 100 },  // Spike to 100 users
-    { duration: '5m', target: 100 },  // Stay at 100 users
-    { duration: '5m', target: 0 },    // Ramp down
+    { duration: '2m', target: 10 }, // Ramp up to 10 users
+    { duration: '5m', target: 10 }, // Stay at 10 users
+    { duration: '2m', target: 50 }, // Ramp to 50 users
+    { duration: '5m', target: 50 }, // Stay at 50 users
+    { duration: '2m', target: 100 }, // Spike to 100 users
+    { duration: '5m', target: 100 }, // Stay at 100 users
+    { duration: '5m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<500', 'p(99)<1000'],
-    'http_req_failed': ['rate<0.01'],
-    'errors': ['rate<0.05'],
+    http_req_duration: ['p(95)<500', 'p(99)<1000'],
+    http_req_failed: ['rate<0.01'],
+    errors: ['rate<0.05'],
   },
 };
 
@@ -46,15 +46,15 @@ export default function () {
   // Health check
   let healthRes = http.get(`${BASE_URL}/health`);
   check(healthRes, {
-    'health check status is 200': (r) => r.status === 200,
+    'health check status is 200': r => r.status === 200,
   });
 
   // API endpoint test
   let apiRes = http.get(`${BASE_URL}/api/v1/status`);
   const success = check(apiRes, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 500ms': (r) => r.timings.duration < 500,
-    'has valid JSON': (r) => {
+    'status is 200': r => r.status === 200,
+    'response time < 500ms': r => r.timings.duration < 500,
+    'has valid JSON': r => {
       try {
         JSON.parse(r.body);
         return true;
@@ -75,7 +75,7 @@ export default function () {
 export function handleSummary(data) {
   return {
     'performance/results/load-test-summary.json': JSON.stringify(data, null, 2),
-    'stdout': textSummary(data, { indent: ' ', enableColors: true }),
+    stdout: textSummary(data, { indent: ' ', enableColors: true }),
   };
 }
 ```
@@ -90,17 +90,17 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '5m', target: 100 },   // Ramp up to normal load
-    { duration: '10m', target: 100 },  // Sustain normal load
-    { duration: '5m', target: 200 },   // Ramp to stress level
-    { duration: '10m', target: 200 },  // Sustain stress
-    { duration: '5m', target: 400 },   // Beyond breaking point
-    { duration: '10m', target: 400 },  // Sustain maximum
-    { duration: '10m', target: 0 },    // Recovery
+    { duration: '5m', target: 100 }, // Ramp up to normal load
+    { duration: '10m', target: 100 }, // Sustain normal load
+    { duration: '5m', target: 200 }, // Ramp to stress level
+    { duration: '10m', target: 200 }, // Sustain stress
+    { duration: '5m', target: 400 }, // Beyond breaking point
+    { duration: '10m', target: 400 }, // Sustain maximum
+    { duration: '10m', target: 0 }, // Recovery
   ],
   thresholds: {
-    'http_req_duration': ['p(99)<2000'], // More lenient for stress test
-    'http_req_failed': ['rate<0.10'],    // Allow higher failure rate
+    http_req_duration: ['p(99)<2000'], // More lenient for stress test
+    http_req_failed: ['rate<0.10'], // Allow higher failure rate
   },
 };
 
@@ -110,17 +110,22 @@ export default function () {
   const responses = http.batch([
     ['GET', `${BASE_URL}/api/v1/images`],
     ['GET', `${BASE_URL}/api/v1/status`],
-    ['POST', `${BASE_URL}/api/v1/validate`, JSON.stringify({
-      version: '24.04',
-      architecture: 'amd64',
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-    }],
+    [
+      'POST',
+      `${BASE_URL}/api/v1/validate`,
+      JSON.stringify({
+        version: '24.04',
+        architecture: 'amd64',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    ],
   ]);
 
-  responses.forEach((response) => {
+  responses.forEach(response => {
     check(response, {
-      'status is 2xx or 5xx': (r) => r.status >= 200 && r.status < 600,
+      'status is 2xx or 5xx': r => r.status >= 200 && r.status < 600,
     });
   });
 
@@ -138,15 +143,15 @@ import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },   // Baseline
-    { duration: '1m', target: 1000 },  // Sudden spike
-    { duration: '3m', target: 1000 },  // Sustain spike
-    { duration: '2m', target: 100 },   // Return to baseline
-    { duration: '1m', target: 0 },     // Recovery
+    { duration: '2m', target: 100 }, // Baseline
+    { duration: '1m', target: 1000 }, // Sudden spike
+    { duration: '3m', target: 1000 }, // Sustain spike
+    { duration: '2m', target: 100 }, // Return to baseline
+    { duration: '1m', target: 0 }, // Recovery
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<2000'],
-    'http_req_failed': ['rate<0.15'], // More lenient for spike
+    http_req_duration: ['p(95)<2000'],
+    http_req_failed: ['rate<0.15'], // More lenient for spike
   },
 };
 
@@ -155,7 +160,7 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 export default function () {
   const res = http.get(`${BASE_URL}/api/v1/status`);
   check(res, {
-    'survived spike': (r) => r.status < 500 || r.status === 503,
+    'survived spike': r => r.status < 500 || r.status === 503,
   });
 }
 ```

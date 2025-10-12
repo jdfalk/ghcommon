@@ -139,8 +139,7 @@ create-missing = true
 
 ---
 
-[Changelog](./changelog.md)
-[License](./license.md)
+[Changelog](./changelog.md) [License](./license.md)
 ```
 
 ### MkDocs Configuration
@@ -167,7 +166,7 @@ theme:
 
   palette:
     # Light mode
-    - media: "(prefers-color-scheme: light)"
+    - media: '(prefers-color-scheme: light)'
       scheme: default
       primary: indigo
       accent: indigo
@@ -176,7 +175,7 @@ theme:
         name: Switch to dark mode
 
     # Dark mode
-    - media: "(prefers-color-scheme: dark)"
+    - media: '(prefers-color-scheme: dark)'
       scheme: slate
       primary: indigo
       accent: indigo
@@ -231,9 +230,8 @@ extra:
   consent:
     title: Cookie consent
     description: >-
-      We use cookies to recognize your repeated visits and preferences, as well
-      as to measure the effectiveness of our documentation and whether users
-      find what they're searching for.
+      We use cookies to recognize your repeated visits and preferences, as well as to measure the
+      effectiveness of our documentation and whether users find what they're searching for.
 
 markdown_extensions:
   # Python Markdown
@@ -687,7 +685,7 @@ on:
       - '**.md'
       - 'docs/**'
   schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
+    - cron: '0 0 * * 0' # Weekly on Sunday
   workflow_dispatch:
 
 jobs:
@@ -792,6 +790,9 @@ jobs:
 
 ---
 
-**Part 3 Complete**: Documentation sites (mdBook and MkDocs configurations with full feature sets), changelog automation (git-cliff configuration and workflow), README badge automation, and link checking. ✅
+**Part 3 Complete**: Documentation sites (mdBook and MkDocs configurations with full feature sets),
+changelog automation (git-cliff configuration and workflow), README badge automation, and link
+checking. ✅
 
-**Continue to Part 4** for documentation publishing (GitHub Pages deployment, versioned docs, CI integration).
+**Continue to Part 4** for documentation publishing (GitHub Pages deployment, versioned docs, CI
+integration).

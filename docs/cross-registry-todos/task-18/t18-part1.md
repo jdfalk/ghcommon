@@ -12,66 +12,49 @@
 # Comprehensive CI/CD and Observability Architecture
 
 ## Layer 1: Source Code Management
-┌─────────────────────────────────────────────────────────────────┐
-│ Git Repository (GitHub)                                         │
-│  ├─ Multi-language codebase (Rust, Python, JS, Go)            │
-│  ├─ Conventional commit enforcement                            │
-│  └─ Branch protection rules                                    │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
+
+┌─────────────────────────────────────────────────────────────────┐ │ Git Repository (GitHub) │ │ ├─
+Multi-language codebase (Rust, Python, JS, Go) │ │ ├─ Conventional commit enforcement │ │ └─ Branch
+protection rules │ └─────────────────────────────────────────────────────────────────┘ │ ▼
+
 ## Layer 2: Continuous Integration
-┌─────────────────────────────────────────────────────────────────┐
-│ GitHub Actions CI Pipeline                                      │
-│  ├─ Task 01: Change Detection (smart file analysis)           │
-│  ├─ Task 02: Matrix Testing (parallel execution)              │
-│  ├─ Task 03: Multi-Language Build (Rust, Python, JS, Go)      │
-│  ├─ Task 04: Protobuf Generation (buf generate)               │
-│  ├─ Task 05: Linting & Formatting (clippy, ruff, eslint)      │
-│  └─ Task 06: Code Coverage (llvm-cov, pytest-cov)             │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
+
+┌─────────────────────────────────────────────────────────────────┐ │ GitHub Actions CI Pipeline │ │
+├─ Task 01: Change Detection (smart file analysis) │ │ ├─ Task 02: Matrix Testing (parallel
+execution) │ │ ├─ Task 03: Multi-Language Build (Rust, Python, JS, Go) │ │ ├─ Task 04: Protobuf
+Generation (buf generate) │ │ ├─ Task 05: Linting & Formatting (clippy, ruff, eslint) │ │ └─ Task
+06: Code Coverage (llvm-cov, pytest-cov) │
+└─────────────────────────────────────────────────────────────────┘ │ ▼
+
 ## Layer 3: Quality Assurance
-┌─────────────────────────────────────────────────────────────────┐
-│ Testing & Quality Gates                                         │
-│  ├─ Task 07: Unit Tests (cargo test, pytest, jest)            │
-│  ├─ Task 08: Integration Tests (API, database, external)      │
-│  ├─ Task 09: Security Scanning (dependency audit, SAST)       │
-│  ├─ Task 10: Performance Testing (benchmarks, profiling)      │
-│  └─ Task 11: Mutation Testing (cargo-mutants, stryker)        │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
+
+┌─────────────────────────────────────────────────────────────────┐ │ Testing & Quality Gates │ │ ├─
+Task 07: Unit Tests (cargo test, pytest, jest) │ │ ├─ Task 08: Integration Tests (API, database,
+external) │ │ ├─ Task 09: Security Scanning (dependency audit, SAST) │ │ ├─ Task 10: Performance
+Testing (benchmarks, profiling) │ │ └─ Task 11: Mutation Testing (cargo-mutants, stryker) │
+└─────────────────────────────────────────────────────────────────┘ │ ▼
+
 ## Layer 4: Artifact Management
-┌─────────────────────────────────────────────────────────────────┐
-│ Build Artifacts & Packages                                      │
-│  ├─ Task 12: Docker Images (multi-stage builds, GitHub CR)    │
-│  ├─ Cosign signatures (keyless signing, verification)         │
-│  ├─ SBOM generation (Syft, cyclonedx)                         │
-│  └─ Container vulnerability scanning (Trivy, Grype)           │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
+
+┌─────────────────────────────────────────────────────────────────┐ │ Build Artifacts & Packages │ │
+├─ Task 12: Docker Images (multi-stage builds, GitHub CR) │ │ ├─ Cosign signatures (keyless signing,
+verification) │ │ ├─ SBOM generation (Syft, cyclonedx) │ │ └─ Container vulnerability scanning
+(Trivy, Grype) │ └─────────────────────────────────────────────────────────────────┘ │ ▼
+
 ## Layer 5: Deployment
-┌─────────────────────────────────────────────────────────────────┐
-│ Deployment Automation                                           │
-│  ├─ Task 16: Kubernetes Deployments (manifests, Helm)         │
-│  ├─ Progressive delivery (Argo Rollouts, Flagger)             │
-│  ├─ Infrastructure as Code (Terraform, Pulumi)                │
-│  └─ Health checks and rollback automation                     │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
+
+┌─────────────────────────────────────────────────────────────────┐ │ Deployment Automation │ │ ├─
+Task 16: Kubernetes Deployments (manifests, Helm) │ │ ├─ Progressive delivery (Argo Rollouts,
+Flagger) │ │ ├─ Infrastructure as Code (Terraform, Pulumi) │ │ └─ Health checks and rollback
+automation │ └─────────────────────────────────────────────────────────────────┘ │ ▼
+
 ## Layer 6: Observability
-┌─────────────────────────────────────────────────────────────────┐
-│ Monitoring, Logging, and Tracing                               │
-│  ├─ Task 13: Prometheus Metrics (application, infrastructure) │
-│  ├─ Task 14: Jaeger Distributed Tracing (OpenTelemetry)       │
-│  ├─ Task 15: Grafana Dashboards (SLOs, performance, alerts)   │
-│  ├─ Task 17: Loki Log Aggregation (structured logs, alerts)   │
-│  └─ Unified observability (logs ↔ traces ↔ metrics)           │
-└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐ │ Monitoring, Logging, and
+Tracing │ │ ├─ Task 13: Prometheus Metrics (application, infrastructure) │ │ ├─ Task 14: Jaeger
+Distributed Tracing (OpenTelemetry) │ │ ├─ Task 15: Grafana Dashboards (SLOs, performance, alerts) │
+│ ├─ Task 17: Loki Log Aggregation (structured logs, alerts) │ │ └─ Unified observability (logs ↔
+traces ↔ metrics) │ └─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Integration Points
@@ -158,7 +141,7 @@ data_flows:
       - tags
       - logs
     protocol: OTLP/gRPC
-    sampling_rate: 0.1  # 10%
+    sampling_rate: 0.1 # 10%
     retention: 7 days
 
   # Logs to Loki
@@ -518,13 +501,13 @@ class TestEndToEndIntegration:
 
 ---
 
-**Part 1 Complete**: Final integration overview with comprehensive architecture showing 6 layers (SCM,
-CI, QA, Artifacts, Deployment, Observability) and integration of all 18 tasks, data flow mapping
-between GitHub Actions/Prometheus/Jaeger/Loki/Alertmanager with retention policies and routing
-configurations, service dependency graph with critical/non-critical dependencies and fallback
-availability, impact radius calculation for failure scenarios, end-to-end integration test suite
-validating service health, CI/CD pipeline, metrics collection, log aggregation, distributed tracing,
-log-trace correlation, and alert routing. ✅
+**Part 1 Complete**: Final integration overview with comprehensive architecture showing 6 layers
+(SCM, CI, QA, Artifacts, Deployment, Observability) and integration of all 18 tasks, data flow
+mapping between GitHub Actions/Prometheus/Jaeger/Loki/Alertmanager with retention policies and
+routing configurations, service dependency graph with critical/non-critical dependencies and
+fallback availability, impact radius calculation for failure scenarios, end-to-end integration test
+suite validating service health, CI/CD pipeline, metrics collection, log aggregation, distributed
+tracing, log-trace correlation, and alert routing. ✅
 
-**Continue to Part 2** for unified monitoring dashboards combining metrics/logs/traces in single pane
-of glass with drill-down capabilities.
+**Continue to Part 2** for unified monitoring dashboards combining metrics/logs/traces in single
+pane of glass with drill-down capabilities.

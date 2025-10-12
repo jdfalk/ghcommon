@@ -41,14 +41,14 @@ spec:
     targetPort: 8080
     # Apex domain gateway
     gateways:
-    - istio-system/public-gateway
+      - istio-system/public-gateway
     # Traffic destination
     hosts:
-    - ubuntu-autoinstall.example.com
+      - ubuntu-autoinstall.example.com
     # HTTP match conditions
     match:
-    - uri:
-        prefix: /
+      - uri:
+          prefix: /
     # HTTP rewrite
     retries:
       attempts: 3
@@ -68,50 +68,50 @@ spec:
 
     # Prometheus checks
     metrics:
-    - name: request-success-rate
-      # Minimum req success rate (non 5xx responses)
-      thresholdRange:
-        min: 99
-      interval: 1m
+      - name: request-success-rate
+        # Minimum req success rate (non 5xx responses)
+        thresholdRange:
+          min: 99
+        interval: 1m
 
-    - name: request-duration
-      # Maximum req duration P99
-      thresholdRange:
-        max: 500
-      interval: 1m
+      - name: request-duration
+        # Maximum req duration P99
+        thresholdRange:
+          max: 500
+        interval: 1m
 
-    - name: error-rate
-      # Custom metric query
-      templateRef:
-        name: error-rate
-        namespace: flagger-system
-      thresholdRange:
-        max: 1
-      interval: 1m
+      - name: error-rate
+        # Custom metric query
+        templateRef:
+          name: error-rate
+          namespace: flagger-system
+        thresholdRange:
+          max: 1
+        interval: 1m
 
     # Load testing webhook
     webhooks:
-    - name: load-test
-      url: http://flagger-loadtester.flagger-system/
-      timeout: 5s
-      metadata:
-        type: cmd
-        cmd: "hey -z 1m -q 10 -c 2 http://ubuntu-autoinstall-agent-canary/api/v1/status"
+      - name: load-test
+        url: http://flagger-loadtester.flagger-system/
+        timeout: 5s
+        metadata:
+          type: cmd
+          cmd: 'hey -z 1m -q 10 -c 2 http://ubuntu-autoinstall-agent-canary/api/v1/status'
 
-    - name: acceptance-test
-      type: pre-rollout
-      url: http://flagger-loadtester.flagger-system/
-      timeout: 30s
-      metadata:
-        type: bash
-        cmd: |
-          curl -s http://ubuntu-autoinstall-agent-canary/health | grep -q '"status":"healthy"'
+      - name: acceptance-test
+        type: pre-rollout
+        url: http://flagger-loadtester.flagger-system/
+        timeout: 30s
+        metadata:
+          type: bash
+          cmd: |
+            curl -s http://ubuntu-autoinstall-agent-canary/health | grep -q '"status":"healthy"'
 
-    - name: rollback-notification
-      type: rollback
-      url: http://slack-webhook/
-      metadata:
-        message: "Canary rollback detected for ubuntu-autoinstall-agent"
+      - name: rollback-notification
+        type: rollback
+        url: http://slack-webhook/
+        metadata:
+          message: 'Canary rollback detected for ubuntu-autoinstall-agent'
 ```
 
 ### Flagger MetricTemplate
@@ -180,23 +180,23 @@ spec:
         app: ubuntu-autoinstall-agent
     spec:
       containers:
-      - name: ubuntu-autoinstall-agent
-        image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
-        ports:
-        - name: http
-          containerPort: 8080
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
+        - name: ubuntu-autoinstall-agent
+          image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
 
   strategy:
     canary:
       # Max surge
-      maxSurge: "25%"
+      maxSurge: '25%'
       # Max unavailable
       maxUnavailable: 0
 
@@ -211,54 +211,54 @@ spec:
           virtualService:
             name: ubuntu-autoinstall-agent
             routes:
-            - primary
+              - primary
 
       # Analysis
       analysis:
         templates:
-        - templateName: success-rate
-        - templateName: latency
+          - templateName: success-rate
+          - templateName: latency
         startingStep: 2
         args:
-        - name: service-name
-          value: ubuntu-autoinstall-agent
+          - name: service-name
+            value: ubuntu-autoinstall-agent
 
       # Steps
       steps:
-      # Step 1: 5% traffic to canary
-      - setWeight: 5
-      - pause:
-          duration: 2m
+        # Step 1: 5% traffic to canary
+        - setWeight: 5
+        - pause:
+            duration: 2m
 
-      # Step 2: 10% traffic (analysis starts)
-      - setWeight: 10
-      - pause:
-          duration: 5m
+        # Step 2: 10% traffic (analysis starts)
+        - setWeight: 10
+        - pause:
+            duration: 5m
 
-      # Step 3: 20% traffic
-      - setWeight: 20
-      - pause:
-          duration: 5m
+        # Step 3: 20% traffic
+        - setWeight: 20
+        - pause:
+            duration: 5m
 
-      # Step 4: 40% traffic
-      - setWeight: 40
-      - pause:
-          duration: 5m
+        # Step 4: 40% traffic
+        - setWeight: 40
+        - pause:
+            duration: 5m
 
-      # Step 5: 60% traffic
-      - setWeight: 60
-      - pause:
-          duration: 5m
+        # Step 5: 60% traffic
+        - setWeight: 60
+        - pause:
+            duration: 5m
 
-      # Step 6: 80% traffic
-      - setWeight: 80
-      - pause:
-          duration: 5m
+        # Step 6: 80% traffic
+        - setWeight: 80
+        - pause:
+            duration: 5m
 
-      # Step 7: 100% traffic (promote to stable)
-      - setWeight: 100
-      - pause:
-          duration: 2m
+        # Step 7: 100% traffic (promote to stable)
+        - setWeight: 100
+        - pause:
+            duration: 2m
 ```
 
 ### Argo Rollouts AnalysisTemplate
@@ -275,30 +275,30 @@ metadata:
   namespace: ubuntu-autoinstall-production
 spec:
   args:
-  - name: service-name
+    - name: service-name
 
   metrics:
-  - name: success-rate
-    interval: 1m
-    successCondition: result[0] >= 0.95
-    failureLimit: 3
-    provider:
-      prometheus:
-        address: http://prometheus.monitoring:9090
-        query: |
-          sum(rate(
-            http_requests_total{
-              kubernetes_namespace="ubuntu-autoinstall-production",
-              service="{{args.service-name}}",
-              status!~"5.."
-            }[5m]
-          )) /
-          sum(rate(
-            http_requests_total{
-              kubernetes_namespace="ubuntu-autoinstall-production",
-              service="{{args.service-name}}"
-            }[5m]
-          ))
+    - name: success-rate
+      interval: 1m
+      successCondition: result[0] >= 0.95
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring:9090
+          query: |
+            sum(rate(
+              http_requests_total{
+                kubernetes_namespace="ubuntu-autoinstall-production",
+                service="{{args.service-name}}",
+                status!~"5.."
+              }[5m]
+            )) /
+            sum(rate(
+              http_requests_total{
+                kubernetes_namespace="ubuntu-autoinstall-production",
+                service="{{args.service-name}}"
+              }[5m]
+            ))
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
@@ -307,25 +307,25 @@ metadata:
   namespace: ubuntu-autoinstall-production
 spec:
   args:
-  - name: service-name
+    - name: service-name
 
   metrics:
-  - name: latency-p95
-    interval: 1m
-    successCondition: result[0] <= 0.5
-    failureLimit: 3
-    provider:
-      prometheus:
-        address: http://prometheus.monitoring:9090
-        query: |
-          histogram_quantile(0.95,
-            sum(rate(
-              http_request_duration_seconds_bucket{
-                kubernetes_namespace="ubuntu-autoinstall-production",
-                service="{{args.service-name}}"
-              }[5m]
-            )) by (le)
-          )
+    - name: latency-p95
+      interval: 1m
+      successCondition: result[0] <= 0.5
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring:9090
+          query: |
+            histogram_quantile(0.95,
+              sum(rate(
+                http_request_duration_seconds_bucket{
+                  kubernetes_namespace="ubuntu-autoinstall-production",
+                  service="{{args.service-name}}"
+                }[5m]
+              )) by (le)
+            )
 ```
 
 ## Blue-Green Deployment
@@ -356,18 +356,18 @@ spec:
         app: ubuntu-autoinstall-agent-bg
     spec:
       containers:
-      - name: ubuntu-autoinstall-agent
-        image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
-        ports:
-        - name: http
-          containerPort: 8080
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
+        - name: ubuntu-autoinstall-agent
+          image: ghcr.io/jdfalk/ubuntu-autoinstall-agent:v1.0.0
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
 
   strategy:
     blueGreen:
@@ -387,20 +387,20 @@ spec:
       # Pre-promotion analysis
       prePromotionAnalysis:
         templates:
-        - templateName: smoke-test
-        - templateName: performance-test
+          - templateName: smoke-test
+          - templateName: performance-test
         args:
-        - name: service-name
-          value: ubuntu-autoinstall-agent-preview
+          - name: service-name
+            value: ubuntu-autoinstall-agent-preview
 
       # Post-promotion analysis
       postPromotionAnalysis:
         templates:
-        - templateName: success-rate
-        - templateName: latency
+          - templateName: success-rate
+          - templateName: latency
         args:
-        - name: service-name
-          value: ubuntu-autoinstall-agent-active
+          - name: service-name
+            value: ubuntu-autoinstall-agent-active
 
       # Anti-affinity
       antiAffinity:
@@ -423,38 +423,38 @@ metadata:
   namespace: ubuntu-autoinstall-production
 spec:
   args:
-  - name: service-name
+    - name: service-name
 
   metrics:
-  - name: smoke-test
-    count: 1
-    provider:
-      job:
-        spec:
-          backoffLimit: 0
-          template:
-            spec:
-              restartPolicy: Never
-              containers:
-              - name: smoke-test
-                image: curlimages/curl:latest
-                command:
-                - sh
-                - -c
-                - |
-                  set -e
-                  echo "Running smoke tests..."
+    - name: smoke-test
+      count: 1
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: smoke-test
+                    image: curlimages/curl:latest
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        set -e
+                        echo "Running smoke tests..."
 
-                  # Health check
-                  curl -f http://{{args.service-name}}/health
+                        # Health check
+                        curl -f http://{{args.service-name}}/health
 
-                  # API status
-                  curl -f http://{{args.service-name}}/api/v1/status
+                        # API status
+                        curl -f http://{{args.service-name}}/api/v1/status
 
-                  # Metrics endpoint
-                  curl -f http://{{args.service-name}}:9090/metrics
+                        # Metrics endpoint
+                        curl -f http://{{args.service-name}}:9090/metrics
 
-                  echo "Smoke tests passed!"
+                        echo "Smoke tests passed!"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
@@ -463,32 +463,32 @@ metadata:
   namespace: ubuntu-autoinstall-production
 spec:
   args:
-  - name: service-name
+    - name: service-name
 
   metrics:
-  - name: performance-test
-    count: 1
-    provider:
-      job:
-        spec:
-          backoffLimit: 0
-          template:
-            spec:
-              restartPolicy: Never
-              containers:
-              - name: performance-test
-                image: williamyeh/hey:latest
-                command:
-                - sh
-                - -c
-                - |
-                  set -e
-                  echo "Running performance tests..."
+    - name: performance-test
+      count: 1
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: performance-test
+                    image: williamyeh/hey:latest
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        set -e
+                        echo "Running performance tests..."
 
-                  # Load test: 100 requests, 10 concurrent
-                  hey -n 100 -c 10 -m GET http://{{args.service-name}}/api/v1/status
+                        # Load test: 100 requests, 10 concurrent
+                        hey -n 100 -c 10 -m GET http://{{args.service-name}}/api/v1/status
 
-                  echo "Performance tests completed!"
+                        echo "Performance tests completed!"
 ```
 
 ## Deployment Workflows
@@ -732,9 +732,10 @@ echo "✅ Rollback completed!"
 
 ---
 
-**Part 4 Complete**: Progressive delivery with Flagger canary deployment (Prometheus metrics, webhooks,
-load testing), Argo Rollouts canary strategy with traffic routing and analysis templates, blue-green
-deployment with pre/post-promotion analysis, smoke tests and performance tests, GitHub Actions workflows
-for automated progressive deployment, manual promotion and rollback scripts. ✅
+**Part 4 Complete**: Progressive delivery with Flagger canary deployment (Prometheus metrics,
+webhooks, load testing), Argo Rollouts canary strategy with traffic routing and analysis templates,
+blue-green deployment with pre/post-promotion analysis, smoke tests and performance tests, GitHub
+Actions workflows for automated progressive deployment, manual promotion and rollback scripts. ✅
 
-**Continue to Part 5** for infrastructure as code with Terraform and deployment automation best practices.
+**Continue to Part 5** for infrastructure as code with Terraform and deployment automation best
+practices.
