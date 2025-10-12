@@ -114,7 +114,9 @@ def set_github_output(name, value):
 def main():
     """Main entry point."""
     # Prefer argv if provided; fall back to FORCE_LANGUAGE env for workflow_dispatch compatibility
-    force_language = sys.argv[1] if len(sys.argv) > 1 else os.getenv("FORCE_LANGUAGE")
+    force_language = (
+        sys.argv[1] if len(sys.argv) > 1 else os.getenv("FORCE_LANGUAGE")
+    )
     if force_language:
         force_language = force_language.strip().lower()
 
@@ -135,8 +137,16 @@ def main():
     else:
         languages = detect_languages()
         # Choose a primary for back-compat; priority order
-        priority: List[str] = ["rust", "go", "typescript", "javascript", "python"]
-        language = next((lang for lang in priority if languages.get(lang)), "unknown")
+        priority: List[str] = [
+            "rust",
+            "go",
+            "typescript",
+            "javascript",
+            "python",
+        ]
+        language = next(
+            (lang for lang in priority if languages.get(lang)), "unknown"
+        )
         print(
             f"Detected languages: {', '.join([k for k, v in languages.items() if v]) or 'none'}"
         )
@@ -149,7 +159,9 @@ def main():
     set_github_output("language", language)
     set_github_output("should-release", "true" if should_rel else "false")
     # New multi-language outputs
-    set_github_output("languages", ",".join([k for k, v in languages.items() if v]))
+    set_github_output(
+        "languages", ",".join([k for k, v in languages.items() if v])
+    )
     set_github_output("languages_json", json.dumps(languages))
     # Ordered matrix array (TS before GO to allow codegen, then others)
     ordered = [
@@ -162,7 +174,9 @@ def main():
     # Print summary
     print("\nLanguage Detection Summary:")
     print(f"  Primary: {language}")
-    print(f"  All: {', '.join([k for k, v in languages.items() if v]) or 'none'}")
+    print(
+        f"  All: {', '.join([k for k, v in languages.items() if v]) or 'none'}"
+    )
     print(f"  Matrix JSON: {json.dumps(languages)}")
     print(f"  Should Release: {should_rel}")
 

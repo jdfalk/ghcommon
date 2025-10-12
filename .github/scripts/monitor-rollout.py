@@ -82,11 +82,15 @@ def parse_iso8601(s: str) -> Optional[dt.datetime]:
 
 def load_target_repos(explicit: Optional[str]) -> List[str]:
     if explicit:
-        parts = [p.strip() for p in explicit.replace(",", " ").split() if p.strip()]
+        parts = [
+            p.strip() for p in explicit.replace(",", " ").split() if p.strip()
+        ]
         return parts
     env_repos = os.environ.get("TARGET_REPOS")
     if env_repos:
-        parts = [p.strip() for p in env_repos.replace(",", " ").split() if p.strip()]
+        parts = [
+            p.strip() for p in env_repos.replace(",", " ").split() if p.strip()
+        ]
         return parts
     # Fallback to repositories.txt
     repos_file = os.path.join(os.getcwd(), ".github", "repositories.txt")
@@ -196,7 +200,10 @@ def build_markdown(results: List[Dict]) -> str:
                 return "⚪"
             return "❌"
 
-        if sec not in ("success", "completed") or rel not in ("success", "completed"):
+        if sec not in ("success", "completed") or rel not in (
+            "success",
+            "completed",
+        ):
             ok_all = False
         lines.append(f"## {repo}")
         lines.append(
@@ -236,7 +243,9 @@ def main():
     results: List[Dict] = []
     for repo in repos:
         try:
-            results.append(summarize_repo(repo, args.per_page, args.since_hours))
+            results.append(
+                summarize_repo(repo, args.per_page, args.since_hours)
+            )
         except Exception as e:
             results.append(
                 {
@@ -259,7 +268,8 @@ def main():
                 return st in ("success", "completed")
 
             all_ok = all(
-                ok_status(r["security"]["status"]) and ok_status(r["release"]["status"])  # type: ignore[index]
+                ok_status(r["security"]["status"])
+                and ok_status(r["release"]["status"])  # type: ignore[index]
                 for r in results
             )
             with open(github_output, "a", encoding="utf-8") as f:

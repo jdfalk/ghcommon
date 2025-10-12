@@ -190,7 +190,11 @@ def build_go_artifacts() -> bool:
             if goos == "windows":
                 archive_name = f"{module_name}-{goos}-{goarch}.zip"
                 run_command(
-                    ["zip", f"releases/{archive_name}", f"releases/{binary_name}"]
+                    [
+                        "zip",
+                        f"releases/{archive_name}",
+                        f"releases/{binary_name}",
+                    ]
                 )
             else:
                 archive_name = f"{module_name}-{goos}-{goarch}.tar.gz"
@@ -253,7 +257,9 @@ def build_javascript_artifacts() -> bool:
             scripts = package_data.get("scripts", {})
 
             if "build" in scripts:
-                build_success, stdout, stderr = run_command(["npm", "run", "build"])
+                build_success, stdout, stderr = run_command(
+                    ["npm", "run", "build"]
+                )
                 if build_success:
                     log("Successfully built JavaScript project")
                     return True
@@ -272,7 +278,9 @@ def build_javascript_artifacts() -> bool:
 def main():
     """Main execution function."""
     language = (
-        sys.argv[1] if len(sys.argv) > 1 else os.environ.get("LANGUAGE", "unknown")
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else os.environ.get("LANGUAGE", "unknown")
     )
 
     log(f"Building artifacts for language: {language}")

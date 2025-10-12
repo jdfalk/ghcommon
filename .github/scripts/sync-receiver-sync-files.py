@@ -142,7 +142,9 @@ def sync_workflows():
         else:
             print(f"❌ Failed to copy workflow {workflow_name}")
 
-    print(f"📊 Workflows sync: {success_count}/{len(workflow_files)} files copied")
+    print(
+        f"📊 Workflows sync: {success_count}/{len(workflow_files)} files copied"
+    )
 
 
 def sync_instructions():
@@ -230,7 +232,9 @@ def sync_prompts():
                 if copy_file_safe(
                     str(prompt_file), f".github/prompts/{prompt_file.name}"
                 ):
-                    print(f"✅ Successfully copied prompt file {prompt_file.name}")
+                    print(
+                        f"✅ Successfully copied prompt file {prompt_file.name}"
+                    )
                 else:
                     print(f"❌ Failed to copy prompt file {prompt_file.name}")
     else:
@@ -289,7 +293,9 @@ def sync_scripts():
                     if copy_file_safe(str(script_file), script_path):
                         success_count += 1
                     else:
-                        print(f"❌ Failed to copy GitHub script {script_file.name}")
+                        print(
+                            f"❌ Failed to copy GitHub script {script_file.name}"
+                        )
 
             excluded_count = len(
                 [
@@ -332,7 +338,9 @@ def sync_linters():
     if src_dir.exists():
         linter_files = list(src_dir.glob("*"))
         print(f"📋 Copying {len(linter_files)} linter files...")
-        copy_directory_safe("ghcommon-source/.github/linters", ".github/linters")
+        copy_directory_safe(
+            "ghcommon-source/.github/linters", ".github/linters"
+        )
         print("✅ Linter files copied")
     else:
         print(f"⚠️  Source not found for linter files: {src_dir}/*")
@@ -353,7 +361,9 @@ def sync_labels():
     label_files = ["labels.json", "labels.md"]
 
     for label_file in label_files:
-        if label_file in sync_paths and not is_file_excluded(label_file, exclude_files):
+        if label_file in sync_paths and not is_file_excluded(
+            label_file, exclude_files
+        ):
             total_files += 1
             print(f"ℹ️  Copying {label_file}: ghcommon-source/{label_file} -> .")
             if copy_file_safe(f"ghcommon-source/{label_file}", label_file):
@@ -407,7 +417,8 @@ def sync_other_files():
         path
         for path in sync_paths
         if not any(
-            path.startswith(pattern) or path == pattern for pattern in handled_patterns
+            path.startswith(pattern) or path == pattern
+            for pattern in handled_patterns
         )
     ]
 
@@ -434,7 +445,9 @@ def sync_other_files():
         else:
             print(f"❌ Failed to copy {file_path}")
 
-    print(f"📊 Other files sync: {success_count}/{len(other_files)} files copied")
+    print(
+        f"📊 Other files sync: {success_count}/{len(other_files)} files copied"
+    )
 
 
 def main():

@@ -59,8 +59,12 @@ def main():
     print("📋 Changes detected, proceeding with commit and push...")
 
     # Configure git user (in case not set in CI)
-    run_command('git config user.name "GitHub Actions"', "Setting git user name")
-    run_command('git config user.email "actions@github.com"', "Setting git user email")
+    run_command(
+        'git config user.name "GitHub Actions"', "Setting git user name"
+    )
+    run_command(
+        'git config user.email "actions@github.com"', "Setting git user email"
+    )
 
     # Add all changes
     if not run_command("git add .", "Adding all changes"):
@@ -71,7 +75,9 @@ def main():
     commit_message = f"chore(sync): synchronize from ghcommon ({timestamp})"
 
     # Commit changes
-    if not run_command(f'git commit -m "{commit_message}"', "Committing changes"):
+    if not run_command(
+        f'git commit -m "{commit_message}"', "Committing changes"
+    ):
         sys.exit(1)
 
     # Push changes

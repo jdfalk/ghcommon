@@ -142,7 +142,11 @@ def get_javascript_config():
             [
                 "@semantic-release/git",
                 {
-                    "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
+                    "assets": [
+                        "package.json",
+                        "package-lock.json",
+                        "CHANGELOG.md",
+                    ],
                     "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
                 },
             ],
@@ -162,7 +166,11 @@ def get_typescript_config():
             [
                 "@semantic-release/git",
                 {
-                    "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
+                    "assets": [
+                        "package.json",
+                        "package-lock.json",
+                        "CHANGELOG.md",
+                    ],
                     "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
                 },
             ],
@@ -194,7 +202,10 @@ def main():
 
     if language not in config_map:
         print(f"Error: Unsupported language: {language}", file=sys.stderr)
-        print(f"Supported languages: {', '.join(config_map.keys())}", file=sys.stderr)
+        print(
+            f"Supported languages: {', '.join(config_map.keys())}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # Generate configuration

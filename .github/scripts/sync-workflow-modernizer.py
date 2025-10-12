@@ -96,7 +96,9 @@ class WorkflowModernizer:
 
                 # Check if pattern exists
                 if re.search(pattern, content, flags):
-                    print(f"  ✅ Replacing {script_type} bash script with Python")
+                    print(
+                        f"  ✅ Replacing {script_type} bash script with Python"
+                    )
                     content = re.sub(pattern, replacement, content, flags=flags)
                 else:
                     print(f"  ℹ️  No {script_type} bash script found to replace")
@@ -125,7 +127,10 @@ class WorkflowModernizer:
             (r"\$\{\{ inputs\.release_type \}\}", "${{ inputs.release_type }}"),
             (r"\$\{\{ inputs\.prerelease \}\}", "${{ inputs.prerelease }}"),
             (r"\$\{\{ inputs\.draft \}\}", "${{ inputs.draft }}"),
-            (r"\$\{\{ secrets\.GITHUB_TOKEN \}\}", "${{ secrets.GITHUB_TOKEN }}"),
+            (
+                r"\$\{\{ secrets\.GITHUB_TOKEN \}\}",
+                "${{ secrets.GITHUB_TOKEN }}",
+            ),
         ]
 
         for pattern, replacement in env_patterns:
@@ -167,7 +172,9 @@ class WorkflowModernizer:
         print("✅ All required Python scripts are available")
         return True
 
-    def generate_modernization_report(self, updated_workflows: List[str]) -> str:
+    def generate_modernization_report(
+        self, updated_workflows: List[str]
+    ) -> str:
         """Generate a report of the modernization results."""
         report = [
             "# Workflow Modernization Report",

@@ -145,7 +145,9 @@ def main():
     """Main entry point."""
     if len(sys.argv) != 3:
         print("Error: Both release_type and language parameters required")
-        print("Usage: sync-release-handle-manual-release.py <release_type> <language>")
+        print(
+            "Usage: sync-release-handle-manual-release.py <release_type> <language>"
+        )
         sys.exit(1)
 
     release_type = sys.argv[1]

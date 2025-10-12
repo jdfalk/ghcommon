@@ -53,7 +53,9 @@ def fix_instruction_file(file_path):
             return False
 
         if re.search(r"^---\s*$", content, re.MULTILINE):
-            log_info(f"  Skipping (already has proper frontmatter): {file_path}")
+            log_info(
+                f"  Skipping (already has proper frontmatter): {file_path}"
+            )
             os.remove(backup_path)
             return False
 

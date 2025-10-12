@@ -81,7 +81,9 @@ def load_build_config() -> Dict[str, Any]:
             key, remainder = key_match.groups()
 
             if remainder == "":  # list start or empty value
-                current_list_key = key if key.endswith("s") else None  # heuristic
+                current_list_key = (
+                    key if key.endswith("s") else None
+                )  # heuristic
                 if current_list_key:
                     build.setdefault(current_list_key, [])
                 continue
@@ -113,7 +115,9 @@ has_python = (
     else False
 )
 has_frontend = exists_any("package.json", "yarn.lock", "pnpm-lock.yaml")
-has_docker = exists_any("Dockerfile", "docker-compose.yml", "docker-compose.yaml")
+has_docker = exists_any(
+    "Dockerfile", "docker-compose.yml", "docker-compose.yaml"
+)
 has_rust = exists_any("Cargo.toml")
 protobuf_needed = (
     (build_cfg.get("enable_protobuf") is True)

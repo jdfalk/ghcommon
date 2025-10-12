@@ -17,9 +17,17 @@ def run_command(cmd, capture_output=True, check=True):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, shell=True, capture_output=capture_output, text=True, check=check
+            cmd,
+            shell=True,
+            capture_output=capture_output,
+            text=True,
+            check=check,
         )
-        return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
+        return (
+            result.returncode == 0,
+            result.stdout.strip(),
+            result.stderr.strip(),
+        )
     except subprocess.CalledProcessError as e:
         return False, e.stdout if e.stdout else "", e.stderr if e.stderr else ""
     except Exception as e:
@@ -44,7 +52,9 @@ def scan_image_with_trivy(image_ref, output_format="sarif", output_file=None):
     return True, output_file
 
 
-def scan_filesystem_with_trivy(scan_path=".", output_file="trivy-fs-results.txt"):
+def scan_filesystem_with_trivy(
+    scan_path=".", output_file="trivy-fs-results.txt"
+):
     """Scan filesystem with Trivy."""
     print(f"Scanning filesystem {scan_path} with Trivy...")
 
@@ -119,7 +129,10 @@ def test_image_functionality(image_ref):
     cmd = f'docker inspect {image_ref} --format="{{{{.Config.Healthcheck}}}}"'
     success, stdout, stderr = run_command(cmd, check=False)
     has_healthcheck = (
-        success and stdout != "none" and stdout != "<nil>" and stdout.strip() != ""
+        success
+        and stdout != "none"
+        and stdout != "<nil>"
+        and stdout.strip() != ""
     )
     tests.append(
         {
@@ -147,7 +160,9 @@ def validate_compose_files(compose_files):
             {
                 "file": compose_file,
                 "valid": success,
-                "message": "Valid configuration" if success else f"Invalid: {stderr}",
+                "message": "Valid configuration"
+                if success
+                else f"Invalid: {stderr}",
             }
         )
 
@@ -193,7 +208,9 @@ def generate_security_summary(scan_results, test_results, compose_results=None):
         summary.append("## 🐳 Docker Compose Validation")
         for result in compose_results:
             status = "✅" if result["valid"] else "❌"
-            summary.append(f"- **{result['file']}**: {status} {result['message']}")
+            summary.append(
+                f"- **{result['file']}**: {status} {result['message']}"
+            )
         summary.append("")
 
     return "\n".join(summary)
