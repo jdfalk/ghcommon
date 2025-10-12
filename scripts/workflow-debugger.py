@@ -193,7 +193,11 @@ class WorkflowDebugger:
                 ],
             },
             "timeout": {
-                "patterns": [r"timeout", r"killed.*exceeded", r"operation timed out"],
+                "patterns": [
+                    r"timeout",
+                    r"killed.*exceeded",
+                    r"operation timed out",
+                ],
                 "category": "timeout",
                 "fixes": [
                     "Increase timeout duration",
@@ -225,7 +229,9 @@ class WorkflowDebugger:
             cmd = ["gh"] + args
             logger.debug(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True
+            )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
             logger.error(f"GitHub CLI command failed: {e}")
@@ -339,7 +345,9 @@ class WorkflowDebugger:
 
     def download_logs(self, repo: str, run_id: str) -> str:
         """Download logs and artifacts for a workflow run."""
-        log_file = self.output_dir / "logs" / f"{repo.replace('/', '_')}_{run_id}.log"
+        log_file = (
+            self.output_dir / "logs" / f"{repo.replace('/', '_')}_{run_id}.log"
+        )
 
         if log_file.exists():
             logger.debug(f"Log file already exists: {log_file}")
@@ -387,7 +395,10 @@ class WorkflowDebugger:
                             file_path = os.path.join(root, file)
                             try:
                                 with open(
-                                    file_path, "r", encoding="utf-8", errors="ignore"
+                                    file_path,
+                                    "r",
+                                    encoding="utf-8",
+                                    errors="ignore",
                                 ) as f:
                                     content = f.read()
                                     combined_logs.append(
@@ -412,7 +423,17 @@ class WorkflowDebugger:
 
             # Method 1: Use gh run view with --log flag
             result = subprocess.run(
-                ["gh", "run", "view", run_id, "--repo", repo, "--job", job.id, "--log"],
+                [
+                    "gh",
+                    "run",
+                    "view",
+                    run_id,
+                    "--repo",
+                    repo,
+                    "--job",
+                    job.id,
+                    "--log",
+                ],
                 capture_output=True,
                 text=True,
             )
@@ -424,7 +445,11 @@ class WorkflowDebugger:
                 # Method 2: Try using gh api to get logs directly
                 try:
                     api_result = subprocess.run(
-                        ["gh", "api", f"/repos/{repo}/actions/jobs/{job.id}/logs"],
+                        [
+                            "gh",
+                            "api",
+                            f"/repos/{repo}/actions/jobs/{job.id}/logs",
+                        ],
                         capture_output=True,
                         text=True,
                     )
@@ -447,7 +472,9 @@ class WorkflowDebugger:
                     logger.warning(
                         f"Failed to get logs via API for job {job.name}: {e}"
                     )
-                    combined_logs.append(f"\n=== JOB: {job.name} (API ERROR) ===\n")
+                    combined_logs.append(
+                        f"\n=== JOB: {job.name} (API ERROR) ===\n"
+                    )
                     self._add_job_failure_info(combined_logs, job)
 
         # Save combined logs
@@ -457,7 +484,9 @@ class WorkflowDebugger:
                 f.write("\n".join(combined_logs))
 
             if combined_logs:
-                logger.info(f"Saved logs to {log_file} ({len(combined_logs)} sections)")
+                logger.info(
+                    f"Saved logs to {log_file} ({len(combined_logs)} sections)"
+                )
                 return str(log_file)
             else:
                 logger.warning(f"No logs were downloaded for run {run_id}")
@@ -540,14 +569,19 @@ class WorkflowDebugger:
         return found_patterns, primary_category, log_snippets
 
     def analyze_failure(
-        self, workflow_run: WorkflowRun, failed_jobs: List[WorkflowJob], log_file: str
+        self,
+        workflow_run: WorkflowRun,
+        failed_jobs: List[WorkflowJob],
+        log_file: str,
     ) -> FailureAnalysis:
         """Analyze a workflow failure comprehensively."""
         logger.info(
             f"Analyzing failure for workflow {workflow_run.name} (run {workflow_run.id})"
         )
 
-        error_patterns, failure_category, log_snippets = self.analyze_logs(log_file)
+        error_patterns, failure_category, log_snippets = self.analyze_logs(
+            log_file
+        )
 
         # Determine root cause and suggested fixes
         root_cause = "Unknown failure"
@@ -586,7 +620,10 @@ class WorkflowDebugger:
         ]
 
         log_content = "\n".join(log_snippets).lower()
-        if any(re.search(keyword, log_content) for keyword in infrastructure_keywords):
+        if any(
+            re.search(keyword, log_content)
+            for keyword in infrastructure_keywords
+        ):
             is_actionable = False
             severity = "low"
             root_cause = "Infrastructure/runner issue (not actionable)"
@@ -690,7 +727,9 @@ Workflow Failure Analysis
             created_at=datetime.now().isoformat(),
         )
 
-    def scan_repositories(self, repositories: List[str], days_back: int = 7) -> None:
+    def scan_repositories(
+        self, repositories: List[str], days_back: int = 7
+    ) -> None:
         """Scan repositories for failing workflows."""
         logger.info(
             f"Scanning {len(repositories)} repositories for failures in the last {days_back} days..."
@@ -729,7 +768,9 @@ Workflow Failure Analysis
 
                 # Get failed jobs
                 all_jobs = self.get_workflow_jobs(repo, run.id)
-                failed_jobs = [job for job in all_jobs if job.conclusion == "failure"]
+                failed_jobs = [
+                    job for job in all_jobs if job.conclusion == "failure"
+                ]
 
                 # Download logs
                 log_file = self.download_logs(repo, run.id)
@@ -753,13 +794,17 @@ Workflow Failure Analysis
         )
         with open(analyses_file, "w") as f:
             json.dump(
-                [asdict(analysis) for analysis in self.failure_analyses], f, indent=2
+                [asdict(analysis) for analysis in self.failure_analyses],
+                f,
+                indent=2,
             )
         logger.info(f"Saved failure analyses to {analyses_file}")
 
         # Save fix tasks
         tasks_file = (
-            self.output_dir / "fix-tasks" / f"copilot_fix_tasks_{timestamp}.json"
+            self.output_dir
+            / "fix-tasks"
+            / f"copilot_fix_tasks_{timestamp}.json"
         )
         with open(tasks_file, "w") as f:
             json.dump([asdict(task) for task in self.fix_tasks], f, indent=2)
@@ -770,7 +815,9 @@ Workflow Failure Analysis
 
     def generate_summary_report(self, timestamp: str) -> None:
         """Generate a human-readable summary report."""
-        report_file = self.output_dir / "reports" / f"summary_report_{timestamp}.md"
+        report_file = (
+            self.output_dir / "reports" / f"summary_report_{timestamp}.md"
+        )
 
         # Count failures by category
         category_counts = {}
@@ -803,7 +850,9 @@ Workflow Failure Analysis
 
         total_failures = len(self.failure_analyses)
         for category, count in sorted(category_counts.items()):
-            percentage = (count / total_failures * 100) if total_failures > 0 else 0
+            percentage = (
+                (count / total_failures * 100) if total_failures > 0 else 0
+            )
             report += f"| {category.title()} | {count} | {percentage:.1f}% |\n"
 
         report += """
@@ -823,7 +872,9 @@ Workflow Failure Analysis
 """
 
         # List top actionable issues
-        actionable_analyses = [a for a in self.failure_analyses if a.is_actionable]
+        actionable_analyses = [
+            a for a in self.failure_analyses if a.is_actionable
+        ]
         actionable_analyses.sort(
             key=lambda x: (x.severity == "high", x.severity == "medium")
         )
@@ -886,9 +937,13 @@ def main():
         action="store_true",
         help="Scan all repositories for workflow failures",
     )
-    parser.add_argument("--repo", help="Scan specific repository (format: owner/repo)")
     parser.add_argument(
-        "--recent-failures", action="store_true", help="Focus on recent failures only"
+        "--repo", help="Scan specific repository (format: owner/repo)"
+    )
+    parser.add_argument(
+        "--recent-failures",
+        action="store_true",
+        help="Focus on recent failures only",
     )
 
     # Configuration
@@ -926,7 +981,9 @@ def main():
         action="store_true",
         help="Only analyze actionable failures (skip infrastructure issues)",
     )
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose logging"
+    )
 
     args = parser.parse_args()
 
@@ -969,7 +1026,9 @@ def main():
             a for a in debugger.failure_analyses if a.is_actionable
         ]
         debugger.fix_tasks = [
-            t for t in debugger.fix_tasks if t.priority in ["urgent", "high", "medium"]
+            t
+            for t in debugger.fix_tasks
+            if t.priority in ["urgent", "high", "medium"]
         ]
 
     # Save results
@@ -977,7 +1036,9 @@ def main():
 
     # Print summary
     total_failures = len(debugger.failure_analyses)
-    actionable_failures = len([a for a in debugger.failure_analyses if a.is_actionable])
+    actionable_failures = len(
+        [a for a in debugger.failure_analyses if a.is_actionable]
+    )
     fix_tasks = len(debugger.fix_tasks)
 
     print(f"\n{'=' * 80}")

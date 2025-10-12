@@ -93,7 +93,9 @@ class DuplicateCleanupManager:
 
         # Identify closed duplicates that need cleanup
         cleanup_candidates = self._identify_cleanup_candidates(duplicate_groups)
-        print(f"🧹 Found {len(cleanup_candidates)} closed duplicates needing cleanup")
+        print(
+            f"🧹 Found {len(cleanup_candidates)} closed duplicates needing cleanup"
+        )
 
         if not cleanup_candidates:
             print("✅ No duplicate cleanup needed")
@@ -147,14 +149,18 @@ class DuplicateCleanupManager:
                     "state": issue["state"],
                     "html_url": issue["html_url"],
                     "created_at": issue["created_at"],
-                    "labels": [label["name"] for label in issue.get("labels", [])],
+                    "labels": [
+                        label["name"] for label in issue.get("labels", [])
+                    ],
                     "body": issue.get("body", ""),
                 }
                 title_groups[title].append(simplified_issue)
 
         # Filter to only groups with multiple issues
         return {
-            title: issues for title, issues in title_groups.items() if len(issues) > 1
+            title: issues
+            for title, issues in title_groups.items()
+            if len(issues) > 1
         }
 
     def _normalize_title(self, title: str) -> str:
@@ -242,7 +248,9 @@ class DuplicateCleanupManager:
             return min(open_issues, key=lambda x: x["created_at"])
 
         # If no open issues, return the oldest closed issue
-        closed_issues = [issue for issue in issues if issue["state"] == "closed"]
+        closed_issues = [
+            issue for issue in issues if issue["state"] == "closed"
+        ]
         if closed_issues:
             return min(closed_issues, key=lambda x: x["created_at"])
 
@@ -258,10 +266,17 @@ class DuplicateCleanupManager:
         Returns:
             True if has duplicate label
         """
-        duplicate_labels = {"duplicate", "duplicates", "duplicate-issue", "wontfix"}
+        duplicate_labels = {
+            "duplicate",
+            "duplicates",
+            "duplicate-issue",
+            "wontfix",
+        }
         return any(label.lower() in duplicate_labels for label in labels)
 
-    def _has_duplicate_comment(self, issue_number: int, canonical_number: int) -> bool:
+    def _has_duplicate_comment(
+        self, issue_number: int, canonical_number: int
+    ) -> bool:
         """
         Check if issue already has a "Duplicate of #xx" comment.
 
@@ -284,7 +299,9 @@ class DuplicateCleanupManager:
             comments = response.json()
 
             # Look for "Duplicate of #xx" pattern in comments
-            duplicate_pattern = re.compile(r"duplicate\s+of\s+#(\d+)", re.IGNORECASE)
+            duplicate_pattern = re.compile(
+                r"duplicate\s+of\s+#(\d+)", re.IGNORECASE
+            )
 
             for comment in comments:
                 comment_body = comment.get("body", "")
@@ -307,7 +324,9 @@ class DuplicateCleanupManager:
             cleanup_candidates: List of issues that need cleanup
             dry_run: Whether this is a dry run
         """
-        print(f"\n{'🧪 DRY RUN - ' if dry_run else ''}🧹 DUPLICATE CLEANUP SUMMARY")
+        print(
+            f"\n{'🧪 DRY RUN - ' if dry_run else ''}🧹 DUPLICATE CLEANUP SUMMARY"
+        )
         print("=" * 60)
 
         if not cleanup_candidates:
@@ -369,13 +388,13 @@ class DuplicateCleanupManager:
             canonical_issue = candidate["canonical_issue"]
 
             # Generate file content
-            delete_action = self._create_delete_action(duplicate_issue, canonical_issue)
+            delete_action = self._create_delete_action(
+                duplicate_issue, canonical_issue
+            )
 
             # Generate filename with UUID
             action_uuid = str(uuid.uuid4())
-            filename = (
-                f"delete-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
-            )
+            filename = f"delete-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
             file_path = os.path.join(output_directory, filename)
 
             try:
@@ -466,9 +485,7 @@ class DuplicateCleanupManager:
 
             # Generate filename with UUID
             action_uuid = str(uuid.uuid4())
-            filename = (
-                f"comment-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
-            )
+            filename = f"comment-duplicate-{duplicate_issue['number']}-{action_uuid[:8]}.json"
             file_path = os.path.join(output_directory, filename)
 
             try:
@@ -539,7 +556,10 @@ def create_github_api() -> GitHubAPI:
     # Get repository from environment or default
     repo = os.environ.get("GITHUB_REPOSITORY")
     if not repo:
-        print("Error: GITHUB_REPOSITORY environment variable required", file=sys.stderr)
+        print(
+            "Error: GITHUB_REPOSITORY environment variable required",
+            file=sys.stderr,
+        )
         print("       Format: owner/repository-name", file=sys.stderr)
         sys.exit(1)
 
@@ -574,10 +594,14 @@ Environment Variables:
         """,
     )
 
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    subparsers = parser.add_subparsers(
+        dest="command", help="Available commands"
+    )
 
     # Scan command
-    scan_parser = subparsers.add_parser("scan", help="Scan for duplicate issues")
+    scan_parser = subparsers.add_parser(
+        "scan", help="Scan for duplicate issues"
+    )
     scan_parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -642,7 +666,9 @@ Environment Variables:
 
             if results["cleanup_candidates"] > 0 and results["dry_run"]:
                 print("\n💡 To generate action files, run:")
-                print("   python scripts/duplicate_cleanup.py scan --generate-deletes")
+                print(
+                    "   python scripts/duplicate_cleanup.py scan --generate-deletes"
+                )
 
         except Exception as e:
             print(f"Error during duplicate cleanup: {e}", file=sys.stderr)

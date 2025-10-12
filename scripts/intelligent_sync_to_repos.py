@@ -109,7 +109,9 @@ def parse_args():
     parser.add_argument(
         "--repos", required=True, help="Comma-separated list of target repos"
     )
-    parser.add_argument("--branch", required=True, help="Branch name to push to")
+    parser.add_argument(
+        "--branch", required=True, help="Branch name to push to"
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -123,7 +125,9 @@ def run(cmd: List[str], cwd=None, check=True, dry_run=False):
     if dry_run:
         logging.info("  [DRY RUN] Command not executed")
         return None
-    result = subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd, cwd=cwd, check=check, capture_output=True, text=True
+    )
     if result.stdout:
         logging.info(result.stdout)
     if result.stderr:
@@ -209,7 +213,12 @@ def sync_to_repo(
 
         # Create/checkout branch
         try:
-            run(["git", "checkout", branch], cwd=tmpdir, check=False, dry_run=dry_run)
+            run(
+                ["git", "checkout", branch],
+                cwd=tmpdir,
+                check=False,
+                dry_run=dry_run,
+            )
         except subprocess.CalledProcessError:
             run(["git", "checkout", "-b", branch], cwd=tmpdir, dry_run=dry_run)
 
@@ -283,7 +292,11 @@ This maintains the centralized coding standards while supporting
 the new VS Code Copilot customization features."""
 
             try:
-                run(["git", "commit", "-m", commit_msg], cwd=tmpdir, dry_run=dry_run)
+                run(
+                    ["git", "commit", "-m", commit_msg],
+                    cwd=tmpdir,
+                    dry_run=dry_run,
+                )
                 run(
                     ["git", "push", "-u", "origin", branch, "--force"],
                     cwd=tmpdir,

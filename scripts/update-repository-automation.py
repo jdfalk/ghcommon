@@ -85,7 +85,9 @@ class RepositoryAutomationUpdater:
             has_new_unified = self._has_new_unified_automation(repo, workflows)
 
             if has_new_unified and not self.force_update:
-                print(f"✅ Repository {repo} already has new unified automation system")
+                print(
+                    f"✅ Repository {repo} already has new unified automation system"
+                )
                 cleanup_success = True
                 if self.enable_cleanup:
                     cleanup_success = self._cleanup_old_automation_files(
@@ -110,7 +112,9 @@ class RepositoryAutomationUpdater:
 
                 # Then add/update the unified automation system
                 if cleanup_success:
-                    add_success = self._add_unified_automation(repo, default_branch)
+                    add_success = self._add_unified_automation(
+                        repo, default_branch
+                    )
                     return add_success
                 else:
                     return False
@@ -143,7 +147,9 @@ class RepositoryAutomationUpdater:
         response.raise_for_status()
         return response.json()
 
-    def _has_new_unified_automation(self, repo: str, workflows: List[Dict]) -> bool:
+    def _has_new_unified_automation(
+        self, repo: str, workflows: List[Dict]
+    ) -> bool:
         """Check if repository has the new unified automation system."""
         # The new system should have a workflow that calls reusable workflows
         # and it should have a configuration file
@@ -154,7 +160,9 @@ class RepositoryAutomationUpdater:
             if "unified-automation" in workflow["name"]:
                 # Get the workflow content to check if it calls reusable workflows
                 try:
-                    content_response = self.session.get(workflow["download_url"])
+                    content_response = self.session.get(
+                        workflow["download_url"]
+                    )
                     if content_response.status_code == 200:
                         content = content_response.text
                         if (
@@ -253,7 +261,9 @@ class RepositoryAutomationUpdater:
 
         if self.dry_run:
             print(f"[DRY RUN] Would add unified-automation.yml to {repo}")
-            print(f"[DRY RUN] Would add unified-automation-config.json to {repo}")
+            print(
+                f"[DRY RUN] Would add unified-automation-config.json to {repo}"
+            )
             return True
 
         # Create workflow file
@@ -277,12 +287,16 @@ class RepositoryAutomationUpdater:
 
         return workflow_success and config_success
 
-    def _add_default_configuration(self, repo: str, default_branch: str) -> bool:
+    def _add_default_configuration(
+        self, repo: str, default_branch: str
+    ) -> bool:
         """Add default configuration to repository."""
         config_content = self._get_default_configuration()
 
         if self.dry_run:
-            print(f"[DRY RUN] Would add unified-automation-config.json to {repo}")
+            print(
+                f"[DRY RUN] Would add unified-automation-config.json to {repo}"
+            )
             return True
 
         return self._create_file(
@@ -359,7 +373,9 @@ class RepositoryAutomationUpdater:
     def _get_complete_workflow_template(self, default_branch: str) -> str:
         """Get the complete workflow template."""
         # First try to read local template if available
-        local_template_path = "examples/workflows/unified-automation-complete.yml"
+        local_template_path = (
+            "examples/workflows/unified-automation-complete.yml"
+        )
         if os.path.exists(local_template_path):
             try:
                 with open(local_template_path, "r") as f:
@@ -443,7 +459,12 @@ jobs:
             )
 
     def _create_file(
-        self, repo: str, path: str, content: str, message: str, default_branch: str
+        self,
+        repo: str,
+        path: str,
+        content: str,
+        message: str,
+        default_branch: str,
     ) -> bool:
         """Create a file in the repository. If file exists, delete it first."""
         import base64
@@ -462,7 +483,8 @@ jobs:
                 "branch": default_branch,
             }
             delete_response = self.session.delete(
-                f"https://api.github.com/repos/{repo}/contents/{path}", json=delete_data
+                f"https://api.github.com/repos/{repo}/contents/{path}",
+                json=delete_data,
             )
             if delete_response.status_code != 200:
                 print(
@@ -551,21 +573,27 @@ def main():
         help="Show what would be done without making changes",
     )
     parser.add_argument(
-        "--no-cleanup", action="store_true", help="Skip cleanup of old automation files"
+        "--no-cleanup",
+        action="store_true",
+        help="Skip cleanup of old automation files",
     )
     parser.add_argument(
         "--force-update",
         action="store_true",
         help="Force update even if new automation already exists",
     )
-    parser.add_argument("--token", help="GitHub token (or set GITHUB_TOKEN env var)")
+    parser.add_argument(
+        "--token", help="GitHub token (or set GITHUB_TOKEN env var)"
+    )
 
     args = parser.parse_args()
 
     # Get GitHub token
     token = args.token or os.getenv("GITHUB_TOKEN")
     if not token:
-        print("❌ GitHub token required. Set GITHUB_TOKEN env var or use --token")
+        print(
+            "❌ GitHub token required. Set GITHUB_TOKEN env var or use --token"
+        )
         sys.exit(1)
 
     # Get repositories to update
@@ -580,7 +608,9 @@ def main():
 
         with open(args.config, "r") as f:
             repositories = [
-                line.strip() for line in f if line.strip() and not line.startswith("#")
+                line.strip()
+                for line in f
+                if line.strip() and not line.startswith("#")
             ]
     else:
         print("❌ Must specify either --repo or --config")
@@ -592,7 +622,9 @@ def main():
     if args.no_cleanup:
         print("🚫 CLEANUP DISABLED - Old automation files will not be removed")
     if args.force_update:
-        print("💪 FORCE UPDATE MODE - Will update workflows even if they already exist")
+        print(
+            "💪 FORCE UPDATE MODE - Will update workflows even if they already exist"
+        )
 
     updater = RepositoryAutomationUpdater(
         token, args.dry_run, not args.no_cleanup, args.force_update

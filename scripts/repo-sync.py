@@ -76,7 +76,10 @@ class RepoSynchronizer:
     ]
 
     def __init__(
-        self, base_path: Path, source_repo: str = "ghcommon", dry_run: bool = False
+        self,
+        base_path: Path,
+        source_repo: str = "ghcommon",
+        dry_run: bool = False,
     ):
         self.base_path = Path(base_path)
         self.source_repo = source_repo
@@ -104,7 +107,9 @@ class RepoSynchronizer:
                     content_hash = hashlib.md5(content.encode()).hexdigest()
                     source_files[file_path] = (version, guid, content_hash)
                 except Exception as e:
-                    print(f"Warning: Could not load {file_path} from source: {e}")
+                    print(
+                        f"Warning: Could not load {file_path} from source: {e}"
+                    )
 
         return source_files
 
@@ -211,7 +216,9 @@ class RepoSynchronizer:
         target_path = target_repo / source_file
 
         if self.dry_run:
-            print(f"    [DRY RUN] Would copy {source_file} to {target_repo.name}")
+            print(
+                f"    [DRY RUN] Would copy {source_file} to {target_repo.name}"
+            )
             return True
 
         try:
@@ -224,7 +231,9 @@ class RepoSynchronizer:
             return True
 
         except Exception as e:
-            print(f"    ✗ Failed to copy {source_file} to {target_repo.name}: {e}")
+            print(
+                f"    ✗ Failed to copy {source_file} to {target_repo.name}: {e}"
+            )
             return False
 
     def sync_repository(self, repo_path: Path) -> List[SyncOperation]:
@@ -242,7 +251,9 @@ class RepoSynchronizer:
             )
 
             if should_sync:
-                operation_type = "copy" if target_status == "missing" else "update"
+                operation_type = (
+                    "copy" if target_status == "missing" else "update"
+                )
                 success = self._copy_file(file_path, repo_path)
 
                 if not success and not self.dry_run:
@@ -306,10 +317,18 @@ class RepoSynchronizer:
 
         # Generate summary
         summary = {
-            "copy": sum(1 for op in all_operations if op.operation_type == "copy"),
-            "update": sum(1 for op in all_operations if op.operation_type == "update"),
-            "skip": sum(1 for op in all_operations if op.operation_type == "skip"),
-            "failed": sum(1 for op in all_operations if op.operation_type == "failed"),
+            "copy": sum(
+                1 for op in all_operations if op.operation_type == "copy"
+            ),
+            "update": sum(
+                1 for op in all_operations if op.operation_type == "update"
+            ),
+            "skip": sum(
+                1 for op in all_operations if op.operation_type == "skip"
+            ),
+            "failed": sum(
+                1 for op in all_operations if op.operation_type == "failed"
+            ),
         }
 
         report = SyncReport(
@@ -366,7 +385,9 @@ Examples:
     )
 
     parser.add_argument(
-        "--output-dir", type=Path, help="Directory to save synchronization reports"
+        "--output-dir",
+        type=Path,
+        help="Directory to save synchronization reports",
     )
 
     parser.add_argument(
@@ -382,7 +403,9 @@ Examples:
     )
 
     parser.add_argument(
-        "--include-repos", nargs="+", help="Only synchronize specified repositories"
+        "--include-repos",
+        nargs="+",
+        help="Only synchronize specified repositories",
     )
 
     parser.add_argument(
@@ -396,7 +419,9 @@ Examples:
     try:
         # Initialize synchronizer
         synchronizer = RepoSynchronizer(
-            base_path=args.base_path, source_repo=args.source_repo, dry_run=args.dry_run
+            base_path=args.base_path,
+            source_repo=args.source_repo,
+            dry_run=args.dry_run,
         )
 
         # Run synchronization
@@ -424,7 +449,9 @@ Examples:
             print(f"\nDetailed report saved to: {report_file}")
 
         # Show any failed operations
-        failed_ops = [op for op in report.operations if op.operation_type == "failed"]
+        failed_ops = [
+            op for op in report.operations if op.operation_type == "failed"
+        ]
         if failed_ops:
             print(f"\n⚠️  {len(failed_ops)} operations failed:")
             for op in failed_ops:

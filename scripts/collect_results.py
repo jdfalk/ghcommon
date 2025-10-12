@@ -46,7 +46,10 @@ def check_repository_changes() -> Dict[str, str]:
             if changed_files:
                 changed_files_list = ",".join(changed_files)
                 print(f"Changed files: {changed_files_list}")
-                return {"has_changes": "true", "changed_files": changed_files_list}
+                return {
+                    "has_changes": "true",
+                    "changed_files": changed_files_list,
+                }
             else:
                 return {"has_changes": "false", "changed_files": ""}
         else:

@@ -124,7 +124,9 @@ class GitHubNotificationCleaner:
         # GitHub returns timestamps like "2023-12-25T10:30:00Z"
         return datetime.fromisoformat(time_str.replace("Z", "+00:00"))
 
-    def is_notification_old(self, notification: Dict, hours_threshold: int) -> bool:
+    def is_notification_old(
+        self, notification: Dict, hours_threshold: int
+    ) -> bool:
         """
         Check if a notification is older than the specified threshold.
 
@@ -136,7 +138,9 @@ class GitHubNotificationCleaner:
             True if notification is older than threshold, False otherwise
         """
         updated_at = self.parse_notification_time(notification["updated_at"])
-        threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
+        threshold_time = datetime.now(timezone.utc) - timedelta(
+            hours=hours_threshold
+        )
         return updated_at < threshold_time
 
     def _rate_limit_wait(self):
@@ -151,7 +155,9 @@ class GitHubNotificationCleaner:
                 time.sleep(self._min_request_interval - time_since_last)
             self._last_request_time = time.time()
 
-    def mark_notification_as_done(self, notification_id: str) -> Tuple[bool, str]:
+    def mark_notification_as_done(
+        self, notification_id: str
+    ) -> Tuple[bool, str]:
         """
         Mark a specific notification as done (completely dismiss it).
 
@@ -170,7 +176,9 @@ class GitHubNotificationCleaner:
             response.raise_for_status()
             return True, ""
         except requests.RequestException as e:
-            error_msg = f"Error marking notification {notification_id} as done: {e}"
+            error_msg = (
+                f"Error marking notification {notification_id} as done: {e}"
+            )
             return False, error_msg
 
     def mark_all_as_done(self) -> bool:
@@ -188,7 +196,9 @@ class GitHubNotificationCleaner:
             response.raise_for_status()
             return True
         except requests.RequestException as e:
-            print(f"Error marking all notifications as done: {e}", file=sys.stderr)
+            print(
+                f"Error marking all notifications as done: {e}", file=sys.stderr
+            )
             return False
 
     def _process_notification_batch(
@@ -250,7 +260,9 @@ class GitHubNotificationCleaner:
                         )
                         marked_count += 1
                     else:
-                        print(f"✗ Failed: {repo} - {subject} (updated: {updated_at})")
+                        print(
+                            f"✗ Failed: {repo} - {subject} (updated: {updated_at})"
+                        )
                         failed_count += 1
                         if error_msg:
                             error_messages.append(error_msg)
@@ -262,7 +274,10 @@ class GitHubNotificationCleaner:
         return marked_count, failed_count, error_messages
 
     def cleanup_old_notifications(
-        self, hours_threshold: int = 24, dry_run: bool = False, batch_size: int = 100
+        self,
+        hours_threshold: int = 24,
+        dry_run: bool = False,
+        batch_size: int = 100,
     ) -> Dict[str, int]:
         """
         Main method to clean up old notifications using parallel processing.
@@ -316,8 +331,8 @@ class GitHubNotificationCleaner:
                 f"\nProcessing batch {batch_num}/{total_batches} ({len(batch)} notifications)..."
             )
 
-            batch_marked, batch_failed, batch_errors = self._process_notification_batch(
-                batch, dry_run
+            batch_marked, batch_failed, batch_errors = (
+                self._process_notification_batch(batch, dry_run)
             )
 
             total_marked += batch_marked
@@ -335,7 +350,9 @@ class GitHubNotificationCleaner:
         }
 
         if dry_run:
-            print(f"\n[DRY RUN] Would have marked {total_marked} notifications as done")
+            print(
+                f"\n[DRY RUN] Would have marked {total_marked} notifications as done"
+            )
         else:
             print(f"\nMarked {total_marked} notifications as done")
             if total_failed > 0:
@@ -360,7 +377,9 @@ def get_github_token() -> Optional[str]:
 
     # Try different environment variable names
     token = (
-        os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("JF_CI_GH_PAT")
+        os.getenv("GITHUB_TOKEN")
+        or os.getenv("GH_TOKEN")
+        or os.getenv("JF_CI_GH_PAT")
     )
 
     if not token:
@@ -433,7 +452,9 @@ Examples:
         help="Number of notifications to process in each batch (default: 100)",
     )
 
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose output"
+    )
 
     args = parser.parse_args()
 
@@ -467,7 +488,9 @@ Examples:
 
     try:
         result = cleaner.cleanup_old_notifications(
-            hours_threshold=args.hours, dry_run=args.dry_run, batch_size=args.batch_size
+            hours_threshold=args.hours,
+            dry_run=args.dry_run,
+            batch_size=args.batch_size,
         )
 
         if result.get("error"):

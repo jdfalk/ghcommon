@@ -71,7 +71,9 @@ class GitHubLabelsSync:
         print(f"✅ Found {len(labels)} existing labels")
         return labels
 
-    def create_label(self, name: str, color: str, description: str = "") -> bool:
+    def create_label(
+        self, name: str, color: str, description: str = ""
+    ) -> bool:
         """Create a new label."""
         data = {"name": name, "color": color, "description": description}
 
@@ -83,7 +85,9 @@ class GitHubLabelsSync:
             print(f"   ❌ Failed to create label '{name}': {e}")
             return False
 
-    def update_label(self, name: str, color: str, description: str = "") -> bool:
+    def update_label(
+        self, name: str, color: str, description: str = ""
+    ) -> bool:
         """Update an existing label."""
         data = {"name": name, "color": color, "description": description}
 
@@ -97,7 +101,10 @@ class GitHubLabelsSync:
             return False
 
     def labels_are_identical(
-        self, existing_label: Dict[str, Any], new_color: str, new_description: str
+        self,
+        existing_label: Dict[str, Any],
+        new_color: str,
+        new_description: str,
     ) -> bool:
         """Check if existing label is identical to the new one."""
         # Normalize colors (remove # prefix if present)
@@ -157,10 +164,14 @@ class GitHubLabelsSync:
             if name in existing_by_name:
                 # Check if the label is identical
                 existing_label = existing_by_name[name]
-                if self.labels_are_identical(existing_label, color, description):
+                if self.labels_are_identical(
+                    existing_label, color, description
+                ):
                     print("   ⏭️  Skipping - label is identical")
                     skipped_count += 1
-                    success_count += 1  # Count as success since no change needed
+                    success_count += (
+                        1  # Count as success since no change needed
+                    )
                 else:
                     # Update existing label
                     print("   📝 Updating existing label...")
@@ -178,7 +189,9 @@ class GitHubLabelsSync:
         print(
             f"✅ GitHub labels sync completed! ({success_count}/{len(labels_data)} successful)"
         )
-        print(f"🔗 View labels: https://github.com/{self.owner}/{self.repo}/labels")
+        print(
+            f"🔗 View labels: https://github.com/{self.owner}/{self.repo}/labels"
+        )
 
         return success_count == len(labels_data)
 

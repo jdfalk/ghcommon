@@ -67,7 +67,9 @@ PATTERNS: List[Tuple[str, re.Pattern]] = [
     ("GitHub Token", re.compile(r"gh[pousr]_[A-Za-z0-9_]{30,}")),
     (
         "JWT",
-        re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
+        re.compile(
+            r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+        ),
     ),
     (
         "Private Key Block",
@@ -135,7 +137,10 @@ def main(argv: List[str]) -> int:
     args = parser.parse_args(argv)
     root = Path(args.target).resolve()
     if not root.exists() or not root.is_dir():
-        print(f"Target does not exist or is not a directory: {root}", file=sys.stderr)
+        print(
+            f"Target does not exist or is not a directory: {root}",
+            file=sys.stderr,
+        )
         return 2
 
     findings = 0

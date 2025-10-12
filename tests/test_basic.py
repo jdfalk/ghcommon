@@ -74,7 +74,8 @@ class TestWorkflowIntegrity(unittest.TestCase):
         for workflow in expected_workflows:
             workflow_path = os.path.join(workflows_dir, workflow)
             self.assertTrue(
-                os.path.exists(workflow_path), f"Expected workflow {workflow} not found"
+                os.path.exists(workflow_path),
+                f"Expected workflow {workflow} not found",
             )
 
 

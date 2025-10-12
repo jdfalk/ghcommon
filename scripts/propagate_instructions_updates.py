@@ -30,8 +30,12 @@ REPOS = [
 
 def copy_instructions(target_repo: Path):
     """Copy the general coding instructions from ghcommon to target repository."""
-    source_file = GHCOMMON_PATH / ".github/instructions/general-coding.instructions.md"
-    target_file = target_repo / ".github/instructions/general-coding.instructions.md"
+    source_file = (
+        GHCOMMON_PATH / ".github/instructions/general-coding.instructions.md"
+    )
+    target_file = (
+        target_repo / ".github/instructions/general-coding.instructions.md"
+    )
 
     if source_file.exists():
         # Ensure target directory exists

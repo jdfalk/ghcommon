@@ -233,7 +233,9 @@ class SmartRebase:
     def get_conflicted_files(self) -> List[str]:
         """Get list of files with merge conflicts"""
         try:
-            result = self.run_command(["git", "diff", "--name-only", "--diff-filter=U"])
+            result = self.run_command(
+                ["git", "diff", "--name-only", "--diff-filter=U"]
+            )
             return [f.strip() for f in result.stdout.split("\n") if f.strip()]
         except GitRebaseError:
             return []
@@ -308,7 +310,9 @@ class SmartRebase:
         try:
             # Save current version
             current_file = f"{file_path}.current"
-            self.run_command(["git", "show", f"HEAD:{file_path}"], capture_output=True)
+            self.run_command(
+                ["git", "show", f"HEAD:{file_path}"], capture_output=True
+            )
             result = self.run_command(["git", "show", f"HEAD:{file_path}"])
 
             if not self.dry_run:
@@ -317,7 +321,9 @@ class SmartRebase:
 
             # Save incoming version
             incoming_file = f"{file_path}.incoming"
-            result = self.run_command(["git", "show", f"MERGE_HEAD:{file_path}"])
+            result = self.run_command(
+                ["git", "show", f"MERGE_HEAD:{file_path}"]
+            )
 
             if not self.dry_run:
                 with open(incoming_file, "w") as f:
@@ -327,7 +333,9 @@ class SmartRebase:
             self.run_command(["git", "checkout", "--theirs", file_path])
             self.run_command(["git", "add", file_path])
 
-            self.log_warning(f"Saved both versions: {current_file}, {incoming_file}")
+            self.log_warning(
+                f"Saved both versions: {current_file}, {incoming_file}"
+            )
             self.log_warning(f"Using incoming version for {file_path}")
             self.log_warning("Please review and merge manually if needed")
 
@@ -374,7 +382,9 @@ class SmartRebase:
 
             if mode == RebaseMode.INTERACTIVE:
                 # In interactive mode, prompt user for each conflict
-                self.log_warning(f"Conflict in {file_path} - please resolve manually")
+                self.log_warning(
+                    f"Conflict in {file_path} - please resolve manually"
+                )
                 response = input("Continue after resolving? (y/n): ")
                 if response.lower() != "y":
                     return False
@@ -382,7 +392,9 @@ class SmartRebase:
             else:
                 # Automated resolution based on file type
                 strategy = self.determine_conflict_strategy(file_path)
-                self.log_verbose(f"Using strategy {strategy.value} for {file_path}")
+                self.log_verbose(
+                    f"Using strategy {strategy.value} for {file_path}"
+                )
 
                 success = False
                 if strategy == ConflictStrategy.PREFER_INCOMING:
@@ -409,10 +421,14 @@ class SmartRebase:
                     self.log_error(f"Failed to resolve conflict in {file_path}")
                     return False
 
-        self.log_success(f"Resolved {resolved_count}/{len(conflicted_files)} conflicts")
+        self.log_success(
+            f"Resolved {resolved_count}/{len(conflicted_files)} conflicts"
+        )
         return resolved_count == len(conflicted_files)
 
-    def perform_rebase(self, target_branch: str, mode: RebaseMode) -> RebaseResult:
+    def perform_rebase(
+        self, target_branch: str, mode: RebaseMode
+    ) -> RebaseResult:
         """
         Perform the Git rebase operation.
 
@@ -423,7 +439,9 @@ class SmartRebase:
         Returns:
             RebaseResult indicating the outcome
         """
-        self.log_info(f"Starting rebase onto {target_branch} in {mode.value} mode")
+        self.log_info(
+            f"Starting rebase onto {target_branch} in {mode.value} mode"
+        )
 
         try:
             # Start the rebase
@@ -456,7 +474,9 @@ class SmartRebase:
                     return RebaseResult.CONFLICTS
 
             # Check rebase status
-            result = self.run_command(["git", "status", "--porcelain"], check=False)
+            result = self.run_command(
+                ["git", "status", "--porcelain"], check=False
+            )
             if result.returncode == 0 and not result.stdout.strip():
                 return RebaseResult.SUCCESS
             else:
@@ -532,23 +552,33 @@ class SmartRebase:
 
         if not self.dry_run:
             with open(summary_file, "w") as f:
-                f.write(f"# Git Rebase Summary - {self.summary['timestamp']}\n\n")
+                f.write(
+                    f"# Git Rebase Summary - {self.summary['timestamp']}\n\n"
+                )
                 f.write("## Operation Details\n\n")
                 f.write(f"- **Mode**: {self.summary['mode']}\n")
-                f.write(f"- **Target Branch**: {self.summary['target_branch']}\n")
-                f.write(f"- **Source Branch**: {self.summary['source_branch']}\n")
+                f.write(
+                    f"- **Target Branch**: {self.summary['target_branch']}\n"
+                )
+                f.write(
+                    f"- **Source Branch**: {self.summary['source_branch']}\n"
+                )
                 f.write(f"- **Result**: {self.summary['result']}\n")
                 f.write(
                     f"- **Execution Time**: {self.summary['execution_time']:.2f} seconds\n"
                 )
-                f.write(f"- **Backup Branch**: {self.summary['backup_branch']}\n\n")
+                f.write(
+                    f"- **Backup Branch**: {self.summary['backup_branch']}\n\n"
+                )
 
                 if self.summary["conflicts_resolved"]:
                     f.write(
                         f"## Conflicts Resolved ({len(self.summary['conflicts_resolved'])})\n\n"
                     )
                     for conflict in self.summary["conflicts_resolved"]:
-                        f.write(f"- **{conflict['file']}**: {conflict['strategy']}\n")
+                        f.write(
+                            f"- **{conflict['file']}**: {conflict['strategy']}\n"
+                        )
                     f.write("\n")
 
                 if self.summary["errors"]:
@@ -596,7 +626,9 @@ class SmartRebase:
 
             # Validate target branch exists
             if not self.branch_exists(target_branch):
-                raise GitRebaseError(f"Target branch '{target_branch}' does not exist")
+                raise GitRebaseError(
+                    f"Target branch '{target_branch}' does not exist"
+                )
 
             # Create backup branch
             self.create_backup_branch(source_branch)
@@ -700,7 +732,9 @@ def main() -> int:
 
         # Run the rebase
         result = rebase.run_rebase(
-            target_branch=args.target_branch, mode=mode, force_push=args.force_push
+            target_branch=args.target_branch,
+            mode=mode,
+            force_push=args.force_push,
         )
 
         # Generate summary

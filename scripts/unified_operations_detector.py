@@ -36,7 +36,9 @@ class UnifiedOperationsDetector:
     def __init__(self):
         self.operations_input = os.getenv("OPERATIONS_INPUT", "auto").strip()
         self.event_name = os.getenv("EVENT_NAME", "")
-        self.issue_updates_file = os.getenv("ISSUE_UPDATES_FILE", "issue_updates.json")
+        self.issue_updates_file = os.getenv(
+            "ISSUE_UPDATES_FILE", "issue_updates.json"
+        )
         self.issue_updates_directory = os.getenv(
             "ISSUE_UPDATES_DIRECTORY", ".github/issue-updates"
         )
@@ -62,7 +64,9 @@ class UnifiedOperationsDetector:
         Returns:
             Dict with detected operations and file availability
         """
-        logger.info(f"🔍 Detecting operations for input: '{self.operations_input}'")
+        logger.info(
+            f"🔍 Detecting operations for input: '{self.operations_input}'"
+        )
         logger.info(f"📅 Event: {self.event_name}")
 
         if self.operations_input == "auto":
@@ -149,7 +153,9 @@ class UnifiedOperationsDetector:
         """Check if issue update files are available."""
         # Check main issue updates file
         if Path(self.issue_updates_file).exists():
-            logger.info(f"✅ Found issue updates file: {self.issue_updates_file}")
+            logger.info(
+                f"✅ Found issue updates file: {self.issue_updates_file}"
+            )
             return True
 
         # Check issue updates directory
@@ -184,7 +190,9 @@ class UnifiedOperationsDetector:
             )
             return True
 
-        logger.info(f"📝 No doc update files found in {self.doc_updates_directory}")
+        logger.info(
+            f"📝 No doc update files found in {self.doc_updates_directory}"
+        )
         return False
 
     def set_github_outputs(self, results: Dict[str, any]) -> None:
@@ -199,10 +207,16 @@ class UnifiedOperationsDetector:
 
         with open(github_output, "a") as f:
             # Convert lists to JSON strings for GitHub Actions
-            f.write(f"issue_operations={json.dumps(results['issue_operations'])}\n")
+            f.write(
+                f"issue_operations={json.dumps(results['issue_operations'])}\n"
+            )
             f.write(f"doc_operations={json.dumps(results['doc_operations'])}\n")
-            f.write(f"has_issue_updates={str(results['has_issue_updates']).lower()}\n")
-            f.write(f"has_doc_updates={str(results['has_doc_updates']).lower()}\n")
+            f.write(
+                f"has_issue_updates={str(results['has_issue_updates']).lower()}\n"
+            )
+            f.write(
+                f"has_doc_updates={str(results['has_doc_updates']).lower()}\n"
+            )
 
         logger.info("✅ GitHub outputs set successfully")
 

@@ -538,7 +538,9 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
         (
             root / "README.md",
             README_TEMPLATE.format(
-                name=opts.name, description=opts.description, license=opts.license
+                name=opts.name,
+                description=opts.description,
+                license=opts.license,
             ),
         )
     )
@@ -568,9 +570,14 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
             CODEOWNERS.replace("OWNER_USERNAME", opts.owner),
         )
     )
-    files.append((root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE))
     files.append(
-        (root / ".github" / "ISSUE_TEMPLATE" / "bug_report.md", ISSUE_TEMPLATE_BUG)
+        (root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE)
+    )
+    files.append(
+        (
+            root / ".github" / "ISSUE_TEMPLATE" / "bug_report.md",
+            ISSUE_TEMPLATE_BUG,
+        )
     )
     files.append(
         (
@@ -581,7 +588,9 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
     files.append(
         (
             root / ".github" / "workflows" / "ci.yml",
-            render_ci_yaml(include_go=opts.with_go, include_python=opts.with_python),
+            render_ci_yaml(
+                include_go=opts.with_go, include_python=opts.with_python
+            ),
         )
     )
     files.append((root / ".github" / "commit-messages.md", COMMIT_MESSAGES_MD))
@@ -599,7 +608,10 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
     )
     files.append(
         (
-            root / ".github" / "instructions" / "general-coding.instructions.md",
+            root
+            / ".github"
+            / "instructions"
+            / "general-coding.instructions.md",
             GENERAL_CODING_INSTRUCTIONS_MD,
         )
     )
@@ -822,7 +834,9 @@ jobs:
         run: |
           python -m twine upload dist/*
 """
-        out.append((root / ".github" / "workflows" / "release-python.yml", py_rel))
+        out.append(
+            (root / ".github" / "workflows" / "release-python.yml", py_rel)
+        )
 
     readme = """# file: .github/workflows/README.md
 # version: 1.0.0
@@ -883,16 +897,24 @@ def parse_args(argv: List[str]) -> Options:
     )
     parser.add_argument("--year", default="2025")
     parser.add_argument(
-        "--target", required=True, help="Target directory to create the repository in"
+        "--target",
+        required=True,
+        help="Target directory to create the repository in",
     )
     parser.add_argument(
-        "--dry-run", action="store_true", help="Only print files that would be created"
+        "--dry-run",
+        action="store_true",
+        help="Only print files that would be created",
     )
     parser.add_argument(
-        "--force", action="store_true", help="Overwrite existing files when present"
+        "--force",
+        action="store_true",
+        help="Overwrite existing files when present",
     )
     parser.add_argument(
-        "--with-go", action="store_true", help="Include minimal Go overlay and tests"
+        "--with-go",
+        action="store_true",
+        help="Include minimal Go overlay and tests",
     )
     parser.add_argument(
         "--with-python",
@@ -900,7 +922,9 @@ def parse_args(argv: List[str]) -> Options:
         help="Include minimal Python overlay and tests",
     )
     parser.add_argument(
-        "--with-dependabot", action="store_true", help="Include .github/dependabot.yml"
+        "--with-dependabot",
+        action="store_true",
+        help="Include .github/dependabot.yml",
     )
     parser.add_argument(
         "--with-releases",

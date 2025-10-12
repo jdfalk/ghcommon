@@ -148,7 +148,9 @@ class ProtobufCycleFixer:
         for proto_file in pkg_dir.glob("*.proto"):
             self.remove_imports_from_file(proto_file, imports_to_remove)
 
-    def remove_imports_from_file(self, proto_file: Path, imports_to_remove: List[str]):
+    def remove_imports_from_file(
+        self, proto_file: Path, imports_to_remove: List[str]
+    ):
         """Remove specific imports from a proto file."""
         with open(proto_file, "r", encoding="utf-8") as f:
             content = f.read()
@@ -162,7 +164,9 @@ class ProtobufCycleFixer:
             for import_to_remove in imports_to_remove:
                 # Convert package name back to import path
                 import_path = (
-                    import_to_remove.replace("gcommon.v1.", "pkg/").replace(".", "/")
+                    import_to_remove.replace("gcommon.v1.", "pkg/").replace(
+                        ".", "/"
+                    )
                     + ".proto"
                 )
                 if f'import "{import_path}"' in line:

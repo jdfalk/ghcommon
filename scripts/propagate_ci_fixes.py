@@ -107,7 +107,9 @@ def increment_version_in_ci(target_repo: Path):
                 )
                 return True
 
-        print(f"⚠️ No version header found in CI workflow for {target_repo.name}")
+        print(
+            f"⚠️ No version header found in CI workflow for {target_repo.name}"
+        )
         return False
 
     except Exception as e:

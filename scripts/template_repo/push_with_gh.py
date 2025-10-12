@@ -48,20 +48,27 @@ def main(argv: list[str]) -> int:
         "--owner", required=True, help="GitHub username or org (e.g., jdfalk)"
     )
     parser.add_argument(
-        "--private", action="store_true", help="Create the repository as private"
+        "--private",
+        action="store_true",
+        help="Create the repository as private",
     )
     args = parser.parse_args(argv)
 
     target = Path(os.path.expanduser(args.target)).resolve()
     if not target.exists() or not target.is_dir():
-        print(f"Target does not exist or is not a directory: {target}", file=sys.stderr)
+        print(
+            f"Target does not exist or is not a directory: {target}",
+            file=sys.stderr,
+        )
         return 2
 
     if not shutil.which("git"):
         print("git is not installed or not in PATH", file=sys.stderr)
         return 2
     if not shutil.which("gh"):
-        print("GitHub CLI (gh) is not installed or not in PATH", file=sys.stderr)
+        print(
+            "GitHub CLI (gh) is not installed or not in PATH", file=sys.stderr
+        )
         return 2
 
     # Ensure we're not inside another repo when initializing (avoid nested repos/submodules)
@@ -107,7 +114,12 @@ def main(argv: list[str]) -> int:
         )
     except subprocess.CalledProcessError:
         run(
-            ["git", "config", "user.email", f"{args.owner}@users.noreply.github.com"],
+            [
+                "git",
+                "config",
+                "user.email",
+                f"{args.owner}@users.noreply.github.com",
+            ],
             cwd=target,
         )
 
@@ -130,7 +142,9 @@ def main(argv: list[str]) -> int:
         cwd=target,
     )
 
-    print(f"Repository created and pushed: https://github.com/{args.owner}/{args.repo}")
+    print(
+        f"Repository created and pushed: https://github.com/{args.owner}/{args.repo}"
+    )
     return 0
 
 

@@ -91,7 +91,9 @@ class UnifiedGitHubProjectManager:
         self.logger = logging.getLogger(__name__)
 
         if self.dry_run:
-            self.logger.info("🔍 Running in DRY-RUN mode - no changes will be made")
+            self.logger.info(
+                "🔍 Running in DRY-RUN mode - no changes will be made"
+            )
 
         # Validate GitHub CLI
         self._validate_github_cli()
@@ -152,7 +154,9 @@ class UnifiedGitHubProjectManager:
             command_str = [str(arg) for arg in command]
 
             if self.dry_run:
-                self.logger.info(f"DRY-RUN: Would execute: gh {' '.join(command_str)}")
+                self.logger.info(
+                    f"DRY-RUN: Would execute: gh {' '.join(command_str)}"
+                )
                 # Return mock JSON for commands that expect JSON output
                 if "--json" in command_str or any(
                     "--format" in cmd and "json" in cmd for cmd in command_str
@@ -172,14 +176,19 @@ class UnifiedGitHubProjectManager:
                 )
             else:
                 result = subprocess.run(
-                    ["gh"] + command_str, capture_output=True, text=True, check=True
+                    ["gh"] + command_str,
+                    capture_output=True,
+                    text=True,
+                    check=True,
                 )
 
             return True, result.stdout.strip()
 
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr.strip() if e.stderr else str(e)
-            command_str = [str(arg) for arg in command]  # Ensure we have command_str
+            command_str = [
+                str(arg) for arg in command
+            ]  # Ensure we have command_str
             self.logger.error(f"Command failed: gh {' '.join(command_str)}")
             self.logger.error(f"Error: {error_msg}")
             return False, error_msg
@@ -189,7 +198,9 @@ class UnifiedGitHubProjectManager:
             self.logger.error(error_msg)
             return False, error_msg
         except Exception as e:
-            command_str = [str(arg) for arg in command]  # Ensure we have command_str
+            command_str = [
+                str(arg) for arg in command
+            ]  # Ensure we have command_str
             error_msg = f"Unexpected error: {str(e)}"
             self.logger.error(f"Command failed: gh {' '.join(command_str)}")
             self.logger.error(error_msg)
@@ -246,7 +257,12 @@ class UnifiedGitHubProjectManager:
                     "ghcommon",
                     "codex-cli",
                 ],
-                "labels": ["type:testing", "tech:go", "tech:python", "workflow:ci-cd"],
+                "labels": [
+                    "type:testing",
+                    "tech:go",
+                    "tech:python",
+                    "workflow:ci-cd",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -320,7 +336,11 @@ class UnifiedGitHubProjectManager:
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
-                    "labels": ["module:ui", "module:frontend", "tech:javascript"],
+                    "labels": [
+                        "module:ui",
+                        "module:frontend",
+                        "tech:javascript",
+                    ],
                 },
             },
             "Database & Performance": {
@@ -347,7 +367,12 @@ class UnifiedGitHubProjectManager:
             "Metrics Module": {
                 "description": "Implementation of 95 empty protobuf files for metrics collection, monitoring, and observability.",
                 "repositories": ["gcommon"],
-                "labels": ["module:metrics", "tech:protobuf", "tech:grpc", "tech:go"],
+                "labels": [
+                    "module:metrics",
+                    "tech:protobuf",
+                    "tech:grpc",
+                    "tech:go",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -362,27 +387,52 @@ class UnifiedGitHubProjectManager:
             "Queue Module": {
                 "description": "Implementation of 175 empty protobuf files for message queuing, task management, and asynchronous processing.",
                 "repositories": ["gcommon"],
-                "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"],
+                "labels": [
+                    "module:queue",
+                    "tech:protobuf",
+                    "tech:grpc",
+                    "tech:go",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
-                    "labels": ["module:queue", "tech:protobuf", "tech:grpc", "tech:go"],
+                    "labels": [
+                        "module:queue",
+                        "tech:protobuf",
+                        "tech:grpc",
+                        "tech:go",
+                    ],
                 },
             },
             "Web Module": {
                 "description": "Implementation of 176 empty protobuf files for web services, HTTP handling, and API management.",
                 "repositories": ["gcommon"],
-                "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"],
+                "labels": [
+                    "module:web",
+                    "tech:protobuf",
+                    "tech:grpc",
+                    "tech:go",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
-                    "labels": ["module:web", "tech:protobuf", "tech:grpc", "tech:go"],
+                    "labels": [
+                        "module:web",
+                        "tech:protobuf",
+                        "tech:grpc",
+                        "tech:go",
+                    ],
                 },
             },
             "Auth Module": {
                 "description": "Implementation of 109 remaining protobuf files for authentication, authorization, and identity management.",
                 "repositories": ["gcommon"],
-                "labels": ["module:auth", "tech:protobuf", "tech:grpc", "tech:go"],
+                "labels": [
+                    "module:auth",
+                    "tech:protobuf",
+                    "tech:grpc",
+                    "tech:go",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -397,7 +447,12 @@ class UnifiedGitHubProjectManager:
             "Cache Module": {
                 "description": "Implementation of 36 remaining protobuf files for caching, data storage, and performance optimization.",
                 "repositories": ["gcommon"],
-                "labels": ["module:cache", "performance", "tech:protobuf", "tech:grpc"],
+                "labels": [
+                    "module:cache",
+                    "performance",
+                    "tech:protobuf",
+                    "tech:grpc",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -412,7 +467,12 @@ class UnifiedGitHubProjectManager:
             "Config Module": {
                 "description": "Implementation of 20 remaining protobuf files for configuration management and system settings.",
                 "repositories": ["gcommon"],
-                "labels": ["module:config", "tech:protobuf", "tech:grpc", "tech:go"],
+                "labels": [
+                    "module:config",
+                    "tech:protobuf",
+                    "tech:grpc",
+                    "tech:go",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -428,7 +488,11 @@ class UnifiedGitHubProjectManager:
             "Infrastructure Cleanup": {
                 "description": "File organization, duplicate file removal, deprecated workflow cleanup, and infrastructure improvements.",
                 "repositories": ["ghcommon"],
-                "labels": ["workflow:automation", "workflow:deployment", "tech:python"],
+                "labels": [
+                    "workflow:automation",
+                    "workflow:deployment",
+                    "tech:python",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -442,7 +506,11 @@ class UnifiedGitHubProjectManager:
             "Core Workflow Enhancement": {
                 "description": "Error handling improvements, workflow modularization, logging framework, and core functionality enhancements.",
                 "repositories": ["ghcommon"],
-                "labels": ["workflow:deployment", "workflow:automation", "tech:python"],
+                "labels": [
+                    "workflow:deployment",
+                    "workflow:automation",
+                    "tech:python",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
@@ -456,11 +524,19 @@ class UnifiedGitHubProjectManager:
             "Security & Compliance": {
                 "description": "Security.md creation, contributing guidelines, code of conduct, and compliance documentation.",
                 "repositories": ["ghcommon"],
-                "labels": ["type:security", "type:documentation", "tech:python"],
+                "labels": [
+                    "type:security",
+                    "type:documentation",
+                    "tech:python",
+                ],
                 "workflows": {
                     "auto_add_issues": True,
                     "auto_close_completed": True,
-                    "labels": ["type:security", "type:documentation", "tech:python"],
+                    "labels": [
+                        "type:security",
+                        "type:documentation",
+                        "tech:python",
+                    ],
                 },
             },
         }
@@ -479,8 +555,14 @@ class UnifiedGitHubProjectManager:
                 "color": "d73a49",
                 "description": "Critical priority - immediate attention required",
             },
-            "priority:high": {"color": "d93f0b", "description": "High priority"},
-            "priority:medium": {"color": "fbca04", "description": "Medium priority"},
+            "priority:high": {
+                "color": "d93f0b",
+                "description": "High priority",
+            },
+            "priority:medium": {
+                "color": "fbca04",
+                "description": "Medium priority",
+            },
             "priority:low": {"color": "0e8a16", "description": "Low priority"},
             # Size labels - from subtitle-manager best practices
             "size:small": {
@@ -491,13 +573,19 @@ class UnifiedGitHubProjectManager:
                 "color": "bfd4f2",
                 "description": "Medium change (half day)",
             },
-            "size:large": {"color": "f9d0c4", "description": "Large change (1-2 days)"},
+            "size:large": {
+                "color": "f9d0c4",
+                "description": "Large change (1-2 days)",
+            },
             "size:epic": {
                 "color": "d73a49",
                 "description": "Epic change (multiple days/weeks)",
             },
             # Type labels - core issue types
-            "type:bug": {"color": "d73a49", "description": "Something isn't working"},
+            "type:bug": {
+                "color": "d73a49",
+                "description": "Something isn't working",
+            },
             "type:feature": {
                 "color": "0052cc",
                 "description": "New feature development",
@@ -510,7 +598,10 @@ class UnifiedGitHubProjectManager:
                 "color": "0075ca",
                 "description": "Improvements or additions to documentation",
             },
-            "type:testing": {"color": "1d76db", "description": "Testing related work"},
+            "type:testing": {
+                "color": "1d76db",
+                "description": "Testing related work",
+            },
             "type:security": {
                 "color": "ee0701",
                 "description": "Security related issues",
@@ -524,7 +615,10 @@ class UnifiedGitHubProjectManager:
                 "description": "Maintenance and housekeeping",
             },
             # Status labels - workflow states
-            "status:todo": {"color": "ffffff", "description": "To do - not started"},
+            "status:todo": {
+                "color": "ffffff",
+                "description": "To do - not started",
+            },
             "status:in-progress": {
                 "color": "d4edda",
                 "description": "Work in progress",
@@ -541,7 +635,10 @@ class UnifiedGitHubProjectManager:
                 "color": "c3e6cb",
                 "description": "Ready for implementation",
             },
-            "status:duplicate": {"color": "6f42c1", "description": "Duplicate issue"},
+            "status:duplicate": {
+                "color": "6f42c1",
+                "description": "Duplicate issue",
+            },
             "status:wontfix": {
                 "color": "6c757d",
                 "description": "This will not be worked on",
@@ -583,13 +680,19 @@ class UnifiedGitHubProjectManager:
                 "color": "0366d6",
                 "description": "API development and changes",
             },
-            "module:backend": {"color": "343a40", "description": "Backend development"},
+            "module:backend": {
+                "color": "343a40",
+                "description": "Backend development",
+            },
             "module:frontend": {
                 "color": "6c757d",
                 "description": "Frontend development",
             },
             # Technology labels - programming languages and frameworks
-            "tech:go": {"color": "00add8", "description": "Go programming language"},
+            "tech:go": {
+                "color": "00add8",
+                "description": "Go programming language",
+            },
             "tech:python": {
                 "color": "3572a5",
                 "description": "Python programming language",
@@ -762,13 +865,16 @@ class UnifiedGitHubProjectManager:
         try:
             projects = json.loads(output)
             return {
-                project["title"]: project for project in projects.get("projects", [])
+                project["title"]: project
+                for project in projects.get("projects", [])
             }
         except (json.JSONDecodeError, KeyError):
             self.logger.warning("Could not parse existing projects JSON")
             return {}
 
-    def _get_existing_labels(self, repository: str) -> Dict[str, Dict[str, str]]:
+    def _get_existing_labels(
+        self, repository: str
+    ) -> Dict[str, Dict[str, str]]:
         """Get existing labels from a repository."""
         if self.dry_run:
             # In dry-run mode, still fetch real labels to show accurate info
@@ -828,7 +934,9 @@ class UnifiedGitHubProjectManager:
             )
             return {}
 
-    def _get_existing_milestones(self, repository: str) -> Dict[str, Dict[str, str]]:
+    def _get_existing_milestones(
+        self, repository: str
+    ) -> Dict[str, Dict[str, str]]:
         """Get existing milestones from a repository."""
         success, output = self._run_gh_command(
             ["api", f"repos/{self.owner}/{repository}/milestones"]
@@ -868,8 +976,12 @@ class UnifiedGitHubProjectManager:
         for title, config in project_definitions.items():
             if title in existing_projects:
                 if not self.force:
-                    self.logger.info(f"✅ Project '{title}' already exists (skipping)")
-                    created_projects[title] = existing_projects[title].get("number", "")
+                    self.logger.info(
+                        f"✅ Project '{title}' already exists (skipping)"
+                    )
+                    created_projects[title] = existing_projects[title].get(
+                        "number", ""
+                    )
                     continue
                 else:
                     self.logger.info(
@@ -879,7 +991,9 @@ class UnifiedGitHubProjectManager:
             project_number = self._create_project(title, config["description"])
             if project_number:
                 created_projects[title] = project_number
-                self.logger.info(f"✅ Created project: {title} (#{project_number})")
+                self.logger.info(
+                    f"✅ Created project: {title} (#{project_number})"
+                )
             else:
                 self.logger.error(f"❌ Failed to create project: {title}")
 
@@ -929,7 +1043,9 @@ class UnifiedGitHubProjectManager:
         print("\n" + "=" * 80)
         print("CURRENT PROJECT-REPOSITORY RELATIONSHIPS")
         print("=" * 80)
-        print(f"{'PROJECT NAME':<40} | {'PROJECT #':<10} | {'LINKED REPOSITORIES'}")
+        print(
+            f"{'PROJECT NAME':<40} | {'PROJECT #':<10} | {'LINKED REPOSITORIES'}"
+        )
         print("-" * 80)
 
         for project_title, project_number in project_numbers.items():
@@ -937,7 +1053,9 @@ class UnifiedGitHubProjectManager:
                 continue
 
             # Get repositories that SHOULD be linked according to config
-            should_be_linked = project_definitions[project_title]["repositories"]
+            should_be_linked = project_definitions[project_title][
+                "repositories"
+            ]
 
             # Get repositories that ARE ACTUALLY linked
             # Ensure project_number is a string
@@ -946,7 +1064,9 @@ class UnifiedGitHubProjectManager:
 
             # Display the results
             if linked_repos is None:
-                linked_repos_str = "ERROR: Could not retrieve linked repositories"
+                linked_repos_str = (
+                    "ERROR: Could not retrieve linked repositories"
+                )
             elif len(linked_repos) == 0:
                 linked_repos_str = "No repositories linked"
             else:
@@ -959,7 +1079,9 @@ class UnifiedGitHubProjectManager:
             # Display which repositories need linking
             if linked_repos is not None:
                 missing_repos = [
-                    repo for repo in should_be_linked if repo not in linked_repos
+                    repo
+                    for repo in should_be_linked
+                    if repo not in linked_repos
                 ]
                 if missing_repos:
                     print(
@@ -1008,7 +1130,9 @@ class UnifiedGitHubProjectManager:
                     self.logger.warning(f"⚠️ Failed to link {repository} to project '{project_title}'")
         """
 
-    def _get_linked_repositories(self, project_number: str) -> Optional[List[str]]:
+    def _get_linked_repositories(
+        self, project_number: str
+    ) -> Optional[List[str]]:
         """
         Get list of repositories already linked to a project.
 
@@ -1055,7 +1179,9 @@ class UnifiedGitHubProjectManager:
 
             # Process the output - the JQ filter should give us one repo name per line
             if repo_output.strip():
-                return [repo.strip() for repo in repo_output.strip().split("\n")]
+                return [
+                    repo.strip() for repo in repo_output.strip().split("\n")
+                ]
             else:
                 return []
 
@@ -1087,7 +1213,10 @@ class UnifiedGitHubProjectManager:
 
         if not success:
             # Check if the error is just that it's already linked
-            if "already linked" in output.lower() or "already exists" in output.lower():
+            if (
+                "already linked" in output.lower()
+                or "already exists" in output.lower()
+            ):
                 self.logger.debug(
                     f"✅ Repository {repository} is already linked to project #{project_number}"
                 )
@@ -1121,12 +1250,20 @@ class UnifiedGitHubProjectManager:
         existing_description = existing_label.get("description", "")
         new_description = new_label_config.get("description", "")
 
-        return existing_color == new_color and existing_description == new_description
+        return (
+            existing_color == new_color
+            and existing_description == new_description
+        )
 
     def create_all_labels(self, repositories: List[str] = None) -> None:
         """Create labels across all repositories."""
         if repositories is None:
-            repositories = ["subtitle-manager", "gcommon", "ghcommon", "codex-cli"]
+            repositories = [
+                "subtitle-manager",
+                "gcommon",
+                "ghcommon",
+                "codex-cli",
+            ]
 
         self.logger.info("🏷️ Creating labels across repositories...")
 
@@ -1170,9 +1307,13 @@ class UnifiedGitHubProjectManager:
                         continue
 
                 # Create new label
-                success = self._create_label(repository, label_name, label_config)
+                success = self._create_label(
+                    repository, label_name, label_config
+                )
                 if success:
-                    self.logger.info(f"✅ Created label '{label_name}' in {repository}")
+                    self.logger.info(
+                        f"✅ Created label '{label_name}' in {repository}"
+                    )
                 else:
                     self.logger.error(
                         f"❌ Failed to create label '{label_name}' in {repository}"
@@ -1281,9 +1422,16 @@ class UnifiedGitHubProjectManager:
     def cleanup_orphaned_labels(self, repositories: List[str] = None) -> None:
         """Remove labels that are not in the current definition."""
         if repositories is None:
-            repositories = ["subtitle-manager", "gcommon", "ghcommon", "codex-cli"]
+            repositories = [
+                "subtitle-manager",
+                "gcommon",
+                "ghcommon",
+                "codex-cli",
+            ]
 
-        self.logger.info("🧹 Cleaning up orphaned labels across repositories...")
+        self.logger.info(
+            "🧹 Cleaning up orphaned labels across repositories..."
+        )
 
         label_definitions = self._get_label_definitions()
         defined_labels = set(label_definitions.keys())
@@ -1325,9 +1473,16 @@ class UnifiedGitHubProjectManager:
     def report_orphaned_labels(self, repositories: List[str] = None) -> None:
         """Report on labels that exist but are not in the current definition."""
         if repositories is None:
-            repositories = ["subtitle-manager", "gcommon", "ghcommon", "codex-cli"]
+            repositories = [
+                "subtitle-manager",
+                "gcommon",
+                "ghcommon",
+                "codex-cli",
+            ]
 
-        self.logger.info("📊 Reporting on orphaned labels across repositories...")
+        self.logger.info(
+            "📊 Reporting on orphaned labels across repositories..."
+        )
 
         label_definitions = self._get_label_definitions()
         defined_labels = set(label_definitions.keys())
@@ -1338,7 +1493,9 @@ class UnifiedGitHubProjectManager:
         print("ORPHANED LABELS REPORT")
         print("=" * 80)
         print(f"Labels defined in configuration: {len(defined_labels)}")
-        print(f"Default GitHub labels (preserved): {len(default_github_labels)}")
+        print(
+            f"Default GitHub labels (preserved): {len(default_github_labels)}"
+        )
         print("-" * 80)
 
         for repository in repositories:
@@ -1364,7 +1521,9 @@ class UnifiedGitHubProjectManager:
                 for label_name in sorted(orphaned_labels):
                     label_info = existing_labels[label_name]
                     color = label_info.get("color", "unknown")
-                    description = label_info.get("description", "no description")
+                    description = label_info.get(
+                        "description", "no description"
+                    )
                     print(f"      - '{label_name}' (#{color}): {description}")
 
             # Also show which default GitHub labels are present (for info)
@@ -1374,7 +1533,9 @@ class UnifiedGitHubProjectManager:
                 )
 
         print("\n" + "=" * 80)
-        print(f"SUMMARY: {total_orphans} total orphaned labels across all repositories")
+        print(
+            f"SUMMARY: {total_orphans} total orphaned labels across all repositories"
+        )
         print(
             f"NOTE: {len(default_github_labels)} default GitHub labels are protected from deletion"
         )
@@ -1383,10 +1544,17 @@ class UnifiedGitHubProjectManager:
             print("Use --interactive-cleanup to review and remove selectively")
         print("=" * 80 + "\n")
 
-    def interactive_cleanup_labels(self, repositories: List[str] = None) -> None:
+    def interactive_cleanup_labels(
+        self, repositories: List[str] = None
+    ) -> None:
         """Interactively clean up orphaned labels."""
         if repositories is None:
-            repositories = ["subtitle-manager", "gcommon", "ghcommon", "codex-cli"]
+            repositories = [
+                "subtitle-manager",
+                "gcommon",
+                "ghcommon",
+                "codex-cli",
+            ]
 
         self.logger.info("🎯 Interactive cleanup of orphaned labels...")
 
@@ -1414,7 +1582,9 @@ class UnifiedGitHubProjectManager:
                 print(f"✅ No orphaned labels found in {repository}")
                 continue
 
-            print(f"🗑️ Found {len(orphaned_labels)} orphaned labels in {repository}")
+            print(
+                f"🗑️ Found {len(orphaned_labels)} orphaned labels in {repository}"
+            )
 
             for label_name in sorted(orphaned_labels):
                 label_info = existing_labels[label_name]
@@ -1430,7 +1600,9 @@ class UnifiedGitHubProjectManager:
                     continue
 
                 while True:
-                    response = input("   Delete this label? [y/N/q]: ").strip().lower()
+                    response = (
+                        input("   Delete this label? [y/N/q]: ").strip().lower()
+                    )
                     if response in ["y", "yes"]:
                         success = self._delete_label(repository, label_name)
                         if success:
@@ -1484,7 +1656,12 @@ class UnifiedGitHubProjectManager:
     def create_all_milestones(self, repositories: List[str] = None) -> None:
         """Create milestones across all repositories."""
         if repositories is None:
-            repositories = ["subtitle-manager", "gcommon", "ghcommon", "codex-cli"]
+            repositories = [
+                "subtitle-manager",
+                "gcommon",
+                "ghcommon",
+                "codex-cli",
+            ]
 
         self.logger.info("📅 Creating milestones across repositories...")
 
@@ -1494,7 +1671,10 @@ class UnifiedGitHubProjectManager:
             self.logger.info(f"Creating milestones for {repository}...")
             existing_milestones = self._get_existing_milestones(repository)
 
-            for milestone_title, milestone_config in milestone_definitions.items():
+            for (
+                milestone_title,
+                milestone_config,
+            ) in milestone_definitions.items():
                 if milestone_title in existing_milestones:
                     if not self.force:
                         self.logger.debug(
@@ -1519,7 +1699,10 @@ class UnifiedGitHubProjectManager:
                     )
 
     def _create_milestone(
-        self, repository: str, milestone_title: str, milestone_config: Dict[str, str]
+        self,
+        repository: str,
+        milestone_title: str,
+        milestone_config: Dict[str, str],
     ) -> bool:
         """Create a single milestone in a repository."""
         if self.dry_run:
@@ -1536,7 +1719,9 @@ class UnifiedGitHubProjectManager:
         }
 
         if "due_date" in milestone_config:
-            milestone_data["due_on"] = f"{milestone_config['due_date']}T23:59:59Z"
+            milestone_data["due_on"] = (
+                f"{milestone_config['due_date']}T23:59:59Z"
+            )
 
         # Use GitHub API to create milestone
         success, output = self._run_gh_command(
@@ -1575,11 +1760,15 @@ class UnifiedGitHubProjectManager:
         # Cross-repository projects
         print("\n🔗 CROSS-REPOSITORY PROJECTS:")
         cross_repo_projects = {
-            k: v for k, v in project_definitions.items() if len(v["repositories"]) > 1
+            k: v
+            for k, v in project_definitions.items()
+            if len(v["repositories"]) > 1
         }
 
         for title, config in cross_repo_projects.items():
-            status = "✅ EXISTS" if title in existing_projects else "❌ NOT CREATED"
+            status = (
+                "✅ EXISTS" if title in existing_projects else "❌ NOT CREATED"
+            )
             print(f"\n  📊 {title} - {status}")
             print(f"     Description: {config['description']}")
             print(f"     Repositories: {', '.join(config['repositories'])}")
@@ -1598,7 +1787,9 @@ class UnifiedGitHubProjectManager:
                 print(f"\n📁 {repo.upper()} PROJECTS:")
                 for title, config in repo_projects.items():
                     status = (
-                        "✅ EXISTS" if title in existing_projects else "❌ NOT CREATED"
+                        "✅ EXISTS"
+                        if title in existing_projects
+                        else "❌ NOT CREATED"
                     )
                     print(f"  📊 {title} - {status}")
                     print(f"     Description: {config['description']}")
@@ -1647,13 +1838,17 @@ class UnifiedGitHubProjectManager:
         )
 
         if self.dry_run:
-            self.logger.info("DRY-RUN: Workflow setup instructions displayed above")
+            self.logger.info(
+                "DRY-RUN: Workflow setup instructions displayed above"
+            )
             return
 
         # Note: Actual GraphQL workflow creation is not yet implemented
         # GitHub's Projects v2 API has limited workflow automation support
         # The instructions above provide manual setup guidance
-        self.logger.info("ℹ️ Workflow setup requires manual configuration in GitHub UI")
+        self.logger.info(
+            "ℹ️ Workflow setup requires manual configuration in GitHub UI"
+        )
         self.logger.info("📋 Follow the detailed instructions displayed above")
 
     def display_workflow_setup_with_repositories(
@@ -1744,7 +1939,9 @@ class UnifiedGitHubProjectManager:
                 print(f"     - Label filters: {', '.join(labels)}")
 
         print("\n" + "=" * 80)
-        print("NOTE: GitHub Projects v2 API has limited workflow automation support.")
+        print(
+            "NOTE: GitHub Projects v2 API has limited workflow automation support."
+        )
         print("Manual setup through the GitHub UI is currently required.")
         print("=" * 80 + "\n")
 
@@ -1816,7 +2013,9 @@ class UnifiedGitHubProjectManager:
             print("\n" + "=" * 60)
             print("AUTO-ADD WORKFLOW CONFIGURATION")
             print("=" * 60)
-            print("Use this configuration in GitHub's built-in project automation:")
+            print(
+                "Use this configuration in GitHub's built-in project automation:"
+            )
             print()
 
             for project_title, labels in workflow_config.items():
@@ -1858,7 +2057,10 @@ Examples:
     )
 
     parser.add_argument(
-        "--force", "-f", action="store_true", help="Force update existing objects"
+        "--force",
+        "-f",
+        action="store_true",
+        help="Force update existing objects",
     )
 
     parser.add_argument(
@@ -1866,7 +2068,9 @@ Examples:
     )
 
     parser.add_argument(
-        "--setup-workflows", action="store_true", help="Setup project workflows only"
+        "--setup-workflows",
+        action="store_true",
+        help="Setup project workflows only",
     )
 
     parser.add_argument(
@@ -1940,7 +2144,9 @@ Examples:
         sys.exit(1)
 
 
-def display_workflow_setup_instructions(workflow_config: Dict[str, List[str]]) -> None:
+def display_workflow_setup_instructions(
+    workflow_config: Dict[str, List[str]],
+) -> None:
     """
     Display clear, actionable instructions for setting up GitHub Project workflows.
 
@@ -1997,8 +2203,12 @@ def display_workflow_setup_instructions(workflow_config: Dict[str, List[str]]) -
     print("\n5. Repeat for each project listed above")
 
     print("\n" + "=" * 80)
-    print("Note: This script does not currently automate the workflow setup directly.")
-    print("      The GitHub Projects API has limited support for workflow automation.")
+    print(
+        "Note: This script does not currently automate the workflow setup directly."
+    )
+    print(
+        "      The GitHub Projects API has limited support for workflow automation."
+    )
     print("      Follow the manual steps above to set up your workflows.")
     print("=" * 80 + "\n")
 

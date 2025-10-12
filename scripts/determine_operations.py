@@ -29,7 +29,9 @@ def check_directory_has_json_files(directory: str) -> int:
     return count
 
 
-def check_for_files(issue_updates_file: str, issue_updates_directory: str) -> dict:
+def check_for_files(
+    issue_updates_file: str, issue_updates_directory: str
+) -> dict:
     """Check for issue update files"""
     has_legacy_file = check_file_exists(issue_updates_file)
     has_update_files = False
@@ -145,7 +147,9 @@ def determine_operations(
         # Scheduled events
         if event_name == "schedule":
             operations.extend(["close-duplicates", "codeql-alerts"])
-            print("  ✓ Added close-duplicates and codeql-alerts (scheduled event)")
+            print(
+                "  ✓ Added close-duplicates and codeql-alerts (scheduled event)"
+            )
 
         # Workflow dispatch can run all operations
         if event_name == "workflow_dispatch":
@@ -207,7 +211,9 @@ def main():
     # Get inputs from environment
     operations_input = os.environ.get("OPERATIONS_INPUT", "auto")
     event_name = os.environ.get("EVENT_NAME", "workflow_dispatch")
-    issue_updates_file = os.environ.get("ISSUE_UPDATES_FILE", "issue_updates.json")
+    issue_updates_file = os.environ.get(
+        "ISSUE_UPDATES_FILE", "issue_updates.json"
+    )
     issue_updates_directory = os.environ.get(
         "ISSUE_UPDATES_DIRECTORY", ".github/issue-updates"
     )
@@ -228,7 +234,9 @@ def main():
 
     # Set outputs
     set_github_output("operations", operations_json)
-    set_github_output("has_issue_updates", str(file_check["has_issue_updates"]).lower())
+    set_github_output(
+        "has_issue_updates", str(file_check["has_issue_updates"]).lower()
+    )
 
     if operations:
         print(f"🎯 Final operations to run: {', '.join(operations)}")

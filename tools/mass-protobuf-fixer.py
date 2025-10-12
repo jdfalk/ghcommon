@@ -42,7 +42,9 @@ class MassProtobufFixer:
                 if f'import "{unused_import}"' in line:
                     should_remove = True
                     self.fixes_applied += 1
-                    print(f"Removing unused import: {line.strip()} from {proto_file}")
+                    print(
+                        f"Removing unused import: {line.strip()} from {proto_file}"
+                    )
                     break
 
             if not should_remove:
@@ -70,9 +72,14 @@ class MassProtobufFixer:
             new_name = fix["new"]
             # Replace enum value declarations
             content = re.sub(rf"\b{re.escape(old_name)}\b", new_name, content)
-            if old_name in original_content and new_name not in original_content:
+            if (
+                old_name in original_content
+                and new_name not in original_content
+            ):
                 self.fixes_applied += 1
-                print(f"Fixed enum prefix: {old_name} -> {new_name} in {proto_file}")
+                print(
+                    f"Fixed enum prefix: {old_name} -> {new_name} in {proto_file}"
+                )
 
         if content != original_content:
             with open(proto_file, "w", encoding="utf-8") as f:
@@ -109,7 +116,9 @@ class MassProtobufFixer:
             dir_path = self.repo_root / proto_dir
             if dir_path.exists():
                 for proto_file in dir_path.glob("*.proto"):
-                    self.remove_unused_imports_from_file(proto_file, imports_to_remove)
+                    self.remove_unused_imports_from_file(
+                        proto_file, imports_to_remove
+                    )
 
     def fix_all_buf_lint_issues(self):
         """Fix all issues identified by buf lint."""
@@ -164,7 +173,9 @@ class MassProtobufFixer:
             print("SUCCESS: All buf lint issues fixed!")
             return True
         else:
-            print(f"Still have {len(result.stderr.split('\\n'))} issues remaining")
+            print(
+                f"Still have {len(result.stderr.split('\\n'))} issues remaining"
+            )
             return False
 
     def fix_unused_import_line(self, line: str):
@@ -176,7 +187,9 @@ class MassProtobufFixer:
         if match:
             proto_file_path = self.repo_root / match.group(1)
             unused_import = match.group(2)
-            self.remove_unused_imports_from_file(proto_file_path, [unused_import])
+            self.remove_unused_imports_from_file(
+                proto_file_path, [unused_import]
+            )
 
     def fix_enum_prefix_line(self, line: str):
         """Fix a single enum prefix line."""

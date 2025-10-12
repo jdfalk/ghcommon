@@ -1,0 +1,262 @@
+# file: .github/workflows/ci-tests.yml
+# version: 1.0.0
+# guid: ci-tests-workflow-2025-automation
+
+name: CI Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+      python: ${{ steps.filter.outputs.python }}
+      javascript: ${{ steps.filter.outputs.javascript }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            rust:
+              - 'src/**/*.rs'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+            python:
+              - 'scripts/**/*.py'
+              - 'tests/**/*.py'
+              - 'pyproject.toml'
+              - 'requirements*.txt'
+            javascript:
+              - 'src/**/*.{js,jsx,ts,tsx}'
+              - 'package*.json'
+              - 'yarn.lock'
+              - 'pnpm-lock.yaml'
+            docs:
+              - 'docs/**'
+              - '**/*.md'
+              - '.github/workflows/**'
+
+  rust-tests:
+    name: Rust Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.rust == 'true' || github.event_name == 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, beta, nightly]
+        exclude:
+          - os: macos-latest
+            rust: nightly
+          - os: windows-latest
+            rust: nightly
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.rust == 'nightly' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust ${{ matrix.rust }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: rustfmt, clippy
+
+      - name: Restore cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ runner.os }}-${{ matrix.rust }}
+
+      - name: Format check
+        if: matrix.rust == 'stable'
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo fmt --all -- --check
+          fi
+
+      - name: Clippy lint
+        if: matrix.rust == 'stable'
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo clippy --all-targets --all-features -- -D warnings
+          fi
+
+      - name: Run cargo tests
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo test --all-targets --all-features -- --nocapture
+          else
+            echo "No Cargo.toml found; skipping Rust tests."
+          fi
+
+  rust-benchmarks:
+    name: Rust Benchmarks
+    needs: rust-tests
+    if: needs.rust-tests.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Restore cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run cargo benchmarks
+        id: run-bench
+        continue-on-error: true
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo bench -- --output-format bencher | tee benchmark-results.txt
+          else
+            echo "No Cargo.toml found; skipping benchmarks." > benchmark-results.txt
+          fi
+
+      - name: Upload benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-benchmarks
+          path: benchmark-results.txt
+
+  python-tests:
+    name: Python Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.python == 'true' || github.event_name == 'schedule'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f "pyproject.toml" ]; then
+            pip install -e ".[dev]" || true
+          fi
+
+      - name: Lint scripts
+        run: |
+          if command -v ruff >/dev/null 2>&1; then
+            ruff --version
+          else
+            pip install ruff
+          fi
+          if command -v black >/dev/null 2>&1; then
+            black --version
+          else
+            pip install black
+          fi
+          if find scripts -name "*.py" -o -path "tests/*.py" | head -1 | grep -q .; then
+            black --check scripts tests || true
+            ruff check scripts tests || true
+          else
+            echo "No Python sources detected for linting."
+          fi
+
+      - name: Run pytest
+        run: |
+          if find . -name "test_*.py" -o -path "tests/*.py" | head -1 | grep -q .; then
+            pip install pytest pytest-cov || true
+            pytest -m "not slow" --maxfail=1 --disable-warnings -q || true
+          else
+            echo "No Python tests discovered."
+          fi
+
+  javascript-tests:
+    name: JavaScript / TypeScript Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.javascript == 'true' || github.event_name == 'schedule'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20, 22]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          else
+            echo "No package.json present; skipping."
+          fi
+
+      - name: Run linters
+        run: |
+          if [ -f package.json ] && npm run | grep -q lint; then
+            npm run lint || true
+          else
+            echo "No lint script defined."
+          fi
+
+      - name: Run unit tests
+        run: |
+          if [ -f package.json ] && npm run | grep -q test; then
+            npm test -- --watch=false --ci || npm test || true
+          else
+            echo "No test script defined."
+          fi
+
+  ci-summary:
+    name: Test Summary
+    needs:
+      - detect-changes
+      - rust-tests
+      - rust-benchmarks
+      - python-tests
+      - javascript-tests
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize results
+        run: |
+          echo "## CI Test Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Job | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rust Tests | ${{ needs.rust-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rust Benchmarks | ${{ needs.rust-benchmarks.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Python Tests | ${{ needs.python-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| JavaScript Tests | ${{ needs.javascript-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
