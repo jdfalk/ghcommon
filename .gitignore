@@ -688,8 +688,11 @@ logs/
 
 
 # Exclude test harness assets
-.github/test-files/
-.github/test-configs/
+# .github/test-files/
+# Track test config files but ignore logs/output
+.github/test-configs/*.log
+# .github/test-configs/*.txt
+.github/test-configs/output/
 
 # Workflow debugging output (should not be committed)
 scripts/workflow-debug-output/
