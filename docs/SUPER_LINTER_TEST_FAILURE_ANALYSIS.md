@@ -4,8 +4,8 @@
 
 # Super Linter Test Workflow Failure Analysis & Resolution
 
-**Status**: ✅ RESOLVED  
-**Date**: 2025-10-12  
+**Status**: ✅ RESOLVED
+**Date**: 2025-10-12
 **Workflow**: `.github/workflows/test-super-linter.yml`
 
 ---
@@ -171,20 +171,20 @@ RUST_CONFIG_FILE=rustfmt.toml  # ← ADDED
 
 Based on ghcommon repository structure and Super Linter requirements:
 
-| Linter | Config Variable | File Location |
-|--------|----------------|---------------|
-| ESLint (JS) | `JAVASCRIPT_ES_CONFIG_FILE` | `.eslintrc.yml` |
-| ESLint (TS) | `TYPESCRIPT_ES_CONFIG_FILE` | `.eslintrc.yml` |
-| Prettier (JS) | `JAVASCRIPT_PRETTIER_CONFIG_FILE` | `.prettierrc.json` |
-| Prettier (TS) | `TYPESCRIPT_PRETTIER_CONFIG_FILE` | `.prettierrc.json` |
-| Python Black | `PYTHON_BLACK_CONFIG_FILE` | `.python-black` |
-| Python Pylint | `PYTHON_PYLINT_CONFIG_FILE` | `.pylintrc` |
-| Python isort | `PYTHON_ISORT_CONFIG_FILE` | `.isort.cfg` |
-| Markdownlint | `MARKDOWN_CONFIG_FILE` | `.markdownlint.json` |
-| yamllint | `YAML_CONFIG_FILE` | `.yaml-lint.yml` |
-| golangci-lint | `GO_CONFIG_FILE` | `.golangci.yml` |
-| Rust Clippy | `RUST_CLIPPY_CONFIG_FILE` | `clippy.toml` |
-| Rust rustfmt | `RUST_CONFIG_FILE` | `rustfmt.toml` |
+| Linter        | Config Variable                   | File Location        |
+| ------------- | --------------------------------- | -------------------- |
+| ESLint (JS)   | `JAVASCRIPT_ES_CONFIG_FILE`       | `.eslintrc.yml`      |
+| ESLint (TS)   | `TYPESCRIPT_ES_CONFIG_FILE`       | `.eslintrc.yml`      |
+| Prettier (JS) | `JAVASCRIPT_PRETTIER_CONFIG_FILE` | `.prettierrc.json`   |
+| Prettier (TS) | `TYPESCRIPT_PRETTIER_CONFIG_FILE` | `.prettierrc.json`   |
+| Python Black  | `PYTHON_BLACK_CONFIG_FILE`        | `.python-black`      |
+| Python Pylint | `PYTHON_PYLINT_CONFIG_FILE`       | `.pylintrc`          |
+| Python isort  | `PYTHON_ISORT_CONFIG_FILE`        | `.isort.cfg`         |
+| Markdownlint  | `MARKDOWN_CONFIG_FILE`            | `.markdownlint.json` |
+| yamllint      | `YAML_CONFIG_FILE`                | `.yaml-lint.yml`     |
+| golangci-lint | `GO_CONFIG_FILE`                  | `.golangci.yml`      |
+| Rust Clippy   | `RUST_CLIPPY_CONFIG_FILE`         | `clippy.toml`        |
+| Rust rustfmt  | `RUST_CONFIG_FILE`                | `rustfmt.toml`       |
 
 ---
 

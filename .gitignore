@@ -686,3 +686,7 @@ go.work.sum
 # Task logs
 logs/
 
+
+# Exclude test harness assets
+.github/test-files/
+.github/test-configs/

@@ -169,6 +169,7 @@ jobs:
       - name: Detect project languages and generate matrices
         id: detect
         env:
+          REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
           SKIP_LANGUAGE_DETECTION: ${{ inputs.skip-language-detection }}
           BUILD_TARGET: ${{ inputs.build-target || 'all' }}
           GO_ENABLED: ${{ inputs.go-enabled && 'true' || 'auto' }}
@@ -178,7 +179,7 @@ jobs:
           DOCKER_ENABLED: ${{ inputs.docker-enabled && 'true' || 'auto' }}
           PROTOBUF_ENABLED: ${{ inputs.protobuf-enabled && 'true' || 'auto' }}
         run: |
-          bash "$GHCOMMON_SCRIPTS_DIR/detect-languages.sh"
+          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" detect-languages
 
       - name: Determine release strategy based on branch
         id: release-strategy
@@ -187,7 +188,7 @@ jobs:
           INPUT_PRERELEASE: ${{ inputs.prerelease }}
           INPUT_DRAFT: ${{ inputs.draft }}
         run: |
-          bash "$GHCOMMON_SCRIPTS_DIR/release-strategy.sh"
+          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" release-strategy
 
       - name: Generate semantic release version
         id: version
@@ -197,7 +198,7 @@ jobs:
           AUTO_PRERELEASE: ${{ steps.release-strategy.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ steps.release-strategy.outputs.auto-draft }}
         run: |
-          bash "$GHCOMMON_SCRIPTS_DIR/generate-version.sh"
+          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" generate-version
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -336,7 +337,7 @@ jobs:
           AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft }}
         run: |
-          bash "$GHCOMMON_SCRIPTS_DIR/generate-changelog.sh"
+          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" generate-changelog
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5

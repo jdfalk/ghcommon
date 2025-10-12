@@ -1,0 +1,23 @@
+{
+  "threshold": 5,
+  "reporters": ["html", "console"],
+  "ignore": [
+    "**/.github/instructions/**",
+    "**/*.instructions.md",
+    "**/templates/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/target/**",
+    "**/pkg/**"
+  ],
+  "format": ["**/*.md", "**/*.js", "**/*.ts", "**/*.go", "**/*.py", "**/*.rs"],
+  "minLines": 5,
+  "minTokens": 50,
+  "maxLines": 500,
+  "maxSize": "100kb"
+}
