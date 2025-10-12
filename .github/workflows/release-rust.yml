@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.8.1
+# version: 1.9.1
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 
 name: Rust Release Build
@@ -231,8 +231,8 @@ jobs:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ matrix.target }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-cargo-registry-${{ matrix.target }}-
-            ${{ runner.os }}-cargo-registry-
+            ${{ runner.os }}-cargo-registry-${{ matrix.target }}
+            ${{ runner.os }}-cargo-registry
 
       - name: Cache cargo index
         uses: actions/cache@v4
@@ -240,8 +240,8 @@ jobs:
           path: ~/.cargo/git
           key: ${{ runner.os }}-cargo-index-${{ matrix.target }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-cargo-index-${{ matrix.target }}-
-            ${{ runner.os }}-cargo-index-
+            ${{ runner.os }}-cargo-index-${{ matrix.target }}
+            ${{ runner.os }}-cargo-index
 
       - name: Cache cargo build
         uses: actions/cache@v4
@@ -249,8 +249,8 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-cargo-build-${{ matrix.target }}-
-            ${{ runner.os }}-cargo-build-
+            ${{ runner.os }}-cargo-build-${{ matrix.target }}
+            ${{ runner.os }}-cargo-build
 
       - name: Run Clippy
         if: matrix.primary
@@ -287,3 +287,238 @@ jobs:
         with:
           name: rust-${{ matrix.name }}
           path: dist/
+
+  publish-rust-crate:
+    name: Publish Rust Crate
+    runs-on: ubuntu-latest
+    needs: build-rust
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Collect crate metadata
+        id: crate-metadata
+        run: |
+          python3 .github/workflows/scripts/collect_rust_crate_metadata.py
+
+      - name: Align crate version with release input
+        id: resolved-version
+        env:
+          INPUT_RELEASE_VERSION: ${{ inputs.release-version }}
+          CRATE_NAME: ${{ steps.crate-metadata.outputs.crate-name }}
+          CURRENT_VERSION: ${{ steps.crate-metadata.outputs.crate-version }}
+        run: |
+          set -euo pipefail
+
+          crate_name="${CRATE_NAME}"
+          current_version="${CURRENT_VERSION}"
+          target_version="${CURRENT_VERSION}"
+
+          if [[ -n "${INPUT_RELEASE_VERSION}" ]]; then
+            stripped="${INPUT_RELEASE_VERSION#v}"
+            stripped="${stripped#V}"
+            if [[ -n "${stripped}" ]]; then
+              target_version="${stripped}"
+            fi
+          fi
+
+          if [[ "${target_version}" != "${current_version}" ]]; then
+            echo "Updating crate version from ${current_version} to ${target_version}"
+            if ! command -v cargo-set-version >/dev/null 2>&1; then
+              cargo install cargo-set-version --locked
+            fi
+            cargo set-version "${target_version}"
+          else
+            echo "Crate version already ${target_version}"
+          fi
+
+          tag_ref="${GITHUB_REF#refs/tags/}"
+          tag_version="${tag_ref#v}"
+          if [[ "${tag_version}" != "${target_version}" ]]; then
+            echo "::warning::Git tag (${tag_version}) does not match crate version (${target_version})"
+          else
+            echo "Tag matches crate version (${tag_version})"
+          fi
+
+          {
+            echo "CRATE_NAME=${crate_name}"
+            echo "CRATE_VERSION=${target_version}"
+          } >> "${GITHUB_ENV}"
+
+          echo "crate-name=${crate_name}" >> "${GITHUB_OUTPUT}"
+          echo "crate-version=${target_version}" >> "${GITHUB_OUTPUT}"
+          echo "tag-version=${tag_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure Cargo for GitHub Packages
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 .github/workflows/scripts/configure_cargo_registry.py
+
+      - name: Check if version already published
+        id: check-published
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          crate="${CRATE_NAME}"
+          version="${CRATE_VERSION}"
+          owner="${OWNER}"
+
+          already="false"
+          resolved_scope="unknown"
+
+          for scope in orgs users; do
+            api_url="https://api.github.com/${scope}/${owner}/packages/cargo/${crate}/versions"
+            echo "Checking ${api_url}..."
+
+            response="$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" -w "HTTPSTATUS:%{http_code}" "${api_url}" || true)"
+
+            http_status="${response##*HTTPSTATUS:}"
+            body="${response%HTTPSTATUS:*}"
+
+            if [[ "${http_status}" == "200" ]]; then
+              resolved_scope="${scope}"
+              versions="$(echo "${body}" | jq -r '.[].name // empty')"
+              if [[ -n "${versions}" ]]; then
+                echo "Found published versions:"
+                echo "${versions}" | head -10 | sed 's/^/  - /'
+                if echo "${versions}" | grep -qx "${version}"; then
+                  echo "⚠️  Version ${version} already published"
+                  already="true"
+                fi
+              else
+                echo "No versions reported yet."
+              fi
+              break
+            elif [[ "${http_status}" == "404" ]]; then
+              echo "Package not found under ${scope}. Trying next scope..."
+            else
+              echo "::warning::Unexpected response (${http_status}) while checking ${scope} scope"
+            fi
+          done
+
+          echo "already-published=${already}" >> "${GITHUB_OUTPUT}"
+          echo "registry-scope=${resolved_scope}" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish crate to GitHub Packages
+        if: steps.check-published.outputs.already-published != 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "📤 Publishing ${CRATE_NAME}@${CRATE_VERSION} to GitHub Package Registry"
+          cargo publish \
+            --registry github \
+            --verbose \
+            --allow-dirty \
+            --no-verify
+          echo "✅ Publish command completed"
+
+      - name: Verify publication
+        if: steps.check-published.outputs.already-published != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          crate="${CRATE_NAME}"
+          owner="${OWNER}"
+          scope="${{ steps.check-published.outputs.registry-scope }}"
+
+          if [[ "${scope}" == "unknown" ]]; then
+            scopes=(orgs users)
+          else
+            scopes=("${scope}")
+          fi
+
+          for attempt in {1..5}; do
+            for sc in "${scopes[@]}"; do
+              api_url="https://api.github.com/${sc}/${owner}/packages/cargo/${crate}"
+              echo "Attempt ${attempt}/5 checking ${api_url}"
+
+              response="$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github+json" -w "HTTPSTATUS:%{http_code}" "${api_url}" || true)"
+
+              http_status="${response##*HTTPSTATUS:}"
+              body="${response%HTTPSTATUS:*}"
+
+              if [[ "${http_status}" == "200" ]]; then
+                echo "✅ Package visible in registry (${sc})"
+                echo "Package details:"
+                echo "${body}" | jq -r '"  Name: \(.name)\n  Visibility: \(.visibility)\n  URL: \(.html_url)"'
+                exit 0
+              fi
+            done
+
+            if [[ "${attempt}" -lt 5 ]]; then
+              echo "Package not visible yet. Waiting 10 seconds..."
+              sleep 10
+            fi
+          done
+
+          echo "::warning::Package ${crate} not yet visible via API. It may take a few minutes to propagate."
+
+      - name: Skip publication (already published)
+        if: steps.check-published.outputs.already-published == 'true'
+        run: |
+          echo "ℹ️  Skipping publish because ${CRATE_NAME}@${CRATE_VERSION} already exists."
+          echo "Check https://github.com/${{ github.repository }}/packages for details."
+
+      - name: Create publication summary
+        if: always()
+        run: |
+          status="${{ job.status }}"
+          already="${{ steps.check-published.outputs.already-published }}"
+
+          {
+            echo "# 📦 Rust Crate Publication"
+            echo ""
+            echo "- **Crate**: \`${CRATE_NAME}\`"
+            echo "- **Version**: \`${CRATE_VERSION}\`"
+            echo "- **Repository**: \`${{ github.repository }}\`"
+            echo "- **Tag**: \`${GITHUB_REF#refs/tags/}\`"
+            echo ""
+            if [[ "${already}" == "true" ]]; then
+              echo "**Status:** ⏭️ Skipped (version already published)"
+            elif [[ "${status}" == "success" ]]; then
+              echo "**Status:** ✅ Published to GitHub Packages"
+            else
+              echo "**Status:** ❌ Publication failed"
+            fi
+            echo ""
+            echo "## 🔗 Useful Links"
+            echo "- Package listing: https://github.com/${{ github.repository }}/packages"
+            echo "- Registry index: https://api.github.com/${{ github.repository }}/cargo/"
+            echo "- Release tag: https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}"
+            echo ""
+            echo "## 📚 Consuming the crate"
+            echo "\`\`\`toml"
+            echo "${CRATE_NAME} = \"${CRATE_VERSION}\""
+            echo "\`\`\`"
+            echo ""
+            echo "Configure \`.cargo/config.toml\`:"
+            echo "\`\`\`toml"
+            echo "[registries.github]"
+            echo "index = \"sparse+https://api.github.com/${{ github.repository }}/cargo/\""
+            echo "\`\`\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
