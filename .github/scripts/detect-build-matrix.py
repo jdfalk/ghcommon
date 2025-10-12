@@ -71,15 +71,28 @@ def detect_build_requirements():
 
     # Check for Python projects
     if any(
-        os.path.exists(f) for f in ["pyproject.toml", "requirements.txt", "setup.py"]
+        os.path.exists(f)
+        for f in ["pyproject.toml", "requirements.txt", "setup.py"]
     ) or check_file_exists("*.py"):
         print("Python project detected")
         flags["has_python"] = True
         matrices["python"] = {
             "include": [
-                {"python-version": "3.13", "os": "ubuntu-latest", "primary": True},
-                {"python-version": "3.13", "os": "macos-latest", "primary": False},
-                {"python-version": "3.13", "os": "windows-latest", "primary": False},
+                {
+                    "python-version": "3.13",
+                    "os": "ubuntu-latest",
+                    "primary": True,
+                },
+                {
+                    "python-version": "3.13",
+                    "os": "macos-latest",
+                    "primary": False,
+                },
+                {
+                    "python-version": "3.13",
+                    "os": "windows-latest",
+                    "primary": False,
+                },
             ]
         }
 
@@ -155,7 +168,11 @@ def detect_build_requirements():
                 matrices["frontend"] = {
                     "include": [
                         {"node-version": "20", "os": "ubuntu-latest"},
-                        {"node-version": "22", "os": "ubuntu-latest", "primary": True},
+                        {
+                            "node-version": "22",
+                            "os": "ubuntu-latest",
+                            "primary": True,
+                        },
                         {"node-version": "24", "os": "ubuntu-latest"},
                         {"node-version": "22", "os": "macos-latest"},
                         {"node-version": "22", "os": "windows-latest"},
@@ -180,7 +197,9 @@ def detect_build_requirements():
         print("Docker project detected")
         flags["has_docker"] = True
         # Use docker-detect.py script for detailed Docker configuration
-        success, output = run_command("python3 .github/scripts/docker-detect.py")
+        success, output = run_command(
+            "python3 .github/scripts/docker-detect.py"
+        )
         if success:
             print("Docker detection script completed successfully")
             # The docker-detect.py script will set its own outputs
@@ -188,7 +207,11 @@ def detect_build_requirements():
             print("Docker detection script failed, using basic matrix")
             matrices["docker"] = {
                 "include": [
-                    {"platform": "linux/amd64", "os": "ubuntu-latest", "primary": True},
+                    {
+                        "platform": "linux/amd64",
+                        "os": "ubuntu-latest",
+                        "primary": True,
+                    },
                     {"platform": "linux/arm64", "os": "ubuntu-latest"},
                 ]
             }
