@@ -1,5 +1,5 @@
 # file: .github/workflows/release-protobuf.yml
-# version: 1.2.1
+# version: 1.3.0
 # guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
 
 name: Release Protobuf Assets
@@ -16,10 +16,17 @@ on:
         required: false
         type: boolean
         default: false
+      buf-module:
+        description: "Override Buf module path (defaults to module declared in buf.yaml)"
+        required: false
+        type: string
     outputs:
       artifacts-available:
         description: "Indicates protobuf artifacts were generated (or existed)"
         value: ${{ jobs.generate.outputs.artifacts_available }}
+      buf-published:
+        description: "Indicates Buf push attempted"
+        value: ${{ jobs.publish-buf.outputs.buf_published }}
 
 env:
   GO_VERSION: "1.23.x"
@@ -121,3 +128,106 @@ jobs:
           else
             echo "artifacts_available=false" >> "$GITHUB_OUTPUT"
           fi
+
+  publish-buf:
+    name: Publish Buf Module
+    runs-on: ubuntu-latest
+    needs: generate
+    if: needs.generate.outputs.artifacts_available == 'true'
+    env:
+      BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+      BUF_MODULE_INPUT: ${{ inputs.buf-module }}
+    outputs:
+      buf_published: ${{ steps.summary.outputs.buf_published }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check Buf token
+        id: token
+        run: |
+          if [ -n "${BUF_TOKEN}" ]; then
+            echo "has-token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-token=false" >> "$GITHUB_OUTPUT"
+            echo "BUF_TOKEN secret is not configured; skipping Buf publish."
+          fi
+
+      - name: Install buf CLI
+        if: steps.token.outputs['has-token'] == 'true'
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Resolve Buf module
+        if: steps.token.outputs['has-token'] == 'true'
+        id: module
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          module="${BUF_MODULE_INPUT}"
+          if [ -z "${module}" ] && [ -f "buf.yaml" ]; then
+            module=$(grep -E '^[[:space:]]*module:' buf.yaml | head -1 | awk '{print $2}')
+          fi
+
+          if [ -z "${module}" ]; then
+            echo "::error::Unable to determine Buf module path. Set inputs.buf-module or ensure buf.yaml contains a module entry."
+            exit 1
+          fi
+
+          echo "module=${module}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish module to Buf
+        if: steps.token.outputs['has-token'] == 'true'
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${GITHUB_REF#refs/tags/}"
+          if [ "${tag}" = "${GITHUB_REF}" ]; then
+            echo "::error::Buf publishing requires a tag trigger."
+            exit 1
+          fi
+
+          module="${{ steps.module.outputs.module }}"
+          echo "Publishing Buf module ${module} with tag ${tag}"
+
+          buf registry login --token "${BUF_TOKEN}"
+          buf push --tag "${tag}"
+
+      - name: Buf publish summary
+        id: summary
+        if: always()
+        shell: bash
+        env:
+          HAS_TOKEN: ${{ steps.token.outputs['has-token'] }}
+          MODULE_PATH: ${{ steps.module.outputs.module }}
+          PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
+        run: |
+          status="skipped"
+          message="- Skipped: BUF_TOKEN secret not configured."
+
+          if [ "${HAS_TOKEN}" = "true" ]; then
+            case "${PUBLISH_OUTCOME}" in
+              success)
+                status="success"
+                tag="${GITHUB_REF#refs/tags/}"
+                message="- ✅ Published Buf module \`${MODULE_PATH}\` with tag \`${tag}\`."
+                ;;
+              failure)
+                status="failed"
+                message="- ❌ Buf push failed. See logs above."
+                ;;
+              *)
+                status="skipped"
+                message="- Skipped: Buf publish step did not run."
+                ;;
+            esac
+          fi
+
+          echo "## Buf Module Publishing" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "${message}" >> "$GITHUB_STEP_SUMMARY"
+          echo "buf_published=${status}" >> "$GITHUB_OUTPUT"
