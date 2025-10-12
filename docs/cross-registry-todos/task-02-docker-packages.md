@@ -1,8 +1,15 @@
 <!-- file: docs/cross-registry-todos/task-02-docker-packages.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t02-docker-verify-b2c3d4e5-f6a7-8b9c-0d1e -->
 
 # Task 02: Verify Docker Package Publishing to GitHub Packages
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-docker.yml` v1.2.0 now derives multi-arch targets from
+> inputs, builds a single manifest per release, and uses the resolved image tag for security
+> scans.  
+> **Verification:** Reviewed workflow logic to confirm QEMU/setup-buildx orchestration, artifact
+> tagging, and provenance/SBOM steps operate on the pushed image.
 
 ## Task Overview
 

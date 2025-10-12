@@ -1,8 +1,15 @@
 <!-- file: docs/cross-registry-todos/task-03-rust-packages.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t03-rust-packages-c3d4e5f6-a7b8-9c0d-1e2f -->
 
 # Task 03: Add Rust Crate Publishing to GitHub Packages
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-rust.yml` v1.9.0 introduces a `publish-rust-crate` job
+> that aligns versions with release tags, configures the GitHub Cargo registry, performs
+> duplicate-version checks, and publishes/verifies the crate.  
+> **Verification:** Workflow steps validated to ensure publishing only occurs on tagged releases and
+> summaries surface registry links.
 
 ## Task Overview
 

@@ -1,8 +1,13 @@
 <!-- file: docs/cross-registry-todos/task-01-fix-yaml-syntax.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: t01-yaml-fix-a1b2c3d4-e5f6-7a8b-9c0d -->
 
 # Task 01: Fix YAML Syntax in release-rust.yml
+
+> **Status:** ✅ Completed  
+> **Updated:** `.github/workflows/release-rust.yml` now v1.9.0 with cache `restore-keys` trimmed to
+> prefix values (no trailing hyphen).  
+> **Verification:** Manual inspection of the workflow confirms the fix across all cache blocks.
 
 ## Task Overview
 
