@@ -1,0 +1,110 @@
+# file: .github/workflows/documentation.yml
+# version: 1.0.0
+# guid: docs-automation-workflow-2025
+
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "**/*.md"
+      - ".github/workflows/documentation.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "**/*.md"
+      - ".github/workflows/documentation.yml"
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect documentation toolchain
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          tool="none"
+          if [ -f "mkdocs.yml" ] || [ -f "mkdocs.yaml" ]; then
+            tool="mkdocs"
+          elif [ -f "docs/conf.py" ]; then
+            tool="sphinx"
+          elif [ -f "package.json" ] && jq -e '.scripts.buildDocs' package.json >/dev/null 2>&1; then
+            tool="npm"
+          fi
+          echo "tool=${tool}" >> "$GITHUB_OUTPUT"
+          echo "Detected documentation tool: ${tool}"
+
+      - name: Build with MkDocs
+        if: steps.detect.outputs.tool == 'mkdocs'
+        run: |
+          pip install --upgrade pip
+          pip install mkdocs mkdocs-material
+          mkdocs build --strict --site-dir site
+
+      - name: Build with Sphinx
+        if: steps.detect.outputs.tool == 'sphinx'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install sphinx sphinx-autobuild sphinx-rtd-theme
+          sphinx-build -b html docs/ _build/html
+
+      - name: Build with npm script
+        if: steps.detect.outputs.tool == 'npm'
+        run: |
+          npm ci || npm install
+          npm run buildDocs
+
+      - name: Validate Markdown links
+        run: |
+          pip install --upgrade pip
+          pip install linkchecker
+          if find . -name "*.md" | head -1 | grep -q .; then
+            linkchecker --ignore-url "mailto:" --ignore-url "http://localhost" docs || true
+          else
+            echo "No Markdown files detected in docs/."
+          fi
+
+      - name: Upload documentation artifact
+        if: steps.detect.outputs.tool != 'none'
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-build
+          path: |
+            site
+            _build/html
+          if-no-files-found: ignore
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: build-docs
+    if: needs.build-docs.result == 'success' && github.ref == 'refs/heads/main' && secrets.DOCS_DEPLOY_TOKEN != ''
+    runs-on: ubuntu-latest
+    environment: documentation
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation-build
+          path: docs-build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.DOCS_DEPLOY_TOKEN }}
+          publish_dir: docs-build/site
+          keep_files: true
