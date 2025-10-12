@@ -1,0 +1,62 @@
+# file: .github/test-files/test.yaml
+# version: 1.0.0
+# guid: f5a6b7c8-d9e0-1f2a-3b4c-5d6e7f8a9b0c
+
+# Test YAML File
+# Purpose: Test yamllint configuration
+
+# Valid YAML structure
+name: test-workflow
+version: "1.0.0"
+
+# Configuration object
+config:
+  enabled: true
+  level: info
+  settings:
+    - option1
+    - option2
+    - option3
+
+# Nested structure
+services:
+  database:
+    host: localhost
+    port: 5432
+    credentials:
+      username: admin
+      password: secret
+
+  cache:
+    host: localhost
+    port: 6379
+    ttl: 3600
+
+# List of objects
+users:
+  - name: Alice
+    role: admin
+    active: true
+
+  - name: Bob
+    role: user
+    active: true
+
+  - name: Charlie
+    role: guest
+    active: false
+
+# Multi-line string
+description: |
+  This is a multi-line
+  description that spans
+  multiple lines.
+
+# Inline list
+tags: [test, yaml, validation]
+
+# Boolean values
+flags:
+  debug: false
+  verbose: true
+  strict: false

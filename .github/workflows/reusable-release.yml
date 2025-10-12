@@ -101,21 +101,10 @@ jobs:
 
       - name: Load repository configuration
         id: load-config
+        env:
+          CONFIG_FILE: .github/repository-config.yml
         run: |
-          config_file=".github/repository-config.yml"
-          if [[ -f "$config_file" ]]; then
-            echo "has-config=true" >> $GITHUB_OUTPUT
-            # Convert YAML to JSON for easier parsing in other jobs
-            python3 -c "
-            import yaml, json
-            with open('$config_file') as f:
-                config = yaml.safe_load(f)
-            print('config=' + json.dumps(config, separators=(',', ':')))
-            " >> $GITHUB_OUTPUT
-          else
-            echo "has-config=false" >> $GITHUB_OUTPUT
-            echo "config={}" >> $GITHUB_OUTPUT
-          fi
+          python3 .github/workflows/scripts/load_repository_config.py
 
   # Detect what languages/technologies are present
   detect-languages:

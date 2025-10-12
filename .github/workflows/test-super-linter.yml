@@ -1,0 +1,581 @@
+# file: .github/workflows/test-super-linter.yml
+# version: 1.0.0
+# guid: a9b8c7d6-e5f4-3a2b-1c0d-9e8f7a6b5c4d
+
+name: Test Super Linter Configuration
+
+on:
+    workflow_dispatch:
+        inputs:
+            test_scenario:
+                description: "Test scenario to run"
+                required: true
+                type: choice
+                options:
+                    - "all"
+                    - "minimal"
+                    - "full"
+                    - "autofix"
+                    - "config-paths"
+                    - "filter-patterns"
+                    - "disabled-validators"
+                    - "markdown-only"
+                    - "python-only"
+                    - "javascript-only"
+                    - "rust-only"
+                    - "go-only"
+                    - "yaml-only"
+                default: "all"
+    push:
+        branches:
+            - "test-super-linter/**"
+        paths:
+            - "super-linter-*.env"
+            - ".github/workflows/test-super-linter.yml"
+            - ".github/test-configs/**"
+            - ".github/test-files/**"
+
+permissions:
+    contents: read
+    pull-requests: read
+    statuses: write
+
+jobs:
+    # Job 1: Pre-flight checks and diagnostics
+    preflight:
+        name: Pre-flight Diagnostics
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: List all linter configuration files
+              run: |
+                  echo "=== Linter Configuration Files in Root ==="
+                  ls -la *.env *.yml *.yaml *.json *.toml *rc* 2>/dev/null || echo "No config files found"
+                  echo ""
+                  echo "=== Super Linter Config Files ==="
+                  ls -la super-linter-*.env 2>/dev/null || echo "No super-linter configs found"
+                  echo ""
+                  echo "=== Test Config Files ==="
+                  ls -la .github/test-configs/*.env 2>/dev/null || echo "No test configs found"
+                  echo ""
+                  echo "=== Test Files ==="
+                  ls -la .github/test-files/* 2>/dev/null || echo "No test files found"
+
+            - name: Display Super Linter CI Config
+              run: |
+                  echo "=== super-linter-ci.env Contents ==="
+                  if [ -f "super-linter-ci.env" ]; then
+                    cat super-linter-ci.env
+                  else
+                    echo "File not found!"
+                    exit 1
+                  fi
+
+            - name: Display Super Linter PR Config
+              run: |
+                  echo "=== super-linter-pr.env Contents ==="
+                  if [ -f "super-linter-pr.env" ]; then
+                    cat super-linter-pr.env
+                  else
+                    echo "File not found!"
+                    exit 1
+                  fi
+
+            - name: Check config file versions
+              run: |
+                  echo "=== Configuration File Versions ==="
+                  for file in super-linter-*.env; do
+                    if [ -f "$file" ]; then
+                      echo "File: $file"
+                      grep -E "^# version:" "$file" || echo "No version header found"
+                      echo ""
+                    fi
+                  done
+
+            - name: Verify all CONFIG_FILE variables point to existing files
+              run: |
+                  echo "=== Verifying *_CONFIG_FILE Variables ==="
+                  config_errors=0
+
+                  for env_file in super-linter-*.env; do
+                    echo "Checking $env_file..."
+                    while IFS='=' read -r key value; do
+                      if [[ "$key" =~ _CONFIG_FILE$ ]] && [[ ! "$key" =~ ^# ]]; then
+                        # Remove quotes and whitespace
+                        value=$(echo "$value" | tr -d '"' | xargs)
+                        if [ -n "$value" ]; then
+                          if [ -f "$value" ]; then
+                            echo "  ✅ $key=$value (exists)"
+                          else
+                            echo "  ❌ $key=$value (NOT FOUND)"
+                            config_errors=$((config_errors + 1))
+                          fi
+                        fi
+                      fi
+                    done < "$env_file"
+                    echo ""
+                  done
+
+                  if [ $config_errors -gt 0 ]; then
+                    echo "ERROR: Found $config_errors missing config files"
+                    exit 1
+                  else
+                    echo "SUCCESS: All config files exist"
+                  fi
+
+    # Job 2: Test with minimal configuration
+    test-minimal:
+        name: Test Minimal Config
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'minimal' ||
+            github.event_name == 'push'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Minimal)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  # Minimal validators only
+                  VALIDATE_MARKDOWN: true
+                  VALIDATE_YAML: true
+                  VALIDATE_JSON: true
+                  # Config files
+                  MARKDOWN_CONFIG_FILE: .markdownlint.json
+                  YAML_CONFIG_FILE: .yaml-lint.yml
+                  # Logging
+                  LOG_LEVEL: DEBUG
+                  CREATE_LOG_FILE: true
+
+    # Job 3: Test with full configuration (all validators)
+    test-full:
+        name: Test Full Config
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'full' ||
+            github.event_name == 'push'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Copy CI config for testing
+              run: |
+                  # Use actual super-linter-ci.env as base
+                  cp super-linter-ci.env .github/test-configs/test-full.env || true
+
+            - name: Run Super Linter (Full Config)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  ENV_FILE: super-linter-ci.env
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  LOG_LEVEL: DEBUG
+                  CREATE_LOG_FILE: true
+
+    # Job 4: Test auto-fix mode
+    test-autofix:
+        name: Test Auto-Fix Mode
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'autofix'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Auto-Fix)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  ENV_FILE: super-linter-pr.env
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  LOG_LEVEL: DEBUG
+                  CREATE_LOG_FILE: true
+
+            - name: Check for auto-fixed files
+              run: |
+                  echo "=== Files modified by auto-fix ==="
+                  git status --porcelain || echo "No files modified"
+
+    # Job 5: Test config file path resolution
+    test-config-paths:
+        name: Test Config File Paths
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'config-paths'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Test each config file individually
+              run: |
+                  echo "=== Testing Individual Config Files ==="
+
+                  # Test ESLint config
+                  if [ -f ".eslintrc.yml" ]; then
+                    echo "✅ ESLint config exists: .eslintrc.yml"
+                  else
+                    echo "❌ ESLint config missing: .eslintrc.yml"
+                  fi
+
+                  # Test markdownlint config
+                  if [ -f ".markdownlint.json" ]; then
+                    echo "✅ Markdownlint config exists: .markdownlint.json"
+                  else
+                    echo "❌ Markdownlint config missing: .markdownlint.json"
+                  fi
+
+                  # Test yamllint config
+                  if [ -f ".yaml-lint.yml" ]; then
+                    echo "✅ YAML lint config exists: .yaml-lint.yml"
+                  else
+                    echo "❌ YAML lint config missing: .yaml-lint.yml"
+                  fi
+
+                  # Test Python configs
+                  if [ -f ".pylintrc" ]; then
+                    echo "✅ Pylint config exists: .pylintrc"
+                  else
+                    echo "❌ Pylint config missing: .pylintrc"
+                  fi
+
+                  if [ -f ".python-black" ]; then
+                    echo "✅ Black config exists: .python-black"
+                  else
+                    echo "❌ Black config missing: .python-black"
+                  fi
+
+                  if [ -f "ruff.toml" ]; then
+                    echo "✅ Ruff config exists: ruff.toml"
+                  else
+                    echo "❌ Ruff config missing: ruff.toml"
+                  fi
+
+                  # Test Rust configs
+                  if [ -f "clippy.toml" ]; then
+                    echo "✅ Clippy config exists: clippy.toml"
+                  else
+                    echo "❌ Clippy config missing: clippy.toml"
+                  fi
+
+                  if [ -f "rustfmt.toml" ]; then
+                    echo "✅ Rustfmt config exists: rustfmt.toml"
+                  else
+                    echo "❌ Rustfmt config missing: rustfmt.toml"
+                  fi
+
+                  # Test Go config
+                  if [ -f ".golangci.yml" ]; then
+                    echo "✅ golangci-lint config exists: .golangci.yml"
+                  else
+                    echo "❌ golangci-lint config missing: .golangci.yml"
+                  fi
+
+            - name: Run Super Linter with explicit config paths
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  # Explicitly set all CONFIG_FILE variables
+                  JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.yml
+                  TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.yml
+                  MARKDOWN_CONFIG_FILE: .markdownlint.json
+                  YAML_CONFIG_FILE: .yaml-lint.yml
+                  PYTHON_BLACK_CONFIG_FILE: .python-black
+                  PYTHON_PYLINT_CONFIG_FILE: .pylintrc
+                  RUST_CLIPPY_CONFIG_FILE: clippy.toml
+                  # Enable validators
+                  VALIDATE_JAVASCRIPT_ES: true
+                  VALIDATE_MARKDOWN: true
+                  VALIDATE_YAML: true
+                  VALIDATE_PYTHON_BLACK: true
+                  VALIDATE_PYTHON_PYLINT: true
+                  VALIDATE_RUST_CLIPPY: true
+                  LOG_LEVEL: DEBUG
+
+    # Job 6: Test filter patterns
+    test-filter-patterns:
+        name: Test Filter Patterns
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'filter-patterns'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter with filters
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  # Test filter regex
+                  FILTER_REGEX_EXCLUDE: (vendor/|node_modules/|\.pb\.go$|_pb2\.py$|\.generated\.|\.min\.|\.map$|coverage/|\.tmp/|dist/|build/)
+                  VALIDATE_MARKDOWN: true
+                  VALIDATE_YAML: true
+                  LOG_LEVEL: DEBUG
+
+    # Job 7: Test with disabled validators
+    test-disabled-validators:
+        name: Test Disabled Validators
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'disabled-validators'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Some Disabled)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: false
+                  # Enable only specific validators
+                  VALIDATE_MARKDOWN: true
+                  VALIDATE_YAML: true
+                  # Explicitly disable others
+                  VALIDATE_JAVASCRIPT_ES: false
+                  VALIDATE_PYTHON: false
+                  VALIDATE_GO: false
+                  LOG_LEVEL: DEBUG
+
+    # Job 8: Test Markdown-only validation
+    test-markdown-only:
+        name: Test Markdown Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'markdown-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Markdown Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_MARKDOWN: true
+                  MARKDOWN_CONFIG_FILE: .markdownlint.json
+                  LOG_LEVEL: DEBUG
+
+    # Job 9: Test Python-only validation
+    test-python-only:
+        name: Test Python Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'python-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Python Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_PYTHON_BLACK: true
+                  VALIDATE_PYTHON_PYLINT: true
+                  VALIDATE_PYTHON_FLAKE8: true
+                  VALIDATE_PYTHON_ISORT: true
+                  PYTHON_BLACK_CONFIG_FILE: .python-black
+                  PYTHON_PYLINT_CONFIG_FILE: .pylintrc
+                  LOG_LEVEL: DEBUG
+
+    # Job 10: Test JavaScript/TypeScript validation
+    test-javascript-only:
+        name: Test JavaScript/TypeScript Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'javascript-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (JavaScript/TypeScript Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_JAVASCRIPT_ES: true
+                  VALIDATE_TYPESCRIPT_ES: true
+                  JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.yml
+                  TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.yml
+                  LOG_LEVEL: DEBUG
+
+    # Job 11: Test Rust validation
+    test-rust-only:
+        name: Test Rust Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'rust-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Rust Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_RUST_CLIPPY: true
+                  RUST_CLIPPY_CONFIG_FILE: clippy.toml
+                  LOG_LEVEL: DEBUG
+
+    # Job 12: Test Go validation
+    test-go-only:
+        name: Test Go Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'go-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (Go Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_GO: true
+                  LOG_LEVEL: DEBUG
+
+    # Job 13: Test YAML validation
+    test-yaml-only:
+        name: Test YAML Only
+        runs-on: ubuntu-latest
+        needs: preflight
+        if: |
+            github.event.inputs.test_scenario == 'all' ||
+            github.event.inputs.test_scenario == 'yaml-only'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Run Super Linter (YAML Only)
+              uses: super-linter/super-linter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BRANCH: main
+                  VALIDATE_ALL_CODEBASE: true
+                  VALIDATE_YAML: true
+                  YAML_CONFIG_FILE: .yaml-lint.yml
+                  LOG_LEVEL: DEBUG
+
+    # Job 14: Summary report
+    summary:
+        name: Test Summary
+        runs-on: ubuntu-latest
+        needs:
+            - preflight
+            - test-minimal
+            - test-full
+            - test-autofix
+            - test-config-paths
+            - test-filter-patterns
+            - test-disabled-validators
+            - test-markdown-only
+            - test-python-only
+            - test-javascript-only
+            - test-rust-only
+            - test-go-only
+            - test-yaml-only
+        if: always()
+        steps:
+            - name: Generate test summary
+              run: |
+                  echo "# Super Linter Test Results" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "| Test Scenario | Status |" >> $GITHUB_STEP_SUMMARY
+                  echo "|--------------|--------|" >> $GITHUB_STEP_SUMMARY
+                  echo "| Pre-flight Diagnostics | ${{ needs.preflight.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Minimal Config | ${{ needs.test-minimal.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Full Config | ${{ needs.test-full.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Auto-Fix Mode | ${{ needs.test-autofix.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Config File Paths | ${{ needs.test-config-paths.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Filter Patterns | ${{ needs.test-filter-patterns.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Disabled Validators | ${{ needs.test-disabled-validators.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Markdown Only | ${{ needs.test-markdown-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Python Only | ${{ needs.test-python-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| JavaScript/TypeScript Only | ${{ needs.test-javascript-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Rust Only | ${{ needs.test-rust-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| Go Only | ${{ needs.test-go-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| YAML Only | ${{ needs.test-yaml-only.result }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "## Configuration Details" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "- **Workflow Version**: 1.0.0" >> $GITHUB_STEP_SUMMARY
+                  echo "- **Test Date**: $(date)" >> $GITHUB_STEP_SUMMARY
+                  echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+                  echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "1. Review failed tests (if any)" >> $GITHUB_STEP_SUMMARY
+                  echo "2. Check log files for detailed error messages" >> $GITHUB_STEP_SUMMARY
+                  echo "3. Update configuration files as needed" >> $GITHUB_STEP_SUMMARY
+                  echo "4. Re-run tests to verify fixes" >> $GITHUB_STEP_SUMMARY
+                  echo "5. Document results in SUPER_LINTER_TESTING_RESULTS.md" >> $GITHUB_STEP_SUMMARY

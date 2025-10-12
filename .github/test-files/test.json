@@ -1,0 +1,63 @@
+{
+  "file": ".github/test-files/test.json",
+  "version": "1.0.0",
+  "guid": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "description": "Test JSON file for JSON linting",
+  "name": "test-config",
+  "config": {
+    "enabled": true,
+    "level": "info",
+    "settings": {
+      "option1": "value1",
+      "option2": "value2",
+      "option3": "value3"
+    },
+    "features": ["feature1", "feature2", "feature3"]
+  },
+  "services": {
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "credentials": {
+        "username": "admin",
+        "password": "secret"
+      },
+      "options": {
+        "poolSize": 10,
+        "timeout": 5000
+      }
+    },
+    "cache": {
+      "host": "localhost",
+      "port": 6379,
+      "ttl": 3600
+    }
+  },
+  "users": [
+    {
+      "name": "Alice",
+      "role": "admin",
+      "active": true
+    },
+    {
+      "name": "Bob",
+      "role": "user",
+      "active": true
+    },
+    {
+      "name": "Charlie",
+      "role": "guest",
+      "active": false
+    }
+  ],
+  "flags": {
+    "debug": false,
+    "verbose": true,
+    "strict": false
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T12:00:00Z",
+    "author": "Test User"
+  }
+}
