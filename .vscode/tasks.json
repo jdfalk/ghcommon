@@ -5,7 +5,10 @@
       "label": "Buf Generate with Output",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["buf", "generate"],
+      "args": [
+        "buf",
+        "generate"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -17,7 +20,12 @@
       "label": "Buf Generate Module",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["buf", "generate", "--module", "${input:module}"],
+      "args": [
+        "buf",
+        "generate",
+        "--module",
+        "${input:module}"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -29,7 +37,10 @@
       "label": "Buf Lint with Output",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["buf", "lint"],
+      "args": [
+        "buf",
+        "lint"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -41,7 +52,12 @@
       "label": "Buf Lint Module",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["buf", "lint", "--module", "${input:module}"],
+      "args": [
+        "buf",
+        "lint",
+        "--module",
+        "${input:module}"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -53,7 +69,10 @@
       "label": "Git Add All",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "add"],
+      "args": [
+        "git",
+        "add"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -65,7 +84,11 @@
       "label": "Git Add Selective",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "add", "${input:filePattern}"],
+      "args": [
+        "git",
+        "add",
+        "${input:filePattern}"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -77,7 +100,10 @@
       "label": "Git Push",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "push"],
+      "args": [
+        "git",
+        "push"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -89,7 +115,10 @@
       "label": "Git Status",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "status"],
+      "args": [
+        "git",
+        "status"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -101,7 +130,11 @@
       "label": "Git Add All Auto",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "add", "."],
+      "args": [
+        "git",
+        "add",
+        "."
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -113,7 +146,12 @@
       "label": "Git Commit Auto",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["git", "commit", "-m", "fix: systematic protobuf import fixes"],
+      "args": [
+        "git",
+        "commit",
+        "-m",
+        "fix: systematic protobuf import fixes"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -140,7 +178,12 @@
       "label": "Buf Generate with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["--args-file", "copilot-util-args", "buf", "generate"],
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "buf",
+        "generate"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -152,7 +195,12 @@
       "label": "Buf Lint with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["--args-file", "copilot-util-args", "buf", "lint"],
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "buf",
+        "lint"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -164,7 +212,12 @@
       "label": "Git Add All with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["--args-file", "copilot-util-args", "git", "add"],
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "add"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -176,7 +229,12 @@
       "label": "Git Push with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["--args-file", "copilot-util-args", "git", "push"],
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "push"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -188,7 +246,12 @@
       "label": "Git Status with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": ["--args-file", "copilot-util-args", "git", "status"],
+      "args": [
+        "--args-file",
+        "copilot-util-args",
+        "git",
+        "status"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -257,6 +320,99 @@
         "-m",
         "fix(workflows): remove GITHUB_TOKEN from workflow_call secrets\n\nFixed critical workflow validation error where GITHUB_TOKEN was declared as a secret in workflow_call, which conflicts with GitHub Actions reserved token names.\n\nIssues Addressed:\n\nfix(protobuf-generation): remove GITHUB_TOKEN secret declaration\n- Removed GITHUB_TOKEN from secrets section in workflow_call\n- GITHUB_TOKEN is automatically available in all workflows\n- Fixed 'secret name GITHUB_TOKEN within workflow_call can not be used since it would collide with system reserved name' error\n- Updated workflow version to 2.2.0\n\nResult: Workflow files now validate successfully without GITHUB_TOKEN collision errors. The token remains automatically available via secrets.GITHUB_TOKEN in all workflow steps."
       ]
+    },
+    {
+      "label": "Validate Linter Configs",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/validate-linter-configs.py",
+        "--verbose"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "isBackground": false,
+      "detail": "Validate all linter configuration files against Google Style Guides"
+    },
+    {
+      "label": "Run Super Linter in Docker (CI Mode)",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-e",
+        "RUN_LOCAL=true",
+        "-e",
+        "USE_FIND_ALGORITHM=true",
+        "-e",
+        "VALIDATE_ALL_CODEBASE=true",
+        "-v",
+        "${workspaceFolder}:/tmp/lint:ro",
+        "--env-file",
+        "${workspaceFolder}/super-linter-ci.env",
+        "ghcr.io/super-linter/super-linter:latest"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "isBackground": false,
+      "detail": "Run Super Linter in Docker container with CI configuration"
+    },
+    {
+      "label": "Run Super Linter in Docker (PR Mode)",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-e",
+        "RUN_LOCAL=true",
+        "-e",
+        "USE_FIND_ALGORITHM=true",
+        "-e",
+        "VALIDATE_ALL_CODEBASE=false",
+        "-v",
+        "${workspaceFolder}:/tmp/lint:ro",
+        "--env-file",
+        "${workspaceFolder}/super-linter-pr.env",
+        "ghcr.io/super-linter/super-linter:latest"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "isBackground": false,
+      "detail": "Run Super Linter in Docker container with PR auto-fix configuration"
+    },
+    {
+      "label": "Run Super Linter in Docker (Test Minimal)",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-e",
+        "RUN_LOCAL=true",
+        "-e",
+        "USE_FIND_ALGORITHM=true",
+        "-e",
+        "VALIDATE_ALL_CODEBASE=true",
+        "-v",
+        "${workspaceFolder}:/tmp/lint:ro",
+        "--env-file",
+        "${workspaceFolder}/.github/test-configs/test-minimal.env",
+        "ghcr.io/super-linter/super-linter:latest"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "isBackground": false,
+      "detail": "Run Super Linter in Docker with minimal test configuration"
     }
   ],
   "inputs": [
