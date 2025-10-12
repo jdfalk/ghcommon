@@ -83,10 +83,43 @@ permissions:
   attestations: write
 
 jobs:
+  load-config:
+    name: Load Repository Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      config: ${{ steps.load.outputs.config }}
+      has-config: ${{ steps.load.outputs.has-config }}
+      go-matrix: ${{ steps.matrices.outputs.go-matrix }}
+      python-matrix: ${{ steps.matrices.outputs.python-matrix }}
+      rust-matrix: ${{ steps.matrices.outputs.rust-matrix }}
+      frontend-matrix: ${{ steps.matrices.outputs.frontend-matrix }}
+      coverage-threshold: ${{ steps.matrices.outputs.coverage-threshold }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Load repository configuration
+        id: load
+        env:
+          CONFIG_FILE: .github/repository-config.yml
+        run: python3 .github/workflows/scripts/load_repository_config.py
+
+      - name: Generate language matrices
+        id: matrices
+        env:
+          REPOSITORY_CONFIG: ${{ steps.load.outputs.config }}
+          FALLBACK_GO_VERSION: ${{ inputs.go-version }}
+          FALLBACK_PYTHON_VERSION: ${{ inputs.python-version }}
+          FALLBACK_RUST_VERSION: ${{ inputs.rust-version }}
+          FALLBACK_NODE_VERSION: ${{ inputs.node-version }}
+          FALLBACK_COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+        run: python3 .github/workflows/scripts/ci_workflow.py generate-matrices
+
   # Detect what files changed to optimize workflow execution
   detect-changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    needs: load-config
     outputs:
       go-files: ${{ steps.changes.outputs.go_files }}
       python-files: ${{ steps.changes.outputs.python_files }}
@@ -186,9 +219,14 @@ jobs:
   # Language-specific build and test jobs
   go-ci:
     name: Go CI
-    needs: detect-changes
+    needs: [load-config, detect-changes]
     if: needs.detect-changes.outputs.go-files == 'true'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
+    runs-on: ${{ matrix.os }}
+    env:
+      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -196,7 +234,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version: ${{ matrix.go-version }}
           cache: true
 
       - name: Build Go project
@@ -205,14 +243,19 @@ jobs:
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
         env:
-          COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+          COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
         run: python3 .github/workflows/scripts/ci_workflow.py go-test
 
   python-ci:
     name: Python CI
-    needs: detect-changes
+    needs: [load-config, detect-changes]
     if: needs.detect-changes.outputs.python-files == 'true'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.load-config.outputs.python-matrix) }}
+    runs-on: ${{ matrix.os }}
+    env:
+      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -220,7 +263,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ matrix.python-version }}
           cache: pip
 
       - name: Install Python dependencies
@@ -236,9 +279,14 @@ jobs:
 
   rust-ci:
     name: Rust CI
-    needs: detect-changes
+    needs: [load-config, detect-changes]
     if: needs.detect-changes.outputs.rust-files == 'true'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.load-config.outputs.rust-matrix) }}
+    runs-on: ${{ matrix.os }}
+    env:
+      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -246,7 +294,7 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ inputs.rust-version }}
+          toolchain: ${{ matrix.rust-version }}
           components: rustfmt, clippy
 
       - name: Cache Rust dependencies
@@ -277,9 +325,14 @@ jobs:
 
   frontend-ci:
     name: Frontend CI
-    needs: detect-changes
+    needs: [load-config, detect-changes]
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.load-config.outputs.frontend-matrix) }}
+    runs-on: ${{ matrix.os }}
+    env:
+      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -287,7 +340,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ inputs.node-version }}
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies

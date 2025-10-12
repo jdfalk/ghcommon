@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -12,9 +13,11 @@ import sys
 import textwrap
 import time
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 import requests
+
+_CONFIG_CACHE: dict[str, Any] | None = None
 
 
 def append_to_file(path_env: str, content: str) -> None:
@@ -37,6 +40,33 @@ def append_env(name: str, value: str) -> None:
 
 def append_summary(text: str) -> None:
     append_to_file("GITHUB_STEP_SUMMARY", text)
+
+
+def get_repository_config() -> dict[str, Any]:
+    global _CONFIG_CACHE
+    if _CONFIG_CACHE is not None:
+        return _CONFIG_CACHE
+
+    raw = os.environ.get("REPOSITORY_CONFIG")
+    if not raw:
+        _CONFIG_CACHE = {}
+        return _CONFIG_CACHE
+
+    try:
+        _CONFIG_CACHE = json.loads(raw)
+    except json.JSONDecodeError:
+        print("::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults")
+        _CONFIG_CACHE = {}
+    return _CONFIG_CACHE
+
+
+def _config_path(default: Any, *path: str) -> Any:
+    current: Any = get_repository_config()
+    for key in path:
+        if not isinstance(current, dict) or key not in current:
+            return default
+        current = current[key]
+    return current
 
 
 def debug_filter(_: argparse.Namespace) -> None:
@@ -204,14 +234,18 @@ def go_test(_: argparse.Namespace) -> None:
         return
 
     coverage_file = os.environ.get("COVERAGE_FILE", "coverage.out")
-    threshold = float(os.environ.get("COVERAGE_THRESHOLD", "0"))
+    coverage_html = os.environ.get("COVERAGE_HTML", "coverage.html")
+    threshold_env = os.environ.get("COVERAGE_THRESHOLD")
+    if threshold_env:
+        threshold = float(threshold_env)
+    else:
+        threshold = float(_config_path(0, "testing", "coverage", "threshold") or 0)
 
-    command = ["go", "test", "-v", "-race", f"-coverprofile={coverage_file}", "./..."]
-    subprocess.run(command, check=True)
+    subprocess.run(["go", "test", "-v", "-race", f"-coverprofile={coverage_file}", "./..."], check=True)
 
     go_binary = shutil.which("go") or "go"
     subprocess.run(
-        [go_binary, "tool", "cover", f"-html={coverage_file}", "-o", os.environ.get("COVERAGE_HTML", "coverage.html")],
+        [go_binary, "tool", "cover", f"-html={coverage_file}", "-o", coverage_html],
         check=True,
     )
     result = subprocess.run(
@@ -237,28 +271,65 @@ def go_test(_: argparse.Namespace) -> None:
     print(f"✅ Coverage {coverage}% meets threshold {threshold}%")
 
 
+def check_go_coverage(_: argparse.Namespace) -> None:
+    coverage_file = Path(os.environ.get("COVERAGE_FILE", "coverage.out"))
+    html_output = Path(os.environ.get("COVERAGE_HTML", "coverage.html"))
+    threshold = float(os.environ.get("COVERAGE_THRESHOLD", "0"))
+
+    if not coverage_file.is_file():
+        raise FileNotFoundError(f"{coverage_file} not found")
+
+    go_binary = shutil.which("go") or "go"
+
+    subprocess.run(
+        [go_binary, "tool", "cover", f"-html={coverage_file}", "-o", str(html_output)],
+        check=True,
+    )
+    result = subprocess.run(
+        [go_binary, "tool", "cover", "-func", str(coverage_file)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    total_line = ""
+    for line in result.stdout.splitlines():
+        if line.startswith("total:"):
+            total_line = line
+            break
+
+    if not total_line:
+        raise ValueError("Total coverage line not found in go tool output")
+
+    coverage = _parse_go_coverage(total_line)
+    print(f"Coverage: {coverage}%")
+    if coverage < threshold:
+        raise SystemExit(
+            f"Coverage {coverage}% is below threshold {threshold}%"
+        )
+    print(f"✅ Coverage {coverage}% meets threshold {threshold}%")
+
+
+def _run_command(command: Iterable[str], check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(list(command), check=check)
+
+
 def frontend_install(_: argparse.Namespace) -> None:
     if Path("package-lock.json").is_file():
-        subprocess.run(["npm", "ci"], check=True)
+        _run_command(["npm", "ci"])
     elif Path("yarn.lock").is_file():
-        subprocess.run(["yarn", "install", "--frozen-lockfile"], check=True)
+        _run_command(["yarn", "install", "--frozen-lockfile"])
     elif Path("pnpm-lock.yaml").is_file():
-        subprocess.run(["npm", "install", "-g", "pnpm"], check=True)
-        subprocess.run(["pnpm", "install", "--frozen-lockfile"], check=True)
-    elif Path("package.json").is_file():
-        subprocess.run(["npm", "install"], check=True)
+        _run_command(["npm", "install", "-g", "pnpm"])
+        _run_command(["pnpm", "install", "--frozen-lockfile"])
     else:
-        print("ℹ️ No package.json found; skipping install")
+        _run_command(["npm", "install"])
 
 
 def frontend_run(_: argparse.Namespace) -> None:
     script_name = os.environ.get("FRONTEND_SCRIPT", "")
     success_message = os.environ.get("FRONTEND_SUCCESS_MESSAGE", "Command succeeded")
     failure_message = os.environ.get("FRONTEND_FAILURE_MESSAGE", "Command failed")
-
-    if not Path("package.json").is_file():
-        print("ℹ️ No package.json found; skipping frontend commands")
-        return
 
     if not script_name:
         raise SystemExit("FRONTEND_SCRIPT environment variable is required")
@@ -276,52 +347,29 @@ def python_install(_: argparse.Namespace) -> None:
 
     if Path("requirements.txt").is_file():
         subprocess.run([python, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
-    if Path("requirements-dev.txt").is_file():
-        subprocess.run([python, "-m", "pip", "install", "-r", "requirements-dev.txt"], check=True)
-    if Path("pyproject.toml").is_file() or Path("setup.py").is_file():
+
+    if Path("pyproject.toml").is_file():
         subprocess.run([python, "-m", "pip", "install", "-e", "."], check=True)
 
-
-def python_lint(_: argparse.Namespace) -> None:
-    python = sys.executable
-    subprocess.run([python, "-m", "pip", "install", "flake8", "black", "isort"], check=True)
-    subprocess.run([python, "-m", "flake8", ".", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"], check=True)
-    subprocess.run([python, "-m", "black", "--check", "."], check=True)
-    subprocess.run([python, "-m", "isort", "--check-only", "."], check=True)
-
-
-def _python_tests_exist() -> bool:
-    for pattern in ("test_*.py", "*_test.py"):
-        if any(Path(".").rglob(pattern)):
-            return True
-    return False
+    subprocess.run([python, "-m", "pip", "install", "pytest", "pytest-cov"], check=True)
 
 
 def python_run_tests(_: argparse.Namespace) -> None:
-    python = sys.executable
-    subprocess.run([python, "-m", "pip", "install", "pytest", "pytest-cov"], check=True)
+    def has_tests() -> bool:
+        for pattern in ("test_*.py", "*_test.py"):
+            if any(Path(".").rglob(pattern)):
+                return True
+        return False
 
-    if not Path("tests").exists() and not _python_tests_exist():
-        print("ℹ️ No Python tests found; skipping pytest run")
+    if not has_tests():
+        print("ℹ️ No Python tests found")
         return
 
-    subprocess.run([python, "-m", "pytest", "--cov", "--cov-report=xml", "--cov-report=term-missing"], check=True)
-
-
-def rust_format(_: argparse.Namespace) -> None:
-    subprocess.run(["cargo", "fmt", "--all", "--", "--check"], check=True)
-
-
-def rust_clippy(_: argparse.Namespace) -> None:
-    subprocess.run(["cargo", "clippy", "--all-targets", "--all-features", "--", "-D", "warnings"], check=True)
-
-
-def rust_build(_: argparse.Namespace) -> None:
-    subprocess.run(["cargo", "build", "--verbose"], check=True)
-
-
-def rust_test(_: argparse.Namespace) -> None:
-    subprocess.run(["cargo", "test", "--verbose"], check=True)
+    python = sys.executable
+    subprocess.run(
+        [python, "-m", "pytest", "--cov=.", "--cov-report=xml", "--cov-report=html"],
+        check=True,
+    )
 
 
 def ensure_cargo_llvm_cov(_: argparse.Namespace) -> None:
@@ -424,48 +472,124 @@ def run_benchmarks(_: argparse.Namespace) -> None:
     subprocess.run(["go", "test", "-bench=.", "-benchmem", "./..."], check=True)
 
 
+def _matrix_entries(versions: list[str], oses: list[str], version_key: str) -> list[dict[str, Any]]:
+    matrix: list[dict[str, Any]] = []
+    for os_index, runner in enumerate(oses):
+        for ver_index, version in enumerate(versions):
+            matrix.append(
+                {
+                    "os": runner,
+                    version_key: version,
+                    "primary": os_index == 0 and ver_index == 0,
+                }
+            )
+    return matrix
+
+
+def generate_matrices(_: argparse.Namespace) -> None:
+    fallback_go = os.environ.get("FALLBACK_GO_VERSION", "1.24")
+    fallback_python = os.environ.get("FALLBACK_PYTHON_VERSION", "3.13")
+    fallback_rust = os.environ.get("FALLBACK_RUST_VERSION", "stable")
+    fallback_node = os.environ.get("FALLBACK_NODE_VERSION", "22")
+    fallback_threshold = os.environ.get("FALLBACK_COVERAGE_THRESHOLD", "80")
+
+    versions_config = _config_path({}, "languages", "versions") or {}
+    build_platforms = _config_path({}, "build", "platforms") or {}
+    os_list = build_platforms.get("os") or ["ubuntu-latest"]
+
+    go_versions = versions_config.get("go") or [fallback_go]
+    python_versions = versions_config.get("python") or [fallback_python]
+    rust_versions = versions_config.get("rust") or [fallback_rust]
+    node_versions = versions_config.get("node") or [fallback_node]
+
+    go_matrix = _matrix_entries(go_versions, os_list, "go-version")
+    python_matrix = _matrix_entries(python_versions, os_list, "python-version")
+    rust_matrix = _matrix_entries(rust_versions, os_list, "rust-version")
+    frontend_matrix = _matrix_entries(node_versions, os_list, "node-version")
+
+    write_output("go-matrix", json.dumps({"include": go_matrix}, separators=(",", ":")))
+    write_output("python-matrix", json.dumps({"include": python_matrix}, separators=(",", ":")))
+    write_output("rust-matrix", json.dumps({"include": rust_matrix}, separators=(",", ":")))
+    write_output("frontend-matrix", json.dumps({"include": frontend_matrix}, separators=(",", ":")))
+
+    coverage_threshold = _config_path(fallback_threshold, "testing", "coverage", "threshold")
+    write_output("coverage-threshold", str(coverage_threshold))
+
+
 def generate_ci_summary(_: argparse.Namespace) -> None:
+    primary_language = os.environ.get("PRIMARY_LANGUAGE", "unknown")
+    steps = {
+        "Detect Changes": os.environ.get("JOB_DETECT_CHANGES", "unknown"),
+        "Detect Languages": os.environ.get("JOB_DETECT_LANGUAGES", "unknown"),
+        "Check Overrides": os.environ.get("JOB_CHECK_OVERRIDES", "unknown"),
+        "Lint": os.environ.get("JOB_LINT", "unknown"),
+        "Test Go": os.environ.get("JOB_TEST_GO", "unknown"),
+        "Test Frontend": os.environ.get("JOB_TEST_FRONTEND", "unknown"),
+        "Test Python": os.environ.get("JOB_TEST_PYTHON", "unknown"),
+        "Test Rust": os.environ.get("JOB_TEST_RUST", "unknown"),
+        "Rust Coverage": os.environ.get("JOB_RUST_COVERAGE", "unknown"),
+        "Test Docker": os.environ.get("JOB_TEST_DOCKER", "unknown"),
+        "Test Docs": os.environ.get("JOB_TEST_DOCS", "unknown"),
+        "Release Build": os.environ.get("JOB_RELEASE_BUILD", "unknown"),
+        "Security Scan": os.environ.get("JOB_SECURITY_SCAN", "unknown"),
+        "Performance Test": os.environ.get("JOB_PERFORMANCE_TEST", "unknown"),
+    }
+
+    files_changed = {
+        "Go": os.environ.get("CI_GO_FILES", "false"),
+        "Frontend": os.environ.get("CI_FRONTEND_FILES", "false"),
+        "Python": os.environ.get("CI_PYTHON_FILES", "false"),
+        "Rust": os.environ.get("CI_RUST_FILES", "false"),
+        "Docker": os.environ.get("CI_DOCKER_FILES", "false"),
+        "Docs": os.environ.get("CI_DOCS_FILES", "false"),
+        "Workflows": os.environ.get("CI_WORKFLOW_FILES", "false"),
+    }
+
+    languages = {
+        "has-rust": os.environ.get("HAS_RUST", "false"),
+        "has-go": os.environ.get("HAS_GO", "false"),
+        "has-python": os.environ.get("HAS_PYTHON", "false"),
+        "has-frontend": os.environ.get("HAS_FRONTEND", "false"),
+        "has-docker": os.environ.get("HAS_DOCKER", "false"),
+    }
+
     summary_lines = [
         "# 🚀 CI Pipeline Summary",
         "",
-        "## 📊 Job Results",
-        "| Job | Status |",
-        "|-----|--------|",
+        "## 🧭 Detection",
+        f"- Primary language: {primary_language}",
     ]
-
-    job_envs = {
-        "Go": os.environ.get("JOB_GO", "skipped"),
-        "Python": os.environ.get("JOB_PYTHON", "skipped"),
-        "Rust": os.environ.get("JOB_RUST", "skipped"),
-        "Frontend": os.environ.get("JOB_FRONTEND", "skipped"),
-    }
-
-    for job, status in job_envs.items():
-        summary_lines.append(f"| {job} | {status} |")
-
+    summary_lines.extend(f"- {label}: {value}" for label, value in languages.items())
+    summary_lines.extend(
+        [
+            "",
+            "## 📊 Job Results",
+            "| Job | Status |",
+            "|-----|--------|",
+        ]
+    )
+    summary_lines.extend(f"| {job} | {status} |" for job, status in steps.items())
     summary_lines.extend(
         [
             "",
             "## 📁 Changed Files",
-            f"- Go: {os.environ.get('CI_GO_FILES', 'false')}",
-            f"- Python: {os.environ.get('CI_PYTHON_FILES', 'false')}",
-            f"- Rust: {os.environ.get('CI_RUST_FILES', 'false')}",
-            f"- Frontend: {os.environ.get('CI_FRONTEND_FILES', 'false')}",
-            f"- Docker: {os.environ.get('CI_DOCKER_FILES', 'false')}",
-            f"- Docs: {os.environ.get('CI_DOCS_FILES', 'false')}",
-            f"- Workflows: {os.environ.get('CI_WORKFLOW_FILES', 'false')}",
         ]
     )
+    summary_lines.extend(f"- {label}: {value}" for label, value in files_changed.items())
+    summary_lines.append("")
 
     append_summary("\n".join(summary_lines) + "\n")
 
 
 def check_ci_status(_: argparse.Namespace) -> None:
     job_envs = {
-        "Go": os.environ.get("JOB_GO"),
-        "Python": os.environ.get("JOB_PYTHON"),
-        "Rust": os.environ.get("JOB_RUST"),
-        "Frontend": os.environ.get("JOB_FRONTEND"),
+        "Lint": os.environ.get("JOB_LINT"),
+        "Test Go": os.environ.get("JOB_TEST_GO"),
+        "Test Frontend": os.environ.get("JOB_TEST_FRONTEND"),
+        "Test Python": os.environ.get("JOB_TEST_PYTHON"),
+        "Test Rust": os.environ.get("JOB_TEST_RUST"),
+        "Test Docker": os.environ.get("JOB_TEST_DOCKER"),
+        "Release Build": os.environ.get("JOB_RELEASE_BUILD"),
     }
 
     failures = [job for job, status in job_envs.items() if status == "failure"]
@@ -485,17 +609,14 @@ def build_parser() -> argparse.ArgumentParser:
         "wait-for-pr-automation": wait_for_pr_automation,
         "load-super-linter-config": load_super_linter_config,
         "write-validation-summary": write_validation_summary,
+        "generate-matrices": generate_matrices,
         "go-setup": go_setup,
         "go-test": go_test,
+        "check-go-coverage": check_go_coverage,
         "frontend-install": frontend_install,
         "frontend-run": frontend_run,
         "python-install": python_install,
-        "python-lint": python_lint,
         "python-run-tests": python_run_tests,
-        "rust-format": rust_format,
-        "rust-clippy": rust_clippy,
-        "rust-build": rust_build,
-        "rust-test": rust_test,
         "ensure-cargo-llvm-cov": ensure_cargo_llvm_cov,
         "generate-rust-lcov": generate_rust_lcov,
         "generate-rust-html": generate_rust_html,
