@@ -26,7 +26,7 @@ echo "Hello, World!"
 
 ### Emphasis
 
-**Bold text** and *italic text*.
+**Bold text** and _italic text_.
 
 ### Headings
 
@@ -48,8 +48,7 @@ Use `inline code` for commands.
 
 ### Blockquotes
 
-> This is a blockquote.
-> It spans multiple lines.
+> This is a blockquote. It spans multiple lines.
 
 ## End of File
 

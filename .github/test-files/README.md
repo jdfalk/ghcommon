@@ -8,7 +8,8 @@ This directory contains sample files for testing Super Linter configurations.
 
 ## Purpose
 
-These files are used by the `test-super-linter.yml` workflow to verify that all linter configurations work correctly.
+These files are used by the `test-super-linter.yml` workflow to verify that all linter
+configurations work correctly.
 
 ## Test Files
 
