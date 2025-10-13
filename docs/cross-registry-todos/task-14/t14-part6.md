@@ -6,7 +6,7 @@
 
 ## DOCUMENTATION.md Guide
 
-````markdown
+`````markdown
 # file: DOCUMENTATION.md
 
 # version: 1.0.0
@@ -66,6 +66,8 @@ pub fn create_disk(path: &Path, size: u64) -> Result<DiskImage, Error> {
     // Implementation
 }
 ````
+`````
+
 ````
 
 **Example (Python):**
@@ -446,7 +448,7 @@ docs-check:
 docs-watch:
 	@echo "Watching for documentation changes..."
 	mdbook serve --open
-````
+```
 
 ## Documentation Maintenance Workflow
 
