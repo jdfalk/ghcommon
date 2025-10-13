@@ -29,7 +29,7 @@ def test_detect_languages_auto(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text("[project]\n")
     (tmp_path / "Dockerfile").write_text("FROM busybox\n")
     (tmp_path / "proto").mkdir()
-    (tmp_path / "proto" / "test.proto").write_text("syntax = \"proto3\";\n")
+    (tmp_path / "proto" / "test.proto").write_text('syntax = "proto3";\n')
 
     output_file = tmp_path / "outputs.txt"
     config = {
@@ -41,7 +41,10 @@ def test_detect_languages_auto(tmp_path, monkeypatch):
                 "node": ["18"],
             }
         },
-        "build": {"platforms": {"os": ["ubuntu-latest"]}, "docker": {"platforms": ["linux/amd64"]}},
+        "build": {
+            "platforms": {"os": ["ubuntu-latest"]},
+            "docker": {"platforms": ["linux/amd64"]},
+        },
     }
     monkeypatch.setenv("REPOSITORY_CONFIG", json.dumps(config))
     monkeypatch.setenv("GITHUB_OUTPUT", str(output_file))
@@ -81,7 +84,9 @@ def test_generate_version_from_tag(monkeypatch, tmp_path):
     monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
 
     monkeypatch.setattr(release_workflow, "_latest_tag_from_api", lambda: "")
-    monkeypatch.setattr(release_workflow, "_latest_tag_from_git", lambda: "v1.2.3")
+    monkeypatch.setattr(
+        release_workflow, "_latest_tag_from_git", lambda: "v1.2.3"
+    )
 
     def fake_run(args, check=False):
         cmd = tuple(args)
@@ -114,7 +119,12 @@ def test_generate_changelog(monkeypatch, tmp_path):
         if cmd[:2] == ("describe", "--tags"):
             return subprocess.CompletedProcess(args, 0, "v1.0.0\n", "")
         if cmd[0] == "log":
-            return subprocess.CompletedProcess(args, 0, "feat: add feature (abc123)\nfix: bug fix (def456)\n", "")
+            return subprocess.CompletedProcess(
+                args,
+                0,
+                "feat: add feature (abc123)\nfix: bug fix (def456)\n",
+                "",
+            )
         return subprocess.CompletedProcess(args, 0, "", "")
 
     monkeypatch.setattr(release_workflow, "_run_git", fake_run)

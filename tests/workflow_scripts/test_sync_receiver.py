@@ -18,7 +18,9 @@ def test_set_parameters_repo_dispatch(tmp_path, monkeypatch):
     monkeypatch.setenv("CLIENT_PAYLOAD_VERBOSE_LOGGING", "false")
 
     sync_receiver.set_parameters(argparse.Namespace())
-    result = dict(line.split("=", 1) for line in output_path.read_text().splitlines())
+    result = dict(
+        line.split("=", 1) for line in output_path.read_text().splitlines()
+    )
     assert result["sync_type"] == "scripts"
     assert result["source_repo"] == "upstream/repo"
     assert result["force_sync"] == "true"
@@ -27,24 +29,40 @@ def test_set_parameters_repo_dispatch(tmp_path, monkeypatch):
 def test_sync_files_fallback_copies_files(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     source_root = tmp_path / "ghcommon-source"
-    (source_root / ".github" / "instructions").mkdir(parents=True, exist_ok=True)
-    (source_root / ".github" / "instructions" / "guide.md").write_text("# Guide", encoding="utf-8")
+    (source_root / ".github" / "instructions").mkdir(
+        parents=True, exist_ok=True
+    )
+    (source_root / ".github" / "instructions" / "guide.md").write_text(
+        "# Guide", encoding="utf-8"
+    )
     (source_root / ".github" / "prompts").mkdir(parents=True, exist_ok=True)
-    (source_root / ".github" / "prompts" / "prompt.txt").write_text("Prompt", encoding="utf-8")
+    (source_root / ".github" / "prompts" / "prompt.txt").write_text(
+        "Prompt", encoding="utf-8"
+    )
     (source_root / "scripts").mkdir(parents=True, exist_ok=True)
-    (source_root / "scripts" / "tool.py").write_text("print('tool')", encoding="utf-8")
+    (source_root / "scripts" / "tool.py").write_text(
+        "print('tool')", encoding="utf-8"
+    )
     (source_root / ".github" / "scripts").mkdir(parents=True, exist_ok=True)
-    (source_root / ".github" / "scripts" / "helper.py").write_text("print('helper')", encoding="utf-8")
+    (source_root / ".github" / "scripts" / "helper.py").write_text(
+        "print('helper')", encoding="utf-8"
+    )
     linters_root = source_root / ".github" / "linters"
     linters_root.mkdir(parents=True, exist_ok=True)
     (linters_root / "clippy.toml").write_text("content", encoding="utf-8")
     (linters_root / "extra.yml").write_text("yaml: true", encoding="utf-8")
     (source_root / "labels.json").write_text("{}", encoding="utf-8")
     (source_root / "labels.md").write_text("# labels", encoding="utf-8")
-    (source_root / "scripts" / "sync-github-labels.py").write_text("print('labels')", encoding="utf-8")
+    (source_root / "scripts" / "sync-github-labels.py").write_text(
+        "print('labels')", encoding="utf-8"
+    )
 
     def fake_run(cmd, check=False, **kwargs):
-        if cmd[:3] == ["python3", ".github/scripts/sync-receiver-sync-files.py", "all"]:
+        if cmd[:3] == [
+            "python3",
+            ".github/scripts/sync-receiver-sync-files.py",
+            "all",
+        ]:
             return subprocess.CompletedProcess(cmd, 1)
         return subprocess.CompletedProcess(cmd, 0)
 
