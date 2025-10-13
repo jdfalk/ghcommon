@@ -5,10 +5,7 @@
       "label": "Buf Generate with Output",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "buf",
-        "generate"
-      ],
+      "args": ["buf", "generate"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -20,12 +17,7 @@
       "label": "Buf Generate Module",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "buf",
-        "generate",
-        "--module",
-        "${input:module}"
-      ],
+      "args": ["buf", "generate", "--module", "${input:module}"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -37,10 +29,7 @@
       "label": "Buf Lint with Output",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "buf",
-        "lint"
-      ],
+      "args": ["buf", "lint"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -52,12 +41,7 @@
       "label": "Buf Lint Module",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "buf",
-        "lint",
-        "--module",
-        "${input:module}"
-      ],
+      "args": ["buf", "lint", "--module", "${input:module}"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -69,10 +53,7 @@
       "label": "Git Add All",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "add"
-      ],
+      "args": ["git", "add"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -84,11 +65,7 @@
       "label": "Git Add Selective",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "add",
-        "${input:filePattern}"
-      ],
+      "args": ["git", "add", "${input:filePattern}"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -100,10 +77,7 @@
       "label": "Git Push",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "push"
-      ],
+      "args": ["git", "push"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -115,10 +89,7 @@
       "label": "Git Status",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "status"
-      ],
+      "args": ["git", "status"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -130,11 +101,7 @@
       "label": "Git Add All Auto",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "add",
-        "."
-      ],
+      "args": ["git", "add", "."],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -146,12 +113,7 @@
       "label": "Git Commit Auto",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "git",
-        "commit",
-        "-m",
-        "fix: systematic protobuf import fixes"
-      ],
+      "args": ["git", "commit", "-m", "fix: systematic protobuf import fixes"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -178,12 +140,7 @@
       "label": "Buf Generate with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "--args-file",
-        "copilot-util-args",
-        "buf",
-        "generate"
-      ],
+      "args": ["--args-file", "copilot-util-args", "buf", "generate"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -195,12 +152,7 @@
       "label": "Buf Lint with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "--args-file",
-        "copilot-util-args",
-        "buf",
-        "lint"
-      ],
+      "args": ["--args-file", "copilot-util-args", "buf", "lint"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -212,12 +164,7 @@
       "label": "Git Add All with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "--args-file",
-        "copilot-util-args",
-        "git",
-        "add"
-      ],
+      "args": ["--args-file", "copilot-util-args", "git", "add"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -229,12 +176,7 @@
       "label": "Git Push with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "--args-file",
-        "copilot-util-args",
-        "git",
-        "push"
-      ],
+      "args": ["--args-file", "copilot-util-args", "git", "push"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -246,12 +188,7 @@
       "label": "Git Status with Args File",
       "type": "shell",
       "command": "copilot-agent-util",
-      "args": [
-        "--args-file",
-        "copilot-util-args",
-        "git",
-        "status"
-      ],
+      "args": ["--args-file", "copilot-util-args", "git", "status"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -325,10 +262,7 @@
       "label": "Validate Linter Configs",
       "type": "shell",
       "command": "python3",
-      "args": [
-        "${workspaceFolder}/scripts/validate-linter-configs.py",
-        "--verbose"
-      ],
+      "args": ["${workspaceFolder}/scripts/validate-linter-configs.py", "--verbose"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
