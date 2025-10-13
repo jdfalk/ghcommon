@@ -82,9 +82,6 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SYNC_TYPE: ${{ steps.params.outputs.sync_type }}
           SYNC_VERBOSE: ${{ steps.params.outputs.verbose_logging }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
