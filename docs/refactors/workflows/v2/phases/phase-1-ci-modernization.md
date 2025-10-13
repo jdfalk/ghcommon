@@ -1,21 +1,47 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b -->
 
 # Phase 1: CI Modernization
 
 ## Overview
 
-Phase 1 modernizes the CI workflow system to use configuration-driven workflows with dynamic matrix generation, intelligent change detection, and optimized test execution.
+Phase 1 modernizes the CI workflow system to use configuration-driven workflows with dynamic matrix generation, intelligent change detection, branch-aware version targeting, and optimized test execution.
 
 **Status**: 🟡 Planning
 **Dependencies**: Phase 0 (workflow_common.py, config validation)
 **Target Completion**: 2025-11-03
 **Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
 
+## Branching Strategy for Parallel Release Tracks
+
+This workflow system supports parallel release tracks using a branch-based versioning strategy:
+
+- **`main` branch**: Always targets **latest language versions** (Go 1.25, Python 3.14, Node 22, Rust stable)
+- **`stable-1-*` branches**: Target **previous versions** for parallel maintenance releases
+  - Examples: `stable-1-go-1.24`, `stable-1-go-1.23`, `stable-1-python-3.13`
+  - Automatically created when new major versions are adopted on `main`
+  - Receive bugfixes and security updates during deprecation period
+  - **Work stops** when version N+2 releases (version deprecated)
+  - **Branch locked** (read-only) after 180-day deprecation period
+
+**Key Benefits**:
+- Users on older versions continue receiving updates during deprecation
+- Clear separation between latest and maintenance releases
+- Automated version targeting based on branch name
+- Hard deprecation limit prevents indefinite maintenance burden
+
+**Example Timeline**:
+1. **Jan 2025**: `main` uses Go 1.24, stable-1-go-1.23 branch created
+2. **Oct 2025**: Go 1.25 releases, `main` upgrades to 1.25, stable-1-go-1.24 branch created
+3. **Oct 2025**: Go 1.23 enters deprecation (N+2 released), work stops on stable-1-go-1.23
+4. **Apr 2026**: stable-1-go-1.23 branch locked (180 days after deprecation)
+5. **Future**: Go 1.26 releases, Go 1.24 enters deprecation, stable-1-go-1.24 work stops
+
 ## Success Criteria
 
 - [ ] `ci_workflow.py` helper created with matrix generation
+- [ ] Branch-aware version targeting implemented
 - [ ] `reusable-ci.yml` workflow created and tested
 - [ ] Change detection working for all languages
 - [ ] Matrix optimization reducing job count by 60%+
@@ -207,17 +233,59 @@ def detect_changes(
     return detection
 
 
+def get_branch_version_target(branch_name: str, language: str) -> str | None:
+    """
+    Determine target language version based on branch name.
+
+    Implements parallel release track strategy:
+    - main branch: uses latest version from config
+    - stable-1-* branches: extract version from branch name
+
+    Args:
+        branch_name: Current git branch name (e.g., "main", "stable-1-go-1.23")
+        language: Language to check (go, python, rust, node)
+
+    Returns:
+        Target version string or None if branch doesn't target this language
+
+    Example:
+        >>> get_branch_version_target("stable-1-go-1.23", "go")
+        "1.23"
+        >>> get_branch_version_target("stable-1-python-3.13", "python")
+        "3.13"
+        >>> get_branch_version_target("main", "go")
+        None  # main uses latest from config
+    """
+    import re
+
+    # Main branch always uses latest version from config
+    if branch_name in ("main", "master", "develop"):
+        return None
+
+    # Parse stable-1-{language}-{version} format
+    # Examples: stable-1-go-1.23, stable-1-python-3.13
+    pattern = rf"stable-1-{language}-(.+)$"
+    match = re.match(pattern, branch_name)
+
+    if match:
+        return match.group(1)
+
+    return None
+
+
 def generate_test_matrix(
     languages: list[str],
     versions: dict[str, list[str]] | None = None,
     platforms: list[str] | None = None,
     optimize: bool = True,
+    branch_name: str | None = None,
 ) -> dict[str, Any]:
     """
-    Generate optimized test matrix for CI workflows.
+    Generate optimized test matrix for CI workflows with branch-aware versioning.
 
     Creates a test matrix based on detected changes and repository
     configuration, optionally optimizing to reduce redundant jobs.
+    Supports parallel release tracks via stable-1-* branches.
 
     Args:
         languages: List of languages to test (e.g., ["go", "python"])
@@ -225,15 +293,34 @@ def generate_test_matrix(
                  (default: load from config)
         platforms: Optional list of platforms (default: load from config)
         optimize: If True, optimize matrix to reduce job count
+        branch_name: Current branch name for version targeting
+                    (default: auto-detect from git)
 
     Returns:
         Dictionary with "include" key containing matrix entries
 
     Example:
-        >>> matrix = generate_test_matrix(["go", "python"], optimize=True)
-        >>> print(len(matrix["include"]))  # Reduced job count
-        4
+        >>> # Main branch: uses latest versions
+        >>> matrix = generate_test_matrix(["go"], branch_name="main")
+        >>> matrix["include"][0]["version"]  # "1.24" (latest)
+
+        >>> # Stable branch: uses branch-specific version
+        >>> matrix = generate_test_matrix(["go"], branch_name="stable-1-go-1.23")
+        >>> matrix["include"][0]["version"]  # "1.23" (from branch)
     """
+    # Auto-detect branch if not provided
+    if branch_name is None:
+        try:
+            result = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            branch_name = result.stdout.strip()
+        except subprocess.CalledProcessError:
+            branch_name = "main"  # Fallback
+
     # Load defaults from config if not provided
     if versions is None:
         versions = {
@@ -259,8 +346,27 @@ def generate_test_matrix(
             print(f"⚠️  No versions configured for {language}, skipping")
             continue
 
-        if optimize:
-            # Optimized matrix: test latest on all platforms, others on Linux only
+        # Check for branch-specific version targeting
+        branch_version = get_branch_version_target(branch_name, language)
+
+        if branch_version:
+            # Stable branch: use only the branch-specific version
+            print(f"🎯 Branch {branch_name} targets {language} {branch_version}")
+
+            if branch_version not in lang_versions:
+                print(f"⚠️  Branch target {branch_version} not in configured versions, skipping")
+                continue
+
+            # Test branch version on all platforms (important for maintenance releases)
+            for platform in platforms:
+                matrix_entries.append({
+                    "language": language,
+                    "version": branch_version,
+                    "os": platform,
+                    "branch": branch_name,
+                })
+        elif optimize:
+            # Main branch with optimization: test latest on all platforms, others on Linux only
             latest_version = lang_versions[-1]
             older_versions = lang_versions[:-1]
 
@@ -270,6 +376,7 @@ def generate_test_matrix(
                     "language": language,
                     "version": latest_version,
                     "os": platform,
+                    "branch": branch_name,
                 })
 
             # Older versions on ubuntu-latest only
@@ -278,15 +385,17 @@ def generate_test_matrix(
                     "language": language,
                     "version": version,
                     "os": "ubuntu-latest",
+                    "branch": branch_name,
                 })
         else:
-            # Full matrix: all versions on all platforms
+            # Main branch without optimization: full matrix (all versions on all platforms)
             for version in lang_versions:
                 for platform in platforms:
                     matrix_entries.append({
                         "language": language,
                         "version": version,
                         "os": platform,
+                        "branch": branch_name,
                     })
 
     return {"include": matrix_entries}
@@ -1132,6 +1241,117 @@ def test_format_matrix_summary_empty():
     # Assert
     assert "## Test Matrix" in summary
     assert "❌ No tests to run" in summary
+
+
+def test_get_branch_version_target_main_branch():
+    """Test get_branch_version_target returns None for main branch."""
+    # Arrange & Act
+    result = ci_workflow.get_branch_version_target("main", "go")
+
+    # Assert
+    assert result is None  # Main uses latest from config
+
+
+def test_get_branch_version_target_stable_branch():
+    """Test get_branch_version_target extracts version from stable branch."""
+    # Arrange & Act
+    result = ci_workflow.get_branch_version_target("stable-1-go-1.23", "go")
+
+    # Assert
+    assert result == "1.23"
+
+
+def test_get_branch_version_target_different_language():
+    """Test get_branch_version_target returns None for different language."""
+    # Arrange & Act
+    result = ci_workflow.get_branch_version_target("stable-1-go-1.23", "python")
+
+    # Assert
+    assert result is None  # Branch targets Go, not Python
+
+
+def test_get_branch_version_target_python_stable():
+    """Test get_branch_version_target works for Python stable branches."""
+    # Arrange & Act
+    result = ci_workflow.get_branch_version_target("stable-1-python-3.13", "python")
+
+    # Assert
+    assert result == "3.13"
+
+
+def test_generate_test_matrix_stable_branch():
+    """Test generate_test_matrix uses branch-specific version on stable branch."""
+    # Arrange
+    languages = ["go"]
+    versions = {"go": ["1.23", "1.24", "1.25"]}
+    platforms = ["ubuntu-latest", "macos-latest"]
+
+    # Act
+    matrix = ci_workflow.generate_test_matrix(
+        languages,
+        versions,
+        platforms,
+        optimize=True,
+        branch_name="stable-1-go-1.23",
+    )
+
+    # Assert
+    entries = matrix["include"]
+
+    # Should only test version 1.23 on all platforms
+    assert len(entries) == 2
+    assert all(e["version"] == "1.23" for e in entries)
+    assert all(e["branch"] == "stable-1-go-1.23" for e in entries)
+    assert {e["os"] for e in entries} == {"ubuntu-latest", "macos-latest"}
+
+
+def test_generate_test_matrix_main_branch_uses_latest():
+    """Test generate_test_matrix uses latest version on main branch."""
+    # Arrange
+    languages = ["go"]
+    versions = {"go": ["1.23", "1.24", "1.25"]}
+    platforms = ["ubuntu-latest"]
+
+    # Act
+    matrix = ci_workflow.generate_test_matrix(
+        languages,
+        versions,
+        platforms,
+        optimize=True,
+        branch_name="main",
+    )
+
+    # Assert
+    entries = matrix["include"]
+
+    # Latest version (1.25) should be on all platforms
+    latest_entries = [e for e in entries if e["version"] == "1.25"]
+    assert len(latest_entries) >= 1
+
+    # Older versions (1.23, 1.24) on ubuntu-latest only
+    assert any(e["version"] == "1.23" for e in entries)
+    assert any(e["version"] == "1.24" for e in entries)
+
+
+def test_generate_test_matrix_invalid_branch_version(capsys):
+    """Test generate_test_matrix skips when branch version not in config."""
+    # Arrange
+    languages = ["go"]
+    versions = {"go": ["1.24", "1.25"]}  # 1.23 not in config
+    platforms = ["ubuntu-latest"]
+
+    # Act
+    matrix = ci_workflow.generate_test_matrix(
+        languages,
+        versions,
+        platforms,
+        branch_name="stable-1-go-1.23",  # Targets 1.23 which isn't configured
+    )
+
+    # Assert
+    captured = capsys.readouterr()
+    assert "Branch target 1.23 not in configured versions" in captured.out
+    assert len(matrix["include"]) == 0
 ```
 
 ### Verification Steps
