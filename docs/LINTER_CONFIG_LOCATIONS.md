@@ -4,11 +4,13 @@
 
 # Linter Configuration File Locations in ghcommon
 
-This document provides a comprehensive reference for all linter configuration files in the ghcommon repository.
+This document provides a comprehensive reference for all linter configuration files in the ghcommon
+repository.
 
 ## 🎯 Key Finding: All Configs in Root Directory
 
-**IMPORTANT**: Unlike some other repositories, ghcommon stores **ALL** linter configuration files in the **repository root directory**, not in `.github/linters/`.
+**IMPORTANT**: Unlike some other repositories, ghcommon stores **ALL** linter configuration files in
+the **repository root directory**, not in `.github/linters/`.
 
 This is the correct and preferred approach for Super Linter, as it:
 
@@ -114,28 +116,31 @@ Different repositories in the jdfalk organization use different approaches:
 | **gcommon-proto**            | Mixed              | Some in root, some in `.github/` |
 | **subtitle-manager**         | Root directory     | Similar to ghcommon              |
 
-**Recommendation**: When syncing configurations FROM ghcommon TO other repositories, be aware that target repositories may use different locations. The sync scripts should handle this appropriately.
+**Recommendation**: When syncing configurations FROM ghcommon TO other repositories, be aware that
+target repositories may use different locations. The sync scripts should handle this appropriately.
 
 ## 📚 Related Documentation
 
 - [Super Linter Configuration Strategy](super-linter-config-strategy.md) - To be created in Task 16
 - [Super Linter Test Results](super-linter-test-results.md) - To be created after Tasks 17-22
-- [General Coding Instructions](../.github/instructions/general-coding.instructions.md) - File header requirements
-- [PROMPT_CATEGORIZATION.md](PROMPT_CATEGORIZATION.md) - Notes about linter config location flexibility
+- [General Coding Instructions](../.github/instructions/general-coding.instructions.md) - File
+  header requirements
+- [PROMPT_CATEGORIZATION.md](PROMPT_CATEGORIZATION.md) - Notes about linter config location
+  flexibility
 
 ## 🎓 Best Practices for ghcommon
 
 1. **Keep configs in root directory** - Don't create `.github/linters/`
 2. **Use regular files, not symlinks** - Ensures Super Linter and local tools work correctly
-3. **Reference root paths in Super Linter env files** - Use `TOOL_CONFIG_FILE=.configfile` not `.github/linters/.configfile`
+3. **Reference root paths in Super Linter env files** - Use `TOOL_CONFIG_FILE=.configfile` not
+   `.github/linters/.configfile`
 4. **Update documentation when adding new linters** - Keep this file current
 5. **Test locally before committing** - Ensure linters work with new configs
 
 ## 🔧 Maintenance Notes
 
-**Last Verified**: October 12, 2025
-**Total Config Files**: 15
-**Super Linter Version**: (check super-linter-ci.env for version)
+**Last Verified**: October 12, 2025 **Total Config Files**: 15 **Super Linter Version**: (check
+super-linter-ci.env for version)
 
 When adding a new linter:
 

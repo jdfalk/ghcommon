@@ -4,17 +4,19 @@
 
 # Super Linter Test Workflow Failure Analysis & Resolution
 
-**Status**: ✅ RESOLVED
-**Date**: 2025-10-12
-**Workflow**: `.github/workflows/test-super-linter.yml`
+**Status**: ✅ RESOLVED **Date**: 2025-10-12 **Workflow**: `.github/workflows/test-super-linter.yml`
 
 ---
 
 ## Executive Summary
 
-All Super Linter test workflow jobs failed due to missing configuration file path declarations in the test environment files. Super Linter couldn't find config files in the expected `.github/linters/` directory because ghcommon stores them in the root directory, causing fatal errors when it fell back to non-existent default configs.
+All Super Linter test workflow jobs failed due to missing configuration file path declarations in
+the test environment files. Super Linter couldn't find config files in the expected
+`.github/linters/` directory because ghcommon stores them in the root directory, causing fatal
+errors when it fell back to non-existent default configs.
 
-**Resolution**: Updated all three test config files to explicitly declare config file paths pointing to root directory.
+**Resolution**: Updated all three test config files to explicitly declare config file paths pointing
+to root directory.
 
 ---
 
@@ -45,11 +47,13 @@ From workflow log `Untitled-2` (Test Minimal Config job):
 
 2. **Super Linter Default Behavior**
    - By default, Super Linter looks for configs in `.github/linters/` directory
-   - From logs: `Checking if the user-provided:[.eslintrc.yml] and exists at:[/github/workspace/.github/linters/.eslintrc.yml]`
+   - From logs:
+     `Checking if the user-provided:[.eslintrc.yml] and exists at:[/github/workspace/.github/linters/.eslintrc.yml]`
 
 3. **Test Config Files Missing Declarations**
    - Test configs (`.github/test-configs/test-*.env`) did NOT specify `*_CONFIG_FILE` variables
-   - Result: Super Linter looked in `.github/linters/`, found nothing, fell back to container defaults
+   - Result: Super Linter looked in `.github/linters/`, found nothing, fell back to container
+     defaults
 
 4. **Fatal Fallback Failure**
    - Log shows: `using Default rules at:[/action/lib/.automation/.markdownlint.json]`
@@ -58,7 +62,8 @@ From workflow log `Untitled-2` (Test Minimal Config job):
 
 ### Why Other Configs Worked
 
-The working configs (`super-linter-ci.env` and `super-linter-pr.env`) explicitly declare config file paths:
+The working configs (`super-linter-ci.env` and `super-linter-pr.env`) explicitly declare config file
+paths:
 
 ```bash
 # super-linter-ci.env (working)
@@ -206,11 +211,13 @@ Based on ghcommon repository structure and Super Linter requirements:
 ### How to Verify
 
 1. **Run test workflow manually**:
+
    ```bash
    gh workflow run test-super-linter.yml
    ```
 
 2. **Or push to trigger workflow**:
+
    ```bash
    git add .github/test-configs/*.env docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md
    git commit -m "fix(ci): add missing config file paths to test env files"
@@ -235,11 +242,14 @@ Different repositories use different conventions:
 - **audiobook-organizer**: Config files in **`.github/linters/`**
 - **ubuntu-autoinstall-agent**: Mixed approach
 
-**Recommendation**: Always explicitly declare `*_CONFIG_FILE` variables in Super Linter env files to avoid default fallback issues.
+**Recommendation**: Always explicitly declare `*_CONFIG_FILE` variables in Super Linter env files to
+avoid default fallback issues.
 
 ### Super Linter Default Fallback is Unreliable
 
-When config files aren't found, Super Linter falls back to defaults in `/action/lib/.automation/`, but:
+When config files aren't found, Super Linter falls back to defaults in `/action/lib/.automation/`,
+but:
+
 - Not all defaults exist in the container
 - Default configs may not match your project's style
 - FATAL errors terminate the entire workflow
@@ -248,15 +258,18 @@ When config files aren't found, Super Linter falls back to defaults in `/action/
 
 ### Test Configs Must Match Real Configs
 
-The test environment files must declare the same config file paths as the real configs, otherwise tests don't accurately represent production behavior.
+The test environment files must declare the same config file paths as the real configs, otherwise
+tests don't accurately represent production behavior.
 
 ---
 
 ## Related Documentation
 
-- [SUPER_LINTER_STRATEGY.md](./SUPER_LINTER_STRATEGY.md) - Overall Super Linter implementation strategy
+- [SUPER_LINTER_STRATEGY.md](./SUPER_LINTER_STRATEGY.md) - Overall Super Linter implementation
+  strategy
 - [LINTER_VALIDATION.md](./LINTER_VALIDATION.md) - Config validation system
-- [PRETTIER_MARKDOWNLINT_STRATEGY.md](./PRETTIER_MARKDOWNLINT_STRATEGY.md) - Markdown linter conflict resolution
+- [PRETTIER_MARKDOWNLINT_STRATEGY.md](./PRETTIER_MARKDOWNLINT_STRATEGY.md) - Markdown linter
+  conflict resolution
 
 ---
 

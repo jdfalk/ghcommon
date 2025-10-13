@@ -6,11 +6,13 @@
 
 ## Overview
 
-This document describes the Docker container caching strategy implemented for the Super Linter test workflow to improve performance and reduce resource consumption in GitHub Actions.
+This document describes the Docker container caching strategy implemented for the Super Linter test
+workflow to improve performance and reduce resource consumption in GitHub Actions.
 
 ## Problem
 
-The Super Linter workflow pulls the `ghcr.io/super-linter/super-linter:v6.9.0` Docker image on every workflow run. For workflows with multiple jobs, this results in:
+The Super Linter workflow pulls the `ghcr.io/super-linter/super-linter:v6.9.0` Docker image on every
+workflow run. For workflows with multiple jobs, this results in:
 
 - **Multiple pulls per run**: Each job pulls the same image independently
 - **Network bandwidth waste**: ~500MB-1GB per pull
@@ -18,6 +20,7 @@ The Super Linter workflow pulls the `ghcr.io/super-linter/super-linter:v6.9.0` D
 - **GitHub Actions resource consumption**: Counts against runner resources
 
 **Example Impact**:
+
 - Workflow with 13 test jobs = 13 Docker pulls
 - Total download: ~6.5GB-13GB per workflow run
 - Added time: 6.5-13 minutes just for image pulls
@@ -34,20 +37,22 @@ Added caching step to all test jobs:
 - name: Cache Super Linter Docker image
   uses: actions/cache@v4
   with:
-      path: /tmp/.superlinter-cache
-      key: ${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}
-      restore-keys: |
-          ${{ runner.os }}-superlinter-
+    path: /tmp/.superlinter-cache
+    key: ${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}
+    restore-keys: |
+      ${{ runner.os }}-superlinter-
 ```
 
 ### Cache Key Strategy
 
 **Primary Key**: `${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}`
+
 - Includes OS (Linux/macOS/Windows)
 - Includes hash of Super Linter configuration files
 - Changes when config files change
 
 **Restore Keys**: `${{ runner.os }}-superlinter-`
+
 - Fallback to any cache for the same OS
 - Provides partial hit even with config changes
 
@@ -75,6 +80,7 @@ Added caching step to all test jobs:
 ### Performance Improvements
 
 **Expected Results**:
+
 - **First run**: No change (establishes cache)
 - **Subsequent runs**:
   - Image pull time: 30-60s → 5-10s (80-85% faster)
@@ -82,6 +88,7 @@ Added caching step to all test jobs:
   - Network bandwidth: ~6.5-13GB → <1GB per run
 
 **Cache Hit Rate**:
+
 - High hit rate for stable configs (95%+)
 - Moderate hit rate during active development (70-80%)
 - Fallback keys ensure some benefit even with changes
@@ -89,16 +96,19 @@ Added caching step to all test jobs:
 ### Cache Management
 
 **Storage**:
+
 - GitHub Actions cache has 10GB limit per repository
 - Super Linter cache: ~500MB-1GB
 - Automatically evicts old caches (LRU policy)
 
 **Invalidation**:
+
 - Automatic when config files change
 - Manual: Change workflow file to update cache key
 - Expires after 7 days of no use
 
 **Multiple Branches**:
+
 - Each branch can have separate caches
 - Branches can share caches (restore keys)
 - Main branch cache often used by feature branches
@@ -106,50 +116,56 @@ Added caching step to all test jobs:
 ### Alternatives Considered
 
 #### 1. Docker Buildx with Registry Cache (Not Chosen)
+
 ```yaml
 - name: Set up Docker Buildx
   uses: docker/setup-buildx-action@v3
   with:
-      install: true
+    install: true
 
 - name: Cache Docker layers
   uses: actions/cache@v4
   with:
-      path: /tmp/.buildx-cache
-      key: ${{ runner.os }}-buildx-${{ github.sha }}
-      restore-keys: |
-          ${{ runner.os }}-buildx-
+    path: /tmp/.buildx-cache
+    key: ${{ runner.os }}-buildx-${{ github.sha }}
+    restore-keys: |
+      ${{ runner.os }}-buildx-
 ```
 
 **Why Not Chosen**:
+
 - More complex setup
 - Requires Docker Buildx configuration
 - Super Linter image is pre-built (not building locally)
 - Buildx primarily for multi-stage builds
 
 #### 2. GitHub Container Registry Caching (Not Chosen)
+
 ```yaml
 - name: Login to GitHub Container Registry
   uses: docker/login-action@v3
   with:
-      registry: ghcr.io
-      username: ${{ github.actor }}
-      password: ${{ secrets.GITHUB_TOKEN }}
+    registry: ghcr.io
+    username: ${{ github.actor }}
+    password: ${{ secrets.GITHUB_TOKEN }}
 
 - name: Pull with caching
   run: docker pull --cache-from ghcr.io/super-linter/super-linter:v6.9.0
 ```
 
 **Why Not Chosen**:
+
 - Requires authentication setup
 - Still pulls from remote (network bandwidth)
 - No significant advantage over actions/cache
 
 #### 3. Self-Hosted Runner with Local Cache (Not Chosen)
+
 - Keep Docker images on runner's local disk
 - No cache expiration
 
 **Why Not Chosen**:
+
 - Requires self-hosted infrastructure
 - Maintenance overhead
 - GitHub-hosted runners are ephemeral
@@ -182,17 +198,20 @@ Restore key hit: Linux-superlinter-
 ### Troubleshooting
 
 **Cache Not Working**:
+
 1. Check cache hit/miss in logs
 2. Verify cache path exists: `/tmp/.superlinter-cache`
 3. Check repository cache quota (Settings → Actions → Caches)
 4. Ensure `actions/cache@v4` is latest version
 
 **Cache Corruption**:
+
 1. Update cache key (change version number)
 2. Clear old caches: Settings → Actions → Caches → Delete
 3. Let workflow create fresh cache
 
 **High Cache Miss Rate**:
+
 1. Review config file changes (git log)
 2. Consider more specific cache keys
 3. Use longer cache expiration if possible
@@ -213,6 +232,7 @@ Restore key hit: Linux-superlinter-
 ### Testing the Cache
 
 **Manual Test**:
+
 ```bash
 # First run - establishes cache
 gh workflow run test-super-linter.yml --field test_scenario=minimal
@@ -228,6 +248,7 @@ gh run list --workflow=test-super-linter.yml --limit 2
 ```
 
 **Expected Output**:
+
 - First run: "Cache miss: true" in logs, normal execution time
 - Second run: "Cache hit: true" in logs, faster execution time
 

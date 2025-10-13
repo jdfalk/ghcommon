@@ -16,8 +16,8 @@ workflows are retired.
 - Always keep the required header (file path, version, guid) and bump the version on any change.
 - Do not use create-doc-update.sh, doc_update_manager.py, or .github/doc-updates/.
 - Prefer VS Code tasks for git operations (Git Add All, Git Commit, Git Push) when available.
-  - These tasks use the `copilot-agent-util` Rust utility for enhanced logging, error handling,
-    and safety.
+  - These tasks use the `copilot-agent-util` Rust utility for enhanced logging, error handling, and
+    safety.
   - Download: <https://github.com/jdfalk/copilot-agent-util-rust/releases/latest>
 
 ## ⚠️ CRITICAL: File Version Updates

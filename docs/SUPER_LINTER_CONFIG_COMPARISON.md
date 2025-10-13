@@ -4,7 +4,8 @@
 
 # Super Linter Configuration Comparison
 
-This document compares Super Linter configurations across different repositories to identify best practices and ensure consistency.
+This document compares Super Linter configurations across different repositories to identify best
+practices and ensure consistency.
 
 ## Repositories Compared
 
@@ -45,8 +46,8 @@ CREATE_LOG_FILE=true
 
 ### Languages in Both Repositories
 
-| Language       | ghcommon                            | ubuntu-autoinstall-agent            | Notes     |
-| -------------- | ----------------------------------- | ----------------------------------- | --------- |
+| Language       | ghcommon                             | ubuntu-autoinstall-agent             | Notes     |
+| -------------- | ------------------------------------ | ------------------------------------ | --------- |
 | Bash/Shell     | ✅ VALIDATE_BASH=true                | ✅ VALIDATE_BASH=true                | Identical |
 | Bash Exec      | ✅ VALIDATE_BASH_EXEC=true           | ✅ VALIDATE_BASH_EXEC=true           | Identical |
 | Docker         | ✅ VALIDATE_DOCKERFILE_HADOLINT=true | ✅ VALIDATE_DOCKERFILE_HADOLINT=true | Identical |
@@ -65,8 +66,8 @@ CREATE_LOG_FILE=true
 
 ### Languages Only in ghcommon
 
-| Language              | ghcommon                                       | Reason                                |
-| --------------------- | ---------------------------------------------- | ------------------------------------- |
+| Language              | ghcommon                                        | Reason                                |
+| --------------------- | ----------------------------------------------- | ------------------------------------- |
 | Go                    | ✅ VALIDATE_GO=true                             | ghcommon has Go code                  |
 | JavaScript/TypeScript | ✅ Enabled (all variants)                       | ghcommon has JS/TS workflow scripts   |
 | Python                | ✅ Enabled (Black, Pylint, Flake8, Isort, Ruff) | ghcommon has extensive Python scripts |
@@ -76,10 +77,10 @@ CREATE_LOG_FILE=true
 
 | Language              | ubuntu-autoinstall-agent | Reason            |
 | --------------------- | ------------------------ | ----------------- |
-| Go                    | ❌ Commented out          | Rust-only project |
-| JavaScript/TypeScript | ❌ Explicitly disabled    | No JS/TS code     |
-| Python                | ❌ Commented out          | Rust-only project |
-| XML                   | ❌ Commented out          | Not needed        |
+| Go                    | ❌ Commented out         | Rust-only project |
+| JavaScript/TypeScript | ❌ Explicitly disabled   | No JS/TS code     |
+| Python                | ❌ Commented out         | Rust-only project |
+| XML                   | ❌ Commented out         | Not needed        |
 
 ## Configuration File References
 
@@ -121,7 +122,8 @@ YAML_CONFIG_FILE=.yaml-lint.yml
 RUST_CLIPPY_CONFIG_FILE=clippy.toml
 ```
 
-**Pattern**: Active configs use root directory paths, but commented-out configs show legacy `.github/linters/` approach
+**Pattern**: Active configs use root directory paths, but commented-out configs show legacy
+`.github/linters/` approach
 
 ## Filter Exclusions
 
@@ -161,10 +163,12 @@ This excludes:
 
 ### For Cross-Repository Consistency
 
-1. **Adopt root directory pattern** - Both repositories should use root directory for all linter configs
+1. **Adopt root directory pattern** - Both repositories should use root directory for all linter
+   configs
 2. **Remove `.github/linters/` references** - Even in comments, to avoid confusion
 3. **Sync versions** - Update ghcommon to v1.1.3 or higher
-4. **Document config file locations** - Each repository should document where its linter configs live
+4. **Document config file locations** - Each repository should document where its linter configs
+   live
 
 ## Action Items
 
@@ -187,7 +191,8 @@ From comparing these two repositories:
 1. **Use root directory for all linter configs** - Simpler and more standard
 2. **Explicitly disable unused validators** - Clearer than commenting them out
 3. **Keep filter regex comprehensive** - Exclude all generated/vendor content
-4. **Match validators to repository languages** - Don't enable validators for languages you don't use
+4. **Match validators to repository languages** - Don't enable validators for languages you don't
+   use
 5. **Version your configuration files** - Include version in file header
 6. **Document deviations** - Comment why certain validators are disabled
 
@@ -199,7 +204,6 @@ From comparing these two repositories:
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: October 12, 2025
-**Compared Repositories**: 2 (ghcommon v1.1.0, ubuntu-autoinstall-agent v1.1.3)
-**Next Review**: After implementing Task 15 config updates
+**Document Version**: 1.0.0 **Last Updated**: October 12, 2025 **Compared Repositories**: 2
+(ghcommon v1.1.0, ubuntu-autoinstall-agent v1.1.3) **Next Review**: After implementing Task 15
+config updates

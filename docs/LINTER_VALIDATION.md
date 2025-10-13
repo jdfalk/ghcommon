@@ -4,11 +4,13 @@
 
 # Linter Configuration Validation
 
-This document describes the comprehensive linter configuration validation system for ensuring all linter configs comply with Google Style Guides.
+This document describes the comprehensive linter configuration validation system for ensuring all
+linter configs comply with Google Style Guides.
 
 ## Overview
 
-The repository contains multiple linter configuration files for different languages and tools. This validation system ensures:
+The repository contains multiple linter configuration files for different languages and tools. This
+validation system ensures:
 
 1. All configuration files exist and are syntactically valid
 2. Configurations follow Google Style Guide standards
@@ -19,7 +21,8 @@ The repository contains multiple linter configuration files for different langua
 
 This repository follows these Google Style Guides:
 
-- **JavaScript/TypeScript**: [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
+- **JavaScript/TypeScript**:
+  [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
 - **Python**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 - **Go**: [Google Go Style Guide](https://google.github.io/styleguide/go/)
 - **Shell**: [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)
@@ -47,6 +50,7 @@ This repository follows these Google Style Guides:
 ### JavaScript/TypeScript
 
 #### `.prettierrc.json`
+
 ```json
 {
   "tabWidth": 2,
@@ -59,30 +63,36 @@ This repository follows these Google Style Guides:
 ```
 
 **Google Compliance:**
+
 - ✅ 2 spaces indentation
 - ✅ 80 character line limit
 - ✅ Semicolons required
 - ✅ Single quotes preferred
 
 #### `.eslintrc.yml`
+
 Should extend `eslint-config-google` for full compliance.
 
 ### Python
 
 #### `.python-black`
+
 ```
 --line-length=80
 --target-version=py311
 ```
 
 **Google Compliance:**
+
 - ✅ 80 character line limit
 - ✅ Python 3.11+ target
 
 #### `.pylintrc`
+
 Should set `max-line-length=80`
 
 #### `.isort.cfg`
+
 ```ini
 [settings]
 line_length = 80
@@ -90,30 +100,36 @@ profile = black
 ```
 
 **Google Compliance:**
+
 - ✅ 80 character line limit
 - ✅ Black-compatible profile
 
 ### Go
 
 #### `.golangci.yml`
+
 Go formatting is handled by `gofmt` and `goimports`, which automatically comply with Go standards.
 
 ### Markdown
 
 #### `.markdownlint.json`
+
 Configured for consistent markdown formatting across documentation.
 
 ### YAML
 
 #### `.yaml-lint.yml`
+
 Ensures YAML files follow consistent formatting rules.
 
 ### Rust
 
 #### `clippy.toml`
+
 Rust linting rules via Clippy.
 
 #### `rustfmt.toml`
+
 Rust formatting rules.
 
 ## Validation Script
@@ -153,23 +169,27 @@ python3 scripts/validate-linter-configs.py --repo-root /path/to/repo
 Run these tasks from VS Code's "Run Task" menu (`Cmd+Shift+P` → "Tasks: Run Task"):
 
 #### 1. Validate Linter Configs
+
 - **Task**: `Validate Linter Configs`
 - **Description**: Runs comprehensive validation script
 - **Usage**: Quick check before committing changes
 
 #### 2. Run Super Linter in Docker (CI Mode)
+
 - **Task**: `Run Super Linter in Docker (CI Mode)`
 - **Description**: Runs Super Linter with CI configuration
 - **Usage**: Test all files as CI would test them
 - **Config**: Uses `super-linter-ci.env`
 
 #### 3. Run Super Linter in Docker (PR Mode)
+
 - **Task**: `Run Super Linter in Docker (PR Mode)`
 - **Description**: Runs Super Linter with PR auto-fix configuration
 - **Usage**: Test auto-fix functionality
 - **Config**: Uses `super-linter-pr.env`
 
 #### 4. Run Super Linter in Docker (Test Minimal)
+
 - **Task**: `Run Super Linter in Docker (Test Minimal)`
 - **Description**: Runs Super Linter with minimal test config
 - **Usage**: Quick smoke test with 3 validators
@@ -180,11 +200,13 @@ Run these tasks from VS Code's "Run Task" menu (`Cmd+Shift+P` → "Tasks: Run Ta
 To use the Docker-based Super Linter tasks, you need:
 
 1. **Docker installed and running**
+
    ```bash
    docker --version
    ```
 
 2. **Super Linter image pulled**
+
    ```bash
    docker pull ghcr.io/super-linter/super-linter:latest
    ```
@@ -267,6 +289,7 @@ pre-commit install
 #### "Config file not found"
 
 **Solution**: Run validation script to identify missing files:
+
 ```bash
 python3 scripts/validate-linter-configs.py --verbose
 ```
@@ -274,6 +297,7 @@ python3 scripts/validate-linter-configs.py --verbose
 #### "Docker mount permission denied"
 
 **Solution**: Ensure Docker has permission to access the repository:
+
 ```bash
 # On macOS
 # System Preferences → Privacy & Security → Files and Folders → Docker
@@ -286,6 +310,7 @@ python3 scripts/validate-linter-configs.py --verbose
 #### "Super Linter fails in Docker"
 
 **Solution**: Check the specific linter logs:
+
 ```bash
 docker run --rm \
   -e RUN_LOCAL=true \

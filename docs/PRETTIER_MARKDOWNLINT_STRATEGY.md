@@ -16,11 +16,13 @@ When both run on the same files, they can produce conflicting results.
 ## Current Configuration
 
 ### Prettier (.prettierrc.json)
+
 - Markdown files: `printWidth: 100`, `proseWrap: "always"`
 - Instructions markdown: `printWidth: 120`, `proseWrap: "preserve"`
 - Formats: line wrapping, list spacing, code blocks
 
 ### Markdownlint (.markdownlint.json)
+
 - Line length: `240` characters
 - List indentation: `2` spaces
 - Validates: headings, blank lines, code blocks, lists
@@ -28,11 +30,13 @@ When both run on the same files, they can produce conflicting results.
 ### Super Linter Configuration
 
 **CI Mode (super-linter-ci.env)**:
+
 - `VALIDATE_MARKDOWN=true` - Markdownlint validates
 - `VALIDATE_JAVASCRIPT_PRETTIER=true`
 - `VALIDATE_TYPESCRIPT_PRETTIER=true`
 
 **PR Mode (super-linter-pr.env)**:
+
 - `FIX_MARKDOWN=true` - **Prettier auto-fixes markdown**
 - `FIX_JAVASCRIPT_PRETTIER=true`
 - `FIX_TYPESCRIPT_PRETTIER=true`
@@ -58,14 +62,15 @@ Use Prettier to handle formatting and Markdownlint only for style rules that don
    - MD024 (no duplicate headings)
 
 3. **Update .markdownlint.json**:
+
 ```json
 {
   "default": true,
   "MD007": { "indent": 2 },
-  "MD013": false,  // Disable - Prettier handles line length
-  "MD022": false,  // Disable - Prettier handles blank lines around headings
-  "MD031": false,  // Disable - Prettier handles blank lines around fences
-  "MD032": false,  // Disable - Prettier handles blank lines around lists
+  "MD013": false, // Disable - Prettier handles line length
+  "MD022": false, // Disable - Prettier handles blank lines around headings
+  "MD031": false, // Disable - Prettier handles blank lines around fences
+  "MD032": false, // Disable - Prettier handles blank lines around lists
   "MD033": false,
   "MD041": false,
   "MD046": { "style": "fenced" },
@@ -75,12 +80,13 @@ Use Prettier to handle formatting and Markdownlint only for style rules that don
 ```
 
 4. **Align Prettier with Google Style**:
+
 ```json
 {
   "files": "*.md",
   "options": {
     "proseWrap": "always",
-    "printWidth": 80,  // Google standard
+    "printWidth": 80, // Google standard
     "tabWidth": 2,
     "useTabs": false
   }
@@ -88,12 +94,14 @@ Use Prettier to handle formatting and Markdownlint only for style rules that don
 ```
 
 **Pros:**
+
 - ✅ No conflicts between tools
 - ✅ Prettier handles all formatting consistently
 - ✅ Markdownlint catches style issues Prettier doesn't care about
 - ✅ Follows Google Style Guide (80 char lines)
 
 **Cons:**
+
 - ⚠️ Must maintain two configs that work together
 
 ### Option 2: Markdownlint Only (Alternative)
@@ -103,6 +111,7 @@ Disable Prettier for markdown and use only Markdownlint.
 **Implementation:**
 
 1. **Update .prettierrc.json** to exclude markdown:
+
 ```json
 {
   "overrides": [
@@ -118,6 +127,7 @@ Disable Prettier for markdown and use only Markdownlint.
 ```
 
 2. **Disable FIX_MARKDOWN in super-linter-pr.env**:
+
 ```bash
 FIX_MARKDOWN=false
 ```
@@ -125,11 +135,13 @@ FIX_MARKDOWN=false
 3. **Keep VALIDATE_MARKDOWN=true in super-linter-ci.env**
 
 **Pros:**
+
 - ✅ No tool conflicts
 - ✅ Simpler configuration
 - ✅ Markdownlint has more markdown-specific rules
 
 **Cons:**
+
 - ❌ No auto-fixing for markdown
 - ❌ Less consistent with other file formats
 
@@ -144,11 +156,13 @@ Use Prettier for everything and disable Markdownlint for markdown.
 3. **Rely on Prettier** for all markdown formatting
 
 **Pros:**
+
 - ✅ Consistent formatting across all file types
 - ✅ Auto-fix works
 - ✅ Simpler tool chain
 
 **Cons:**
+
 - ❌ Loses markdown-specific style checks
 - ❌ Prettier doesn't check all markdown best practices
 
@@ -227,6 +241,7 @@ markdownlint "**/*.md"
 ### Step 4: Update Documentation
 
 Document the strategy in:
+
 - `.markdownlint.json` (add comments explaining disabled rules)
 - `.prettierrc.json` (add comments explaining markdown config)
 - This file (PRETTIER_MARKDOWNLINT_STRATEGY.md)
@@ -269,8 +284,8 @@ docker run --rm \
 
 ## Tool Comparison
 
-| Feature                     | Prettier   | Markdownlint          |
-| --------------------------- | ---------- | --------------------- |
+| Feature                     | Prettier    | Markdownlint           |
+| --------------------------- | ----------- | ---------------------- |
 | **Line wrapping**           | ✅ Yes      | ❌ No (only validates) |
 | **Code block language**     | ❌ No       | ✅ Yes (MD040)         |
 | **Blank lines**             | ✅ Yes      | ⚠️ Validates           |

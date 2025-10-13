@@ -6,18 +6,23 @@
 
 ## Overview
 
-This document describes the JSCPD (JavaScript Copy/Paste Detector) configuration used in this repository to identify code duplication while accounting for legitimate patterns in documentation and templates.
+This document describes the JSCPD (JavaScript Copy/Paste Detector) configuration used in this
+repository to identify code duplication while accounting for legitimate patterns in documentation
+and templates.
 
 ## Problem
 
-JSCPD was configured with a 0% duplicate threshold, causing workflow failures when detecting legitimate duplicates:
+JSCPD was configured with a 0% duplicate threshold, causing workflow failures when detecting
+legitimate duplicates:
 
 **Error Message**:
+
 ```text
 jscpd found too many duplicates (0.69%) over threshold (0%)
 ```
 
 **Duplicate Examples Found**:
+
 - **README.md**: Project automation notes (121:1-128:17, 402:2-419:9)
 - **AGENTS.md vs CLAUDE.md**: Shared documentation protocol sections
 - **AGENTS.md vs general-coding.instructions.md**: Version update guidelines
@@ -50,14 +55,7 @@ Created `.jscpd.json` configuration file with reasonable threshold and targeted 
     "**/target/**",
     "**/pkg/**"
   ],
-  "format": [
-    "**/*.md",
-    "**/*.js",
-    "**/*.ts",
-    "**/*.go",
-    "**/*.py",
-    "**/*.rs"
-  ],
+  "format": ["**/*.md", "**/*.js", "**/*.ts", "**/*.go", "**/*.py", "**/*.rs"],
   "minLines": 5,
   "minTokens": 50,
   "maxLines": 500,
@@ -68,6 +66,7 @@ Created `.jscpd.json` configuration file with reasonable threshold and targeted 
 ### Configuration Explained
 
 #### `threshold: 5`
+
 - **Purpose**: Maximum allowed duplication percentage
 - **Value**: 5% (increased from 0%)
 - **Rationale**:
@@ -79,12 +78,14 @@ Created `.jscpd.json` configuration file with reasonable threshold and targeted 
   - Still catches actual copy/paste issues (typically >10%)
 
 #### `reporters: ["html", "console"]`
+
 - **Purpose**: How to report duplicates
 - **html**: Generates detailed report with visual comparison
 - **console**: Prints summary to terminal/logs
 - **Output**: See duplicate patterns at a glance
 
 #### `ignore` Patterns
+
 Excludes files/directories with legitimate duplication:
 
 1. **`**/.github/instructions/**`**: Coding instruction files
@@ -92,7 +93,7 @@ Excludes files/directories with legitimate duplication:
    - Standard patterns for different languages
    - Version update sections are identical by design
 
-2. **`**/*.instructions.md`**: All instruction files
+2. **`**/\*.instructions.md`\*\*: All instruction files
    - Broader pattern for instructions anywhere
    - Covers `.github/instructions/` and other locations
 
@@ -119,6 +120,7 @@ Excludes files/directories with legitimate duplication:
    - `**/pkg/**`: Generated packages
 
 #### `format` Array
+
 Files to scan for duplicates:
 
 - `**/*.md`: Markdown documentation
@@ -157,12 +159,14 @@ Files to scan for duplicates:
 ## Version Update Requirements
 
 When modifying any file with a version header, ALWAYS update the version number:
+
 - Patch version (x.y.Z): Bug fixes, typos, minor formatting changes
 - Minor version (x.Y.z): New features, significant content additions
 - Major version (X.y.z): Breaking changes, structural overhauls
 ```
 
 **Why Duplicated**:
+
 - Standard versioning rules across all repositories
 - Consistent guidelines for contributors
 - Part of centralized instruction system
@@ -182,6 +186,7 @@ When modifying any file with a version header, ALWAYS update the version number:
 ```
 
 **Why Duplicated**:
+
 - Shared protocol across different AI agents
 - Consistency required for automation
 - Intentional standardization
@@ -196,12 +201,14 @@ When modifying any file with a version header, ALWAYS update the version number:
 ## Project Automation
 
 This repository uses:
+
 - GitHub Actions workflows for CI/CD
 - Super Linter for code quality
 - Automated dependency updates via Dependabot
 ```
 
 **Why Duplicated**:
+
 - Standard project structure documentation
 - Repeated in different sections (overview, setup, workflow)
 - Part of comprehensive documentation
@@ -217,13 +224,14 @@ on:
   workflow_call:
     inputs:
       test_scenario:
-        description: "Test scenario to run"
+        description: 'Test scenario to run'
         required: false
         type: string
-        default: "all"
+        default: 'all'
 ```
 
 **Why Duplicated**:
+
 - Reusable workflow patterns
 - Standard input/output structures
 - Template boilerplate
@@ -315,6 +323,7 @@ If legitimate duplicates still fail:
 ```
 
 **Use Cases**:
+
 - High documentation to code ratio
 - Monorepo with shared patterns
 - Template-heavy project
@@ -363,12 +372,14 @@ To include more languages:
 ### Issue: JSCPD Still Failing
 
 **Check**:
+
 1. Verify `.jscpd.json` exists in repository root
 2. Confirm `JSCPD_CONFIG_FILE=.jscpd.json` in Super Linter config
 3. Check threshold value is reasonable (≥5%)
 4. Review duplicate report for actual issues
 
 **Fix**:
+
 - Increase threshold: `"threshold": 10`
 - Add specific file exclusions
 - Review and refactor actual duplicates
@@ -376,11 +387,13 @@ To include more languages:
 ### Issue: Not Detecting Real Duplicates
 
 **Check**:
+
 1. Verify files are in `format` list
 2. Check files not in `ignore` list
 3. Ensure `minLines` and `minTokens` not too high
 
 **Fix**:
+
 - Lower threshold: `"threshold": 3`
 - Reduce `minLines`: `"minLines": 3`
 - Remove overly broad ignore patterns
@@ -388,11 +401,13 @@ To include more languages:
 ### Issue: Performance Problems
 
 **Check**:
+
 1. Large files being scanned
 2. Too many files matching `format`
 3. `maxSize` and `maxLines` too high
 
 **Fix**:
+
 - Reduce `maxSize`: `"maxSize": "50kb"`
 - Reduce `maxLines`: `"maxLines": 200`
 - Add more exclusions to `ignore`

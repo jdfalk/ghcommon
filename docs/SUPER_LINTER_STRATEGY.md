@@ -4,7 +4,8 @@
 
 # Super Linter Configuration Strategy
 
-This document explains ghcommon's Super Linter configuration approach, design decisions, and best practices for maintaining linter configurations across repositories.
+This document explains ghcommon's Super Linter configuration approach, design decisions, and best
+practices for maintaining linter configurations across repositories.
 
 ## Table of Contents
 
@@ -29,7 +30,8 @@ ghcommon follows these core principles for Super Linter configuration:
 
 ## Root Directory Pattern
 
-All 15 linter configuration files in ghcommon are stored in the repository root directory, not in `.github/linters/`:
+All 15 linter configuration files in ghcommon are stored in the repository root directory, not in
+`.github/linters/`:
 
 ```bash
 # ✅ CORRECT: Root directory
@@ -121,7 +123,8 @@ MARKDOWN_CONFIG_FILE=.markdownlint.json
 
 ### Why Symlinks Cause Problems
 
-1. **Docker container path resolution**: Super Linter runs in a Docker container where symlinks may resolve to incorrect paths
+1. **Docker container path resolution**: Super Linter runs in a Docker container where symlinks may
+   resolve to incorrect paths
 2. **Cross-platform issues**: Symlinks behave differently on Windows, macOS, and Linux
 3. **Git repository problems**: Symlinks can cause issues in different git configurations
 4. **Debugging difficulty**: Hard to trace which file is actually being used
@@ -337,17 +340,22 @@ When updating Super Linter configurations:
 **Same pattern, different locations:**
 
 - **ghcommon, subtitle-manager**: Config files in root directory
-- **audiobook-organizer, copilot-agent-util-rust, gcommon-proto**: Config files in `.github/linters/`
+- **audiobook-organizer, copilot-agent-util-rust, gcommon-proto**: Config files in
+  `.github/linters/`
 - **ubuntu-autoinstall-agent**: Config files in root directory, Rust-focused
 
-**Key point**: The *pattern* (explicit `*_CONFIG_FILE` variables) is consistent, but the *location* varies by repository needs.
+**Key point**: The _pattern_ (explicit `*_CONFIG_FILE` variables) is consistent, but the _location_
+varies by repository needs.
 
 ## Related Documentation
 
-- [LINTER_CONFIG_LOCATIONS.md](./LINTER_CONFIG_LOCATIONS.md) - Complete list of all 15 linter configs
-- [SUPER_LINTER_CONFIG_COMPARISON.md](./SUPER_LINTER_CONFIG_COMPARISON.md) - Comparison with ubuntu-autoinstall-agent
+- [LINTER_CONFIG_LOCATIONS.md](./LINTER_CONFIG_LOCATIONS.md) - Complete list of all 15 linter
+  configs
+- [SUPER_LINTER_CONFIG_COMPARISON.md](./SUPER_LINTER_CONFIG_COMPARISON.md) - Comparison with
+  ubuntu-autoinstall-agent
 - [MANUAL_SYNC_PROCESS.md](./MANUAL_SYNC_PROCESS.md) - How to sync configs to other repos (Task 24)
-- [SUPER_LINTER_TESTING_RESULTS.md](./SUPER_LINTER_TESTING_RESULTS.md) - Test results and verification (Task 23)
+- [SUPER_LINTER_TESTING_RESULTS.md](./SUPER_LINTER_TESTING_RESULTS.md) - Test results and
+  verification (Task 23)
 
 ## Troubleshooting
 
@@ -422,7 +430,9 @@ docker run --rm -v "$PWD":/tmp/lint github/super-linter:latest
 After reading this document:
 
 1. Review [LINTER_CONFIG_LOCATIONS.md](./LINTER_CONFIG_LOCATIONS.md) for complete config list
-2. Compare with other repositories using [SUPER_LINTER_CONFIG_COMPARISON.md](./SUPER_LINTER_CONFIG_COMPARISON.md)
+2. Compare with other repositories using
+   [SUPER_LINTER_CONFIG_COMPARISON.md](./SUPER_LINTER_CONFIG_COMPARISON.md)
 3. Learn manual sync process from [MANUAL_SYNC_PROCESS.md](./MANUAL_SYNC_PROCESS.md) (when created)
 4. Run test workflow to verify configurations (Tasks 17-23)
-5. Review test results in [SUPER_LINTER_TESTING_RESULTS.md](./SUPER_LINTER_TESTING_RESULTS.md) (when created)
+5. Review test results in [SUPER_LINTER_TESTING_RESULTS.md](./SUPER_LINTER_TESTING_RESULTS.md) (when
+   created)

@@ -12,7 +12,8 @@
 >
 > - Keep file headers (file path, version, guid) and bump versions on changes
 > - Follow `.github/instructions/general-coding.instructions.md` for formatting rules
-> - Use VS Code tasks for git operations (Git Add All, Git Commit, Git Push) - these tasks use `copilot-agent-util` for enhanced logging and safety
+> - Use VS Code tasks for git operations (Git Add All, Git Commit, Git Push) - these tasks use
+>   `copilot-agent-util` for enhanced logging and safety
 > - See `AGENTS.md` and `CLAUDE.md` in repository root for workflow details
 >
 > **What was removed**:
@@ -22,9 +23,9 @@
 > - `.github/doc-updates/` directory and workflow system
 > - JSON-based update file approach
 >
-> **Why it was deprecated**: The indirect JSON-based update system added unnecessary
-> complexity. Direct editing with version tracking in file headers provides better
-> transparency and simpler workflows.
+> **Why it was deprecated**: The indirect JSON-based update system added unnecessary complexity.
+> Direct editing with version tracking in file headers provides better transparency and simpler
+> workflows.
 >
 > ---
 >
