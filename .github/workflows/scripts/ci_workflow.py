@@ -55,7 +55,9 @@ def get_repository_config() -> dict[str, Any]:
     try:
         _CONFIG_CACHE = json.loads(raw)
     except json.JSONDecodeError:
-        print("::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults")
+        print(
+            "::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults"
+        )
         _CONFIG_CACHE = {}
     return _CONFIG_CACHE
 
@@ -86,7 +88,9 @@ def debug_filter(_: argparse.Namespace) -> None:
 
 def determine_execution(_: argparse.Namespace) -> None:
     commit_message = os.environ.get("GITHUB_HEAD_COMMIT_MESSAGE", "")
-    skip_ci = bool(re.search(r"\[(skip ci|ci skip)\]", commit_message, flags=re.IGNORECASE))
+    skip_ci = bool(
+        re.search(r"\[(skip ci|ci skip)\]", commit_message, flags=re.IGNORECASE)
+    )
     write_output("skip_ci", "true" if skip_ci else "false")
     if skip_ci:
         print("Skipping CI due to commit message")
@@ -95,10 +99,16 @@ def determine_execution(_: argparse.Namespace) -> None:
 
     write_output("should_lint", "true")
     write_output("should_test_go", os.environ.get("CI_GO_FILES", "false"))
-    write_output("should_test_frontend", os.environ.get("CI_FRONTEND_FILES", "false"))
-    write_output("should_test_python", os.environ.get("CI_PYTHON_FILES", "false"))
+    write_output(
+        "should_test_frontend", os.environ.get("CI_FRONTEND_FILES", "false")
+    )
+    write_output(
+        "should_test_python", os.environ.get("CI_PYTHON_FILES", "false")
+    )
     write_output("should_test_rust", os.environ.get("CI_RUST_FILES", "false"))
-    write_output("should_test_docker", os.environ.get("CI_DOCKER_FILES", "false"))
+    write_output(
+        "should_test_docker", os.environ.get("CI_DOCKER_FILES", "false")
+    )
 
 
 def wait_for_pr_automation(_: argparse.Namespace) -> None:
@@ -110,7 +120,9 @@ def wait_for_pr_automation(_: argparse.Namespace) -> None:
     sleep_seconds = int(os.environ.get("SLEEP_SECONDS", "10"))
 
     if not (repo and token and target_sha):
-        print("Missing required environment values; skipping PR automation wait")
+        print(
+            "Missing required environment values; skipping PR automation wait"
+        )
         return
 
     headers = {
@@ -121,16 +133,25 @@ def wait_for_pr_automation(_: argparse.Namespace) -> None:
 
     print("🔄 Waiting for PR automation to complete...")
     for attempt in range(max_attempts):
-        print(f"Checking for PR automation completion (attempt {attempt + 1}/{max_attempts})...")
-        response = requests.get(url, headers=headers, params={"per_page": 100}, timeout=30)
+        print(
+            f"Checking for PR automation completion (attempt {attempt + 1}/{max_attempts})..."
+        )
+        response = requests.get(
+            url, headers=headers, params={"per_page": 100}, timeout=30
+        )
         if response.status_code != 200:
-            print(f"::warning::Unable to query workflow runs: {response.status_code}")
+            print(
+                f"::warning::Unable to query workflow runs: {response.status_code}"
+            )
             time.sleep(sleep_seconds)
             continue
 
         runs = response.json().get("workflow_runs", [])
         matching_runs = [
-            run for run in runs if run.get("head_sha") == target_sha and run.get("name") == workflow_name
+            run
+            for run in runs
+            if run.get("head_sha") == target_sha
+            and run.get("name") == workflow_name
         ]
 
         if not matching_runs:
@@ -239,13 +260,32 @@ def go_test(_: argparse.Namespace) -> None:
     if threshold_env:
         threshold = float(threshold_env)
     else:
-        threshold = float(_config_path(0, "testing", "coverage", "threshold") or 0)
+        threshold = float(
+            _config_path(0, "testing", "coverage", "threshold") or 0
+        )
 
-    subprocess.run(["go", "test", "-v", "-race", f"-coverprofile={coverage_file}", "./..."], check=True)
+    subprocess.run(
+        [
+            "go",
+            "test",
+            "-v",
+            "-race",
+            f"-coverprofile={coverage_file}",
+            "./...",
+        ],
+        check=True,
+    )
 
     go_binary = shutil.which("go") or "go"
     subprocess.run(
-        [go_binary, "tool", "cover", f"-html={coverage_file}", "-o", coverage_html],
+        [
+            go_binary,
+            "tool",
+            "cover",
+            f"-html={coverage_file}",
+            "-o",
+            coverage_html,
+        ],
         check=True,
     )
     result = subprocess.run(
@@ -267,7 +307,9 @@ def go_test(_: argparse.Namespace) -> None:
     coverage = _parse_go_coverage(total_line)
     print(f"Coverage: {coverage}%")
     if coverage < threshold:
-        raise SystemExit(f"Coverage {coverage}% is below threshold {threshold}%")
+        raise SystemExit(
+            f"Coverage {coverage}% is below threshold {threshold}%"
+        )
     print(f"✅ Coverage {coverage}% meets threshold {threshold}%")
 
 
@@ -282,7 +324,14 @@ def check_go_coverage(_: argparse.Namespace) -> None:
     go_binary = shutil.which("go") or "go"
 
     subprocess.run(
-        [go_binary, "tool", "cover", f"-html={coverage_file}", "-o", str(html_output)],
+        [
+            go_binary,
+            "tool",
+            "cover",
+            f"-html={coverage_file}",
+            "-o",
+            str(html_output),
+        ],
         check=True,
     )
     result = subprocess.run(
@@ -310,7 +359,9 @@ def check_go_coverage(_: argparse.Namespace) -> None:
     print(f"✅ Coverage {coverage}% meets threshold {threshold}%")
 
 
-def _run_command(command: Iterable[str], check: bool = True) -> subprocess.CompletedProcess[str]:
+def _run_command(
+    command: Iterable[str], check: bool = True
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(list(command), check=check)
 
 
@@ -328,8 +379,12 @@ def frontend_install(_: argparse.Namespace) -> None:
 
 def frontend_run(_: argparse.Namespace) -> None:
     script_name = os.environ.get("FRONTEND_SCRIPT", "")
-    success_message = os.environ.get("FRONTEND_SUCCESS_MESSAGE", "Command succeeded")
-    failure_message = os.environ.get("FRONTEND_FAILURE_MESSAGE", "Command failed")
+    success_message = os.environ.get(
+        "FRONTEND_SUCCESS_MESSAGE", "Command succeeded"
+    )
+    failure_message = os.environ.get(
+        "FRONTEND_FAILURE_MESSAGE", "Command failed"
+    )
 
     if not script_name:
         raise SystemExit("FRONTEND_SCRIPT environment variable is required")
@@ -343,15 +398,22 @@ def frontend_run(_: argparse.Namespace) -> None:
 
 def python_install(_: argparse.Namespace) -> None:
     python = sys.executable
-    subprocess.run([python, "-m", "pip", "install", "--upgrade", "pip"], check=True)
+    subprocess.run(
+        [python, "-m", "pip", "install", "--upgrade", "pip"], check=True
+    )
 
     if Path("requirements.txt").is_file():
-        subprocess.run([python, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+        subprocess.run(
+            [python, "-m", "pip", "install", "-r", "requirements.txt"],
+            check=True,
+        )
 
     if Path("pyproject.toml").is_file():
         subprocess.run([python, "-m", "pip", "install", "-e", "."], check=True)
 
-    subprocess.run([python, "-m", "pip", "install", "pytest", "pytest-cov"], check=True)
+    subprocess.run(
+        [python, "-m", "pip", "install", "pytest", "pytest-cov"], check=True
+    )
 
 
 def python_run_tests(_: argparse.Namespace) -> None:
@@ -367,7 +429,14 @@ def python_run_tests(_: argparse.Namespace) -> None:
 
     python = sys.executable
     subprocess.run(
-        [python, "-m", "pytest", "--cov=.", "--cov-report=xml", "--cov-report=html"],
+        [
+            python,
+            "-m",
+            "pytest",
+            "--cov=.",
+            "--cov-report=xml",
+            "--cov-report=html",
+        ],
         check=True,
     )
 
@@ -376,13 +445,23 @@ def ensure_cargo_llvm_cov(_: argparse.Namespace) -> None:
     if shutil.which("cargo-llvm-cov"):
         print("cargo-llvm-cov already installed")
         return
-    subprocess.run(["cargo", "install", "cargo-llvm-cov", "--locked"], check=True)
+    subprocess.run(
+        ["cargo", "install", "cargo-llvm-cov", "--locked"], check=True
+    )
 
 
 def generate_rust_lcov(_: argparse.Namespace) -> None:
     output_path = Path(os.environ.get("LCOV_OUTPUT", "lcov.info"))
     subprocess.run(
-        ["cargo", "llvm-cov", "--workspace", "--verbose", "--lcov", "--output-path", str(output_path)],
+        [
+            "cargo",
+            "llvm-cov",
+            "--workspace",
+            "--verbose",
+            "--lcov",
+            "--output-path",
+            str(output_path),
+        ],
         check=True,
     )
 
@@ -391,7 +470,15 @@ def generate_rust_html(_: argparse.Namespace) -> None:
     output_dir = Path(os.environ.get("HTML_OUTPUT_DIR", "htmlcov"))
     output_dir.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["cargo", "llvm-cov", "--workspace", "--verbose", "--html", "--output-dir", str(output_dir)],
+        [
+            "cargo",
+            "llvm-cov",
+            "--workspace",
+            "--verbose",
+            "--html",
+            "--output-dir",
+            str(output_dir),
+        ],
         check=True,
     )
 
@@ -437,11 +524,17 @@ def docker_build(_: argparse.Namespace) -> None:
         print("ℹ️ No Dockerfile found")
         return
 
-    subprocess.run(["docker", "build", "-t", image_name, str(dockerfile.parent)], check=True)
+    subprocess.run(
+        ["docker", "build", "-t", image_name, str(dockerfile.parent)],
+        check=True,
+    )
 
 
 def docker_test_compose(_: argparse.Namespace) -> None:
-    if Path("docker-compose.yml").is_file() or Path("docker-compose.yaml").is_file():
+    if (
+        Path("docker-compose.yml").is_file()
+        or Path("docker-compose.yaml").is_file()
+    ):
         subprocess.run(["docker-compose", "config"], check=True)
     else:
         print("ℹ️ No docker-compose file found")
@@ -472,7 +565,9 @@ def run_benchmarks(_: argparse.Namespace) -> None:
     subprocess.run(["go", "test", "-bench=.", "-benchmem", "./..."], check=True)
 
 
-def _matrix_entries(versions: list[str], oses: list[str], version_key: str) -> list[dict[str, Any]]:
+def _matrix_entries(
+    versions: list[str], oses: list[str], version_key: str
+) -> list[dict[str, Any]]:
     matrix: list[dict[str, Any]] = []
     for os_index, runner in enumerate(oses):
         for ver_index, version in enumerate(versions):
@@ -507,12 +602,25 @@ def generate_matrices(_: argparse.Namespace) -> None:
     rust_matrix = _matrix_entries(rust_versions, os_list, "rust-version")
     frontend_matrix = _matrix_entries(node_versions, os_list, "node-version")
 
-    write_output("go-matrix", json.dumps({"include": go_matrix}, separators=(",", ":")))
-    write_output("python-matrix", json.dumps({"include": python_matrix}, separators=(",", ":")))
-    write_output("rust-matrix", json.dumps({"include": rust_matrix}, separators=(",", ":")))
-    write_output("frontend-matrix", json.dumps({"include": frontend_matrix}, separators=(",", ":")))
+    write_output(
+        "go-matrix", json.dumps({"include": go_matrix}, separators=(",", ":"))
+    )
+    write_output(
+        "python-matrix",
+        json.dumps({"include": python_matrix}, separators=(",", ":")),
+    )
+    write_output(
+        "rust-matrix",
+        json.dumps({"include": rust_matrix}, separators=(",", ":")),
+    )
+    write_output(
+        "frontend-matrix",
+        json.dumps({"include": frontend_matrix}, separators=(",", ":")),
+    )
 
-    coverage_threshold = _config_path(fallback_threshold, "testing", "coverage", "threshold")
+    coverage_threshold = _config_path(
+        fallback_threshold, "testing", "coverage", "threshold"
+    )
     write_output("coverage-threshold", str(coverage_threshold))
 
 
@@ -559,7 +667,9 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
         "## 🧭 Detection",
         f"- Primary language: {primary_language}",
     ]
-    summary_lines.extend(f"- {label}: {value}" for label, value in languages.items())
+    summary_lines.extend(
+        f"- {label}: {value}" for label, value in languages.items()
+    )
     summary_lines.extend(
         [
             "",
@@ -568,14 +678,18 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
             "|-----|--------|",
         ]
     )
-    summary_lines.extend(f"| {job} | {status} |" for job, status in steps.items())
+    summary_lines.extend(
+        f"| {job} | {status} |" for job, status in steps.items()
+    )
     summary_lines.extend(
         [
             "",
             "## 📁 Changed Files",
         ]
     )
-    summary_lines.extend(f"- {label}: {value}" for label, value in files_changed.items())
+    summary_lines.extend(
+        f"- {label}: {value}" for label, value in files_changed.items()
+    )
     summary_lines.append("")
 
     append_summary("\n".join(summary_lines) + "\n")

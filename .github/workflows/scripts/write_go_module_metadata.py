@@ -22,7 +22,9 @@ def main() -> None:
         "repository": repository,
         "commit": commit_sha,
         "tag": tag_name,
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": datetime.now(timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        ),
     }
 
     output_path = Path("module-metadata.json")

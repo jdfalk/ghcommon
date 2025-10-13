@@ -26,7 +26,9 @@ def load_toml(path: Path) -> dict:
         except ModuleNotFoundError:  # pragma: no cover
             import tomli as tomllib  # type: ignore
     except ModuleNotFoundError:  # pragma: no cover
-        print("::error::Python tomllib/tomli module is required", file=sys.stderr)
+        print(
+            "::error::Python tomllib/tomli module is required", file=sys.stderr
+        )
         raise SystemExit(1)
 
     try:
@@ -39,20 +41,26 @@ def load_toml(path: Path) -> dict:
 def main() -> None:
     cargo_path = Path("Cargo.toml")
     if not cargo_path.exists():
-        print("::error::Cargo.toml not found in repository root", file=sys.stderr)
+        print(
+            "::error::Cargo.toml not found in repository root", file=sys.stderr
+        )
         raise SystemExit(1)
 
     data = load_toml(cargo_path)
     package = data.get("package")
     if not isinstance(package, dict):
-        print("::error::[package] section missing in Cargo.toml", file=sys.stderr)
+        print(
+            "::error::[package] section missing in Cargo.toml", file=sys.stderr
+        )
         raise SystemExit(1)
 
     missing: list[str] = []
     for field in REQUIRED_FIELDS:
         value = package.get(field)
-        if value is None or (isinstance(value, str) and not value.strip()) or (
-            isinstance(value, (list, tuple)) and not value
+        if (
+            value is None
+            or (isinstance(value, str) and not value.strip())
+            or (isinstance(value, (list, tuple)) and not value)
         ):
             missing.append(field)
         else:
@@ -60,7 +68,8 @@ def main() -> None:
 
     if missing:
         print(
-            "::error::Missing required Cargo.toml fields: " + ", ".join(missing),
+            "::error::Missing required Cargo.toml fields: "
+            + ", ".join(missing),
             file=sys.stderr,
         )
         raise SystemExit(1)

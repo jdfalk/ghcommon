@@ -48,7 +48,9 @@ def get_repository_config() -> dict[str, Any]:
     try:
         _CONFIG_CACHE = json.loads(raw)
     except json.JSONDecodeError:
-        print("::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults")
+        print(
+            "::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults"
+        )
         _CONFIG_CACHE = {}
     return _CONFIG_CACHE
 
@@ -74,10 +76,16 @@ def _normalize_override(value: str | None) -> str:
 def _build_target_set(build_target: str) -> set[str]:
     if not build_target or build_target == "all":
         return {"go", "python", "rust", "frontend", "docker", "protobuf"}
-    return {entry.strip().lower() for entry in build_target.split(",") if entry.strip()}
+    return {
+        entry.strip().lower()
+        for entry in build_target.split(",")
+        if entry.strip()
+    }
 
 
-def _derive_flag(override: str, key: str, targets: set[str], default: bool) -> bool:
+def _derive_flag(
+    override: str, key: str, targets: set[str], default: bool
+) -> bool:
     if override == "true":
         return True
     if override == "false":
@@ -98,7 +106,9 @@ def _any_proto_files(limit: int = 20) -> bool:
     return count > 0
 
 
-def _matrix_json(version_key: str, versions: Iterable[str], oses: Iterable[str]) -> str:
+def _matrix_json(
+    version_key: str, versions: Iterable[str], oses: Iterable[str]
+) -> str:
     matrix = {
         version_key: list(dict.fromkeys(versions)),
         "os": list(dict.fromkeys(oses)),
@@ -112,7 +122,9 @@ def _docker_matrix_json(platforms: Iterable[str]) -> str:
 
 
 def detect_languages(_: argparse.Namespace) -> None:
-    skip_detection = os.environ.get("SKIP_LANGUAGE_DETECTION", "false").lower() == "true"
+    skip_detection = (
+        os.environ.get("SKIP_LANGUAGE_DETECTION", "false").lower() == "true"
+    )
     targets = _build_target_set(os.environ.get("BUILD_TARGET", "all").lower())
 
     overrides = {
@@ -128,9 +140,13 @@ def detect_languages(_: argparse.Namespace) -> None:
         has_go = _derive_flag(overrides["go"], "go", targets, False)
         has_python = _derive_flag(overrides["python"], "python", targets, False)
         has_rust = _derive_flag(overrides["rust"], "rust", targets, False)
-        has_frontend = _derive_flag(overrides["frontend"], "frontend", targets, False)
+        has_frontend = _derive_flag(
+            overrides["frontend"], "frontend", targets, False
+        )
         has_docker = _derive_flag(overrides["docker"], "docker", targets, False)
-        protobuf_needed = _derive_flag(overrides["protobuf"], "protobuf", targets, False)
+        protobuf_needed = _derive_flag(
+            overrides["protobuf"], "protobuf", targets, False
+        )
     else:
         has_go = (
             Path("go.mod").is_file()
@@ -138,7 +154,15 @@ def detect_languages(_: argparse.Namespace) -> None:
             or Path("cmd").exists()
             or Path("pkg").exists()
         )
-        has_python = any(Path(".").joinpath(name).exists() for name in ["setup.py", "pyproject.toml", "requirements.txt", "poetry.lock"])
+        has_python = any(
+            Path(".").joinpath(name).exists()
+            for name in [
+                "setup.py",
+                "pyproject.toml",
+                "requirements.txt",
+                "poetry.lock",
+            ]
+        )
         has_rust = Path("Cargo.toml").is_file() or Path("Cargo.lock").is_file()
         has_frontend = (
             Path("package.json").is_file()
@@ -146,8 +170,16 @@ def detect_languages(_: argparse.Namespace) -> None:
             or Path("frontend").exists()
             or Path("ui").exists()
         )
-        has_docker = any(Path(".").glob("Dockerfile*")) or Path("docker-compose.yml").is_file() or Path("docker-compose.yaml").is_file()
-        protobuf_needed = Path("buf.yaml").is_file() or Path("buf.gen.yaml").is_file() or _any_proto_files()
+        has_docker = (
+            any(Path(".").glob("Dockerfile*"))
+            or Path("docker-compose.yml").is_file()
+            or Path("docker-compose.yaml").is_file()
+        )
+        protobuf_needed = (
+            Path("buf.yaml").is_file()
+            or Path("buf.gen.yaml").is_file()
+            or _any_proto_files()
+        )
 
         for key, override in overrides.items():
             if override == "true":
@@ -208,18 +240,30 @@ def detect_languages(_: argparse.Namespace) -> None:
     python_versions = versions.get("python") or ["3.11", "3.12", "3.13"]
     rust_versions = versions.get("rust") or ["stable", "beta"]
     node_versions = versions.get("node") or ["18", "20", "22"]
-    docker_platforms = _config_path(["linux/amd64", "linux/arm64"], "build", "docker", "platforms")
+    docker_platforms = _config_path(
+        ["linux/amd64", "linux/arm64"], "build", "docker", "platforms"
+    )
 
     write_output("go-matrix", _matrix_json("go-version", go_versions, os_list))
-    write_output("python-matrix", _matrix_json("python-version", python_versions, os_list))
-    write_output("rust-matrix", _matrix_json("rust-version", rust_versions, os_list))
-    write_output("frontend-matrix", _matrix_json("node-version", node_versions, ["ubuntu-latest"]))
+    write_output(
+        "python-matrix",
+        _matrix_json("python-version", python_versions, os_list),
+    )
+    write_output(
+        "rust-matrix", _matrix_json("rust-version", rust_versions, os_list)
+    )
+    write_output(
+        "frontend-matrix",
+        _matrix_json("node-version", node_versions, ["ubuntu-latest"]),
+    )
     write_output("docker-matrix", _docker_matrix_json(docker_platforms))
 
 
 def release_strategy(_: argparse.Namespace) -> None:
     branch = os.environ.get("BRANCH_NAME", "")
-    input_prerelease = os.environ.get("INPUT_PRERELEASE", "false").lower() == "true"
+    input_prerelease = (
+        os.environ.get("INPUT_PRERELEASE", "false").lower() == "true"
+    )
     input_draft = os.environ.get("INPUT_DRAFT", "false").lower() == "true"
 
     if branch == "main":
@@ -245,8 +289,12 @@ def release_strategy(_: argparse.Namespace) -> None:
     print(f"📋 Auto-draft: {auto_draft}")
 
 
-def _run_git(args: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(["git"] + args, check=check, capture_output=True, text=True)
+def _run_git(
+    args: list[str], check: bool = False
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git"] + args, check=check, capture_output=True, text=True
+    )
 
 
 def _latest_tag_from_api() -> str:
@@ -296,7 +344,9 @@ def _latest_tag_from_git() -> str:
 def generate_version(_: argparse.Namespace) -> None:
     release_type = os.environ.get("RELEASE_TYPE", "auto").lower()
     branch_name = os.environ.get("BRANCH_NAME", "")
-    auto_prerelease = os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
+    auto_prerelease = (
+        os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
+    )
 
     print("🔍 Detecting latest version...")
     latest_tag = _latest_tag_from_api()
@@ -330,7 +380,9 @@ def generate_version(_: argparse.Namespace) -> None:
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M")
     if auto_prerelease:
         suffix = "dev" if branch_name == "develop" else "alpha"
-        version_tag = f"v{new_major}.{new_minor}.{new_patch}-{suffix}.{timestamp}"
+        version_tag = (
+            f"v{new_major}.{new_minor}.{new_patch}-{suffix}.{timestamp}"
+        )
     else:
         version_tag = f"v{new_major}.{new_minor}.{new_patch}"
 
@@ -367,7 +419,9 @@ def generate_version(_: argparse.Namespace) -> None:
             new_patch += 1
             version_tag = f"v{new_major}.{new_minor}.{new_patch}"
         if new_patch - patch > 10:
-            version_tag = f"v{new_major}.{new_minor}.{new_patch}-build.{timestamp}"
+            version_tag = (
+                f"v{new_major}.{new_minor}.{new_patch}-build.{timestamp}"
+            )
             break
 
     print(f"✅ Final version tag: {version_tag}")
@@ -378,7 +432,9 @@ def generate_changelog(_: argparse.Namespace) -> None:
     branch = os.environ.get("BRANCH_NAME", "")
     primary_language = os.environ.get("PRIMARY_LANGUAGE", "unknown")
     strategy = os.environ.get("RELEASE_STRATEGY", "stable")
-    auto_prerelease = os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
+    auto_prerelease = (
+        os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
+    )
     auto_draft = os.environ.get("AUTO_DRAFT", "false").lower() == "true"
 
     describe = _run_git(["describe", "--tags", "--abbrev=0"])
@@ -390,7 +446,9 @@ def generate_changelog(_: argparse.Namespace) -> None:
         log_args = []
         header = "### 📋 Initial Release Commits:\n"
 
-    commits = _run_git(["log"] + log_args + ["--pretty=%s (%h)"]).stdout.splitlines()
+    commits = _run_git(
+        ["log"] + log_args + ["--pretty=%s (%h)"]
+    ).stdout.splitlines()
     commits = [entry for entry in commits if entry.strip()]
 
     lines = ["## 🚀 What's Changed", "", header]
@@ -410,9 +468,13 @@ def generate_changelog(_: argparse.Namespace) -> None:
     )
 
     if auto_prerelease:
-        lines.append("\n⚠️ **This is a pre-release version** - use for testing purposes.")
+        lines.append(
+            "\n⚠️ **This is a pre-release version** - use for testing purposes."
+        )
     if auto_draft:
-        lines.append("\n📝 **This is a draft release** - review before making public.")
+        lines.append(
+            "\n📝 **This is a draft release** - review before making public."
+        )
 
     changelog = "\n".join(lines) + "\n"
     append_to_file("GITHUB_OUTPUT", "changelog_content<<EOF\n")
@@ -421,7 +483,9 @@ def generate_changelog(_: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Release workflow helper commands.")
+    parser = argparse.ArgumentParser(
+        description="Release workflow helper commands."
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     commands = {
@@ -446,5 +510,5 @@ def main() -> None:
     handler(args)
 
 
-+if __name__ == "__main__":
-+    main()
+if __name__ == "__main__":
+    main()

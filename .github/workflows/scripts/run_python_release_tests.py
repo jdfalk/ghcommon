@@ -35,7 +35,17 @@ def main() -> None:
 
     if has_pytest_ini or has_pyproject or test_files:
         if has_pytest_ini or test_files:
-            subprocess.run([sys.executable, "-m", "pip", "install", "pytest", "pytest-cov"], check=True)
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "pytest",
+                    "pytest-cov",
+                ],
+                check=True,
+            )
             result = run_pytest(test_files)
         else:
             result = subprocess.run(
@@ -44,7 +54,9 @@ def main() -> None:
             ).returncode
         raise SystemExit(result)
 
-    print("No tests found in this repository. This is a configuration/shared repository.")
+    print(
+        "No tests found in this repository. This is a configuration/shared repository."
+    )
     print("Creating a placeholder test result to avoid failure.")
     coverage = PROJECT_ROOT / "coverage.xml"
     coverage.write_text(
