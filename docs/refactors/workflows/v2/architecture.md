@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document defines the architectural principles and patterns for the refactored ghcommon workflow system.
+This document defines the architectural principles and patterns for the refactored ghcommon workflow
+system.
 
 ## Core Principles
 
@@ -15,19 +16,21 @@ This document defines the architectural principles and patterns for the refactor
 **Single Source of Truth**: `.github/repository-config.yml`
 
 All workflow behavior is controlled by configuration, not hardcoded values. This enables:
+
 - **Consistency**: Same behavior across all consumer repositories
 - **Maintainability**: Changes in one place propagate everywhere
 - **Testability**: Can test with different configs without changing code
 - **Documentation**: Config serves as living documentation
 
 **Config Structure**:
+
 ```yaml
 languages:
   versions:
-    go: ["1.23", "1.24"]        # Latest 2 stable versions
-    python: ["3.13", "3.14"]    # Latest 2 stable versions
-    node: ["20", "22"]          # LTS versions only
-    rust: ["stable", "stable-1"] # Latest + previous stable
+    go: ['1.23', '1.24'] # Latest 2 stable versions
+    python: ['3.13', '3.14'] # Latest 2 stable versions
+    node: ['20', '22'] # LTS versions only
+    rust: ['stable', 'stable-1'] # Latest + previous stable
 
 build:
   platforms:
@@ -37,12 +40,13 @@ build:
 testing:
   coverage:
     threshold: 80
-    format: "lcov"
+    format: 'lcov'
 ```
 
 ### 2. Python Helper Scripts
 
 **Why Python Over Bash**:
+
 - **Type Safety**: Type hints catch errors at development time
 - **Error Handling**: Structured exceptions vs exit codes
 - **Testing**: pytest ecosystem provides excellent test infrastructure
@@ -50,6 +54,7 @@ testing:
 - **Cross-Platform**: Works identically on Linux and macOS
 
 **Helper Structure**:
+
 ```
 .github/workflows/scripts/
 ├── workflow_common.py          # Shared utilities (config loading, I/O)
@@ -61,6 +66,7 @@ testing:
 ```
 
 **Coding Standards**: All helpers MUST follow:
+
 - `.github/instructions/python.instructions.md` - Python style guide
 - `.github/instructions/general-coding.instructions.md` - Universal standards
 - `.github/instructions/test-generation.instructions.md` - Testing requirements
@@ -70,6 +76,7 @@ testing:
 **Idempotency**: Running a task multiple times produces the same result.
 
 Examples:
+
 ```python
 # ✅ IDEMPOTENT: Checks before creating
 def ensure_config_file():
@@ -86,12 +93,14 @@ def add_config_line():
 **Independence**: Tasks can be executed in any order without breaking.
 
 Design patterns:
+
 - Each task includes dependency check at start
 - Use file existence checks before creating
 - Load config fresh in each task (don't rely on state)
 - Clean up temporary files at task end
 
 **Benefits for Parallel Agents**:
+
 - Multiple copilot agents can work simultaneously
 - Failed tasks can be retried safely
 - No need for complex coordination logic
@@ -109,6 +118,7 @@ Design patterns:
 | Rust     | stable, stable-1 | Monthly (stable updates) | Auto-managed |
 
 **Rationale**:
+
 - **Security**: Older versions miss critical patches
 - **Maintenance Burden**: Testing N versions costs N times resources
 - **Modern Features**: Can use latest language features
@@ -175,16 +185,19 @@ See [Version Policy](version-policy.md) for complete details.
 ### Data Flow
 
 1. **Config Loading**:
+
    ```
    Consumer Repo Config → GitHub Actions Context → Helper Script → Cache
    ```
 
 2. **Matrix Generation**:
+
    ```
    Config Versions → Helper → JSON Matrix → Workflow Job Strategy
    ```
 
 3. **Test Execution**:
+
    ```
    Job Matrix → Language-Specific Helper → Test Runner → Results → Summary
    ```
@@ -308,12 +321,14 @@ def load_optional_config(key: str, default: Any) -> Any:
 ### Test Independence
 
 Each test must:
+
 - Set up its own fixtures
 - Clean up after itself
 - Not rely on test execution order
 - Use temporary directories
 
 Example:
+
 ```python
 def test_generate_matrices(tmp_path, monkeypatch):
     # Arrange: Create isolated environment
@@ -338,6 +353,7 @@ See [Testing Guide](implementation/testing-guide.md) for complete details.
 ### Secret Handling
 
 **Never log secrets**:
+
 ```python
 import re
 
@@ -354,18 +370,20 @@ print(sanitize_log(output))
 ### Least Privilege
 
 Workflows request minimal permissions:
+
 ```yaml
 permissions:
-  contents: read     # Only what's needed
-  pull-requests: write  # For PR comments
+  contents: read # Only what's needed
+  pull-requests: write # For PR comments
   # NOT: write: all
 ```
 
 ### Dependency Pinning
 
 Pin third-party actions to commit SHA:
+
 ```yaml
-- uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+- uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
   # NOT: @v4 (mutable tag)
 ```
 
@@ -374,6 +392,7 @@ Pin third-party actions to commit SHA:
 ### Config Caching
 
 Load config once per workflow run:
+
 ```python
 _CONFIG_CACHE: dict[str, Any] | None = None
 
@@ -390,6 +409,7 @@ def get_repository_config() -> dict[str, Any]:
 ### Matrix Optimization
 
 Generate minimal matrices:
+
 ```python
 # ❌ BAD: Every combination (4 jobs)
 platforms = ["ubuntu", "macos"]
@@ -407,6 +427,7 @@ matrix = [
 ### Early Exit
 
 Skip unnecessary work:
+
 ```python
 def should_run_tests(language: str) -> bool:
     """Check if language files changed."""
@@ -423,16 +444,18 @@ def should_run_tests(language: str) -> bool:
 ### Phase Rollout
 
 Each phase is gated by feature flags:
+
 ```yaml
 # In repository-config.yml
 workflows:
   experimental:
-    use_new_ci: false        # Stable: old workflow
-    use_new_release: false   # Stable: old workflow
-    use_config_matrices: false  # Stable: hardcoded
+    use_new_ci: false # Stable: old workflow
+    use_new_release: false # Stable: old workflow
+    use_config_matrices: false # Stable: hardcoded
 ```
 
 Enable progressively:
+
 1. **Alpha**: Enable in 1-2 test repos
 2. **Beta**: Enable in 5-10 diverse repos
 3. **GA**: Enable by default, opt-out available
@@ -441,6 +464,7 @@ Enable progressively:
 ### Rollback Plan
 
 Every phase includes rollback procedures:
+
 1. **Immediate**: Revert commits
 2. **Short-term**: Pin to previous workflow version
 3. **Config**: Disable feature flags
@@ -470,6 +494,7 @@ See [Rollback Procedures](operations/rollback-procedures.md) for details.
 ### Alerting
 
 Set up alerts for:
+
 - Workflow failure rate > 5%
 - Average duration increase > 20%
 - Config validation errors
@@ -512,6 +537,5 @@ All code in this refactoring MUST comply with:
 
 ---
 
-**Last Updated**: 2025-10-12
-**Document Owner**: Workflow Refactoring Team
-**Status**: Living Document - Update as architecture evolves
+**Last Updated**: 2025-10-12 **Document Owner**: Workflow Refactoring Team **Status**: Living
+Document - Update as architecture evolves
