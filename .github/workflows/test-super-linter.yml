@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -138,7 +138,7 @@ jobs:
       github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -178,7 +178,7 @@ jobs:
       github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -215,7 +215,7 @@ jobs:
       github.event.inputs.test_scenario == 'autofix'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -252,7 +252,7 @@ jobs:
       github.event.inputs.test_scenario == 'config-paths'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -353,7 +353,7 @@ jobs:
       github.event.inputs.test_scenario == 'filter-patterns'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -379,7 +379,7 @@ jobs:
       github.event.inputs.test_scenario == 'disabled-validators'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -408,7 +408,7 @@ jobs:
       github.event.inputs.test_scenario == 'markdown-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -432,7 +432,7 @@ jobs:
       github.event.inputs.test_scenario == 'python-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -460,7 +460,7 @@ jobs:
       github.event.inputs.test_scenario == 'javascript-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -486,7 +486,7 @@ jobs:
       github.event.inputs.test_scenario == 'rust-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -510,7 +510,7 @@ jobs:
       github.event.inputs.test_scenario == 'go-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -533,7 +533,7 @@ jobs:
       github.event.inputs.test_scenario == 'yaml-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
