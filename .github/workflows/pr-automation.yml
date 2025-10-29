@@ -102,7 +102,7 @@ jobs:
 
       - name: Run Super Linter with Auto-Fix
         id: run-super-linter
-        uses: super-linter/super-linter@v8.1.0
+        uses: super-linter/super-linter@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
