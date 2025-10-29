@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload documentation artifact
         if: steps.detect.outputs.tool != 'none'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: documentation-build
           path: |

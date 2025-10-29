@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload coverage (primary only)
         if: matrix.primary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-coverage-${{ matrix.os }}-${{ matrix.go-version }}
           path: coverage.out
@@ -97,7 +97,7 @@ jobs:
           ls -l dist
 
       - name: Upload Go build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-${{ matrix.os }}-${{ matrix.go-version }}
           path: dist/
@@ -380,7 +380,7 @@ jobs:
 
       - name: Upload validation report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-module-validation-report
           path: |
@@ -546,7 +546,7 @@ jobs:
           echo "Artifact signing completed" >&2
 
       - name: Upload signature files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-signatures
           path: |
@@ -565,13 +565,13 @@ jobs:
           fi
 
       - name: Upload cosign public key
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cosign-public-key
           path: cosign.pub
 
       - name: Upload checksum artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-all-checksums
           path: |
@@ -580,7 +580,7 @@ jobs:
             per-os/*.sha256
 
       - name: Upload SBOMs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-sboms
           path: |
@@ -588,7 +588,7 @@ jobs:
             per-os/*.sbom.spdx.json
 
       - name: Upload signatures (if any)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-signatures
           path: |
@@ -597,20 +597,20 @@ jobs:
             per-os/*.sig
 
       - name: Upload combined artifact (tar.gz)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-all-tar
           path: go-build-all.tar.gz
 
       - name: Upload combined artifact (zip)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-all-zip
           path: go-build-all.zip
 
       - name: Upload per-OS archives
         if: hashFiles('per-os/*') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-build-per-os
           path: per-os/
@@ -759,7 +759,7 @@ jobs:
           fi
 
       - name: Upload publishing artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: go-module-${{ steps.context.outputs.tag-name }}
           path: |

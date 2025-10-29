@@ -43,7 +43,7 @@ jobs:
           fi
 
       - name: Upload rust benchmarks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: rust-benchmarks
           path: rust-benchmark.txt
@@ -77,7 +77,7 @@ jobs:
           fi
 
       - name: Upload node benchmarks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: node-benchmarks
           path: node-benchmark.txt
@@ -122,7 +122,7 @@ jobs:
           fi
 
       - name: Upload python benchmarks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: python-benchmarks
           path: |

@@ -88,14 +88,14 @@ jobs:
 
       - name: Upload build artifacts (primary only, root)
         if: matrix.primary && steps.detect.outputs.found == 'true' && hashFiles('package.json') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-build
           path: dist/
 
       - name: Upload build artifacts (primary only, webui)
         if: matrix.primary && steps.detect.outputs.found == 'true' && hashFiles('webui/package.json') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-build-webui
           path: webui/dist/
@@ -239,7 +239,7 @@ jobs:
           echo "Generated tarball: $TAR_ABS"
 
       - name: Upload frontend package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-package-${{ needs.detect-frontend-package.outputs.package-name }}-${{ github.ref_name }}
           path: ${{ steps.pack.outputs.tarball }}
