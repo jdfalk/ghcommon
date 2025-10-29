@@ -35,7 +35,7 @@ jobs:
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: protobuf-generated
 
@@ -284,7 +284,7 @@ jobs:
         run: corepack enable
 
       - name: Download packaged artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: frontend-package-${{ needs.detect-frontend-package.outputs.package-name }}-${{ github.ref_name }}
           path: publish
