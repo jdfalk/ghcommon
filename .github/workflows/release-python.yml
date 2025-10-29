@@ -60,7 +60,7 @@ jobs:
 
       - name: Upload coverage (primary only)
         if: matrix.primary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: python-coverage-${{ matrix.os }}-${{ matrix.python-version }}
           path: coverage.xml
@@ -174,7 +174,7 @@ jobs:
           python -m twine check dist/*
 
       - name: Upload distribution artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: python-dist-${{ github.ref_name }}
           path: dist/
