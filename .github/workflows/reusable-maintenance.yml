@@ -262,7 +262,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: maintenance-*-report
           merge-multiple: true
