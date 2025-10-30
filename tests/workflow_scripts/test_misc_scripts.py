@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import configure_cargo_registry
 import detect_frontend_package

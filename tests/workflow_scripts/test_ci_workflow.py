@@ -1,12 +1,10 @@
 import argparse
 import json
 import subprocess
-from pathlib import Path
 from typing import Any
 
-import pytest
-
 import ci_workflow
+import pytest
 
 
 @pytest.fixture(autouse=True)

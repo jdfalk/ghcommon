@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 import release_workflow
 
 
@@ -94,7 +93,7 @@ def test_generate_version_from_tag(monkeypatch, tmp_path):
             return subprocess.CompletedProcess(args, 0, "", "")
         return subprocess.CompletedProcess(args, 0, "", "")
 
-    import subprocess  # noqa: F401 - used in fake_run
+    import subprocess
 
     monkeypatch.setattr(release_workflow, "_run_git", fake_run)
 
@@ -112,7 +111,7 @@ def test_generate_changelog(monkeypatch, tmp_path):
     monkeypatch.setenv("AUTO_PRERELEASE", "false")
     monkeypatch.setenv("AUTO_DRAFT", "true")
 
-    import subprocess  # noqa: F401
+    import subprocess
 
     def fake_run(args, check=False):
         cmd = tuple(args)

@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""
-Basic test suite for ghcommon repository.
+"""Basic test suite for ghcommon repository.
 
 This is a shared configuration repository that contains workflow
 templates and scripts but doesn't have a main Python package to test.
 This file ensures CI passes by providing minimal test coverage.
 """
 
-import unittest
 import os
 import sys
+import unittest
 
 # Add the parent directory to Python path for importing scripts
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -56,7 +55,7 @@ class TestBasicFunctionality(unittest.TestCase):
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         requirements_path = os.path.join(repo_root, "requirements.txt")
 
-        with open(requirements_path, "r") as f:
+        with open(requirements_path) as f:
             content = f.read()
             self.assertIn("requests", content)
 
