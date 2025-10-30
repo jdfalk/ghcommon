@@ -4,7 +4,8 @@
 
 # Configuration Schema Reference
 
-Complete JSON schema documentation for `workflow-versions.yml`, the central configuration file for the v2 workflow system.
+Complete JSON schema documentation for `workflow-versions.yml`, the central configuration file for
+the v2 workflow system.
 
 ## Table of Contents
 
@@ -24,7 +25,8 @@ Complete JSON schema documentation for `workflow-versions.yml`, the central conf
 
 ## Overview
 
-The `workflow-versions.yml` file is the central configuration for the v2 workflow system. It defines:
+The `workflow-versions.yml` file is the central configuration for the v2 workflow system. It
+defines:
 
 - **Language versions** for each branch
 - **Feature flags** to enable/disable v2 features
@@ -43,7 +45,7 @@ The `workflow-versions.yml` file is the central configuration for the v2 workflo
 
 ## File Location
 
-```text
+````text
 .github/workflow-versions.yml
 ```text
 
@@ -341,8 +343,8 @@ This file must be in the repository root's `.github/` directory.
 
 ### `version` (required)
 
-**Type:** `string`  
-**Format:** Semantic version (e.g., `"1.0.0"`)  
+**Type:** `string`
+**Format:** Semantic version (e.g., `"1.0.0"`)
 **Description:** Schema version for the configuration file.
 
 ```yaml
@@ -357,8 +359,8 @@ version: "1.0.0"
 
 ### `use_workflow_v2`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Description:** Global flag to enable/disable the entire v2 workflow system.
 
 ```yaml
@@ -380,7 +382,7 @@ use_workflow_v2: true
 
 ### `versions`
 
-**Type:** `object`  
+**Type:** `object`
 **Description:** Language and tool versions for different branches.
 
 #### Language Version Object
@@ -507,7 +509,7 @@ versions:
 
 ### `feature_flags`
 
-**Type:** `object`  
+**Type:** `object`
 **Description:** Toggles for individual v2 features.
 
 ```yaml
@@ -524,8 +526,8 @@ feature_flags:
 
 #### `use_change_detection`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 1 - CI Modernization
 
 **What It Enables:**
@@ -560,8 +562,8 @@ jobs:
 
 #### `use_matrix_generation`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 1 - CI Modernization
 
 **What It Enables:**
@@ -599,8 +601,8 @@ jobs:
 
 #### `use_release_automation`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 2 - Release Consolidation
 
 **What It Enables:**
@@ -635,8 +637,8 @@ jobs:
 
 #### `use_docs_automation`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 3 - Documentation Automation
 
 **What It Enables:**
@@ -670,8 +672,8 @@ jobs:
 
 #### `use_maintenance_automation`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 4 - Maintenance Automation
 
 **What It Enables:**
@@ -704,8 +706,8 @@ jobs:
 
 #### `use_advanced_features`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Phase:** Phase 5 - Advanced Features
 
 **What It Enables:**
@@ -742,7 +744,7 @@ jobs:
 
 ### `branch_policies`
 
-**Type:** `object`  
+**Type:** `object`
 **Description:** Branch-specific configuration for stable branches.
 
 ```yaml
@@ -752,7 +754,7 @@ branch_policies:
     locked: false
     end_of_life: "2026-02-15"
     work_stopped: "2025-08-15"
-  
+
   "stable-1-python-3.13":
     python_version: "3.13"
     locked: false
@@ -764,7 +766,7 @@ branch_policies:
 
 #### `go_version`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** Locked Go version for this branch.
 
 ```yaml
@@ -780,7 +782,7 @@ branch_policies:
 
 #### `python_version`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** Locked Python version for this branch.
 
 ```yaml
@@ -796,7 +798,7 @@ branch_policies:
 
 #### `node_version`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** Locked Node.js version for this branch.
 
 ```yaml
@@ -807,7 +809,7 @@ branch_policies:
 
 #### `rust_version`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** Locked Rust version for this branch.
 
 ```yaml
@@ -818,8 +820,8 @@ branch_policies:
 
 #### `locked`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Description:** If true, no more changes allowed to this branch.
 
 ```yaml
@@ -841,8 +843,8 @@ branch_policies:
 
 #### `end_of_life`
 
-**Type:** `string`  
-**Format:** `YYYY-MM-DD`  
+**Type:** `string`
+**Format:** `YYYY-MM-DD`
 **Description:** Date when branch reaches end of life.
 
 ```yaml
@@ -863,8 +865,8 @@ branch_policies:
 
 #### `work_stopped`
 
-**Type:** `string`  
-**Format:** `YYYY-MM-DD`  
+**Type:** `string`
+**Format:** `YYYY-MM-DD`
 **Description:** Date when active development stopped.
 
 ```yaml
@@ -910,7 +912,7 @@ stable-1-go-1.24-python-3.13
 
 ### `advanced`
 
-**Type:** `object`  
+**Type:** `object`
 **Description:** Advanced configuration for caching, metrics, and GitHub Apps.
 
 ```yaml
@@ -922,12 +924,12 @@ advanced:
       go:
         - "~/go/pkg/mod"
         - "~/.cache/go-build"
-  
+
   metrics:
     enabled: true
     collect_build_times: true
     retention_days: 30
-  
+
   github_app:
     enabled: false
 ```text
@@ -936,8 +938,8 @@ advanced:
 
 #### `advanced.cache.enabled`
 
-**Type:** `boolean`  
-**Default:** `true`  
+**Type:** `boolean`
+**Default:** `true`
 **Description:** Enable/disable caching system.
 
 ```yaml
@@ -948,8 +950,8 @@ advanced:
 
 #### `advanced.cache.key_prefix`
 
-**Type:** `string`  
-**Default:** `"v2"`  
+**Type:** `string`
+**Default:** `"v2"`
 **Description:** Prefix for cache keys.
 
 ```yaml
@@ -965,7 +967,7 @@ advanced:
 
 #### `advanced.cache.restore_keys`
 
-**Type:** `array` of `string`  
+**Type:** `array` of `string`
 **Description:** Fallback cache keys.
 
 ```yaml
@@ -983,7 +985,7 @@ advanced:
 
 #### `advanced.cache.paths`
 
-**Type:** `object`  
+**Type:** `object`
 **Description:** Language-specific cache paths.
 
 ```yaml
@@ -1013,8 +1015,8 @@ advanced:
 
 #### `advanced.metrics.enabled`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Description:** Enable metrics collection.
 
 ```yaml
@@ -1025,8 +1027,8 @@ advanced:
 
 #### `advanced.metrics.collect_build_times`
 
-**Type:** `boolean`  
-**Default:** `true`  
+**Type:** `boolean`
+**Default:** `true`
 **Description:** Collect build duration metrics.
 
 ```yaml
@@ -1042,8 +1044,8 @@ advanced:
 
 #### `advanced.metrics.collect_test_results`
 
-**Type:** `boolean`  
-**Default:** `true`  
+**Type:** `boolean`
+**Default:** `true`
 **Description:** Collect test result metrics.
 
 ```yaml
@@ -1059,8 +1061,8 @@ advanced:
 
 #### `advanced.metrics.collect_cache_stats`
 
-**Type:** `boolean`  
-**Default:** `true`  
+**Type:** `boolean`
+**Default:** `true`
 **Description:** Collect cache performance metrics.
 
 ```yaml
@@ -1076,9 +1078,9 @@ advanced:
 
 #### `advanced.metrics.retention_days`
 
-**Type:** `integer`  
-**Range:** 1-90  
-**Default:** `30`  
+**Type:** `integer`
+**Range:** 1-90
+**Default:** `30`
 **Description:** How long to retain metrics.
 
 ```yaml
@@ -1091,8 +1093,8 @@ advanced:
 
 #### `advanced.github_app.enabled`
 
-**Type:** `boolean`  
-**Default:** `false`  
+**Type:** `boolean`
+**Default:** `false`
 **Description:** Use GitHub App for authentication.
 
 ```yaml
@@ -1108,7 +1110,7 @@ advanced:
 
 #### `advanced.github_app.app_id`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** GitHub App ID.
 
 ```yaml
@@ -1123,7 +1125,7 @@ advanced:
 
 #### `advanced.github_app.installation_id`
 
-**Type:** `string`  
+**Type:** `string`
 **Description:** Installation ID for this repository.
 
 ```yaml
@@ -1160,10 +1162,10 @@ from pathlib import Path
 
 def load_config(config_path: str) -> dict:
     """Load configuration file.
-    
+
     Args:
         config_path: Path to workflow-versions.yml.
-    
+
     Returns:
         dict: Parsed configuration.
     """
@@ -1173,11 +1175,11 @@ def load_config(config_path: str) -> dict:
 
 def validate_config(config: dict, schema: dict) -> list:
     """Validate configuration against schema.
-    
+
     Args:
         config: Configuration to validate.
         schema: JSON schema.
-    
+
     Returns:
         list: Validation errors (empty if valid).
     """
@@ -1188,9 +1190,9 @@ def validate_config(config: dict, schema: dict) -> list:
 if __name__ == "__main__":
     config = load_config(".github/workflow-versions.yml")
     schema = load_config(".github/helpers/config-schema.json")
-    
+
     errors = validate_config(config, schema)
-    
+
     if errors:
         print("❌ Validation errors:")
         for error in errors:
@@ -1331,19 +1333,19 @@ versions:
   go:
     main: "1.25"
     stable-1: "1.24"
-  
+
   python:
     main: "3.14"
     stable-1: "3.13"
-  
+
   node:
     main: "22"
     stable-1: "20"
-  
+
   rust:
     main: "stable"
     stable-1: "stable-1"
-  
+
   actions:
     checkout: "v4"
     setup-go: "v5"
@@ -1371,19 +1373,19 @@ versions:
     main: "1.25"
     stable-1: "1.24"
     stable-2: "1.23"
-  
+
   python:
     main: "3.14"
     stable-1: "3.13"
-  
+
   node:
     main: "22"
     stable-1: "20"
-  
+
   rust:
     main: "stable"
     stable-1: "1.75.0"
-  
+
   actions:
     checkout: "v4"
     setup-go: "v5"
@@ -1408,7 +1410,7 @@ branch_policies:
     locked: false
     end_of_life: "2026-02-15"
     work_stopped: "2025-08-15"
-  
+
   "stable-1-go-1.23":
     go_version: "1.23"
     python_version: "3.12"
@@ -1436,14 +1438,14 @@ advanced:
       rust:
         - "~/.cargo"
         - "target"
-  
+
   metrics:
     enabled: true
     collect_build_times: true
     collect_test_results: true
     collect_cache_stats: true
     retention_days: 30
-  
+
   github_app:
     enabled: true
     app_id: "123456"
@@ -1616,3 +1618,4 @@ The `workflow-versions.yml` configuration file provides:
 6. **Safety**: Rollback via `use_workflow_v2: false`
 
 Use this reference when creating or modifying workflow configuration files.
+````

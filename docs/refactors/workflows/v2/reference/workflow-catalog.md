@@ -1,19 +1,18 @@
 # Workflow Catalog
 
-**Version**: 1.0.0
-**Last Updated**: 2025-10-15
-**Status**: Complete
+**Version**: 1.0.0 **Last Updated**: 2025-10-15 **Status**: Complete
 
 ## Overview
 
-This document provides a complete catalog of all workflows in the v2 system. Each workflow is documented with its purpose, inputs, outputs, secrets, triggers, and usage examples.
+This document provides a complete catalog of all workflows in the v2 system. Each workflow is
+documented with its purpose, inputs, outputs, secrets, triggers, and usage examples.
 
 ### Workflow Organization
 
 Workflows are organized into categories:
 
 1. **Core Workflows**: Main CI/CD workflows (ci.yml, release.yml)
-2. **Reusable Workflows**: Shared workflow components (reusable-*.yml)
+2. **Reusable Workflows**: Shared workflow components (reusable-\*.yml)
 3. **Scheduled Workflows**: Automated maintenance (maintenance.yml, metrics.yml)
 4. **Manual Workflows**: On-demand operations (manual-release.yml)
 
@@ -21,9 +20,9 @@ Workflows are organized into categories:
 
 - **ci.yml**: Continuous Integration
 - **release.yml**: Release automation
-- **reusable-*.yml**: Reusable workflow components
-- **manual-*.yml**: Manual trigger workflows
-- **scheduled-*.yml**: Scheduled workflows
+- **reusable-\*.yml**: Reusable workflow components
+- **manual-\*.yml**: Manual trigger workflows
+- **scheduled-\*.yml**: Scheduled workflows
 
 ---
 
@@ -36,6 +35,7 @@ Workflows are organized into categories:
 **Location**: `.github/workflows/ci.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   push:
@@ -119,7 +119,7 @@ env:
 **Branch-Specific Behavior**:
 
 - **main branch**: Uses latest language versions
-- **stable-1-* branches**: Uses locked versions from workflow-versions.yml
+- **stable-1-\* branches**: Uses locked versions from workflow-versions.yml
 - Respects `locked`, `end_of_life`, and `work_stopped` flags
 
 **Performance Optimizations**:
@@ -138,6 +138,7 @@ env:
 **Location**: `.github/workflows/release.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   push:
@@ -198,9 +199,7 @@ on:
 
 ```yaml
 # Automatic trigger on tag push
-git tag v1.2.3
-git push origin v1.2.3
-
+git tag v1.2.3 git push origin v1.2.3
 # Manual trigger
 # Go to Actions → Release → Run workflow
 # Select bump_type: minor
@@ -209,18 +208,21 @@ git push origin v1.2.3
 **Release Artifact Matrix**:
 
 **Go Binaries**:
+
 - `binary-linux-amd64`
 - `binary-linux-arm64`
 - `binary-darwin-amd64` (Intel Mac)
 - `binary-darwin-arm64` (Apple Silicon)
 
 **Rust Binaries**:
+
 - `binary-x86_64-unknown-linux-gnu`
 - `binary-aarch64-unknown-linux-gnu`
 - `binary-x86_64-apple-darwin`
 - `binary-aarch64-apple-darwin`
 
 **Docker Images**:
+
 - `ghcr.io/owner/repo:version`
 - `ghcr.io/owner/repo:latest` (main branch only)
 - `ghcr.io/owner/repo:stable-1` (stable branches)
@@ -230,8 +232,8 @@ git push origin v1.2.3
 | Branch Pattern | Tag Prefix | Version Source | Registry Tags     |
 | -------------- | ---------- | -------------- | ----------------- |
 | main           | v          | Auto-detect    | latest, version   |
-| stable-1-*     | stable-1-v | Locked version | stable-1, version |
-| stable-2-*     | stable-2-v | Locked version | stable-2, version |
+| stable-1-\*    | stable-1-v | Locked version | stable-1, version |
+| stable-2-\*    | stable-2-v | Locked version | stable-2, version |
 
 **Version Detection Logic**:
 
@@ -257,6 +259,7 @@ git push origin v1.2.3
 **Location**: `.github/workflows/reusable-test.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_call:
@@ -319,6 +322,7 @@ jobs:
 **Supported Languages**:
 
 **Go**:
+
 ```yaml
 test:
   uses: ./.github/workflows/reusable-test.yml
@@ -329,6 +333,7 @@ test:
 ```
 
 **Python**:
+
 ```yaml
 test:
   uses: ./.github/workflows/reusable-test.yml
@@ -339,6 +344,7 @@ test:
 ```
 
 **Node.js**:
+
 ```yaml
 test:
   uses: ./.github/workflows/reusable-test.yml
@@ -349,6 +355,7 @@ test:
 ```
 
 **Rust**:
+
 ```yaml
 test:
   uses: ./.github/workflows/reusable-test.yml
@@ -367,6 +374,7 @@ test:
 **Location**: `.github/workflows/reusable-build.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_call:
@@ -417,6 +425,7 @@ jobs:
 **Build Matrix**:
 
 Automatically builds for:
+
 - Linux: amd64, arm64
 - macOS: amd64 (Intel), arm64 (Apple Silicon)
 - NO WINDOWS
@@ -430,6 +439,7 @@ Automatically builds for:
 **Location**: `.github/workflows/reusable-lint.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_call:
@@ -488,6 +498,7 @@ jobs:
 **Location**: `.github/workflows/reusable-docs.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_call:
@@ -541,6 +552,7 @@ jobs:
 **Location**: `.github/workflows/reusable-release.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_call:
@@ -605,10 +617,11 @@ jobs:
 **Location**: `.github/workflows/maintenance.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   schedule:
-    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+    - cron: '0 2 * * 1' # Every Monday at 2 AM UTC
   workflow_dispatch:
 ```
 
@@ -655,10 +668,11 @@ on:
 **Location**: `.github/workflows/metrics.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight UTC
+    - cron: '0 0 * * *' # Daily at midnight UTC
   workflow_dispatch:
 ```
 
@@ -716,6 +730,7 @@ on:
 **Location**: `.github/workflows/manual-release.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_dispatch:
@@ -765,6 +780,7 @@ on:
 **Location**: `.github/workflows/manual-docs.yml`
 
 **Triggers**:
+
 ```yaml
 on:
   workflow_dispatch:
@@ -823,12 +839,14 @@ graph TD
 ### Workflow Call Chain
 
 **CI Workflow**:
+
 1. ci.yml (main)
    - → reusable-test.yml (for each language)
    - → reusable-lint.yml (Super Linter)
    - → coverage aggregation
 
 **Release Workflow**:
+
 1. release.yml (main)
    - → reusable-build.yml (build assets)
    - → reusable-release.yml (create release)
@@ -836,6 +854,7 @@ graph TD
    - → package publishing
 
 **Maintenance Workflow**:
+
 1. maintenance.yml (scheduled)
    - → dependency checks
    - → security scans
@@ -960,6 +979,7 @@ env:
 ### Language-Specific Variables
 
 **Go**:
+
 ```yaml
 env:
   GO_VERSION: ${{ matrix.go-version }}
@@ -968,6 +988,7 @@ env:
 ```
 
 **Python**:
+
 ```yaml
 env:
   PYTHON_VERSION: ${{ matrix.python-version }}
@@ -976,6 +997,7 @@ env:
 ```
 
 **Node.js**:
+
 ```yaml
 env:
   NODE_VERSION: ${{ matrix.node-version }}
@@ -984,6 +1006,7 @@ env:
 ```
 
 **Rust**:
+
 ```yaml
 env:
   RUST_VERSION: ${{ matrix.rust-version }}
@@ -998,23 +1021,28 @@ env:
 ### Required Secrets
 
 **For All Workflows**:
+
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions
 
 **For Release Workflows**:
+
 - `GPG_PRIVATE_KEY`: For signing release artifacts
 - `GPG_PASSPHRASE`: GPG key passphrase
 
 **For Docker Publishing**:
+
 - `DOCKER_USERNAME`: Docker Hub username
 - `DOCKER_PASSWORD`: Docker Hub password/token
 - `GHCR_TOKEN`: GitHub Container Registry token
 
 **For Package Publishing**:
+
 - `NPM_TOKEN`: npm registry token
 - `PYPI_TOKEN`: PyPI publishing token
 - `CRATES_IO_TOKEN`: Crates.io publishing token
 
 **For Code Coverage**:
+
 - `CODECOV_TOKEN`: Codecov upload token
 
 ### Secret Usage Example
@@ -1041,6 +1069,7 @@ jobs:
 ### Caching Strategy
 
 **Dependencies**:
+
 ```yaml
 - name: Cache Dependencies
   uses: actions/cache@v4
@@ -1054,6 +1083,7 @@ jobs:
 ```
 
 **Build Artifacts**:
+
 ```yaml
 - name: Cache Build
   uses: actions/cache@v4
@@ -1089,18 +1119,22 @@ jobs:
 ### Common Issues
 
 **Issue**: Workflow not triggering
+
 - **Cause**: Invalid trigger configuration
 - **Fix**: Verify `on:` section matches expected events
 
 **Issue**: Matrix generation fails
+
 - **Cause**: Invalid workflow-versions.yml
 - **Fix**: Validate config with schema
 
 **Issue**: Reusable workflow not found
+
 - **Cause**: Incorrect path or missing workflow
 - **Fix**: Use relative path: `./.github/workflows/reusable-*.yml`
 
 **Issue**: Secrets not available
+
 - **Cause**: Secrets not passed to reusable workflow
 - **Fix**: Add `secrets: inherit` or explicit secret passing
 
@@ -1118,6 +1152,7 @@ jobs:
 ```
 
 Or set repository variable:
+
 - Settings → Secrets and variables → Actions → Variables
 - Add `ACTIONS_STEP_DEBUG` = `true`
 
@@ -1128,18 +1163,20 @@ Or set repository variable:
 ### Migrating from v1 to v2
 
 **Step 1**: Add workflow-versions.yml
+
 ```yaml
-version: "1.0.0"
+version: '1.0.0'
 use_workflow_v2: true
 
 versions:
   go:
-    main: "1.23"
+    main: '1.23'
   python:
-    main: "3.13"
+    main: '3.13'
 ```
 
 **Step 2**: Update workflow triggers
+
 ```yaml
 # Before (v1)
 on: [push, pull_request]
@@ -1153,6 +1190,7 @@ on:
 ```
 
 **Step 3**: Add helper scripts
+
 ```bash
 mkdir -p .github/helpers
 cp workflow_common.py .github/helpers/
@@ -1160,6 +1198,7 @@ cp ci_workflow.py .github/helpers/
 ```
 
 **Step 4**: Update job configuration
+
 ```yaml
 # Before (v1)
 jobs:
@@ -1232,6 +1271,4 @@ jobs:
 
 ---
 
-**Document Version**: 1.0.0
-**Last Review**: 2025-10-15
-**Next Review**: 2025-11-15
+**Document Version**: 1.0.0 **Last Review**: 2025-10-15 **Next Review**: 2025-11-15

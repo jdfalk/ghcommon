@@ -1,12 +1,12 @@
 # Helper Scripts API Reference
 
-**Version**: 1.0.0
-**Last Updated**: 2025-10-15
-**Status**: Complete
+**Version**: 1.0.0 **Last Updated**: 2025-10-15 **Status**: Complete
 
 ## Overview
 
-This document provides comprehensive API documentation for all helper modules in the workflow v2 system. These modules provide the core functionality for CI/CD automation, release management, documentation generation, maintenance tasks, and advanced automation features.
+This document provides comprehensive API documentation for all helper modules in the workflow v2
+system. These modules provide the core functionality for CI/CD automation, release management,
+documentation generation, maintenance tasks, and advanced automation features.
 
 ### Module Organization
 
@@ -67,6 +67,7 @@ def load_config(
 ```
 
 **Implementation Notes**:
+
 - Validates against JSON Schema (see config-schema.md)
 - Caches config for performance
 - Supports environment variable overrides
@@ -98,6 +99,7 @@ def validate_config(config: dict[str, Any]) -> tuple[bool, list[str]]:
 ```
 
 **Validation Rules**:
+
 - Required fields: version, use_workflow_v2
 - Version format: Semantic versioning (X.Y.Z)
 - Language versions: Match supported patterns
@@ -132,6 +134,7 @@ def get_branch_config(
 ```
 
 **Branch Resolution**:
+
 1. Check branch_policies for exact match
 2. Parse branch name for pattern matching
 3. Fall back to main branch versions
@@ -189,6 +192,7 @@ def bump_version(
 ```
 
 **Bump Rules**:
+
 - major: X.0.0 (resets minor and patch)
 - minor: X.Y.0 (resets patch)
 - patch: X.Y.Z (increments patch)
@@ -360,6 +364,7 @@ def setup_logging(
 ```
 
 **Log Format**:
+
 ```text
 [2025-10-15 10:30:45] INFO [module.function:42] Message here
 ```
@@ -403,6 +408,7 @@ def generate_test_matrix(
 ```
 
 **Matrix Structure**:
+
 - **Languages**: Go, Python, Node.js, Rust
 - **Versions**: From config (branch-aware)
 - **Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
@@ -489,6 +495,7 @@ def categorize_changes(
 ```
 
 **Category Rules**:
+
 - **go**: `*.go`, `go.mod`, `go.sum`
 - **python**: `*.py`, `requirements.txt`, `pyproject.toml`
 - **node**: `*.js`, `*.ts`, `package.json`, `package-lock.json`
@@ -591,6 +598,7 @@ def detect_version_bump(
 ```
 
 **Detection Rules**:
+
 - **major**: `BREAKING CHANGE:` in commit body or footer
 - **minor**: `feat:` or `feat(scope):` commit type
 - **patch**: `fix:`, `chore:`, `docs:`, etc.
@@ -650,6 +658,7 @@ def get_release_config(
 ```
 
 **Release Configuration**:
+
 - Language versions for build
 - Branch policy status (locked, EOL, work_stopped)
 - Tag prefix (e.g., 'v', 'stable-1-')
@@ -727,19 +736,24 @@ def generate_release_notes(
 ```
 
 **Release Notes Format**:
+
 ```markdown
 ## 🚀 Features
+
 - feat(api): Add new endpoint (#123)
 - feat(ui): Improve dashboard layout (#124)
 
 ## 🐛 Bug Fixes
+
 - fix(auth): Resolve token expiration issue (#125)
 - fix(db): Fix connection pool leak (#126)
 
 ## 📚 Documentation
+
 - docs: Update API reference (#127)
 
 ## 🔧 Chores
+
 - chore(deps): Update dependencies (#128)
 ```
 
@@ -774,9 +788,10 @@ def build_release_assets(
 ```
 
 **Build Matrix**:
+
 - **Go**: linux/amd64, linux/arm64, darwin/amd64, darwin/arm64
-- **Rust**: x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu,
-           x86_64-apple-darwin, aarch64-apple-darwin
+- **Rust**: x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-apple-darwin,
+  aarch64-apple-darwin
 - **NO WINDOWS**: No Windows builds
 
 ---
@@ -819,6 +834,7 @@ def parse_go_file(file_path: str) -> dict[str, Any]:
 ```
 
 **Extracted Information**:
+
 - Function signatures with parameters and returns
 - Type definitions (structs, interfaces, aliases)
 - Method receivers and signatures
@@ -882,6 +898,7 @@ def generate_api_docs(
 ```
 
 **Generated Documentation Structure**:
+
 1. Package overview
 2. Table of contents
 3. Constants and variables
@@ -1038,6 +1055,7 @@ def check_outdated_dependencies(
 ```
 
 **Language-Specific Commands**:
+
 - **Go**: `go list -u -m all`
 - **Python**: `pip list --outdated`
 - **Node**: `npm outdated`
@@ -1105,6 +1123,7 @@ def run_security_scan(
 ```
 
 **Scanning Tools**:
+
 - **Go**: `govulncheck`
 - **Python**: `pip-audit` or `safety`
 - **Node**: `npm audit`
@@ -1811,6 +1830,7 @@ def old_function():
 ### Breaking Changes
 
 All breaking changes require:
+
 1. Major version bump
 2. Migration guide in CHANGELOG.md
 3. Deprecation warnings in previous version
@@ -1829,6 +1849,4 @@ All breaking changes require:
 
 ---
 
-**Document Version**: 1.0.0
-**Last Review**: 2025-10-15
-**Next Review**: 2025-11-15
+**Document Version**: 1.0.0 **Last Review**: 2025-10-15 **Next Review**: 2025-11-15
