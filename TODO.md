@@ -8,6 +8,7 @@
       caller, unit + integration tests)
 - [x] Phase 2: Release consolidation (branch-aware release helper, reusable release workflow,
       feature-flagged caller, GitHub Packages docs/tests)
+- [x] GitHub Packages publishing job, helper script, rollout docs, automated tests, and summary tooling
 
 ## 🚧 In Progress / Upcoming
 

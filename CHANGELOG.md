@@ -8,8 +8,11 @@
   flags, and supporting tests.
 - Reusable CI workflow stack (helper, reusable workflow, feature-flagged caller) plus
   unit/integration coverage for change detection and matrix generation.
-- Branch-aware release helper and reusable release workflow with GitHub Packages documentation and
-  test suite.
+- Branch-aware release helper and reusable release workflow with GitHub Packages documentation,
+  publish helper, release summary generator, and unit tests.
+- GitHub Packages publishing helper (`publish_to_github_packages.py`), reusable
+  workflow job integration, new documentation, and unit tests.
+- GitHub Packages publishing script (`publish_to_github_packages.py`), workflow integration, and unit tests.
 - Repository configuration updates enabling new CI and release systems, including registry
   preferences for future package publishing.
 
