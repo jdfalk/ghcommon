@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: e2f3g4h5-i6j7-k8l9-m0n1-o2p3q4r5s6t7
 
-"""
-Docker security scanning utilities for matrix build system.
+"""Docker security scanning utilities for matrix build system.
 Handles vulnerability scanning, SBOM generation, and security reporting.
 """
 

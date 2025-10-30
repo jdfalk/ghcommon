@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: b7c8d9e0-f1a2-3b4c-5d6e-7f8a9b0c1d2e
 
-"""
-Test Python File.
+"""Test Python File.
 
 Purpose: Test Python linting with Black, Pylint, Flake8, isort, and mypy.
 """
@@ -16,8 +15,7 @@ class TestClass:
     """Test class for Python linting."""
 
     def __init__(self, name: str, value: int) -> None:
-        """
-        Initialize TestClass.
+        """Initialize TestClass.
 
         Args:
             name: The name identifier
@@ -35,8 +33,7 @@ class TestClass:
         return self.value
 
     def increment(self, amount: int = 1) -> int:
-        """
-        Increment the value.
+        """Increment the value.
 
         Args:
             amount: Amount to increment by (default: 1)
@@ -49,8 +46,7 @@ class TestClass:
 
 
 def process_list(items: List[str], filter_empty: bool = True) -> List[str]:
-    """
-    Process a list of items.
+    """Process a list of items.
 
     Args:
         items: List of string items to process
@@ -65,8 +61,7 @@ def process_list(items: List[str], filter_empty: bool = True) -> List[str]:
 
 
 def find_item(items: List[str], target: str) -> Optional[int]:
-    """
-    Find the index of a target item.
+    """Find the index of a target item.
 
     Args:
         items: List of items to search

@@ -3,14 +3,13 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Determine target repositories for sync operations.
+"""Determine target repositories for sync operations.
 Reads from repositories.txt and outputs repository names.
 """
 
 import os
-import sys
 from pathlib import Path
+import sys
 
 
 def get_target_repos():
@@ -23,7 +22,7 @@ def get_target_repos():
 
     repos = []
     try:
-        with open(repo_file, "r") as f:
+        with open(repo_file) as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):

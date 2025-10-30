@@ -3,13 +3,12 @@
 # version: 1.0.0
 # guid: c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f
 
-"""
-Generate synchronization summary for GitHub Actions step summary.
+"""Generate synchronization summary for GitHub Actions step summary.
 """
 
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
 
 
 def generate_summary():

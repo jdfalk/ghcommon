@@ -3,29 +3,27 @@
 # version: 1.0.0
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
-"""
-Determine version for release based on manual input or semantic-release analysis.
+"""Determine version for release based on manual input or semantic-release analysis.
 Usage: sync-release-determine-version.py <language> <manual_release_type> <github_token>
 """
 
-import sys
-import re
-import subprocess
 import json
 from pathlib import Path
+import re
+import subprocess
+import sys
 
 
 def get_current_version_rust():
     """Get current version from Cargo.toml."""
     try:
-        with open("Cargo.toml", "r") as f:
+        with open("Cargo.toml") as f:
             content = f.read()
 
         match = re.search(r'^version = "([^"]+)"', content, re.MULTILINE)
         if match:
             return match.group(1)
-        else:
-            raise ValueError("Could not find version in Cargo.toml")
+        raise ValueError("Could not find version in Cargo.toml")
     except FileNotFoundError:
         raise ValueError("Cargo.toml not found")
 
@@ -84,7 +82,7 @@ def get_current_version_python():
 def get_current_version_js_ts():
     """Get current version from package.json."""
     try:
-        with open("package.json", "r") as f:
+        with open("package.json") as f:
             package_data = json.load(f)
         return package_data.get("version", "0.0.0")
     except FileNotFoundError:
@@ -101,12 +99,11 @@ def increment_version(version, release_type):
 
     if release_type == "major":
         return f"{major + 1}.0.0"
-    elif release_type == "minor":
+    if release_type == "minor":
         return f"{major}.{minor + 1}.0"
-    elif release_type == "patch":
+    if release_type == "patch":
         return f"{major}.{minor}.{patch + 1}"
-    else:
-        raise ValueError(f"Invalid release type: {release_type}")
+    raise ValueError(f"Invalid release type: {release_type}")
 
 
 def run_semantic_release_dry_run(github_token):
@@ -117,7 +114,7 @@ def run_semantic_release_dry_run(github_token):
     try:
         result = subprocess.run(
             ["npx", "semantic-release", "--dry-run"],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
             env=env,
         )

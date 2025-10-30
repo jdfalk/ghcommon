@@ -5,16 +5,16 @@
 
 """Run semantic-release with proper environment and configuration."""
 
+import os
 import subprocess
 import sys
-import os
 
 
 def main():
     """Run semantic-release."""
     # Ensure npm dependencies are installed
     print("Installing npm dependencies...")
-    result = subprocess.run(["npm", "install"], capture_output=True, text=True)
+    result = subprocess.run(["npm", "install"], check=False, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Failed to install npm dependencies: {result.stderr}")
         sys.exit(1)
@@ -22,7 +22,7 @@ def main():
     # Run semantic-release
     print("Running semantic-release...")
     env = os.environ.copy()
-    result = subprocess.run(["npx", "semantic-release"], env=env)
+    result = subprocess.run(["npx", "semantic-release"], check=False, env=env)
     sys.exit(result.returncode)
 
 

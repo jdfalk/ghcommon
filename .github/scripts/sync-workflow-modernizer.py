@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: e1f2a3b4-c5d6-7e8f-9a0b-1c2d3e4f5a6b
 
-"""
-Workflow Modernization Script
+"""Workflow Modernization Script
 
 This script modernizes GitHub Actions workflow files by replacing embedded bash
 scripts with external Python scripts for better reliability and maintainability.
@@ -20,9 +19,9 @@ all language-specific workflows while maintaining the security improvements.
 """
 
 import os
-import sys
-import re
 from pathlib import Path
+import re
+import sys
 from typing import List
 
 
@@ -111,9 +110,8 @@ class WorkflowModernizer:
                 workflow_file.write_text(content)
                 print(f"  ✅ Updated {workflow_file}")
                 return True
-            else:
-                print(f"  ℹ️  No changes needed for {workflow_file}")
-                return False
+            print(f"  ℹ️  No changes needed for {workflow_file}")
+            return False
 
         except Exception as e:
             print(f"  ❌ Error modernizing {workflow_file}: {e}")

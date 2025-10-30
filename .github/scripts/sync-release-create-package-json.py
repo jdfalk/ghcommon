@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
-"""
-Create package.json for semantic-release based on language type.
+"""Create package.json for semantic-release based on language type.
 Usage: sync-release-create-package-json.py <language>
 """
 

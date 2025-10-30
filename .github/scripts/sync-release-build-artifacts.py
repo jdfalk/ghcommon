@@ -3,19 +3,17 @@
 # version: 1.0.0
 # guid: f2a3b4c5-d6e7-8f9a-0b1c-2d3e4f5a6b7c
 
-"""
-Build Artifacts Script
+"""Build Artifacts Script
 
 Handles building release artifacts for different programming languages.
 Replaces embedded bash build scripts with reliable Python-based build logic.
 """
 
-import os
-import sys
 import json
-import subprocess
-import platform
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 
 def log(message: str, level: str = "INFO") -> None:
@@ -51,7 +49,7 @@ def build_rust_artifacts() -> bool:
     # Get binary name from Cargo.toml
     binary_name = "unknown"
     try:
-        with open("Cargo.toml", "r") as f:
+        with open("Cargo.toml") as f:
             content = f.read()
             # Look for [[bin]] section first
             if "[[bin]]" in content:
@@ -152,7 +150,7 @@ def build_go_artifacts() -> bool:
     # Get module name
     module_name = "unknown"
     try:
-        with open("go.mod", "r") as f:
+        with open("go.mod") as f:
             first_line = f.readline().strip()
             if first_line.startswith("module"):
                 module_name = Path(first_line.split()[1]).name
@@ -235,9 +233,8 @@ def build_python_artifacts() -> bool:
     if build_success:
         log("Successfully built Python wheel")
         return True
-    else:
-        log(f"Failed to build Python wheel: {stderr}", "ERROR")
-        return False
+    log(f"Failed to build Python wheel: {stderr}", "ERROR")
+    return False
 
 
 def build_javascript_artifacts() -> bool:
@@ -252,7 +249,7 @@ def build_javascript_artifacts() -> bool:
 
     # Build if build script exists
     try:
-        with open("package.json", "r") as f:
+        with open("package.json") as f:
             package_data = json.load(f)
             scripts = package_data.get("scripts", {})
 
@@ -263,12 +260,10 @@ def build_javascript_artifacts() -> bool:
                 if build_success:
                     log("Successfully built JavaScript project")
                     return True
-                else:
-                    log(f"Build failed: {stderr}", "ERROR")
-                    return False
-            else:
-                log("No build script found, assuming library project")
-                return True
+                log(f"Build failed: {stderr}", "ERROR")
+                return False
+            log("No build script found, assuming library project")
+            return True
 
     except Exception as e:
         log(f"Error processing package.json: {e}", "ERROR")

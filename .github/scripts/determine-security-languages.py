@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Determine which languages need security scanning based on file changes.
+"""Determine which languages need security scanning based on file changes.
 
 This script reads environment variables for change detection outputs and generates
 a JSON matrix for CodeQL security scanning, only including languages that have
@@ -24,8 +23,7 @@ def get_env_bool(key: str, default: bool = False) -> bool:
 
 
 def determine_security_languages() -> Dict[str, any]:
-    """
-    Determine which languages need security scanning based on file changes.
+    """Determine which languages need security scanning based on file changes.
 
     Returns:
         Dict containing matrix configuration and metadata

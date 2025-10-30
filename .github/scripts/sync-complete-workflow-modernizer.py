@@ -3,16 +3,15 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6
 
-"""
-Complete workflow modernization script.
+"""Complete workflow modernization script.
 Converts ALL workflows to use Python scripts and removes inline bash.
 """
 
 import os
-import re
-import sys
-import subprocess
 from pathlib import Path
+import re
+import subprocess
+import sys
 
 
 class WorkflowModernizer:
@@ -23,7 +22,7 @@ class WorkflowModernizer:
 
     def run_command(self, cmd):
         """Run shell command."""
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, check=False, shell=True, capture_output=True, text=True)
         return result.returncode == 0, result.stdout, result.stderr
 
     def extract_inline_scripts(self, content):
@@ -123,7 +122,7 @@ class WorkflowModernizer:
     def modernize_workflow(self, workflow_path):
         """Modernize a single workflow file."""
         try:
-            with open(workflow_path, "r") as f:
+            with open(workflow_path) as f:
                 content = f.read()
 
             # Skip if already modernized
@@ -143,9 +142,8 @@ class WorkflowModernizer:
                 print(f"  ✓ Modernized {workflow_path.name}")
                 self.modernized_count += 1
                 return True
-            else:
-                print(f"  - {workflow_path.name} no changes needed")
-                return False
+            print(f"  - {workflow_path.name} no changes needed")
+            return False
 
         except Exception as e:
             print(f"  ✗ Error modernizing {workflow_path.name}: {e}")
@@ -297,7 +295,7 @@ def main():
         )
 
         # Add files
-        subprocess.run(["git", "add", "."], cwd=os.path.dirname(workflow_dir))
+        subprocess.run(["git", "add", "."], check=False, cwd=os.path.dirname(workflow_dir))
 
         # Commit
         commit_msg = f"""feat(workflows): complete workflow modernization phase 2
@@ -312,7 +310,7 @@ Part of comprehensive workflow system overhaul."""
 
         result = subprocess.run(
             ["git", "commit", "-m", commit_msg],
-            cwd=os.path.dirname(workflow_dir),
+            check=False, cwd=os.path.dirname(workflow_dir),
         )
 
         if result.returncode == 0:
@@ -320,7 +318,7 @@ Part of comprehensive workflow system overhaul."""
 
             # Push changes
             result = subprocess.run(
-                ["git", "push"], cwd=os.path.dirname(workflow_dir)
+                ["git", "push"], check=False, cwd=os.path.dirname(workflow_dir)
             )
             if result.returncode == 0:
                 print("✓ Changes pushed successfully")

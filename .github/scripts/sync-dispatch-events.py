@@ -3,15 +3,14 @@
 # version: 1.1.0
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
-"""
-Dispatch repository events to target repositories for synchronization.
+"""Dispatch repository events to target repositories for synchronization.
 """
 
 import json
 import os
-import sys
-import subprocess
 from pathlib import Path
+import subprocess
+import sys
 
 
 def get_target_repos():
@@ -24,7 +23,7 @@ def get_target_repos():
 
     repos = []
     try:
-        with open(repo_file, "r") as f:
+        with open(repo_file) as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):
@@ -77,7 +76,7 @@ def dispatch_event(repo, event_type, client_payload):
 
     try:
         result = subprocess.run(
-            curl_cmd, capture_output=True, text=True, timeout=30
+            curl_cmd, check=False, capture_output=True, text=True, timeout=30
         )
 
         if result.returncode == 0:
@@ -85,18 +84,16 @@ def dispatch_event(repo, event_type, client_payload):
             if status == "204" or status == "200":
                 print(f"✅ Dispatched '{payload.get('event_type')}' to {repo}")
                 return True
-            else:
-                print(
-                    f"❌ Dispatch to {repo} returned HTTP {status}",
-                    file=sys.stderr,
-                )
-                return False
-        else:
             print(
-                f"❌ Failed to dispatch event to {repo}: {result.stderr}",
+                f"❌ Dispatch to {repo} returned HTTP {status}",
                 file=sys.stderr,
             )
             return False
+        print(
+            f"❌ Failed to dispatch event to {repo}: {result.stderr}",
+            file=sys.stderr,
+        )
+        return False
     except subprocess.TimeoutExpired:
         print(f"❌ Timeout dispatching event to {repo}", file=sys.stderr)
         return False

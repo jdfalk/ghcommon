@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: d1e2f3g4-h5i6-j7k8-l9m0-n1o2p3q4r5s6
 
-"""
-Docker configuration detection script for matrix build system.
+"""Docker configuration detection script for matrix build system.
 Detects Docker files, configurations, and determines build strategy.
 """
 
@@ -18,7 +17,7 @@ def run_command(cmd, capture_output=True):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, shell=True, capture_output=capture_output, text=True
+            cmd, check=False, shell=True, capture_output=capture_output, text=True
         )
         return result.returncode == 0, result.stdout.strip()
     except Exception:
@@ -59,11 +58,7 @@ def check_docker_compose():
 
 def should_build_docker(event_name, ref):
     """Determine if Docker image should be built and pushed."""
-    if event_name == "push" and ref == "refs/heads/main":
-        return True
-    elif event_name == "release":
-        return True
-    elif event_name == "workflow_dispatch":
+    if (event_name == "push" and ref == "refs/heads/main") or event_name == "release" or event_name == "workflow_dispatch":
         return True
     return False
 

@@ -5,19 +5,18 @@
 # version: 3.0.0
 # guid: 8d9e1f2a-3b4c-5d6e-7f8a-9b0c1d2e3f4a
 
-"""
-Sync receiver script for copying files from ghcommon to target repositories.
+"""Sync receiver script for copying files from ghcommon to target repositories.
 This script performs the actual file copying operations based on sync_type.
 Now reads workflow-config.yaml to determine what files to sync.
 """
 
-import os
+from pathlib import Path
 import shutil
 import stat
 import subprocess
 import sys
+
 import yaml
-from pathlib import Path
 
 
 def load_sync_config():
@@ -28,7 +27,7 @@ def load_sync_config():
         return {"sync": {"sync_paths": [], "exclude_files": []}}
 
     try:
-        with open(config_file, "r") as f:
+        with open(config_file) as f:
             config = yaml.safe_load(f)
             print(f"✅ Loaded sync configuration from {config_file}")
             return config

@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Check if there are changes after sync operation.
+"""Check if there are changes after sync operation.
 Usage: sync-receiver-check-changes.py
 """
 

@@ -3,8 +3,7 @@
 # version: 1.1.0
 # guid: a1b2c3d4-e5f6-7890-1234-56789abcdef0
 
-"""
-Detect build matrix requirements for the repository.
+"""Detect build matrix requirements for the repository.
 This script analyzes the repository to determine what technologies are used
 and generates appropriate build matrices for GitHub Actions.
 """
@@ -19,7 +18,7 @@ def run_command(cmd, capture_output=True):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, shell=True, capture_output=capture_output, text=True
+            cmd, check=False, shell=True, capture_output=capture_output, text=True
         )
         return result.returncode == 0, result.stdout.strip()
     except Exception:
@@ -100,7 +99,7 @@ def detect_build_requirements():
     if os.path.exists("package.json"):
         # Read package.json to determine if this is actually a frontend project
         try:
-            with open("package.json", "r") as f:
+            with open("package.json") as f:
                 import json as json_lib
 
                 pkg_data = json_lib.load(f)

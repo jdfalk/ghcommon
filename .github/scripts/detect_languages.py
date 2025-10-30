@@ -43,7 +43,7 @@ def load_build_config() -> Dict[str, Any]:
     in_build = False
     current_list_key: str | None = None
 
-    with open(CONFIG_PATH, "r", encoding="utf-8") as fh:
+    with open(CONFIG_PATH, encoding="utf-8") as fh:
         for raw_line in fh:
             line = raw_line.rstrip("\n")
             stripped = line.strip()

@@ -3,16 +3,15 @@
 # version: 1.2.0
 # guid: a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d
 
-"""
-Detect programming languages and determine if release should be triggered.
+"""Detect programming languages and determine if release should be triggered.
 Usage: sync-release-detect-language.py [force_language]
 """
 
-import os
 import json
-import sys
-import subprocess
+import os
 from pathlib import Path
+import subprocess
+import sys
 from typing import Dict, List
 
 

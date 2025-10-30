@@ -3,8 +3,7 @@
 # version: 1.1.0
 # guid: 7f1a3b2c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
 
-"""
-Monitor rollout across target repositories:
+"""Monitor rollout across target repositories:
 
 - Reads target repos from .github/repositories.txt or TARGET_REPOS env (space/comma-separated)
 - For each repo, fetches recent GitHub Actions runs and summarizes key workflows:
@@ -23,13 +22,12 @@ Auth:
 """
 
 import argparse
+import datetime as dt
+import json
 import os
 import sys
-import json
-import datetime as dt
-from urllib import request, error
-from typing import List, Dict, Optional, Tuple
-
+from typing import Dict, List, Optional, Tuple
+from urllib import error, request
 
 API_BASE = os.environ.get("GITHUB_API_URL", "https://api.github.com")
 
@@ -96,7 +94,7 @@ def load_target_repos(explicit: Optional[str]) -> List[str]:
     repos_file = os.path.join(os.getcwd(), ".github", "repositories.txt")
     repos: List[str] = []
     if os.path.exists(repos_file):
-        with open(repos_file, "r", encoding="utf-8") as f:
+        with open(repos_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):

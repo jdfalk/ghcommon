@@ -3,16 +3,15 @@
 # version: 1.0.0
 # guid: b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e
 
-"""
-Handle manual release version calculation.
+"""Handle manual release version calculation.
 Usage: sync-release-handle-manual-release.py <release_type> <language>
 """
 
-import sys
 import os
+from pathlib import Path
 import re
 import subprocess
-from pathlib import Path
+import sys
 
 
 def get_current_version_rust():

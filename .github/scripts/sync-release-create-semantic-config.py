@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
-"""
-Create semantic-release configuration based on language type.
+"""Create semantic-release configuration based on language type.
 Usage: sync-release-create-semantic-config.py <language>
 """
 
@@ -218,7 +217,7 @@ def main():
 
         print(f"Semantic-release config created successfully for {language}")
 
-    except IOError as e:
+    except OSError as e:
         print(f"Error writing .releaserc.json: {e}", file=sys.stderr)
         sys.exit(1)
 

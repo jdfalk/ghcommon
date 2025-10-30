@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: f7a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c
 
-"""
-Auto-commit script for workflow modernization.
+"""Auto-commit script for workflow modernization.
 Creates conventional commits for workflow changes.
 """
 
@@ -14,7 +13,7 @@ import subprocess
 def run_command(cmd, capture_output=True):
     """Run a shell command."""
     result = subprocess.run(
-        cmd, shell=True, capture_output=capture_output, text=True
+        cmd, check=False, shell=True, capture_output=capture_output, text=True
     )
     if result.returncode != 0 and capture_output:
         print(f"Error running command: {cmd}")
