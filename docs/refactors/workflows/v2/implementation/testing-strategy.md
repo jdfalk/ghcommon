@@ -6,10 +6,11 @@
 
 ## Overview
 
-This guide provides comprehensive testing strategies for the v2 workflow system, covering unit tests, integration tests, workflow testing, and helper module validation.
+This guide provides comprehensive testing strategies for the v2 workflow system, covering unit
+tests, integration tests, workflow testing, and helper module validation.
 
-**Target Audience**: Developers implementing and maintaining workflow tests
-**Prerequisites**:
+**Target Audience**: Developers implementing and maintaining workflow tests **Prerequisites**:
+
 - Python 3.13+ and pytest installed
 - Go 1.23+ for Go testing
 - Rust stable for Rust testing

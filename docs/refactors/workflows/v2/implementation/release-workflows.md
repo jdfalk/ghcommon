@@ -6,10 +6,11 @@
 
 ## Overview
 
-This guide provides comprehensive instructions for implementing branch-aware release workflows with parallel release tracks, version targeting, and multi-platform builds.
+This guide provides comprehensive instructions for implementing branch-aware release workflows with
+parallel release tracks, version targeting, and multi-platform builds.
 
-**Target Audience**: Developers and release managers
-**Prerequisites**:
+**Target Audience**: Developers and release managers **Prerequisites**:
+
 - Completed Phase 0 (Foundation) and Phase 2 (Release Consolidation)
 - Understanding of semantic versioning
 - GitHub Actions and repository permissions
@@ -71,10 +72,12 @@ jobs:
 Releases automatically target the correct version based on the branch:
 
 **Main branch** (`main`):
+
 - Tags: `v1.2.3`
 - Targets: Go 1.25, Python 3.14, Rust stable
 
 **Stable branch** (`stable-1-go-1.24`):
+
 - Tags: `v1.2.3-go-1.24`
 - Targets: Go 1.24, Python 3.13/3.14
 
@@ -97,6 +100,7 @@ git push origin v1.0.0-rust-1.75
 ```
 
 The release workflow automatically:
+
 1. Detects branch from tag
 2. Loads version configuration
 3. Builds for appropriate versions
@@ -496,7 +500,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for changelog
+          fetch-depth: 0 # Full history for changelog
 
       - name: Generate changelog
         run: |
@@ -517,6 +521,7 @@ jobs:
 ### Cross-Compilation Setup
 
 **Go cross-compilation**:
+
 ```yaml
 strategy:
   matrix:
@@ -541,6 +546,7 @@ steps:
 ```
 
 **Rust cross-compilation**:
+
 ```yaml
 strategy:
   matrix:
@@ -664,23 +670,23 @@ $CHANGES
 ## Installation
 
 ### Go
-\`\`\`bash
-go install github.com/${{ github.repository }}/cmd/app@${{ github.ref_name }}
-\`\`\`
+
+\`\`\`bash go install github.com/${{ github.repository }}/cmd/app@${{ github.ref_name }} \`\`\`
 
 ### Rust
-\`\`\`bash
-cargo install app --version ${{ github.ref_name }}
-\`\`\`
+
+\`\`\`bash cargo install app --version ${{ github.ref_name }} \`\`\`
 
 ### Binary
+
 Download from assets below.
 
 ## Checksums
 
 See `SHA256SUMS.txt` in assets.
 
-**Full Changelog**: https://github.com/${{ github.repository }}/compare/v$PREVIOUS_VERSION...${{ github.ref_name }}
+**Full Changelog**: https://github.com/${{ github.repository
+}}/compare/v$PREVIOUS_VERSION...${{ github.ref_name }}
 ```
 
 ## Branch-Specific Releases
@@ -730,6 +736,7 @@ git push origin v1.4.3-go-1.24
 **Problem**: Version in code doesn't match tag
 
 **Solution**:
+
 ```yaml
 - name: Validate version
   run: |
@@ -747,6 +754,7 @@ git push origin v1.4.3-go-1.24
 **Problem**: Linker errors on cross-compilation
 
 **Solution for Rust**:
+
 ```toml
 # .cargo/config.toml
 [target.aarch64-unknown-linux-gnu]
@@ -757,6 +765,7 @@ linker = "musl-gcc"
 ```
 
 **Solution for Go**:
+
 ```yaml
 - name: Install cross-compile tools
   run: |
@@ -768,6 +777,7 @@ linker = "musl-gcc"
 **Problem**: Artifacts exceed size limit
 
 **Solution**:
+
 ```yaml
 - name: Compress artifacts
   run: |
@@ -778,7 +788,7 @@ linker = "musl-gcc"
   with:
     name: binaries
     path: bin/*.gz
-    compression-level: 0  # Already compressed
+    compression-level: 0 # Already compressed
 ```
 
 ## Best Practices

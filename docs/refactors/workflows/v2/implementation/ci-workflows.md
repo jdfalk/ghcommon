@@ -6,10 +6,12 @@
 
 ## Overview
 
-This guide provides detailed instructions for implementing branch-aware CI workflows with the v2 system. It covers change detection, matrix generation, parallel execution, and Super Linter integration.
+This guide provides detailed instructions for implementing branch-aware CI workflows with the v2
+system. It covers change detection, matrix generation, parallel execution, and Super Linter
+integration.
 
-**Target Audience**: Developers implementing CI workflows in repositories
-**Prerequisites**:
+**Target Audience**: Developers implementing CI workflows in repositories **Prerequisites**:
+
 - Completed Phase 0 (Foundation) and Phase 1 (CI Modernization)
 - Python 3.13+ installed
 - GitHub Actions experience
@@ -47,6 +49,7 @@ jobs:
 ```
 
 This provides:
+
 - Branch-aware version selection
 - Change detection for efficient runs
 - Parallel matrix execution
@@ -65,42 +68,42 @@ version_policies:
   # Main branch - latest versions
   main:
     go:
-      versions: ["1.25"]
-      default: "1.25"
+      versions: ['1.25']
+      default: '1.25'
     python:
-      versions: ["3.14"]
-      default: "3.14"
+      versions: ['3.14']
+      default: '3.14'
     node:
-      versions: ["22"]
-      default: "22"
+      versions: ['22']
+      default: '22'
     rust:
-      versions: ["stable"]
-      default: "stable"
+      versions: ['stable']
+      default: 'stable'
 
   # Go 1.24 maintenance branch
   stable-1-go-1.24:
     go:
-      versions: ["1.24"]
-      default: "1.24"
+      versions: ['1.24']
+      default: '1.24'
     python:
-      versions: ["3.13", "3.14"]
-      default: "3.13"
+      versions: ['3.13', '3.14']
+      default: '3.13'
     lifecycle:
-      created: "2025-02-01"
-      work_stops_at: "2025-08-01"  # When 1.26 released
+      created: '2025-02-01'
+      work_stops_at: '2025-08-01' # When 1.26 released
       lock_after_days: 180
 
   # Go 1.23 maintenance branch (approaching lock)
   stable-1-go-1.23:
     go:
-      versions: ["1.23"]
-      default: "1.23"
+      versions: ['1.23']
+      default: '1.23'
     python:
-      versions: ["3.12", "3.13"]
-      default: "3.12"
+      versions: ['3.12', '3.13']
+      default: '3.12'
     lifecycle:
-      created: "2024-08-01"
-      work_stops_at: "2025-02-01"
+      created: '2024-08-01'
+      work_stops_at: '2025-02-01'
       lock_after_days: 180
 ```
 
@@ -164,7 +167,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for accurate diff
+          fetch-depth: 0 # Full history for accurate diff
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -363,12 +366,12 @@ strategy:
     # Exclude specific combinations
     exclude:
       - go: '1.23'
-        os: macos-latest  # Don't test old version on macOS
+        os: macos-latest # Don't test old version on macOS
     # Add specific combinations
     include:
       - go: '1.25'
         os: ubuntu-latest
-        race: true  # Only race detection on latest Go
+        race: true # Only race detection on latest Go
 ```
 
 ## Super Linter Integration
@@ -392,7 +395,8 @@ jobs:
         uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          VALIDATE_ALL_CODEBASE:
+            ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 ```
 
 ### Configuration Files
@@ -432,6 +436,7 @@ CREATE_LOG_FILE=true
 Configure linters for each language:
 
 **.github/linters/.python-black**:
+
 ```ini
 [tool.black]
 line-length = 88
@@ -439,15 +444,17 @@ target-version = ['py313', 'py314']
 ```
 
 **.github/linters/.markdown-lint.yml**:
+
 ```yaml
 # Google-style markdown
 line-length: 100
 no-duplicate-heading: true
 no-trailing-punctuation:
-  punctuation: ".,;:!"
+  punctuation: '.,;:!'
 ```
 
 **.github/linters/.yaml-lint.yml**:
+
 ```yaml
 extends: default
 rules:
@@ -668,6 +675,7 @@ jobs:
 **Problem**: Matrix generation produces empty or invalid JSON
 
 **Solution**:
+
 ```bash
 # Test matrix generation locally
 python .github/workflows/scripts/ci_workflow.py generate-matrix \
@@ -686,6 +694,7 @@ python .github/workflows/scripts/ci_workflow.py generate-matrix \
 **Problem**: Changes not detected for specific file patterns
 
 **Solution**:
+
 1. Verify fetch-depth is 0 in checkout
 2. Check file patterns in ci_workflow.py
 3. Test locally:
@@ -701,6 +710,7 @@ python .github/workflows/scripts/ci_workflow.py detect-changes \
 **Problem**: Cache always misses despite no dependency changes
 
 **Solution**:
+
 ```yaml
 # Add verbose cache logging
 - name: Cache dependencies
