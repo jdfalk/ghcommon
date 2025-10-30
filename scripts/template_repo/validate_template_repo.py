@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: 5c1d2e3f-4a5b-6c7d-8e9f-0a1b2c3d4e5f
 
-"""
-Validate that a directory contains no obvious secrets before publishing.
+"""Validate that a directory contains no obvious secrets before publishing.
 
 This is a conservative, pattern-based scanner intended to catch common mistakes.
 It avoids scanning large/binary files and respects typical ignore directories.
@@ -15,11 +14,12 @@ It never uploads data anywhere. All checks are local-only.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
 import os
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 DEFAULT_IGNORE_DIRS = {
     ".git",

@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""
-Workflow Summary Generator
+"""Workflow Summary Generator
 
 Generates comprehensive summaries for GitHub Actions workflows,
 specifically for the unified issue management workflow.
 """
 
+from datetime import datetime
 import json
 import os
 import subprocess
 import sys
-from datetime import datetime
 from typing import List
 
 

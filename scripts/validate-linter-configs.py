@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Comprehensive Linter Configuration Validator
+"""Comprehensive Linter Configuration Validator
 
 This script validates all linter configuration files in the repository to ensure:
 1. Config files exist and are valid
@@ -17,12 +16,10 @@ Usage:
 """
 
 import json
-import os
-import subprocess
-import sys
-import yaml
 from pathlib import Path
-from typing import Dict, List, Tuple
+import sys
+
+import yaml
 
 # Color codes for output
 GREEN = "\033[92m"
@@ -68,7 +65,7 @@ class LinterValidator:
     def validate_json_syntax(self, filepath: str) -> bool:
         """Validate JSON file syntax."""
         try:
-            with open(self.repo_root / filepath, "r") as f:
+            with open(self.repo_root / filepath) as f:
                 json.load(f)
             self.log(f"Valid JSON syntax: {filepath}", "success")
             return True
@@ -79,7 +76,7 @@ class LinterValidator:
     def validate_yaml_syntax(self, filepath: str) -> bool:
         """Validate YAML file syntax."""
         try:
-            with open(self.repo_root / filepath, "r") as f:
+            with open(self.repo_root / filepath) as f:
                 yaml.safe_load(f)
             self.log(f"Valid YAML syntax: {filepath}", "success")
             return True
@@ -95,7 +92,7 @@ class LinterValidator:
         if not self.validate_json_syntax(filepath):
             return False
 
-        with open(self.repo_root / filepath, "r") as f:
+        with open(self.repo_root / filepath) as f:
             config = json.load(f)
 
         # Google Style Guide preferences
@@ -129,7 +126,7 @@ class LinterValidator:
         if not self.validate_yaml_syntax(filepath):
             return False
 
-        with open(self.repo_root / filepath, "r") as f:
+        with open(self.repo_root / filepath) as f:
             config = yaml.safe_load(f)
 
         # Check for Google style guide extends
@@ -153,7 +150,7 @@ class LinterValidator:
             return False
 
         try:
-            with open(self.repo_root / filepath, "r") as f:
+            with open(self.repo_root / filepath) as f:
                 content = f.read().strip()
 
             # Black config should specify line length
@@ -185,7 +182,7 @@ class LinterValidator:
 
         # Just check if it's readable for now
         try:
-            with open(self.repo_root / filepath, "r") as f:
+            with open(self.repo_root / filepath) as f:
                 content = f.read()
 
             # Google Python style uses 80 char lines
@@ -216,7 +213,7 @@ class LinterValidator:
             return False
 
         try:
-            with open(self.repo_root / filepath, "r") as f:
+            with open(self.repo_root / filepath) as f:
                 content = f.read()
 
             # Google Python style uses 80 char lines
@@ -308,7 +305,7 @@ class LinterValidator:
                 all_valid = False
                 continue
 
-            with open(self.repo_root / env_file, "r") as f:
+            with open(self.repo_root / env_file) as f:
                 content = f.read()
 
             # Extract CONFIG_FILE references
@@ -336,9 +333,9 @@ class LinterValidator:
     def run_all_validations(self) -> bool:
         """Run all validation checks."""
         print(f"\n{BLUE}{'=' * 70}")
-        print(f"  Linter Configuration Validator")
+        print("  Linter Configuration Validator")
         print(f"  Repository: {self.repo_root}")
-        print(f"  Google Style Guide Compliance Check")
+        print("  Google Style Guide Compliance Check")
         print(f"{'=' * 70}{RESET}\n")
 
         validators = [
@@ -360,7 +357,7 @@ class LinterValidator:
 
         # Print summary
         print(f"\n{BLUE}{'=' * 70}")
-        print(f"  Validation Summary")
+        print("  Validation Summary")
         print(f"{'=' * 70}{RESET}\n")
 
         print(f"{GREEN}✅ Successes: {len(self.success)}{RESET}")
@@ -372,14 +369,13 @@ class LinterValidator:
                 f"{RED}Validation FAILED with {len(self.errors)} errors{RESET}"
             )
             return False
-        elif self.warnings:
+        if self.warnings:
             print(
                 f"{YELLOW}Validation passed with {len(self.warnings)} warnings{RESET}"
             )
             return True
-        else:
-            print(f"{GREEN}All validations PASSED!{RESET}")
-            return True
+        print(f"{GREEN}All validations PASSED!{RESET}")
+        return True
 
 
 def main():

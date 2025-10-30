@@ -3,15 +3,14 @@
 # version: 1.0.0
 # guid: 9b8a7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d
 
-"""
-Update all workflow file versions in ghcommon to match the propagated versions.
+"""Update all workflow file versions in ghcommon to match the propagated versions.
 
 This ensures consistency between the source repository (ghcommon) and all
 target repositories that received the CI fixes.
 """
 
-import re
 from pathlib import Path
+import re
 
 # Define version mappings
 VERSION_UPDATES = {
@@ -53,9 +52,8 @@ def update_workflow_version(file_path: Path, new_version: str):
         file_path.write_text(updated_content)
         print(f"✅ Updated {file_path.name} to version {new_version}")
         return True
-    else:
-        print(f"⚠️  No version header found in {file_path.name}")
-        return False
+    print(f"⚠️  No version header found in {file_path.name}")
+    return False
 
 
 def main():

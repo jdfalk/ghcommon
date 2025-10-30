@@ -3,8 +3,7 @@
 # version: 1.2.0
 # guid: 7f8a9b0c-1d2e-3f4a-5b6c-7d8e9f0a1b2c
 
-"""
-Repository Automation Update Script
+"""Repository Automation Update Script
 
 This script updates repositories to use the new unified automation configuration
 system with enhanced duplicate prevention and standardized settings.
@@ -97,27 +96,25 @@ class RepositoryAutomationUpdater:
                     repo, workflows, default_branch
                 )
                 return cleanup_success and update_success
+            if has_new_unified and self.force_update:
+                print(f"� Force updating unified automation in {repo}")
             else:
-                if has_new_unified and self.force_update:
-                    print(f"� Force updating unified automation in {repo}")
-                else:
-                    print(f"�📝 Adding unified automation to {repo}")
+                print(f"�📝 Adding unified automation to {repo}")
 
-                # First, clean up old automation files (including old unified-automation.yml)
-                cleanup_success = True
-                if self.enable_cleanup:
-                    cleanup_success = self._cleanup_old_automation_files(
-                        repo, workflows, default_branch
-                    )
+            # First, clean up old automation files (including old unified-automation.yml)
+            cleanup_success = True
+            if self.enable_cleanup:
+                cleanup_success = self._cleanup_old_automation_files(
+                    repo, workflows, default_branch
+                )
 
-                # Then add/update the unified automation system
-                if cleanup_success:
-                    add_success = self._add_unified_automation(
-                        repo, default_branch
-                    )
-                    return add_success
-                else:
-                    return False
+            # Then add/update the unified automation system
+            if cleanup_success:
+                add_success = self._add_unified_automation(
+                    repo, default_branch
+                )
+                return add_success
+            return False
 
         except Exception as e:
             print(f"❌ Error updating {repo}: {e}")
@@ -221,18 +218,17 @@ class RepositoryAutomationUpdater:
             if self.dry_run:
                 print(f"[DRY RUN] Would remove old workflow: {file_name}")
                 success_count += 1
+            elif self._remove_file(
+                repo,
+                file_path,
+                workflow_file["sha"],
+                f"Remove redundant workflow: {file_name}",
+                default_branch,
+            ):
+                print(f"🗑️  Removed old workflow: {file_name}")
+                success_count += 1
             else:
-                if self._remove_file(
-                    repo,
-                    file_path,
-                    workflow_file["sha"],
-                    f"Remove redundant workflow: {file_name}",
-                    default_branch,
-                ):
-                    print(f"🗑️  Removed old workflow: {file_name}")
-                    success_count += 1
-                else:
-                    print(f"❌ Failed to remove old workflow: {file_name}")
+                print(f"❌ Failed to remove old workflow: {file_name}")
 
         return success_count == len(files_to_remove)
 
@@ -248,11 +244,10 @@ class RepositoryAutomationUpdater:
         if config_response.status_code == 404:
             print(f"📄 Adding default configuration to {repo}")
             return self._add_default_configuration(repo, default_branch)
-        else:
-            print(f"📄 Configuration file already exists in {repo}")
-            return self._validate_existing_configuration(
-                repo, config_response.json(), default_branch
-            )
+        print(f"📄 Configuration file already exists in {repo}")
+        return self._validate_existing_configuration(
+            repo, config_response.json(), default_branch
+        )
 
     def _add_unified_automation(self, repo: str, default_branch: str) -> bool:
         """Add unified automation to a repository that doesn't have it."""
@@ -326,11 +321,10 @@ class RepositoryAutomationUpdater:
             if has_duplicate_settings:
                 print(f"✅ Configuration in {repo} is up to date")
                 return True
-            else:
-                print(f"🔄 Configuration in {repo} needs updating")
-                return self._update_configuration(
-                    repo, config, config_file["sha"], default_branch
-                )
+            print(f"🔄 Configuration in {repo} needs updating")
+            return self._update_configuration(
+                repo, config, config_file["sha"], default_branch
+            )
 
         except Exception as e:
             print(f"⚠️  Error validating configuration in {repo}: {e}")
@@ -378,7 +372,7 @@ class RepositoryAutomationUpdater:
         )
         if os.path.exists(local_template_path):
             try:
-                with open(local_template_path, "r") as f:
+                with open(local_template_path) as f:
                     return f.read()
             except Exception:
                 pass
@@ -506,9 +500,8 @@ jobs:
         if response.status_code == 201:
             print(f"✅ Created {path} in {repo}")
             return True
-        else:
-            print(f"❌ Failed to create {path} in {repo}: {response.text}")
-            return False
+        print(f"❌ Failed to create {path} in {repo}: {response.text}")
+        return False
 
     def _update_file(
         self,
@@ -536,9 +529,8 @@ jobs:
         if response.status_code == 200:
             print(f"✅ Updated {path} in {repo}")
             return True
-        else:
-            print(f"❌ Failed to update {path} in {repo}: {response.text}")
-            return False
+        print(f"❌ Failed to update {path} in {repo}: {response.text}")
+        return False
 
     def _remove_file(
         self, repo: str, path: str, sha: str, message: str, default_branch: str
@@ -552,9 +544,8 @@ jobs:
 
         if response.status_code == 200:
             return True
-        else:
-            print(f"❌ Failed to remove {path} from {repo}: {response.text}")
-            return False
+        print(f"❌ Failed to remove {path} from {repo}: {response.text}")
+        return False
 
 
 def main():
@@ -606,7 +597,7 @@ def main():
             print(f"❌ Config file not found: {args.config}")
             sys.exit(1)
 
-        with open(args.config, "r") as f:
+        with open(args.config) as f:
             repositories = [
                 line.strip()
                 for line in f

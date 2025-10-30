@@ -3,8 +3,7 @@
 # version: 3.2.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
-"""
-Unified GitHub Project Manager v2
+"""Unified GitHub Project Manager v2
 
 A comprehensive script for creating and managing GitHub Projects across multiple repositories.
 Consolidates ALL project management functionality into a single, idempotent, configuration-driven tool.
@@ -55,12 +54,11 @@ import json
 import logging
 import subprocess
 import sys
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class UnifiedGitHubProjectManager:
-    """
-    Unified GitHub Project Manager for multi-repository project management.
+    """Unified GitHub Project Manager for multi-repository project management.
 
     This class handles creation, linking, and management of GitHub Projects
     across multiple repositories with intelligent issue assignment, label management,
@@ -125,12 +123,11 @@ class UnifiedGitHubProjectManager:
                 raise RuntimeError(
                     "GitHub CLI authentication failed. Run: gh auth login"
                 ) from e
-            elif "project" in str(e):
+            if "project" in str(e):
                 raise RuntimeError(
                     "Missing project permissions. Run: gh auth refresh -s project,read:project"
                 ) from e
-            else:
-                raise RuntimeError(f"GitHub CLI validation failed: {e}") from e
+            raise RuntimeError(f"GitHub CLI validation failed: {e}") from e
         except FileNotFoundError:
             raise RuntimeError(
                 "GitHub CLI not found. Install with: brew install gh"
@@ -139,8 +136,7 @@ class UnifiedGitHubProjectManager:
     def _run_gh_command(
         self, command: List[str], input_data: str = None
     ) -> Tuple[bool, str]:
-        """
-        Run a GitHub CLI command with error handling.
+        """Run a GitHub CLI command with error handling.
 
         Args:
             command: List of command arguments
@@ -201,14 +197,13 @@ class UnifiedGitHubProjectManager:
             command_str = [
                 str(arg) for arg in command
             ]  # Ensure we have command_str
-            error_msg = f"Unexpected error: {str(e)}"
+            error_msg = f"Unexpected error: {e!s}"
             self.logger.error(f"Command failed: gh {' '.join(command_str)}")
             self.logger.error(error_msg)
             return False, error_msg
 
     def _get_project_definitions(self) -> Dict[str, Dict[str, Any]]:
-        """
-        Get comprehensive project definitions with standardized labels.
+        """Get comprehensive project definitions with standardized labels.
 
         Returns:
             Dictionary mapping project titles to their configurations
@@ -542,8 +537,7 @@ class UnifiedGitHubProjectManager:
         }
 
     def _get_label_definitions(self) -> Dict[str, Dict[str, str]]:
-        """
-        Get comprehensive standardized label definitions for all repositories.
+        """Get comprehensive standardized label definitions for all repositories.
         Consolidates best practices from gcommon, ghcommon, subtitle-manager, and codex-cli.
 
         Returns:
@@ -823,8 +817,7 @@ class UnifiedGitHubProjectManager:
         }
 
     def _get_milestone_definitions(self) -> Dict[str, Dict[str, str]]:
-        """
-        Get milestone definitions for project planning.
+        """Get milestone definitions for project planning.
 
         Returns:
             Dictionary mapping milestone titles to their properties
@@ -962,8 +955,7 @@ class UnifiedGitHubProjectManager:
         color = color.lstrip("#")
         if len(color) == 6:
             return color.lower()
-        else:
-            raise ValueError(f"Invalid color format: {color}")
+        raise ValueError(f"Invalid color format: {color}")
 
     def create_all_projects(self) -> Dict[str, str]:
         """Create all GitHub Projects defined in the configuration."""
@@ -983,10 +975,9 @@ class UnifiedGitHubProjectManager:
                         "number", ""
                     )
                     continue
-                else:
-                    self.logger.info(
-                        f"🔄 Project '{title}' exists, force update enabled"
-                    )
+                self.logger.info(
+                    f"🔄 Project '{title}' exists, force update enabled"
+                )
 
             project_number = self._create_project(title, config["description"])
             if project_number:
@@ -1133,8 +1124,7 @@ class UnifiedGitHubProjectManager:
     def _get_linked_repositories(
         self, project_number: str
     ) -> Optional[List[str]]:
-        """
-        Get list of repositories already linked to a project.
+        """Get list of repositories already linked to a project.
 
         Args:
             project_number: Project number to check
@@ -1182,8 +1172,7 @@ class UnifiedGitHubProjectManager:
                 return [
                     repo.strip() for repo in repo_output.strip().split("\n")
                 ]
-            else:
-                return []
+            return []
 
         except Exception as e:
             self.logger.warning(
@@ -1221,19 +1210,17 @@ class UnifiedGitHubProjectManager:
                     f"✅ Repository {repository} is already linked to project #{project_number}"
                 )
                 return True
-            else:
-                self.logger.warning(
-                    f"Failed to link repository '{repository}' to project #{project_number}: {output}"
-                )
-                return False
+            self.logger.warning(
+                f"Failed to link repository '{repository}' to project #{project_number}: {output}"
+            )
+            return False
 
         return success
 
     def _labels_are_identical(
         self, existing_label: Dict[str, str], new_label_config: Dict[str, str]
     ) -> bool:
-        """
-        Check if an existing label is identical to the desired label configuration.
+        """Check if an existing label is identical to the desired label configuration.
 
         Args:
             existing_label: Label data from GitHub API
@@ -1282,29 +1269,28 @@ class UnifiedGitHubProjectManager:
                             f"✅ Label '{label_name}' already exists in {repository} with correct properties (skipping)"
                         )
                         continue
-                    else:
-                        # Label exists but needs updating
-                        if not self.force:
-                            self.logger.info(
-                                f"🔄 Label '{label_name}' exists in {repository} but needs updating..."
-                            )
-                        else:
-                            self.logger.info(
-                                f"🔄 Force updating label '{label_name}' in {repository}..."
-                            )
-
-                        success = self._update_label(
-                            repository, label_name, label_config
+                    # Label exists but needs updating
+                    if not self.force:
+                        self.logger.info(
+                            f"🔄 Label '{label_name}' exists in {repository} but needs updating..."
                         )
-                        if success:
-                            self.logger.info(
-                                f"✅ Updated label '{label_name}' in {repository}"
-                            )
-                        else:
-                            self.logger.error(
-                                f"❌ Failed to update label '{label_name}' in {repository}"
-                            )
-                        continue
+                    else:
+                        self.logger.info(
+                            f"🔄 Force updating label '{label_name}' in {repository}..."
+                        )
+
+                    success = self._update_label(
+                        repository, label_name, label_config
+                    )
+                    if success:
+                        self.logger.info(
+                            f"✅ Updated label '{label_name}' in {repository}"
+                        )
+                    else:
+                        self.logger.error(
+                            f"❌ Failed to update label '{label_name}' in {repository}"
+                        )
+                    continue
 
                 # Create new label
                 success = self._create_label(
@@ -1391,8 +1377,7 @@ class UnifiedGitHubProjectManager:
         return success
 
     def _get_default_github_labels(self) -> set:
-        """
-        Get the set of default labels that GitHub provides for new repositories.
+        """Get the set of default labels that GitHub provides for new repositories.
         These should never be deleted during cleanup operations.
 
         Returns:
@@ -1610,14 +1595,13 @@ class UnifiedGitHubProjectManager:
                         else:
                             print(f"   ❌ Failed to delete '{label_name}'")
                         break
-                    elif response in ["n", "no", ""]:
+                    if response in ["n", "no", ""]:
                         print(f"   ⏭️ Skipped '{label_name}'")
                         break
-                    elif response in ["q", "quit"]:
+                    if response in ["q", "quit"]:
                         print("   🛑 Quitting interactive cleanup")
                         return
-                    else:
-                        print("   Please enter y(es), n(o), or q(uit)")
+                    print("   Please enter y(es), n(o), or q(uit)")
 
     def _delete_label(self, repository: str, label_name: str) -> bool:
         """Delete a label from a repository."""
@@ -1681,10 +1665,9 @@ class UnifiedGitHubProjectManager:
                             f"✅ Milestone '{milestone_title}' already exists in {repository}"
                         )
                         continue
-                    else:
-                        self.logger.info(
-                            f"🔄 Would update milestone '{milestone_title}' in {repository} (not implemented)"
-                        )
+                    self.logger.info(
+                        f"🔄 Would update milestone '{milestone_title}' in {repository} (not implemented)"
+                    )
 
                 success = self._create_milestone(
                     repository, milestone_title, milestone_config
@@ -1804,8 +1787,7 @@ class UnifiedGitHubProjectManager:
         print("=" * 80 + "\n")
 
     def get_auto_add_workflow_config(self) -> Dict[str, List[str]]:
-        """
-        Generate configuration for GitHub's auto-add workflow rules.
+        """Generate configuration for GitHub's auto-add workflow rules.
 
         Returns:
             Dictionary mapping project names to lists of labels that should auto-add issues
@@ -1820,8 +1802,7 @@ class UnifiedGitHubProjectManager:
         return workflow_config
 
     def setup_project_workflows(self, project_numbers: Dict[str, str]) -> None:
-        """
-        Set up automated workflows for GitHub Projects.
+        """Set up automated workflows for GitHub Projects.
 
         Args:
             project_numbers: Dictionary mapping project titles to their numbers
@@ -1856,8 +1837,7 @@ class UnifiedGitHubProjectManager:
         project_definitions: Dict[str, Dict[str, Any]],
         workflow_config: Dict[str, List[str]],
     ) -> None:
-        """
-        Display detailed workflow setup instructions with repository information.
+        """Display detailed workflow setup instructions with repository information.
 
         Args:
             project_definitions: Full project configuration
@@ -1948,8 +1928,7 @@ class UnifiedGitHubProjectManager:
     def _build_workflow_mutation(
         self, project_number: str, workflow_name: str, labels: List[str]
     ) -> str:
-        """
-        Build GraphQL mutation for creating a project workflow.
+        """Build GraphQL mutation for creating a project workflow.
 
         Args:
             project_number: Project number
@@ -2026,7 +2005,7 @@ class UnifiedGitHubProjectManager:
             self.logger.info("✅ Full setup completed successfully!")
 
         except Exception as e:
-            self.logger.error(f"❌ Setup failed: {str(e)}")
+            self.logger.error(f"❌ Setup failed: {e!s}")
             raise
 
 
@@ -2140,15 +2119,14 @@ Examples:
             manager.run_full_setup()
 
     except Exception as e:
-        print(f"❌ Error: {str(e)}", file=sys.stderr)
+        print(f"❌ Error: {e!s}", file=sys.stderr)
         sys.exit(1)
 
 
 def display_workflow_setup_instructions(
     workflow_config: Dict[str, List[str]],
 ) -> None:
-    """
-    Display clear, actionable instructions for setting up GitHub Project workflows.
+    """Display clear, actionable instructions for setting up GitHub Project workflows.
 
     Args:
         workflow_config: Dictionary mapping project names to lists of labels for auto-add

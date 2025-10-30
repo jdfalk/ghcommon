@@ -3,8 +3,7 @@
 # version: 1.3.2
 # guid: 7f2d3a2e-4b5c-8d9e-0f1a-2b3c4d5e6f70
 
-"""
-Scaffold a minimal, public-safe template repository to a target directory.
+"""Scaffold a minimal, public-safe template repository to a target directory.
 
 Design goals:
 - No secrets written to disk. No tokens, passwords, or PATs.
@@ -28,8 +27,8 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import os
-import sys
 from pathlib import Path
+import sys
 from typing import Dict, List, Tuple
 
 SUPPORTED_LICENSES: Dict[str, str] = {
@@ -151,8 +150,7 @@ coverage*
 
 
 def render_ci_yaml(include_go: bool, include_python: bool) -> str:
-    """
-    Build CI workflow content dynamically based on selected overlays.
+    """Build CI workflow content dynamically based on selected overlays.
     Always includes Super Linter job; conditionally adds Go/Python test jobs.
     """
     header = """# file: .github/workflows/ci.yml

@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7890-abcd-ef0123456789
 
-"""
-Optionally initialize a local git repository and publish it to GitHub using the
+"""Optionally initialize a local git repository and publish it to GitHub using the
 GitHub CLI (gh). This script does not embed tokens, secrets, or credentials.
 
 Requirements:
@@ -20,10 +19,10 @@ from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
 
 def run(cmd: list[str], cwd: Path) -> None:
@@ -76,7 +75,7 @@ def main(argv: list[str]) -> int:
         # Returns exit code 0 when inside any git work tree
         res = subprocess.run(
             ["git", "rev-parse", "--is-inside-work-tree"],
-            cwd=str(target),
+            check=False, cwd=str(target),
             capture_output=True,
         )
         inside = res.returncode == 0 and res.stdout.decode().strip() == "true"

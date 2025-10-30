@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: 7f3c9a3e-1b2c-4d5e-8f90-abc123def456
 
-"""
-Batch-update .github/instructions/*.instructions.md files across repositories to:
+"""Batch-update .github/instructions/*.instructions.md files across repositories to:
 1) Wrap the YAML frontmatter (applyTo/description) block with ignore markers:
    <!-- prettier-ignore-start --> / <!-- prettier-ignore-end -->
    <!-- markdownlint-disable --> / <!-- markdownlint-enable -->
@@ -17,8 +16,8 @@ Safety:
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
+import re
 
 WORKSPACE_REPOS = [
     "subtitle-manager",

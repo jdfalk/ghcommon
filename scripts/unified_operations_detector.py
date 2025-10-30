@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: 8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e
 
-"""
-Unified Operations Detector
+"""Unified Operations Detector
 
 Intelligently determines which operations to run based on:
 - Explicit input parameters
@@ -16,12 +15,12 @@ Used by the unified automation workflow to decide between:
 - Documentation update operations (process doc update files)
 """
 
-import os
-import sys
 import json
 import logging
+import os
 from pathlib import Path
-from typing import List, Dict
+import sys
+from typing import Dict, List
 
 # Configure logging
 logging.basicConfig(
@@ -58,8 +57,7 @@ class UnifiedOperationsDetector:
         self.doc_operations = {"doc-updates"}
 
     def detect_operations(self) -> Dict[str, any]:
-        """
-        Detect which operations to run based on input and available files.
+        """Detect which operations to run based on input and available files.
 
         Returns:
             Dict with detected operations and file availability

@@ -3,8 +3,7 @@
 # version: 2.1.0
 # guid: 9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d
 
-"""
-Enhanced Workflow Debugger
+"""Enhanced Workflow Debugger
 =========================
 
 A comprehensive tool for debugging GitHub Actions workflows across repositories.
@@ -24,17 +23,16 @@ Usage:
 """
 
 import argparse
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
 import json
 import logging
+from pathlib import Path
 import re
 import subprocess
 import sys
+from typing import Any, Dict, List, Set, Tuple
 import uuid
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Tuple, Set, Any
-from dataclasses import dataclass, asdict
-
 
 # Configure logging
 logging.basicConfig(
@@ -366,8 +364,8 @@ class WorkflowDebugger:
 
         # Try to download artifacts first
         try:
-            import tempfile
             import os
+            import tempfile
 
             logger.debug(f"Attempting to download artifacts for run {run_id}")
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -382,7 +380,7 @@ class WorkflowDebugger:
                         "--dir",
                         temp_dir,
                     ],
-                    capture_output=True,
+                    check=False, capture_output=True,
                     text=True,
                 )
 
@@ -396,7 +394,6 @@ class WorkflowDebugger:
                             try:
                                 with open(
                                     file_path,
-                                    "r",
                                     encoding="utf-8",
                                     errors="ignore",
                                 ) as f:
@@ -434,7 +431,7 @@ class WorkflowDebugger:
                     job.id,
                     "--log",
                 ],
-                capture_output=True,
+                check=False, capture_output=True,
                 text=True,
             )
 
@@ -450,7 +447,7 @@ class WorkflowDebugger:
                             "api",
                             f"/repos/{repo}/actions/jobs/{job.id}/logs",
                         ],
-                        capture_output=True,
+                        check=False, capture_output=True,
                         text=True,
                     )
 
@@ -488,9 +485,8 @@ class WorkflowDebugger:
                     f"Saved logs to {log_file} ({len(combined_logs)} sections)"
                 )
                 return str(log_file)
-            else:
-                logger.warning(f"No logs were downloaded for run {run_id}")
-                return ""
+            logger.warning(f"No logs were downloaded for run {run_id}")
+            return ""
 
         except Exception as e:
             logger.error(f"Failed to save combined logs: {e}")
@@ -524,7 +520,7 @@ class WorkflowDebugger:
             return [], "unknown", []
 
         try:
-            with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+            with open(log_file, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
         except Exception as e:
             logger.error(f"Failed to read log file {log_file}: {e}")
