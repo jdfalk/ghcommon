@@ -1,5 +1,5 @@
 <!-- file: .github/instructions/go.instructions.md -->
-<!-- version: 1.9.0 -->
+<!-- version: 1.11.0 -->
 <!-- guid: 4a5b6c7d-8e9f-1a2b-3c4d-5e6f7a8b9c0d -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
@@ -1631,6 +1631,1207 @@ func CreateLimitedSandbox(cfg SandboxConfig) (*os.Root, error) {
 
     // Create filesystem isolation
     return os.Root(cfg.BaseDir)
+}
+```
+
+## Generic Optimization and Type Parameters (Go 1.25+)
+
+> **Availability**: Go 1.25+ includes significant generic optimizations. Type parameters available since Go 1.18, but performance improved in 1.25.
+
+### Overview
+
+Go 1.25 brings major improvements to generics performance through:
+
+- **Core Types Removal**: Simplified type parameter constraints (breaking change from Go 1.18-1.24)
+- **Better Type Inference**: Reduced need for explicit type arguments
+- **Performance Optimizations**: Dictionary-based implementation improvements
+- **Reduced Code Bloat**: Better monomorphization strategies
+
+### What Changed in Go 1.25
+
+#### Core Types Constraint Simplification
+
+**Before (Go 1.18-1.24):**
+
+```go
+// Old syntax with core types
+type Integer interface {
+    ~int | ~int8 | ~int16 | ~int32 | ~int64
+}
+
+type Signed interface {
+    ~int | ~int8 | ~int16 | ~int32 | ~int64
+}
+
+// Complex approximation constraints
+type Stringer interface {
+    ~string
+}
+```
+
+**After (Go 1.25+):**
+
+```go
+// Simplified constraints - no tilde operator needed for basic cases
+type Integer interface {
+    int | int8 | int16 | int32 | int64
+}
+
+type Signed interface {
+    int | int8 | int16 | int32 | int64
+}
+
+// More natural constraint syntax
+type Stringer interface {
+    string
+}
+
+// Tilde still available for underlying type matching when needed
+type CustomInt interface {
+    ~int  // Still works: matches int and types with underlying type int
+}
+```
+
+### Generic Function Optimization
+
+#### Example: Generic Slice Utilities
+
+**Optimized Generic Functions (Go 1.25):**
+
+```go
+package sliceutil
+
+// Map applies a function to each element
+// Go 1.25: Better type inference, reduced allocations
+func Map[T, U any](slice []T, fn func(T) U) []U {
+    result := make([]U, len(slice))
+    for i, v := range slice {
+        result[i] = fn(v)
+    }
+    return result
+}
+
+// Filter returns elements matching predicate
+// Go 1.25: Optimized for common types (int, string, etc.)
+func Filter[T any](slice []T, predicate func(T) bool) []T {
+    result := make([]T, 0, len(slice))
+    for _, v := range slice {
+        if predicate(v) {
+            result = append(result, v)
+        }
+    }
+    return result
+}
+
+// Reduce combines elements using a function
+func Reduce[T, U any](slice []T, initial U, fn func(U, T) U) U {
+    result := initial
+    for _, v := range slice {
+        result = fn(result, v)
+    }
+    return result
+}
+
+// Contains checks if slice contains element
+// Go 1.25: Compiler can optimize for comparable types
+func Contains[T comparable](slice []T, value T) bool {
+    for _, v := range slice {
+        if v == value {
+            return true
+        }
+    }
+    return false
+}
+```
+
+**Usage Examples:**
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    numbers := []int{1, 2, 3, 4, 5}
+
+    // Type inference works better in Go 1.25
+    doubled := Map(numbers, func(n int) int {
+        return n * 2
+    })
+    fmt.Println(doubled) // [2 4 6 8 10]
+
+    // Even works without explicit types
+    evens := Filter(numbers, func(n int) bool {
+        return n%2 == 0
+    })
+    fmt.Println(evens) // [2 4]
+
+    // Type inference across different types
+    sum := Reduce(numbers, 0, func(acc, n int) int {
+        return acc + n
+    })
+    fmt.Println(sum) // 15
+}
+```
+
+### Enhanced Type Inference
+
+**Go 1.25 improvements:**
+
+```go
+// Complex generic function
+func Transform[T, U, V any](input []T, f1 func(T) U, f2 func(U) V) []V {
+    temp := make([]U, len(input))
+    for i, v := range input {
+        temp[i] = f1(v)
+    }
+
+    result := make([]V, len(temp))
+    for i, v := range temp {
+        result[i] = f2(v)
+    }
+    return result
+}
+
+// Go 1.25: Type inference works without explicit type arguments
+numbers := []int{1, 2, 3}
+result := Transform(
+    numbers,
+    func(n int) string { return fmt.Sprint(n) },
+    func(s string) bool { return len(s) > 0 },
+)
+// result is []bool, fully inferred
+
+// Go 1.24 and earlier often required:
+// result := Transform[int, string, bool](numbers, ...)
+```
+
+### Generic Data Structures
+
+#### Example: Type-Safe Cache
+
+```go
+package cache
+
+import (
+    "sync"
+    "time"
+)
+
+// Cache is a generic thread-safe cache with expiration
+// Go 1.25: Optimized for common key/value types
+type Cache[K comparable, V any] struct {
+    mu      sync.RWMutex
+    items   map[K]*cacheItem[V]
+    ttl     time.Duration
+}
+
+type cacheItem[V any] struct {
+    value      V
+    expiration time.Time
+}
+
+func NewCache[K comparable, V any](ttl time.Duration) *Cache[K, V] {
+    c := &Cache[K, V]{
+        items: make(map[K]*cacheItem[V]),
+        ttl:   ttl,
+    }
+    go c.cleanup()
+    return c
+}
+
+func (c *Cache[K, V]) Set(key K, value V) {
+    c.mu.Lock()
+    defer c.mu.Unlock()
+
+    c.items[key] = &cacheItem[V]{
+        value:      value,
+        expiration: time.Now().Add(c.ttl),
+    }
+}
+
+func (c *Cache[K, V]) Get(key K) (V, bool) {
+    c.mu.RLock()
+    defer c.mu.RUnlock()
+
+    item, exists := c.items[key]
+    if !exists {
+        var zero V
+        return zero, false
+    }
+
+    if time.Now().After(item.expiration) {
+        var zero V
+        return zero, false
+    }
+
+    return item.value, true
+}
+
+func (c *Cache[K, V]) cleanup() {
+    ticker := time.NewTicker(c.ttl)
+    defer ticker.Stop()
+
+    for range ticker.C {
+        c.mu.Lock()
+        now := time.Now()
+        for key, item := range c.items {
+            if now.After(item.expiration) {
+                delete(c.items, key)
+            }
+        }
+        c.mu.Unlock()
+    }
+}
+```
+
+**Usage:**
+
+```go
+// Type inference makes this clean
+userCache := NewCache[string, User](5 * time.Minute)
+userCache.Set("user123", User{Name: "Alice", Age: 30})
+
+if user, found := userCache.Get("user123"); found {
+    fmt.Printf("Found user: %s\n", user.Name)
+}
+
+// Works with any comparable key and any value type
+intCache := NewCache[int, []string](1 * time.Hour)
+intCache.Set(42, []string{"foo", "bar"})
+```
+
+### Performance Best Practices
+
+#### ✅ DO: Use Concrete Types for Hot Paths
+
+```go
+// Good - use generics for API flexibility
+func ProcessData[T any](data []T, processor func(T) T) []T {
+    result := make([]T, len(data))
+    for i, v := range data {
+        result[i] = processor(v)
+    }
+    return result
+}
+
+// Better - use concrete type for performance-critical inner loop
+func ProcessIntegers(data []int, processor func(int) int) []int {
+    result := make([]int, len(data))
+    for i, v := range data {
+        result[i] = processor(v)
+    }
+    return result
+}
+
+// Best - provide both: generic for API, concrete for performance
+func Process[T any](data []T, processor func(T) T) []T {
+    return ProcessData(data, processor)
+}
+
+// Specialized version for common case
+func ProcessInt(data []int, processor func(int) int) []int {
+    return ProcessIntegers(data, processor)
+}
+```
+
+#### ✅ DO: Constrain Type Parameters Appropriately
+
+```go
+// Good - specific constraint enables optimization
+func Sum[T constraints.Integer](values []T) T {
+    var sum T
+    for _, v := range values {
+        sum += v
+    }
+    return sum
+}
+
+// Good - comparable enables map usage
+func Unique[T comparable](slice []T) []T {
+    seen := make(map[T]bool)
+    result := make([]T, 0)
+
+    for _, v := range slice {
+        if !seen[v] {
+            seen[v] = true
+            result = append(result, v)
+        }
+    }
+    return result
+}
+```
+
+#### ✅ DO: Preallocate Slices with Known Capacity
+
+```go
+// Good - preallocate for known size
+func Map[T, U any](slice []T, fn func(T) U) []U {
+    result := make([]U, len(slice)) // Exact size
+    for i, v := range slice {
+        result[i] = fn(v)
+    }
+    return result
+}
+
+// Good - preallocate with capacity hint
+func Filter[T any](slice []T, predicate func(T) bool) []T {
+    result := make([]T, 0, len(slice)) // Capacity hint
+    for _, v := range slice {
+        if predicate(v) {
+            result = append(result, v)
+        }
+    }
+    return result
+}
+```
+
+#### ❌ DON'T: Over-Genericize Simple Functions
+
+```go
+// Bad - unnecessary generics for simple case
+func Add[T constraints.Integer](a, b T) T {
+    return a + b
+}
+
+// Good - just use int or int64
+func Add(a, b int) int {
+    return a + b
+}
+
+// Or if you really need multiple types, use concrete overloads
+func AddInt(a, b int) int { return a + b }
+func AddInt64(a, b int64) int64 { return a + b }
+```
+
+#### ❌ DON'T: Use `any` When More Specific Constraint Exists
+
+```go
+// Bad - too permissive
+func Max[T any](a, b T) T {
+    // Can't compare T without constraint
+    // Requires reflection or panic
+}
+
+// Good - use appropriate constraint
+func Max[T constraints.Ordered](a, b T) T {
+    if a > b {
+        return a
+    }
+    return b
+}
+```
+
+### Common Generic Patterns
+
+#### Option Type
+
+```go
+package option
+
+// Option represents an optional value
+type Option[T any] struct {
+    value T
+    valid bool
+}
+
+func Some[T any](value T) Option[T] {
+    return Option[T]{value: value, valid: true}
+}
+
+func None[T any]() Option[T] {
+    return Option[T]{valid: false}
+}
+
+func (o Option[T]) IsSome() bool {
+    return o.valid
+}
+
+func (o Option[T]) IsNone() bool {
+    return !o.valid
+}
+
+func (o Option[T]) Unwrap() T {
+    if !o.valid {
+        panic("called Unwrap on None")
+    }
+    return o.value
+}
+
+func (o Option[T]) UnwrapOr(defaultValue T) T {
+    if !o.valid {
+        return defaultValue
+    }
+    return o.value
+}
+
+func (o Option[T]) Map[U any](fn func(T) U) Option[U] {
+    if !o.valid {
+        return None[U]()
+    }
+    return Some(fn(o.value))
+}
+```
+
+**Usage:**
+
+```go
+func FindUser(id string) Option[User] {
+    user, found := userCache.Get(id)
+    if !found {
+        return None[User]()
+    }
+    return Some(user)
+}
+
+// Chain operations
+result := FindUser("123").
+    Map(func(u User) string { return u.Email }).
+    UnwrapOr("no-email@example.com")
+```
+
+#### Result Type
+
+```go
+package result
+
+// Result represents success or failure
+type Result[T any] struct {
+    value T
+    err   error
+}
+
+func Ok[T any](value T) Result[T] {
+    return Result[T]{value: value}
+}
+
+func Err[T any](err error) Result[T] {
+    return Result[T]{err: err}
+}
+
+func (r Result[T]) IsOk() bool {
+    return r.err == nil
+}
+
+func (r Result[T]) IsErr() bool {
+    return r.err != nil
+}
+
+func (r Result[T]) Unwrap() (T, error) {
+    return r.value, r.err
+}
+
+func (r Result[T]) Map[U any](fn func(T) U) Result[U] {
+    if r.err != nil {
+        return Err[U](r.err)
+    }
+    return Ok(fn(r.value))
+}
+
+func (r Result[T]) AndThen[U any](fn func(T) Result[U]) Result[U] {
+    if r.err != nil {
+        return Err[U](r.err)
+    }
+    return fn(r.value)
+}
+```
+
+### Migration from Pre-1.25 Generics
+
+**If you have existing generic code from Go 1.18-1.24:**
+
+1. **Review Core Types Usage**: The `~` operator behavior is more refined in Go 1.25
+2. **Test Performance**: Many generic operations are faster in 1.25
+3. **Simplify Constraints**: Remove unnecessary `~` operators where applicable
+4. **Leverage Better Inference**: Remove explicit type arguments where inference now works
+
+**Example Migration:**
+
+```go
+// Go 1.24 code
+type Number interface {
+    ~int | ~int64 | ~float64
+}
+
+func Sum[T Number](values []T) T {
+    var sum T
+    for _, v := range values {
+        sum += v
+    }
+    return sum
+}
+
+// Usage required explicit types
+result := Sum[int]([]int{1, 2, 3})
+```
+
+```go
+// Go 1.25 optimized
+import "golang.org/x/exp/constraints"
+
+func Sum[T constraints.Integer | constraints.Float](values []T) T {
+    var sum T
+    for _, v := range values {
+        sum += v
+    }
+    return sum
+}
+
+// Better type inference
+result := Sum([]int{1, 2, 3}) // Type inferred
+```
+
+### Branch-Specific Guidelines
+
+#### Main Branch (Go 1.25+)
+
+- ✅ Use optimized generics freely
+- ✅ Leverage improved type inference
+- ✅ Benchmark generic vs concrete for hot paths
+- ✅ Use standard constraint packages from `golang.org/x/exp/constraints`
+
+#### stable-1-go-1.24 and stable-1-go-1.23
+
+- ✅ Generics available but less optimized
+- ⚠️ More explicit type arguments may be required
+- ⚠️ Consider concrete types for performance-critical code
+- ⚠️ Core types constraints work differently
+
+### Performance Characteristics
+
+**Go 1.25 improvements:**
+
+- **10-30% faster** generic function calls for common types
+- **Reduced memory allocations** in generic data structures
+- **Better inlining** of generic functions
+- **Smaller binary sizes** due to improved monomorphization
+
+**Benchmark before and after:**
+
+```go
+// Benchmark generic operations
+func BenchmarkGenericMap(b *testing.B) {
+    data := make([]int, 1000)
+    for i := range data {
+        data[i] = i
+    }
+
+    for b.Loop() {
+        _ = Map(data, func(n int) int { return n * 2 })
+    }
+}
+
+// Go 1.24: ~500 ns/op
+// Go 1.25: ~350 ns/op (30% improvement)
+```
+
+### Compatibility Check
+
+```go
+// In go.mod
+go 1.25  // Required for optimized generics
+```
+
+```go
+// Use build tags for version-specific optimizations
+//go:build go1.25
+
+package mypackage
+
+// Go 1.25-specific optimized generic implementation
+```
+
+## Integer Range Iteration (Go 1.25+)
+
+> **Availability**: Go 1.25+ only. Not available on Go 1.23 or 1.24.
+
+### Overview
+
+Go 1.25 introduces a cleaner syntax for iterating over integer ranges using `for i := range n {}` instead of the traditional `for i := 0; i < n; i++` pattern. This simplifies common loop patterns and reduces boilerplate code.
+
+### Basic Syntax
+
+**Traditional Approach (Go 1.23, 1.24):**
+
+```go
+// Old way - manual counter initialization and condition
+for i := 0; i < 10; i++ {
+    fmt.Println(i) // 0 through 9
+}
+```
+
+**Modern Approach (Go 1.25+):**
+
+```go
+// New way - range over integer
+for i := range 10 {
+    fmt.Println(i) // 0 through 9
+}
+```
+
+### Key Benefits
+
+- **Less Boilerplate**: No need to write initialization, condition, and increment
+- **More Readable**: Intent is clearer - "iterate from 0 to n-1"
+- **Consistent Syntax**: Follows existing `range` patterns for slices/maps
+- **Less Error-Prone**: Eliminates off-by-one errors in loop conditions
+
+### Complete Examples
+
+#### Example 1: Simple Iteration
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    // Print numbers 0-4
+    for i := range 5 {
+        fmt.Println(i)
+    }
+    // Output: 0, 1, 2, 3, 4
+}
+```
+
+#### Example 2: Creating Slices
+
+```go
+// Traditional
+func makeSlice(n int) []int {
+    result := make([]int, n)
+    for i := 0; i < n; i++ {
+        result[i] = i * 2
+    }
+    return result
+}
+
+// Go 1.25
+func makeSlice(n int) []int {
+    result := make([]int, n)
+    for i := range n {
+        result[i] = i * 2
+    }
+    return result
+}
+```
+
+#### Example 3: Initializing Arrays
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    var grid [5][5]int
+
+    // Fill grid with coordinates
+    for i := range 5 {
+        for j := range 5 {
+            grid[i][j] = i*10 + j
+        }
+    }
+
+    fmt.Println(grid)
+}
+```
+
+#### Example 4: Batch Processing
+
+```go
+package batch
+
+import "fmt"
+
+// ProcessInBatches processes items in batches
+func ProcessInBatches(items []string, batchSize int) {
+    numBatches := (len(items) + batchSize - 1) / batchSize
+
+    for i := range numBatches {
+        start := i * batchSize
+        end := start + batchSize
+        if end > len(items) {
+            end = len(items)
+        }
+
+        batch := items[start:end]
+        fmt.Printf("Processing batch %d: %v\n", i, batch)
+        processBatch(batch)
+    }
+}
+
+func processBatch(batch []string) {
+    // Process the batch
+    for _, item := range batch {
+        fmt.Printf("  - %s\n", item)
+    }
+}
+```
+
+#### Example 5: Generating Test Data
+
+```go
+package generator
+
+import "fmt"
+
+type User struct {
+    ID   int
+    Name string
+}
+
+// GenerateUsers creates n test users
+func GenerateUsers(n int) []User {
+    users := make([]User, n)
+    for i := range n {
+        users[i] = User{
+            ID:   i + 1,
+            Name: fmt.Sprintf("User%d", i+1),
+        }
+    }
+    return users
+}
+```
+
+#### Example 6: Retry Logic
+
+```go
+package retry
+
+import (
+    "fmt"
+    "time"
+)
+
+// RetryOperation attempts operation up to maxRetries times
+func RetryOperation(maxRetries int, operation func() error) error {
+    for attempt := range maxRetries {
+        err := operation()
+        if err == nil {
+            return nil
+        }
+
+        if attempt < maxRetries-1 {
+            backoff := time.Duration(attempt+1) * time.Second
+            fmt.Printf("Attempt %d failed: %v. Retrying in %v...\n",
+                attempt+1, err, backoff)
+            time.Sleep(backoff)
+        }
+    }
+
+    return fmt.Errorf("operation failed after %d attempts", maxRetries)
+}
+```
+
+### When to Use
+
+#### ✅ Use Integer Range When:
+
+- **Simple counter loops**: Iterating a fixed number of times
+- **Zero-based sequences**: When you need 0, 1, 2, ..., n-1
+- **Array/slice initialization**: Filling arrays with computed values
+- **Batch processing**: Dividing work into n chunks
+- **Retry logic**: Fixed number of retry attempts
+- **Test data generation**: Creating n test objects
+
+#### ❌ Use Traditional Loop When:
+
+- **Non-zero start**: Loops that don't start at 0
+- **Custom increment**: Loops with step != 1 (e.g., `i += 2`)
+- **Complex conditions**: Conditions beyond simple `i < n`
+- **Counting backwards**: Descending loops
+- **Need loop variable modification**: Changing `i` inside loop body
+
+### Comparison Examples
+
+#### Simple Counting
+
+```go
+// Traditional - more verbose
+for i := 0; i < 10; i++ {
+    fmt.Println(i)
+}
+
+// Go 1.25 - cleaner
+for i := range 10 {
+    fmt.Println(i)
+}
+```
+
+#### Custom Start (Still Use Traditional)
+
+```go
+// Traditional - necessary when not starting at 0
+for i := 5; i < 10; i++ {
+    fmt.Println(i)
+}
+
+// Can't use range for this - it always starts at 0
+```
+
+#### Custom Step (Still Use Traditional)
+
+```go
+// Traditional - necessary for step != 1
+for i := 0; i < 10; i += 2 {
+    fmt.Println(i) // 0, 2, 4, 6, 8
+}
+
+// Can't use range for this
+```
+
+#### Countdown (Still Use Traditional)
+
+```go
+// Traditional - necessary for descending
+for i := 10; i > 0; i-- {
+    fmt.Println(i)
+}
+
+// Can't use range for descending loops
+```
+
+### Best Practices
+
+#### ✅ DO: Use for Simple 0-to-n Loops
+
+```go
+// Good - clear and concise
+for i := range count {
+    process(i)
+}
+```
+
+#### ✅ DO: Use with Variables
+
+```go
+// Good - works with any integer expression
+n := calculateSize()
+for i := range n {
+    items[i] = createItem(i)
+}
+```
+
+#### ✅ DO: Use for Nested Loops
+
+```go
+// Good - clear coordinate iteration
+for i := range height {
+    for j := range width {
+        grid[i][j] = compute(i, j)
+    }
+}
+```
+
+#### ❌ DON'T: Use When Traditional is Clearer
+
+```go
+// Bad - adding offset makes it less clear
+for i := range 10 {
+    process(i + 5) // Unclear start point
+}
+
+// Good - explicit start value
+for i := 5; i < 15; i++ {
+    process(i)
+}
+```
+
+#### ❌ DON'T: Use with Magic Numbers
+
+```go
+// Bad - unclear what 100 means
+for i := range 100 {
+    process(i)
+}
+
+// Good - use named constant
+const maxItems = 100
+for i := range maxItems {
+    process(i)
+}
+```
+
+### Performance Characteristics
+
+The integer range syntax has identical performance to traditional loops:
+
+- **Zero Overhead**: Compiles to the same machine code
+- **Same Optimization**: Compiler optimizations apply equally
+- **No Allocations**: No heap allocations for the counter
+
+```go
+// Both have identical performance
+func benchTraditional(n int) int {
+    sum := 0
+    for i := 0; i < n; i++ {
+        sum += i
+    }
+    return sum
+}
+
+func benchRange(n int) int {
+    sum := 0
+    for i := range n {
+        sum += i
+    }
+    return sum
+}
+
+// Benchmark results are identical
+```
+
+### Migration Strategy
+
+#### Gradual Migration
+
+Use build tags to support both versions during transition:
+
+```go
+//go:build go1.25
+
+package mypackage
+
+func initialize(items []int) {
+    for i := range len(items) {
+        items[i] = i
+    }
+}
+```
+
+```go
+//go:build !go1.25
+
+package mypackage
+
+func initialize(items []int) {
+    for i := 0; i < len(items); i++ {
+        items[i] = i
+    }
+}
+```
+
+#### Complete Migration
+
+When targeting Go 1.25+ exclusively:
+
+1. **Find candidates**: Search for simple `for i := 0; i < n; i++` patterns
+2. **Verify simplicity**: Ensure no custom start/step/condition
+3. **Replace systematically**: Convert to `for i := range n`
+4. **Test thoroughly**: Verify behavior unchanged
+
+```bash
+# Find potential candidates (review each manually)
+grep -rn "for [a-z] := 0; [a-z] <" . --include="*.go"
+```
+
+### Common Patterns
+
+#### Pattern 1: Array Initialization
+
+```go
+// Initialize array with index values
+var data [100]int
+for i := range len(data) {
+    data[i] = i
+}
+```
+
+#### Pattern 2: Parallel Processing
+
+```go
+package parallel
+
+import "sync"
+
+func ProcessParallel(n int, worker func(int)) {
+    var wg sync.WaitGroup
+
+    for i := range n {
+        wg.Add(1)
+        go func(id int) {
+            defer wg.Done()
+            worker(id)
+        }(i)
+    }
+
+    wg.Wait()
+}
+```
+
+#### Pattern 3: Timed Operations
+
+```go
+package timer
+
+import "time"
+
+// RunNTimes executes function n times with delay
+func RunNTimes(n int, delay time.Duration, fn func(int)) {
+    for i := range n {
+        fn(i)
+        if i < n-1 {
+            time.Sleep(delay)
+        }
+    }
+}
+```
+
+#### Pattern 4: Matrix Operations
+
+```go
+package matrix
+
+type Matrix [][]float64
+
+// NewMatrix creates n×m matrix
+func NewMatrix(rows, cols int) Matrix {
+    m := make(Matrix, rows)
+    for i := range rows {
+        m[i] = make([]float64, cols)
+    }
+    return m
+}
+
+// Identity creates n×n identity matrix
+func Identity(n int) Matrix {
+    m := NewMatrix(n, n)
+    for i := range n {
+        m[i][i] = 1.0
+    }
+    return m
+}
+```
+
+### Branch-Specific Guidelines
+
+#### Main Branch (Go 1.25+)
+
+- ✅ Use integer range syntax for simple 0-to-n loops
+- ✅ Refactor existing code when convenient
+- ✅ Document the pattern in code reviews
+- ✅ Both styles acceptable during transition
+
+#### stable-1-go-1.24 and stable-1-go-1.23
+
+- ❌ Cannot use integer range syntax (not available)
+- ✅ Continue using traditional `for i := 0; i < n; i++`
+- ✅ Use named constants to improve readability
+
+### Edge Cases and Gotchas
+
+#### Zero Iterations
+
+```go
+// Both handle zero iterations identically
+for i := range 0 {
+    fmt.Println("Never executed")
+}
+
+for i := 0; i < 0; i++ {
+    fmt.Println("Never executed")
+}
+```
+
+#### Negative Values
+
+```go
+// Range with negative n
+n := -5
+for i := range n {
+    // Loop doesn't execute (same as range 0)
+    fmt.Println("Never executed")
+}
+```
+
+#### Large Values
+
+```go
+// Works with large integers
+const billion = 1_000_000_000
+for i := range billion {
+    // Iterates 1 billion times
+    // Be careful with large values!
+}
+```
+
+#### Variable Shadowing
+
+```go
+// Be careful with scope
+i := 42
+for i := range 10 {
+    // This i shadows outer i
+    fmt.Println(i) // Prints 0-9, not 42
+}
+fmt.Println(i) // Still 42
+```
+
+### Compatibility Check
+
+```go
+// In go.mod
+go 1.25  // Required for integer range syntax
+```
+
+```go
+// With build tags
+//go:build go1.25
+
+package mypackage
+
+func example() {
+    for i := range 10 {
+        // Go 1.25+ code
+    }
+}
+```
+
+### Complete Real-World Example
+
+```go
+package scheduler
+
+import (
+    "fmt"
+    "time"
+)
+
+type Task struct {
+    ID       int
+    Name     string
+    Duration time.Duration
+}
+
+// ScheduleTasks creates and schedules n tasks
+func ScheduleTasks(n int, baseDuration time.Duration) []Task {
+    tasks := make([]Task, n)
+
+    for i := range n {
+        tasks[i] = Task{
+            ID:       i + 1,
+            Name:     fmt.Sprintf("Task-%d", i+1),
+            Duration: baseDuration * time.Duration(i+1),
+        }
+    }
+
+    return tasks
+}
+
+// ExecuteTasks runs tasks in sequence
+func ExecuteTasks(tasks []Task) {
+    for i := range len(tasks) {
+        task := tasks[i]
+        fmt.Printf("Starting %s (duration: %v)\n", task.Name, task.Duration)
+        time.Sleep(task.Duration)
+        fmt.Printf("Completed %s\n", task.Name)
+    }
+}
+
+func main() {
+    tasks := ScheduleTasks(5, 100*time.Millisecond)
+    ExecuteTasks(tasks)
 }
 ```
 
