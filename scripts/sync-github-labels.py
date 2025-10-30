@@ -3,8 +3,7 @@
 # version: 1.2.0
 # guid: b2c3d4e5-f6g7-8901-bcde-f23456789abc
 
-"""
-GitHub Labels Sync Script
+"""GitHub Labels Sync Script
 This script manages GitHub repository labels via the GitHub API.
 It reads labels.json and creates/updates actual repository labels.
 """
@@ -13,10 +12,10 @@ import argparse
 import json
 import os
 import sys
+from typing import Any, Dict, List, Optional
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Dict, List, Optional
 
 
 class GitHubLabelsSync:
@@ -126,7 +125,7 @@ class GitHubLabelsSync:
 
         # Load labels from file
         try:
-            with open(labels_file, "r", encoding="utf-8") as f:
+            with open(labels_file, encoding="utf-8") as f:
                 labels_data = json.load(f)
         except FileNotFoundError:
             print(f"❌ Labels file not found: {labels_file}")

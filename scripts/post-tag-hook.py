@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
 
-"""
-Post-tag hook script for creating module-specific tags.
+"""Post-tag hook script for creating module-specific tags.
 
 This script can be called by workflows after creating a version tag to
 automatically create module-specific tags for Go SDK packages.
@@ -18,8 +17,8 @@ Environment Variables:
     CI: Automatically detected in CI environments
 """
 
-import sys
 from pathlib import Path
+import sys
 
 # Add the scripts directory to the path so we can import the module tagger
 sys.path.insert(0, str(Path(__file__).parent))
@@ -42,7 +41,7 @@ try:
         # Run the module tagging script
         result = subprocess.run(
             [sys.executable, str(script_path), version_tag],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
         )
 
@@ -51,13 +50,12 @@ try:
             if result.stdout:
                 print(result.stdout)
             return True
-        else:
-            print("❌ Module tagging failed")
-            if result.stderr:
-                print(f"Error: {result.stderr}")
-            if result.stdout:
-                print(f"Output: {result.stdout}")
-            return False
+        print("❌ Module tagging failed")
+        if result.stderr:
+            print(f"Error: {result.stderr}")
+        if result.stdout:
+            print(f"Output: {result.stdout}")
+        return False
 
     def main():
         """Main function."""
@@ -83,9 +81,8 @@ try:
         if success:
             print("🎉 Post-tag hook completed successfully")
             return 0
-        else:
-            print("❌ Post-tag hook failed")
-            return 1
+        print("❌ Post-tag hook failed")
+        return 1
 
 except ImportError as e:
     print(f"⚠️  Import error: {e}")

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-# file: scripts/label_manager.py
+"""# file: scripts/label_manager.py
 # version: 1.0.0
 # guid: a8b9c0d1-e2f3-4567-8901-234567890abc
 
@@ -116,8 +115,7 @@ class GitHubLabelAPI:
     """GitHub API client for label management."""
 
     def __init__(self, token: str, repo: str):
-        """
-        Initialize GitHub API client.
+        """Initialize GitHub API client.
 
         Args:
             token: GitHub personal access token
@@ -150,7 +148,7 @@ class GitHubLabelAPI:
             if response.status_code == 401:
                 print("Error: Invalid or expired GitHub token", file=sys.stderr)
                 return False
-            elif response.status_code == 404:
+            if response.status_code == 404:
                 print(
                     f"Error: Repository '{self.repo}' not found or not accessible",
                     file=sys.stderr,
@@ -204,15 +202,14 @@ class GitHubLabelAPI:
             )
             if response.status_code == 201:
                 return True
-            else:
-                print(
-                    f"Failed to create label '{name}': {response.status_code}",
-                    file=sys.stderr,
-                )
-                if response.status_code == 422:
-                    error_data = response.json()
-                    print(f"Details: {error_data}", file=sys.stderr)
-                return False
+            print(
+                f"Failed to create label '{name}': {response.status_code}",
+                file=sys.stderr,
+            )
+            if response.status_code == 422:
+                error_data = response.json()
+                print(f"Details: {error_data}", file=sys.stderr)
+            return False
         except requests.RequestException as e:
             print(
                 f"Network error creating label '{name}': {e}", file=sys.stderr
@@ -245,12 +242,11 @@ class GitHubLabelAPI:
             )
             if response.status_code == 200:
                 return True
-            else:
-                print(
-                    f"Failed to update label '{name}': {response.status_code}",
-                    file=sys.stderr,
-                )
-                return False
+            print(
+                f"Failed to update label '{name}': {response.status_code}",
+                file=sys.stderr,
+            )
+            return False
         except requests.RequestException as e:
             print(
                 f"Network error updating label '{name}': {e}", file=sys.stderr
@@ -267,12 +263,11 @@ class GitHubLabelAPI:
             response = requests.delete(url, headers=self.headers, timeout=10)
             if response.status_code == 204:
                 return True
-            else:
-                print(
-                    f"Failed to delete label '{name}': {response.status_code}",
-                    file=sys.stderr,
-                )
-                return False
+            print(
+                f"Failed to delete label '{name}': {response.status_code}",
+                file=sys.stderr,
+            )
+            return False
         except requests.RequestException as e:
             print(
                 f"Network error deleting label '{name}': {e}", file=sys.stderr
@@ -284,8 +279,7 @@ class LabelManager:
     """Manage label synchronization across repositories."""
 
     def __init__(self, token: str, dry_run: bool = False):
-        """
-        Initialize label manager.
+        """Initialize label manager.
 
         Args:
             token: GitHub personal access token
@@ -299,7 +293,7 @@ class LabelManager:
     ) -> Optional[List[Dict[str, Any]]]:
         """Load label configuration from JSON file."""
         try:
-            with open(config_file, "r", encoding="utf-8") as f:
+            with open(config_file, encoding="utf-8") as f:
                 labels = json.load(f)
 
             # Validate label structure
@@ -344,8 +338,7 @@ class LabelManager:
         target_labels: List[Dict[str, Any]],
         delete_extra: bool = False,
     ) -> LabelSyncResult:
-        """
-        Sync labels to a single repository.
+        """Sync labels to a single repository.
 
         Args:
             repo: Repository in owner/name format
@@ -397,27 +390,24 @@ class LabelManager:
                     if self.dry_run:
                         print(f"   Would update: {name}")
                         result.add_updated(name)
+                    elif api.update_label(
+                        name, color=color, description=description
+                    ):
+                        print(f"   ✅ Updated: {name}")
+                        result.add_updated(name)
                     else:
-                        if api.update_label(
-                            name, color=color, description=description
-                        ):
-                            print(f"   ✅ Updated: {name}")
-                            result.add_updated(name)
-                        else:
-                            result.add_error(f"Failed to update label: {name}")
+                        result.add_error(f"Failed to update label: {name}")
                 else:
                     result.add_skipped(name, "no changes needed")
+            # Create new label
+            elif self.dry_run:
+                print(f"   Would create: {name}")
+                result.add_created(name)
+            elif api.create_label(name, color, description):
+                print(f"   ✅ Created: {name}")
+                result.add_created(name)
             else:
-                # Create new label
-                if self.dry_run:
-                    print(f"   Would create: {name}")
-                    result.add_created(name)
-                else:
-                    if api.create_label(name, color, description):
-                        print(f"   ✅ Created: {name}")
-                        result.add_created(name)
-                    else:
-                        result.add_error(f"Failed to create label: {name}")
+                result.add_error(f"Failed to create label: {name}")
 
         # Delete extra labels if requested
         if delete_extra:
@@ -426,22 +416,20 @@ class LabelManager:
                     if self.dry_run:
                         print(f"   Would delete: {current_name}")
                         result.add_deleted(current_name)
+                    elif api.delete_label(current_name):
+                        print(f"   🗑️ Deleted: {current_name}")
+                        result.add_deleted(current_name)
                     else:
-                        if api.delete_label(current_name):
-                            print(f"   🗑️ Deleted: {current_name}")
-                            result.add_deleted(current_name)
-                        else:
-                            result.add_error(
-                                f"Failed to delete label: {current_name}"
-                            )
+                        result.add_error(
+                            f"Failed to delete label: {current_name}"
+                        )
 
         return result
 
     def sync_labels_to_repos(
         self, repos: List[str], config_file: str, delete_extra: bool = False
     ) -> Dict[str, LabelSyncResult]:
-        """
-        Sync labels to multiple repositories.
+        """Sync labels to multiple repositories.
 
         Args:
             repos: List of repositories in owner/name format
@@ -481,7 +469,7 @@ def parse_repo_list(repos_arg: str) -> List[str]:
 def load_repos_from_file(file_path: str) -> List[str]:
     """Load repository list from file (one repo per line)."""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             repos = [
                 line.strip()
                 for line in f

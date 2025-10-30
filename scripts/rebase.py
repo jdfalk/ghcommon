@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # file: scripts/rebase.py
 
-"""
-Smart Git Rebase Tool - Python Implementation
+"""Smart Git Rebase Tool - Python Implementation
 
 A comprehensive Git rebase automation tool with intelligent conflict resolution,
 backup management, and detailed logging. This is the primary implementation
@@ -18,11 +17,11 @@ Features:
 """
 
 import argparse
+from datetime import datetime
+from enum import Enum
 import json
 import subprocess
 import sys
-from datetime import datetime
-from enum import Enum
 from typing import List
 
 
@@ -56,12 +55,10 @@ class RebaseResult(Enum):
 class GitRebaseError(Exception):
     """Custom exception for rebase operations"""
 
-    pass
 
 
 class SmartRebase:
-    """
-    Smart Git Rebase implementation with intelligent conflict resolution.
+    """Smart Git Rebase implementation with intelligent conflict resolution.
 
     This class provides comprehensive rebase functionality including:
     - Automatic conflict resolution based on file types
@@ -71,8 +68,7 @@ class SmartRebase:
     """
 
     def __init__(self, verbose: bool = False, dry_run: bool = False):
-        """
-        Initialize the SmartRebase instance.
+        """Initialize the SmartRebase instance.
 
         Args:
             verbose: Enable verbose logging output
@@ -157,8 +153,7 @@ class SmartRebase:
     def run_command(
         self, cmd: List[str], capture_output: bool = True, check: bool = True
     ) -> subprocess.CompletedProcess:
-        """
-        Run a shell command with optional output capture.
+        """Run a shell command with optional output capture.
 
         Args:
             cmd: Command and arguments to execute
@@ -211,8 +206,7 @@ class SmartRebase:
             return False
 
     def create_backup_branch(self, source_branch: str) -> str:
-        """
-        Create a backup branch before starting rebase.
+        """Create a backup branch before starting rebase.
 
         Args:
             source_branch: Source branch to backup
@@ -241,8 +235,7 @@ class SmartRebase:
             return []
 
     def determine_conflict_strategy(self, file_path: str) -> ConflictStrategy:
-        """
-        Determine the appropriate conflict resolution strategy for a file.
+        """Determine the appropriate conflict resolution strategy for a file.
 
         Args:
             file_path: Path to the conflicted file
@@ -260,8 +253,7 @@ class SmartRebase:
         return ConflictStrategy.MANUAL_REVIEW
 
     def resolve_conflict_prefer_incoming(self, file_path: str) -> bool:
-        """
-        Resolve conflict by preferring incoming changes.
+        """Resolve conflict by preferring incoming changes.
 
         Args:
             file_path: Path to the conflicted file
@@ -279,8 +271,7 @@ class SmartRebase:
             return False
 
     def resolve_conflict_prefer_current(self, file_path: str) -> bool:
-        """
-        Resolve conflict by preferring current changes.
+        """Resolve conflict by preferring current changes.
 
         Args:
             file_path: Path to the conflicted file
@@ -298,8 +289,7 @@ class SmartRebase:
             return False
 
     def resolve_conflict_save_both(self, file_path: str) -> bool:
-        """
-        Resolve conflict by saving both versions for manual review.
+        """Resolve conflict by saving both versions for manual review.
 
         Args:
             file_path: Path to the conflicted file
@@ -345,8 +335,7 @@ class SmartRebase:
             return False
 
     def resolve_conflict_smart_merge(self, file_path: str) -> bool:
-        """
-        Resolve conflict using smart merge strategy.
+        """Resolve conflict using smart merge strategy.
 
         Args:
             file_path: Path to the conflicted file
@@ -359,8 +348,7 @@ class SmartRebase:
         return self.resolve_conflict_prefer_incoming(file_path)
 
     def resolve_conflicts(self, mode: RebaseMode) -> bool:
-        """
-        Resolve merge conflicts based on the rebase mode and file types.
+        """Resolve merge conflicts based on the rebase mode and file types.
 
         Args:
             mode: Rebase mode determining conflict resolution behavior
@@ -429,8 +417,7 @@ class SmartRebase:
     def perform_rebase(
         self, target_branch: str, mode: RebaseMode
     ) -> RebaseResult:
-        """
-        Perform the Git rebase operation.
+        """Perform the Git rebase operation.
 
         Args:
             target_branch: Target branch to rebase onto
@@ -469,9 +456,8 @@ class SmartRebase:
                     # Continue the rebase
                     self.run_command(["git", "rebase", "--continue"])
                     return RebaseResult.SUCCESS
-                else:
-                    self.log_error("Failed to resolve all conflicts")
-                    return RebaseResult.CONFLICTS
+                self.log_error("Failed to resolve all conflicts")
+                return RebaseResult.CONFLICTS
 
             # Check rebase status
             result = self.run_command(
@@ -479,16 +465,14 @@ class SmartRebase:
             )
             if result.returncode == 0 and not result.stdout.strip():
                 return RebaseResult.SUCCESS
-            else:
-                return RebaseResult.FAILED
+            return RebaseResult.FAILED
 
         except GitRebaseError as e:
             self.log_error(f"Rebase failed: {e}")
             return RebaseResult.FAILED
 
     def force_push_changes(self, branch_name: str) -> bool:
-        """
-        Force push changes to remote repository.
+        """Force push changes to remote repository.
 
         Args:
             branch_name: Branch name to push
@@ -508,8 +492,7 @@ class SmartRebase:
             return False
 
     def generate_summary(self, result: RebaseResult) -> str:
-        """
-        Generate a comprehensive summary of the rebase operation.
+        """Generate a comprehensive summary of the rebase operation.
 
         Args:
             result: Final result of the rebase operation
@@ -601,8 +584,7 @@ class SmartRebase:
     def run_rebase(
         self, target_branch: str, mode: RebaseMode, force_push: bool = False
     ) -> RebaseResult:
-        """
-        Main rebase execution method.
+        """Main rebase execution method.
 
         Args:
             target_branch: Target branch to rebase onto
@@ -652,13 +634,12 @@ class SmartRebase:
             return RebaseResult.FAILED
         except Exception as e:
             self.log_error(f"Unexpected error during rebase: {e}")
-            self.summary["errors"].append(f"Unexpected error: {str(e)}")
+            self.summary["errors"].append(f"Unexpected error: {e!s}")
             return RebaseResult.FAILED
 
 
 def create_argument_parser() -> argparse.ArgumentParser:
-    """
-    Create and configure the argument parser.
+    """Create and configure the argument parser.
 
     Returns:
         Configured ArgumentParser instance
@@ -714,8 +695,7 @@ automatic backup creation, and comprehensive logging.
 
 
 def main() -> int:
-    """
-    Main entry point for the smart rebase tool.
+    """Main entry point for the smart rebase tool.
 
     Returns:
         Exit code (0 for success, non-zero for failure)
@@ -744,14 +724,13 @@ def main() -> int:
         if result == RebaseResult.SUCCESS:
             rebase.log_success("Rebase completed successfully")
             return 0
-        elif result == RebaseResult.CONFLICTS:
+        if result == RebaseResult.CONFLICTS:
             rebase.log_error("Rebase stopped due to conflicts")
             rebase.log_info(f"See {summary_file} for recovery instructions")
             return 1
-        else:
-            rebase.log_error("Rebase failed")
-            rebase.log_info(f"See {summary_file} for recovery instructions")
-            return 2
+        rebase.log_error("Rebase failed")
+        rebase.log_info(f"See {summary_file} for recovery instructions")
+        return 2
 
     except KeyboardInterrupt:
         rebase.log_warning("Rebase interrupted by user")

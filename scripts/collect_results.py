@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Collect Operation Results
+"""Collect Operation Results
 
 Collects operation results and file changes for workflow summary reporting.
 """
@@ -50,11 +49,9 @@ def check_repository_changes() -> Dict[str, str]:
                     "has_changes": "true",
                     "changed_files": changed_files_list,
                 }
-            else:
-                return {"has_changes": "false", "changed_files": ""}
-        else:
-            print("No changes detected in repository")
             return {"has_changes": "false", "changed_files": ""}
+        print("No changes detected in repository")
+        return {"has_changes": "false", "changed_files": ""}
     except Exception as e:
         print(f"Error checking repository changes: {e}")
         return {"has_changes": "false", "changed_files": ""}

@@ -2,8 +2,7 @@
 # file: scripts/duplicate_cleanup.py
 # version: 1.0.0
 # guid: a7b8c9d0-e1f2-3456-7890-abcdef123456
-"""
-Advanced Duplicate Issue Cleanup Manager
+"""Advanced Duplicate Issue Cleanup Manager
 
 This script identifies closed duplicate issues that are not properly labeled as duplicates
 and generates issue update files to delete them with appropriate "Duplicate of #xx" messages.
@@ -22,14 +21,14 @@ Usage:
 """
 
 import argparse
+from collections import defaultdict
+from datetime import datetime
 import json
 import os
 import re
 import sys
+from typing import Any, Dict, List, Optional
 import uuid
-from collections import defaultdict
-from datetime import datetime
-from typing import Dict, List, Any, Optional
 
 # Add the scripts directory to the path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -48,8 +47,7 @@ class DuplicateCleanupManager:
     """Advanced manager for identifying and cleaning up duplicate issues."""
 
     def __init__(self, github_api: GitHubAPI):
-        """
-        Initialize the duplicate cleanup manager.
+        """Initialize the duplicate cleanup manager.
 
         Args:
             github_api: GitHub API client instance
@@ -63,8 +61,7 @@ class DuplicateCleanupManager:
         generate_deletes: bool = False,
         output_directory: str = ".github/issue-updates",
     ) -> Dict[str, Any]:
-        """
-        Scan for duplicate issues and optionally generate cleanup actions.
+        """Scan for duplicate issues and optionally generate cleanup actions.
 
         Args:
             dry_run: If True, only identify duplicates without generating actions
@@ -125,8 +122,7 @@ class DuplicateCleanupManager:
     def _find_duplicate_groups(
         self, issues: List[Dict[str, Any]]
     ) -> Dict[str, List[Dict[str, Any]]]:
-        """
-        Group issues by title to find duplicates.
+        """Group issues by title to find duplicates.
 
         Args:
             issues: List of all issues (open and closed)
@@ -164,8 +160,7 @@ class DuplicateCleanupManager:
         }
 
     def _normalize_title(self, title: str) -> str:
-        """
-        Normalize issue title for comparison.
+        """Normalize issue title for comparison.
 
         Args:
             title: Raw issue title
@@ -188,8 +183,7 @@ class DuplicateCleanupManager:
     def _identify_cleanup_candidates(
         self, duplicate_groups: Dict[str, List[Dict[str, Any]]]
     ) -> List[Dict[str, Any]]:
-        """
-        Identify closed duplicate issues that need cleanup.
+        """Identify closed duplicate issues that need cleanup.
 
         Args:
             duplicate_groups: Groups of issues with same titles
@@ -232,8 +226,7 @@ class DuplicateCleanupManager:
     def _find_canonical_issue(
         self, issues: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Any]]:
-        """
-        Find the canonical (original) issue from a group of duplicates.
+        """Find the canonical (original) issue from a group of duplicates.
 
         Args:
             issues: List of issues with the same title
@@ -257,8 +250,7 @@ class DuplicateCleanupManager:
         return None
 
     def _has_duplicate_label(self, labels: List[str]) -> bool:
-        """
-        Check if issue has a duplicate-related label.
+        """Check if issue has a duplicate-related label.
 
         Args:
             labels: List of label names
@@ -277,8 +269,7 @@ class DuplicateCleanupManager:
     def _has_duplicate_comment(
         self, issue_number: int, canonical_number: int
     ) -> bool:
-        """
-        Check if issue already has a "Duplicate of #xx" comment.
+        """Check if issue already has a "Duplicate of #xx" comment.
 
         Args:
             issue_number: Issue number to check
@@ -317,8 +308,7 @@ class DuplicateCleanupManager:
     def _print_cleanup_summary(
         self, cleanup_candidates: List[Dict[str, Any]], dry_run: bool
     ) -> None:
-        """
-        Print a summary of cleanup candidates.
+        """Print a summary of cleanup candidates.
 
         Args:
             cleanup_candidates: List of issues that need cleanup
@@ -366,8 +356,7 @@ class DuplicateCleanupManager:
     def _generate_delete_files(
         self, cleanup_candidates: List[Dict[str, Any]], output_directory: str
     ) -> int:
-        """
-        Generate individual delete action files for cleanup candidates.
+        """Generate individual delete action files for cleanup candidates.
 
         Args:
             cleanup_candidates: List of issues that need cleanup
@@ -418,8 +407,7 @@ class DuplicateCleanupManager:
     def _create_delete_action(
         self, duplicate_issue: Dict[str, Any], canonical_issue: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Create a delete action object for a duplicate issue.
+        """Create a delete action object for a duplicate issue.
 
         Args:
             duplicate_issue: The duplicate issue to delete
@@ -457,8 +445,7 @@ class DuplicateCleanupManager:
         cleanup_candidates: List[Dict[str, Any]],
         output_directory: str = ".github/issue-updates",
     ) -> int:
-        """
-        Generate comment actions to add "Duplicate of #xx" comments before deletion.
+        """Generate comment actions to add "Duplicate of #xx" comments before deletion.
 
         Args:
             cleanup_candidates: List of issues that need cleanup
@@ -509,8 +496,7 @@ class DuplicateCleanupManager:
     def _create_comment_action(
         self, duplicate_issue: Dict[str, Any], canonical_issue: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Create a comment action object for a duplicate reference.
+        """Create a comment action object for a duplicate reference.
 
         Args:
             duplicate_issue: The duplicate issue to comment on

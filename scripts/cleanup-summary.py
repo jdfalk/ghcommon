@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: 1a2b3c4d-5e6f-7890-abcd-ef1234567890
 
-"""
-GitHub Project Management Scripts Cleanup Summary
+"""GitHub Project Management Scripts Cleanup Summary
 
 This script documents the cleanup of old GitHub project management scripts
 and consolidation into the unified project manager.

@@ -3,8 +3,7 @@
 # version: 1.1.0
 # guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
-"""
-GitHub Notifications Cleanup Script
+"""GitHub Notifications Cleanup Script
 
 This script marks all GitHub notifications older than 24 hours as done.
 It uses the GitHub API to fetch unread notifications and marks those older
@@ -23,29 +22,27 @@ Arguments:
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta, timezone
 import os
 import sys
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
-import requests
 from dotenv import load_dotenv
+import requests
 
 
 class GitHubNotificationCleaner:
-    """
-    Manages cleanup of old GitHub notifications using the GitHub API.
+    """Manages cleanup of old GitHub notifications using the GitHub API.
 
     This class provides functionality to fetch unread notifications and
     mark those older than a specified threshold as done (completely dismissed).
     """
 
     def __init__(self, token: str, max_workers: int = 10):
-        """
-        Initialize the notification cleaner with a GitHub token.
+        """Initialize the notification cleaner with a GitHub token.
 
         Args:
             token: GitHub Personal Access Token with notifications scope
@@ -69,8 +66,7 @@ class GitHubNotificationCleaner:
         )
 
     def get_notifications(self, all_notifications: bool = False) -> List[Dict]:
-        """
-        Fetch notifications from GitHub API.
+        """Fetch notifications from GitHub API.
 
         Args:
             all_notifications: If True, fetch all notifications; if False, only unread
@@ -112,8 +108,7 @@ class GitHubNotificationCleaner:
         return notifications
 
     def parse_notification_time(self, time_str: str) -> datetime:
-        """
-        Parse GitHub notification timestamp to datetime object.
+        """Parse GitHub notification timestamp to datetime object.
 
         Args:
             time_str: ISO 8601 timestamp string from GitHub API
@@ -127,8 +122,7 @@ class GitHubNotificationCleaner:
     def is_notification_old(
         self, notification: Dict, hours_threshold: int
     ) -> bool:
-        """
-        Check if a notification is older than the specified threshold.
+        """Check if a notification is older than the specified threshold.
 
         Args:
             notification: Notification dictionary from GitHub API
@@ -144,8 +138,7 @@ class GitHubNotificationCleaner:
         return updated_at < threshold_time
 
     def _rate_limit_wait(self):
-        """
-        Implement rate limiting to respect GitHub API limits.
+        """Implement rate limiting to respect GitHub API limits.
         Ensures minimum interval between requests.
         """
         with self._rate_limit_lock:
@@ -158,8 +151,7 @@ class GitHubNotificationCleaner:
     def mark_notification_as_done(
         self, notification_id: str
     ) -> Tuple[bool, str]:
-        """
-        Mark a specific notification as done (completely dismiss it).
+        """Mark a specific notification as done (completely dismiss it).
 
         Args:
             notification_id: GitHub notification ID
@@ -182,8 +174,7 @@ class GitHubNotificationCleaner:
             return False, error_msg
 
     def mark_all_as_done(self) -> bool:
-        """
-        Mark all notifications as done (completely dismiss them).
+        """Mark all notifications as done (completely dismiss them).
         Note: GitHub API doesn't support bulk delete, so this marks them as read.
 
         Returns:
@@ -204,8 +195,7 @@ class GitHubNotificationCleaner:
     def _process_notification_batch(
         self, notifications: List[Dict], dry_run: bool = False
     ) -> Tuple[int, int, List[str]]:
-        """
-        Process a batch of notifications in parallel.
+        """Process a batch of notifications in parallel.
 
         Args:
             notifications: List of notification dictionaries to process
@@ -279,8 +269,7 @@ class GitHubNotificationCleaner:
         dry_run: bool = False,
         batch_size: int = 100,
     ) -> Dict[str, int]:
-        """
-        Main method to clean up old notifications using parallel processing.
+        """Main method to clean up old notifications using parallel processing.
 
         Args:
             hours_threshold: Number of hours old notifications must be to mark as done
@@ -366,8 +355,7 @@ class GitHubNotificationCleaner:
 
 
 def get_github_token() -> Optional[str]:
-    """
-    Get GitHub token from environment or .env file.
+    """Get GitHub token from environment or .env file.
 
     Returns:
         GitHub token string if found, None otherwise
@@ -397,8 +385,7 @@ def get_github_token() -> Optional[str]:
 
 
 def main():
-    """
-    Main entry point for the script.
+    """Main entry point for the script.
     """
     parser = argparse.ArgumentParser(
         description="Mark old GitHub notifications as done (completely dismissed)",

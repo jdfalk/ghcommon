@@ -3,15 +3,14 @@
 # version: 1.0.0
 # guid: 9b8a7c6d-5e4f-3a2b-1c9d-8e7f6a5b4c3d
 
-"""
-Propagate updated general coding instructions from ghcommon to all repositories.
+"""Propagate updated general coding instructions from ghcommon to all repositories.
 
 This script ensures all repositories have the latest version of the general coding
 instructions with the critical version increment requirement.
 """
 
-import shutil
 from pathlib import Path
+import shutil
 
 # Source repository (ghcommon)
 GHCOMMON_PATH = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon")
@@ -43,9 +42,8 @@ def copy_instructions(target_repo: Path):
         shutil.copy2(source_file, target_file)
         print(f"✅ Copied general coding instructions to {target_repo.name}")
         return True
-    else:
-        print("❌ Source general coding instructions not found in ghcommon")
-        return False
+    print("❌ Source general coding instructions not found in ghcommon")
+    return False
 
 
 def main():
@@ -86,9 +84,8 @@ def main():
     if success_count == total_repos:
         print("🎉 All repositories updated with latest instructions!")
         return 0
-    else:
-        print("⚠️ Some repositories had issues. Review the output above.")
-        return 1
+    print("⚠️ Some repositories had issues. Review the output above.")
+    return 1
 
 
 if __name__ == "__main__":

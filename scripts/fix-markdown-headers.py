@@ -3,10 +3,10 @@
 # version: 1.4.0
 # guid: 4b8e9f2a-3c5d-4e7f-8a9b-1c2d3e4f5a6b
 
+import argparse
 import os
 import re
 import sys
-import argparse
 import uuid
 
 
@@ -140,9 +140,8 @@ def has_html_comment_header(content):
             or line.startswith("<!-- END doctoc")
         ):
             continue
-        else:
-            start_index = i
-            break
+        start_index = i
+        break
 
     # Check if we have enough lines left for a header
     if start_index + 3 > len(lines):
@@ -200,17 +199,14 @@ def needs_header(content):
         if stripped.startswith("<!-- START doctoc"):
             in_doctoc = True
             continue
-        elif stripped.startswith("<!-- END doctoc"):
+        if stripped.startswith("<!-- END doctoc"):
             in_doctoc = False
             content_start = i + 1
             continue
-        elif in_doctoc:
+        if in_doctoc or stripped == "":
             continue
-        elif stripped == "":
-            continue
-        else:
-            content_start = i
-            break
+        content_start = i
+        break
 
     # Look for partial headers after skipping special blocks
     for line in lines[content_start : content_start + 5]:
@@ -255,21 +251,20 @@ def insert_header_after_special_comments(content, header_lines):
         if stripped.startswith("<!-- START doctoc"):
             in_doctoc = True
             continue
-        elif stripped.startswith("<!-- END doctoc"):
+        if stripped.startswith("<!-- END doctoc"):
             in_doctoc = False
             insert_position = i + 1
             break
-        elif in_doctoc:
+        if in_doctoc:
             continue
-        elif not stripped:  # Skip empty lines at the start
+        if not stripped:  # Skip empty lines at the start
             if not in_doctoc:
                 insert_position = i + 1
             continue
-        else:
-            # Found content, stop here if not in doctoc
-            if not in_doctoc:
-                insert_position = i
-                break
+        # Found content, stop here if not in doctoc
+        if not in_doctoc:
+            insert_position = i
+            break
 
     # Insert header at the determined position
     before_lines = lines[:insert_position]
@@ -287,7 +282,7 @@ def insert_header_after_special_comments(content, header_lines):
 def process_file(file_path, dry_run=False, verbose=False):
     """Process a single markdown file."""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # First try to fix existing bad header
@@ -313,18 +308,16 @@ def process_file(file_path, dry_run=False, verbose=False):
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(new_content)
                 return True
+            if needs_header(content):
+                print(f"   [DRY RUN] Would add header to: {file_path}")
             else:
-                if needs_header(content):
-                    print(f"   [DRY RUN] Would add header to: {file_path}")
-                else:
-                    print(f"   [DRY RUN] Would fix header in: {file_path}")
-                return True
-        else:
-            if verbose:
-                if has_html_comment_header(content):
-                    print(f"✅ Already correct: {file_path}")
-                else:
-                    print(f"ℹ️  No action needed: {file_path}")
+                print(f"   [DRY RUN] Would fix header in: {file_path}")
+            return True
+        if verbose:
+            if has_html_comment_header(content):
+                print(f"✅ Already correct: {file_path}")
+            else:
+                print(f"ℹ️  No action needed: {file_path}")
 
         return False
 

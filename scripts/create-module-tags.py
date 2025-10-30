@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Create module-specific Git tags for Go SDK packages.
+"""Create module-specific Git tags for Go SDK packages.
 
 This script automatically creates module-specific tags for each Go SDK package
 when a new version tag is created. This is required for Go modules to properly
@@ -21,9 +20,9 @@ Usage:
     python3 scripts/create-module-tags.py v1.3.0
 """
 
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 
 def run_command(cmd, check=True):

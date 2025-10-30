@@ -3,8 +3,7 @@
 # version: 1.1.0
 # guid: 9a8b7c6d-5e4f-3d2c-1b0a-9c8b7a6d5e4f
 
-"""
-Repository Synchronization Tool
+"""Repository Synchronization Tool
 
 This script synchronizes files across repositories to ensure consistency.
 It can copy missing files, update outdated files, and maintain version control.
@@ -17,14 +16,14 @@ for all shared files and propagates them to target repositories.
 """
 
 import argparse
+from dataclasses import asdict, dataclass
+from datetime import datetime
 import hashlib
 import json
+from pathlib import Path
 import re
 import shutil
 import sys
-from dataclasses import asdict, dataclass
-from datetime import datetime
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 

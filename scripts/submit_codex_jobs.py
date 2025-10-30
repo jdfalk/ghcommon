@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 from typing import Any, Dict, List, Set
 
 LEDGER_PATH = Path(".codex_submitted_jobs.json")

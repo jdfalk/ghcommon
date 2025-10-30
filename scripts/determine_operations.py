@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Determine Operations
+"""Determine Operations
 
 Determines which operations to run based on workflow inputs and context.
 """
@@ -94,18 +93,16 @@ def validate_operation(operation: str) -> str:
             raise ValueError(
                 f"Invalid operation '{operation}' - found placeholder instead of actual operation names"
             )
-        else:
-            corrected = corrections[operation]
-            print(f"⚠️  Auto-correcting '{operation}' to '{corrected}'")
-            return corrected
+        corrected = corrections[operation]
+        print(f"⚠️  Auto-correcting '{operation}' to '{corrected}'")
+        return corrected
 
     if operation in valid_operations:
         print(f"  ✓ Valid operation: {operation}")
         return operation
-    else:
-        raise ValueError(
-            f"Invalid operation '{operation}'. Valid operations: {', '.join(valid_operations)}"
-        )
+    raise ValueError(
+        f"Invalid operation '{operation}'. Valid operations: {', '.join(valid_operations)}"
+    )
 
 
 def determine_operations(

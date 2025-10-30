@@ -3,8 +3,7 @@
 # version: 1.0.1
 # guid: f1a2b3c4-d5e6-7890-abcd-ef1234567890
 
-"""
-GitHub Repository Cleanup Script
+"""GitHub Repository Cleanup Script
 
 Automatically detects archived or read-only repositories in the local file system
 and optionally removes their local directories to free up disk space.
@@ -21,13 +20,13 @@ Featu                self.logger.info(f"Archived: {repo_info.get('isArchived', '
 """
 
 import argparse
+from datetime import datetime
 import json
 import logging
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from datetime import datetime
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 
@@ -37,8 +36,7 @@ class RepositoryCleanup:
     def __init__(
         self, base_path: str, dry_run: bool = True, interactive: bool = True
     ):
-        """
-        Initialize the repository cleanup tool.
+        """Initialize the repository cleanup tool.
 
         Args:
             base_path: Base directory containing repositories
@@ -97,8 +95,7 @@ class RepositoryCleanup:
     def _run_command(
         self, cmd: List[str], cwd: Optional[Path] = None
     ) -> Tuple[bool, str, str]:
-        """
-        Run a shell command and return success status and output.
+        """Run a shell command and return success status and output.
 
         Args:
             cmd: Command and arguments to run
@@ -109,7 +106,7 @@ class RepositoryCleanup:
         """
         try:
             result = subprocess.run(
-                cmd, cwd=cwd, capture_output=True, text=True, timeout=30
+                cmd, check=False, cwd=cwd, capture_output=True, text=True, timeout=30
             )
             return (
                 result.returncode == 0,
@@ -135,8 +132,7 @@ class RepositoryCleanup:
         return None
 
     def _parse_github_url(self, url: str) -> Optional[Tuple[str, str]]:
-        """
-        Parse GitHub URL to extract owner and repository name.
+        """Parse GitHub URL to extract owner and repository name.
 
         Args:
             url: Git remote URL
@@ -166,8 +162,7 @@ class RepositoryCleanup:
         return None
 
     def _get_repository_info(self, owner: str, repo: str) -> Optional[Dict]:
-        """
-        Get repository information from GitHub API using gh CLI.
+        """Get repository information from GitHub API using gh CLI.
 
         Args:
             owner: Repository owner
@@ -203,8 +198,7 @@ class RepositoryCleanup:
     def _should_remove_repository(
         self, repo_info: Dict, repo_path: Path
     ) -> Tuple[bool, str]:
-        """
-        Determine if a repository should be removed based on its status.
+        """Determine if a repository should be removed based on its status.
 
         Args:
             repo_info: Repository information from GitHub API
@@ -270,8 +264,7 @@ class RepositoryCleanup:
         return False, "Repository is active"
 
     def _remove_repository(self, repo_path: Path) -> bool:
-        """
-        Remove a repository directory.
+        """Remove a repository directory.
 
         Args:
             repo_path: Path to the repository to remove
@@ -292,8 +285,7 @@ class RepositoryCleanup:
             return False
 
     def _confirm_action(self, message: str) -> bool:
-        """
-        Ask for user confirmation in interactive mode.
+        """Ask for user confirmation in interactive mode.
 
         Args:
             message: Confirmation message to display
@@ -308,17 +300,16 @@ class RepositoryCleanup:
             response = input(f"{message} (y/n/q): ").lower().strip()
             if response == "y":
                 return True
-            elif response == "n":
+            if response == "n":
                 return False
-            elif response == "q":
+            if response == "q":
                 self.logger.info("User requested to quit")
                 sys.exit(0)
             else:
                 print("Please enter 'y' for yes, 'n' for no, or 'q' to quit")
 
     def scan_repositories(self) -> List[Path]:
-        """
-        Scan the base directory for Git repositories.
+        """Scan the base directory for Git repositories.
 
         Returns:
             List of paths to Git repositories
@@ -340,8 +331,7 @@ class RepositoryCleanup:
         return repositories
 
     def process_repositories(self, repositories: List[Path]) -> None:
-        """
-        Process each repository and determine cleanup actions.
+        """Process each repository and determine cleanup actions.
 
         Args:
             repositories: List of repository paths to process

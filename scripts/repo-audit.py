@@ -3,8 +3,7 @@
 # version: 1.1.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
-"""
-Repository Audit Script
+"""Repository Audit Script
 =======================
 
 This script audits all repositories in the workspace to compare:
@@ -17,10 +16,10 @@ Generates a comprehensive comparison chart and identifies repositories that need
 """
 
 import argparse
-import json
-import re
 from dataclasses import dataclass
+import json
 from pathlib import Path
+import re
 from typing import Dict, Optional, Tuple
 
 
@@ -83,7 +82,7 @@ class RepoAuditor:
             return None, None
 
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read(1000)  # Read first 1KB to find headers
 
             # Look for version patterns

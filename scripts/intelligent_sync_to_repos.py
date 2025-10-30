@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
-"""
-Intelligent sync script that understands the new modular .github structure.
+"""Intelligent sync script that understands the new modular .github structure.
 
 This script:
 1. Syncs the new modular structure (.github/instructions/, .github/prompts/)
@@ -13,14 +12,14 @@ This script:
 4. Creates proper VS Code symlinks for Copilot integration
 """
 
-import os
-import sys
-import subprocess
-import shutil
-import tempfile
 import argparse
-from typing import List
 import logging
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from typing import List
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
@@ -340,7 +339,7 @@ def main():
         try:
             sync_to_repo(repo, branch, gh_token, summary, args.dry_run)
         except Exception as e:
-            summary.append(f"[FAIL] {repo}: {str(e)}")
+            summary.append(f"[FAIL] {repo}: {e!s}")
             logging.error(f"Failed to sync {repo}: {e}")
 
     # Write summary

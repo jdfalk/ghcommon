@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
-"""
-Sync repository setup files from ghcommon to other repositories.
+"""Sync repository setup files from ghcommon to other repositories.
 
 This script copies:
 1. .github/instructions/ directory
@@ -17,13 +16,14 @@ The script detects the programming languages in each repository and
 customizes the dependabot.yml configuration accordingly.
 """
 
-import shutil
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 import argparse
 import logging
-import yaml
+from pathlib import Path
 import re
+import shutil
+from typing import Any, Dict, List, Optional, Tuple
+
+import yaml
 
 # Configure logging
 logging.basicConfig(
@@ -68,7 +68,7 @@ def compare_versions(version1: str, version2: str) -> int:
         for a, b in zip(v1_parts, v2_parts):
             if a < b:
                 return -1
-            elif a > b:
+            if a > b:
                 return 1
 
         return 0
@@ -86,9 +86,9 @@ def should_overwrite_file(
 
     try:
         # Read both files
-        with open(source_file, "r", encoding="utf-8") as f:
+        with open(source_file, encoding="utf-8") as f:
             source_content = f.read()
-        with open(target_file, "r", encoding="utf-8") as f:
+        with open(target_file, encoding="utf-8") as f:
             target_content = f.read()
 
         # Extract versions
@@ -99,8 +99,7 @@ def should_overwrite_file(
         if not source_version and not target_version:
             if source_content == target_content:
                 return False, "files are identical"
-            else:
-                return True, "files differ (no version info)"
+            return True, "files differ (no version info)"
 
         # If only source has version, overwrite
         if source_version and not target_version:
@@ -120,20 +119,18 @@ def should_overwrite_file(
                 True,
                 f"source version {source_version} > target version {target_version}",
             )
-        elif comparison < 0:
+        if comparison < 0:
             return (
                 False,
                 f"target version {target_version} > source version {source_version}",
             )
-        else:
-            # Same version - check content
-            if source_content == target_content:
-                return (
-                    False,
-                    f"same version {source_version}, identical content",
-                )
-            else:
-                return True, f"same version {source_version}, content differs"
+        # Same version - check content
+        if source_content == target_content:
+            return (
+                False,
+                f"same version {source_version}, identical content",
+            )
+        return True, f"same version {source_version}, content differs"
 
     except UnicodeDecodeError:
         # For binary files, fall back to simple comparison
@@ -145,8 +142,7 @@ def should_overwrite_file(
 
             if source_bytes == target_bytes:
                 return False, "binary files are identical"
-            else:
-                return True, "binary files differ"
+            return True, "binary files differ"
         except Exception:
             return True, "unable to compare files"
 
@@ -161,7 +157,7 @@ logger = logging.getLogger(__name__)
 def extract_version_from_file(file_path: Path) -> str:
     """Extract version from file header comments."""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Look for version in various comment formats
@@ -232,10 +228,9 @@ class RepositoryAnalyzer:
                 # Also check subdirectories for certain patterns
                 if list(repo_path.glob(f"**/{indicator}")):
                     return True
-            else:
-                # Check exact file
-                if (repo_path / indicator).exists():
-                    return True
+            # Check exact file
+            elif (repo_path / indicator).exists():
+                return True
 
         return False
 
@@ -428,8 +423,8 @@ class RepoSetupSyncer:
 
     def find_target_repositories(self) -> List[Path]:
         """Find all target repositories to sync to using GitHub CLI."""
-        import subprocess
         import json
+        import subprocess
 
         repos = []
 
@@ -746,7 +741,7 @@ class RepoSetupSyncer:
             # Check if the content is already identical
             if target_file.exists():
                 try:
-                    with open(target_file, "r", encoding="utf-8") as f:
+                    with open(target_file, encoding="utf-8") as f:
                         existing_content = f.read()
 
                     if existing_content == new_content:

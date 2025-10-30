@@ -3,15 +3,14 @@
 # version: 1.0.0
 # guid: 8a7b6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d
 
-"""
-Copy fixed CI workflow and Super Linter configs from ghcommon to all repositories.
+"""Copy fixed CI workflow and Super Linter configs from ghcommon to all repositories.
 
 This script addresses the systematic CI failures caused by incorrect Super Linter
 configuration file references across all repositories.
 """
 
-import shutil
 from pathlib import Path
+import shutil
 
 # Source repository (ghcommon)
 GHCOMMON_PATH = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon")
@@ -38,9 +37,8 @@ def copy_ci_workflow(target_repo: Path):
         shutil.copy2(source_ci, target_ci)
         print(f"✅ Copied CI workflow to {target_repo.name}")
         return True
-    else:
-        print("❌ Source CI workflow not found in ghcommon")
-        return False
+    print("❌ Source CI workflow not found in ghcommon")
+    return False
 
 
 def copy_super_linter_configs(target_repo: Path):
@@ -85,7 +83,7 @@ def increment_version_in_ci(target_repo: Path):
         return False
 
     try:
-        with open(ci_file, "r") as f:
+        with open(ci_file) as f:
             content = f.read()
 
         # Look for version line and increment patch version
@@ -161,9 +159,8 @@ def main():
     if success_count == total_repos:
         print("🎉 All repositories updated! Ready to test CI workflows.")
         return 0
-    else:
-        print("⚠️ Some repositories had issues. Review the output above.")
-        return 1
+    print("⚠️ Some repositories had issues. Review the output above.")
+    return 1
 
 
 if __name__ == "__main__":
