@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Determine the Dockerfile path and whether a build should run.
+"""Determine the Dockerfile path and whether a build should run.
 
 Outputs (written to $GITHUB_OUTPUT):
   dockerfile-path=<path>
@@ -9,10 +8,9 @@ Outputs (written to $GITHUB_OUTPUT):
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import os
 from pathlib import Path
-from typing import Iterable
-
 
 DOCKERFILE_CANDIDATES: Iterable[str] = (
     "Dockerfile",

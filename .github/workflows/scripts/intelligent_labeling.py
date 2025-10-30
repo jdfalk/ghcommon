@@ -3,8 +3,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import os
-from typing import Iterable, List
+from typing import List
 
 import requests
 

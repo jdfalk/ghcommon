@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
+import subprocess
 
 COMPOSE_FILES = (
     "docker-compose.yml",
@@ -17,7 +17,7 @@ COMPOSE_FILES = (
 def validate(path: Path) -> int:
     result = subprocess.run(
         ["docker-compose", "-f", str(path), "config"],
-        capture_output=True,
+        check=False, capture_output=True,
         text=True,
     )
     if result.returncode == 0:

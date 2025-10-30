@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import os
-import sys
 from pathlib import Path
-from typing import Iterable
+import sys
 
 REQUIRED_FIELDS: Iterable[str] = (
     "name",

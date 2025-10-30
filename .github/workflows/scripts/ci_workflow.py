@@ -4,16 +4,17 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
 import json
 import os
+from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 import textwrap
 import time
-from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import requests
 
@@ -195,10 +196,9 @@ def load_super_linter_config(_: argparse.Namespace) -> None:
         elif ci_env.is_file():
             print(f"PR config not found, falling back to CI config ({ci_env})")
             chosen = ci_env
-    else:
-        if ci_env.is_file():
-            print(f"Loading CI Super Linter configuration from {ci_env}")
-            chosen = ci_env
+    elif ci_env.is_file():
+        print(f"Loading CI Super Linter configuration from {ci_env}")
+        chosen = ci_env
 
     if chosen:
         _export_env_from_file(chosen)
@@ -389,7 +389,7 @@ def frontend_run(_: argparse.Namespace) -> None:
     if not script_name:
         raise SystemExit("FRONTEND_SCRIPT environment variable is required")
 
-    result = subprocess.run(["npm", "run", script_name, "--if-present"])
+    result = subprocess.run(["npm", "run", script_name, "--if-present"], check=False)
     if result.returncode == 0:
         print(success_message)
     else:

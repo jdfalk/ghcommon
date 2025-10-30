@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Normalize Docker build platforms and emit results for the workflow.
+"""Normalize Docker build platforms and emit results for the workflow.
 
 Inputs via environment variables:
   INPUT_PLATFORMS: comma-separated platform list (preferred)
@@ -13,9 +12,10 @@ Outputs:
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import json
 import os
-from typing import Iterable, List
+from typing import List
 
 DEFAULT_PLATFORMS = ("linux/amd64", "linux/arm64")
 

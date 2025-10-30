@@ -6,9 +6,9 @@ from __future__ import annotations
 import configparser
 import json
 import os
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 module_name = ""
 module_version = ""

@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import importlib
-import sys
 
 MODULES = ["grpc_tools.protoc", "mypy_protobuf"]
 

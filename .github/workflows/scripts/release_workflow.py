@@ -4,14 +4,14 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
+from datetime import datetime
 import json
 import os
+from pathlib import Path
 import re
 import subprocess
-import sys
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import requests
 
@@ -367,15 +367,12 @@ def generate_version(_: argparse.Namespace) -> None:
         new_major, new_minor, new_patch = major + 1, 0, 0
     elif release_type == "minor":
         new_major, new_minor, new_patch = major, minor + 1, 0
-    elif release_type == "patch":
+    elif release_type == "patch" or branch_name == "main":
         new_major, new_minor, new_patch = major, minor, patch + 1
+    elif branch_name == "develop":
+        new_major, new_minor, new_patch = major, minor + 1, 0
     else:
-        if branch_name == "main":
-            new_major, new_minor, new_patch = major, minor, patch + 1
-        elif branch_name == "develop":
-            new_major, new_minor, new_patch = major, minor + 1, 0
-        else:
-            new_major, new_minor, new_patch = major, minor, patch + 1
+        new_major, new_minor, new_patch = major, minor, patch + 1
 
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M")
     if auto_prerelease:
