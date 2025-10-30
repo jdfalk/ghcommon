@@ -15,53 +15,7 @@ from typing import Any
 
 import requests
 
-_CONFIG_CACHE: dict[str, Any] | None = None
-
-
-def append_to_file(path_env: str, content: str) -> None:
-    file_path = os.environ.get(path_env)
-    if not file_path:
-        return
-    Path(file_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(file_path, "a", encoding="utf-8") as handle:
-        handle.write(content)
-
-
-def write_output(name: str, value: str) -> None:
-    append_to_file("GITHUB_OUTPUT", f"{name}={value}\n")
-
-
-def append_summary(text: str) -> None:
-    append_to_file("GITHUB_STEP_SUMMARY", text)
-
-
-def get_repository_config() -> dict[str, Any]:
-    global _CONFIG_CACHE
-    if _CONFIG_CACHE is not None:
-        return _CONFIG_CACHE
-
-    raw = os.environ.get("REPOSITORY_CONFIG")
-    if not raw:
-        _CONFIG_CACHE = {}
-        return _CONFIG_CACHE
-
-    try:
-        _CONFIG_CACHE = json.loads(raw)
-    except json.JSONDecodeError:
-        print(
-            "::warning::Unable to parse REPOSITORY_CONFIG JSON; falling back to defaults"
-        )
-        _CONFIG_CACHE = {}
-    return _CONFIG_CACHE
-
-
-def _config_path(default: Any, *path: str) -> Any:
-    current: Any = get_repository_config()
-    for key in path:
-        if not isinstance(current, dict) or key not in current:
-            return default
-        current = current[key]
-    return current
+from workflow_common import append_summary, append_to_file, config_path, write_output
 
 
 def _normalize_override(value: str | None) -> str:
@@ -209,7 +163,7 @@ def detect_languages(_: argparse.Namespace) -> None:
                 elif key == "protobuf":
                     protobuf_needed = False
 
-    config_primary = _config_path("auto", "repository", "primary_language")
+    config_primary = config_path("auto", "repository", "primary_language")
     if config_primary and config_primary != "auto":
         primary_language = str(config_primary)
     else:
@@ -233,14 +187,14 @@ def detect_languages(_: argparse.Namespace) -> None:
     write_output("protobuf-needed", "true" if protobuf_needed else "false")
     write_output("primary-language", primary_language)
 
-    versions = _config_path({}, "languages", "versions") or {}
-    platforms = _config_path({}, "build", "platforms") or {}
+    versions = config_path({}, "languages", "versions") or {}
+    platforms = config_path({}, "build", "platforms") or {}
     os_list = platforms.get("os") or ["ubuntu-latest", "macos-latest"]
     go_versions = versions.get("go") or ["1.22", "1.23", "1.24"]
     python_versions = versions.get("python") or ["3.11", "3.12", "3.13"]
     rust_versions = versions.get("rust") or ["stable", "beta"]
     node_versions = versions.get("node") or ["18", "20", "22"]
-    docker_platforms = _config_path(
+    docker_platforms = config_path(
         ["linux/amd64", "linux/arm64"], "build", "docker", "platforms"
     )
 
