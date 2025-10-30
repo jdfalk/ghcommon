@@ -6,7 +6,9 @@
 
 ## Overview
 
-This phase implements automated documentation generation, versioning, and publishing for the v2 workflow system. It provides tools to generate API documentation, workflow references, and user guides from code and configuration.
+This phase implements automated documentation generation, versioning, and publishing for the v2
+workflow system. It provides tools to generate API documentation, workflow references, and user
+guides from code and configuration.
 
 ## Goals
 
@@ -39,18 +41,18 @@ This phase implements automated documentation generation, versioning, and publis
 
 ## Task 3.1: Create docs_workflow.py Helper Module
 
-**Status**: Not Started
-**Dependencies**: Phase 0 (workflow_common.py)
-**Estimated Time**: 4 hours
+**Status**: Not Started **Dependencies**: Phase 0 (workflow_common.py) **Estimated Time**: 4 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create a Python helper module for automated documentation generation from code and configuration files.
+Create a Python helper module for automated documentation generation from code and configuration
+files.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/python.instructions.md` - Google Python Style Guide
 - `.github/instructions/general-coding.instructions.md` - File headers, versioning
 
@@ -58,7 +60,7 @@ Create a Python helper module for automated documentation generation from code a
 
 Create file: `.github/workflows/scripts/docs_workflow.py`
 
-```python
+````python
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/docs_workflow.py
 # version: 1.0.0
@@ -894,7 +896,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-```
+````
 
 ### Verification Steps
 
@@ -923,9 +925,7 @@ python3 .github/workflows/scripts/docs_workflow.py generate-workflows \
 
 ## Task 3.2: Create Unit Tests for docs_workflow
 
-**Status**: Not Started
-**Dependencies**: Task 3.1 (docs_workflow.py)
-**Estimated Time**: 3 hours
+**Status**: Not Started **Dependencies**: Task 3.1 (docs_workflow.py) **Estimated Time**: 3 hours
 **Idempotent**: Yes
 
 ### Description
@@ -935,6 +935,7 @@ Create comprehensive unit tests for the documentation generation module.
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/test-generation.instructions.md` - Arrange-Act-Assert pattern
 
 ### Implementation
@@ -1312,14 +1313,13 @@ pytest tests/workflow_scripts/test_docs_workflow.py \
 
 ## Task 3.3: Create Documentation Publishing Workflow
 
-**Status**: Not Started
-**Dependencies**: Task 3.1 (docs_workflow.py)
-**Estimated Time**: 2 hours
+**Status**: Not Started **Dependencies**: Task 3.1 (docs_workflow.py) **Estimated Time**: 2 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create workflow to automatically generate and publish documentation to GitHub Pages with versioning support.
+Create workflow to automatically generate and publish documentation to GitHub Pages with versioning
+support.
 
 ### Implementation
 
@@ -1336,7 +1336,7 @@ on:
   workflow_call:
     inputs:
       deploy:
-        description: "Deploy to GitHub Pages"
+        description: 'Deploy to GitHub Pages'
         type: boolean
         default: false
         required: false
@@ -1355,12 +1355,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Need full history for version info
+          fetch-depth: 0 # Need full history for version info
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: '3.13'
           cache: pip
 
       - name: Install dependencies
@@ -1461,7 +1461,7 @@ jobs:
       - name: Check for broken links
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
-          use-quiet-mode: "yes"
+          use-quiet-mode: 'yes'
           folder-path: docs-site
 
       - name: Validate markdown formatting
@@ -1490,9 +1490,7 @@ act workflow_call --input deploy=false && echo "✅ Local test passed"
 
 ## Task 3.4: Create Documentation Workflow Caller
 
-**Status**: Not Started
-**Dependencies**: Task 3.3 (reusable-docs.yml)
-**Estimated Time**: 1 hour
+**Status**: Not Started **Dependencies**: Task 3.3 (reusable-docs.yml) **Estimated Time**: 1 hour
 **Idempotent**: Yes
 
 ### Description
@@ -1514,20 +1512,20 @@ on:
   push:
     branches:
       - main
-      - "stable-1-*"
+      - 'stable-1-*'
     paths:
-      - ".github/workflows/scripts/**/*.py"
-      - ".github/workflows/*.yml"
-      - "docs/**"
+      - '.github/workflows/scripts/**/*.py'
+      - '.github/workflows/*.yml'
+      - 'docs/**'
   pull_request:
     paths:
-      - ".github/workflows/scripts/**/*.py"
-      - ".github/workflows/*.yml"
-      - "docs/**"
+      - '.github/workflows/scripts/**/*.py'
+      - '.github/workflows/*.yml'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       deploy:
-        description: "Deploy to GitHub Pages"
+        description: 'Deploy to GitHub Pages'
         type: boolean
         default: false
         required: false
@@ -1569,7 +1567,9 @@ jobs:
     if: needs.check-feature-flag.outputs.enabled == 'true'
     uses: ./.github/workflows/reusable-docs.yml
     with:
-      deploy: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true' }}
+      deploy:
+        ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' ||
+        github.event.inputs.deploy == 'true' }}
 
   legacy-docs:
     name: Documentation (legacy)
@@ -1605,9 +1605,7 @@ gh workflow run docs.yml --ref main -f deploy=false
 
 ## Task 3.5: Create Documentation Site Configuration
 
-**Status**: Not Started
-**Dependencies**: Task 3.3 (reusable-docs.yml)
-**Estimated Time**: 1 hour
+**Status**: Not Started **Dependencies**: Task 3.3 (reusable-docs.yml) **Estimated Time**: 1 hour
 **Idempotent**: Yes
 
 ### Description
@@ -1629,8 +1627,8 @@ description: Comprehensive documentation for the v2 workflow system
 theme: jekyll-theme-minimal
 
 # URL configuration
-baseurl: ""
-url: "https://jdfalk.github.io/ghcommon"
+baseurl: ''
+url: 'https://jdfalk.github.io/ghcommon'
 
 # Build settings
 markdown: kramdown
@@ -1687,8 +1685,8 @@ exclude:
   - Gemfile.lock
   - node_modules
   - vendor
-  - "*.py"
-  - "*.sh"
+  - '*.py'
+  - '*.sh'
 
 # Include hidden files
 include:
@@ -1704,97 +1702,95 @@ Create file: `docs-site/_layouts/default.html`
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ page.title }} - {{ site.title }}</title>
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-</head>
-<body>
-  <header>
-    <div class="container">
-      <h1>{{ site.title }}</h1>
-      <p>{{ site.description }}</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ page.title }} - {{ site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>{{ site.title }}</h1>
+        <p>{{ site.description }}</p>
 
-      <!-- Version selector -->
-      <div class="version-selector">
-        <label for="version">Version:</label>
-        <select id="version" onchange="switchVersion(this.value)">
-          <option value="latest">Latest</option>
-          <option value="go-1.24">Go 1.24</option>
-          <option value="go-1.23">Go 1.23</option>
-          <option value="python-3.13">Python 3.13</option>
-          <option value="rust-stable">Rust Stable</option>
-        </select>
+        <!-- Version selector -->
+        <div class="version-selector">
+          <label for="version">Version:</label>
+          <select id="version" onchange="switchVersion(this.value)">
+            <option value="latest">Latest</option>
+            <option value="go-1.24">Go 1.24</option>
+            <option value="go-1.23">Go 1.23</option>
+            <option value="python-3.13">Python 3.13</option>
+            <option value="rust-stable">Rust Stable</option>
+          </select>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <nav>
-    <div class="container">
-      <ul>
-        {% for item in site.navigation %}
-        <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-  </nav>
+    <nav>
+      <div class="container">
+        <ul>
+          {% for item in site.navigation %}
+          <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </nav>
 
-  <main>
-    <div class="container">
-      {{ content }}
-    </div>
-  </main>
+    <main>
+      <div class="container">{{ content }}</div>
+    </main>
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 ghcommon - Workflow System Documentation</p>
-      <p>Generated on {{ site.time | date: "%Y-%m-%d %H:%M" }}</p>
-    </div>
-  </footer>
+    <footer>
+      <div class="container">
+        <p>&copy; 2025 ghcommon - Workflow System Documentation</p>
+        <p>Generated on {{ site.time | date: "%Y-%m-%d %H:%M" }}</p>
+      </div>
+    </footer>
 
-  <script>
-    // Version switcher
-    function switchVersion(version) {
-      const currentPath = window.location.pathname;
-      const pathParts = currentPath.split('/');
+    <script>
+      // Version switcher
+      function switchVersion(version) {
+        const currentPath = window.location.pathname;
+        const pathParts = currentPath.split('/');
 
-      // Replace version in path (assumes /<version>/... structure)
-      if (pathParts.length > 2) {
-        pathParts[1] = version;
-        window.location.pathname = pathParts.join('/');
-      } else {
-        window.location.pathname = `/${version}/`;
-      }
-    }
-
-    // Set current version in selector
-    document.addEventListener('DOMContentLoaded', () => {
-      const pathParts = window.location.pathname.split('/');
-      if (pathParts.length > 1) {
-        const currentVersion = pathParts[1];
-        const selector = document.getElementById('version');
-        if (selector) {
-          selector.value = currentVersion || 'latest';
+        // Replace version in path (assumes /<version>/... structure)
+        if (pathParts.length > 2) {
+          pathParts[1] = version;
+          window.location.pathname = pathParts.join('/');
+        } else {
+          window.location.pathname = `/${version}/`;
         }
       }
-    });
 
-    // Search functionality
-    function initSearch() {
-      const searchInput = document.getElementById('search-input');
-      if (!searchInput) return;
-
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        // Implement search logic here
-        console.log('Search query:', query);
+      // Set current version in selector
+      document.addEventListener('DOMContentLoaded', () => {
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.length > 1) {
+          const currentVersion = pathParts[1];
+          const selector = document.getElementById('version');
+          if (selector) {
+            selector.value = currentVersion || 'latest';
+          }
+        }
       });
-    }
 
-    initSearch();
-  </script>
-</body>
+      // Search functionality
+      function initSearch() {
+        const searchInput = document.getElementById('search-input');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', e => {
+          const query = e.target.value.toLowerCase();
+          // Implement search logic here
+          console.log('Search query:', query);
+        });
+      }
+
+      initSearch();
+    </script>
+  </body>
 </html>
 ```
 
@@ -1895,7 +1891,12 @@ main {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 24px;
   margin-bottom: 16px;
   font-weight: 600;
@@ -1951,7 +1952,8 @@ table {
   margin-bottom: 16px;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
   border: 1px solid #ddd;
@@ -2035,4 +2037,5 @@ html5validator docs-site/_site && echo "✅ HTML validation passed"
 
 ---
 
-**Phase 3 Complete!** This phase establishes automated documentation generation with versioning support and GitHub Pages publishing.
+**Phase 3 Complete!** This phase establishes automated documentation generation with versioning
+support and GitHub Pages publishing.

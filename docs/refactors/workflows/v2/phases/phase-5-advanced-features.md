@@ -6,7 +6,9 @@
 
 ## Overview
 
-This phase implements advanced automation features including GitHub Apps integration, intelligent caching strategies, performance optimization, and workflow analytics. These features enhance the v2 system with sophisticated automation capabilities.
+This phase implements advanced automation features including GitHub Apps integration, intelligent
+caching strategies, performance optimization, and workflow analytics. These features enhance the v2
+system with sophisticated automation capabilities.
 
 ## Goals
 
@@ -38,18 +40,18 @@ This phase implements advanced automation features including GitHub Apps integra
 
 ## Task 5.1: Create automation_workflow.py Helper Module
 
-**Status**: Not Started
-**Dependencies**: Phase 0 (workflow_common.py)
-**Estimated Time**: 5 hours
+**Status**: Not Started **Dependencies**: Phase 0 (workflow_common.py) **Estimated Time**: 5 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create a Python helper module for advanced automation features including GitHub Apps integration, caching strategies, performance monitoring, and self-healing capabilities.
+Create a Python helper module for advanced automation features including GitHub Apps integration,
+caching strategies, performance monitoring, and self-healing capabilities.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/python.instructions.md` - Google Python Style Guide
 - `.github/instructions/general-coding.instructions.md` - File headers, versioning
 
@@ -864,10 +866,8 @@ python3 .github/workflows/scripts/automation_workflow.py optimize \
 
 ## Task 5.2: Create test_automation_workflow.py Unit Tests
 
-**Status**: Not Started
-**Dependencies**: Task 5.1 (automation_workflow.py)
-**Estimated Time**: 2 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 5.1 (automation_workflow.py) **Estimated Time**: 2
+hours **Idempotent**: Yes
 
 ### Description
 
@@ -1168,10 +1168,8 @@ python3 -m pytest .github/workflows/scripts/tests/test_automation_workflow.py::T
 
 ## Task 5.3: Create GitHub Apps Configuration
 
-**Status**: Not Started
-**Dependencies**: Tasks 5.1-5.2
-**Estimated Time**: 2 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Tasks 5.1-5.2 **Estimated Time**: 2 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -1181,7 +1179,7 @@ Configure GitHub Apps for enhanced API access and automation.
 
 Create file: `docs/refactors/workflows/v2/github-apps-setup.md`
 
-```markdown
+````markdown
 <!-- file: docs/refactors/workflows/v2/github-apps-setup.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a -->
@@ -1190,7 +1188,8 @@ Create file: `docs/refactors/workflows/v2/github-apps-setup.md`
 
 ## Overview
 
-GitHub Apps provide enhanced API access with higher rate limits and more granular permissions than personal access tokens. The v2 workflow system uses GitHub Apps for advanced automation features.
+GitHub Apps provide enhanced API access with higher rate limits and more granular permissions than
+personal access tokens. The v2 workflow system uses GitHub Apps for advanced automation features.
 
 ## Benefits
 
@@ -1208,6 +1207,7 @@ GitHub Apps provide enhanced API access with higher rate limits and more granula
 3. Fill in app details:
 
 **Basic Information**:
+
 - **Name**: "Workflow Automation v2"
 - **Description**: "Advanced workflow automation with intelligent caching and self-healing"
 - **Homepage URL**: https://github.com/YOUR_ORG/ghcommon
@@ -1216,6 +1216,7 @@ GitHub Apps provide enhanced API access with higher rate limits and more granula
 **Permissions**:
 
 Repository permissions:
+
 - **Actions**: Read & Write (for workflow dispatch and monitoring)
 - **Contents**: Read & Write (for automated commits)
 - **Issues**: Read & Write (for maintenance automation)
@@ -1223,10 +1224,12 @@ Repository permissions:
 - **Metadata**: Read (required)
 
 Organization permissions:
+
 - **Administration**: Read (for organization-wide operations)
 - **Members**: Read (for team mentions)
 
 **Where can this GitHub App be installed?**:
+
 - Select "Only on this account"
 
 4. Click "Create GitHub App"
@@ -1259,23 +1262,17 @@ gh secret set GITHUB_APP_INSTALLATION_ID --body "789012"
 # Add private key (multi-line secret)
 gh secret set GITHUB_APP_PRIVATE_KEY < path/to/private-key.pem
 ```
+````
 
 ### 5. Test Integration
 
 Create test workflow:
 
-\`\`\`yaml
-name: Test GitHub App
+\`\`\`yaml name: Test GitHub App
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch:
 
-jobs:
-  test-app:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+jobs: test-app: runs-on: ubuntu-latest steps: - name: Checkout uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -1300,9 +1297,11 @@ jobs:
         run: |
           curl -H "Authorization: Bearer $GITHUB_TOKEN" \\
             https://api.github.com/rate_limit
+
 \`\`\`
 
 Run workflow and verify:
+
 - Token generation succeeds
 - API rate limit shows 5,000/hour
 
@@ -1310,23 +1309,12 @@ Run workflow and verify:
 
 ### Basic Usage
 
-\`\`\`yaml
-jobs:
-  automated-task:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate App Token
-        id: app-token
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { execSync } = require('child_process');
-            const token = execSync(
-              'python .github/workflows/scripts/automation_workflow.py github-app-token ' +
-              '--app-id \${{ secrets.GITHUB_APP_ID }} ' +
-              '--private-key \${{ secrets.GITHUB_APP_PRIVATE_KEY }}'
-            ).toString().trim();
-            core.setOutput('token', token);
+\`\`\`yaml jobs: automated-task: runs-on: ubuntu-latest steps: - name: Generate App Token id:
+app-token uses: actions/github-script@v7 with: script: | const { execSync } =
+require('child_process'); const token = execSync( 'python
+.github/workflows/scripts/automation_workflow.py github-app-token ' + '--app-id
+\${{ secrets.GITHUB_APP_ID }} ' + '--private-key \${{ secrets.GITHUB_APP_PRIVATE_KEY }}'
+).toString().trim(); core.setOutput('token', token);
 
       - name: Use Enhanced Token
         env:
@@ -1334,26 +1322,17 @@ jobs:
         run: |
           # API calls here use app token with higher rate limits
           gh api /repos/\${{ github.repository }}/actions/runs
+
 \`\`\`
 
 ### Advanced: Reusable Action
 
 Create `.github/actions/github-app-token/action.yml`:
 
-\`\`\`yaml
-name: 'Get GitHub App Token'
-description: 'Generate installation token for GitHub App'
-outputs:
-  token:
-    description: 'GitHub App installation token'
-    value: \${{ steps.generate.outputs.token }}
-runs:
-  using: composite
-  steps:
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.14'
+\`\`\`yaml name: 'Get GitHub App Token' description: 'Generate installation token for GitHub App'
+outputs: token: description: 'GitHub App installation token' value:
+\${{ steps.generate.outputs.token }} runs: using: composite steps: - name: Set up Python uses:
+actions/setup-python@v5 with: python-version: '3.14'
 
     - name: Install dependencies
       shell: bash
@@ -1367,23 +1346,19 @@ runs:
           --app-id \${{ secrets.GITHUB_APP_ID }} \\
           --private-key \${{ secrets.GITHUB_APP_PRIVATE_KEY }} \\
           --installation-id \${{ secrets.GITHUB_APP_INSTALLATION_ID }}
+
 \`\`\`
 
 Use in workflows:
 
-\`\`\`yaml
-jobs:
-  task:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get App Token
-        id: app-token
-        uses: ./.github/actions/github-app-token
+\`\`\`yaml jobs: task: runs-on: ubuntu-latest steps: - name: Get App Token id: app-token uses:
+./.github/actions/github-app-token
 
       - name: Use Token
         env:
           GITHUB_TOKEN: \${{ steps.app-token.outputs.token }}
         run: gh api /user
+
 \`\`\`
 
 ## Security Best Practices
@@ -1415,6 +1390,7 @@ jobs:
 **Error**: `Failed to generate JWT`
 
 **Solutions**:
+
 1. Verify private key format (PEM with header/footer)
 2. Check that private key secret is multi-line
 3. Ensure pyjwt package is installed
@@ -1424,6 +1400,7 @@ jobs:
 **Error**: `No installation found`
 
 **Solutions**:
+
 1. Verify app is installed in organization
 2. Check installation ID in GitHub settings
 3. Ensure app has access to repository
@@ -1433,6 +1410,7 @@ jobs:
 **Error**: `Resource not accessible by integration`
 
 **Solutions**:
+
 1. Review app permissions in settings
 2. Verify permission matches required operation
 3. Regenerate token with updated permissions
@@ -1448,19 +1426,16 @@ Follow setup steps above.
 Replace PAT usage:
 
 \`\`\`yaml
+
 # Before (using PAT)
-env:
-  GITHUB_TOKEN: \${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+env: GITHUB_TOKEN: \${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
 # After (using GitHub App)
-- name: Get App Token
-  id: app-token
-  uses: ./.github/actions/github-app-token
 
-- name: Use Token
-  env:
-    GITHUB_TOKEN: \${{ steps.app-token.outputs.token }}
-\`\`\`
+- name: Get App Token id: app-token uses: ./.github/actions/github-app-token
+
+- name: Use Token env: GITHUB_TOKEN: \${{ steps.app-token.outputs.token }} \`\`\`
 
 ### Step 3: Test
 
@@ -1475,48 +1450,57 @@ Once all workflows migrated, remove PAT secret.
 Monitor API usage:
 
 \`\`\`bash
+
 # Check current rate limit
+
 gh api /rate_limit --jq '.resources.core'
 
 # Expected output with GitHub App:
+
 # {
-#   "limit": 5000,
-#   "remaining": 4999,
-#   "reset": 1234567890
+
+# "limit": 5000,
+
+# "remaining": 4999,
+
+# "reset": 1234567890
+
 # }
+
 \`\`\`
 
 ## References
 
 - [GitHub Apps Documentation](https://docs.github.com/en/apps)
 - [Creating a GitHub App](https://docs.github.com/en/apps/creating-github-apps)
-- [Rate Limits](https://docs.github.com/en/rest/rate-limit)
-\`\`\`
+- [Rate Limits](https://docs.github.com/en/rest/rate-limit) \`\`\`
 
 ### Verification Steps
 
 \`\`\`bash
+
 # 1. Verify documentation exists
+
 test -f docs/refactors/workflows/v2/github-apps-setup.md && echo "✅ GitHub Apps doc created"
 
 # 2. Create GitHub App following guide
+
 # (Manual step in GitHub UI)
 
 # 3. Test app integration
+
 gh workflow run test-github-app.yml
 
 # 4. Verify rate limits
-gh api /rate_limit
-\`\`\`
+
+gh api /rate_limit \`\`\`
 
 ---
 
 ## Task 5.4: Create Advanced Caching Workflow
 
-**Status**: Not Started
-**Dependencies**: Tasks 5.1-5.3
-**Estimated Time**: 2 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Tasks 5.1-5.3 **Estimated Time**: 2 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -1527,49 +1511,26 @@ Create workflow with intelligent caching strategies.
 Create file: `.github/workflows/reusable-advanced-cache.yml`
 
 \`\`\`yaml
+
 # file: .github/workflows/reusable-advanced-cache.yml
+
 # version: 1.0.0
+
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
 name: Reusable Advanced Caching
 
-on:
-  workflow_call:
-    inputs:
-      language:
-        description: 'Programming language'
-        required: true
-        type: string
-      cache-prefix:
-        description: 'Cache key prefix'
-        required: true
-        type: string
-      include-branch:
-        description: 'Include branch in cache key'
-        required: false
-        type: boolean
-        default: false
-    outputs:
-      cache-hit:
-        description: 'Whether cache was hit'
-        value: \${{ jobs.cache-setup.outputs.cache-hit }}
-      cache-key:
-        description: 'Generated cache key'
-        value: \${{ jobs.cache-setup.outputs.cache-key }}
+on: workflow_call: inputs: language: description: 'Programming language' required: true type: string
+cache-prefix: description: 'Cache key prefix' required: true type: string include-branch:
+description: 'Include branch in cache key' required: false type: boolean default: false outputs:
+cache-hit: description: 'Whether cache was hit' value: \${{ jobs.cache-setup.outputs.cache-hit }}
+cache-key: description: 'Generated cache key' value: \${{ jobs.cache-setup.outputs.cache-key }}
 
-permissions:
-  contents: read
+permissions: contents: read
 
-jobs:
-  cache-setup:
-    name: Setup Intelligent Cache
-    runs-on: ubuntu-latest
-    outputs:
-      cache-hit: \${{ steps.cache.outputs.cache-hit }}
-      cache-key: \${{ steps.generate-key.outputs.cache-key }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+jobs: cache-setup: name: Setup Intelligent Cache runs-on: ubuntu-latest outputs: cache-hit:
+\${{ steps.cache.outputs.cache-hit }} cache-key: \${{ steps.generate-key.outputs.cache-key }}
+steps: - name: Checkout code uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -1624,43 +1585,41 @@ jobs:
           else
             echo "⚠️  Cache miss: \${{ steps.generate-key.outputs.cache-key }}"
           fi
+
 \`\`\`
 
 ### Verification Steps
 
 \`\`\`bash
+
 # 1. Validate workflow syntax
+
 actionlint .github/workflows/reusable-advanced-cache.yml
 
 # 2. Test Go caching
-gh workflow run test-advanced-cache.yml \\
-  -f language=go \\
-  -f cache-prefix=go-build
+
+gh workflow run test-advanced-cache.yml \\ -f language=go \\ -f cache-prefix=go-build
 
 # 3. Test Rust caching
-gh workflow run test-advanced-cache.yml \\
-  -f language=rust \\
-  -f cache-prefix=rust-cargo
+
+gh workflow run test-advanced-cache.yml \\ -f language=rust \\ -f cache-prefix=rust-cargo
 
 # 4. Test with branch-specific cache
-gh workflow run test-advanced-cache.yml \\
-  -f language=go \\
-  -f cache-prefix=go-build \\
-  -f include-branch=true
+
+gh workflow run test-advanced-cache.yml \\ -f language=go \\ -f cache-prefix=go-build \\ -f
+include-branch=true
 
 # 5. Verify cache hit rate
-gh run list --workflow=test-advanced-cache.yml --json conclusion,name | \\
-  jq -r '.[] | select(.conclusion=="success") | .name'
-\`\`\`
+
+gh run list --workflow=test-advanced-cache.yml --json conclusion,name | \\ jq -r '.[] |
+select(.conclusion=="success") | .name' \`\`\`
 
 ---
 
 ## Task 5.5: Create Workflow Analytics Dashboard
 
-**Status**: Not Started
-**Dependencies**: Tasks 5.1-5.4
-**Estimated Time**: 3 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Tasks 5.1-5.4 **Estimated Time**: 3 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -1671,35 +1630,22 @@ Create workflow for collecting and displaying analytics.
 Create file: `.github/workflows/workflow-analytics.yml`
 
 \`\`\`yaml
+
 # file: .github/workflows/workflow-analytics.yml
+
 # version: 1.0.0
+
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
 name: Workflow Analytics
 
-on:
-  schedule:
-    # Daily at 00:00 UTC
-    - cron: '0 0 * * *'
-  workflow_dispatch:
-    inputs:
-      lookback-days:
-        description: 'Days of history to analyze'
-        required: false
-        type: number
-        default: 30
+on: schedule: # Daily at 00:00 UTC - cron: '0 0 \* \* \*' workflow_dispatch: inputs: lookback-days:
+description: 'Days of history to analyze' required: false type: number default: 30
 
-permissions:
-  contents: write
-  actions: read
+permissions: contents: write actions: read
 
-jobs:
-  collect-metrics:
-    name: Collect Workflow Metrics
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+jobs: collect-metrics: name: Collect Workflow Metrics runs-on: ubuntu-latest steps: - name: Checkout
+code uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -1841,26 +1787,32 @@ jobs:
       - name: Comment on summary
         run: |
           cat workflow-analytics.md >> $GITHUB_STEP_SUMMARY
+
 \`\`\`
 
 ### Verification Steps
 
 \`\`\`bash
+
 # 1. Validate workflow syntax
+
 actionlint .github/workflows/workflow-analytics.yml
 
 # 2. Test analytics collection
+
 gh workflow run workflow-analytics.yml
 
 # 3. Download analytics report
+
 gh run download --name workflow-analytics
 
 # 4. View charts
+
 open analytics-charts.png
 
 # 5. Schedule verification
-gh workflow view workflow-analytics.yml
-\`\`\`
+
+gh workflow view workflow-analytics.yml \`\`\`
 
 ---
 

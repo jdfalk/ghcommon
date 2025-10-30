@@ -6,12 +6,11 @@
 
 ## Overview
 
-Phase 0 establishes the foundational infrastructure required for all subsequent phases. This includes shared utilities, configuration validation, security frameworks, and feature flags.
+Phase 0 establishes the foundational infrastructure required for all subsequent phases. This
+includes shared utilities, configuration validation, security frameworks, and feature flags.
 
-**Status**: 🟡 Planning
-**Dependencies**: None
-**Target Completion**: 2025-10-20
-**Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
+**Status**: 🟡 Planning **Dependencies**: None **Target Completion**: 2025-10-20 **Platforms**:
+ubuntu-latest, macos-latest (NO WINDOWS)
 
 ## Success Criteria
 
@@ -25,27 +24,29 @@ Phase 0 establishes the foundational infrastructure required for all subsequent 
 ## Design Principles
 
 Every task in this phase MUST be:
+
 - **Independent**: Can be executed without waiting for other tasks
 - **Idempotent**: Running multiple times produces same result
 - **Testable**: Unit tests exist and pass
-- **Compliant**: Follows `.github/instructions/python.instructions.md` and `.github/instructions/general-coding.instructions.md`
+- **Compliant**: Follows `.github/instructions/python.instructions.md` and
+  `.github/instructions/general-coding.instructions.md`
 
 ---
 
 ## Task 0.1: Create Shared Utility Module
 
-**Status**: Not Started
-**Dependencies**: None (fully independent)
-**Estimated Time**: 1-2 hours
+**Status**: Not Started **Dependencies**: None (fully independent) **Estimated Time**: 1-2 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create `.github/workflows/scripts/workflow_common.py` containing shared utilities used by all workflow helpers.
+Create `.github/workflows/scripts/workflow_common.py` containing shared utilities used by all
+workflow helpers.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/python.instructions.md` - Type hints, docstrings, formatting
 - `.github/instructions/general-coding.instructions.md` - File headers, versioning
 
@@ -386,9 +387,7 @@ Create `tests/workflow_scripts/test_workflow_common.py` (see Task 0.5).
 
 ## Task 0.2: Create Configuration Schema
 
-**Status**: Not Started
-**Dependencies**: None (fully independent)
-**Estimated Time**: 1 hour
+**Status**: Not Started **Dependencies**: None (fully independent) **Estimated Time**: 1 hour
 **Idempotent**: Yes
 
 ### Description
@@ -414,28 +413,28 @@ Create file: `.github/schemas/repository-config.schema.json`
           "properties": {
             "go": {
               "type": "array",
-              "items": {"type": "string", "pattern": "^1\\.(23|24)$"},
+              "items": { "type": "string", "pattern": "^1\\.(23|24)$" },
               "minItems": 1,
               "maxItems": 2,
               "description": "Supported Go versions (1.23, 1.24)"
             },
             "python": {
               "type": "array",
-              "items": {"type": "string", "pattern": "^3\\.(13|14)$"},
+              "items": { "type": "string", "pattern": "^3\\.(13|14)$" },
               "minItems": 1,
               "maxItems": 2,
               "description": "Supported Python versions (3.13, 3.14)"
             },
             "node": {
               "type": "array",
-              "items": {"type": "string", "pattern": "^(20|22)$"},
+              "items": { "type": "string", "pattern": "^(20|22)$" },
               "minItems": 1,
               "maxItems": 2,
               "description": "Supported Node.js LTS versions (20, 22)"
             },
             "rust": {
               "type": "array",
-              "items": {"type": "string", "enum": ["stable", "stable-1"]},
+              "items": { "type": "string", "enum": ["stable", "stable-1"] },
               "minItems": 1,
               "maxItems": 2,
               "description": "Supported Rust channels"
@@ -485,9 +484,9 @@ Create file: `.github/schemas/repository-config.schema.json`
         "experimental": {
           "type": "object",
           "properties": {
-            "use_new_ci": {"type": "boolean"},
-            "use_new_release": {"type": "boolean"},
-            "use_config_matrices": {"type": "boolean"}
+            "use_new_ci": { "type": "boolean" },
+            "use_new_release": { "type": "boolean" },
+            "use_config_matrices": { "type": "boolean" }
           },
           "description": "Feature flags for gradual rollout"
         }
@@ -523,10 +522,8 @@ print('✅ Schema validation works')
 
 ## Task 0.3: Create Config Validation Script
 
-**Status**: Not Started
-**Dependencies**: Task 0.2 (needs schema), Task 0.1 (needs workflow_common)
-**Estimated Time**: 30 minutes
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 0.2 (needs schema), Task 0.1 (needs workflow_common)
+**Estimated Time**: 30 minutes **Idempotent**: Yes
 
 ### Description
 
@@ -680,9 +677,7 @@ python3 .github/workflows/scripts/validate_config.py \
 
 ## Task 0.4: Create Security Audit Checklist
 
-**Status**: Not Started
-**Dependencies**: None (fully independent)
-**Estimated Time**: 30 minutes
+**Status**: Not Started **Dependencies**: None (fully independent) **Estimated Time**: 30 minutes
 **Idempotent**: Yes
 
 ### Description
@@ -693,7 +688,7 @@ Create security audit checklist template for workflow reviews.
 
 Create file: `.github/SECURITY_CHECKLIST.md`
 
-```markdown
+````markdown
 <!-- file: .github/SECURITY_CHECKLIST.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d -->
@@ -702,9 +697,11 @@ Create file: `.github/SECURITY_CHECKLIST.md`
 
 Complete this checklist before deploying new workflows or workflow changes.
 
-## Date: ________________
-## Reviewer: ________________
-## Phase/PR: ________________
+## Date: ******\_\_\_\_******
+
+## Reviewer: ******\_\_\_\_******
+
+## Phase/PR: ******\_\_\_\_******
 
 ---
 
@@ -729,12 +726,14 @@ Complete this checklist before deploying new workflows or workflow changes.
 - [ ] Pull requests from forks have restricted permissions
 
 **Current Permissions:**
+
 ```yaml
 permissions:
   contents: read
   pull-requests: write
   # ... list all permissions
 ```
+````
 
 ---
 
@@ -746,8 +745,9 @@ permissions:
 - [ ] No mutable references (`@main`, `@v1`)
 
 **Example:**
+
 ```yaml
-- uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+- uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 ```
 
 ---
@@ -828,12 +828,13 @@ permissions:
 - [ ] Issues documented and tracked
 - [ ] Deployment approved
 
-**Reviewer Signature:** ________________
+**Reviewer Signature:** ******\_\_\_\_******
 
-**Date:** ________________
+**Date:** ******\_\_\_\_******
 
 **Notes:**
-```
+
+````
 
 ### Verification Steps
 
@@ -843,16 +844,14 @@ test -f .github/SECURITY_CHECKLIST.md && echo "✅ Checklist created"
 
 # 2. Verify markdown is valid
 npx markdownlint-cli .github/SECURITY_CHECKLIST.md && echo "✅ Valid markdown"
-```
+````
 
 ---
 
 ## Task 0.5: Create Unit Tests for workflow_common
 
-**Status**: Not Started
-**Dependencies**: Task 0.1 (needs workflow_common.py)
-**Estimated Time**: 2 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 0.1 (needs workflow_common.py) **Estimated Time**: 2
+hours **Idempotent**: Yes
 
 ### Description
 
@@ -861,6 +860,7 @@ Create comprehensive unit tests for `workflow_common.py`.
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/test-generation.instructions.md` - Arrange-Act-Assert, independence
 
 ### Implementation
@@ -1092,10 +1092,8 @@ python -m pytest tests/workflow_scripts/test_workflow_common.py --cov=workflow_c
 
 ## Task 0.6: Create Feature Flag System
 
-**Status**: Not Started
-**Dependencies**: Task 0.1 (needs workflow_common)
-**Estimated Time**: 30 minutes
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 0.1 (needs workflow_common) **Estimated Time**: 30
+minutes **Idempotent**: Yes
 
 ### Description
 
@@ -1218,6 +1216,5 @@ Language versions: Go 1.23/1.24, Python 3.13/3.14
 
 ---
 
-**Last Updated**: 2025-10-12
-**Phase Owner**: Workflow Refactoring Team
-**Status**: Ready for implementation
+**Last Updated**: 2025-10-12 **Phase Owner**: Workflow Refactoring Team **Status**: Ready for
+implementation

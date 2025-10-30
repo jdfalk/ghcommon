@@ -6,12 +6,13 @@
 
 ## Overview
 
-Phase 2 consolidates release workflows into a unified system with branch-aware version detection, automated changelog generation, GitHub Packages publishing, and support for parallel release tracks via stable-1-* branches.
+Phase 2 consolidates release workflows into a unified system with branch-aware version detection,
+automated changelog generation, GitHub Packages publishing, and support for parallel release tracks
+via stable-1-\* branches.
 
-**Status**: 🟡 Planning
-**Dependencies**: Phase 0 (workflow_common.py), Phase 1 (ci_workflow.py for branch detection patterns)
-**Target Completion**: 2025-11-10
-**Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
+**Status**: 🟡 Planning **Dependencies**: Phase 0 (workflow_common.py), Phase 1 (ci_workflow.py for
+branch detection patterns) **Target Completion**: 2025-11-10 **Platforms**: ubuntu-latest,
+macos-latest (NO WINDOWS)
 
 ## Branching Strategy for Parallel Releases
 
@@ -29,12 +30,14 @@ Release workflows support parallel release tracks using branch-aware version tar
   - Enables users on older versions to receive updates during deprecation period
 
 **Release Examples**:
+
 - Main branch → `v2.1.0` (Go 1.25, Python 3.14)
 - stable-1-go-1.24 → `v2.1.0-go1.24` (Go 1.24)
 - stable-1-go-1.23 → `v2.1.0-go1.23` (Go 1.23)
 - stable-1-python-3.13 → `v2.1.0-python3.13` (Python 3.13)
 
 **Benefits**:
+
 - Multiple parallel versions available simultaneously
 - Clear version identification with language tags
 - Users can select appropriate version for their environment
@@ -55,27 +58,29 @@ Release workflows support parallel release tracks using branch-aware version tar
 ## Design Principles
 
 Every task in this phase MUST be:
+
 - **Independent**: Can be executed without waiting for other tasks
 - **Idempotent**: Running multiple times produces same result
 - **Testable**: Unit tests exist and pass
-- **Compliant**: Follows `.github/instructions/python.instructions.md` and `.github/instructions/github-actions.instructions.md`
+- **Compliant**: Follows `.github/instructions/python.instructions.md` and
+  `.github/instructions/github-actions.instructions.md`
 
 ---
 
 ## Task 2.1: Create Release Helper Module
 
-**Status**: Not Started
-**Dependencies**: Phase 0 Task 0.1 (workflow_common.py)
-**Estimated Time**: 4 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Phase 0 Task 0.1 (workflow_common.py) **Estimated Time**:
+4 hours **Idempotent**: Yes
 
 ### Description
 
-Create `.github/workflows/scripts/release_workflow.py` containing release-specific helper functions for language detection, version extraction, changelog generation, and branch-aware tagging.
+Create `.github/workflows/scripts/release_workflow.py` containing release-specific helper functions
+for language detection, version extraction, changelog generation, and branch-aware tagging.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/python.instructions.md` - Google Python Style Guide with full docstrings
 - `.github/instructions/general-coding.instructions.md` - File headers, versioning
 - `.github/instructions/github-actions.instructions.md` - Workflow best practices
@@ -588,18 +593,18 @@ cd /path/to/repo && git checkout -b stable-1-go-1.24 && python3 .github/workflow
 
 ## Task 2.2: Create Reusable Release Workflow
 
-**Status**: Not Started
-**Dependencies**: Task 2.1 (release_workflow.py)
-**Estimated Time**: 3 hours
+**Status**: Not Started **Dependencies**: Task 2.1 (release_workflow.py) **Estimated Time**: 3 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create `.github/workflows/reusable-release.yml` - a reusable workflow that calls release_workflow.py to generate releases with branch-aware tagging and GitHub Packages publishing.
+Create `.github/workflows/reusable-release.yml` - a reusable workflow that calls release_workflow.py
+to generate releases with branch-aware tagging and GitHub Packages publishing.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/github-actions.instructions.md` - Workflow best practices
 
 ### Implementation
@@ -660,12 +665,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
         with:
-          fetch-depth: 0  # Need full history for changelog
+          fetch-depth: 0 # Need full history for changelog
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: '3.13'
 
@@ -712,10 +717,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Go
-        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v5.0.0
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version-file: go.mod
 
@@ -732,7 +737,7 @@ jobs:
           chmod +x "${output_name}" || true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8  # v4.3.0
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
         with:
           name: go-${{ matrix.goos }}-${{ matrix.goarch }}
           path: app-${{ matrix.goos }}-${{ matrix.goarch }}*
@@ -756,10 +761,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@1fbea72663f6d4c03efaab13560c8a24cfd2a7cc  # v1.8.0
+        uses: actions-rust-lang/setup-rust-toolchain@1fbea72663f6d4c03efaab13560c8a24cfd2a7cc # v1.8.0
         with:
           toolchain: stable
           target: ${{ matrix.target }}
@@ -769,7 +774,7 @@ jobs:
           cargo build --release --target ${{ matrix.target }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8  # v4.3.0
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
         with:
           name: rust-${{ matrix.target }}
           path: target/${{ matrix.target }}/release/app
@@ -782,10 +787,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: '3.13'
 
@@ -798,7 +803,7 @@ jobs:
           python -m build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8  # v4.3.0
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
         with:
           name: python-dist
           path: dist/*
@@ -811,10 +816,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8  # v4.0.2
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version-file: package.json
 
@@ -828,10 +833,10 @@ jobs:
         run: npm pack
 
       - name: Upload artifact
-        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8  # v4.3.0
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
         with:
           name: node-package
-          path: "*.tgz"
+          path: '*.tgz'
 
   create-release:
     name: Create GitHub Release
@@ -841,15 +846,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Download all artifacts
-        uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935  # v4.1.1
+        uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
         with:
           path: artifacts
 
       - name: Create release
-        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191  # v0.1.15
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v0.1.15
         with:
           tag_name: ${{ needs.prepare-release.outputs.tag }}
           name: Release ${{ needs.prepare-release.outputs.tag }}
@@ -866,7 +871,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up language environment
         run: |
@@ -918,10 +923,8 @@ grep -i "windows" .github/workflows/reusable-release.yml && echo "❌ Found Wind
 
 ## Task 2.3: Create Caller Release Workflow
 
-**Status**: Not Started
-**Dependencies**: Task 2.2 (reusable-release.yml)
-**Estimated Time**: 30 minutes
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 2.2 (reusable-release.yml) **Estimated Time**: 30
+minutes **Idempotent**: Yes
 
 ### Description
 
@@ -971,10 +974,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: '3.13'
 
@@ -1018,7 +1021,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Run legacy release
         run: |
@@ -1055,9 +1058,7 @@ echo "✅ Release workflow created with feature flag support"
 
 ## Task 2.4: Create Unit Tests for release_workflow
 
-**Status**: Not Started
-**Dependencies**: Task 2.1 (release_workflow.py)
-**Estimated Time**: 3 hours
+**Status**: Not Started **Dependencies**: Task 2.1 (release_workflow.py) **Estimated Time**: 3 hours
 **Idempotent**: Yes
 
 ### Description
@@ -1067,6 +1068,7 @@ Create comprehensive unit tests for `release_workflow.py`.
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/test-generation.instructions.md` - Arrange-Act-Assert, independence
 
 ### Implementation
@@ -1499,9 +1501,7 @@ pytest tests/workflow_scripts/test_release_workflow.py --cov=release_workflow --
 
 ## Task 2.5: Document GitHub Packages Configuration
 
-**Status**: Not Started
-**Dependencies**: Task 2.2 (reusable-release.yml)
-**Estimated Time**: 1 hour
+**Status**: Not Started **Dependencies**: Task 2.2 (reusable-release.yml) **Estimated Time**: 1 hour
 **Idempotent**: Yes
 
 ### Description
@@ -1512,14 +1512,15 @@ Create documentation for configuring GitHub Packages publishing with branch-spec
 
 Create file: `docs/refactors/workflows/v2/github-packages-setup.md`
 
-```markdown
+````markdown
 <!-- file: docs/refactors/workflows/v2/github-packages-setup.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c2d3e4f5-a6b7-8c9d-0e1f-2a3b4c5d6e7f -->
 
 # GitHub Packages Setup
 
-This guide explains how to configure GitHub Packages publishing for multi-version support with branch-specific tags.
+This guide explains how to configure GitHub Packages publishing for multi-version support with
+branch-specific tags.
 
 ## Overview
 
@@ -1533,18 +1534,22 @@ The v2 workflow system publishes packages to GitHub Packages with branch-aware t
 ### Go Modules
 
 **Publishing from main branch**:
+
 ```bash
 # Tag: v1.2.3
 # Package: github.com/owner/repo@v1.2.3
 ```
+````
 
 **Publishing from stable-1-go-1.24 branch**:
+
 ```bash
 # Tag: v1.2.3-go124
 # Package: github.com/owner/repo@v1.2.3-go124
 ```
 
 **Consuming packages**:
+
 ```bash
 # Latest version (from main)
 go get github.com/owner/repo@latest
@@ -1556,16 +1561,19 @@ go get github.com/owner/repo@v1.2.3-go124
 ### Python Packages (PyPI)
 
 **Publishing from main branch**:
+
 ```bash
 # Package: package-name==1.2.3
 ```
 
 **Publishing from stable-1-python-3.13 branch**:
+
 ```bash
 # Package: package-name==1.2.3+python313
 ```
 
 **Consuming packages**:
+
 ```bash
 # Latest version
 pip install package-name
@@ -1577,18 +1585,21 @@ pip install package-name==1.2.3+python313
 ### Node.js Packages (npm)
 
 **Publishing from main branch**:
+
 ```bash
 # Package: @owner/package@1.2.3
 # Tag: latest
 ```
 
 **Publishing from stable-1-node-20 branch**:
+
 ```bash
 # Package: @owner/package@1.2.3-node20
 # Tag: node20
 ```
 
 **Consuming packages**:
+
 ```bash
 # Latest version
 npm install @owner/package
@@ -1600,16 +1611,19 @@ npm install @owner/package@1.2.3-node20
 ### Rust Crates (crates.io)
 
 **Publishing from main branch**:
+
 ```bash
 # Crate: package-name 1.2.3
 ```
 
 **Publishing from stable-1-rust-stable branch**:
+
 ```bash
 # Crate: package-name 1.2.3+rust-stable
 ```
 
 **Consuming crates**:
+
 ```toml
 # Latest version
 [dependencies]
@@ -1655,8 +1669,8 @@ workflows:
 packages:
   registries:
     github: true
-    pypi: false  # Enable when ready
-    npm: false   # Enable when ready
+    pypi: false # Enable when ready
+    npm: false # Enable when ready
     cargo: false # Enable when ready
 ```
 
@@ -1679,6 +1693,7 @@ gh workflow run release.yml \
 **Problem**: Package not appearing in GitHub Packages
 
 **Solution**:
+
 1. Check workflow permissions (read/write required)
 2. Verify package is linked to repository
 3. Check workflow logs for publishing errors
@@ -1688,6 +1703,7 @@ gh workflow run release.yml \
 **Problem**: Version already exists error
 
 **Solution**:
+
 1. Increment version number
 2. For testing, use prerelease versions (e.g., 1.2.3-rc1)
 3. Delete old test packages from GitHub Packages UI
@@ -1697,6 +1713,7 @@ gh workflow run release.yml \
 **Problem**: Git tag already exists error
 
 **Solution**:
+
 1. Delete the tag: `git tag -d v1.2.3 && git push origin :refs/tags/v1.2.3`
 2. Increment version number
 3. Use semantic versioning correctly (patch/minor/major)
@@ -1726,7 +1743,8 @@ If migrating from an existing package publishing system:
 - [Semantic Versioning Spec](https://semver.org/)
 - [Workflow v2 Architecture](architecture.md)
 - [Release Workflow Reference](reference/workflow-reference.md)
-```
+
+````
 
 ### Verification Steps
 
@@ -1739,7 +1757,7 @@ markdownlint docs/refactors/workflows/v2/github-packages-setup.md && echo "✅ V
 
 # 3. Verify links work (if markdown-link-check installed)
 markdown-link-check docs/refactors/workflows/v2/github-packages-setup.md && echo "✅ All links valid"
-```
+````
 
 ---
 
@@ -1759,4 +1777,5 @@ markdown-link-check docs/refactors/workflows/v2/github-packages-setup.md && echo
 
 ---
 
-**Phase 2 Complete!** This phase establishes the foundation for branch-aware releases with GitHub Packages support.
+**Phase 2 Complete!** This phase establishes the foundation for branch-aware releases with GitHub
+Packages support.

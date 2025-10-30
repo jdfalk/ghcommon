@@ -6,18 +6,19 @@
 
 ## Overview
 
-Phase 1 modernizes the CI workflow system to use configuration-driven workflows with dynamic matrix generation, intelligent change detection, branch-aware version targeting, and optimized test execution.
+Phase 1 modernizes the CI workflow system to use configuration-driven workflows with dynamic matrix
+generation, intelligent change detection, branch-aware version targeting, and optimized test
+execution.
 
-**Status**: 🟡 Planning
-**Dependencies**: Phase 0 (workflow_common.py, config validation)
-**Target Completion**: 2025-11-03
-**Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
+**Status**: 🟡 Planning **Dependencies**: Phase 0 (workflow_common.py, config validation) **Target
+Completion**: 2025-11-03 **Platforms**: ubuntu-latest, macos-latest (NO WINDOWS)
 
 ## Branching Strategy for Parallel Release Tracks
 
 This workflow system supports parallel release tracks using a branch-based versioning strategy:
 
-- **`main` branch**: Always targets **latest language versions** (Go 1.25, Python 3.14, Node 22, Rust stable)
+- **`main` branch**: Always targets **latest language versions** (Go 1.25, Python 3.14, Node 22,
+  Rust stable)
 - **`stable-1-*` branches**: Target **previous versions** for parallel maintenance releases
   - Examples: `stable-1-go-1.24`, `stable-1-go-1.23`, `stable-1-python-3.13`
   - Automatically created when new major versions are adopted on `main`
@@ -26,12 +27,14 @@ This workflow system supports parallel release tracks using a branch-based versi
   - **Branch locked** (read-only) after 180-day deprecation period
 
 **Key Benefits**:
+
 - Users on older versions continue receiving updates during deprecation
 - Clear separation between latest and maintenance releases
 - Automated version targeting based on branch name
 - Hard deprecation limit prevents indefinite maintenance burden
 
 **Example Timeline**:
+
 1. **Jan 2025**: `main` uses Go 1.24, stable-1-go-1.23 branch created
 2. **Oct 2025**: Go 1.25 releases, `main` upgrades to 1.25, stable-1-go-1.24 branch created
 3. **Oct 2025**: Go 1.23 enters deprecation (N+2 released), work stops on stable-1-go-1.23
@@ -52,27 +55,29 @@ This workflow system supports parallel release tracks using a branch-based versi
 ## Design Principles
 
 Every task in this phase MUST be:
+
 - **Independent**: Can be executed without waiting for other tasks
 - **Idempotent**: Running multiple times produces same result
 - **Testable**: Unit tests exist and pass
-- **Compliant**: Follows `.github/instructions/python.instructions.md` and `.github/instructions/github-actions.instructions.md`
+- **Compliant**: Follows `.github/instructions/python.instructions.md` and
+  `.github/instructions/github-actions.instructions.md`
 
 ---
 
 ## Task 1.1: Create CI Helper Module
 
-**Status**: Not Started
-**Dependencies**: Phase 0 Task 0.1 (workflow_common.py)
-**Estimated Time**: 3 hours
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Phase 0 Task 0.1 (workflow_common.py) **Estimated Time**:
+3 hours **Idempotent**: Yes
 
 ### Description
 
-Create `.github/workflows/scripts/ci_workflow.py` containing CI-specific helper functions for matrix generation, change detection, and test orchestration.
+Create `.github/workflows/scripts/ci_workflow.py` containing CI-specific helper functions for matrix
+generation, change detection, and test orchestration.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/python.instructions.md` - Google Python Style Guide with full docstrings
 - `.github/instructions/general-coding.instructions.md` - File headers, versioning
 - `.github/instructions/github-actions.instructions.md` - Workflow best practices
@@ -605,18 +610,18 @@ cd /path/to/repo && python3 .github/workflows/scripts/ci_workflow.py --base-ref 
 
 ## Task 1.2: Create Reusable CI Workflow
 
-**Status**: Not Started
-**Dependencies**: Task 1.1 (ci_workflow.py)
-**Estimated Time**: 2 hours
+**Status**: Not Started **Dependencies**: Task 1.1 (ci_workflow.py) **Estimated Time**: 2 hours
 **Idempotent**: Yes
 
 ### Description
 
-Create `.github/workflows/reusable-ci.yml` - a reusable workflow that calls ci_workflow.py to generate matrices and execute tests.
+Create `.github/workflows/reusable-ci.yml` - a reusable workflow that calls ci_workflow.py to
+generate matrices and execute tests.
 
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/github-actions.instructions.md` - Workflow best practices
 
 ### Implementation
@@ -670,12 +675,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
         with:
-          fetch-depth: 0  # Need full history for change detection
+          fetch-depth: 0 # Need full history for change detection
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: '3.13'
 
@@ -702,12 +707,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       # Go setup
       - name: Set up Go
         if: matrix.language == 'go'
-        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v5.0.0
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: ${{ matrix.version }}
 
@@ -720,7 +725,7 @@ jobs:
       # Python setup
       - name: Set up Python
         if: matrix.language == 'python'
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: ${{ matrix.version }}
 
@@ -733,7 +738,7 @@ jobs:
       # Rust setup
       - name: Set up Rust
         if: matrix.language == 'rust'
-        uses: actions-rust-lang/setup-rust-toolchain@1fbea72663f6d4c03efaab13560c8a24cfd2a7cc  # v1.8.0
+        uses: actions-rust-lang/setup-rust-toolchain@1fbea72663f6d4c03efaab13560c8a24cfd2a7cc # v1.8.0
         with:
           toolchain: ${{ matrix.version }}
 
@@ -746,7 +751,7 @@ jobs:
       # Node.js setup
       - name: Set up Node.js
         if: matrix.language == 'node'
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8  # v4.0.2
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: ${{ matrix.version }}
 
@@ -757,7 +762,7 @@ jobs:
           npm test -- --coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@e0b68c6749509c5f83f984dd99a76a1c1a231044  # v4.0.1
+        uses: codecov/codecov-action@e0b68c6749509c5f83f984dd99a76a1c1a231044 # v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.out
@@ -784,9 +789,7 @@ grep -i "windows" .github/workflows/reusable-ci.yml && echo "❌ Found Windows r
 
 ## Task 1.3: Create Caller CI Workflow
 
-**Status**: Not Started
-**Dependencies**: Task 1.2 (reusable-ci.yml)
-**Estimated Time**: 30 minutes
+**Status**: Not Started **Dependencies**: Task 1.2 (reusable-ci.yml) **Estimated Time**: 30 minutes
 **Idempotent**: Yes
 
 ### Description
@@ -830,10 +833,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version: '3.13'
 
@@ -875,7 +878,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v4.1.1
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4.1.1
 
       - name: Run legacy tests
         run: |
@@ -914,9 +917,7 @@ echo "✅ CI workflow created with feature flag support"
 
 ## Task 1.4: Create Unit Tests for ci_workflow
 
-**Status**: Not Started
-**Dependencies**: Task 1.1 (ci_workflow.py)
-**Estimated Time**: 3 hours
+**Status**: Not Started **Dependencies**: Task 1.1 (ci_workflow.py) **Estimated Time**: 3 hours
 **Idempotent**: Yes
 
 ### Description
@@ -926,6 +927,7 @@ Create comprehensive unit tests for `ci_workflow.py`.
 ### Code Style Requirements
 
 **MUST follow**:
+
 - `.github/instructions/test-generation.instructions.md` - Arrange-Act-Assert, independence
 
 ### Implementation
@@ -1373,10 +1375,8 @@ python -m pytest tests/workflow_scripts/test_ci_workflow.py --cov=ci_workflow --
 
 ## Task 1.5: Create Integration Test
 
-**Status**: Not Started
-**Dependencies**: Task 1.2 (reusable-ci.yml), Task 1.3 (ci.yml)
-**Estimated Time**: 1 hour
-**Idempotent**: Yes
+**Status**: Not Started **Dependencies**: Task 1.2 (reusable-ci.yml), Task 1.3 (ci.yml) **Estimated
+Time**: 1 hour **Idempotent**: Yes
 
 ### Description
 
@@ -1576,6 +1576,5 @@ Language versions: Go 1.23/1.24, Python 3.13/3.14
 
 ---
 
-**Last Updated**: 2025-10-12
-**Phase Owner**: Workflow Refactoring Team
-**Status**: Ready for implementation
+**Last Updated**: 2025-10-12 **Phase Owner**: Workflow Refactoring Team **Status**: Ready for
+implementation
