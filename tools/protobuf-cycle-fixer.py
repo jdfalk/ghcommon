@@ -3,18 +3,17 @@
 # version: 1.0.0
 # guid: 8f7e6d5c-4b3a-2f9e-8d7c-6b5a4f3e2d1c
 
-"""
-Automated protobuf import cycle detection and resolution tool.
+"""Automated protobuf import cycle detection and resolution tool.
 Designed to work with the copilot-agent-util for logging and execution.
 """
 
-import os
-import re
-import sys
-import subprocess
-from pathlib import Path
-from typing import Dict, List, Tuple
 from collections import defaultdict, deque
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+from typing import Dict, List, Tuple
 
 
 class ProtobufCycleFixer:
@@ -31,7 +30,7 @@ class ProtobufCycleFixer:
         package_name = ""
         imports = []
 
-        with open(proto_path, "r", encoding="utf-8") as f:
+        with open(proto_path, encoding="utf-8") as f:
             content = f.read()
 
         # Extract package name
@@ -152,7 +151,7 @@ class ProtobufCycleFixer:
         self, proto_file: Path, imports_to_remove: List[str]
     ):
         """Remove specific imports from a proto file."""
-        with open(proto_file, "r", encoding="utf-8") as f:
+        with open(proto_file, encoding="utf-8") as f:
             content = f.read()
 
         modified = False
@@ -187,7 +186,7 @@ class ProtobufCycleFixer:
         try:
             result = subprocess.run(
                 ["copilot-agent-util", "buf", "lint"],
-                cwd=self.repo_root,
+                check=False, cwd=self.repo_root,
                 capture_output=True,
                 text=True,
             )

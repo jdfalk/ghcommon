@@ -3,16 +3,15 @@
 # version: 1.0.0
 # guid: 9f8e7d6c-5b4a-3f9e-8d7c-6b5a4f3e2d1c
 
-"""
-Mass protobuf import cycle and unused import fixer.
+"""Mass protobuf import cycle and unused import fixer.
 Designed to work autonomously with the copilot-agent-util for execution.
 """
 
 import os
-import re
-import sys
-import subprocess
 from pathlib import Path
+import re
+import subprocess
+import sys
 from typing import Dict, List
 
 
@@ -29,7 +28,7 @@ class MassProtobufFixer:
         if not proto_file.exists():
             return False
 
-        with open(proto_file, "r", encoding="utf-8") as f:
+        with open(proto_file, encoding="utf-8") as f:
             content = f.read()
 
         original_content = content
@@ -62,7 +61,7 @@ class MassProtobufFixer:
         if not proto_file.exists():
             return False
 
-        with open(proto_file, "r", encoding="utf-8") as f:
+        with open(proto_file, encoding="utf-8") as f:
             content = f.read()
 
         original_content = content
@@ -130,7 +129,7 @@ class MassProtobufFixer:
         # Get current buf lint output
         result = subprocess.run(
             ["copilot-agent-util", "buf", "lint"],
-            cwd=self.repo_root,
+            check=False, cwd=self.repo_root,
             capture_output=True,
             text=True,
         )
@@ -164,7 +163,7 @@ class MassProtobufFixer:
         # Test if fixes worked
         result = subprocess.run(
             ["copilot-agent-util", "buf", "lint"],
-            cwd=self.repo_root,
+            check=False, cwd=self.repo_root,
             capture_output=True,
             text=True,
         )
@@ -172,11 +171,10 @@ class MassProtobufFixer:
         if result.returncode == 0:
             print("SUCCESS: All buf lint issues fixed!")
             return True
-        else:
-            print(
-                f"Still have {len(result.stderr.split('\\n'))} issues remaining"
-            )
-            return False
+        print(
+            f"Still have {len(result.stderr.split('\\n'))} issues remaining"
+        )
+        return False
 
     def fix_unused_import_line(self, line: str):
         """Fix a single unused import line."""
