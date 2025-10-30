@@ -3,14 +3,13 @@
 # version: 1.0.0
 # guid: f7e8d9c0-b1a2-3c4d-5e6f-7a8b9c0d1e2f
 
-"""
-Script to commit the GITHUB_TOKEN workflow fix across repositories.
+"""Script to commit the GITHUB_TOKEN workflow fix across repositories.
 This fixes the issue where GITHUB_TOKEN was declared as a secret in workflow_call,
 which conflicts with GitHub's reserved token name.
 """
 
-import subprocess
 import os
+import subprocess
 import sys
 
 
@@ -18,7 +17,7 @@ def run_command(cmd, cwd=None):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, shell=True, cwd=cwd, capture_output=True, text=True
+            cmd, check=False, shell=True, cwd=cwd, capture_output=True, text=True
         )
         if result.returncode != 0:
             print(f"Error running command: {cmd}")
@@ -45,7 +44,7 @@ def commit_repo_changes(repo_path, repo_name):
 
     status_result = subprocess.run(
         "git status --porcelain",
-        shell=True,
+        check=False, shell=True,
         cwd=repo_path,
         capture_output=True,
         text=True,
@@ -93,7 +92,7 @@ def main():
         if commit_repo_changes(repo_path, repo_name):
             success_count += 1
 
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(
         f"Successfully processed {success_count} out of {len(repos)} repositories"
     )
@@ -101,9 +100,8 @@ def main():
     if success_count == len(repos):
         print("All repositories processed successfully!")
         return 0
-    else:
-        print("Some repositories had issues.")
-        return 1
+    print("Some repositories had issues.")
+    return 1
 
 
 if __name__ == "__main__":

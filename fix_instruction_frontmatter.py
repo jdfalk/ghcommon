@@ -3,15 +3,14 @@
 # version: 1.0.0
 # guid: f1e2d3c4-b5a6-9e8f-7d6c-5b4a3e2f1d0e
 
-"""
-Fix malformed frontmatter in instruction files across all repositories.
+"""Fix malformed frontmatter in instruction files across all repositories.
 Converts improperly formatted frontmatter to proper YAML frontmatter format.
 """
 
 import os
+from pathlib import Path
 import re
 import shutil
-from pathlib import Path
 
 
 # Colors for output
@@ -43,7 +42,7 @@ def fix_instruction_file(file_path):
     shutil.copy2(file_path, backup_path)
 
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Check if this file needs fixing
@@ -68,8 +67,8 @@ def fix_instruction_file(file_path):
             # Keep header comments
             if (
                 line.startswith("<!--")
-                or line.strip() == ""
-                and not frontmatter_started
+                or (line.strip() == ""
+                and not frontmatter_started)
             ):
                 fixed_lines.append(line)
             # Start frontmatter when we find applyTo
