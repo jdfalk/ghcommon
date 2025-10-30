@@ -6,11 +6,12 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for migrating from the v1 workflow system to the v2 branch-aware workflow system with minimal disruption.
+This guide provides step-by-step instructions for migrating from the v1 workflow system to the v2
+branch-aware workflow system with minimal disruption.
 
-**Migration Time**: 2-4 weeks depending on repository complexity
-**Risk Level**: Low to Medium (can be rolled back at any point)
-**Prerequisites**:
+**Migration Time**: 2-4 weeks depending on repository complexity **Risk Level**: Low to Medium (can
+be rolled back at any point) **Prerequisites**:
+
 - Admin access to repository
 - Understanding of current v1 workflows
 - Access to create branches and GitHub secrets
@@ -108,23 +109,23 @@ feature_flags:
   # Global v2 system toggle
   use_v2_workflows:
     enabled: false
-    description: "Enable v2 branch-aware workflow system"
-    enabled_branches: []  # Start with empty, add gradually
+    description: 'Enable v2 branch-aware workflow system'
+    enabled_branches: [] # Start with empty, add gradually
 
   # Per-feature flags
   use_branch_aware_matrix:
     enabled: false
-    description: "Use branch-aware matrix generation"
+    description: 'Use branch-aware matrix generation'
     enabled_branches: []
 
   use_change_detection:
     enabled: false
-    description: "Use intelligent change detection"
+    description: 'Use intelligent change detection'
     enabled_branches: []
 
   use_parallel_releases:
     enabled: false
-    description: "Enable parallel release tracks"
+    description: 'Enable parallel release tracks'
     enabled_branches: []
 ```
 
@@ -181,40 +182,40 @@ Create version policy configuration:
 version_policies:
   # Main branch - latest versions
   main:
-    created: "2025-10-14"
-    description: "Latest stable versions"
+    created: '2025-10-14'
+    description: 'Latest stable versions'
     go:
-      versions: ["1.25"]
-      default: "1.25"
+      versions: ['1.25']
+      default: '1.25'
     python:
-      versions: ["3.14"]
-      default: "3.14"
+      versions: ['3.14']
+      default: '3.14'
     node:
-      versions: ["22"]
-      default: "22"
+      versions: ['22']
+      default: '22'
     rust:
-      versions: ["stable"]
-      default: "stable"
+      versions: ['stable']
+      default: 'stable'
 
   # Stable branch for Go 1.24
   stable-1-go-1.24:
-    created: "2025-10-14"
-    description: "Go 1.24 maintenance branch"
-    work_stops_at: "2026-04-14"  # 6 months
+    created: '2025-10-14'
+    description: 'Go 1.24 maintenance branch'
+    work_stops_at: '2026-04-14' # 6 months
     lock_after_days: 180
     go:
-      versions: ["1.24"]
-      default: "1.24"
+      versions: ['1.24']
+      default: '1.24'
       locked: true
     python:
-      versions: ["3.13", "3.14"]
-      default: "3.14"
+      versions: ['3.13', '3.14']
+      default: '3.14'
     node:
-      versions: ["20", "22"]
-      default: "22"
+      versions: ['20', '22']
+      default: '22'
     rust:
-      versions: ["stable"]
-      default: "stable"
+      versions: ['stable']
+      default: 'stable'
 ```
 
 Commit configuration:
@@ -277,12 +278,14 @@ pip install -r .github/workflows/scripts/requirements.txt
 Select a repository for pilot migration:
 
 **Good pilot candidates**:
+
 - Medium complexity (not too simple, not too complex)
 - Active development (to test thoroughly)
 - Willing team (receptive to changes)
 - Non-critical (can tolerate issues)
 
 **Avoid for pilot**:
+
 - Production-critical repositories
 - Rarely updated repositories
 - Repositories with complex custom workflows
@@ -400,7 +403,7 @@ feature_flags:
   use_v2_workflows:
     enabled: true
     enabled_branches:
-      - main  # Enable for main branch only initially
+      - main # Enable for main branch only initially
 ```
 
 Commit and push:
@@ -622,18 +625,21 @@ done
 Continue expanding in phases:
 
 **Week 3, Day 1-2**: 25% → 50%
+
 ```bash
 # Enable for another 25% of repositories
 # Monitor for 2 days
 ```
 
 **Week 3, Day 3-4**: 50% → 75%
+
 ```bash
 # Enable for another 25% of repositories
 # Monitor for 2 days
 ```
 
 **Week 3, Day 5-7**: 75% → 100%
+
 ```bash
 # Enable for remaining repositories
 # Monitor for 3 days
@@ -793,7 +799,7 @@ name: Workflow Metrics
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily
+    - cron: '0 0 * * *' # Daily
   workflow_dispatch:
 
 jobs:

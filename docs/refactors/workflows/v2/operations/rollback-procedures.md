@@ -4,7 +4,8 @@
 
 # Rollback Procedures
 
-This guide provides comprehensive procedures for rolling back from the v2 workflow system to v1, including emergency fixes, partial rollbacks, and version fallback strategies.
+This guide provides comprehensive procedures for rolling back from the v2 workflow system to v1,
+including emergency fixes, partial rollbacks, and version fallback strategies.
 
 ## Table of Contents
 
@@ -57,23 +58,23 @@ This guide provides comprehensive procedures for rolling back from the v2 workfl
 
 ### Decision Matrix
 
-```mermaid
+````mermaid
 graph TD
     A[Issue Detected] --> B{Severity?}
     B -->|Critical| C{Affects All Repos?}
     B -->|High| D{Blocking Releases?}
     B -->|Medium| E{Fix Available in < 2 hours?}
     B -->|Low| F[Do Not Rollback]
-    
+
     C -->|Yes| G[Full Rollback]
     C -->|No| H[Partial Rollback]
-    
+
     D -->|Yes| G
     D -->|No| I{Affects > 50% Repos?}
-    
+
     I -->|Yes| H
     I -->|No| J[Disable Feature Flag]
-    
+
     E -->|Yes| F
     E -->|No| J
 ```text
@@ -207,29 +208,29 @@ from datetime import datetime, timedelta
 
 def check_recent_runs():
     """Check recent workflow runs for success rate.
-    
+
     Returns:
         dict: Run statistics including success/failure counts.
     """
     # Get runs from last hour
     cutoff = (datetime.now() - timedelta(hours=1)).isoformat()
-    
+
     cmd = [
         "gh", "run", "list",
         "--workflow=ci.yml",
         "--limit", "50",
         "--json", "conclusion,createdAt,durationMs"
     ]
-    
+
     result = subprocess.run(cmd, capture_output=True, text=True)
     runs = json.loads(result.stdout)
-    
+
     # Filter recent runs
     recent_runs = [
         r for r in runs
         if r["createdAt"] >= cutoff
     ]
-    
+
     # Calculate stats
     stats = {
         "total": len(recent_runs),
@@ -237,19 +238,19 @@ def check_recent_runs():
         "failure": sum(1 for r in recent_runs if r["conclusion"] == "failure"),
         "avg_duration": sum(r.get("durationMs", 0) for r in recent_runs) / len(recent_runs) if recent_runs else 0
     }
-    
+
     return stats
 
 
 if __name__ == "__main__":
     stats = check_recent_runs()
-    
+
     print(f"Workflow Statistics (Last Hour)")
     print(f"Total Runs: {stats['total']}")
     print(f"Success: {stats['success']} ({stats['success']/stats['total']*100:.1f}%)")
     print(f"Failure: {stats['failure']} ({stats['failure']/stats['total']*100:.1f}%)")
     print(f"Avg Duration: {stats['avg_duration']/1000/60:.1f} minutes")
-    
+
     # Alert if high failure rate
     if stats['failure'] / stats['total'] > 0.2:
         print("\n⚠️  WARNING: High failure rate detected!")
@@ -390,16 +391,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
-      
+
       - name: Run tests
         run: go test -v ./...
-      
+
       - name: Build
         run: go build -v ./...
 ```text
@@ -449,36 +450,36 @@ from pathlib import Path
 
 def check_v2_removed():
     """Verify v2 components removed.
-    
+
     Returns:
         list: Any remaining v2 artifacts found.
     """
     artifacts = []
-    
+
     # Check for helpers directory
     if Path(".github/helpers").exists():
         artifacts.append(".github/helpers/ still exists")
-    
+
     # Check for workflow-versions.yml
     if Path(".github/workflow-versions.yml").exists():
         artifacts.append(".github/workflow-versions.yml still exists")
-    
+
     # Check for v2 imports in workflows
     result = subprocess.run(
         ["grep", "-r", "workflow_common.py", ".github/workflows/"],
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode == 0:
         artifacts.append("v2 helper imports found in workflows")
-    
+
     return artifacts
 
 
 def check_v1_restored():
     """Verify v1 workflows present.
-    
+
     Returns:
         list: Missing v1 workflow files.
     """
@@ -486,36 +487,36 @@ def check_v1_restored():
         ".github/workflows/ci.yml",
         ".github/workflows/release.yml",
     ]
-    
+
     missing = []
     for workflow in required_workflows:
         if not Path(workflow).exists():
             missing.append(workflow)
-    
+
     return missing
 
 
 if __name__ == "__main__":
     print("Checking v2 removal...")
     v2_artifacts = check_v2_removed()
-    
+
     if v2_artifacts:
         print("❌ V2 artifacts found:")
         for artifact in v2_artifacts:
             print(f"  - {artifact}")
     else:
         print("✅ V2 components removed")
-    
+
     print("\nChecking v1 restoration...")
     missing_v1 = check_v1_restored()
-    
+
     if missing_v1:
         print("❌ V1 workflows missing:")
         for workflow in missing_v1:
             print(f"  - {workflow}")
     else:
         print("✅ V1 workflows restored")
-    
+
     # Overall status
     if not v2_artifacts and not missing_v1:
         print("\n✅ Rollback verified successfully")
@@ -557,7 +558,7 @@ jobs:
       python: steps.filter.outputs.python
     steps:
       - uses: actions/checkout@v4
-      
+
       # Use dorny/paths-filter instead of helper script
       - uses: dorny/paths-filter@v3
         id: filter
@@ -631,7 +632,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       # Use GoReleaser instead of helper script
       - uses: goreleaser/goreleaser-action@v6
         with:
@@ -659,7 +660,7 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go test -v ./...
-  
+
   test-python:
     # v2 still enabled for Python
     runs-on: ubuntu-latest
@@ -799,7 +800,7 @@ versions:
   go:
     main: "1.24"      # Rolled back from 1.25
     stable-1: "1.23"  # Rolled back from 1.24
-    
+
 branch_policies:
   "stable-1-go-1.24":
     go_version: "1.24"  # Keep stable branch locked
@@ -1099,78 +1100,78 @@ from typing import Dict, List
 
 def validate_v2_removed() -> Dict[str, bool]:
     """Validate v2 components removed.
-    
+
     Returns:
         dict: Validation results for v2 removal.
     """
     checks = {}
-    
+
     # Check helpers directory removed
     checks["helpers_removed"] = not Path(".github/helpers").exists()
-    
+
     # Check workflow-versions.yml removed
     checks["config_removed"] = not Path(".github/workflow-versions.yml").exists()
-    
+
     # Check no v2 imports in workflows
     result = subprocess.run(
         ["grep", "-r", "workflow_common", ".github/workflows/"],
         capture_output=True
     )
     checks["no_v2_imports"] = result.returncode != 0
-    
+
     return checks
 
 
 def validate_v1_working() -> Dict[str, bool]:
     """Validate v1 workflows functional.
-    
+
     Returns:
         dict: Validation results for v1 functionality.
     """
     checks = {}
-    
+
     # Check CI workflow exists
     checks["ci_exists"] = Path(".github/workflows/ci.yml").exists()
-    
+
     # Trigger test run
     result = subprocess.run(
         ["gh", "workflow", "run", "ci.yml"],
         capture_output=True
     )
     checks["ci_triggered"] = result.returncode == 0
-    
+
     # Check recent runs
     result = subprocess.run(
         ["gh", "run", "list", "--workflow=ci.yml", "--limit=5", "--json=conclusion"],
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode == 0:
         runs = json.loads(result.stdout)
         success_count = sum(1 for r in runs if r.get("conclusion") == "success")
         checks["recent_success_rate"] = success_count / len(runs) if runs else 0
     else:
         checks["recent_success_rate"] = 0
-    
+
     return checks
 
 
 def validate_performance() -> Dict[str, float]:
     """Validate workflow performance metrics.
-    
+
     Returns:
         dict: Performance metrics.
     """
     metrics = {}
-    
+
     # Get recent run durations
     result = subprocess.run(
         ["gh", "run", "list", "--workflow=ci.yml", "--limit=10", "--json=durationMs"],
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode == 0:
         runs = json.loads(result.stdout)
         durations = [r.get("durationMs", 0) for r in runs]
@@ -1179,20 +1180,20 @@ def validate_performance() -> Dict[str, float]:
     else:
         metrics["avg_duration_minutes"] = 0
         metrics["max_duration_minutes"] = 0
-    
+
     return metrics
 
 
 if __name__ == "__main__":
     print("🔍 Validating Rollback...\n")
-    
+
     # V2 removal validation
     print("Checking v2 removal...")
     v2_checks = validate_v2_removed()
     for check, result in v2_checks.items():
         status = "✅" if result else "❌"
         print(f"{status} {check}: {result}")
-    
+
     # V1 functionality validation
     print("\nChecking v1 functionality...")
     v1_checks = validate_v1_working()
@@ -1202,18 +1203,18 @@ if __name__ == "__main__":
             print(f"{status} {check}: {result}")
         else:
             print(f"ℹ️  {check}: {result:.1%}")
-    
+
     # Performance validation
     print("\nChecking performance...")
     perf_metrics = validate_performance()
     for metric, value in perf_metrics.items():
         print(f"ℹ️  {metric}: {value:.1f}")
-    
+
     # Overall status
     all_v2_removed = all(v2_checks.values())
     all_v1_working = all(v if isinstance(v, bool) else v > 0.8 for v in v1_checks.values())
     perf_acceptable = perf_metrics.get("avg_duration_minutes", 999) < 30
-    
+
     print("\n" + "="*50)
     if all_v2_removed and all_v1_working and perf_acceptable:
         print("✅ ROLLBACK VALIDATED SUCCESSFULLY")
@@ -1316,113 +1317,113 @@ from pathlib import Path
 
 class RollbackTester:
     """Test rollback procedures in isolated environment."""
-    
+
     def __init__(self, test_repo: str):
         """Initialize tester.
-        
+
         Args:
             test_repo: Path to test repository.
         """
         self.test_repo = Path(test_repo)
         self.backup_dir = None
-    
+
     def setup(self):
         """Set up test environment."""
         print("Setting up test environment...")
-        
+
         # Create backup
         self.backup_dir = tempfile.mkdtemp(prefix="rollback-test-")
         shutil.copytree(
             self.test_repo / ".github",
             Path(self.backup_dir) / ".github"
         )
-        
+
         print(f"✅ Backup created: {self.backup_dir}")
-    
+
     def test_feature_flag_disable(self) -> bool:
         """Test disabling via feature flags.
-        
+
         Returns:
             bool: Test passed.
         """
         print("\nTesting feature flag disable...")
-        
+
         config_file = self.test_repo / ".github" / "workflow-versions.yml"
-        
+
         # Modify config
         with open(config_file, 'r') as f:
             content = f.read()
-        
+
         modified = content.replace(
             "use_workflow_v2: true",
             "use_workflow_v2: false"
         )
-        
+
         with open(config_file, 'w') as f:
             f.write(modified)
-        
+
         # Verify change
         with open(config_file, 'r') as f:
             new_content = f.read()
-        
+
         success = "use_workflow_v2: false" in new_content
-        
+
         status = "✅" if success else "❌"
         print(f"{status} Feature flag disable test")
-        
+
         return success
-    
+
     def test_file_removal(self) -> bool:
         """Test removing v2 files.
-        
+
         Returns:
             bool: Test passed.
         """
         print("\nTesting file removal...")
-        
+
         helpers_dir = self.test_repo / ".github" / "helpers"
         config_file = self.test_repo / ".github" / "workflow-versions.yml"
-        
+
         # Remove files
         if helpers_dir.exists():
             shutil.rmtree(helpers_dir)
-        
+
         if config_file.exists():
             config_file.unlink()
-        
+
         # Verify removal
         success = not helpers_dir.exists() and not config_file.exists()
-        
+
         status = "✅" if success else "❌"
         print(f"{status} File removal test")
-        
+
         return success
-    
+
     def test_workflow_trigger(self) -> bool:
         """Test triggering workflow after rollback.
-        
+
         Returns:
             bool: Test passed.
         """
         print("\nTesting workflow trigger...")
-        
+
         result = subprocess.run(
             ["gh", "workflow", "run", "ci.yml"],
             cwd=self.test_repo,
             capture_output=True
         )
-        
+
         success = result.returncode == 0
-        
+
         status = "✅" if success else "❌"
         print(f"{status} Workflow trigger test")
-        
+
         return success
-    
+
     def cleanup(self):
         """Restore from backup and cleanup."""
         print("\nCleaning up...")
-        
+
         # Restore from backup
         if self.backup_dir:
             shutil.rmtree(self.test_repo / ".github")
@@ -1431,46 +1432,46 @@ class RollbackTester:
                 self.test_repo / ".github"
             )
             shutil.rmtree(self.backup_dir)
-        
+
         print("✅ Test environment restored")
-    
+
     def run_all_tests(self) -> bool:
         """Run all rollback tests.
-        
+
         Returns:
             bool: All tests passed.
         """
         try:
             self.setup()
-            
+
             results = [
                 self.test_feature_flag_disable(),
                 self.test_file_removal(),
                 self.test_workflow_trigger()
             ]
-            
+
             return all(results)
-        
+
         finally:
             self.cleanup()
 
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) < 2:
         print("Usage: test_rollback.py <test-repo-path>")
         sys.exit(1)
-    
+
     tester = RollbackTester(sys.argv[1])
     success = tester.run_all_tests()
-    
+
     print("\n" + "="*50)
     if success:
         print("✅ ALL ROLLBACK TESTS PASSED")
     else:
         print("❌ SOME ROLLBACK TESTS FAILED")
-    
+
     sys.exit(0 if success else 1)
 ```text
 
@@ -1494,14 +1495,14 @@ git status
 # If changes staged but not pushed
 if git log origin/main..HEAD | grep -q "rollback"; then
   echo "Rollback commit exists locally but not pushed"
-  
+
   # Force push if necessary (requires permissions)
   git push origin main --force-with-lease
-  
+
   # Or create new branch
   git branch rollback-recovery
   git push origin rollback-recovery
-  
+
   # Create PR
   gh pr create \
     --title "Recovery: Complete workflow rollback" \
@@ -1550,10 +1551,10 @@ from typing import List, Dict
 
 def check_repo_status(repo: str) -> Dict[str, any]:
     """Check rollback status for a repository.
-    
+
     Args:
         repo: Repository name (org/repo).
-    
+
     Returns:
         dict: Status information.
     """
@@ -1563,21 +1564,21 @@ def check_repo_status(repo: str) -> Dict[str, any]:
         capture_output=True
     )
     has_helpers = result.returncode == 0
-    
+
     # Check recent workflow runs
     result = subprocess.run(
         ["gh", "run", "list", "--repo", repo, "--limit", "5", "--json", "conclusion"],
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode == 0:
         runs = json.loads(result.stdout)
         recent_success = sum(1 for r in runs if r.get("conclusion") == "success")
         success_rate = recent_success / len(runs) if runs else 0
     else:
         success_rate = 0
-    
+
     return {
         "repo": repo,
         "has_v2_artifacts": has_helpers,
@@ -1588,21 +1589,21 @@ def check_repo_status(repo: str) -> Dict[str, any]:
 
 def fix_inconsistent_repo(repo: str):
     """Fix repository in inconsistent state.
-    
+
     Args:
         repo: Repository name to fix.
     """
     print(f"\n🔧 Fixing {repo}...")
-    
+
     # Clone repo
     subprocess.run(["gh", "repo", "clone", repo, f"temp-{repo.replace('/', '-')}"])
-    
+
     repo_dir = f"temp-{repo.replace('/', '-')}"
-    
+
     # Remove v2 artifacts
     subprocess.run(["rm", "-rf", f"{repo_dir}/.github/helpers"])
     subprocess.run(["rm", "-f", f"{repo_dir}/.github/workflow-versions.yml"])
-    
+
     # Commit and push
     subprocess.run(["git", "add", "."], cwd=repo_dir)
     subprocess.run(
@@ -1610,10 +1611,10 @@ def fix_inconsistent_repo(repo: str):
         cwd=repo_dir
     )
     subprocess.run(["git", "push"], cwd=repo_dir)
-    
+
     # Cleanup
     subprocess.run(["rm", "-rf", repo_dir])
-    
+
     print(f"✅ Fixed {repo}")
 
 
@@ -1623,27 +1624,27 @@ if __name__ == "__main__":
         "jdfalk/repo2",
         "jdfalk/repo3"
     ]
-    
+
     print("Checking repository status...")
     statuses = [check_repo_status(repo) for repo in repos]
-    
+
     # Report status
     print("\nRepository Status:")
     for status in statuses:
         icon = "❌" if status["status"] == "inconsistent" else "✅"
         print(f"{icon} {status['repo']}: {status['status']} (success: {status['success_rate']:.1%})")
-    
+
     # Fix inconsistent repos
     inconsistent = [s["repo"] for s in statuses if s["status"] == "inconsistent"]
-    
+
     if inconsistent:
         print(f"\nFound {len(inconsistent)} inconsistent repositories")
         response = input("Fix automatically? (yes/no): ")
-        
+
         if response.lower() == "yes":
             for repo in inconsistent:
                 fix_inconsistent_repo(repo)
-            
+
             print("\n✅ All repositories fixed")
         else:
             print("\n⚠️  Manual intervention required")
@@ -1916,3 +1917,4 @@ This rollback procedures guide provides:
 1. **Documentation**: Incident reports and lessons learned templates
 
 Use this guide to ensure safe and effective rollback when v2 issues arise. Always document incidents and update procedures based on learnings.
+````

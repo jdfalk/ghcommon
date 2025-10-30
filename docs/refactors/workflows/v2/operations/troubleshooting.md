@@ -9,6 +9,7 @@
 This guide provides solutions to common issues encountered with the v2 branch-aware workflow system.
 
 **Quick Debug Commands**:
+
 ```bash
 # Check workflow status
 gh run list --limit 10
@@ -43,11 +44,13 @@ When encountering issues, run through this checklist:
 #### Feature flag not being detected
 
 **Symptoms**:
+
 - Workflow runs but uses v1 behavior
 - Feature flag check step shows "disabled"
 - Expected v2 features not activating
 
 **Diagnosis**:
+
 ```bash
 # Verify file exists and is valid YAML
 ls -la .github/workflow-feature-flags.yml
@@ -61,6 +64,7 @@ grep -A 5 "enabled_branches:" .github/workflow-feature-flags.yml
 **Solutions**:
 
 1. **File doesn't exist**:
+
 ```bash
 # Create feature flags file
 cat > .github/workflow-feature-flags.yml << 'EOF'
@@ -78,6 +82,7 @@ git push
 ```
 
 1. **Branch not in enabled list**:
+
 ```bash
 # Add branch to enabled_branches
 vim .github/workflow-feature-flags.yml
@@ -87,6 +92,7 @@ git push
 ```
 
 1. **YAML syntax error**:
+
 ```bash
 # Validate YAML
 python -c "import yaml; yaml.safe_load(open('.github/workflow-feature-flags.yml'))"
@@ -99,10 +105,12 @@ git push
 #### Feature flag check fails with Python error
 
 **Symptoms**:
+
 - Error: "ModuleNotFoundError: No module named 'yaml'"
 - Feature flag check step fails immediately
 
 **Solutions**:
+
 ```yaml
 # Add Python setup to workflow
 - name: Set up Python
@@ -125,11 +133,13 @@ git push
 #### Matrix generation produces empty matrix
 
 **Symptoms**:
+
 - Job skipped due to empty matrix
 - No test configurations generated
 - Error: "matrix must define at least one vector"
 
 **Diagnosis**:
+
 ```bash
 # Test matrix generation locally
 python .github/workflows/scripts/ci_workflow.py generate-matrix \
@@ -144,18 +154,20 @@ grep -A 20 "$(git branch --show-current):" .github/workflow-versions.yml
 **Solutions**:
 
 1. **Branch not in version policy**:
+
 ```yaml
 # Add branch to workflow-versions.yml
 version_policies:
   your-branch-name:
-    created: "2025-10-14"
-    description: "Your branch description"
+    created: '2025-10-14'
+    description: 'Your branch description'
     go:
-      versions: ["1.25"]
-      default: "1.25"
+      versions: ['1.25']
+      default: '1.25'
 ```
 
 1. **Language not configured**:
+
 ```bash
 # Check available languages in version policy
 python .github/workflows/scripts/ci_workflow.py generate-matrix \
@@ -167,6 +179,7 @@ python .github/workflows/scripts/ci_workflow.py generate-matrix \
 ```
 
 1. **Script error**:
+
 ```bash
 # Enable debug logging
 export DEBUG=1
@@ -182,11 +195,13 @@ grep -A 10 "Traceback" matrix-debug.log
 #### Matrix includes wrong versions
 
 **Symptoms**:
+
 - Old language versions in matrix
 - Versions don't match branch policy
 - Wrong default version selected
 
 **Diagnosis**:
+
 ```bash
 # Verify version policy for current branch
 BRANCH=$(git branch --show-current)
@@ -201,16 +216,18 @@ python .github/workflows/scripts/ci_workflow.py generate-matrix \
 **Solutions**:
 
 1. **Update version policy**:
+
 ```yaml
 # Edit .github/workflow-versions.yml
 version_policies:
   main:
     go:
-      versions: ["1.25"]  # Update to correct version
-      default: "1.25"
+      versions: ['1.25'] # Update to correct version
+      default: '1.25'
 ```
 
 1. **Clear cache and regenerate**:
+
 ```bash
 # In workflow, add cache-busting
 - name: Generate matrix
@@ -226,11 +243,13 @@ version_policies:
 #### Change detection not finding changed files
 
 **Symptoms**:
+
 - Jobs skip even when files changed
 - `has_code_changes: false` when it should be true
 - All change outputs are empty arrays
 
 **Diagnosis**:
+
 ```bash
 # Check git fetch depth
 git log --oneline | wc -l  # Should be > 1
@@ -248,15 +267,17 @@ git diff --name-only origin/main...HEAD
 **Solutions**:
 
 1. **Shallow clone issue**:
+
 ```yaml
 # Ensure proper fetch depth
 - name: Checkout with history
   uses: actions/checkout@v4
   with:
-    fetch-depth: 0  # Must be 0 for full history
+    fetch-depth: 0 # Must be 0 for full history
 ```
 
 1. **Wrong base/head references**:
+
 ```yaml
 # For pull requests
 - name: Detect changes
@@ -274,6 +295,7 @@ git diff --name-only origin/main...HEAD
 ```
 
 1. **File patterns not matching**:
+
 ```python
 # Check change patterns in ci_workflow.py
 # Update patterns to match your repository structure
@@ -287,6 +309,7 @@ CHANGE_PATTERNS = {
 #### Change detection is too broad
 
 **Symptoms**:
+
 - All jobs run on every commit
 - Documentation changes trigger code tests
 - Takes too long to run CI
@@ -294,6 +317,7 @@ CHANGE_PATTERNS = {
 **Solutions**:
 
 1. **Add path filters**:
+
 ```yaml
 # In workflow file
 on:
@@ -306,6 +330,7 @@ on:
 ```
 
 1. **Refine change patterns**:
+
 ```python
 # In ci_workflow.py, make patterns more specific
 CHANGE_PATTERNS = {
@@ -320,6 +345,7 @@ CHANGE_PATTERNS = {
 ```
 
 1. **Add conditional job execution**:
+
 ```yaml
 jobs:
   test-go:
@@ -332,11 +358,13 @@ jobs:
 #### Release workflow not triggered
 
 **Symptoms**:
+
 - Tag pushed but no release created
 - Workflow doesn't run on tag push
 - Release job skipped
 
 **Diagnosis**:
+
 ```bash
 # Check if tag exists
 git tag -l
@@ -351,16 +379,18 @@ git tag -l "v*"
 **Solutions**:
 
 1. **Tag format doesn't match**:
+
 ```yaml
 # Workflow expects specific tag format
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'  # Matches v1.2.3
-      - 'v[0-9]+.[0-9]+.[0-9]+-*'  # Matches v1.2.3-go-1.24
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Matches v1.2.3
+      - 'v[0-9]+.[0-9]+.[0-9]+-*' # Matches v1.2.3-go-1.24
 ```
 
 1. **Recreate tag**:
+
 ```bash
 # Delete and recreate tag
 git tag -d v1.0.0
@@ -372,6 +402,7 @@ git push origin v1.0.0
 ```
 
 1. **Workflow not enabled**:
+
 ```bash
 # Check workflow is active
 gh api repos/{owner}/{repo}/actions/workflows/release.yml \
@@ -384,11 +415,13 @@ gh workflow enable release.yml
 #### Version mismatch in release
 
 **Symptoms**:
+
 - Tag version doesn't match artifact version
 - Release notes show wrong version
 - Multiple versions in same release
 
 **Diagnosis**:
+
 ```bash
 # Check tag version
 git describe --tags
@@ -405,6 +438,7 @@ python .github/workflows/scripts/release_workflow.py get-target-version \
 **Solutions**:
 
 1. **Update version in code**:
+
 ```bash
 # For Go modules
 go mod edit -module=github.com/owner/repo/v2
@@ -417,6 +451,7 @@ sed -i 's/version = ".*"/version = "1.0.0"/' pyproject.toml
 ```
 
 1. **Use automated version bumping**:
+
 ```yaml
 # Add version update step before release
 - name: Update version
@@ -428,11 +463,13 @@ sed -i 's/version = ".*"/version = "1.0.0"/' pyproject.toml
 #### Cross-compilation fails
 
 **Symptoms**:
+
 - Build fails for specific platforms
 - Linker errors on aarch64 or musl targets
 - CGO errors on cross-compilation
 
 **Diagnosis**:
+
 ```bash
 # Test cross-compilation locally (Go)
 GOOS=linux GOARCH=arm64 go build
@@ -447,6 +484,7 @@ grep -r "import \"C\"" .
 **Solutions**:
 
 1. **Go cross-compilation with CGO**:
+
 ```yaml
 # Disable CGO for static binaries
 - name: Build
@@ -457,6 +495,7 @@ grep -r "import \"C\"" .
 ```
 
 1. **Rust cross-compilation setup**:
+
 ```toml
 # Add to .cargo/config.toml
 [target.aarch64-unknown-linux-gnu]
@@ -477,6 +516,7 @@ linker = "x86_64-linux-musl-gcc"
 ```
 
 1. **Use cross-compilation containers**:
+
 ```yaml
 # Use cross-compilation action
 - name: Build with cross
@@ -490,11 +530,13 @@ linker = "x86_64-linux-musl-gcc"
 #### Cache miss on every run
 
 **Symptoms**:
+
 - Cache restore always fails
 - "Cache not found" message every time
 - Build times don't improve
 
 **Diagnosis**:
+
 ```bash
 # Check cache key generation
 python .github/workflows/scripts/automation_workflow.py generate-cache-key \
@@ -509,6 +551,7 @@ gh api repos/{owner}/{repo}/actions/caches --jq '.actions_caches[].key'
 **Solutions**:
 
 1. **Fix cache key**:
+
 ```yaml
 # Use correct cache key with file hashes
 - name: Cache dependencies
@@ -523,6 +566,7 @@ gh api repos/{owner}/{repo}/actions/caches --jq '.actions_caches[].key'
 ```
 
 1. **Add restore keys**:
+
 ```yaml
 # Add fallback restore keys
 restore-keys: |
@@ -531,6 +575,7 @@ restore-keys: |
 ```
 
 1. **Check file exists for hash**:
+
 ```bash
 # Verify hash files exist
 test -f go.sum || echo "go.sum not found!"
@@ -540,6 +585,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 #### Cache size too large
 
 **Symptoms**:
+
 - Warning: "Cache size exceeds limit"
 - Cache save fails
 - Error: "Cache size of XXX MB exceeds the 10GB limit"
@@ -547,6 +593,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 **Solutions**:
 
 1. **Exclude large directories**:
+
 ```yaml
 - name: Cache dependencies
   uses: actions/cache@v4
@@ -558,6 +605,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 ```
 
 1. **Clean before caching**:
+
 ```bash
 # Add cleanup step
 - name: Clean cache
@@ -568,6 +616,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 ```
 
 1. **Use multiple smaller caches**:
+
 ```yaml
 # Split into multiple caches
 - name: Cache Go modules
@@ -588,6 +637,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 #### Import error for helper modules
 
 **Symptoms**:
+
 - Error: "ModuleNotFoundError: No module named 'workflow_common'"
 - Helper script import fails
 - Python can't find modules
@@ -595,6 +645,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 **Solutions**:
 
 1. **Fix Python path**:
+
 ```yaml
 - name: Run helper script
   run: |
@@ -603,6 +654,7 @@ test -f Cargo.lock || echo "Cargo.lock not found!"
 ```
 
 1. **Use absolute imports**:
+
 ```python
 # In helper scripts, add path manipulation
 import sys
@@ -613,6 +665,7 @@ import workflow_common
 ```
 
 1. **Install as package**:
+
 ```bash
 # Create setup.py for helper scripts
 pip install -e .github/workflows/scripts/
@@ -621,6 +674,7 @@ pip install -e .github/workflows/scripts/
 #### Helper script fails with cryptic error
 
 **Symptoms**:
+
 - Script exits with error code 1
 - No clear error message
 - Traceback is unhelpful
@@ -628,6 +682,7 @@ pip install -e .github/workflows/scripts/
 **Solutions**:
 
 1. **Enable debug mode**:
+
 ```bash
 # Run with debug flag
 python .github/workflows/scripts/ci_workflow.py \
@@ -637,6 +692,7 @@ python .github/workflows/scripts/ci_workflow.py \
 ```
 
 1. **Add error handling**:
+
 ```python
 # In helper scripts, wrap in try-except
 try:
@@ -647,6 +703,7 @@ except Exception as e:
 ```
 
 1. **Check dependencies**:
+
 ```bash
 # Verify all dependencies installed
 pip install -r .github/workflows/scripts/requirements.txt
@@ -660,6 +717,7 @@ python --version  # Should be 3.13 or 3.14
 #### Workflow fails with permissions error
 
 **Symptoms**:
+
 - Error: "Resource not accessible by integration"
 - Permission denied errors
 - Can't create release, push tag, etc.
@@ -667,16 +725,18 @@ python --version  # Should be 3.13 or 3.14
 **Solutions**:
 
 1. **Add workflow permissions**:
+
 ```yaml
 # At workflow or job level
 permissions:
-  contents: write  # For releases, tags
-  pull-requests: write  # For PR comments
-  issues: write  # For issue comments
-  packages: write  # For GitHub Packages
+  contents: write # For releases, tags
+  pull-requests: write # For PR comments
+  issues: write # For issue comments
+  packages: write # For GitHub Packages
 ```
 
 1. **Use PAT instead of GITHUB_TOKEN**:
+
 ```yaml
 # For operations requiring elevated permissions
 - name: Create release
@@ -687,6 +747,7 @@ permissions:
 ```
 
 1. **Check repository settings**:
+
 ```bash
 # Verify workflow permissions in repo settings
 # Settings → Actions → General → Workflow permissions
@@ -696,6 +757,7 @@ permissions:
 #### Workflow timeout
 
 **Symptoms**:
+
 - Job canceled after 6 hours
 - "The job was canceled because it exceeded the maximum execution time"
 - Long-running builds
@@ -703,13 +765,15 @@ permissions:
 **Solutions**:
 
 1. **Increase timeout**:
+
 ```yaml
 jobs:
   build:
-    timeout-minutes: 120  # Default is 360 (6 hours)
+    timeout-minutes: 120 # Default is 360 (6 hours)
 ```
 
 1. **Optimize build**:
+
 ```yaml
 # Use caching
 - name: Cache dependencies
@@ -722,11 +786,12 @@ strategy:
 ```
 
 1. **Split into multiple jobs**:
+
 ```yaml
 jobs:
   build-linux:
     # Fast build
-  
+
   build-macos:
     # Slow build, separate job
 ```
@@ -734,6 +799,7 @@ jobs:
 #### Rate limit exceeded
 
 **Symptoms**:
+
 - Error: "API rate limit exceeded"
 - GitHub API calls fail
 - 403 Forbidden responses
@@ -741,6 +807,7 @@ jobs:
 **Solutions**:
 
 1. **Use GitHub App token** (higher rate limit):
+
 ```yaml
 - name: Generate token
   uses: actions/create-github-app-token@v1
@@ -750,6 +817,7 @@ jobs:
 ```
 
 1. **Add delays between API calls**:
+
 ```python
 import time
 
@@ -759,6 +827,7 @@ for repo in repositories:
 ```
 
 1. **Use pagination**:
+
 ```python
 # Instead of fetching all at once
 response = requests.get(
@@ -840,22 +909,26 @@ When reporting issues, include:
    - Runner OS
    - Language versions
    - Branch name
-4. **Steps to reproduce**
-5. **Expected vs actual behavior**
-6. **Workflow run URL**
+1. **Steps to reproduce**
+1. **Expected vs actual behavior**
+1. **Workflow run URL**
 
 Example bug report:
 
 ```markdown
 ### Description
+
 Matrix generation fails on stable-1-go-1.24 branch
 
 ### Workflow File
+
 [Attach workflow file]
 
 ### Error Message
 ```
+
 Error: matrix must define at least one vector
+
 ```
 
 ### Environment
@@ -905,7 +978,7 @@ For critical production issues:
 1. **Disable affected workflows**
 1. **Document the issue**
 1. **Create incident report**
-4. **Follow rollback procedures** (see [Rollback Guide](rollback-procedures.md))
+1. **Follow rollback procedures** (see [Rollback Guide](rollback-procedures.md))
 
 ## Prevention
 
@@ -914,11 +987,11 @@ For critical production issues:
 1. **Test in pilot repository first**
 1. **Enable debug logging during migration**
 1. **Monitor metrics closely**
-4. **Have rollback plan ready**
-5. **Keep backups of working configurations**
-6. **Document custom changes**
-7. **Review logs regularly**
-8. **Update helper scripts incrementally**
+1. **Have rollback plan ready**
+1. **Keep backups of working configurations**
+1. **Document custom changes**
+1. **Review logs regularly**
+1. **Update helper scripts incrementally**
 
 ### Pre-deployment Checklist
 
@@ -936,8 +1009,8 @@ For critical production issues:
 1. **Review** common issues relevant to your setup
 1. **Test** solutions in development environment
 1. **Document** any new issues discovered
-4. **Share** solutions with team
-5. **Update** this guide with new findings
+1. **Share** solutions with team
+1. **Update** this guide with new findings
 
 ## References
 
