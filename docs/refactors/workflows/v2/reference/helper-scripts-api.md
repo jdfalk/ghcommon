@@ -19,7 +19,6 @@ The helper scripts are organized into 6 main modules:
 5. **maintenance_workflow.py**: Dependency updates, security scanning, stale detection
 6. **automation_workflow.py**: GitHub Apps, caching, metrics, self-healing
 
-
 ## docs_workflow.py
 
 ### generate_api_docs(source_dirs, output_dir)
@@ -32,12 +31,13 @@ Parses GitHub Actions workflow YAML definitions and writes a catalog in Markdown
 
 ### build_documentation(source_dirs, workflows_dir, output_root, version=None)
 
-Builds a versioned documentation tree with API docs, workflow reference, search index, and versions manifest.
+Builds a versioned documentation tree with API docs, workflow reference, search index, and versions
+manifest.
 
 ### CLI entrypoints
 
-The script exposes `generate-api`, `generate-workflows`, and `build` subcommands for integration with GitHub workflows.
-
+The script exposes `generate-api`, `generate-workflows`, and `build` subcommands for integration
+with GitHub workflows.
 
 ## maintenance_workflow.py
 
@@ -51,7 +51,8 @@ Formats dependency updates into Markdown and appends them to the step summary.
 
 ### parse_stale_items(data, days)
 
-Filters issue/PR data for items exceeding the stale threshold and returns structured `StaleItem` records.
+Filters issue/PR data for items exceeding the stale threshold and returns structured `StaleItem`
+records.
 
 ### CLI commands
 
@@ -1890,7 +1891,8 @@ def old_function():
 
 ### 6.5 CLI Enhancements (2025-10)
 
-Recent updates to `automation_workflow.py` added quality-of-life improvements for reusable workflows:
+Recent updates to `automation_workflow.py` added quality-of-life improvements for reusable
+workflows:
 
 - `cache-key` now accepts `--paths` to emit cache directories and `--include-branch` to append the
   current branch name to cache keys. When executed inside GitHub Actions the command writes

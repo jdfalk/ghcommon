@@ -7,13 +7,11 @@
 
 from __future__ import annotations
 
-import textwrap
 from pathlib import Path
-from typing import Iterable
-
-import pytest
+import textwrap
 
 import docs_workflow
+import pytest
 
 
 def _write_file(path: Path, content: str) -> None:
@@ -78,7 +76,9 @@ def test_generate_workflow_docs(tmp_path: Path) -> None:
     assert "runs-on `ubuntu-latest`" in content
 
 
-def test_build_documentation_creates_versioned_site(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_build_documentation_creates_versioned_site(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """build_documentation assembles API docs, workflow docs, and search index."""
     monkeypatch.setenv("DOC_VERSION", "v1")
     source_dir = tmp_path / "scripts"

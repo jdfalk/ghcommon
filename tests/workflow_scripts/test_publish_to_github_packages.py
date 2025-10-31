@@ -116,7 +116,7 @@ def test_main_skips_when_registry_disabled(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """main exits early when GitHub registry disabled."""
+    """Main exits early when GitHub registry disabled."""
     monkeypatch.setenv(
         "REPOSITORY_CONFIG",
         json.dumps({"packages": {"registries": {"github": False}}}),

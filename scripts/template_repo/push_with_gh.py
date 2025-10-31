@@ -75,7 +75,8 @@ def main(argv: list[str]) -> int:
         # Returns exit code 0 when inside any git work tree
         res = subprocess.run(
             ["git", "rev-parse", "--is-inside-work-tree"],
-            check=False, cwd=str(target),
+            check=False,
+            cwd=str(target),
             capture_output=True,
         )
         inside = res.returncode == 0 and res.stdout.decode().strip() == "true"

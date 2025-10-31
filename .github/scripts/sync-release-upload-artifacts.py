@@ -41,7 +41,9 @@ def upload_artifacts(release_id, artifacts_dir):
             os.environ.get("GITHUB_REPOSITORY", ""),
         ]
 
-        result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, check=False, capture_output=True, text=True
+        )
         if result.returncode == 0:
             print(f"  ✓ Uploaded {artifact.name}")
         else:

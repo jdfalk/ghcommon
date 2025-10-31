@@ -17,7 +17,12 @@ def run_command(cmd, cwd=None):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, check=False, shell=True, cwd=cwd, capture_output=True, text=True
+            cmd,
+            check=False,
+            shell=True,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
         )
         if result.returncode != 0:
             print(f"Error running command: {cmd}")
@@ -44,7 +49,8 @@ def commit_repo_changes(repo_path, repo_name):
 
     status_result = subprocess.run(
         "git status --porcelain",
-        check=False, shell=True,
+        check=False,
+        shell=True,
         cwd=repo_path,
         capture_output=True,
         text=True,

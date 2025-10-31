@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
-"""Commit and push synchronized changes.
-"""
+"""Commit and push synchronized changes."""
 
 from datetime import datetime
 import subprocess
@@ -17,7 +16,12 @@ def run_command(cmd, description):
 
     try:
         result = subprocess.run(
-            cmd, check=False, shell=True, capture_output=True, text=True, timeout=60
+            cmd,
+            check=False,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=60,
         )
 
         if result.returncode == 0:
@@ -40,7 +44,11 @@ def run_command(cmd, description):
 def check_for_changes():
     """Check if there are any changes to commit."""
     result = subprocess.run(
-        "git status --porcelain", check=False, shell=True, capture_output=True, text=True
+        "git status --porcelain",
+        check=False,
+        shell=True,
+        capture_output=True,
+        text=True,
     )
 
     return bool(result.stdout.strip())

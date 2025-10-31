@@ -787,13 +787,15 @@ git push origin main
 
 ## Phase 5: Advanced Automation Rollout
 
-With v2 core workflows stable, enable the advanced features delivered in Phase 5 across repositories.
+With v2 core workflows stable, enable the advanced features delivered in Phase 5 across
+repositories.
 
 ### Step 5.1: Adopt cache-plan powered reusable caching
 
 1. Copy `.github/workflows/reusable-advanced-cache.yml` into the target repository.
-2. Ensure the repository includes `.github/workflows/scripts/automation_workflow.py` v1.2.0 or newer.
-3. Replace ad-hoc `actions/cache` invocations with: 
+2. Ensure the repository includes `.github/workflows/scripts/automation_workflow.py` v1.2.0 or
+   newer.
+3. Replace ad-hoc `actions/cache` invocations with:
    ```yaml
    uses: ./.github/workflows/reusable-advanced-cache.yml
    with:
@@ -801,7 +803,7 @@ With v2 core workflows stable, enable the advanced features delivered in Phase 5
      cache-prefix: go-build
      include-branch: true
    ```
-4. For ecosystems beyond the built-in profiles, extend the workflow call with `cache-plan` extras: 
+4. For ecosystems beyond the built-in profiles, extend the workflow call with `cache-plan` extras:
    ```yaml
    with:
      language: python
@@ -810,24 +812,29 @@ With v2 core workflows stable, enable the advanced features delivered in Phase 5
      extra-file: poetry.lock
      extra-path: ~/.cache/pip-tools
    ```
-5. Verify caching locally: `python .github/workflows/scripts/automation_workflow.py cache-plan --language go`.
+5. Verify caching locally:
+   `python .github/workflows/scripts/automation_workflow.py cache-plan --language go`.
 
 ### Step 5.2: Enable workflow analytics reporting
 
 1. Copy `.github/workflows/workflow-analytics.yml` to the repository.
-2. Confirm the repository grants the workflow `actions:read` and `contents:read` permissions (defaults).
-3. Schedule the workflow (Monday 03:00 UTC by default) or trigger manually via `gh workflow run workflow-analytics.yml -f lookback-days=14`.
+2. Confirm the repository grants the workflow `actions:read` and `contents:read` permissions
+   (defaults).
+3. Schedule the workflow (Monday 03:00 UTC by default) or trigger manually via
+   `gh workflow run workflow-analytics.yml -f lookback-days=14`.
 4. Review the generated `workflow-analytics.md` summary and artifacts for accuracy.
 5. Optional: integrate the artifact into dashboards or Slack by extending the summary step.
 
 ### Step 5.3: Update documentation and training
 
-- Reference `docs/refactors/workflows/v2/github-apps-setup.md` for GitHub App provisioning and token management.
-- Share the updated helper API (`automation_workflow.cache-plan`, lookback filtering) with maintainers.
+- Reference `docs/refactors/workflows/v2/github-apps-setup.md` for GitHub App provisioning and token
+  management.
+- Share the updated helper API (`automation_workflow.cache-plan`, lookback filtering) with
+  maintainers.
 - Record caching/analytics adoption in each repository's migration tracker.
 
-Once Steps 5.1–5.3 are complete across repositories, mark Phase 5 finished in the rollout plan and proceed to continuous monitoring.
-
+Once Steps 5.1–5.3 are complete across repositories, mark Phase 5 finished in the rollout plan and
+proceed to continuous monitoring.
 
 ## Post-Migration Tasks
 
@@ -857,7 +864,8 @@ jobs:
     uses: ./.github/workflows/workflow-analytics.yml
 ```
 
-Review the generated `workflow-analytics.md` artifact each week and feed findings into reliability tracking.
+Review the generated `workflow-analytics.md` artifact each week and feed findings into reliability
+tracking.
 
 ### Team Training
 

@@ -4,13 +4,12 @@
 
 # GitHub Packages Setup
 
-This guide explains how to configure GitHub Packages publishing for multi-version
-support with branch-specific tags.
+This guide explains how to configure GitHub Packages publishing for multi-version support with
+branch-specific tags.
 
 ## Overview
 
-The v2 workflow system publishes packages to GitHub Packages with
-branch-aware tagging:
+The v2 workflow system publishes packages to GitHub Packages with branch-aware tagging:
 
 - **Main branch**: Packages tagged as `latest` and semantic version
 - **Stable branches**: Packages tagged with language-specific versions
@@ -134,11 +133,9 @@ package-name = "1.2.3+rust-stable"
 
 ### Secrets Configuration
 
-No additional secrets required for GitHub Packages. The workflow uses
-`GITHUB_TOKEN` automatically.
+No additional secrets required for GitHub Packages. The workflow uses `GITHUB_TOKEN` automatically.
 
-For publishing to external registries (PyPI, npm, crates.io), add these
-secrets:
+For publishing to external registries (PyPI, npm, crates.io), add these secrets:
 
 - `PYPI_TOKEN` - PyPI API token
 - `NPM_TOKEN` - npm access token
@@ -156,8 +153,8 @@ workflows:
 packages:
   registries:
     github: true
-    pypi: false  # Enable when ready
-    npm: false   # Enable when ready
+    pypi: false # Enable when ready
+    npm: false # Enable when ready
     cargo: false # Enable when ready
 ```
 
@@ -180,6 +177,7 @@ gh workflow run release.yml \
 **Problem**: Package not appearing in GitHub Packages
 
 **Solution**:
+
 1. Check workflow permissions (read/write required)
 2. Verify package is linked to repository
 3. Check workflow logs for publishing errors
@@ -189,6 +187,7 @@ gh workflow run release.yml \
 **Problem**: Version already exists error
 
 **Solution**:
+
 1. Increment version number
 2. For testing, use prerelease versions (e.g., 1.2.3-rc1)
 3. Delete old test packages from GitHub Packages UI
@@ -198,6 +197,7 @@ gh workflow run release.yml \
 **Problem**: Git tag already exists error
 
 **Solution**:
+
 1. Delete the tag: `git tag -d v1.2.3 && git push origin :refs/tags/v1.2.3`
 2. Increment version number
 3. Use semantic versioning correctly (patch/minor/major)

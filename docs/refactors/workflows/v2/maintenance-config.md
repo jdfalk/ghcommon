@@ -28,7 +28,7 @@ Automatically inspects supported ecosystems (Go, Rust, Python, Node.js) and prop
 ```yaml
 maintenance:
   dependencies:
-    schedule: "0 0 * * 1"  # weekly Monday 00:00 UTC
+    schedule: '0 0 * * 1' # weekly Monday 00:00 UTC
     auto_merge_patch: false
     auto_merge_minor: false
     exemptions:
@@ -51,7 +51,7 @@ Labels inactive issues / PRs and closes them after a grace period.
 ```yaml
 maintenance:
   stale:
-    schedule: "0 0 * * *"  # daily 00:00 UTC
+    schedule: '0 0 * * *' # daily 00:00 UTC
     days_until_stale: 90
     days_until_close: 30
     exempt_labels:
@@ -73,7 +73,7 @@ Surfaces Dependabot and advisory data and can raise alerts.
 ```yaml
 maintenance:
   security:
-    schedule: "0 */6 * * *"  # every 6 hours
+    schedule: '0 */6 * * *' # every 6 hours
     auto_fix_patch: false
     severity_threshold: medium
     alert_slack: true
@@ -125,7 +125,7 @@ maintenance:
     exemptions:
       - package: legacy-library
         reason: Version pinned for compatibility
-        until: "2025-12-31"
+        until: '2025-12-31'
 ```
 
 ### Stale Exemptions
@@ -149,8 +149,8 @@ maintenance:
       enabled: true
       webhook_secret: SLACK_WEBHOOK_URL
       channels:
-        security: "#security-alerts"
-        dependencies: "#dependency-updates"
+        security: '#security-alerts'
+        dependencies: '#dependency-updates'
     email:
       enabled: true
       recipients:
@@ -174,4 +174,3 @@ maintenance:
 2. Review weekly reports to confirm automation health.
 3. Track exemptions with context and set expiry dates.
 4. Revisit configuration quarterly to align with policy changes.
-

@@ -385,8 +385,7 @@ def get_github_token() -> Optional[str]:
 
 
 def main():
-    """Main entry point for the script.
-    """
+    """Main entry point for the script."""
     parser = argparse.ArgumentParser(
         description="Mark old GitHub notifications as done (completely dismissed)",
         formatter_class=argparse.RawDescriptionHelpFormatter,

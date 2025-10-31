@@ -12,8 +12,9 @@ documented with its purpose, inputs, outputs, secrets, triggers, and usage examp
 Workflows are organized into categories:
 
 1. **Core Workflows**: Main CI/CD workflows (ci.yml, release.yml)
-2. **Reusable Workflows**: Shared workflow components (reusable-*.yml, reusable-advanced-cache.yml)
-3. **Scheduled Workflows**: Automated maintenance and analytics (maintenance.yml, workflow-analytics.yml)
+2. **Reusable Workflows**: Shared workflow components (reusable-\*.yml, reusable-advanced-cache.yml)
+3. **Scheduled Workflows**: Automated maintenance and analytics (maintenance.yml,
+   workflow-analytics.yml)
 4. **Manual Workflows**: On-demand operations (manual-release.yml)
 
 ### Workflow Naming Convention
@@ -632,18 +633,18 @@ on:
 
 **Inputs**:
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| language | string | Yes | - | Language ecosystem (go/rust/python/node) used to derive cache metadata |
-| cache-prefix | string | Yes | - | Base prefix for cache keys (e.g., go-build) |
-| include-branch | boolean | No | false | Append sanitized branch name for branch-scoped caches |
+| Name           | Type    | Required | Default | Description                                                            |
+| -------------- | ------- | -------- | ------- | ---------------------------------------------------------------------- |
+| language       | string  | Yes      | -       | Language ecosystem (go/rust/python/node) used to derive cache metadata |
+| cache-prefix   | string  | Yes      | -       | Base prefix for cache keys (e.g., go-build)                            |
+| include-branch | boolean | No       | false   | Append sanitized branch name for branch-scoped caches                  |
 
 **Outputs**:
 
-| Name | Type | Description |
-| --- | --- | --- |
-| cache-key | string | Fully qualified cache key produced by `automation_workflow.py` |
-| cache-hit | boolean | Indicates whether `actions/cache` restored an entry |
+| Name      | Type    | Description                                                    |
+| --------- | ------- | -------------------------------------------------------------- |
+| cache-key | string  | Fully qualified cache key produced by `automation_workflow.py` |
+| cache-hit | boolean | Indicates whether `actions/cache` restored an entry            |
 
 **Secrets**: _None_
 
@@ -661,9 +662,12 @@ jobs:
 
 **Implementation Notes**:
 
-- Uses `automation_workflow.py cache-plan` to emit language-specific files and directories to GitHub outputs.
-- Uses `automation_workflow.py cache-key` to emit cache metadata (key, restore keys, paths) with optional branch segmentation.
-- Supports Go, Rust, Python, and Node heuristics out of the box; extend `cache-plan` for additional ecosystems.
+- Uses `automation_workflow.py cache-plan` to emit language-specific files and directories to GitHub
+  outputs.
+- Uses `automation_workflow.py cache-key` to emit cache metadata (key, restore keys, paths) with
+  optional branch segmentation.
+- Supports Go, Rust, Python, and Node heuristics out of the box; extend `cache-plan` for additional
+  ecosystems.
 - Branch names are normalized to lower-case kebab form to avoid cache key collisions.
 
 ---
@@ -802,20 +806,21 @@ on:
 
 **Inputs** (manual trigger):
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| lookback-days | string | No | '30' | Rolling window (days) for metrics collection |
+| Name          | Type   | Required | Default | Description                                  |
+| ------------- | ------ | -------- | ------- | -------------------------------------------- |
+| lookback-days | string | No       | '30'    | Rolling window (days) for metrics collection |
 
 **Artifacts & Outputs**:
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name               | Type     | Description                                                  |
+| ------------------ | -------- | ------------------------------------------------------------ |
 | workflow-analytics | artifact | Contains `analytics-report.json` and `workflow-analytics.md` |
-| step summary | markdown | Inline summary appended to `$GITHUB_STEP_SUMMARY` |
+| step summary       | markdown | Inline summary appended to `$GITHUB_STEP_SUMMARY`            |
 
 **Jobs**:
 
-1. **collect**: Calls `automation_workflow.py collect-metrics` against the current repository with optional lookback filtering.
+1. **collect**: Calls `automation_workflow.py collect-metrics` against the current repository with
+   optional lookback filtering.
 2. **summarize**: Generates Markdown tables highlighting top workflows and recommended actions.
 3. **publish**: Uploads artifacts and updates the workflow run summary for quick visibility.
 
@@ -833,7 +838,8 @@ workflow_dispatch:
 
 **Integration Tips**:
 
-- Grant the workflow access to `GITHUB_TOKEN` with `actions:read` and `contents:read` permissions (default).
+- Grant the workflow access to `GITHUB_TOKEN` with `actions:read` and `contents:read` permissions
+  (default).
 - Combine with dashboards or external tooling by parsing `analytics-report.json`.
 - Extend the summary step to push data into Slack or other reporting endpoints as needed.
 

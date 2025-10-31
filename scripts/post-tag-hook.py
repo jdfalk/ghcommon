@@ -41,7 +41,8 @@ try:
         # Run the module tagging script
         result = subprocess.run(
             [sys.executable, str(script_path), version_tag],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 

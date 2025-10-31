@@ -129,7 +129,8 @@ class MassProtobufFixer:
         # Get current buf lint output
         result = subprocess.run(
             ["copilot-agent-util", "buf", "lint"],
-            check=False, cwd=self.repo_root,
+            check=False,
+            cwd=self.repo_root,
             capture_output=True,
             text=True,
         )
@@ -163,7 +164,8 @@ class MassProtobufFixer:
         # Test if fixes worked
         result = subprocess.run(
             ["copilot-agent-util", "buf", "lint"],
-            check=False, cwd=self.repo_root,
+            check=False,
+            cwd=self.repo_root,
             capture_output=True,
             text=True,
         )
@@ -171,9 +173,7 @@ class MassProtobufFixer:
         if result.returncode == 0:
             print("SUCCESS: All buf lint issues fixed!")
             return True
-        print(
-            f"Still have {len(result.stderr.split('\\n'))} issues remaining"
-        )
+        print(f"Still have {len(result.stderr.split('\\n'))} issues remaining")
         return False
 
     def fix_unused_import_line(self, line: str):

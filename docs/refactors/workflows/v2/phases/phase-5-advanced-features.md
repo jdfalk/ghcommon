@@ -866,7 +866,8 @@ python3 .github/workflows/scripts/automation_workflow.py optimize \
 
 ## Task 5.2: Create test_automation_workflow.py Unit Tests
 
-**Status**: Completed **Dependencies**: Task 5.1 (automation_workflow.py) **Estimated Time**: 2 hours **Idempotent**: Yes
+**Status**: Completed **Dependencies**: Task 5.1 (automation_workflow.py) **Estimated Time**: 2
+hours **Idempotent**: Yes
 
 ### Description
 
@@ -874,9 +875,13 @@ Create comprehensive unit tests for automation_workflow.py.
 
 ### Implementation
 
-- Implemented integration-style tests in `tests/workflow_scripts/test_automation_workflow.py` covering GitHub App JWT creation, cache strategy generation, CLI outputs, lookback filtering, and REST-fetch behaviour.
-- Added fixtures that exercise CLI paths (`cache-key`, `collect-metrics`) and verify GitHub output handling for cache metadata.
-- Leveraged property-style assertions to validate fingerprints, restore keys, branch sanitization, and session usage.
+- Implemented integration-style tests in `tests/workflow_scripts/test_automation_workflow.py`
+  covering GitHub App JWT creation, cache strategy generation, CLI outputs, lookback filtering, and
+  REST-fetch behaviour.
+- Added fixtures that exercise CLI paths (`cache-key`, `collect-metrics`) and verify GitHub output
+  handling for cache metadata.
+- Leveraged property-style assertions to validate fingerprints, restore keys, branch sanitization,
+  and session usage.
 
 ### Verification Steps
 
@@ -886,7 +891,8 @@ python3 -m pytest tests/workflow_scripts/test_automation_workflow.py -v
 
 ## Task 5.3: Create GitHub Apps Configuration
 
-**Status**: Completed **Dependencies**: Tasks 5.1-5.2 **Estimated Time**: 2 hours **Idempotent**: Yes
+**Status**: Completed **Dependencies**: Tasks 5.1-5.2 **Estimated Time**: 2 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -894,9 +900,12 @@ Configure GitHub Apps for enhanced API access and automation.
 
 ### Implementation
 
-- Authored `docs/refactors/workflows/v2/github-apps-setup.md` detailing app creation, permissions, installation, secret management, workflow usage, and operational security.
-- Documented integration with `automation_workflow.py github-app-token` and installation token exchange patterns for reusable workflows.
-- Added troubleshooting guidance and maintenance best practices for key rotation and audit monitoring.
+- Authored `docs/refactors/workflows/v2/github-apps-setup.md` detailing app creation, permissions,
+  installation, secret management, workflow usage, and operational security.
+- Documented integration with `automation_workflow.py github-app-token` and installation token
+  exchange patterns for reusable workflows.
+- Added troubleshooting guidance and maintenance best practices for key rotation and audit
+  monitoring.
 
 ### Verification Steps
 
@@ -907,7 +916,8 @@ ls docs/refactors/workflows/v2/github-apps-setup.md
 
 ## Task 5.4: Create Advanced Caching Workflow
 
-**Status**: Completed **Dependencies**: Tasks 5.1-5.3 **Estimated Time**: 2 hours **Idempotent**: Yes
+**Status**: Completed **Dependencies**: Tasks 5.1-5.3 **Estimated Time**: 2 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -915,9 +925,12 @@ Create workflow with intelligent caching strategies.
 
 ### Implementation
 
-- Added `.github/workflows/reusable-advanced-cache.yml` with workflow_call inputs for language, cache prefix, and branch inclusion.
-- Introduced `automation_workflow.py cache-plan` to centralize language-specific cache metadata and emit GitHub outputs used by the workflow.
-- Reused `automation_workflow.py cache-key` with branch-aware segmentation to produce cache keys, restore keys, and paths for downstream steps.
+- Added `.github/workflows/reusable-advanced-cache.yml` with workflow_call inputs for language,
+  cache prefix, and branch inclusion.
+- Introduced `automation_workflow.py cache-plan` to centralize language-specific cache metadata and
+  emit GitHub outputs used by the workflow.
+- Reused `automation_workflow.py cache-key` with branch-aware segmentation to produce cache keys,
+  restore keys, and paths for downstream steps.
 
 ### Verification Steps
 
@@ -928,7 +941,8 @@ actionlint .github/workflows/reusable-advanced-cache.yml
 
 ## Task 5.5: Create Workflow Analytics Dashboard
 
-**Status**: Completed **Dependencies**: Tasks 5.1-5.4 **Estimated Time**: 3 hours **Idempotent**: Yes
+**Status**: Completed **Dependencies**: Tasks 5.1-5.4 **Estimated Time**: 3 hours **Idempotent**:
+Yes
 
 ### Description
 
@@ -936,9 +950,12 @@ Create workflow for collecting and displaying analytics.
 
 ### Implementation
 
-- Added `.github/workflows/workflow-analytics.yml` triggered by schedule and workflow_dispatch inputs for lookback windows.
-- Extended `automation_workflow.py collect-metrics` with lookback filtering and JSON output, then generated Markdown summaries with top workflows and self-healing actions.
-- Published analytics artifacts (`analytics-report.json`, `workflow-analytics.md`) and appended results to the step summary for quick review.
+- Added `.github/workflows/workflow-analytics.yml` triggered by schedule and workflow_dispatch
+  inputs for lookback windows.
+- Extended `automation_workflow.py collect-metrics` with lookback filtering and JSON output, then
+  generated Markdown summaries with top workflows and self-healing actions.
+- Published analytics artifacts (`analytics-report.json`, `workflow-analytics.md`) and appended
+  results to the step summary for quick review.
 
 ### Verification Steps
 
@@ -949,7 +966,6 @@ actionlint .github/workflows/workflow-analytics.yml
 # Manual dry run example
 gh workflow run workflow-analytics.yml -f lookback-days=7
 ```
-
 
 ## Phase 5 Completion Checklist
 

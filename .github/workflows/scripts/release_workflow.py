@@ -11,11 +11,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Any
 
 import requests
-
-from workflow_common import append_summary, append_to_file, config_path, write_output
+from workflow_common import (
+    append_to_file,
+    config_path,
+    write_output,
+)
 
 
 def _normalize_override(value: str | None) -> str:

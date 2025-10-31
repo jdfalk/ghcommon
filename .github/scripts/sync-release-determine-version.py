@@ -114,7 +114,8 @@ def run_semantic_release_dry_run(github_token):
     try:
         result = subprocess.run(
             ["npx", "semantic-release", "--dry-run"],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             env=env,
         )

@@ -8,19 +8,19 @@
 from __future__ import annotations
 
 import argparse
-import json
-import re
-import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import json
 from pathlib import Path
-from typing import Any, Iterable
+import re
+import sys
+from typing import Any
 
 from workflow_common import (
     append_summary_line,
     format_summary_table,
     log_notice,
-    log_warning,
 )
 
 
@@ -166,7 +166,10 @@ def parse_cargo_outdated(path: Path) -> list[DependencyUpdate]:
                 latest_version=latest,
                 update_type=update_type,
                 breaking=update_type == "major",
-                security=bool(item.get("is_direct") and item.get("rustsec_vulnerabilities")),
+                security=bool(
+                    item.get("is_direct")
+                    and item.get("rustsec_vulnerabilities")
+                ),
                 language="rust",
             )
         )
@@ -231,14 +234,19 @@ def summarize_dependency_updates(updates: Iterable[DependencyUpdate]) -> str:
     updates.sort(key=lambda item: (item.language, item.update_type, item.name))
     rows: list[tuple[str, str]] = []
     for update in updates:
-        rows.extend([
-            ("Package", update.name),
-            ("Current → Latest", f"{update.current_version} → {update.latest_version}"),
-            ("Update Type", update.update_type),
-            ("Security Fix", "yes" if update.security else "no"),
-            ("Language", update.language),
-            ("", ""),
-        ])
+        rows.extend(
+            [
+                ("Package", update.name),
+                (
+                    "Current → Latest",
+                    f"{update.current_version} → {update.latest_version}",
+                ),
+                ("Update Type", update.update_type),
+                ("Security Fix", "yes" if update.security else "no"),
+                ("Language", update.language),
+                ("", ""),
+            ]
+        )
     table = format_summary_table(rows)
     append_summary_line(table)
     return table
@@ -251,7 +259,9 @@ def write_dependency_summary(
     updates = list(updates)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if not updates:
-        output_path.write_text("No dependency updates found.\n", encoding="utf-8")
+        output_path.write_text(
+            "No dependency updates found.\n", encoding="utf-8"
+        )
         return
 
     lines = ["# Dependency Updates", ""]
@@ -298,7 +308,10 @@ def summarize_security_issues(issues: Iterable[SecurityIssue]) -> None:
 
     rows: list[tuple[str, str]] = []
     severity_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-    issues.sort(key=lambda issue: severity_order.get(issue.severity.lower(), 0), reverse=True)
+    issues.sort(
+        key=lambda issue: severity_order.get(issue.severity.lower(), 0),
+        reverse=True,
+    )
     for issue in issues:
         rows.extend(
             [
@@ -318,7 +331,9 @@ def summarize_security_issues(issues: Iterable[SecurityIssue]) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def parse_stale_items(data: Iterable[dict[str, Any]], days: int) -> list[StaleItem]:
+def parse_stale_items(
+    data: Iterable[dict[str, Any]], days: int
+) -> list[StaleItem]:
     threshold = timedelta(days=days)
     items: list[StaleItem] = []
     now = datetime.utcnow()
@@ -349,21 +364,35 @@ def parse_stale_items(data: Iterable[dict[str, Any]], days: int) -> list[StaleIt
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Maintenance workflow utilities")
+    parser = argparse.ArgumentParser(
+        description="Maintenance workflow utilities"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    dep_parser = subparsers.add_parser("summarize-dependencies", help="Summarize dependency updates")
-    dep_parser.add_argument("--pip", type=Path, default=Path("maintenance/pip-outdated.json"))
-    dep_parser.add_argument("--npm", type=Path, default=Path("maintenance/npm-outdated.json"))
-    dep_parser.add_argument("--cargo", type=Path, default=Path("maintenance/cargo-outdated.json"))
-    dep_parser.add_argument("--go", type=Path, default=Path("maintenance/go-outdated.json"))
+    dep_parser = subparsers.add_parser(
+        "summarize-dependencies", help="Summarize dependency updates"
+    )
+    dep_parser.add_argument(
+        "--pip", type=Path, default=Path("maintenance/pip-outdated.json")
+    )
+    dep_parser.add_argument(
+        "--npm", type=Path, default=Path("maintenance/npm-outdated.json")
+    )
+    dep_parser.add_argument(
+        "--cargo", type=Path, default=Path("maintenance/cargo-outdated.json")
+    )
+    dep_parser.add_argument(
+        "--go", type=Path, default=Path("maintenance/go-outdated.json")
+    )
     dep_parser.add_argument(
         "--output",
         type=Path,
         default=Path("maintenance/dependency-summary.md"),
     )
 
-    stale_parser = subparsers.add_parser("summarize-stale", help="Summarize stale issues/PRs")
+    stale_parser = subparsers.add_parser(
+        "summarize-stale", help="Summarize stale issues/PRs"
+    )
     stale_parser.add_argument("--input", type=Path, required=True)
     stale_parser.add_argument("--days", type=int, default=60)
 
@@ -380,7 +409,9 @@ def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv or sys.argv[1:])
 
     if args.command == "summarize-dependencies":
-        updates = collect_dependency_updates(args.pip, args.npm, args.cargo, args.go)
+        updates = collect_dependency_updates(
+            args.pip, args.npm, args.cargo, args.go
+        )
         write_dependency_summary(updates, args.output)
         summarize_dependency_updates(updates)
         log_notice(f"Dependency summary written to {args.output}")

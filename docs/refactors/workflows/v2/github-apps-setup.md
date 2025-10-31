@@ -7,8 +7,8 @@
 ## Overview
 
 Phase 5 workflows use a GitHub App for elevated API rate limits, granular permissions, and
-installation-scoped automation. This guide documents how to provision the app, store credentials, and
-operate it securely alongside `automation_workflow.py`.
+installation-scoped automation. This guide documents how to provision the app, store credentials,
+and operate it securely alongside `automation_workflow.py`.
 
 ## Create the GitHub App
 
@@ -61,8 +61,8 @@ When using repository environments, scope the secrets to workflows that require 
 
 ## Using the App in Workflows
 
-`automation_workflow.py` exposes a `github-app-token` command that emits a JWT or can exchange it for
-an installation token.
+`automation_workflow.py` exposes a `github-app-token` command that emits a JWT or can exchange it
+for an installation token.
 
 Example workflow step:
 
@@ -100,18 +100,19 @@ secrets.
 
 ## Troubleshooting
 
-| Symptom | Probable Cause | Resolution |
-| --- | --- | --- |
-| `Failed to obtain installation token` | Incorrect installation ID or missing permissions | Verify installation ID and ensure the app has Actions/Contents access. |
-| `Signature has expired` | JWT lifetime too long or system clock drift | Use `expires-in` between 60-600 seconds and confirm UTC time on runner. |
-| `Resource not accessible by integration` | App lacks required permission | Update app permissions and reinstall to refresh grants. |
-| `Bad credentials` during REST calls | Token expired mid-run | Regenerate token inside long-running jobs before performing API calls. |
+| Symptom                                  | Probable Cause                                   | Resolution                                                              |
+| ---------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `Failed to obtain installation token`    | Incorrect installation ID or missing permissions | Verify installation ID and ensure the app has Actions/Contents access.  |
+| `Signature has expired`                  | JWT lifetime too long or system clock drift      | Use `expires-in` between 60-600 seconds and confirm UTC time on runner. |
+| `Resource not accessible by integration` | App lacks required permission                    | Update app permissions and reinstall to refresh grants.                 |
+| `Bad credentials` during REST calls      | Token expired mid-run                            | Regenerate token inside long-running jobs before performing API calls.  |
 
 ## Maintenance
 
 - Review app installations monthly and remove unused repositories.
 - Rotate the private key at least twice a year or upon incident response.
-- Capture metrics from `automation_workflow.collect_workflow_metrics` to audit API error rates tied to the app.
+- Capture metrics from `automation_workflow.collect_workflow_metrics` to audit API error rates tied
+  to the app.
 
 ## References
 

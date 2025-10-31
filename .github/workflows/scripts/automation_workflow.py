@@ -15,19 +15,18 @@ helpers can compose the pieces they need without relying on shell scripts.
 from __future__ import annotations
 
 import argparse
+from collections import defaultdict
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
-from collections import defaultdict
-from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Final
 
 import jwt
 import requests
-
 import workflow_common
 
 DEFAULT_CACHE_RESTORE_SLICES: Final[tuple[int, ...]] = (32, 24, 16)
@@ -101,7 +100,7 @@ class WorkflowRun:
     cache_hit: bool | None = None
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "WorkflowRun":
+    def from_dict(cls, data: Mapping[str, Any]) -> WorkflowRun:
         """Normalise raw workflow run data."""
         workflow = str(
             data.get("name")
@@ -117,7 +116,9 @@ class WorkflowRun:
         completed_at = _parse_datetime(
             data.get("updated_at") or data.get("completed_at")
         )
-        duration_seconds = _resolve_duration_seconds(data, started_at, completed_at)
+        duration_seconds = _resolve_duration_seconds(
+            data, started_at, completed_at
+        )
         cache_hit: bool | None = None
         cache_info = data.get("cache")
         if isinstance(cache_info, Mapping):
@@ -274,7 +275,9 @@ def get_installation_access_token(
     return response.json()
 
 
-def fingerprint_paths(paths: Sequence[str | os.PathLike[str]]) -> dict[str, str]:
+def fingerprint_paths(
+    paths: Sequence[str | os.PathLike[str]],
+) -> dict[str, str]:
     """Return SHA256 fingerprints for files/directories."""
     fingerprints: dict[str, str] = {}
     for raw_path in paths:
@@ -317,7 +320,9 @@ def generate_cache_strategy(
         for length in restore_slices
         if 0 < length <= len(full_hash)
     )
-    norm_cache_paths = tuple(str(Path(item).expanduser()) for item in cache_paths)
+    norm_cache_paths = tuple(
+        str(Path(item).expanduser()) for item in cache_paths
+    )
     metadata = {
         "prefix": prefix,
         "namespace": namespace or "",
@@ -400,7 +405,9 @@ def collect_workflow_metrics(
     for name, workflow_runs in runs_by_workflow.items():
         sorted_runs = sorted(
             workflow_runs,
-            key=lambda item: item.started_at or item.completed_at or datetime.now(timezone.utc),
+            key=lambda item: item.started_at
+            or item.completed_at
+            or datetime.now(timezone.utc),
         )
         runs_count = len(sorted_runs)
         successes = sum(1 for item in sorted_runs if item.succeeded)
@@ -408,9 +415,13 @@ def collect_workflow_metrics(
         duration_sum = sum(item.duration_seconds for item in sorted_runs)
         overall_duration += duration_sum
         overall_success += successes
-        cache_hits = [item.cache_hit for item in sorted_runs if item.cache_hit is not None]
+        cache_hits = [
+            item.cache_hit for item in sorted_runs if item.cache_hit is not None
+        ]
         cache_hit_rate = (
-            sum(1 for hit in cache_hits if hit) / len(cache_hits) if cache_hits else None
+            sum(1 for hit in cache_hits if hit) / len(cache_hits)
+            if cache_hits
+            else None
         )
         consecutive_failures = _calculate_consecutive_failures(sorted_runs)
         last_run = sorted_runs[-1] if sorted_runs else None
@@ -462,7 +473,9 @@ def detect_self_healing_actions(
         metrics.total_runs >= min_runs_for_success_rate
         and metrics.success_rate < overall_threshold
     ):
-        severity = "high" if metrics.success_rate < overall_threshold / 2 else "medium"
+        severity = (
+            "high" if metrics.success_rate < overall_threshold / 2 else "medium"
+        )
         actions.append(
             SelfHealingAction(
                 slug="global-success-rate",
@@ -608,7 +621,11 @@ def _parse_datetime(value: Any) -> datetime | None:
     if value is None:
         return None
     if isinstance(value, datetime):
-        return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+        return (
+            value
+            if value.tzinfo is not None
+            else value.replace(tzinfo=timezone.utc)
+        )
     if isinstance(value, str):
         text = value.strip()
         if not text:
@@ -695,7 +712,9 @@ def _load_runs_from_file(path: str | os.PathLike[str]) -> list[dict[str, Any]]:
 
 
 def _write_json(path: str | os.PathLike[str], data: Mapping[str, Any]) -> None:
-    Path(path).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    Path(path).write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def _create_arg_parser() -> argparse.ArgumentParser:
@@ -725,7 +744,9 @@ def _create_arg_parser() -> argparse.ArgumentParser:
         "cache-key",
         help="Generate a cache key from file fingerprints.",
     )
-    cache_parser.add_argument("--prefix", required=True, help="Cache key prefix.")
+    cache_parser.add_argument(
+        "--prefix", required=True, help="Cache key prefix."
+    )
     cache_parser.add_argument(
         "--files",
         required=True,
@@ -827,7 +848,9 @@ def _handle_cache_key(args: argparse.Namespace) -> int:
     files = [item.strip() for item in args.files.split(",") if item.strip()]
     cache_paths = []
     if args.paths:
-        cache_paths = [item.strip() for item in args.paths.split(",") if item.strip()]
+        cache_paths = [
+            item.strip() for item in args.paths.split(",") if item.strip()
+        ]
     extras: dict[str, Any] = {}
     prefix = args.prefix
     branch_value: str | None = None
@@ -853,12 +876,18 @@ def _handle_cache_key(args: argparse.Namespace) -> int:
         payload["branch"] = _sanitize_branch(branch_value)
 
     workflow_common.write_output("cache-key", strategy.key)
-    workflow_common.write_output("restore-keys", "\n".join(strategy.restore_keys))
-    workflow_common.write_output("cache-metadata", json.dumps(payload["metadata"]))
+    workflow_common.write_output(
+        "restore-keys", "\n".join(strategy.restore_keys)
+    )
+    workflow_common.write_output(
+        "cache-metadata", json.dumps(payload["metadata"])
+    )
     if strategy.paths:
         workflow_common.write_output("cache-paths", "\n".join(strategy.paths))
     if branch_value:
-        workflow_common.write_output("cache-branch", _sanitize_branch(branch_value))
+        workflow_common.write_output(
+            "cache-branch", _sanitize_branch(branch_value)
+        )
 
     print(json.dumps(payload, indent=2))
     return 0
@@ -903,7 +932,9 @@ def _handle_collect_metrics(args: argparse.Namespace) -> int:
     metrics = collect_workflow_metrics(runs)
     payload = {
         "metrics": metrics.to_dict(),
-        "self_healing_actions": [action.to_dict() for action in detect_self_healing_actions(metrics)],
+        "self_healing_actions": [
+            action.to_dict() for action in detect_self_healing_actions(metrics)
+        ],
     }
     if args.output:
         _write_json(args.output, payload)

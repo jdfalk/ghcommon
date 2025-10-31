@@ -22,7 +22,9 @@ class WorkflowModernizer:
 
     def run_command(self, cmd):
         """Run shell command."""
-        result = subprocess.run(cmd, check=False, shell=True, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, check=False, shell=True, capture_output=True, text=True
+        )
         return result.returncode == 0, result.stdout, result.stderr
 
     def extract_inline_scripts(self, content):
@@ -295,7 +297,9 @@ def main():
         )
 
         # Add files
-        subprocess.run(["git", "add", "."], check=False, cwd=os.path.dirname(workflow_dir))
+        subprocess.run(
+            ["git", "add", "."], check=False, cwd=os.path.dirname(workflow_dir)
+        )
 
         # Commit
         commit_msg = f"""feat(workflows): complete workflow modernization phase 2
@@ -310,7 +314,8 @@ Part of comprehensive workflow system overhaul."""
 
         result = subprocess.run(
             ["git", "commit", "-m", commit_msg],
-            check=False, cwd=os.path.dirname(workflow_dir),
+            check=False,
+            cwd=os.path.dirname(workflow_dir),
         )
 
         if result.returncode == 0:

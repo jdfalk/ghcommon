@@ -8,7 +8,8 @@
       caller, unit + integration tests)
 - [x] Phase 2: Release consolidation (branch-aware release helper, reusable release workflow,
       feature-flagged caller, GitHub Packages docs/tests)
-- [x] GitHub Packages publishing job, helper script, rollout docs, automated tests, and summary tooling
+- [x] GitHub Packages publishing job, helper script, rollout docs, automated tests, and summary
+      tooling
 
 ## 🚧 In Progress / Upcoming
 
@@ -23,7 +24,8 @@
 
 - [x] Implement maintenance helpers for dependency updates (docs + summary tooling).
 - [x] Create reusable maintenance workflow and feature-flagged caller (wired to maintenance helper)
-- [x] Add scheduling + configuration hooks for maintenance jobs across repos (config-driven via repository-config.yml)
+- [x] Add scheduling + configuration hooks for maintenance jobs across repos (config-driven via
+      repository-config.yml)
 - [x] Document maintenance automation runbooks and verification steps
 
 ### Phase 5: Advanced Features

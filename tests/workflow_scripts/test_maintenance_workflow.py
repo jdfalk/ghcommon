@@ -7,13 +7,13 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 import json
 from pathlib import Path
 from typing import Any
 
-import pytest
 import maintenance_workflow
-from datetime import datetime, timedelta
+import pytest
 
 
 def write_json(path: Path, data: Any) -> None:
@@ -29,7 +29,11 @@ def test_collect_dependency_updates(tmp_path: Path) -> None:
     npm_data = {"lodash": {"current": "4.17.20", "latest": "4.17.21"}}
     cargo_data = {
         "packages": [
-            {"name": "serde", "version": "1.0.190", "latest_version": "1.0.201"},
+            {
+                "name": "serde",
+                "version": "1.0.190",
+                "latest_version": "1.0.201",
+            },
         ]
     }
     go_data = """{"Path":"example.com/mod","Version":"1.2.0","Update":{"Path":"example.com/mod","Version":"1.3.0"}}"""
@@ -52,7 +56,9 @@ def test_collect_dependency_updates(tmp_path: Path) -> None:
     assert {"python", "node", "rust", "go"}.issubset(languages)
 
 
-def test_summarize_dependencies(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_summarize_dependencies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """summarize_dependency_updates writes markdown summary."""
     updates = [
         maintenance_workflow.DependencyUpdate(
@@ -67,14 +73,18 @@ def test_summarize_dependencies(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     ]
     summary_file = tmp_path / "summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary_file))
-    maintenance_workflow.write_dependency_summary(updates, tmp_path / "summary_output.md")
+    maintenance_workflow.write_dependency_summary(
+        updates, tmp_path / "summary_output.md"
+    )
     maintenance_workflow.summarize_dependency_updates(updates)
 
     assert (tmp_path / "summary_output.md").read_text(encoding="utf-8")
     assert "pkg" in summary_file.read_text(encoding="utf-8")
 
 
-def test_cli_summarize_dependencies(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_cli_summarize_dependencies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """CLI summarize-dependencies command writes summary file."""
     pip_path = tmp_path / "pip.json"
     write_json(
@@ -132,7 +142,9 @@ def test_parse_stale_items() -> None:
     assert stale[0].number == 1
 
 
-def test_summarize_security_issues(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_summarize_security_issues(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """summarize_security_issues appends advisory information."""
     issues = [
         maintenance_workflow.SecurityIssue(
@@ -152,7 +164,9 @@ def test_summarize_security_issues(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     assert "CVE-2024-1234" in content
 
 
-def test_cli_summarize_security(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_cli_summarize_security(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """CLI summarize-security handles missing file gracefully."""
     summary_file = tmp_path / "summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary_file))
@@ -171,5 +185,7 @@ def test_cli_summarize_security(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
         ),
         encoding="utf-8",
     )
-    maintenance_workflow.main(["summarize-security", "--input", str(security_path)])
+    maintenance_workflow.main(
+        ["summarize-security", "--input", str(security_path)]
+    )
     assert "libssl" in summary_file.read_text(encoding="utf-8")

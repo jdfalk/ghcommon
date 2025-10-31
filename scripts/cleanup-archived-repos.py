@@ -106,7 +106,12 @@ class RepositoryCleanup:
         """
         try:
             result = subprocess.run(
-                cmd, check=False, cwd=cwd, capture_output=True, text=True, timeout=30
+                cmd,
+                check=False,
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             return (
                 result.returncode == 0,

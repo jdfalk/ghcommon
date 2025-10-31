@@ -7,12 +7,10 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
-import pytest
-
 import generate_release_summary
+import pytest
 
 
 def test_generate_release_summary_success(

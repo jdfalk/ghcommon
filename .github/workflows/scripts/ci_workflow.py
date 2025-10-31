@@ -18,9 +18,10 @@ from typing import Any
 
 try:
     import requests  # type: ignore
-except ModuleNotFoundError:  # pragma: no cover - fallback when requests unavailable
+except (
+    ModuleNotFoundError
+):  # pragma: no cover - fallback when requests unavailable
     requests = None
-    from urllib.error import URLError
     from urllib.parse import urlencode
     from urllib.request import Request, urlopen
 
@@ -53,13 +54,17 @@ except ModuleNotFoundError:  # pragma: no cover - fallback when requests unavail
             payload = {}
         return _HTTPResponse(status_code, payload)
 else:  # pragma: no cover - exercised in runtime environments with requests installed
+
     def _http_get(
         url: str,
         headers: dict[str, str] | None = None,
         params: dict[str, Any] | None = None,
         timeout: int = 30,
     ):
-        return requests.get(url, headers=headers, params=params, timeout=timeout)
+        return requests.get(
+            url, headers=headers, params=params, timeout=timeout
+        )
+
 
 _CONFIG_CACHE: dict[str, Any] | None = None
 
@@ -437,7 +442,9 @@ def frontend_run(_: argparse.Namespace) -> None:
     if not script_name:
         raise SystemExit("FRONTEND_SCRIPT environment variable is required")
 
-    result = subprocess.run(["npm", "run", script_name, "--if-present"], check=False)
+    result = subprocess.run(
+        ["npm", "run", script_name, "--if-present"], check=False
+    )
     if result.returncode == 0:
         print(success_message)
     else:
@@ -491,7 +498,6 @@ def python_run_tests(_: argparse.Namespace) -> None:
 
 def python_lint(_: argparse.Namespace) -> None:
     """Run Python formatting and linting if sources are present."""
-
     python_sources = [
         path
         for path in Path(".").rglob("*.py")
@@ -515,7 +521,9 @@ def python_lint(_: argparse.Namespace) -> None:
         lint_targets = ["."]
 
     required_tools = ["black", "ruff"]
-    missing_tools = [tool for tool in required_tools if shutil.which(tool) is None]
+    missing_tools = [
+        tool for tool in required_tools if shutil.which(tool) is None
+    ]
     if missing_tools:
         python = sys.executable
         subprocess.run(
@@ -529,7 +537,6 @@ def python_lint(_: argparse.Namespace) -> None:
 
 def rust_format(_: argparse.Namespace) -> None:
     """Run rustfmt in check mode when a Cargo project exists."""
-
     if not Path("Cargo.toml").is_file():
         print("ℹ️ No Cargo.toml found; skipping rustfmt.")
         return

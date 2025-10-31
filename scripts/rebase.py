@@ -56,7 +56,6 @@ class GitRebaseError(Exception):
     """Custom exception for rebase operations"""
 
 
-
 class SmartRebase:
     """Smart Git Rebase implementation with intelligent conflict resolution.
 

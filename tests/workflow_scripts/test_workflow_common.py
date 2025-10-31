@@ -11,7 +11,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 import workflow_common
 
 
@@ -64,7 +63,9 @@ def test_registry_enabled_uses_config(monkeypatch: pytest.MonkeyPatch) -> None:
     assert workflow_common.registry_enabled("pypi") is False
 
 
-def test_config_path_returns_default_for_missing(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_config_path_returns_default_for_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """config_path returns provided default when key missing."""
     monkeypatch.delenv("REPOSITORY_CONFIG", raising=False)
     assert workflow_common.config_path("fallback", "missing") == "fallback"

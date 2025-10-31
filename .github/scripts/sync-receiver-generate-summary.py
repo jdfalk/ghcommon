@@ -3,8 +3,7 @@
 # version: 1.0.0
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
-"""Generate synchronization summary for sync receiver workflow.
-"""
+"""Generate synchronization summary for sync receiver workflow."""
 
 from datetime import datetime
 import os
@@ -16,7 +15,11 @@ def get_sync_changes():
     try:
         # Get git status
         result = subprocess.run(
-            "git status --porcelain", check=False, shell=True, capture_output=True, text=True
+            "git status --porcelain",
+            check=False,
+            shell=True,
+            capture_output=True,
+            text=True,
         )
 
         if result.returncode != 0:

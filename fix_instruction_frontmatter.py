@@ -65,10 +65,8 @@ def fix_instruction_file(file_path):
 
         for i, line in enumerate(lines):
             # Keep header comments
-            if (
-                line.startswith("<!--")
-                or (line.strip() == ""
-                and not frontmatter_started)
+            if line.startswith("<!--") or (
+                line.strip() == "" and not frontmatter_started
             ):
                 fixed_lines.append(line)
             # Start frontmatter when we find applyTo

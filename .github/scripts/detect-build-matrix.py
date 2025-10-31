@@ -18,7 +18,11 @@ def run_command(cmd, capture_output=True):
     """Run a shell command and return the result."""
     try:
         result = subprocess.run(
-            cmd, check=False, shell=True, capture_output=capture_output, text=True
+            cmd,
+            check=False,
+            shell=True,
+            capture_output=capture_output,
+            text=True,
         )
         return result.returncode == 0, result.stdout.strip()
     except Exception:

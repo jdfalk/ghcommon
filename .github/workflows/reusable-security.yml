@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-security.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: reusable-security-2025-09-24-core-workflow
 
 name: Reusable Security Workflow
@@ -50,7 +50,7 @@ jobs:
           languages=()
 
           # Check for Go
-          if [ -f "go.mod" ] || find . -name "*.go" -type f -not -path "./.git/*" | head -1 | grep -q .; then
+          if [ -f "go.mod" ] || [ -f "go.work" ]; then
             languages+=('"go"')
           fi
 

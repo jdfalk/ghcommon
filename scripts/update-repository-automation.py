@@ -110,9 +110,7 @@ class RepositoryAutomationUpdater:
 
             # Then add/update the unified automation system
             if cleanup_success:
-                add_success = self._add_unified_automation(
-                    repo, default_branch
-                )
+                add_success = self._add_unified_automation(repo, default_branch)
                 return add_success
             return False
 

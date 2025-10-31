@@ -186,7 +186,8 @@ class ProtobufCycleFixer:
         try:
             result = subprocess.run(
                 ["copilot-agent-util", "buf", "lint"],
-                check=False, cwd=self.repo_root,
+                check=False,
+                cwd=self.repo_root,
                 capture_output=True,
                 text=True,
             )

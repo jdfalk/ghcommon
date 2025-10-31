@@ -17,7 +17,8 @@ COMPOSE_FILES = (
 def validate(path: Path) -> int:
     result = subprocess.run(
         ["docker-compose", "-f", str(path), "config"],
-        check=False, capture_output=True,
+        check=False,
+        capture_output=True,
         text=True,
     )
     if result.returncode == 0:

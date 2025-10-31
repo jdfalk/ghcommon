@@ -697,11 +697,11 @@ Create file: `.github/SECURITY_CHECKLIST.md`
 
 Complete this checklist before deploying new workflows or workflow changes.
 
-## Date: ******\_\_\_\_******
+## Date: **\*\***\_\_\_\_**\*\***
 
-## Reviewer: ******\_\_\_\_******
+## Reviewer: **\*\***\_\_\_\_**\*\***
 
-## Phase/PR: ******\_\_\_\_******
+## Phase/PR: **\*\***\_\_\_\_**\*\***
 
 ---
 
@@ -828,9 +828,9 @@ permissions:
 - [ ] Issues documented and tracked
 - [ ] Deployment approved
 
-**Reviewer Signature:** ******\_\_\_\_******
+**Reviewer Signature:** **\*\***\_\_\_\_**\*\***
 
-**Date:** ******\_\_\_\_******
+**Date:** **\*\***\_\_\_\_**\*\***
 
 **Notes:**
 

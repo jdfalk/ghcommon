@@ -380,7 +380,8 @@ class WorkflowDebugger:
                         "--dir",
                         temp_dir,
                     ],
-                    check=False, capture_output=True,
+                    check=False,
+                    capture_output=True,
                     text=True,
                 )
 
@@ -431,7 +432,8 @@ class WorkflowDebugger:
                     job.id,
                     "--log",
                 ],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
             )
 
@@ -447,7 +449,8 @@ class WorkflowDebugger:
                             "api",
                             f"/repos/{repo}/actions/jobs/{job.id}/logs",
                         ],
-                        check=False, capture_output=True,
+                        check=False,
+                        capture_output=True,
                         text=True,
                     )
 

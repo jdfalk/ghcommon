@@ -28,15 +28,14 @@ from __future__ import annotations
 
 import argparse
 import ast
+from collections.abc import Iterable
+from dataclasses import dataclass
 import json
 import os
+from pathlib import Path
 import re
 import sys
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Iterable
-
-import yaml
+from typing import Any
 
 from workflow_common import (
     append_summary_line,
@@ -46,6 +45,7 @@ from workflow_common import (
     log_notice,
     log_warning,
 )
+import yaml
 
 # --------------------------------------------------------------------------- #
 # Data structures                                                             #
@@ -119,7 +119,9 @@ def _format_args(args: ast.arguments) -> str:
     total_defaults = len(defaults)
     default_start = len(positional) - total_defaults
     for index, arg in enumerate(positional):
-        default = defaults[index - default_start] if index >= default_start else None
+        default = (
+            defaults[index - default_start] if index >= default_start else None
+        )
         parts.append(_format(arg, default))
 
     if args.vararg:
@@ -140,7 +142,9 @@ def _format_args(args: ast.arguments) -> str:
 def _extract_version(path: Path) -> str:
     """Extract module version from header comment."""
     for line in path.read_text(encoding="utf-8").splitlines()[:5]:
-        match = re.search(r"#\s*version:\s*([0-9]+\.[0-9]+\.[0-9]+)", line, re.IGNORECASE)
+        match = re.search(
+            r"#\s*version:\s*([0-9]+\.[0-9]+\.[0-9]+)", line, re.IGNORECASE
+        )
         if match:
             return match.group(1)
     return "0.0.0"
@@ -167,7 +171,9 @@ def parse_python_module(path: Path) -> DocModule:
                 if isinstance(item, ast.FunctionDef):
                     signature = f"{item.name}({_format_args(item.args)})"
                     method_doc = ast.get_docstring(item) or ""
-                    methods.append(DocFunction(item.name, signature, method_doc))
+                    methods.append(
+                        DocFunction(item.name, signature, method_doc)
+                    )
             classes.append(DocClass(node.name, docstring, methods))
 
     return DocModule(
@@ -202,7 +208,12 @@ def generate_api_docs(source_dirs: list[str], output_dir: Path) -> list[Path]:
     for module in modules:
         rel_path = module.path.relative_to(sources[0].parent)
         doc_path = output_dir / f"{module.name}.md"
-        lines = [f"# Module `{module.name}`", "", f"**Version:** {module.version}", ""]
+        lines = [
+            f"# Module `{module.name}`",
+            "",
+            f"**Version:** {module.version}",
+            "",
+        ]
         if module.docstring:
             lines.extend([module.docstring.strip(), ""])
 
@@ -253,7 +264,9 @@ def parse_workflow(path: Path) -> WorkflowDoc:
     triggers = list(data.get("on", {}))
     description = data.get("description", "")
     jobs = data.get("jobs", {})
-    return WorkflowDoc(name=name, file=path, on=triggers, description=description, jobs=jobs)
+    return WorkflowDoc(
+        name=name, file=path, on=triggers, description=description, jobs=jobs
+    )
 
 
 def discover_workflows(workflows_dir: Path) -> list[WorkflowDoc]:
@@ -285,7 +298,9 @@ def generate_workflow_docs(workflows_dir: str, output: Path) -> Path:
         lines.append("### Jobs")
         lines.append("")
         for job_name, job in workflow.jobs.items():
-            lines.append(f"- **{job_name}**: runs-on `{job.get('runs-on', 'N/A')}`")
+            lines.append(
+                f"- **{job_name}**: runs-on `{job.get('runs-on', 'N/A')}`"
+            )
         lines.append("")
 
     output.write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
@@ -338,7 +353,10 @@ def build_documentation(
         for doc_path in api_files
     ]
     search_index.append(
-        {"title": "Workflows", "path": str(workflows_output.relative_to(output_root))}
+        {
+            "title": "Workflows",
+            "path": str(workflows_output.relative_to(output_root)),
+        }
     )
 
     (output_root / "search-index.json").write_text(
@@ -355,7 +373,9 @@ def build_documentation(
             log_warning("versions.json malformed; regenerating")
     if version_name not in versions:
         versions.append(version_name)
-    versions_path.write_text(json.dumps(sorted(versions), indent=2), encoding="utf-8")
+    versions_path.write_text(
+        json.dumps(sorted(versions), indent=2), encoding="utf-8"
+    )
 
     summary_table = format_summary_table(
         [
@@ -380,10 +400,14 @@ def build_documentation(
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Documentation workflow utilities")
+    parser = argparse.ArgumentParser(
+        description="Documentation workflow utilities"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    api_parser = subparsers.add_parser("generate-api", help="Generate API documentation")
+    api_parser = subparsers.add_parser(
+        "generate-api", help="Generate API documentation"
+    )
     api_parser.add_argument(
         "--source",
         action="append",
@@ -413,7 +437,9 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="Output Markdown file",
     )
 
-    build_parser = subparsers.add_parser("build", help="Build complete documentation")
+    build_parser = subparsers.add_parser(
+        "build", help="Build complete documentation"
+    )
     build_parser.add_argument(
         "--source",
         action="append",
