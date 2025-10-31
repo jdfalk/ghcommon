@@ -21,9 +21,9 @@
 
 ### Phase 4: Maintenance Automation
 
-- [ ] Implement maintenance helpers for dependency updates, security scans, and housekeeping tasks
-- [ ] Create reusable maintenance workflow and feature-flagged caller
-- [ ] Add scheduling + configuration hooks for maintenance jobs across repos
+- [x] Implement maintenance helpers for dependency updates (docs + summary tooling).
+- [x] Create reusable maintenance workflow and feature-flagged caller (wired to maintenance helper)
+- [x] Add scheduling + configuration hooks for maintenance jobs across repos (config-driven via repository-config.yml)
 - [ ] Document maintenance automation runbooks and verification steps
 
 ### Phase 5: Advanced Features
