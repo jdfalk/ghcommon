@@ -1347,6 +1347,35 @@ def get_cache_key(
     """
 ```
 
+#### build_cache_plan()
+
+Return recommended cache metadata for supported languages.
+
+```python
+def build_cache_plan(
+    language: str,
+    extra_files: Sequence[str] | None = None,
+    extra_paths: Sequence[str] | None = None,
+) -> CachePlan:
+    """Return default cache plan for the requested ecosystem."""
+
+    Args:
+        language: Language key (go, rust, python, node).
+        extra_files: Optional additional manifest files.
+        extra_paths: Optional additional cache directories.
+
+    Returns:
+        CachePlan object containing files and directories.
+
+    Example:
+        >>> plan = build_cache_plan('python', extra_files=['poetry.lock'])
+        >>> plan.files
+        ('requirements.txt', 'pyproject.toml', 'poetry.lock')
+
+    Raises:
+        ValueError: If the language is not supported.
+```
+
 #### should_invalidate_cache()
 
 Determine if cache should be invalidated.
@@ -1871,6 +1900,8 @@ Recent updates to `automation_workflow.py` added quality-of-life improvements fo
   metadata, enabling reusable workflows to capture tool-specific caches.
 - `collect-metrics` exposes `--lookback-days` for server-side filtering when gathering workflow runs
   and persists results to disk via `--output` to support downstream analytics summarization.
+- `cache-plan` returns pre-defined cache file/path sets per language, optionally extending them with
+  custom entries and writing `files`/`paths` outputs for GitHub Actions steps.
 - `filter_runs_by_lookback()` (internal helper) centralizes lookback filtering logic and is used by
   the CLI command as well as unit tests.
 

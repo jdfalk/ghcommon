@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: tests/workflow_scripts/test_automation_workflow.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: d9f5c8b3-2c4d-4e5f-9a7b-3c2d1f0e1a2b
 
 """Tests for automation_workflow helper module."""
@@ -105,6 +105,15 @@ def test_generate_cache_strategy_includes_fingerprints(tmp_path: Path) -> None:
     # ensure restore keys trimmed consistently
     assert all(strategy.key.startswith(key) for key in strategy.restore_keys)
     assert str(tmp_path / "cache") in strategy.paths
+
+
+def test_build_cache_plan_returns_defaults() -> None:
+    """build_cache_plan returns default files and paths for language."""
+    plan = automation_workflow.build_cache_plan("go")
+    assert plan.language == "go"
+    assert plan.files == ("go.mod", "go.sum")
+    assert "~/.cache/go-build" in plan.paths
+    assert "~/go/pkg/mod" in plan.paths
 
 
 def test_collect_workflow_metrics_groups_runs() -> None:
@@ -257,6 +266,35 @@ def test_cache_key_includes_branch_and_writes_outputs(
     assert "restore-keys=" in outputs
     assert "cache-paths=" in outputs
     assert "cache-branch=feature-new-thing" in outputs
+
+
+def test_cache_plan_writes_github_outputs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """cache-plan writes files/paths to GitHub outputs."""
+    output_file = tmp_path / "metadata.txt"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output_file))
+
+    exit_code = automation_workflow.main(
+        [
+            "cache-plan",
+            "--language",
+            "python",
+            "--github-output",
+            "--extra-file",
+            "poetry.lock",
+        ]
+    )
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert "python" == payload["language"]
+    assert "poetry.lock" in payload["files"]
+    outputs = output_file.read_text(encoding="utf-8")
+    assert "files=requirements.txt,pyproject.toml,poetry.lock" in outputs
+    assert "./.venv" in outputs
 
 
 def test_fetch_recent_workflow_runs_uses_session(monkeypatch: pytest.MonkeyPatch) -> None:

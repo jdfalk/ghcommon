@@ -661,8 +661,9 @@ jobs:
 
 **Implementation Notes**:
 
-- Uses `automation_workflow.py cache-key` to emit cache metadata (key, restore keys, paths).
-- Supports Go, Rust, Python, and Node heuristics; add additional languages by extending the metadata step.
+- Uses `automation_workflow.py cache-plan` to emit language-specific files and directories to GitHub outputs.
+- Uses `automation_workflow.py cache-key` to emit cache metadata (key, restore keys, paths) with optional branch segmentation.
+- Supports Go, Rust, Python, and Node heuristics out of the box; extend `cache-plan` for additional ecosystems.
 - Branch names are normalized to lower-case kebab form to avoid cache key collisions.
 
 ---

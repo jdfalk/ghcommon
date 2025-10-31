@@ -916,8 +916,8 @@ Create workflow with intelligent caching strategies.
 ### Implementation
 
 - Added `.github/workflows/reusable-advanced-cache.yml` with workflow_call inputs for language, cache prefix, and branch inclusion.
-- Reused `automation_workflow.py cache-key` to emit cache keys, restore keys, and path metadata directly to GitHub outputs for subsequent steps.
-- Introduced language-aware metadata detection covering Go, Rust, Python, and Node ecosystems, plus branch-aware cache segmentation.
+- Introduced `automation_workflow.py cache-plan` to centralize language-specific cache metadata and emit GitHub outputs used by the workflow.
+- Reused `automation_workflow.py cache-key` with branch-aware segmentation to produce cache keys, restore keys, and paths for downstream steps.
 
 ### Verification Steps
 

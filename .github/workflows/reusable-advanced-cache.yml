@@ -50,28 +50,9 @@ jobs:
       - name: Determine cache metadata
         id: metadata
         run: |
-          case "${{ inputs.language }}" in
-            go)
-              echo "files=go.mod,go.sum" >> "$GITHUB_OUTPUT"
-              echo "paths=~/.cache/go-build,~/go/pkg/mod" >> "$GITHUB_OUTPUT"
-              ;;
-            rust)
-              echo "files=Cargo.toml,Cargo.lock" >> "$GITHUB_OUTPUT"
-              echo "paths=~/.cargo/registry/cache,~/.cargo/git,./target" >> "$GITHUB_OUTPUT"
-              ;;
-            python)
-              echo "files=requirements.txt,pyproject.toml" >> "$GITHUB_OUTPUT"
-              echo "paths=~/.cache/pip,./.venv" >> "$GITHUB_OUTPUT"
-              ;;
-            node)
-              echo "files=package-lock.json,yarn.lock,pnpm-lock.yaml" >> "$GITHUB_OUTPUT"
-              echo "paths=~/.npm,~/.cache/pnpm,./node_modules" >> "$GITHUB_OUTPUT"
-              ;;
-            *)
-              echo "::error::Unsupported language: ${{ inputs.language }}" >&2
-              exit 1
-              ;;
-          esac
+          python .github/workflows/scripts/automation_workflow.py cache-plan \
+            --language "${{ inputs.language }}" \
+            --github-output
 
       - name: Generate intelligent cache key
         id: generate-key
@@ -83,6 +64,7 @@ jobs:
           fi
           python .github/workflows/scripts/automation_workflow.py cache-key \
             --prefix "${{ inputs.cache-prefix }}" \
+            --namespace "${{ inputs.language }}" \
             --files "${{ steps.metadata.outputs.files }}" \
             --paths "${{ steps.metadata.outputs.paths }}" \
             ${INCLUDE_FLAG}

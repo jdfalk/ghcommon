@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/automation_workflow.py
-# version: 1.1.0
+# version: 1.2.0
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
 """Advanced automation workflow helper.
@@ -32,6 +32,24 @@ import workflow_common
 
 DEFAULT_CACHE_RESTORE_SLICES: Final[tuple[int, ...]] = (32, 24, 16)
 DEFAULT_GITHUB_API_URL: Final[str] = "https://api.github.com"
+CACHE_PROFILES: Final[dict[str, dict[str, tuple[str, ...]]]] = {
+    "go": {
+        "files": ("go.mod", "go.sum"),
+        "paths": ("~/.cache/go-build", "~/go/pkg/mod"),
+    },
+    "rust": {
+        "files": ("Cargo.toml", "Cargo.lock"),
+        "paths": ("~/.cargo/registry/cache", "~/.cargo/git", "./target"),
+    },
+    "python": {
+        "files": ("requirements.txt", "pyproject.toml"),
+        "paths": ("~/.cache/pip", "./.venv"),
+    },
+    "node": {
+        "files": ("package-lock.json", "yarn.lock", "pnpm-lock.yaml"),
+        "paths": ("~/.npm", "~/.cache/pnpm", "./node_modules"),
+    },
+}
 
 
 @dataclass(slots=True)
@@ -49,6 +67,23 @@ class CacheStrategy:
             "key": self.key,
             "restore_keys": list(self.restore_keys),
             "metadata": self.metadata,
+            "paths": list(self.paths),
+        }
+
+
+@dataclass(slots=True)
+class CachePlan:
+    """Recommended dependency cache inputs and paths."""
+
+    language: str
+    files: tuple[str, ...]
+    paths: tuple[str, ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return serialisable representation."""
+        return {
+            "language": self.language,
+            "files": list(self.files),
             "paths": list(self.paths),
         }
 
@@ -297,6 +332,43 @@ def generate_cache_strategy(
         restore_keys=restore_keys,
         metadata=metadata,
         paths=norm_cache_paths,
+    )
+
+
+def build_cache_plan(
+    language: str,
+    *,
+    extra_files: Sequence[str] | None = None,
+    extra_paths: Sequence[str] | None = None,
+) -> CachePlan:
+    """Return default cache plan for a language with optional extras."""
+    profile = CACHE_PROFILES.get(language.lower())
+    if profile is None:
+        supported = ", ".join(sorted(CACHE_PROFILES))
+        msg = f"Unsupported language '{language}'. Supported: {supported}"
+        raise ValueError(msg)
+
+    files = list(profile["files"])
+    if extra_files:
+        files.extend(extra_files)
+
+    paths = list(profile["paths"])
+    if extra_paths:
+        paths.extend(extra_paths)
+
+    def _unique(items: list[str]) -> tuple[str, ...]:
+        seen: set[str] = set()
+        ordered: list[str] = []
+        for item in items:
+            if item not in seen:
+                ordered.append(item)
+                seen.add(item)
+        return tuple(ordered)
+
+    return CachePlan(
+        language=language.lower(),
+        files=_unique(files),
+        paths=_unique(paths),
     )
 
 
@@ -673,6 +745,37 @@ def _create_arg_parser() -> argparse.ArgumentParser:
         help="Include current branch name in the cache key prefix.",
     )
 
+    plan_parser = subparsers.add_parser(
+        "cache-plan",
+        help="Recommend cache files and paths for a given language.",
+    )
+    plan_parser.add_argument(
+        "--language",
+        required=True,
+        help="Language ecosystem (go, rust, python, node).",
+    )
+    plan_parser.add_argument(
+        "--extra-file",
+        action="append",
+        default=[],
+        help="Additional file to include in the cache plan.",
+    )
+    plan_parser.add_argument(
+        "--extra-path",
+        action="append",
+        default=[],
+        help="Additional path to include in the cache plan.",
+    )
+    plan_parser.add_argument(
+        "--output",
+        help="Optional path to write JSON payload.",
+    )
+    plan_parser.add_argument(
+        "--github-output",
+        action="store_true",
+        help="Emit GitHub Action outputs (files, paths).",
+    )
+
     metrics_parser = subparsers.add_parser(
         "collect-metrics",
         help="Collect workflow metrics from JSON or GitHub API.",
@@ -761,6 +864,27 @@ def _handle_cache_key(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_cache_plan(args: argparse.Namespace) -> int:
+    try:
+        plan = build_cache_plan(
+            args.language,
+            extra_files=args.extra_file,
+            extra_paths=args.extra_path,
+        )
+    except ValueError as exc:
+        workflow_common.log_error(str(exc))
+        raise
+
+    payload = plan.to_dict()
+    if args.github_output:
+        workflow_common.write_output("files", ",".join(plan.files))
+        workflow_common.write_output("paths", ",".join(plan.paths))
+    if args.output:
+        _write_json(args.output, payload)
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
 def _handle_collect_metrics(args: argparse.Namespace) -> int:
     if args.input:
         runs = _load_runs_from_file(args.input)
@@ -795,6 +919,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _handle_github_app_token(args)
     if args.command == "cache-key":
         return _handle_cache_key(args)
+    if args.command == "cache-plan":
+        return _handle_cache_plan(args)
     if args.command == "collect-metrics":
         return _handle_collect_metrics(args)
     parser.print_help()
