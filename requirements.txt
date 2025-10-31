@@ -1,8 +1,10 @@
 # file: requirements.txt
-# version: 1.0.0  
+# version: 1.1.0  
 # guid: f7e6d5c4-b3a2-1098-7654-321fedcba987
 
 # Python dependencies for gcommon automation scripts
 
 # Required for setup_dependabot_all_repos.py
 PyYAML>=6.0
+PyJWT>=2.8.0
+requests>=2.31.0
