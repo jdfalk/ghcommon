@@ -42,71 +42,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Check Go dependencies
+      - name: Collect Go dependency updates
         if: hashFiles('go.mod') != ''
         run: |
-          echo "## Go Dependencies" >> maintenance-report.md
-          echo "" >> maintenance-report.md
-          if [ -f go.mod ]; then
-            go list -u -m all | grep '\[.*\]' || echo "All Go dependencies are up to date" >> maintenance-report.md
-          fi
-          echo "" >> maintenance-report.md
+          mkdir -p maintenance
+          go list -u -m -json all > maintenance/go-outdated.json || true
 
-      - name: Check Node.js dependencies
+      - name: Collect Node.js dependency updates
         if: hashFiles('package*.json') != ''
         run: |
-          echo "## Node.js Dependencies" >> maintenance-report.md
-          echo "" >> maintenance-report.md
-          if [ -f package.json ]; then
-            npm outdated --json > npm-outdated.json 2>/dev/null || true
-            if [ -s npm-outdated.json ] && [ "$(cat npm-outdated.json)" != "{}" ]; then
-              echo "Outdated npm packages detected:" >> maintenance-report.md
-              cat npm-outdated.json >> maintenance-report.md
-            else
-              echo "All npm dependencies are up to date" >> maintenance-report.md
-            fi
-          fi
-          echo "" >> maintenance-report.md
+          mkdir -p maintenance
+          npm outdated --json > maintenance/npm-outdated.json 2>/dev/null || true
 
-      - name: Check Python dependencies
+      - name: Collect Python dependency updates
         if: hashFiles('requirements*.txt', 'pyproject.toml') != ''
         run: |
-          echo "## Python Dependencies" >> maintenance-report.md
-          echo "" >> maintenance-report.md
-          pip install pip-check-updates || pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip list --outdated --format=json > pip-outdated.json 2>/dev/null || true
-            if [ -s pip-outdated.json ] && [ "$(cat pip-outdated.json)" != "[]" ]; then
-              echo "Outdated pip packages:" >> maintenance-report.md
-              cat pip-outdated.json >> maintenance-report.md
-            else
-              echo "All pip dependencies are up to date" >> maintenance-report.md
-            fi
-          fi
-          echo "" >> maintenance-report.md
+          mkdir -p maintenance
+          python -m pip install --upgrade pip
+          python -m pip install pip-check-updates || true
+          pip list --outdated --format=json > maintenance/pip-outdated.json 2>/dev/null || true
 
-      - name: Check Rust dependencies
+      - name: Collect Rust dependency updates
         if: hashFiles('Cargo.toml') != ''
         run: |
-          echo "## Rust Dependencies" >> maintenance-report.md
-          echo "" >> maintenance-report.md
+          mkdir -p maintenance
           cargo install cargo-outdated || true
           if command -v cargo-outdated >/dev/null 2>&1; then
-            cargo outdated --format json > cargo-outdated.json 2>/dev/null || true
-            if [ -s cargo-outdated.json ]; then
-              echo "Outdated Rust crates:" >> maintenance-report.md
-              cat cargo-outdated.json >> maintenance-report.md
-            else
-              echo "All Rust dependencies are up to date" >> maintenance-report.md
-            fi
+            cargo outdated --format json > maintenance/cargo-outdated.json 2>/dev/null || true
           fi
-          echo "" >> maintenance-report.md
+
+      - name: Summarize dependency updates
+        run: python3 .github/workflows/scripts/maintenance_workflow.py summarize-dependencies --pip maintenance/pip-outdated.json --npm maintenance/npm-outdated.json --cargo maintenance/cargo-outdated.json --go maintenance/go-outdated.json --output maintenance/dependency-summary.md
 
       - name: Upload dependency report
         uses: actions/upload-artifact@v5
         with:
           name: maintenance-dependency-report
-          path: maintenance-report.md
+          path: maintenance
+
+      - name: Summarize security advisories
+        run: python3 .github/workflows/scripts/maintenance_workflow.py summarize-security --input maintenance/security-alerts.json || true
 
   # Repository Cleanup
   cleanup-tasks:

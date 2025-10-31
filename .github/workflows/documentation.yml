@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Generate helper documentation
+        run: python3 .github/workflows/scripts/docs_workflow.py build --source .github/workflows/scripts --workflows .github/workflows --output docs/generated
 
       - name: Detect documentation toolchain
         id: detect
