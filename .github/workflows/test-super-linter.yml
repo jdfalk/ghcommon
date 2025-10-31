@@ -54,7 +54,7 @@ jobs:
       - name: List all linter configuration files
         run: |
           echo "=== Linter Configuration Files in Root ==="
-          ls -la *.env *.yml *.yaml *.json *.toml *rc* 2>/dev/null || echo "No config files found"
+          ls -la -- ./*.env ./*.yml ./*.yaml ./*.json ./*.toml ./*rc* 2>/dev/null || echo "No config files found"
           echo ""
           echo "=== Super Linter Config Files ==="
           ls -la super-linter-*.env 2>/dev/null || echo "No super-linter configs found"
@@ -569,37 +569,39 @@ jobs:
     steps:
       - name: Generate test summary
         run: |
-          echo "# Super Linter Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Test Scenario | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Pre-flight Diagnostics | ${{ needs.preflight.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Minimal Config | ${{ needs.test-minimal.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Full Config | ${{ needs.test-full.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Auto-Fix Mode | ${{ needs.test-autofix.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Config File Paths | ${{ needs.test-config-paths.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Filter Patterns | ${{ needs.test-filter-patterns.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Disabled Validators | ${{ needs.test-disabled-validators.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Markdown Only | ${{ needs.test-markdown-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Python Only | ${{ needs.test-python-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| JavaScript/TypeScript Only | ${{ needs.test-javascript-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Rust Only | ${{ needs.test-rust-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Go Only | ${{ needs.test-go-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| YAML Only | ${{ needs.test-yaml-only.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Configuration Details" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Workflow Version**: 1.0.0" >> $GITHUB_STEP_SUMMARY
-          echo "- **Test Date**: $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. Review failed tests (if any)" >> $GITHUB_STEP_SUMMARY
-          echo "2. Check log files for detailed error messages" >> $GITHUB_STEP_SUMMARY
-          echo "3. Update configuration files as needed" >> $GITHUB_STEP_SUMMARY
-          echo "4. Re-run tests to verify fixes" >> $GITHUB_STEP_SUMMARY
-          echo "5. Document results in SUPER_LINTER_TESTING_RESULTS.md" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# Super Linter Test Results"
+            echo ""
+            echo "## Test Execution Summary"
+            echo ""
+            echo "| Test Scenario | Status |"
+            echo "|--------------|--------|"
+            echo "| Pre-flight Diagnostics | ${{ needs.preflight.result }} |"
+            echo "| Minimal Config | ${{ needs.test-minimal.result }} |"
+            echo "| Full Config | ${{ needs.test-full.result }} |"
+            echo "| Auto-Fix Mode | ${{ needs.test-autofix.result }} |"
+            echo "| Config File Paths | ${{ needs.test-config-paths.result }} |"
+            echo "| Filter Patterns | ${{ needs.test-filter-patterns.result }} |"
+            echo "| Disabled Validators | ${{ needs.test-disabled-validators.result }} |"
+            echo "| Markdown Only | ${{ needs.test-markdown-only.result }} |"
+            echo "| Python Only | ${{ needs.test-python-only.result }} |"
+            echo "| JavaScript/TypeScript Only | ${{ needs.test-javascript-only.result }} |"
+            echo "| Rust Only | ${{ needs.test-rust-only.result }} |"
+            echo "| Go Only | ${{ needs.test-go-only.result }} |"
+            echo "| YAML Only | ${{ needs.test-yaml-only.result }} |"
+            echo ""
+            echo "## Configuration Details"
+            echo ""
+            echo "- **Workflow Version**: 1.0.0"
+            echo "- **Test Date**: $(date)"
+            echo "- **Branch**: ${{ github.ref_name }}"
+            echo "- **Commit**: ${{ github.sha }}"
+            echo ""
+            echo "## Next Steps"
+            echo ""
+            echo "1. Review failed tests (if any)"
+            echo "2. Check log files for detailed error messages"
+            echo "3. Update configuration files as needed"
+            echo "4. Re-run tests to verify fixes"
+            echo "5. Document results in SUPER_LINTER_TESTING_RESULTS.md"
+          } >> "$GITHUB_STEP_SUMMARY"

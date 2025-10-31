@@ -1,5 +1,5 @@
 # file: .github/workflows/manager-sync-dispatcher.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: b2c3d4e5-f6a7-8901-bcde-f23456789012
 
 # ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
@@ -79,10 +79,10 @@ jobs:
           DEFAULT_REPOS="jdfalk/subtitle-manager,jdfalk/audiobook-organizer,jdfalk/copilot-agent-util-rust,jdfalk/apt-cacher-go"
 
           if [ "$INPUT_TARGET_REPOS" = "auto" ] || [ -z "$INPUT_TARGET_REPOS" ]; then
-            echo "repos=$DEFAULT_REPOS" >> $GITHUB_OUTPUT
+            echo "repos=$DEFAULT_REPOS" >> "$GITHUB_OUTPUT"
             echo "Using default repository list: $DEFAULT_REPOS"
           else
-            echo "repos=$INPUT_TARGET_REPOS" >> $GITHUB_OUTPUT
+            echo "repos=$INPUT_TARGET_REPOS" >> "$GITHUB_OUTPUT"
             echo "Using custom repository list: $INPUT_TARGET_REPOS"
           fi
 
@@ -97,7 +97,7 @@ jobs:
               echo "Auto-detecting sync type based on changed files..."
 
               # Get changed files
-              CHANGED_FILES=$(git diff --name-only $BEFORE_SHA..$SOURCE_SHA)
+              CHANGED_FILES=$(git diff --name-only "$BEFORE_SHA" "$SOURCE_SHA")
               echo "Changed files: $CHANGED_FILES"
 
               if echo "$CHANGED_FILES" | grep -q "^\.github/workflows/"; then
@@ -122,7 +122,7 @@ jobs:
             fi
           fi
 
-          echo "sync_type=$SYNC_TYPE" >> $GITHUB_OUTPUT
+          echo "sync_type=$SYNC_TYPE" >> "$GITHUB_OUTPUT"
           echo "Sync type determined: $SYNC_TYPE"
 
       - name: Dispatch sync events
@@ -143,7 +143,7 @@ jobs:
             # Create repository dispatch event using the PAT
             curl -X POST \
               -H "Accept: application/vnd.github.v3+json" \
-              -H "Authorization: token $DISPATCH_TOKEN" \
+              -H "Authorization: token ${DISPATCH_TOKEN}" \
               "https://api.github.com/repos/$repo/dispatches" \
               -d "{
                 \"event_type\": \"sync-from-ghcommon\",
@@ -162,9 +162,11 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## 🔄 Sync Dispatch Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Sync Type:** ${{ steps.sync-type.outputs.sync_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Target Repositories:** ${{ steps.repos.outputs.repos }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source SHA:** $SOURCE_SHA" >> $GITHUB_STEP_SUMMARY
-          echo "- **Triggered By:** $EVENT_NAME" >> $GITHUB_STEP_SUMMARY
-          echo "- **Actor:** $ACTOR" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🔄 Sync Dispatch Summary"
+            echo "- **Sync Type:** ${{ steps.sync-type.outputs.sync_type }}"
+            echo "- **Target Repositories:** ${{ steps.repos.outputs.repos }}"
+            echo "- **Source SHA:** $SOURCE_SHA"
+            echo "- **Triggered By:** $EVENT_NAME"
+            echo "- **Actor:** $ACTOR"
+          } >> "$GITHUB_STEP_SUMMARY"

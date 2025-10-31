@@ -1,5 +1,5 @@
 # file: .github/workflows/performance-monitoring.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: performance-monitoring-workflow-2025
 
 name: Performance Monitoring
@@ -138,10 +138,12 @@ jobs:
     steps:
       - name: Summarize results
         run: |
-          echo "## Benchmark Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Suite | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Rust | ${{ needs.rust-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Node.js | ${{ needs.node-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Python | ${{ needs.python-benchmarks.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          ## Benchmark Summary
+
+          | Suite | Result |
+          |-------|--------|
+          | Rust | ${{ needs.rust-benchmarks.result }} |
+          | Node.js | ${{ needs.node-benchmarks.result }} |
+          | Python | ${{ needs.python-benchmarks.result }} |
+          EOF

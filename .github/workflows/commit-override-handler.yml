@@ -76,10 +76,10 @@ jobs:
           # Attempt to gather commit messages relative to base; fall back gracefully on errors
           set +e
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            COMMITS=$(git log --pretty=format:"%s" origin/$BASE_BRANCH..HEAD 2>/dev/null)
+            COMMITS=$(git log --pretty=format:"%s" "origin/${BASE_BRANCH}..HEAD" 2>/dev/null)
             STATUS=$?
             if [ $STATUS -ne 0 ] || [ -z "$COMMITS" ]; then
-              echo "⚠️  Unable to compute commit range origin/$BASE_BRANCH..HEAD (exit $STATUS). Falling back to last 20 commits on HEAD."
+              echo "⚠️  Unable to compute commit range origin/${BASE_BRANCH}..HEAD (exit $STATUS). Falling back to last 20 commits on HEAD."
               COMMITS=$(git log --pretty=format:"%s" -n 20)
             fi
           else
@@ -122,35 +122,33 @@ jobs:
           fi
 
           # Output results
-          echo "skip-tests=$SKIP_TESTS" >> $GITHUB_OUTPUT
-          echo "skip-validation=$SKIP_VALIDATION" >> $GITHUB_OUTPUT
-          echo "skip-ci=$SKIP_CI" >> $GITHUB_OUTPUT
-          echo "skip-build=$SKIP_BUILD" >> $GITHUB_OUTPUT
-          echo "commit-message<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "skip-tests=$SKIP_TESTS"
+            echo "skip-validation=$SKIP_VALIDATION"
+            echo "skip-ci=$SKIP_CI"
+            echo "skip-build=$SKIP_BUILD"
+            echo "commit-message<<EOF"
+            echo "$COMMITS"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
 
           # Summary
-          echo "## 🔍 Commit Override Analysis" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Override Type | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Skip Tests | $SKIP_TESTS |" >> $GITHUB_STEP_SUMMARY
-          echo "| Skip Validation | $SKIP_VALIDATION |" >> $GITHUB_STEP_SUMMARY
-          echo "| Skip CI | $SKIP_CI |" >> $GITHUB_STEP_SUMMARY
-          echo "| Skip Build | $SKIP_BUILD |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          summary_content="## 🔍 Commit Override Analysis\n\n"
+          summary_content+="| Override Type | Status |\n"
+          summary_content+="|---------------|--------|\n"
+          summary_content+="| Skip Tests | $SKIP_TESTS |\n"
+          summary_content+="| Skip Validation | $SKIP_VALIDATION |\n"
+          summary_content+="| Skip CI | $SKIP_CI |\n"
+          summary_content+="| Skip Build | $SKIP_BUILD |\n\n"
 
           if [ "$SKIP_TESTS" = "true" ] || [ "$SKIP_VALIDATION" = "true" ] || [ "$SKIP_CI" = "true" ] || [ "$SKIP_BUILD" = "true" ]; then
-            echo "⚠️ **Warning**: Some CI checks have been disabled via commit message overrides." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Commit Messages Analyzed:**" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "$COMMITS" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            summary_content+="⚠️ **Warning**: Some CI checks have been disabled via commit message overrides.\n\n"
+            summary_content+="**Commit Messages Analyzed:**\n\`\`\`\n${COMMITS}\n\`\`\`\n"
           else
-            echo "✅ **All CI checks enabled** - No override keywords detected." >> $GITHUB_STEP_SUMMARY
+            summary_content+="✅ **All CI checks enabled** - No override keywords detected.\n"
           fi
+
+          printf '%s' "${summary_content}" >> "${GITHUB_STEP_SUMMARY}"
 
   # This job can be referenced by other workflows to conditionally skip steps
   notify-overrides:
@@ -161,35 +159,40 @@ jobs:
     steps:
       - name: Display override status
         run: |
-          echo "## 🎛️ CI Override Configuration" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The following overrides are active for this workflow:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY}"
+          {
+            echo "## 🎛️ CI Override Configuration"
+            echo ""
+            echo "The following overrides are active for this workflow:"
+            echo ""
+          } >> "${SUMMARY_FILE}"
 
           if [ "${{ needs.check-overrides.outputs.skip-tests }}" = "true" ]; then
-            echo "- 🚫 **Tests will be skipped**" >> $GITHUB_STEP_SUMMARY
+            echo "- 🚫 **Tests will be skipped**" >> "${SUMMARY_FILE}"
           else
-            echo "- ✅ **Tests will run normally**" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Tests will run normally**" >> "${SUMMARY_FILE}"
           fi
 
           if [ "${{ needs.check-overrides.outputs.skip-validation }}" = "true" ]; then
-            echo "- 🚫 **Validation/Linting will be skipped**" >> $GITHUB_STEP_SUMMARY
+            echo "- 🚫 **Validation/Linting will be skipped**" >> "${SUMMARY_FILE}"
           else
-            echo "- ✅ **Validation/Linting will run normally**" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Validation/Linting will run normally**" >> "${SUMMARY_FILE}"
           fi
 
           if [ "${{ needs.check-overrides.outputs.skip-build }}" = "true" ]; then
-            echo "- 🚫 **Build steps will be skipped**" >> $GITHUB_STEP_SUMMARY
+            echo "- 🚫 **Build steps will be skipped**" >> "${SUMMARY_FILE}"
           else
-            echo "- ✅ **Build steps will run normally**" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Build steps will run normally**" >> "${SUMMARY_FILE}"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Available Override Keywords" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Use these in your commit messages to control CI behavior:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Skip Tests**: `[skip tests]`, `[no tests]`, `SKIP TESTS`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Skip Validation**: `[skip validation]`, `[skip lint]`, `SKIP VALIDATION`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Skip CI**: `[skip ci]`, `[ci skip]`, `SKIP CI`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Skip Build**: `[skip build]`, `[no build]`, `SKIP BUILD`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo ""
+            echo "### Available Override Keywords"
+            echo ""
+            echo "Use these in your commit messages to control CI behavior:"
+            echo ""
+            echo "- **Skip Tests**: \`[skip tests]\`, \`[no tests]\`, \`SKIP TESTS\`"
+            echo "- **Skip Validation**: \`[skip validation]\`, \`[skip lint]\`, \`SKIP VALIDATION\`"
+            echo "- **Skip CI**: \`[skip ci]\`, \`[ci skip]\`, \`SKIP CI\`"
+            echo "- **Skip Build**: \`[skip build]\`, \`[no build]\`, \`SKIP BUILD\`"
+          } >> "${SUMMARY_FILE}"

@@ -1,5 +1,5 @@
 # file: .github/workflows/documentation.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: docs-automation-workflow-2025
 
 name: Documentation
@@ -92,21 +92,32 @@ jobs:
   deploy-docs:
     name: Deploy Documentation
     needs: build-docs
-    if: needs.build-docs.result == 'success' && github.ref == 'refs/heads/main' && secrets.DOCS_DEPLOY_TOKEN != ''
+    if: needs.build-docs.result == 'success' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: documentation
+    env:
+      DOCS_DEPLOY_TOKEN: ${{ secrets.DOCS_DEPLOY_TOKEN }}
     steps:
+      - name: Check deployment token
+        if: env.DOCS_DEPLOY_TOKEN == ''
+        run: |
+          echo "DOCS_DEPLOY_TOKEN secret not set; skipping deployment."
+          exit 0
+
       - uses: actions/checkout@v5
+        if: env.DOCS_DEPLOY_TOKEN != ''
 
       - name: Download documentation artifact
         uses: actions/download-artifact@v6
+        if: env.DOCS_DEPLOY_TOKEN != ''
         with:
           name: documentation-build
           path: docs-build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
+        if: env.DOCS_DEPLOY_TOKEN != ''
         with:
-          github_token: ${{ secrets.DOCS_DEPLOY_TOKEN }}
+          github_token: ${{ env.DOCS_DEPLOY_TOKEN }}
           publish_dir: docs-build/site
           keep_files: true

@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.5.0
+# version: 4.5.1
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
@@ -57,9 +57,26 @@ jobs:
       - name: Detect project languages (for linter toolchain setup)
         id: detect_langs
         run: |
-          echo "go_present=$(test -f go.mod && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "rust_present=$(test -f Cargo.toml && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "node_present=$(test -f package.json || test -f webui/package.json && echo true || echo false)" >> $GITHUB_OUTPUT
+          go_present=false
+          if [ -f "go.mod" ]; then
+            go_present=true
+          fi
+
+          rust_present=false
+          if [ -f "Cargo.toml" ]; then
+            rust_present=true
+          fi
+
+          node_present=false
+          if [ -f "package.json" ] || [ -f "webui/package.json" ]; then
+            node_present=true
+          fi
+
+          {
+            echo "go_present=${go_present}"
+            echo "rust_present=${rust_present}"
+            echo "node_present=${node_present}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Setup Go (if go.mod present)
         if: steps.detect_langs.outputs.go_present == 'true'
@@ -92,12 +109,14 @@ jobs:
           # Check if PR-specific config exists, fallback to default
           if [ -f "super-linter-pr.env" ]; then
             echo "Using PR automation configuration: super-linter-pr.env"
-            cat super-linter-pr.env >> $GITHUB_ENV
+            cat super-linter-pr.env >> "$GITHUB_ENV"
           else
             echo "PR config not found, using default configuration"
-            echo "VALIDATE_ALL_CODEBASE=false" >> $GITHUB_ENV
-            echo "DEFAULT_BRANCH=${{ github.event.repository.default_branch }}" >> $GITHUB_ENV
-            echo "FILTER_REGEX_EXCLUDE=${{ env.FILTER_REGEX_EXCLUDE }}" >> $GITHUB_ENV
+            {
+              echo "VALIDATE_ALL_CODEBASE=false"
+              echo "DEFAULT_BRANCH=${{ github.event.repository.default_branch }}"
+              echo "FILTER_REGEX_EXCLUDE=${{ env.FILTER_REGEX_EXCLUDE }}"
+            } >> "$GITHUB_ENV"
           fi
 
       - name: Run Super Linter with Auto-Fix
@@ -110,10 +129,10 @@ jobs:
         id: check-fixes
         run: |
           if ! git diff --quiet; then
-            echo "has_fixes=true" >> $GITHUB_OUTPUT
+            echo "has_fixes=true" >> "$GITHUB_OUTPUT"
             echo "Auto-fixes were applied by Super Linter"
           else
-            echo "has_fixes=false" >> $GITHUB_OUTPUT
+            echo "has_fixes=false" >> "$GITHUB_OUTPUT"
             echo "No auto-fixes were applied"
           fi
 
@@ -130,11 +149,13 @@ jobs:
           FIXED_FILES=$(git diff --cached --name-only | head -10)
           TOTAL_FILES=$(git diff --cached --name-only | wc -l)
 
-          echo "style: auto-fix linting issues [skip ci]" > commit_msg.txt
-          echo "" >> commit_msg.txt
-          echo "Auto-formatting and fixes applied by Super Linter." >> commit_msg.txt
-          echo "" >> commit_msg.txt
-          echo "Files changed:" >> commit_msg.txt
+          cat <<'EOF' > commit_msg.txt
+style: auto-fix linting issues [skip ci]
+
+Auto-formatting and fixes applied by Super Linter.
+
+Files changed:
+EOF
 
           echo "$FIXED_FILES" | while IFS= read -r file; do
             echo "- $file - Auto-formatting applied" >> commit_msg.txt
@@ -143,6 +164,13 @@ jobs:
           if [ "$TOTAL_FILES" -gt 10 ]; then
             echo "- ... and $((TOTAL_FILES - 10)) more files" >> commit_msg.txt
           fi
+
+          {
+            echo ""
+            echo "Total files changed: $TOTAL_FILES"
+            echo ""
+            echo "Generated-by: Super Linter"
+          } >> commit_msg.txt
 
           git commit -F commit_msg.txt
           rm commit_msg.txt
@@ -154,30 +182,35 @@ jobs:
       - name: Create Job Summary
         if: always()
         run: |
-          echo "# 🔍 Super Linter Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+# 🔍 Super Linter Summary
+EOF
 
           if [ "${{ steps.run-super-linter.outcome }}" = "success" ]; then
-            echo "✅ **All code quality checks passed!**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All code quality checks passed!**" >> "$GITHUB_STEP_SUMMARY"
           elif [ "${{ steps.run-super-linter.outcome }}" = "failure" ]; then
-            echo "❌ **Issues found that need attention**" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Issues found that need attention**" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "⚠️ **Linter status unknown** - check workflow logs" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Linter status unknown** - check workflow logs" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           # Show auto-fixes if applied
           if [ "${{ steps.check-fixes.outputs.has_fixes }}" = "true" ]; then
-            echo "## 🔧 Auto-fixes Applied" >> $GITHUB_STEP_SUMMARY
-            echo "Auto-formatting fixes were applied and committed." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## 🔧 Auto-fixes Applied"
+              echo "Auto-formatting fixes were applied and committed."
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
-          echo "- **Mode**: Changed files only" >> $GITHUB_STEP_SUMMARY
-          echo "- **Auto-fix**: true" >> $GITHUB_STEP_SUMMARY
-          echo "- **Auto-commit**: true" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Configuration"
+            echo "- **Mode**: Changed files only"
+            echo "- **Auto-fix**: true"
+            echo "- **Auto-commit**: true"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Super Linter results
         if: always() && hashFiles('super-linter-output/**/*') != ''
@@ -190,14 +223,16 @@ jobs:
       - name: Mark PR Automation Complete
         if: always()
         run: |
-          echo "PR_AUTOMATION_COMPLETE=true" >> $GITHUB_ENV
-          echo "# 🎯 PR Automation Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **PR automation workflow has completed**" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Code quality checks: ${{ steps.run-super-linter.outcome }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Auto-fixes applied: ${{ steps.check-fixes.outputs.has_fixes }}" >> $GITHUB_STEP_SUMMARY
-          echo "- CI workflow can now run safely" >> $GITHUB_STEP_SUMMARY
+          echo "PR_AUTOMATION_COMPLETE=true" >> "$GITHUB_ENV"
+          {
+            echo "# 🎯 PR Automation Complete"
+            echo ""
+            echo "✅ **PR automation workflow has completed**"
+            echo ""
+            echo "- Code quality checks: ${{ steps.run-super-linter.outcome }}"
+            echo "- Auto-fixes applied: ${{ steps.check-fixes.outputs.has_fixes }}"
+            echo "- CI workflow can now run safely"
+          } >> "$GITHUB_STEP_SUMMARY"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "_This marker allows CI workflows to detect completion of PR automation_" >> $GITHUB_STEP_SUMMARY
 

@@ -252,11 +252,13 @@ jobs:
     steps:
       - name: Summarize results
         run: |
-          echo "## CI Test Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Job | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Rust Tests | ${{ needs.rust-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Rust Benchmarks | ${{ needs.rust-benchmarks.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Python Tests | ${{ needs.python-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| JavaScript Tests | ${{ needs.javascript-tests.result || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## CI Test Summary"
+            echo ""
+            echo "| Job | Result |"
+            echo "|-----|--------|"
+            echo "| Rust Tests | ${{ needs.rust-tests.result || 'skipped' }} |"
+            echo "| Rust Benchmarks | ${{ needs.rust-benchmarks.result || 'skipped' }} |"
+            echo "| Python Tests | ${{ needs.python-tests.result || 'skipped' }} |"
+            echo "| JavaScript Tests | ${{ needs.javascript-tests.result || 'skipped' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

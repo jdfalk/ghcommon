@@ -43,17 +43,17 @@ jobs:
             VERSION_TAG="${GITHUB_REF#refs/tags/}"
           fi
 
-          echo "version_tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
+          echo "version_tag=${VERSION_TAG}" >> "${GITHUB_OUTPUT}"
           echo "📋 Processing version tag: ${VERSION_TAG}"
 
       - name: Check if repository has Go SDK modules
         id: check-sdk
         run: |
           if [ -d "sdks/go/v1" ]; then
-            echo "has_sdk=true" >> $GITHUB_OUTPUT
+            echo "has_sdk=true" >> "${GITHUB_OUTPUT}"
             echo "✅ Go SDK modules found"
           else
-            echo "has_sdk=false" >> $GITHUB_OUTPUT
+            echo "has_sdk=false" >> "${GITHUB_OUTPUT}"
             echo "ℹ️  No Go SDK modules found, skipping module tagging"
           fi
 
@@ -66,9 +66,7 @@ jobs:
           export PUSH_TAGS=true
 
           echo "🏷️  Creating module-specific tags for ${VERSION_TAG}"
-          python3 scripts/create-module-tags.py "${VERSION_TAG}"
-
-          if [ $? -eq 0 ]; then
+          if python3 scripts/create-module-tags.py "${VERSION_TAG}"; then
             echo "✅ Module tagging completed successfully"
           else
             echo "❌ Module tagging failed"
