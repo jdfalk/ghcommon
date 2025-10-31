@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.3.1
+# version: 1.3.2
 # guid: f3a4b5c6-d7e8-9f0a-1b2c-3d4e5f6a7b8c
 
 name: Frontend Release Build
@@ -49,10 +49,10 @@ jobs:
         id: detect
         run: |
           if [ -f "package.json" ] || [ -f "webui/package.json" ]; then
-            echo "found=true" >> $GITHUB_OUTPUT
+            echo "found=true" >> "$GITHUB_OUTPUT"
             echo "✅ package.json found"
           else
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "found=false" >> "$GITHUB_OUTPUT"
             echo "ℹ️ No package.json found – skipping frontend build/test steps for this repo."
           fi
 
@@ -103,7 +103,7 @@ jobs:
       - name: Summary (no frontend)
         if: steps.detect.outputs.found == 'false'
         run: |
-          echo "No frontend project detected (no package.json). Job treated as success." >> $GITHUB_STEP_SUMMARY
+          echo "No frontend project detected (no package.json). Job treated as success." >> "$GITHUB_STEP_SUMMARY"
 
   detect-frontend-package:
     name: Detect Frontend Package
@@ -134,15 +134,15 @@ jobs:
           {
             echo "# Frontend Package Detection"
             echo ""
-          if [[ "${{ steps.detect.outputs.has-package }}" == "true" ]]; then
-            DIR="${{ steps.detect.outputs.package-dir }}"
-            [ -z "${DIR}" ] && DIR="."
-            VERSION="${{ steps.detect.outputs.package-version }}"
-            [ -z "${VERSION}" ] && VERSION="unknown"
-            echo "- Package: \`${{ steps.detect.outputs.package-name }}\`"
-            echo "- Version: \`${VERSION}\`"
-            echo "- Directory: \`$DIR\`"
-            echo "- Package manager: \`${{ steps.detect.outputs.package-manager }}\`"
+            if [[ "${{ steps.detect.outputs.has-package }}" == "true" ]]; then
+              DIR="${{ steps.detect.outputs.package-dir }}"
+              [[ -z "${DIR}" ]] && DIR="."
+              VERSION="${{ steps.detect.outputs.package-version }}"
+              [[ -z "${VERSION}" ]] && VERSION="unknown"
+              echo "- Package: \`${{ steps.detect.outputs.package-name }}\`"
+              echo "- Version: \`${VERSION}\`"
+              echo "- Directory: \`${DIR}\`"
+              echo "- Package manager: \`${{ steps.detect.outputs.package-manager }}\`"
             else
               echo "- No package.json located for publishing."
             fi

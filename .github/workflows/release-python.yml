@@ -1,5 +1,5 @@
 # file: .github/workflows/release-python.yml
-# version: 1.3.1
+# version: 1.3.2
 # guid: d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a
 
 name: Python Release Build
@@ -167,7 +167,7 @@ jobs:
           set -euo pipefail
           rm -rf dist
           python -m build --sdist --wheel --outdir dist
-          ls -l dist
+          find dist -maxdepth 1 -type f -print | sort
 
       - name: Validate distributions with twine
         run: |
@@ -183,13 +183,20 @@ jobs:
       - name: Build summary
         shell: bash
         run: |
+          set -euo pipefail
+          ARTIFACT_LINES=$(python -c "import pathlib; dist=pathlib.Path('dist'); print('\\n'.join(f'  - {path.name}' for path in sorted(dist.iterdir()) if path.is_file()) if dist.exists() else '  - (dist directory missing)')")
+
           {
             echo "## Python Package Build"
             echo ""
             echo "- Package: \`${{ steps.version-check.outputs.package-name }}\`"
             echo "- Version: \`${{ steps.version-check.outputs.package-version }}\`"
             echo "- Artifacts:"
-            ls dist | sed 's/^/  - /'
+            if [ -n "${ARTIFACT_LINES}" ]; then
+              printf '%s\n' "${ARTIFACT_LINES}"
+            else
+              echo "  - (no files detected)"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   publish-python-package:
@@ -239,6 +246,7 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
+          set -euo pipefail
           python -m twine upload --repository pypi --skip-existing dist/*
 
       - name: Publish to GitHub Packages
@@ -246,22 +254,25 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -m twine upload \
+          set -euo pipefail
+          if ! python -m twine upload \
             --repository-url https://upload.pypi.org/legacy/ \
             --skip-existing \
-            dist/* || {
-              echo "GitHub Packages upload did not succeed; continuing."
-            }
+            dist/*; then
+            echo "GitHub Packages upload did not succeed; continuing."
+          fi
 
       - name: Publishing summary
         shell: bash
         run: |
+          set -euo pipefail
+
           {
             echo "## Python Package Publishing"
             echo ""
             echo "- Package: \`${{ needs.build-python-distribution.outputs.package-name }}\`"
             echo "- Version: \`${{ needs.build-python-distribution.outputs.package-version }}\`"
-            if [[ "$PYPI_TOKEN" != "" ]]; then
+            if [[ -n "${PYPI_TOKEN}" ]]; then
               echo "- PyPI: ✅ Attempted upload"
             else
               echo "- PyPI: ⏭️ Token not provided"

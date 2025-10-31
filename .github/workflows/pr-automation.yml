@@ -149,13 +149,13 @@ jobs:
           FIXED_FILES=$(git diff --cached --name-only | head -10)
           TOTAL_FILES=$(git diff --cached --name-only | wc -l)
 
-          cat <<'EOF' > commit_msg.txt
-style: auto-fix linting issues [skip ci]
-
-Auto-formatting and fixes applied by Super Linter.
-
-Files changed:
-EOF
+          {
+            printf '%s\n' "style: auto-fix linting issues [skip ci]"
+            printf '%s\n' ""
+            printf '%s\n' "Auto-formatting and fixes applied by Super Linter."
+            printf '%s\n' ""
+            printf '%s\n' "Files changed:"
+          } > commit_msg.txt
 
           echo "$FIXED_FILES" | while IFS= read -r file; do
             echo "- $file - Auto-formatting applied" >> commit_msg.txt
@@ -182,9 +182,9 @@ EOF
       - name: Create Job Summary
         if: always()
         run: |
-          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
-# 🔍 Super Linter Summary
-EOF
+          {
+            echo "# 🔍 Super Linter Summary"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ steps.run-super-linter.outcome }}" = "success" ]; then
             echo "✅ **All code quality checks passed!**" >> "$GITHUB_STEP_SUMMARY"
@@ -233,12 +233,14 @@ EOF
             echo "- Auto-fixes applied: ${{ steps.check-fixes.outputs.has_fixes }}"
             echo "- CI workflow can now run safely"
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "_This marker allows CI workflows to detect completion of PR automation_" >> $GITHUB_STEP_SUMMARY
+          {
+            echo ""
+            echo "_This marker allows CI workflows to detect completion of PR automation_"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           # Create a completion marker file for CI workflows
           mkdir -p .github/workflow-markers
-          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .github/workflow-markers/pr-automation-complete
+          date -u +%Y-%m-%dT%H:%M:%SZ > ".github/workflow-markers/pr-automation-complete"
           echo "PR automation completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
   # File-pattern based auto-labeling
@@ -290,114 +292,88 @@ EOF
       - name: Run intelligent labeling
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
         run: |
-          cat << 'EOF' > intelligent_labeling.py
+          set -euo pipefail
+          python <<'PY'
           import os
           import requests
-          import json
-          import re
-          from collections import defaultdict
+          from typing import Iterable, List
 
-          def analyze_pr_content(title, body, changed_files):
-              """Basic intelligent labeling based on content analysis"""
-              labels = []
 
-              # Analyze title and body
-              text = (title + " " + (body or "")).lower()
+          def analyze_pr_content(title: str, body: str | None, changed_files: Iterable[str]) -> List[str]:
+              """Basic intelligent labeling based on content analysis."""
+              labels: set[str] = set()
+              text = f"{title} {(body or '')}".lower()
 
-              # Bug fixes
-              if any(word in text for word in ['fix', 'bug', 'error', 'issue', 'problem']):
-                  labels.append('bug')
+              if any(word in text for word in ("fix", "bug", "error", "issue", "problem")):
+                  labels.add("bug")
+              if any(word in text for word in ("feature", "add", "new", "implement")):
+                  labels.add("enhancement")
+              if any(word in text for word in ("doc", "readme", "documentation")):
+                  labels.add("documentation")
+              if any(word in text for word in ("test", "testing", "spec")):
+                  labels.add("tests")
 
-              # Features
-              if any(word in text for word in ['feature', 'add', 'new', 'implement']):
-                  labels.append('enhancement')
+              for file_path in changed_files:
+                  lower_path = file_path.lower()
+                  if lower_path.endswith((".md", ".rst")):
+                      labels.add("documentation")
+                  elif lower_path.endswith(".go"):
+                      labels.add("go")
+                  elif lower_path.endswith((".js", ".ts", ".jsx", ".tsx")):
+                      labels.add("frontend")
+                  elif lower_path.endswith(".py"):
+                      labels.add("python")
+                  elif lower_path.endswith(("dockerfile", ".docker")):
+                      labels.add("docker")
+                  elif "test" in lower_path:
+                      labels.add("tests")
 
-              # Documentation
-              if any(word in text for word in ['doc', 'readme', 'documentation']):
-                  labels.append('documentation')
+              return sorted(labels)
 
-              # Tests
-              if any(word in text for word in ['test', 'testing', 'spec']):
-                  labels.append('tests')
 
-              # Analyze changed files
-              for file in changed_files:
-                  file_lower = file.lower()
-                  if file_lower.endswith(('.md', '.rst')):
-                      labels.append('documentation')
-                  elif file_lower.endswith(('.go')):
-                      labels.append('go')
-                  elif file_lower.endswith(('.js', '.ts', '.jsx', '.tsx')):
-                      labels.append('frontend')
-                  elif file_lower.endswith(('.py')):
-                      labels.append('python')
-                  elif file_lower.endswith(('dockerfile', '.docker')):
-                      labels.append('docker')
-                  elif 'test' in file_lower:
-                      labels.append('tests')
+          github_token = os.environ.get("GITHUB_TOKEN")
+          repo = os.environ.get("GITHUB_REPOSITORY")
+          pr_number = os.environ.get("PR_NUMBER")
 
-              return list(set(labels))
-
-          # Get PR information
-          github_token = os.environ.get('GITHUB_TOKEN')
-          repo = os.environ.get('GITHUB_REPOSITORY')
-          pr_number = os.environ.get('PR_NUMBER', '${{ github.event.number }}')
-
-          if not all([github_token, repo, pr_number]):
-              print("Missing required environment variables")
-              exit(0)
+          if not all((github_token, repo, pr_number)):
+              raise SystemExit("Missing required environment variables.")
 
           headers = {
-              'Authorization': f'token {github_token}',
-              'Accept': 'application/vnd.github.v3+json'
+              "Authorization": f"token {github_token}",
+              "Accept": "application/vnd.github.v3+json",
           }
 
-          # Get PR details
-          pr_url = f'https://api.github.com/repos/{repo}/pulls/{pr_number}'
-          pr_response = requests.get(pr_url, headers=headers)
+          session = requests.Session()
+          session.headers.update(headers)
 
-          if pr_response.status_code != 200:
-              print(f"Failed to get PR details: {pr_response.status_code}")
-              exit(0)
-
+          pr_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}"
+          pr_response = session.get(pr_url, timeout=30)
+          pr_response.raise_for_status()
           pr_data = pr_response.json()
 
-          # Get changed files
-          files_url = f'https://api.github.com/repos/{repo}/pulls/{pr_number}/files'
-          files_response = requests.get(files_url, headers=headers)
+          files_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files?per_page=100"
+          files_response = session.get(files_url, timeout=30)
+          files_response.raise_for_status()
+          changed_files = [item["filename"] for item in files_response.json()]
 
-          if files_response.status_code != 200:
-              print(f"Failed to get changed files: {files_response.status_code}")
-              exit(0)
-
-          changed_files = [f['filename'] for f in files_response.json()]
-
-          # Analyze and suggest labels
           suggested_labels = analyze_pr_content(
-              pr_data['title'],
-              pr_data['body'],
-              changed_files
+              pr_data.get("title", ""),
+              pr_data.get("body"),
+              changed_files,
           )
 
           print(f"Suggested labels for PR #{pr_number}: {suggested_labels}")
 
-          # Apply labels
           if suggested_labels:
-              labels_url = f'https://api.github.com/repos/{repo}/issues/{pr_number}/labels'
-              labels_response = requests.post(
-                  labels_url,
-                  headers=headers,
-                  json={'labels': suggested_labels}
-              )
-
-              if labels_response.status_code == 200:
+              labels_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/labels"
+              response = session.post(labels_url, json={"labels": suggested_labels}, timeout=30)
+              if response.ok:
                   print(f"✅ Successfully applied labels: {suggested_labels}")
               else:
-                  print(f"❌ Failed to apply labels: {labels_response.status_code}")
-          EOF
-
-          python intelligent_labeling.py
+                  print(f"❌ Failed to apply labels: {response.status_code}")
+          PY
 
   # PR size and complexity analysis
   pr-analysis:
@@ -414,43 +390,49 @@ EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get changed files and calculate metrics
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.repository.default_branch }}...HEAD | wc -l)
-          ADDED_LINES=$(git diff --numstat origin/${{ github.event.repository.default_branch }}...HEAD | awk '{sum += $1} END {print sum}')
-          DELETED_LINES=$(git diff --numstat origin/${{ github.event.repository.default_branch }}...HEAD | awk '{sum += $2} END {print sum}')
+          set -euo pipefail
+
+          BASE_REF="origin/${{ github.event.repository.default_branch }}"
+          CHANGED_FILES=$(git diff --name-only "${BASE_REF}...HEAD" | wc -l | tr -d '[:space:]')
+
+          ADDED_LINES=$(git diff --numstat "${BASE_REF}...HEAD" | awk '{sum += $1} END {print sum}')
+          ADDED_LINES=${ADDED_LINES:-0}
+          DELETED_LINES=$(git diff --numstat "${BASE_REF}...HEAD" | awk '{sum += $2} END {print sum}')
+          DELETED_LINES=${DELETED_LINES:-0}
           TOTAL_CHANGES=$((ADDED_LINES + DELETED_LINES))
 
-          echo "# 📊 PR Analysis" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Files Changed | $CHANGED_FILES |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lines Added | $ADDED_LINES |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lines Deleted | $DELETED_LINES |" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Changes | $TOTAL_CHANGES |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# 📊 PR Analysis"
+            echo ""
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            echo "| Files Changed | ${CHANGED_FILES} |"
+            echo "| Lines Added | ${ADDED_LINES} |"
+            echo "| Lines Deleted | ${DELETED_LINES} |"
+            echo "| Total Changes | ${TOTAL_CHANGES} |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
 
           # Determine size label
-          if [ $TOTAL_CHANGES -lt 10 ]; then
+          if [ "${TOTAL_CHANGES}" -lt 10 ]; then
             SIZE_LABEL="size/XS"
-          elif [ $TOTAL_CHANGES -lt 30 ]; then
+          elif [ "${TOTAL_CHANGES}" -lt 30 ]; then
             SIZE_LABEL="size/S"
-          elif [ $TOTAL_CHANGES -lt 100 ]; then
+          elif [ "${TOTAL_CHANGES}" -lt 100 ]; then
             SIZE_LABEL="size/M"
-          elif [ $TOTAL_CHANGES -lt 500 ]; then
+          elif [ "${TOTAL_CHANGES}" -lt 500 ]; then
             SIZE_LABEL="size/L"
           else
             SIZE_LABEL="size/XL"
           fi
 
-          echo "**Size Classification**: \`$SIZE_LABEL\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Size Classification**: \`${SIZE_LABEL}\`" >> "$GITHUB_STEP_SUMMARY"
 
-          # Apply size label
-          curl -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
+          curl -sS -X POST \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels \
-            -d "{\"labels\": [\"$SIZE_LABEL\"]}"
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels" \
+            -d "{\"labels\":[\"${SIZE_LABEL}\"]}"
 
   # Check for breaking changes
   breaking-changes:
@@ -465,30 +447,43 @@ EOF
 
       - name: Check for breaking changes
         run: |
-          echo "# 🚨 Breaking Changes Analysis" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          set -euo pipefail
 
-          # Check commit messages for breaking change indicators
-          BREAKING_COMMITS=$(git log --oneline origin/${{ github.event.repository.default_branch }}...HEAD | grep -i "breaking\|BREAKING" || true)
+          BASE_REF="origin/${{ github.event.repository.default_branch }}"
+          BREAKING_COMMITS=$(git log --oneline "${BASE_REF}...HEAD" | grep -Ei 'breaking' || true)
+          API_CHANGES=$(git diff "${BASE_REF}...HEAD" -- '*.go' | grep -E '^-.*func.*\(' || true)
 
-          # Check for API changes in Go files
-          API_CHANGES=$(git diff --name-only origin/${{ github.event.repository.default_branch }}...HEAD | grep -E "\.(go)$" | xargs -I {} git diff origin/${{ github.event.repository.default_branch }}...HEAD -- {} | grep -E "^-.*func.*\(" || true)
+          {
+            echo "# 🚨 Breaking Changes Analysis"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ -n "$BREAKING_COMMITS" ]; then
-            echo "⚠️ **Potential breaking changes detected in commits:**" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "$BREAKING_COMMITS" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${BREAKING_COMMITS}${API_CHANGES}" ]; then
+            {
+              echo "⚠️ **Potential breaking changes detected.**"
+              if [ -n "${BREAKING_COMMITS}" ]; then
+                echo ""
+                echo "Commits referencing breaking changes:"
+                echo '```'
+                echo "${BREAKING_COMMITS}"
+                echo '```'
+              fi
+              if [ -n "${API_CHANGES}" ]; then
+                echo ""
+                echo "Notable API modifications detected in Go sources:"
+                echo '```diff'
+                echo "${API_CHANGES}"
+                echo '```'
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
 
-            # Apply breaking-change label
-            curl -X POST \
+            curl -sS -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels \
-              -d '{"labels": ["breaking-change"]}'
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels" \
+              -d '{"labels":["breaking-change"]}'
           else
-            echo "✅ **No breaking changes detected**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **No breaking changes detected**" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   # Conflict resolution helper
@@ -501,47 +496,56 @@ EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get PR status
-          PR_STATUS=$(curl -s \
-            -H "Authorization: token $GITHUB_TOKEN" \
+          set -euo pipefail
+
+          PR_STATUS=$(curl -sS \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }} \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}" \
             | jq -r '.mergeable')
 
-          echo "# 🔀 Merge Status" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          PR_STATUS=${PR_STATUS:-"unknown"}
 
-          if [ "$PR_STATUS" = "false" ]; then
-            echo "❌ **Merge conflicts detected**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "This PR has merge conflicts that need to be resolved." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Steps to resolve:**" >> $GITHUB_STEP_SUMMARY
-            echo "1. Pull the latest changes from the base branch" >> $GITHUB_STEP_SUMMARY
-            echo "2. Merge or rebase your branch" >> $GITHUB_STEP_SUMMARY
-            echo "3. Resolve any conflicts" >> $GITHUB_STEP_SUMMARY
-            echo "4. Push the resolved changes" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# 🔀 Merge Status"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
 
-            # Apply needs-rebase label
-            curl -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
+          if [ "${PR_STATUS}" = "false" ]; then
+            {
+              echo "❌ **Merge conflicts detected**"
+              echo ""
+              echo "This PR has merge conflicts that need to be resolved."
+              echo ""
+              echo "**Steps to resolve:**"
+              echo "1. Pull the latest changes from the base branch"
+              echo "2. Merge or rebase your branch"
+              echo "3. Resolve any conflicts"
+              echo "4. Push the resolved changes"
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            curl -sS -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels \
-              -d '{"labels": ["needs-rebase"]}'
-          elif [ "$PR_STATUS" = "true" ]; then
-            echo "✅ **No merge conflicts**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "This PR can be merged cleanly." >> $GITHUB_STEP_SUMMARY
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels" \
+              -d '{"labels":["needs-rebase"]}'
+          elif [ "${PR_STATUS}" = "true" ]; then
+            {
+              echo "✅ **No merge conflicts**"
+              echo ""
+              echo "This PR can be merged cleanly."
+            } >> "$GITHUB_STEP_SUMMARY"
 
-            # Remove needs-rebase label if present
-            curl -X DELETE \
-              -H "Authorization: token $GITHUB_TOKEN" \
+            curl -sS -X DELETE \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels/needs-rebase || true
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/labels/needs-rebase" || true
           else
-            echo "⏳ **Merge status unknown**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "GitHub is still calculating the merge status." >> $GITHUB_STEP_SUMMARY
+            {
+              echo "⏳ **Merge status unknown**"
+              echo ""
+              echo "GitHub is still calculating the merge status."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
   # PR automation summary
@@ -553,51 +557,56 @@ EOF
     steps:
       - name: Generate summary
         run: |
-          echo "# 🤖 PR Automation Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          set -euo pipefail
+          SUMMARY_FILE="$GITHUB_STEP_SUMMARY"
 
-          if [[ "${{ needs.code-quality.result }}" == "success" ]]; then
-            echo "✅ **Code Quality**: Passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Code Quality**: Failed" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "# 🤖 PR Automation Summary"
+            echo ""
 
-          if [[ "${{ needs.auto-labeling.result }}" == "success" ]]; then
-            echo "✅ **Auto Labeling**: Applied" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⏭️ **Auto Labeling**: Skipped" >> $GITHUB_STEP_SUMMARY
-          fi
+            if [[ "${{ needs.code-quality.result }}" == "success" ]]; then
+              echo "✅ **Code Quality**: Passed"
+            else
+              echo "❌ **Code Quality**: Failed"
+            fi
 
-          if [[ "${{ needs.intelligent-labeling.result }}" == "success" ]]; then
-            echo "✅ **AI Labeling**: Applied" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⏭️ **AI Labeling**: Skipped" >> $GITHUB_STEP_SUMMARY
-          fi
+            if [[ "${{ needs.auto-labeling.result }}" == "success" ]]; then
+              echo "✅ **Auto Labeling**: Applied"
+            else
+              echo "⏭️ **Auto Labeling**: Skipped"
+            fi
 
-          if [[ "${{ needs.pr-analysis.result }}" == "success" ]]; then
-            echo "✅ **PR Analysis**: Completed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⏭️ **PR Analysis**: Skipped" >> $GITHUB_STEP_SUMMARY
-          fi
+            if [[ "${{ needs.intelligent-labeling.result }}" == "success" ]]; then
+              echo "✅ **AI Labeling**: Applied"
+            else
+              echo "⏭️ **AI Labeling**: Skipped"
+            fi
 
-          if [[ "${{ needs.attestations.result }}" == "success" ]]; then
-            echo "✅ **Attestations**: Generated" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.attestations.result }}" == "skipped" ]]; then
-            echo "⏭️ **Attestations**: Skipped" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Attestations**: Failed" >> $GITHUB_STEP_SUMMARY
-          fi
+            if [[ "${{ needs.pr-analysis.result }}" == "success" ]]; then
+              echo "✅ **PR Analysis**: Completed"
+            else
+              echo "⏭️ **PR Analysis**: Skipped"
+            fi
 
-          if [[ "${{ needs.ai-rebase.result }}" == "success" ]]; then
-            echo "✅ **AI Rebase**: Completed" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.ai-rebase.result }}" == "skipped" ]]; then
-            echo "⏭️ **AI Rebase**: Skipped (no conflicts)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **AI Rebase**: Failed" >> $GITHUB_STEP_SUMMARY
-          fi
+            if [[ "${{ needs.attestations.result }}" == "success" ]]; then
+              echo "✅ **Attestations**: Generated"
+            elif [[ "${{ needs.attestations.result }}" == "skipped" ]]; then
+              echo "⏭️ **Attestations**: Skipped"
+            else
+              echo "❌ **Attestations**: Failed"
+            fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Workflow completed at**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ needs.ai-rebase.result }}" == "success" ]]; then
+              echo "✅ **AI Rebase**: Completed"
+            elif [[ "${{ needs.ai-rebase.result }}" == "skipped" ]]; then
+              echo "⏭️ **AI Rebase**: Skipped (no conflicts)"
+            else
+              echo "❌ **AI Rebase**: Failed"
+            fi
+
+            echo ""
+            echo "**Workflow completed at**: $(date -u)"
+          } >> "${SUMMARY_FILE}"
 
   # AI-powered rebase and conflict resolution
   ai-rebase:
@@ -651,12 +660,16 @@ EOF
         if: steps.conflict-check.outputs.result == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
+          set -euo pipefail
           chmod +x .github/scripts/ai-rebase.sh
           .github/scripts/ai-rebase.sh \
-            "${{ github.event.pull_request.number }}" \
-            "${{ github.event.pull_request.base.ref }}" \
-            "${{ github.event.pull_request.head.ref }}"
+            "${PR_NUMBER}" \
+            "${PR_BASE_REF}" \
+            "${PR_HEAD_REF}"
 
   # SBOM generation and provenance attestations (runs on PR for visibility)
   attestations:
@@ -691,9 +704,10 @@ EOF
 
       - name: Create attestation bundle
         run: |
+          set -euo pipefail
           tar -czf pr-automation-context.tar.gz \
             .github/workflows/pr-automation.yml \
-            sbom.spdx.json || true
+            sbom.spdx.json
           ls -l pr-automation-context.tar.gz
 
       - name: Attest SBOM
@@ -710,7 +724,9 @@ EOF
       - name: Attestation summary
         if: always()
         run: |
-          echo "# 🛡️ Attestations" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Generated SBOM (sbom.spdx.json) and created provenance & SBOM attestations." >> $GITHUB_STEP_SUMMARY
-            echo "Subject: pr-automation-context.tar.gz" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# 🛡️ Attestations"
+            echo ""
+            echo "Generated SBOM (sbom.spdx.json) and created provenance & SBOM attestations."
+            echo "Subject: pr-automation-context.tar.gz"
+          } >> "$GITHUB_STEP_SUMMARY"

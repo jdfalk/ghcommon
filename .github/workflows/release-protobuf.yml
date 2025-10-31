@@ -1,5 +1,5 @@
 # file: .github/workflows/release-protobuf.yml
-# version: 1.3.0
+# version: 1.3.1
 # guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
 
 name: Release Protobuf Assets
@@ -47,15 +47,20 @@ jobs:
       - name: Quick change detection
         id: changes
         run: |
-          if git ls-files -m | grep -qE '(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$|scripts/setup-go-modules.py|scripts/setup-python-sdk.py'; then
-            echo "proto_changed=true" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          BASE_REF="origin/${GITHUB_BASE_REF:-main}"
+          MODIFIED_PATTERN='(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$|scripts/setup-go-modules.py|scripts/setup-python-sdk.py'
+          DIFF_PATTERN='(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$'
+
+          if git ls-files -m | grep -Eq "${MODIFIED_PATTERN}"; then
+            echo "proto_changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "${BASE_REF}" | grep -Eq "${DIFF_PATTERN}"; then
+            echo "proto_changed=true" >> "$GITHUB_OUTPUT"
           else
-            if git diff --name-only origin/${GITHUB_BASE_REF:-main} | grep -qE '(^|/)proto/.*\.proto$|buf\.ya?ml$|buf\.gen\.ya?ml$'; then
-              echo "proto_changed=true" >> $GITHUB_OUTPUT
-            else
-              echo "proto_changed=false" >> $GITHUB_OUTPUT
-            fi
+            echo "proto_changed=false" >> "$GITHUB_OUTPUT"
           fi
+
           echo "Build target input: '${{ inputs.build_target }}'"
 
       - name: Set up Go
@@ -71,30 +76,44 @@ jobs:
 
       - name: Install protoc
         run: |
+          set -euo pipefail
+
           PROTOC_VERSION="${{ env.PROTOC_VERSION }}"
           PB_REL="https://github.com/protocolbuffers/protobuf/releases"
+          ARCHIVE="protoc-${PROTOC_VERSION}-linux-x86_64.zip"
+          TMP_DIR="$(mktemp -d)"
+
           echo "Downloading protoc ${PROTOC_VERSION}..."
-          curl -sSL -o protoc.zip $PB_REL/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip
-          unzip -q protoc.zip -d $HOME/protoc
-          sudo cp $HOME/protoc/bin/protoc /usr/local/bin/
+          curl -sSL -o "${TMP_DIR}/protoc.zip" "${PB_REL}/download/v${PROTOC_VERSION}/${ARCHIVE}"
+          unzip -q "${TMP_DIR}/protoc.zip" -d "${TMP_DIR}/protoc"
+          sudo install -m 0755 "${TMP_DIR}/protoc/bin/protoc" /usr/local/bin/protoc
           sudo mkdir -p /usr/local/include
-          sudo cp -r $HOME/protoc/include/* /usr/local/include/
+          sudo cp -r "${TMP_DIR}/protoc/include/." /usr/local/include/
           protoc --version
 
       - name: Install buf CLI
         run: |
+          set -euo pipefail
+
           BUF_VERSION="${{ env.BUF_VERSION }}"
+          OS_NAME=$(uname -s)
+          ARCH=$(uname -m)
           echo "Installing buf ${BUF_VERSION}..."
-          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-$(uname -s)-$(uname -m)" -o /tmp/buf
-          sudo mv /tmp/buf /usr/local/bin/buf
-          sudo chmod +x /usr/local/bin/buf
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-${OS_NAME}-${ARCH}" -o /tmp/buf
+          sudo install -m 0755 /tmp/buf /usr/local/bin/buf
           buf --version
 
       - name: Install Go protoc plugins
         run: |
-          echo "Installing protoc-gen-go..." && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          echo "Installing protoc-gen-go-grpc..." && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          set -euo pipefail
+
+          echo "Installing protoc-gen-go..."
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+
+          echo "Installing protoc-gen-go-grpc..."
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
           protoc-gen-go --version || echo "protoc-gen-go version not reported"
           protoc-gen-go-grpc --version || echo "protoc-gen-go-grpc version not reported"
 
@@ -109,12 +128,15 @@ jobs:
       - name: Generate SDKs (make generate)
         id: generate
         run: |
+          set -euo pipefail
+
           if [ "${{ steps.changes.outputs.proto_changed }}" = "true" ] || [ "${{ inputs.force }}" = "true" ]; then
             if make -n generate >/dev/null 2>&1; then
-              echo "Running make generate..."; make generate
+              echo "Running make generate..."
+              make generate
             else
               echo "Makefile generate target missing; running fallback buf generate"
-              buf generate || exit 1
+              buf generate
             fi
           else
             echo "No proto changes detected and force not enabled; skipping generation"
@@ -123,6 +145,8 @@ jobs:
       - name: Determine artifact availability
         id: artifact-status
         run: |
+          set -euo pipefail
+
           if [ "${{ steps.changes.outputs.proto_changed }}" = "true" ] || [ "${{ inputs.force }}" = "true" ]; then
             echo "artifacts_available=true" >> "$GITHUB_OUTPUT"
           else
@@ -148,6 +172,8 @@ jobs:
       - name: Check Buf token
         id: token
         run: |
+          set -euo pipefail
+
           if [ -n "${BUF_TOKEN}" ]; then
             echo "has-token=true" >> "$GITHUB_OUTPUT"
           else
@@ -206,6 +232,8 @@ jobs:
           MODULE_PATH: ${{ steps.module.outputs.module }}
           PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
         run: |
+          set -euo pipefail
+
           status="skipped"
           message="- Skipped: BUF_TOKEN secret not configured."
 
@@ -222,12 +250,15 @@ jobs:
                 ;;
               *)
                 status="skipped"
-                message="- Skipped: Buf publish step did not run."
+              message="- Skipped: Buf publish step did not run."
                 ;;
             esac
           fi
 
-          echo "## Buf Module Publishing" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "${message}" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Buf Module Publishing"
+            echo ""
+            echo "${message}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
           echo "buf_published=${status}" >> "$GITHUB_OUTPUT"

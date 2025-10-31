@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.2.1
+# version: 2.2.2
 # guid: e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b
 
 name: Go Release Build
@@ -647,9 +647,11 @@ jobs:
           MODULE_VERSION="${{ needs.validate-go-module.outputs.module-version }}"
           TAG_NAME="${GITHUB_REF#refs/tags/}"
 
-          echo "module-path=${MODULE_PATH}" >> "$GITHUB_OUTPUT"
-          echo "module-version=${MODULE_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag-name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          {
+            echo "module-path=${MODULE_PATH}"
+            echo "module-version=${MODULE_VERSION}"
+            echo "tag-name=${TAG_NAME}"
+          } >> "$GITHUB_OUTPUT"
 
           {
             echo "# Go Module Publishing"
@@ -712,6 +714,10 @@ jobs:
       - name: Test module discoverability
         id: discoverability
         shell: bash
+        env:
+          GOPRIVATE: github.com/${{ github.repository_owner }}/*
+          GONOSUMDB: off
+          GOPROXY: direct
         run: |
           set -euo pipefail
 
@@ -719,7 +725,7 @@ jobs:
           VERSION="${{ steps.context.outputs.tag-name }}"
 
           echo "Checking module availability for ${MODULE}@${VERSION}"
-          if GOPRIVATE=github.com/${{ github.repository_owner }}/* GONOSUMDB=off GOPROXY=direct go list -m "${MODULE}@${VERSION}"; then
+          if go list -m "${MODULE}@${VERSION}"; then
             echo "discoverable=true" >> "$GITHUB_OUTPUT"
             echo "✅ Module is discoverable via go list"
           else
@@ -740,7 +746,7 @@ jobs:
           ZIP="${{ steps.create-archive.outputs.zip-name }}"
           PACKAGE_ENDPOINT="https://api.github.com/repos/${{ github.repository }}/packages/go/${{ github.event.repository.name }}/versions"
 
-          echo "Attempting to publish ${ZIP} to GitHub Packages (${PACKAGE_ENDPOINT})"
+          echo "Attempting to publish ${MODULE}@${VERSION} (${ZIP}) to GitHub Packages (${PACKAGE_ENDPOINT})"
           RESPONSE=$(curl -sS -X POST \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
@@ -838,9 +844,11 @@ jobs:
       - name: Prepare release assets
         run: |
           set -euo pipefail
-          ls -R artifacts | head -200
-          find artifacts -type f -maxdepth 4 -exec cp {} . \;
-          ls -l .
+          find artifacts -maxdepth 4 -type f -print | head -200
+          while IFS= read -r file; do
+            cp "${file}" .
+          done < <(find artifacts -maxdepth 4 -type f -print)
+          find . -maxdepth 1 -type f -print | sort
       - name: Create / Update Release
         uses: softprops/action-gh-release@v2
         with:
