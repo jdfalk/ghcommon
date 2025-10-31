@@ -4,11 +4,14 @@ from pathlib import Path
 
 import pytest
 import release_workflow
+import workflow_common
 
 
 @pytest.fixture(autouse=True)
 def reset_release_config_cache():
-    release_workflow._CONFIG_CACHE = None  # type: ignore[attr-defined]
+    workflow_common.reset_repository_config()
+    yield
+    workflow_common.reset_repository_config()
 
 
 def _parse_outputs(path: Path) -> dict[str, str]:
