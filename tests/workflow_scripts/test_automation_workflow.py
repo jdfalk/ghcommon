@@ -211,10 +211,15 @@ def test_filter_runs_by_lookback_filters_old_entries() -> None:
     assert all(item["name"] != "CI" or item["run_started_at"].startswith("2024-02") for item in filtered)
 
 
-def test_main_cache_key_outputs_json(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_cache_key_outputs_json(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """cache-key command prints JSON payload."""
     file_a = tmp_path / "example.txt"
     file_a.write_text("data\n", encoding="utf-8")
+    monkeypatch.setenv("GITHUB_OUTPUT", str(tmp_path / "outputs.txt"))
 
     exit_code = automation_workflow.main(
         [

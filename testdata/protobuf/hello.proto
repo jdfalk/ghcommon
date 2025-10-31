@@ -1,0 +1,11 @@
+# file: testdata/protobuf/hello.proto
+# version: 1.0.0
+# guid: 8642ace0-b135-79bd-f246-8ace0b13579d
+
+syntax = "proto3";
+
+package ghcommon.testdata;
+
+message Greeting {
+  string message = 1;
+}

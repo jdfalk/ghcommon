@@ -80,7 +80,7 @@ def test_wait_for_pr_automation_completed(monkeypatch, capsys):
             },
         )
 
-    monkeypatch.setattr(ci_workflow.requests, "get", fake_get)
+    monkeypatch.setattr(ci_workflow, "_http_get", fake_get)
     ci_workflow.wait_for_pr_automation(argparse.Namespace())
     captured = capsys.readouterr().out
     assert "✅ PR automation has completed" in captured

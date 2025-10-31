@@ -16,7 +16,50 @@ import textwrap
 import time
 from typing import Any
 
-import requests
+try:
+    import requests  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - fallback when requests unavailable
+    requests = None
+    from urllib.error import URLError
+    from urllib.parse import urlencode
+    from urllib.request import Request, urlopen
+
+    class _HTTPResponse:
+        """Minimal response wrapper mirroring requests.Response."""
+
+        def __init__(self, status_code: int, payload: dict[str, Any]) -> None:
+            self.status_code = status_code
+            self._payload = payload
+
+        def json(self) -> dict[str, Any]:
+            return self._payload
+
+    def _http_get(
+        url: str,
+        headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None,
+        timeout: int = 30,
+    ) -> _HTTPResponse:
+        if params:
+            query = urlencode(params)
+            url = f"{url}?{query}"
+        req = Request(url, headers=headers or {})
+        with urlopen(req, timeout=timeout) as resp:
+            status_code = resp.getcode()
+            body = resp.read().decode("utf-8")
+        try:
+            payload = json.loads(body or "{}")
+        except json.JSONDecodeError:
+            payload = {}
+        return _HTTPResponse(status_code, payload)
+else:  # pragma: no cover - exercised in runtime environments with requests installed
+    def _http_get(
+        url: str,
+        headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None,
+        timeout: int = 30,
+    ):
+        return requests.get(url, headers=headers, params=params, timeout=timeout)
 
 _CONFIG_CACHE: dict[str, Any] | None = None
 
@@ -137,9 +180,14 @@ def wait_for_pr_automation(_: argparse.Namespace) -> None:
         print(
             f"Checking for PR automation completion (attempt {attempt + 1}/{max_attempts})..."
         )
-        response = requests.get(
-            url, headers=headers, params={"per_page": 100}, timeout=30
-        )
+        try:
+            response = _http_get(
+                url, headers=headers, params={"per_page": 100}, timeout=30
+            )
+        except Exception as exc:  # pragma: no cover - network issues during CI
+            print(f"::warning::Unable to query workflow runs: {exc}")
+            time.sleep(sleep_seconds)
+            continue
         if response.status_code != 200:
             print(
                 f"::warning::Unable to query workflow runs: {response.status_code}"

@@ -1,0 +1,10 @@
+# file: testdata/rust/Cargo.toml
+# version: 1.0.0
+# guid: 0a1b2c3d-4e5f-6071-8a9b-bcdef0123456
+
+[package]
+name = "ghcommon-test-fixture"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
