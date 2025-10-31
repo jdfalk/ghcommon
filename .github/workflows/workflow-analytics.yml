@@ -1,0 +1,124 @@
+# file: .github/workflows/workflow-analytics.yml
+# version: 1.0.0
+# guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
+
+name: Workflow Analytics
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback-days:
+        description: Number of days to analyze (default 30).
+        required: false
+        default: "30"
+        type: string
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  analytics:
+    name: Collect Workflow Analytics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Collect workflow metrics
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eo pipefail
+          LOOKBACK="${{ github.event.inputs.lookback-days }}"
+          if [ -z "$LOOKBACK" ]; then
+            LOOKBACK=30
+          fi
+          python .github/workflows/scripts/automation_workflow.py collect-metrics \
+            --repo "$GITHUB_REPOSITORY" \
+            --token "$GH_TOKEN" \
+            --pages 5 \
+            --lookback-days "$LOOKBACK" \
+            --output analytics-report.json
+
+      - name: Generate analytics summary
+        run: |
+          python - <<'PY'
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+report = json.loads(Path("analytics-report.json").read_text(encoding="utf-8"))
+metrics = report.get("metrics", {})
+workflows = metrics.get("workflows", {})
+self_healing = report.get("self_healing_actions", [])
+
+
+def pct(value: float) -> str:
+    return f"{value * 100:.1f}%"
+
+
+generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+lines = [
+    "# Workflow Analytics Report",
+    "",
+    f"**Generated**: {generated}",
+    "",
+    "## Summary",
+    "",
+    f"- **Total Runs**: {metrics.get('total_runs', 0)}",
+    f"- **Success Rate**: {pct(metrics.get('success_rate', 0.0))}",
+    f"- **Average Duration**: {metrics.get('average_duration', 0.0):.1f} s",
+    "",
+    "## Top Workflows",
+    "",
+]
+
+top = sorted(workflows.items(), key=lambda item: item[1].get("runs", 0), reverse=True)[:5]
+if top:
+    lines.append("| Workflow | Runs | Success Rate | Avg Duration | Cache Hit Rate |")
+    lines.append("| --- | --- | --- | --- | --- |")
+    for name, data in top:
+        cache_hit = data.get("cache_hit_rate")
+        cache_text = pct(cache_hit) if isinstance(cache_hit, float) else "N/A"
+        success = pct(data.get("success_rate", 0.0))
+        duration = f"{data.get('average_duration', 0.0):.1f} s"
+        lines.append(
+            f"| {name} | {data.get('runs', 0)} | {success} | {duration} | {cache_text} |",
+        )
+else:
+    lines.append("No workflow runs found in the selected window.")
+
+lines.extend(["", "## Self-Healing Actions", ""])
+if self_healing:
+    for action in self_healing:
+        lines.append(
+            f"- **{action.get('severity', 'info').upper()}** `{action.get('slug')}` – {action.get('description')}",
+        )
+else:
+    lines.append("- None")
+
+Path("workflow-analytics.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+PY
+
+      - name: Append summary to workflow run
+        run: |
+          cat workflow-analytics.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload analytics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-analytics
+          path: |
+            analytics-report.json
+            workflow-analytics.md
+          retention-days: 30

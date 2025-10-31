@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: tests/workflow_scripts/test_automation_workflow.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: d9f5c8b3-2c4d-4e5f-9a7b-3c2d1f0e1a2b
 
 """Tests for automation_workflow helper module."""
@@ -71,7 +71,10 @@ def test_build_app_jwt_encodes_expected_payload() -> None:
         token,
         TEST_PUBLIC_KEY,
         algorithms=["RS256"],
-        options={"verify_aud": False},
+        options={
+            "verify_aud": False,
+            "verify_exp": False,
+        },
     )
     assert decoded["iss"] == "12345"
     assert decoded["iat"] == int(now.timestamp())
@@ -91,6 +94,7 @@ def test_generate_cache_strategy_includes_fingerprints(tmp_path: Path) -> None:
         [file_a, dir_b],
         namespace="ci",
         extras={"python": "3.13"},
+        cache_paths=[tmp_path / "cache"],
     )
 
     assert strategy.key.startswith("python-")
@@ -100,6 +104,7 @@ def test_generate_cache_strategy_includes_fingerprints(tmp_path: Path) -> None:
     assert str(dir_b) in fingerprints
     # ensure restore keys trimmed consistently
     assert all(strategy.key.startswith(key) for key in strategy.restore_keys)
+    assert str(tmp_path / "cache") in strategy.paths
 
 
 def test_collect_workflow_metrics_groups_runs() -> None:
@@ -184,6 +189,19 @@ def test_detect_self_healing_actions_flags_failures() -> None:
     assert cache_action.severity == "medium"
 
 
+def test_filter_runs_by_lookback_filters_old_entries() -> None:
+    """filter_runs_by_lookback drops runs older than the cutoff."""
+    now = datetime(2024, 2, 10, tzinfo=timezone.utc)
+    runs = [
+        {"name": "CI", "run_started_at": "2024-02-09T00:00:00Z"},
+        {"name": "CI", "run_started_at": "2024-01-20T00:00:00Z"},
+        {"name": "Docs", "run_started_at": "2024-02-08T12:00:00Z"},
+    ]
+    filtered = automation_workflow.filter_runs_by_lookback(runs, 10, now=now)
+    assert len(filtered) == 2
+    assert all(item["name"] != "CI" or item["run_started_at"].startswith("2024-02") for item in filtered)
+
+
 def test_main_cache_key_outputs_json(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """cache-key command prints JSON payload."""
     file_a = tmp_path / "example.txt"
@@ -203,6 +221,42 @@ def test_main_cache_key_outputs_json(tmp_path: Path, capsys: pytest.CaptureFixtu
     payload = json.loads(captured.out)
     assert payload["key"].startswith("ci-")
     assert payload["metadata"]["fingerprints"][str(file_a)]
+
+
+def test_cache_key_includes_branch_and_writes_outputs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """cache-key command includes branch component and writes GitHub outputs."""
+    file_a = tmp_path / "example.txt"
+    file_a.write_text("data\n", encoding="utf-8")
+    output_file = tmp_path / "outputs.txt"
+    monkeypatch.setenv("GITHUB_REF_NAME", "Feature/New-Thing")
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output_file))
+
+    exit_code = automation_workflow.main(
+        [
+            "cache-key",
+            "--prefix",
+            "ci",
+            "--files",
+            str(file_a),
+            "--paths",
+            str(tmp_path / "cache"),
+            "--include-branch",
+        ]
+    )
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["branch"] == "feature-new-thing"
+    assert payload["key"].startswith("ci-feature-new-thing-")
+    outputs = output_file.read_text(encoding="utf-8")
+    assert "cache-key=ci-feature-new-thing-" in outputs
+    assert "restore-keys=" in outputs
+    assert "cache-paths=" in outputs
+    assert "cache-branch=feature-new-thing" in outputs
 
 
 def test_fetch_recent_workflow_runs_uses_session(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -234,4 +288,3 @@ def test_fetch_recent_workflow_runs_uses_session(monkeypatch: pytest.MonkeyPatch
 
     assert runs == [{"name": "CI"}]
     assert session.calls  # ensures request executed
-

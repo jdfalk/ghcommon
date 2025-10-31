@@ -1,0 +1,106 @@
+# file: .github/workflows/reusable-advanced-cache.yml
+# version: 1.0.0
+# guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
+
+name: Reusable Advanced Caching
+
+on:
+  workflow_call:
+    inputs:
+      language:
+        description: Programming language ecosystem.
+        required: true
+        type: string
+      cache-prefix:
+        description: Base cache key prefix.
+        required: true
+        type: string
+      include-branch:
+        description: Include branch name in cache key.
+        required: false
+        default: false
+        type: boolean
+    outputs:
+      cache-hit:
+        description: Whether the cache was restored.
+        value: ${{ jobs.cache.outputs.cache-hit }}
+      cache-key:
+        description: Generated cache key.
+        value: ${{ jobs.cache.outputs.cache-key }}
+
+permissions:
+  contents: read
+
+jobs:
+  cache:
+    name: Prepare Intelligent Cache
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+      cache-key: ${{ steps.generate-key.outputs.cache-key }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Determine cache metadata
+        id: metadata
+        run: |
+          case "${{ inputs.language }}" in
+            go)
+              echo "files=go.mod,go.sum" >> "$GITHUB_OUTPUT"
+              echo "paths=~/.cache/go-build,~/go/pkg/mod" >> "$GITHUB_OUTPUT"
+              ;;
+            rust)
+              echo "files=Cargo.toml,Cargo.lock" >> "$GITHUB_OUTPUT"
+              echo "paths=~/.cargo/registry/cache,~/.cargo/git,./target" >> "$GITHUB_OUTPUT"
+              ;;
+            python)
+              echo "files=requirements.txt,pyproject.toml" >> "$GITHUB_OUTPUT"
+              echo "paths=~/.cache/pip,./.venv" >> "$GITHUB_OUTPUT"
+              ;;
+            node)
+              echo "files=package-lock.json,yarn.lock,pnpm-lock.yaml" >> "$GITHUB_OUTPUT"
+              echo "paths=~/.npm,~/.cache/pnpm,./node_modules" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::Unsupported language: ${{ inputs.language }}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Generate intelligent cache key
+        id: generate-key
+        run: |
+          set -eo pipefail
+          INCLUDE_FLAG=""
+          if [ "${{ inputs.include-branch }}" = "true" ]; then
+            INCLUDE_FLAG="--include-branch"
+          fi
+          python .github/workflows/scripts/automation_workflow.py cache-key \
+            --prefix "${{ inputs.cache-prefix }}" \
+            --files "${{ steps.metadata.outputs.files }}" \
+            --paths "${{ steps.metadata.outputs.paths }}" \
+            ${INCLUDE_FLAG}
+
+      - name: Configure cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ steps.generate-key.outputs.cache-key }}
+          restore-keys: |
+            ${{ steps.generate-key.outputs.restore-keys }}
+          path: |
+            ${{ steps.generate-key.outputs.cache-paths }}
+
+      - name: Report cache status
+        run: |
+          if [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
+            echo "✅ Cache hit for ${{ steps.generate-key.outputs.cache-key }}"
+          else
+            echo "⚠️  Cache miss for ${{ steps.generate-key.outputs.cache-key }}"
+          fi

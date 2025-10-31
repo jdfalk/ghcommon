@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/automation_workflow.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
 """Advanced automation workflow helper.
@@ -41,6 +41,7 @@ class CacheStrategy:
     key: str
     restore_keys: tuple[str, ...] = tuple()
     metadata: dict[str, Any] = field(default_factory=dict)
+    paths: tuple[str, ...] = tuple()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serialisable representation."""
@@ -48,6 +49,7 @@ class CacheStrategy:
             "key": self.key,
             "restore_keys": list(self.restore_keys),
             "metadata": self.metadata,
+            "paths": list(self.paths),
         }
 
 
@@ -259,6 +261,7 @@ def generate_cache_strategy(
     namespace: str | None = None,
     extras: Mapping[str, Any] | None = None,
     restore_slices: Sequence[int] = DEFAULT_CACHE_RESTORE_SLICES,
+    cache_paths: Sequence[str | os.PathLike[str]] = (),
 ) -> CacheStrategy:
     """Generate a deterministic cache key based on file fingerprints."""
     fingerprints = fingerprint_paths(paths)
@@ -279,6 +282,7 @@ def generate_cache_strategy(
         for length in restore_slices
         if 0 < length <= len(full_hash)
     )
+    norm_cache_paths = tuple(str(Path(item).expanduser()) for item in cache_paths)
     metadata = {
         "prefix": prefix,
         "namespace": namespace or "",
@@ -286,7 +290,14 @@ def generate_cache_strategy(
         "fingerprints": fingerprints,
         "generated_at": _datetime_to_str(datetime.now(timezone.utc)),
     }
-    return CacheStrategy(key=f"{prefix}-{full_hash}", restore_keys=restore_keys, metadata=metadata)
+    if norm_cache_paths:
+        metadata["paths"] = list(norm_cache_paths)
+    return CacheStrategy(
+        key=f"{prefix}-{full_hash}",
+        restore_keys=restore_keys,
+        metadata=metadata,
+        paths=norm_cache_paths,
+    )
 
 
 def collect_workflow_metrics(
@@ -480,6 +491,47 @@ def _hash_directory(path: Path) -> str:
     return digest.hexdigest()
 
 
+def filter_runs_by_lookback(
+    runs_data: Sequence[Mapping[str, Any]],
+    lookback_days: int,
+    *,
+    now: datetime | None = None,
+) -> list[Mapping[str, Any]]:
+    """Limit workflow run payloads to those within lookback window."""
+    if lookback_days <= 0:
+        return list(runs_data)
+    cutoff = (now or datetime.now(timezone.utc)) - timedelta(days=lookback_days)
+    filtered: list[Mapping[str, Any]] = []
+    for item in runs_data:
+        timestamp = _parse_datetime(
+            item.get("run_started_at")
+            or item.get("started_at")
+            or item.get("created_at")
+            or item.get("updated_at"),
+        )
+        if timestamp is None or timestamp >= cutoff:
+            filtered.append(item)
+    return filtered
+
+
+def _current_branch() -> str | None:
+    ref_name = os.environ.get("GITHUB_REF_NAME")
+    if ref_name:
+        return ref_name
+    ref = os.environ.get("GITHUB_REF")
+    if ref and ref.startswith("refs/heads/"):
+        return ref.split("/", 2)[-1]
+    return None
+
+
+def _sanitize_branch(value: str) -> str:
+    sanitized = "".join(ch if ch.isalnum() else "-" for ch in value.strip())
+    sanitized = sanitized.strip("-") or "unknown"
+    while "--" in sanitized:
+        sanitized = sanitized.replace("--", "-")
+    return sanitized.lower()
+
+
 def _parse_datetime(value: Any) -> datetime | None:
     if value is None:
         return None
@@ -611,6 +663,15 @@ def _create_arg_parser() -> argparse.ArgumentParser:
         "--namespace",
         help="Optional namespace component for the cache key.",
     )
+    cache_parser.add_argument(
+        "--paths",
+        help="Comma separated cache paths to return for actions/cache.",
+    )
+    cache_parser.add_argument(
+        "--include-branch",
+        action="store_true",
+        help="Include current branch name in the cache key prefix.",
+    )
 
     metrics_parser = subparsers.add_parser(
         "collect-metrics",
@@ -644,6 +705,11 @@ def _create_arg_parser() -> argparse.ArgumentParser:
         default=1,
         help="Number of pages to fetch (API mode).",
     )
+    metrics_parser.add_argument(
+        "--lookback-days",
+        type=int,
+        help="Only include workflow runs from the last N days.",
+    )
     return parser
 
 
@@ -656,12 +722,42 @@ def _handle_github_app_token(args: argparse.Namespace) -> int:
 
 def _handle_cache_key(args: argparse.Namespace) -> int:
     files = [item.strip() for item in args.files.split(",") if item.strip()]
+    cache_paths = []
+    if args.paths:
+        cache_paths = [item.strip() for item in args.paths.split(",") if item.strip()]
+    extras: dict[str, Any] = {}
+    prefix = args.prefix
+    branch_value: str | None = None
+    if args.include_branch:
+        branch_value = _current_branch()
+        if branch_value:
+            sanitized_branch = _sanitize_branch(branch_value)
+            prefix = f"{prefix}-{sanitized_branch}"
+            extras["branch"] = sanitized_branch
+        else:
+            workflow_common.log_warning(
+                "include-branch flag set but branch could not be detected; proceeding without it",
+            )
     strategy = generate_cache_strategy(
-        args.prefix,
+        prefix,
         files,
         namespace=args.namespace,
+        extras=extras or None,
+        cache_paths=cache_paths,
     )
-    print(json.dumps(strategy.to_dict(), indent=2))
+    payload = strategy.to_dict()
+    if branch_value:
+        payload["branch"] = _sanitize_branch(branch_value)
+
+    workflow_common.write_output("cache-key", strategy.key)
+    workflow_common.write_output("restore-keys", "\n".join(strategy.restore_keys))
+    workflow_common.write_output("cache-metadata", json.dumps(payload["metadata"]))
+    if strategy.paths:
+        workflow_common.write_output("cache-paths", "\n".join(strategy.paths))
+    if branch_value:
+        workflow_common.write_output("cache-branch", _sanitize_branch(branch_value))
+
+    print(json.dumps(payload, indent=2))
     return 0
 
 
@@ -678,6 +774,8 @@ def _handle_collect_metrics(args: argparse.Namespace) -> int:
             per_page=args.per_page,
             pages=args.pages,
         )
+    if args.lookback_days:
+        runs = filter_runs_by_lookback(runs, args.lookback_days)
     metrics = collect_workflow_metrics(runs)
     payload = {
         "metrics": metrics.to_dict(),
@@ -705,4 +803,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

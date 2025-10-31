@@ -1,6 +1,6 @@
 # Helper Scripts API Reference
 
-**Version**: 1.0.0 **Last Updated**: 2025-10-15 **Status**: Complete
+**Version**: 1.1.0 **Last Updated**: 2025-10-31 **Status**: Complete
 
 ## Overview
 
@@ -1859,6 +1859,24 @@ def old_function():
     return new_function()
 ```
 
+### 6.5 CLI Enhancements (2025-10)
+
+Recent updates to `automation_workflow.py` added quality-of-life improvements for reusable workflows:
+
+- `cache-key` now accepts `--paths` to emit cache directories and `--include-branch` to append the
+  current branch name to cache keys. When executed inside GitHub Actions the command writes
+  `cache-key`, `restore-keys`, `cache-paths`, and `cache-branch` entries to `$GITHUB_OUTPUT` for
+  direct reuse with `actions/cache`.
+- `generate_cache_strategy()` accepts a `cache_paths` parameter to persist canonical directories in
+  metadata, enabling reusable workflows to capture tool-specific caches.
+- `collect-metrics` exposes `--lookback-days` for server-side filtering when gathering workflow runs
+  and persists results to disk via `--output` to support downstream analytics summarization.
+- `filter_runs_by_lookback()` (internal helper) centralizes lookback filtering logic and is used by
+  the CLI command as well as unit tests.
+
+Refer to `.github/workflows/reusable-advanced-cache.yml` and
+`.github/workflows/workflow-analytics.yml` for end-to-end examples of these enhancements in action.
+
 ### Version Compatibility
 
 - Minimum Python: 3.13
@@ -1888,4 +1906,4 @@ All breaking changes require:
 
 ---
 
-**Document Version**: 1.0.0 **Last Review**: 2025-10-15 **Next Review**: 2025-11-15
+**Document Version**: 1.1.0 **Last Review**: 2025-10-31 **Next Review**: 2025-11-30

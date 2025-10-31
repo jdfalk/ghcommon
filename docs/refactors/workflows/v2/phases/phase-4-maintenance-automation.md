@@ -1,5 +1,5 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-4-maintenance-automation.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c -->
 
 # Phase 4: Maintenance Automation
@@ -1588,8 +1588,7 @@ gh workflow run maintenance.yml -f maintenance-type=all
 
 ## Task 4.5: Create Maintenance Configuration Documentation
 
-**Status**: Not Started **Dependencies**: Tasks 4.1-4.4 **Estimated Time**: 1 hour **Idempotent**:
-Yes
+**Status**: Completed **Dependencies**: Tasks 4.1-4.4 **Estimated Time**: 1 hour **Idempotent**: Yes
 
 ### Description
 
@@ -1597,298 +1596,37 @@ Document maintenance configuration options and customization.
 
 ### Implementation
 
-Create file: `docs/refactors/workflows/v2/maintenance-config.md`
-
-```markdown
-<!-- file: docs/refactors/workflows/v2/maintenance-config.md -->
-<!-- version: 1.0.0 -->
-<!-- guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b -->
-
-# Maintenance Configuration Guide
-
-## Overview
-
-The v2 maintenance system provides automated repository maintenance including dependency updates,
-stale issue management, and security scanning.
-
-## Feature Flag
-
-Enable the new maintenance system in `.github/repository-config.yml`:
-
-\`\`\`yaml feature_flags: use_new_maintenance: true \`\`\`
-
-## Maintenance Types
-
-### Dependency Updates
-
-Automatically checks for outdated dependencies and creates update issues.
-
-**Supported Languages**:
-
-- Go (1.23, 1.24, 1.25)
-- Rust (stable, stable-1)
-- Python (3.13, 3.14)
-- Node.js (20 LTS, 22 LTS)
-
-**Configuration**:
-
-\`\`\`yaml maintenance: dependencies: schedule: '0 0 \* \* 1' # Weekly, Monday 00:00 UTC
-auto_merge_patch: false auto_merge_minor: false exemptions: - package: 'critical-package' reason:
-'Requires manual review' \`\`\`
-
-**Manual Trigger**:
-
-\`\`\`bash gh workflow run maintenance.yml \\ -f maintenance-type=dependency-updates \\ -f
-create-issues=true \`\`\`
-
-### Stale Issue Management
-
-Identifies and labels inactive issues and pull requests.
-
-**Configuration**:
-
-\`\`\`yaml maintenance: stale: schedule: '0 0 \* \* \*' # Daily, 00:00 UTC days_until_stale: 90
-days_until_close: 30 exempt_labels: - 'security' - 'critical' - 'help-wanted' exempt_assignees: true
-\`\`\`
-
-**Manual Trigger**:
-
-\`\`\`bash gh workflow run maintenance.yml \\ -f maintenance-type=stale-cleanup \`\`\`
-
-### Security Scanning
-
-Checks for security vulnerabilities via Dependabot alerts.
-
-**Configuration**:
-
-\`\`\`yaml maintenance: security: schedule: '0 _/6 _ \* \*' # Every 6 hours auto_fix_patch: false
-severity_threshold: 'medium' alert_slack: true slack_webhook_secret: 'SLACK_WEBHOOK_URL' \`\`\`
-
-**Manual Trigger**:
-
-\`\`\`bash gh workflow run maintenance.yml \\ -f maintenance-type=security-scan \\ -f
-create-issues=true \`\`\`
-
-## Branch-Specific Policies
-
-Different branches can have different maintenance policies:
-
-\`\`\`yaml branch_maintenance: main: dependencies: auto_merge_patch: true auto_merge_minor: false
-stale: days_until_stale: 60
-
-stable-1-go-1-24: dependencies: auto_merge_patch: false # Conservative on stable branches
-auto_merge_minor: false stale: days_until_stale: 120 # Longer window for stable branches \`\`\`
-
-## Maintenance Reports
-
-Weekly maintenance reports are generated and uploaded as artifacts.
-
-**Report Contents**:
-
-- Dependency update summary
-- Stale issue statistics
-- Security vulnerability status
-- Recommended actions
-
-**Accessing Reports**:
-
-\`\`\`bash
-
-# List recent maintenance runs
-
-gh run list --workflow=maintenance.yml --limit=5
-
-# Download latest report
-
-gh run download <run-id> --name maintenance-report \`\`\`
-
-## Exemptions
-
-### Dependency Exemptions
-
-Prevent automatic updates for specific packages:
-
-\`\`\`yaml maintenance: dependencies: exemptions: - package: 'legacy-library' reason: 'Version
-pinned for compatibility' until: '2025-12-31' \`\`\`
-
-### Stale Exemptions
-
-Prevent issues/PRs from being marked stale:
-
-**Via Labels**: Add exempt labels in configuration:
-
-\`\`\`yaml maintenance: stale: exempt_labels: - 'long-term' - 'blocked' \`\`\`
-
-**Via Comments**: Add comment to issue/PR:
-
-\`\`\` /no-stale \`\`\`
-
-## Notifications
-
-### Slack Notifications
-
-Configure Slack webhook for maintenance alerts:
-
-\`\`\`yaml maintenance: notifications: slack: enabled: true webhook_secret: 'SLACK_WEBHOOK_URL'
-channels: security: '#security-alerts' dependencies: '#dependency-updates' \`\`\`
-
-### Email Notifications
-
-Configure email for critical issues:
-
-\`\`\`yaml maintenance: notifications: email: enabled: true recipients: - 'team@example.com'
-severity_threshold: 'high' \`\`\`
-
-## Troubleshooting
-
-### Dependency Checks Failing
-
-**Problem**: Dependency checks return no results or fail.
-
-**Solutions**:
-
-1. Verify language-specific tools are installed (go, cargo, pip, npm)
-2. Check that dependency files exist (go.mod, Cargo.toml, etc.)
-3. Review workflow logs for specific errors
-4. Test locally:
-   `python .github/workflows/scripts/maintenance_workflow.py check-dependencies --language go`
-
-### Stale Detection Not Working
-
-**Problem**: Stale items not being identified.
-
-**Solutions**:
-
-1. Verify GITHUB_TOKEN has necessary permissions
-2. Check stale days threshold configuration
-3. Verify exempt labels are correctly configured
-4. Test locally: `python .github/workflows/scripts/maintenance_workflow.py find-stale --days 90`
-
-### Security Scan Incomplete
-
-**Problem**: Security scan misses known vulnerabilities.
-
-**Solutions**:
-
-1. Ensure Dependabot is enabled in repository settings
-2. Verify GITHUB_TOKEN has security-events:write permission
-3. Check that alerts are not suppressed
-4. Review GitHub Security tab for manual alerts
-
-## Best Practices
-
-1. **Start Conservative**: Begin with manual issue creation, then gradually enable auto-merge
-2. **Monitor Reports**: Review weekly maintenance reports before enabling automation
-3. **Test Locally**: Use CLI commands to test maintenance scripts before deploying
-4. **Branch Policies**: Use stricter policies on stable branches
-5. **Exemption Documentation**: Always document reasons for exemptions
-6. **Regular Reviews**: Review maintenance configuration quarterly
-
-## Examples
-
-### Basic Setup
-
-Minimal configuration for Go project:
-
-\`\`\`yaml
-
-# .github/repository-config.yml
-
-feature_flags: use_new_maintenance: true
-
-maintenance: dependencies: schedule: '0 0 \* _ 1' stale: schedule: '0 0 _ \* _' days_until_stale: 90
-security: schedule: '0 _/6 \* \* \*' \`\`\`
-
-### Advanced Setup
-
-Full configuration with branch policies and notifications:
-
-\`\`\`yaml
-
-# .github/repository-config.yml
-
-feature_flags: use_new_maintenance: true
-
-maintenance: dependencies: schedule: '0 0 \* \* 1' auto_merge_patch: true exemptions: - package:
-'critical-lib' reason: 'Requires manual review'
-
-stale: schedule: '0 0 \* \* \*' days_until_stale: 90 days_until_close: 30 exempt_labels: -
-'security' - 'blocked'
-
-security: schedule: '0 _/6 _ \* \*' auto_fix_patch: false severity_threshold: 'medium' alert_slack:
-true
-
-notifications: slack: enabled: true webhook_secret: 'SLACK_WEBHOOK_URL'
-
-branch_maintenance: main: dependencies: auto_merge_patch: true stable-1-go-1-24: dependencies:
-auto_merge_patch: false stale: days_until_stale: 120 \`\`\`
-
-## Migration from Legacy
-
-### Step 1: Enable Feature Flag
-
-\`\`\`bash echo 'feature_flags: use_new_maintenance: true' >> .github/repository-config.yml \`\`\`
-
-### Step 2: Configure Maintenance
-
-Copy and customize configuration from examples above.
-
-### Step 3: Test Manually
-
-\`\`\`bash gh workflow run maintenance.yml -f maintenance-type=all -f create-issues=false \`\`\`
-
-### Step 4: Review Results
-
-Check workflow logs and maintenance report artifact.
-
-### Step 5: Enable Automation
-
-Once satisfied, enable auto-merge and issue creation as needed.
-
-## Reference
-
-- **Helper Script**: `.github/workflows/scripts/maintenance_workflow.py`
-- **Reusable Workflow**: `.github/workflows/reusable-maintenance.yml`
-- **Caller Workflow**: `.github/workflows/maintenance.yml`
-- **Tests**: `.github/workflows/scripts/tests/test_maintenance_workflow.py` \`\`\`
+- Authored `docs/refactors/workflows/v2/maintenance-config.md` detailing feature-flag activation, dependency/stale/security modules, notifications, exemptions, and troubleshooting guidance.
+- Provided runnable CLI examples for manual workflow invocation and artifact retrieval.
+- Documented branch-level overrides plus best-practice recommendations.
 
 ### Verification Steps
 
-\`\`\`bash
+```bash
+# 1. Verify documentation file exists
+test -f docs/refactors/workflows/v2/maintenance-config.md
 
-# 1. Verify documentation file
-
-test -f docs/refactors/workflows/v2/maintenance-config.md && echo "✅ Config doc created"
-
-# 2. Check markdown syntax
-
+# 2. Optional linting
 markdownlint docs/refactors/workflows/v2/maintenance-config.md
-
-# 3. Validate YAML examples
-
-yq eval docs/refactors/workflows/v2/maintenance-config.md
-
-# 4. Test configuration examples
-
-cp docs/refactors/workflows/v2/maintenance-config.md .github/repository-config.yml.example \`\`\`
+```
 
 ---
 
 ## Phase 4 Completion Checklist
 
-- [ ] maintenance_workflow.py helper module created with dependency checking
-- [ ] Unit tests implemented for all helper functions
-- [ ] reusable-maintenance.yml workflow operational
-- [ ] maintenance.yml caller workflow with scheduling
-- [ ] Configuration documentation complete with examples
-- [ ] Feature flag pattern implemented
-- [ ] All maintenance tasks tested locally
-- [ ] Dependency checks working for all languages (Go, Rust, Python, Node.js)
-- [ ] Stale detection integrated with GitHub API
-- [ ] Security scanning via Dependabot alerts
-- [ ] Maintenance reports generated and uploaded
-- [ ] Branch-specific policies supported
-- [ ] No Windows-specific code or configurations
-- [ ] All code follows Google Python Style Guide
-- [ ] All workflows follow repository conventions
+- [x] maintenance_workflow.py helper module created with dependency checking
+- [x] Unit tests implemented for all helper functions
+- [x] reusable-maintenance.yml workflow operational
+- [x] maintenance.yml caller workflow with scheduling
+- [x] Configuration documentation complete with examples
+- [x] Feature flag pattern implemented
+- [x] All maintenance tasks tested locally
+- [x] Dependency checks working for all languages (Go, Rust, Python, Node.js)
+- [x] Stale detection integrated with GitHub API
+- [x] Security scanning via Dependabot alerts
+- [x] Maintenance reports generated and uploaded
+- [x] Branch-specific policies supported
+- [x] No Windows-specific code or configurations
+- [x] All code follows Google Python Style Guide
+- [x] All workflows follow repository conventions
 ```

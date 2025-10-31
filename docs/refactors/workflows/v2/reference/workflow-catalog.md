@@ -1,6 +1,6 @@
 # Workflow Catalog
 
-**Version**: 1.0.0 **Last Updated**: 2025-10-15 **Status**: Complete
+**Version**: 1.1.0 **Last Updated**: 2025-10-31 **Status**: Complete
 
 ## Overview
 
@@ -12,8 +12,8 @@ documented with its purpose, inputs, outputs, secrets, triggers, and usage examp
 Workflows are organized into categories:
 
 1. **Core Workflows**: Main CI/CD workflows (ci.yml, release.yml)
-2. **Reusable Workflows**: Shared workflow components (reusable-\*.yml)
-3. **Scheduled Workflows**: Automated maintenance (maintenance.yml, metrics.yml)
+2. **Reusable Workflows**: Shared workflow components (reusable-*.yml, reusable-advanced-cache.yml)
+3. **Scheduled Workflows**: Automated maintenance and analytics (maintenance.yml, workflow-analytics.yml)
 4. **Manual Workflows**: On-demand operations (manual-release.yml)
 
 ### Workflow Naming Convention
@@ -606,6 +606,65 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+### reusable-advanced-cache.yml - Intelligent Dependency Caching
+
+**Purpose**: Generate deterministic cache keys and coordinate dependency caching across ecosystems.
+
+**Location**: `.github/workflows/reusable-advanced-cache.yml`
+
+**Triggers**:
+
+```yaml
+on:
+  workflow_call:
+    inputs:
+      language:
+        required: true
+        type: string
+      cache-prefix:
+        required: true
+        type: string
+      include-branch:
+        required: false
+        type: boolean
+        default: false
+```
+
+**Inputs**:
+
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| language | string | Yes | - | Language ecosystem (go/rust/python/node) used to derive cache metadata |
+| cache-prefix | string | Yes | - | Base prefix for cache keys (e.g., go-build) |
+| include-branch | boolean | No | false | Append sanitized branch name for branch-scoped caches |
+
+**Outputs**:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| cache-key | string | Fully qualified cache key produced by `automation_workflow.py` |
+| cache-hit | boolean | Indicates whether `actions/cache` restored an entry |
+
+**Secrets**: _None_
+
+**Usage Example**:
+
+```yaml
+jobs:
+  cache-go:
+    uses: ./.github/workflows/reusable-advanced-cache.yml
+    with:
+      language: go
+      cache-prefix: go-build
+      include-branch: true
+```
+
+**Implementation Notes**:
+
+- Uses `automation_workflow.py cache-key` to emit cache metadata (key, restore keys, paths).
+- Supports Go, Rust, Python, and Node heuristics; add additional languages by extending the metadata step.
+- Branch names are normalized to lower-case kebab form to avoid cache key collisions.
+
 ---
 
 ## Scheduled Workflows
@@ -718,6 +777,64 @@ on:
 - Most expensive workflows
 - Failure patterns
 - Performance trends
+
+### workflow-analytics.yml - Workflow Insights
+
+**Purpose**: Collect workflow run metrics, generate summaries, and surface self-healing actions.
+
+**Location**: `.github/workflows/workflow-analytics.yml`
+
+**Triggers**:
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      lookback-days:
+        description: Number of days to analyze (default 30)
+        required: false
+        default: '30'
+        type: string
+  schedule:
+    - cron: '0 3 * * 1'
+```
+
+**Inputs** (manual trigger):
+
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| lookback-days | string | No | '30' | Rolling window (days) for metrics collection |
+
+**Artifacts & Outputs**:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| workflow-analytics | artifact | Contains `analytics-report.json` and `workflow-analytics.md` |
+| step summary | markdown | Inline summary appended to `$GITHUB_STEP_SUMMARY` |
+
+**Jobs**:
+
+1. **collect**: Calls `automation_workflow.py collect-metrics` against the current repository with optional lookback filtering.
+2. **summarize**: Generates Markdown tables highlighting top workflows and recommended actions.
+3. **publish**: Uploads artifacts and updates the workflow run summary for quick visibility.
+
+**Usage Example**:
+
+```yaml
+# Manual run with custom lookback window
+workflow_dispatch:
+  inputs:
+    lookback-days:
+      description: Analyze the last 14 days
+      required: false
+      default: '14'
+```
+
+**Integration Tips**:
+
+- Grant the workflow access to `GITHUB_TOKEN` with `actions:read` and `contents:read` permissions (default).
+- Combine with dashboards or external tooling by parsing `analytics-report.json`.
+- Extend the summary step to push data into Slack or other reporting endpoints as needed.
 
 ---
 
@@ -1271,4 +1388,4 @@ jobs:
 
 ---
 
-**Document Version**: 1.0.0 **Last Review**: 2025-10-15 **Next Review**: 2025-11-15
+**Document Version**: 1.1.0 **Last Review**: 2025-10-31 **Next Review**: 2025-11-30
