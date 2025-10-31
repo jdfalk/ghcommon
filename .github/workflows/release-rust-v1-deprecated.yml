@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust-v1-deprecated.yml
-# version: 1.9.3
+# version: 1.9.4
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
 # NOTE: Deprecated workflow retained for archival; use reusable-release.yml instead.
 
@@ -43,10 +43,7 @@ jobs:
             os: ubuntu-latest
             name: linux-x86_64-musl
             primary: false
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            name: windows-x86_64
-            primary: false
+          # Windows release target removed; V2 workflows are linux-only.
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

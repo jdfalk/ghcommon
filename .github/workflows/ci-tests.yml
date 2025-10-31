@@ -1,5 +1,5 @@
 # file: .github/workflows/ci-tests.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: ci-tests-workflow-2025-automation
 
 name: CI Tests
@@ -66,12 +66,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         rust: [stable, beta, nightly]
         exclude:
           - os: macos-latest
-            rust: nightly
-          - os: windows-latest
             rust: nightly
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.rust == 'nightly' }}
@@ -147,7 +145,7 @@ jobs:
     if: needs.detect-changes.outputs.python == 'true' || github.event_name == 'schedule'
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         python: ["3.9", "3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -203,7 +201,7 @@ jobs:
     if: needs.detect-changes.outputs.javascript == 'true' || github.event_name == 'schedule'
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         node: [18, 20, 22]
     runs-on: ${{ matrix.os }}
     steps:

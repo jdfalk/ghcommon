@@ -27,7 +27,7 @@ VERSION_UPDATES = {
     "protobuf-generation.yml": "1.1.0",
     "release.yml": "2.0.0",
     "release-go-v1-deprecated.yml": "2.2.3",
-    "release-rust-v1-deprecated.yml": "1.9.3",
+    "release-rust-v1-deprecated.yml": "1.9.4",
     "release-python-v1-deprecated.yml": "1.3.3",
     "release-docker-v1-deprecated.yml": "1.2.3",
     "release-frontend-v1-deprecated.yml": "1.3.3",
