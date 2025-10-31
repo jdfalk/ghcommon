@@ -1,5 +1,5 @@
 <!-- file: docs/refactors/workflows/v2/operations/migration-guide.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b -->
 
 # Migration Guide: v1 to v2 Workflow System
@@ -785,39 +785,79 @@ git commit -m "chore(ci): archive v1 workflows"
 git push origin main
 ```
 
+## Phase 5: Advanced Automation Rollout
+
+With v2 core workflows stable, enable the advanced features delivered in Phase 5 across repositories.
+
+### Step 5.1: Adopt cache-plan powered reusable caching
+
+1. Copy `.github/workflows/reusable-advanced-cache.yml` into the target repository.
+2. Ensure the repository includes `.github/workflows/scripts/automation_workflow.py` v1.2.0 or newer.
+3. Replace ad-hoc `actions/cache` invocations with: 
+   ```yaml
+   uses: ./.github/workflows/reusable-advanced-cache.yml
+   with:
+     language: go # or rust/python/node
+     cache-prefix: go-build
+     include-branch: true
+   ```
+4. For ecosystems beyond the built-in profiles, extend the workflow call with `cache-plan` extras: 
+   ```yaml
+   with:
+     language: python
+     cache-prefix: py-venv
+     include-branch: true
+     extra-file: poetry.lock
+     extra-path: ~/.cache/pip-tools
+   ```
+5. Verify caching locally: `python .github/workflows/scripts/automation_workflow.py cache-plan --language go`.
+
+### Step 5.2: Enable workflow analytics reporting
+
+1. Copy `.github/workflows/workflow-analytics.yml` to the repository.
+2. Confirm the repository grants the workflow `actions:read` and `contents:read` permissions (defaults).
+3. Schedule the workflow (Monday 03:00 UTC by default) or trigger manually via `gh workflow run workflow-analytics.yml -f lookback-days=14`.
+4. Review the generated `workflow-analytics.md` summary and artifacts for accuracy.
+5. Optional: integrate the artifact into dashboards or Slack by extending the summary step.
+
+### Step 5.3: Update documentation and training
+
+- Reference `docs/refactors/workflows/v2/github-apps-setup.md` for GitHub App provisioning and token management.
+- Share the updated helper API (`automation_workflow.cache-plan`, lookback filtering) with maintainers.
+- Record caching/analytics adoption in each repository's migration tracker.
+
+Once Steps 5.1–5.3 are complete across repositories, mark Phase 5 finished in the rollout plan and proceed to continuous monitoring.
+
+
 ## Post-Migration Tasks
 
 ### Monitoring and Metrics
 
-Set up ongoing monitoring:
+Set up ongoing monitoring with the shared analytics workflow:
 
 ```yaml
-# file: .github/workflows/workflow-metrics.yml
+# file: .github/workflows/workflow-analytics.yml
 # version: 1.0.0
 
-name: Workflow Metrics
+name: Workflow Analytics
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Daily
+    - cron: '0 3 * * 1' # Weekly analysis
   workflow_dispatch:
+    inputs:
+      lookback-days:
+        description: Number of days to analyze
+        required: false
+        default: '30'
+        type: string
 
 jobs:
-  collect-metrics:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Collect metrics
-        run: |
-          python .github/workflows/scripts/automation_workflow.py collect-metrics \
-            --lookback-days 7
-
-      - name: Generate report
-        run: |
-          python .github/workflows/scripts/automation_workflow.py generate-report
+  analytics:
+    uses: ./.github/workflows/workflow-analytics.yml
 ```
+
+Review the generated `workflow-analytics.md` artifact each week and feed findings into reliability tracking.
 
 ### Team Training
 
