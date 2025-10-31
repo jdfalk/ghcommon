@@ -157,6 +157,18 @@ def test_python_run_tests_skips_when_no_tests(tmp_path, monkeypatch, capsys):
     assert "ℹ️ No Python tests found" in capsys.readouterr().out
 
 
+def test_python_lint_skips_without_sources(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    ci_workflow.python_lint(argparse.Namespace())
+    assert "No Python sources" in capsys.readouterr().out
+
+
+def test_rust_format_skips_without_cargo(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    ci_workflow.rust_format(argparse.Namespace())
+    assert "No Cargo.toml" in capsys.readouterr().out
+
+
 def test_go_test_uses_config_threshold(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "go.mod").write_text(

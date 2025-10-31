@@ -489,6 +489,54 @@ def python_run_tests(_: argparse.Namespace) -> None:
     )
 
 
+def python_lint(_: argparse.Namespace) -> None:
+    """Run Python formatting and linting if sources are present."""
+
+    python_sources = [
+        path
+        for path in Path(".").rglob("*.py")
+        if ".venv" not in path.parts and "site-packages" not in path.parts
+    ]
+    if not python_sources:
+        print("ℹ️ No Python sources detected for linting.")
+        return
+
+    lint_targets = [
+        str(path)
+        for path in [
+            Path("scripts"),
+            Path("tests"),
+            Path("src"),
+            Path("testdata/python"),
+        ]
+        if path.exists()
+    ]
+    if not lint_targets:
+        lint_targets = ["."]
+
+    required_tools = ["black", "ruff"]
+    missing_tools = [tool for tool in required_tools if shutil.which(tool) is None]
+    if missing_tools:
+        python = sys.executable
+        subprocess.run(
+            [python, "-m", "pip", "install", "--upgrade", *missing_tools],
+            check=True,
+        )
+
+    subprocess.run(["black", "--check", *lint_targets], check=True)
+    subprocess.run(["ruff", "check", *lint_targets], check=True)
+
+
+def rust_format(_: argparse.Namespace) -> None:
+    """Run rustfmt in check mode when a Cargo project exists."""
+
+    if not Path("Cargo.toml").is_file():
+        print("ℹ️ No Cargo.toml found; skipping rustfmt.")
+        return
+
+    subprocess.run(["cargo", "fmt", "--all", "--", "--check"], check=True)
+
+
 def ensure_cargo_llvm_cov(_: argparse.Namespace) -> None:
     if shutil.which("cargo-llvm-cov"):
         print("cargo-llvm-cov already installed")
@@ -778,8 +826,10 @@ def build_parser() -> argparse.ArgumentParser:
         "frontend-install": frontend_install,
         "frontend-run": frontend_run,
         "python-install": python_install,
+        "python-lint": python_lint,
         "python-run-tests": python_run_tests,
         "ensure-cargo-llvm-cov": ensure_cargo_llvm_cov,
+        "rust-format": rust_format,
         "generate-rust-lcov": generate_rust_lcov,
         "generate-rust-html": generate_rust_html,
         "compute-rust-coverage": compute_rust_coverage,
