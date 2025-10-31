@@ -24,7 +24,7 @@ Successfully created the comprehensive reusable release workflow system as reque
 1. **Language Detection**: Automatically detects project type and configures appropriate builds
 2. **Config Integration**: Uses unified repository-config.yml for all settings
 3. **Matrix Generation**: Creates build matrices for supported languages
-4. **Workflow Orchestration**: Calls existing release-go.yml, release-rust.yml, etc.
+4. **Workflow Orchestration**: Historically delegated to per-language workflows (now archived as `release-*-v1-deprecated.yml`).
 5. **Release Creation**: Automated GitHub release with changelog
 6. **Status Reporting**: Comprehensive build summary with failure detection
 7. **Flexible Inputs**: Supports draft releases, prerelease, custom build targets

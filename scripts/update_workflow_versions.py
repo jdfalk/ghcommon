@@ -25,13 +25,13 @@ VERSION_UPDATES = {
     "auto-module-tagging.yml": "1.1.0",
     "commit-override-handler.yml": "1.1.0",
     "protobuf-generation.yml": "1.1.0",
-    "release.yml": "3.4.0",
-    "release-go.yml": "1.2.0",
-    "release-rust.yml": "1.2.0",
-    "release-python.yml": "1.1.0",
-    "release-docker.yml": "1.1.0",
-    "release-frontend.yml": "1.1.0",
-    "release-protobuf.yml": "1.2.0",
+    "release.yml": "2.0.0",
+    "release-go-v1-deprecated.yml": "2.2.3",
+    "release-rust-v1-deprecated.yml": "1.9.3",
+    "release-python-v1-deprecated.yml": "1.3.3",
+    "release-docker-v1-deprecated.yml": "1.2.3",
+    "release-frontend-v1-deprecated.yml": "1.3.3",
+    "release-protobuf-v1-deprecated.yml": "1.3.2",
 }
 
 
