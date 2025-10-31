@@ -1,6 +1,7 @@
-# file: .github/workflows/release-rust.yml
-# version: 1.9.2
+# file: .github/workflows/release-rust-v1-deprecated.yml
+# version: 1.9.3
 # guid: b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e
+# NOTE: Deprecated workflow retained for archival; use reusable-release.yml instead.
 
 name: Rust Release Build
 
@@ -61,6 +62,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+
           echo "🔍 Environment Debug Information"
           echo "================================="
           echo "Repository: ${{ github.repository }}"
@@ -69,148 +72,79 @@ jobs:
           echo "Input release-version: '${{ inputs.release-version }}'"
           echo ""
 
-          # Check if Cargo.toml exists and show its content
-          if [[ -f "Cargo.toml" ]]; then
-            echo "📋 Found existing Cargo.toml:"
-            echo "---"
-            head -10 Cargo.toml
-            echo "---"
-          else
-            echo "❌ No Cargo.toml found - this might be the wrong repository type"
-            echo "� Contents of current directory:"
+          if [ ! -f Cargo.toml ]; then
+            echo "❌ No Cargo.toml found - this workflow expects a Rust crate."
+            echo "📂 Contents of current directory:"
             ls -la
             exit 1
           fi
 
+          echo "📋 Found existing Cargo.toml:"
+          head -10 Cargo.toml
           echo ""
-          echo "�🔍 Detecting version using GitHub API..."
 
-          # Try to get version from input first
           INPUT_VERSION="${{ inputs.release-version }}"
-          echo "📥 Input version: '$INPUT_VERSION'"
-
-          if [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "--workspace" && "$INPUT_VERSION" != "" ]]; then
+          VERSION=""
+          if [ -n "${INPUT_VERSION}" ] && [ "${INPUT_VERSION}" != "--workspace" ]; then
             VERSION="${INPUT_VERSION#v}"
-            echo "✅ Using input version: $VERSION"
+            echo "✅ Using input version: ${VERSION}"
           else
             echo "🌐 Querying GitHub API for latest release..."
+            API_RESPONSE=$(curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -w "HTTPSTATUS:%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/latest" || true)
+            HTTP_STATUS=${API_RESPONSE##*HTTPSTATUS:}
+            BODY=${API_RESPONSE%HTTPSTATUS:*}
+            echo "📡 API HTTP Status: ${HTTP_STATUS}"
 
-            # Get latest release from GitHub API with better error handling
-            API_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/latest")
-
-            HTTP_STATUS=$(echo "$API_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-            BODY=$(echo "$API_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
-
-            echo "📡 API HTTP Status: $HTTP_STATUS"
-
-            if [[ "$HTTP_STATUS" == "200" ]]; then
-              LATEST_RELEASE=$(echo "$BODY" | grep '"tag_name"' | cut -d'"' -f4 || echo "")
-
-              if [[ -n "$LATEST_RELEASE" ]]; then
-                # Increment patch version
-                LATEST_VERSION="${LATEST_RELEASE#v}"
-                echo "🏷️ Latest release: $LATEST_VERSION"
-
-                # Parse version components
-                IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
+            if [ "${HTTP_STATUS}" = "200" ]; then
+              LATEST_RELEASE=$(echo "${BODY}" | jq -r '.tag_name // empty')
+              if [ -n "${LATEST_RELEASE}" ]; then
+                LATEST_VERSION=${LATEST_RELEASE#v}
+                echo "🏷️ Latest release: ${LATEST_VERSION}"
+                IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION}"
                 MAJOR=${MAJOR:-0}
                 MINOR=${MINOR:-0}
                 PATCH=${PATCH:-0}
-
-                # Increment patch for new version
-                NEW_PATCH=$((PATCH + 1))
-                VERSION="$MAJOR.$MINOR.$NEW_PATCH"
-                echo "🆙 Generated new version: $VERSION"
+                VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+                echo "🆙 Generated new version: ${VERSION}"
               else
-                echo "⚠️ No tag_name found in API response"
+                echo "⚠️ No existing releases detected; defaulting to 0.1.0"
                 VERSION="0.1.0"
               fi
             else
-              echo "⚠️ API call failed with status $HTTP_STATUS"
-              if [[ "$HTTP_STATUS" == "404" ]]; then
-                echo "📦 No releases found, starting with 0.1.0"
-              fi
+              echo "⚠️ API call failed; defaulting to 0.1.0"
               VERSION="0.1.0"
             fi
           fi
 
-          # Final validation and cleanup
-          if [[ "$VERSION" == "--workspace" ]]; then
-            echo "❌ CRITICAL: Version is '--workspace', this should never happen!"
+          if [ "${VERSION}" = "--workspace" ] || [ -z "${VERSION}" ]; then
             VERSION="0.1.0-emergency.$(date +%Y%m%d%H%M%S)"
-          elif [[ -z "$VERSION" ]]; then
-            echo "❌ CRITICAL: Version is empty!"
-            VERSION="0.1.0-emergency.$(date +%Y%m%d%H%M%S)"
-          elif ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "⚠️ Version '$VERSION' doesn't match semver, fixing..."
+            echo "::warning::Invalid version value; using fallback ${VERSION}"
+          elif ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             VERSION="0.1.0-dev.$(date +%Y%m%d%H%M%S)"
+            echo "::warning::Version '${VERSION}' does not match semver; using fallback ${VERSION}"
           fi
 
-          echo ""
-          echo "✅ Final version: $VERSION"
+          echo "✅ Final version: ${VERSION}"
 
-          # Install cargo-set-version if needed
           if ! command -v cargo-set-version >/dev/null 2>&1; then
             echo "📦 Installing cargo-set-version..."
             cargo install cargo-set-version --locked
           fi
 
-          # Set the version with explicit validation
-          echo "🔧 Setting crate version to: $VERSION"
-
-          # Method 1: Try cargo-set-version with correct syntax
-          echo "🔍 Attempting Method 1: cargo set-version $VERSION"
-          if cargo set-version "$VERSION"; then
-            echo "✅ Method 1 successful"
-          else
-            echo "⚠️ Method 1 failed, trying Method 2"
-
-            # Method 2: Use sed to directly update Cargo.toml
-            echo "🔍 Method 2: Direct sed replacement"
-            if [[ -f "Cargo.toml" ]]; then
-              # Backup original
-              cp Cargo.toml Cargo.toml.backup
-
-              # Update version line
-              sed -i.tmp "s/^version = .*/version = \"$VERSION\"/" Cargo.toml
-
-              # Check if it worked
-              if grep -q "^version = \"$VERSION\"" Cargo.toml; then
-                echo "✅ Method 2 successful"
-                rm -f Cargo.toml.tmp Cargo.toml.backup
-              else
-                echo "❌ Method 2 failed, restoring backup"
-                mv Cargo.toml.backup Cargo.toml
-                exit 1
-              fi
-            else
-              echo "❌ No Cargo.toml found"
-              exit 1
-            fi
+          echo "🔧 Setting crate version to: ${VERSION}"
+          if ! cargo set-version "${VERSION}"; then
+            echo "::error::Failed to update crate version via cargo-set-version"
+            exit 1
           fi
 
-          # Verify the change
-          echo ""
           echo "📋 Verifying Cargo.toml after version update:"
-          if [[ -f "Cargo.toml" ]]; then
-            echo "Version line:"
-            grep "^version" Cargo.toml || echo "❌ No version line found!"
-            echo ""
-            echo "First 10 lines of Cargo.toml:"
-            head -10 Cargo.toml
-          fi
-          echo "📋 Verifying Cargo.toml version:"
-          if [[ -f "Cargo.toml" ]]; then
-            grep "^version" Cargo.toml || echo "❌ No version line found in Cargo.toml"
-          fi
+          grep "^version" Cargo.toml || echo "::error::No version line found in Cargo.toml"
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
+          targets: ${{ matrix.target }}
           components: rustfmt, clippy
 
       - name: Install cross-compilation tools
@@ -261,26 +195,42 @@ jobs:
         run: cargo test --verbose
 
       - name: Build release binary
-        env:
-          # Export cross-compilation environment variables for robustness
-          CC: ${{ matrix.target == 'aarch64-unknown-linux-gnu' && 'aarch64-linux-gnu-gcc' || '' }}
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: ${{ matrix.target == 'aarch64-unknown-linux-gnu' && 'aarch64-linux-gnu-gcc' || '' }}
-          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: ${{ matrix.target == 'x86_64-unknown-linux-musl' && 'musl-gcc' || '' }}
         run: |
-          cargo build --release --target ${{ matrix.target }}
+          set -euo pipefail
+          TARGET="${{ matrix.target }}"
+
+          case "${TARGET}" in
+            aarch64-unknown-linux-gnu)
+              export CC=aarch64-linux-gnu-gcc
+              export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+              ;;
+            x86_64-unknown-linux-musl)
+              export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc
+              ;;
+          esac
+
+          cargo build --release --target "${TARGET}"
 
       - name: Prepare binary (Unix)
         if: runner.os != 'Windows'
         run: |
+          set -euo pipefail
+          APP_NAME=$(basename "$PWD")
+          TARGET="${{ matrix.target }}"
+          OUTPUT="dist/${APP_NAME}-${{ matrix.name }}"
+
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/$(basename $(pwd)) dist/$(basename $(pwd))-${{ matrix.name }}
-          chmod +x dist/$(basename $(pwd))-${{ matrix.name }}
+          cp "target/${TARGET}/release/${APP_NAME}" "${OUTPUT}"
+          chmod +x "${OUTPUT}"
 
       - name: Prepare binary (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          mkdir dist
-          copy target\\${{ matrix.target }}\\release\\$(Split-Path -Leaf $(Get-Location)).exe dist\\$(Split-Path -Leaf $(Get-Location))-${{ matrix.name }}.exe
+          $appName = Split-Path -Leaf (Get-Location)
+          $targetDir = "target/${{ matrix.target }}/release"
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Copy-Item "$targetDir/$appName.exe" "dist/$appName-${{ matrix.name }}.exe" -Force
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v5
@@ -305,10 +255,9 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
 
       - name: Collect crate metadata
         id: crate-metadata
@@ -323,6 +272,9 @@ jobs:
           CURRENT_VERSION: ${{ steps.crate-metadata.outputs.crate-version }}
         run: |
           set -euo pipefail
+
+          : "${CRATE_NAME:?CRATE_NAME not set}"
+          : "${CURRENT_VERSION:?CURRENT_VERSION not set}"
 
           crate_name="${CRATE_NAME}"
           current_version="${CURRENT_VERSION}"
@@ -357,11 +309,13 @@ jobs:
           {
             echo "CRATE_NAME=${crate_name}"
             echo "CRATE_VERSION=${target_version}"
-          } >> "${GITHUB_ENV}"
+          } >> "$GITHUB_ENV"
 
-          echo "crate-name=${crate_name}" >> "${GITHUB_OUTPUT}"
-          echo "crate-version=${target_version}" >> "${GITHUB_OUTPUT}"
-          echo "tag-version=${tag_version}" >> "${GITHUB_OUTPUT}"
+          {
+            echo "crate-name=${crate_name}"
+            echo "crate-version=${target_version}"
+            echo "tag-version=${tag_version}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Configure Cargo for GitHub Packages
         env:
@@ -376,6 +330,10 @@ jobs:
           OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
+
+          : "${CRATE_NAME:?CRATE_NAME not set}"
+          : "${CRATE_VERSION:?CRATE_VERSION not set}"
+          : "${OWNER:?OWNER not set}"
 
           crate="${CRATE_NAME}"
           version="${CRATE_VERSION}"
@@ -440,6 +398,9 @@ jobs:
           OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
+
+          : "${CRATE_NAME:?CRATE_NAME not set}"
+          : "${OWNER:?OWNER not set}"
 
           crate="${CRATE_NAME}"
           owner="${OWNER}"

@@ -1,6 +1,7 @@
-# file: .github/workflows/release-docker.yml
-# version: 1.2.2
+# file: .github/workflows/release-docker-v1-deprecated.yml
+# version: 1.2.3
 # guid: a4b5c6d7-e8f9-0a1b-2c3d-4e5f6a7b8c9d
+# NOTE: Deprecated workflow retained for archival; use reusable-release.yml instead.
 
 name: Docker Release Build
 

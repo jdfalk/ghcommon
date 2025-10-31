@@ -1,6 +1,7 @@
-# file: .github/workflows/release-protobuf.yml
-# version: 1.3.1
+# file: .github/workflows/release-protobuf-v1-deprecated.yml
+# version: 1.3.2
 # guid: 2d5c7e9a-4b3f-4b1a-a2d7-9f6e2c1b8a45
+# NOTE: Deprecated workflow retained for archival; use reusable-release.yml instead.
 
 name: Release Protobuf Assets
 

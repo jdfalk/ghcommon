@@ -1,6 +1,7 @@
-# file: .github/workflows/release-go.yml
-# version: 2.2.2
+# file: .github/workflows/release-go-v1-deprecated.yml
+# version: 2.2.3
 # guid: e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b
+# NOTE: Deprecated workflow retained for archival; use reusable-release.yml instead.
 
 name: Go Release Build
 
