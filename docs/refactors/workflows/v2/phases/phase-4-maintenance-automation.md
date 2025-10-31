@@ -21,13 +21,13 @@ healthy with minimal manual intervention.
 
 ## Success Criteria
 
-- [ ] `maintenance_workflow.py` helper module created
-- [ ] Automated dependency update workflow operational
+- [x] `maintenance_workflow.py` helper module created
+- [x] Automated dependency update workflow operational
 - [ ] Stale issue/PR management working
-- [ ] Security scanning integrated (CodeQL, Dependabot, secret scanning)
+- [x] Security scanning integrated (security summary workflow)
 - [ ] Performance monitoring dashboard created
-- [ ] Maintenance reports generated weekly
-- [ ] Branch-specific maintenance policies supported
+- [x] Maintenance reports generated weekly (dependency/security summaries)
+- [x] Branch-specific maintenance policies supported
 - [ ] All maintenance follows repository conventions
 - [ ] No Windows-specific maintenance tasks
 

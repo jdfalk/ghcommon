@@ -19,6 +19,45 @@ The helper scripts are organized into 6 main modules:
 5. **maintenance_workflow.py**: Dependency updates, security scanning, stale detection
 6. **automation_workflow.py**: GitHub Apps, caching, metrics, self-healing
 
+
+## docs_workflow.py
+
+### generate_api_docs(source_dirs, output_dir)
+
+Generates Markdown documentation for helper modules and returns the generated file paths.
+
+### generate_workflow_docs(workflows_dir, output)
+
+Parses GitHub Actions workflow YAML definitions and writes a catalog in Markdown format.
+
+### build_documentation(source_dirs, workflows_dir, output_root, version=None)
+
+Builds a versioned documentation tree with API docs, workflow reference, search index, and versions manifest.
+
+### CLI entrypoints
+
+The script exposes `generate-api`, `generate-workflows`, and `build` subcommands for integration with GitHub workflows.
+
+
+## maintenance_workflow.py
+
+### collect_dependency_updates(pip_path, npm_path, cargo_path, go_path)
+
+Parses dependency reports (pip, npm, cargo, go) and returns a list of `DependencyUpdate` instances.
+
+### summarize_dependency_updates(updates)
+
+Formats dependency updates into Markdown and appends them to the step summary.
+
+### parse_stale_items(data, days)
+
+Filters issue/PR data for items exceeding the stale threshold and returns structured `StaleItem` records.
+
+### CLI commands
+
+- `summarize-dependencies` — summarise JSON reports into Markdown and artifacts.
+- `summarize-stale` — produce a summary table for stale issues or PRs.
+
 ### Design Principles
 
 - **Type Safety**: All functions use type hints with Python 3.13+ syntax
