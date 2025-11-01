@@ -4,11 +4,11 @@
 
 # Dependency Analysis for ghcommon Repository
 
-**Analysis Date:** November 1, 2025
-**Purpose:** Map all file dependencies to identify unused files and cleanup opportunities
-**Status:** ✅ **COMPLETE**
+**Analysis Date:** November 1, 2025 **Purpose:** Map all file dependencies to identify unused files
+and cleanup opportunities **Status:** ✅ **COMPLETE**
 
-> Update (v2.1.0): Analyzer now supports CLI options, default excludes, and a "full" mode for large Mermaid/DOT outputs. See enhancements and usage below.
+> Update (v2.1.0): Analyzer now supports CLI options, default excludes, and a "full" mode for large
+> Mermaid/DOT outputs. See enhancements and usage below.
 
 ## 📊 Executive Summary
 
@@ -33,7 +33,8 @@ The comprehensive dependency analysis has been completed successfully!
 All analysis outputs are located in the `dependency-analysis/` directory:
 
 1. **dependencies.txt** - ASCII art dependency graph
-2. **dependencies.dot** - Graphviz DOT format (can generate PNG with: `dot -Tpng dependencies.dot -o dependencies.png`)
+2. **dependencies.dot** - Graphviz DOT format (can generate PNG with:
+   `dot -Tpng dependencies.dot -o dependencies.png`)
 3. **dependencies.mermaid.md** - Mermaid.js graph for GitHub rendering
 4. **dependencies.html** - Interactive HTML report (open in browser)
 5. **dependencies.json** - Raw JSON data for programmatic analysis
@@ -51,7 +52,8 @@ All analysis outputs are located in the `dependency-analysis/` directory:
 - `--log-level` to adjust verbosity
 - Fixed HTML generation robustness and improved logging.
 - Explanation of size differences:
-- Mermaid intentionally defaults to conservative limits for readability and performance; JSON/DOT/ASCII are exhaustive. Use `--full` to lift limits.
+- Mermaid intentionally defaults to conservative limits for readability and performance;
+  JSON/DOT/ASCII are exhaustive. Use `--full` to lift limits.
 
 ### How to run
 
@@ -65,26 +67,31 @@ From the repository root (uses the repo’s virtualenv):
 ## Analysis Progress
 
 ### Phase 1: Root Directory Files ✅
+
 - ✅ Scanned root directory
 - ✅ Found 1,495 files (including .venv)
 - ✅ Tracked references
 
 ### Phase 2: Documentation Files ✅
+
 - ✅ Scanned docs/ directory
 - ✅ Found 163 documentation files
 - ✅ Mapped cross-references
 
 ### Phase 3: Scripts ✅
+
 - ✅ Scanned scripts/ directory
 - ✅ Found 61 script files
 - ✅ Mapped script dependencies
 
 ### Phase 4: Workflows ✅
+
 - ✅ Scanned .github/workflows/
 - ✅ Found 53 workflow files
 - ✅ Mapped reusable workflow calls
 
 ### Phase 5: Supporting Directories ✅
+
 - ✅ tools/ - 2 files
 - ✅ templates/ - 4 files
 - ✅ examples/ - 16 files
@@ -141,8 +148,8 @@ Based on the orphan analysis, the following categories likely contain unused fil
 **Total:** 1,495 files (mostly from .venv/)
 
 **Key Active Files:**
+
 - README.md - Main documentation
 - package.json - Node dependencies
 - requirements.txt - Python dependencies
 - Various config files (.golangci.yml, .pylintrc, etc.)
-

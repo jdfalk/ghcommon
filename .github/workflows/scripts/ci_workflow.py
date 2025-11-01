@@ -758,9 +758,7 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
             "CI_WORKFLOW_YAML_FILES",
             os.environ.get("CI_WORKFLOW_FILES", "false"),
         ),
-        "Workflow Scripts": os.environ.get(
-            "CI_WORKFLOW_SCRIPT_FILES", "false"
-        ),
+        "Workflow Scripts": os.environ.get("CI_WORKFLOW_SCRIPT_FILES", "false"),
         "Lint Config": os.environ.get("CI_LINT_FILES", "false"),
     }
 
@@ -789,9 +787,7 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
             "|-----|--------|",
         ]
     )
-    summary_lines.extend(
-        f"| {job} | {status} |" for job, status in steps
-    )
+    summary_lines.extend(f"| {job} | {status} |" for job, status in steps)
     summary_lines.extend(
         [
             "",

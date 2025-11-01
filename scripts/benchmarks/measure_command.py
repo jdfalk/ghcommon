@@ -9,20 +9,22 @@ and writes a JSON array where the first entry contains summary statistics that t
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 import json
 import math
-import os
-import shlex
+from pathlib import Path
 import statistics
 import subprocess
 import time
-from pathlib import Path
-from typing import Sequence
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Measure command execution time.")
-    parser.add_argument("--label", required=True, help="Benchmark label to report.")
+    parser = argparse.ArgumentParser(
+        description="Measure command execution time."
+    )
+    parser.add_argument(
+        "--label", required=True, help="Benchmark label to report."
+    )
     parser.add_argument(
         "--command",
         required=True,
@@ -108,7 +110,9 @@ def write_results(
             "name": label,
             "unit": "seconds",
             "value": average,
-            "range": f"{to_human(best)} … {to_human(worst)}" if durations else "",
+            "range": f"{to_human(best)} … {to_human(worst)}"
+            if durations
+            else "",
             "extra": "\n".join(extra_lines),
             "average_seconds": average,
             "best_seconds": best_value,
