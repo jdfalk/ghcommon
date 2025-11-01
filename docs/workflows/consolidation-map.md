@@ -1,5 +1,5 @@
 <!-- file: docs/workflows/consolidation-map.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.0.1 -->
 <!-- guid: 7f5db8a1-4c9c-4f2a-9b36-5f46dfdb73e2 -->
 
 # Workflow Consolidation Map
@@ -38,7 +38,6 @@
 | `.github/workflows/commit-override-handler.yml`                                         | Override handling      | Processes approved commit overrides for guarded branches.                                                 |
 | `reusable-protobuf.yml`                                                                 | Protobuf tooling       | Reusable helper; migrate consumers to reusable version.                                                   |
 | `.github/workflows/test-super-linter.yml`                                               | Lint smoke test        | Standalone Super Linter invocation for troubleshooting.                                                   |
-| `.github/workflows/workflow-scripts-tests.yml`                                          | Helper unit tests      | Runs pytest suite for `.github/workflows/scripts/` modules.                                               |
 | `.github/workflows/ci-tests.yml`                                                        | Legacy CI (deprecated) | Maintained only for parity while downstream migration completes; target replacement is `reusable-ci.yml`. |
 
 > **Tip:** Reference archived `*-v1-deprecated.yml` files only for historical context. All new

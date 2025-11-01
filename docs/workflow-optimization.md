@@ -13,8 +13,8 @@ truth in `.github/repository-config.yml`.
   should be avoided when the logic is complex or needed in multiple jobs.
 - **Single checkout of ghcommon:** Consumers should not need to re-checkout ghcommon when the
   workflow already ships the required scripts.
-- **Test the helpers:** Every helper script should have direct unit-level coverage and a workflow
-  that exercises the suite (`workflow-scripts-tests.yml`).
+- **Test the helpers:** Every helper script should have direct unit-level coverage, executed through
+  the Python test job in `reusable-ci.yml` (runs `pytest tests/workflow_scripts`).
 
 ## Summary by Workflow
 
@@ -90,7 +90,7 @@ truth in `.github/repository-config.yml`.
 - Helpers should live under `.github/workflows/scripts/` with pytest coverage in
   `tests/workflow_scripts/`.
 - Each reusable workflow should have a matching entry in
-  `.github/workflows/workflow-scripts-tests.yml` once new helpers land.
+  reusable Python test job once new helpers land.
 - When deprecating legacy workflows (e.g., per-language release ones), keep them temporarily but
   emit warnings pointing maintainers to the consolidated workflow.
 - Promote the helper scripts as versioned assets if we want external repos to pin specific revisions
@@ -216,7 +216,7 @@ testing:
 - [x] Matrices produced via helper.
 - [x] Language jobs use generated matrix.
 - [x] All helper tests pass.
-- [x] `workflow-scripts-tests.yml` runs green in CI.
+- [x] Helper script tests run green under the reusable CI Python job.
 
 ---
 
@@ -387,7 +387,7 @@ workflows (`ci-tests.yml`, etc.).
    - Migrate necessary coverage/benchmark tasks into `reusable-ci.yml`.
 5. **Tests**
    - Add `test_maintenance_workflow.py`, `test_docs_workflow.py`.
-   - Expand `workflow-scripts-tests.yml` to run new suites.
+  - Expand reusable CI Python test coverage to include new suites.
 
 ### Example Implementation Blueprint
 
@@ -493,7 +493,7 @@ python -m pytest tests/workflow_scripts/test_docs_workflow.py -vv
   documentation.
 - **Communicate**: share the workflow updates with downstream repositories and provide guidance on
   pinning new tags.
-- **Automate validation**: ensure `workflow-scripts-tests.yml` runs as part of CI to catch
+- **Automate validation**: ensure reusable CI Python tests run as part of every PR to catch
   regressions.
 - **Document everything**: this file should evolve with each phase to keep instructions accurate for
   new contributors.

@@ -242,6 +242,7 @@ def test_generate_ci_summary(tmp_path, monkeypatch):
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary_path))
     monkeypatch.setenv("JOB_DETECT_CHANGES", "success")
     monkeypatch.setenv("JOB_WORKFLOW_LINT", "success")
+    monkeypatch.setenv("JOB_WORKFLOW_SCRIPTS", "skipped")
     monkeypatch.setenv("JOB_GO", "success")
     monkeypatch.setenv("JOB_PYTHON", "skipped")
     monkeypatch.setenv("JOB_RUST", "failure")
@@ -255,17 +256,22 @@ def test_generate_ci_summary(tmp_path, monkeypatch):
     monkeypatch.setenv("CI_DOCKER_FILES", "false")
     monkeypatch.setenv("CI_DOCS_FILES", "true")
     monkeypatch.setenv("CI_WORKFLOW_FILES", "false")
+    monkeypatch.setenv("CI_WORKFLOW_YAML_FILES", "true")
+    monkeypatch.setenv("CI_WORKFLOW_SCRIPT_FILES", "false")
     monkeypatch.setenv("CI_LINT_FILES", "true")
 
     ci_workflow.generate_ci_summary(argparse.Namespace())
     content = summary_path.read_text()
     assert "CI Pipeline Summary" in content
     assert "| Rust CI | failure |" in content
+    assert "- Workflow YAML: true" in content
+    assert "- Workflow Scripts: false" in content
     assert "- Lint Config: true" in content
 
 
 def test_check_ci_status_failure(monkeypatch):
     monkeypatch.setenv("JOB_WORKFLOW_LINT", "success")
+    monkeypatch.setenv("JOB_WORKFLOW_SCRIPTS", "skipped")
     monkeypatch.setenv("JOB_GO", "success")
     monkeypatch.setenv("JOB_PYTHON", "failure")
     monkeypatch.setenv("JOB_RUST", "success")

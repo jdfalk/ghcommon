@@ -129,6 +129,12 @@ def debug_filter(_: argparse.Namespace) -> None:
         "Docker files changed": os.environ.get("CI_DOCKER_FILES", ""),
         "Docs files changed": os.environ.get("CI_DOCS_FILES", ""),
         "Workflow files changed": os.environ.get("CI_WORKFLOW_FILES", ""),
+        "Workflow YAML files changed": os.environ.get(
+            "CI_WORKFLOW_YAML_FILES", ""
+        ),
+        "Workflow scripts changed": os.environ.get(
+            "CI_WORKFLOW_SCRIPT_FILES", ""
+        ),
         "Linter config files changed": os.environ.get("CI_LINT_FILES", ""),
     }
     for label, value in mapping.items():
@@ -731,7 +737,8 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
     primary_language = os.environ.get("PRIMARY_LANGUAGE", "unknown")
     steps = [
         ("Detect Changes", os.environ.get("JOB_DETECT_CHANGES", "skipped")),
-        ("Workflow Lint", os.environ.get("JOB_WORKFLOW_LINT", "skipped")),
+        ("Workflow YAML", os.environ.get("JOB_WORKFLOW_LINT", "skipped")),
+        ("Workflow Scripts", os.environ.get("JOB_WORKFLOW_SCRIPTS", "skipped")),
         ("Go CI", os.environ.get("JOB_GO", "skipped")),
         ("Python CI", os.environ.get("JOB_PYTHON", "skipped")),
         ("Rust CI", os.environ.get("JOB_RUST", "skipped")),
@@ -747,7 +754,13 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
         "Rust": os.environ.get("CI_RUST_FILES", "false"),
         "Docker": os.environ.get("CI_DOCKER_FILES", "false"),
         "Docs": os.environ.get("CI_DOCS_FILES", "false"),
-        "Workflows": os.environ.get("CI_WORKFLOW_FILES", "false"),
+        "Workflow YAML": os.environ.get(
+            "CI_WORKFLOW_YAML_FILES",
+            os.environ.get("CI_WORKFLOW_FILES", "false"),
+        ),
+        "Workflow Scripts": os.environ.get(
+            "CI_WORKFLOW_SCRIPT_FILES", "false"
+        ),
         "Lint Config": os.environ.get("CI_LINT_FILES", "false"),
     }
 
@@ -796,6 +809,7 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
 def check_ci_status(_: argparse.Namespace) -> None:
     job_envs = {
         "Workflow Lint": os.environ.get("JOB_WORKFLOW_LINT"),
+        "Workflow Scripts": os.environ.get("JOB_WORKFLOW_SCRIPTS"),
         "Go CI": os.environ.get("JOB_GO"),
         "Frontend CI": os.environ.get("JOB_FRONTEND"),
         "Python CI": os.environ.get("JOB_PYTHON"),

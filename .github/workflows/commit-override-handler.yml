@@ -1,5 +1,5 @@
 # file: .github/workflows/commit-override-handler.yml
-# version: 1.2.0
+# version: 1.2.1
 # guid: 7a8b9c0d-1e2f-3456-789a-bcdef0123456
 
 # ⚠️  DO NOT EDIT DIRECTLY - This file is managed in ghcommon repository
@@ -133,22 +133,38 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
           # Summary
-          summary_content="## 🔍 Commit Override Analysis\n\n"
-          summary_content+="| Override Type | Status |\n"
-          summary_content+="|---------------|--------|\n"
-          summary_content+="| Skip Tests | $SKIP_TESTS |\n"
-          summary_content+="| Skip Validation | $SKIP_VALIDATION |\n"
-          summary_content+="| Skip CI | $SKIP_CI |\n"
-          summary_content+="| Skip Build | $SKIP_BUILD |\n\n"
+          {
+            cat <<EOF
+## 🔍 Commit Override Analysis
+
+| Override Type | Status |
+|---------------|--------|
+| Skip Tests | $SKIP_TESTS |
+| Skip Validation | $SKIP_VALIDATION |
+| Skip CI | $SKIP_CI |
+| Skip Build | $SKIP_BUILD |
+
+EOF
+          } >> "${GITHUB_STEP_SUMMARY}"
 
           if [ "$SKIP_TESTS" = "true" ] || [ "$SKIP_VALIDATION" = "true" ] || [ "$SKIP_CI" = "true" ] || [ "$SKIP_BUILD" = "true" ]; then
-            summary_content+="⚠️ **Warning**: Some CI checks have been disabled via commit message overrides.\n\n"
-            summary_content+="**Commit Messages Analyzed:**\n\`\`\`\n${COMMITS}\n\`\`\`\n"
-          else
-            summary_content+="✅ **All CI checks enabled** - No override keywords detected.\n"
-          fi
+            {
+              cat <<EOF
+⚠️ **Warning**: Some CI checks have been disabled via commit message overrides.
 
-          printf '%s' "${summary_content}" >> "${GITHUB_STEP_SUMMARY}"
+**Commit Messages Analyzed:**
+\`\`\`
+${COMMITS}
+\`\`\`
+
+EOF
+            } >> "${GITHUB_STEP_SUMMARY}"
+          else
+            {
+              echo "✅ **All CI checks enabled** - No override keywords detected."
+              echo ""
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
 
   # This job can be referenced by other workflows to conditionally skip steps
   notify-overrides:

@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.2.0
+# version: 1.3.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -127,7 +127,9 @@ jobs:
       frontend-files: ${{ steps.changes.outputs.frontend_files }}
       docker-files: ${{ steps.changes.outputs.docker_files }}
       docs-files: ${{ steps.changes.outputs.docs_files }}
-      workflows-files: ${{ steps.changes.outputs.workflow_files }}
+      workflow-files: ${{ steps.changes.outputs.workflow_yaml }}
+      workflows-files: ${{ steps.changes.outputs.workflow_yaml }}
+      workflows-scripts: ${{ steps.changes.outputs.workflow_scripts }}
       lint-files: ${{ steps.changes.outputs.lint_files }}
     steps:
       - name: Checkout repository
@@ -178,9 +180,11 @@ jobs:
               - '**/*.md'
               - 'docs/**'
               - '*.md'
-            workflow_files:
+            workflow_yaml:
               - '.github/workflows/**'
+            workflow_scripts:
               - '.github/actions/**'
+              - '.github/scripts/**'
             lint_files:
               - 'super-linter-*.env'
               - '.markdownlint.json'
@@ -201,7 +205,9 @@ jobs:
           CI_FRONTEND_FILES: ${{ steps.changes.outputs.frontend_files }}
           CI_DOCKER_FILES: ${{ steps.changes.outputs.docker_files }}
           CI_DOCS_FILES: ${{ steps.changes.outputs.docs_files }}
-          CI_WORKFLOW_FILES: ${{ steps.changes.outputs.workflow_files }}
+          CI_WORKFLOW_FILES: ${{ steps.changes.outputs.workflow_yaml }}
+          CI_WORKFLOW_YAML_FILES: ${{ steps.changes.outputs.workflow_yaml }}
+          CI_WORKFLOW_SCRIPT_FILES: ${{ steps.changes.outputs.workflow_scripts }}
           CI_LINT_FILES: ${{ steps.changes.outputs.lint_files }}
         run: python3 .github/workflows/scripts/ci_workflow.py debug-filter
 
@@ -248,6 +254,64 @@ jobs:
           name: workflow-lint-report
           path: actionlint.log
           if-no-files-found: ignore
+
+  workflow-scripts:
+    name: Workflow Scripts
+    needs: detect-changes
+    if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Lint Python workflow scripts
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install ruff black
+          if find .github/scripts -maxdepth 1 -name "*.py" | head -n 1 | grep -q .; then
+            ruff check .github/scripts
+            black --check .github/scripts
+            python -m compileall .github/scripts
+          else
+            echo "No Python workflow scripts detected."
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Lint JavaScript/TypeScript workflow scripts
+        run: |
+          set -euo pipefail
+          mapfile -d '' JS_TS_FILES < <(find .github -type f \( -path "./.github/scripts/*" -o -path "./.github/actions/*" \) \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \) -print0)
+          if [ ${#JS_TS_FILES[@]} -gt 0 ]; then
+            TARGET_DIRS=".github/scripts"
+            if [ -d ".github/actions" ]; then
+              TARGET_DIRS="$TARGET_DIRS .github/actions"
+            fi
+            npx --yes eslint@9.13.0 --config .eslintrc.yml --ext .js,.ts,.tsx $TARGET_DIRS
+            printf '%s\0' "${JS_TS_FILES[@]}" | xargs -0 npx --yes prettier@3.3.3 --check
+          else
+            echo "No JavaScript/TypeScript workflow scripts detected."
+          fi
+
+      - name: Publish workflow script summary
+        if: always()
+        run: |
+          echo "## Workflow Script Lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Python scripts linted with Ruff and Black." >> "$GITHUB_STEP_SUMMARY"
+          echo "- JavaScript/TypeScript scripts linted with ESLint and checked with Prettier." >> "$GITHUB_STEP_SUMMARY"
 
   # Protobuf generation (if applicable)
   protobuf-generation:
@@ -420,6 +484,7 @@ jobs:
       [
         detect-changes,
         workflow-lint,
+        workflow-scripts,
         go-ci,
         python-ci,
         rust-ci,
@@ -435,6 +500,7 @@ jobs:
         env:
           JOB_DETECT_CHANGES: ${{ needs.detect-changes.result || 'skipped' }}
           JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
+          JOB_WORKFLOW_SCRIPTS: ${{ needs.workflow-scripts.result || 'skipped' }}
           JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
           JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
           JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
@@ -448,12 +514,15 @@ jobs:
           CI_DOCKER_FILES: ${{ needs.detect-changes.outputs.docker-files }}
           CI_DOCS_FILES: ${{ needs.detect-changes.outputs.docs-files }}
           CI_WORKFLOW_FILES: ${{ needs.detect-changes.outputs.workflow-files }}
+          CI_WORKFLOW_YAML_FILES: ${{ needs.detect-changes.outputs.workflows-files }}
+          CI_WORKFLOW_SCRIPT_FILES: ${{ needs.detect-changes.outputs.workflows-scripts }}
           CI_LINT_FILES: ${{ needs.detect-changes.outputs.lint-files }}
         run: python3 .github/workflows/scripts/ci_workflow.py generate-ci-summary
 
       - name: Check overall status
         env:
           JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
+          JOB_WORKFLOW_SCRIPTS: ${{ needs.workflow-scripts.result || 'skipped' }}
           JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
           JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
           JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
