@@ -1,5 +1,5 @@
 # file: .github/workflows/ci-tests.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: ci-tests-workflow-2025-automation
 
 name: CI Tests
@@ -131,6 +131,18 @@ jobs:
             cargo bench -- --output-format bencher | tee benchmark-results.txt
           else
             echo "No Cargo.toml found; skipping benchmarks." > benchmark-results.txt
+          fi
+
+      - name: Publish benchmark summary
+        run: |
+          echo "## Rust Benchmarks" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s benchmark-results.txt ]; then
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            cat benchmark-results.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_Benchmark output not available._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload benchmark artifact
