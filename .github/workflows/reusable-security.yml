@@ -47,47 +47,46 @@ jobs:
       - name: Detect available languages
         id: detect
         run: |
-          languages=()
+          python3 - <<'PY'
+          from __future__ import annotations
 
-          # Check for Go
-          if [ -f "go.mod" ] || [ -f "go.work" ]; then
-            languages+=('"go"')
-          fi
+          import json
+          import os
+          from pathlib import Path
 
-          # Check for JavaScript/TypeScript
-          if [ -f "package.json" ] || find . -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" -type f -not -path "./.git/*" -not -path "./node_modules/*" | head -1 | grep -q .; then
-            languages+=('"javascript"')
-          fi
+          root = Path(".")
 
-          # Check for Python
-          if [ -f "requirements.txt" ] || [ -f "setup.py" ] || [ -f "pyproject.toml" ] || find . -name "*.py" -type f -not -path "./.git/*" | head -1 | grep -q .; then
-            languages+=('"python"')
-          fi
+          def has_files(patterns: tuple[str, ...]) -> bool:
+              for pattern in patterns:
+                  if any(root.rglob(pattern)):
+                      return True
+              return False
 
-          # Check for Java
-          if [ -f "pom.xml" ] || [ -f "build.gradle" ] || find . -name "*.java" -type f -not -path "./.git/*" | head -1 | grep -q .; then
-            languages+=('"java"')
-          fi
+          languages: list[str] = []
 
-          # Check for C/C++
-          if find . -name "*.c" -o -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.h" -o -name "*.hpp" -type f -not -path "./.git/*" | head -1 | grep -q .; then
-            languages+=('"cpp"')
-          fi
+          if any(root.joinpath(name).exists() for name in ("go.mod", "go.work")):
+              languages.append("go")
 
-          # Check for C#
-          if [ -f "*.csproj" ] || [ -f "*.sln" ] || find . -name "*.cs" -type f -not -path "./.git/*" | head -1 | grep -q .; then
-            languages+=('"csharp"')
-          fi
+          if root.joinpath("package.json").exists() or has_files(("*.js", "*.ts", "*.jsx", "*.tsx")):
+              languages.append("javascript")
 
-          # Build JSON array
-          if [ ${#languages[@]} -eq 0 ]; then
-            echo "languages=[]" >> $GITHUB_OUTPUT
-          else
-            lang_list=$(IFS=,; echo "${languages[*]}")
-            echo "languages=[$lang_list]" >> $GITHUB_OUTPUT
-          fi
+          if any(root.joinpath(name).exists() for name in ("requirements.txt", "setup.py", "pyproject.toml")) or has_files(("*.py",)):
+              languages.append("python")
 
-          echo "Detected languages: [$lang_list]"
+          if any(root.joinpath(name).exists() for name in ("pom.xml", "build.gradle")) or has_files(("*.java",)):
+              languages.append("java")
+
+          if has_files(("*.c", "*.cpp", "*.cc", "*.cxx", "*.h", "*.hpp")):
+              languages.append("cpp")
+
+          if has_files(("*.csproj", "*.sln", "*.cs")):
+              languages.append("csharp")
+
+          detected = json.dumps(languages)
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          output_path.write_text(f"languages={detected}\n", encoding="utf-8")
+          print(f"Detected languages: {detected}")
+          PY
 
   # CodeQL Analysis
   codeql-analysis:
@@ -229,25 +228,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate security summary
+        env:
+          RESULT_CODEQL: ${{ needs.codeql-analysis.result || 'skipped' }}
+          RESULT_DEP_REVIEW: ${{ needs.dependency-review.result || 'skipped' }}
+          RESULT_SECURITY_AUDIT: ${{ needs.security-audit.result || 'skipped' }}
+          RESULT_TRIVY: ${{ needs.trivy-scan.result || 'skipped' }}
         run: |
-          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Review | ${{ needs.dependency-review.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Audit | ${{ needs.security-audit.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy Scan | ${{ needs.trivy-scan.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          python3 - <<'PY'
+          from __future__ import annotations
 
-          # Set overall status
-          if [[ "${{ needs.codeql-analysis.result }}" == "failure" ||
-                "${{ needs.dependency-review.result }}" == "failure" ||
-                "${{ needs.security-audit.result }}" == "failure" ||
-                "${{ needs.trivy-scan.result }}" == "failure" ]]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Security issues detected. Please review the scan results.**" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **All security scans passed.**" >> $GITHUB_STEP_SUMMARY
-          fi
+          import os
+          from pathlib import Path
+
+          results = {
+              "CodeQL Analysis": os.environ.get("RESULT_CODEQL", "skipped"),
+              "Dependency Review": os.environ.get("RESULT_DEP_REVIEW", "skipped"),
+              "Security Audit": os.environ.get("RESULT_SECURITY_AUDIT", "skipped"),
+              "Trivy Scan": os.environ.get("RESULT_TRIVY", "skipped"),
+          }
+
+          summary_lines = [
+              "## Security Scan Summary",
+              "",
+              "| Scan Type | Status |",
+              "|-----------|--------|",
+          ]
+
+          for label, status in results.items():
+              summary_lines.append(f"| {label} | {status} |")
+
+          warning_required = any(status == "failure" for status in results.values())
+          summary_lines.append("")
+          if warning_required:
+              summary_lines.append("⚠️ **Security issues detected. Please review the scan results.**")
+          else:
+              summary_lines.append("✅ **All security scans passed.**")
+
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+          if warning_required:
+              raise SystemExit(1)
+          PY

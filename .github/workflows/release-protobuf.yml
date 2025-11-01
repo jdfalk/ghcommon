@@ -1,0 +1,62 @@
+# file: .github/workflows/release-protobuf.yml
+# version: 1.0.0
+# guid: release-protobuf-wrapper-2025-10
+
+name: Release Protobuf
+
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        description: "Path to the repository configuration file"
+        required: false
+        type: string
+        default: ".github/repository-config.yml"
+      protobuf-path:
+        description: "Path to protobuf source files"
+        required: false
+        type: string
+        default: "proto"
+      output-path:
+        description: "Output path for generated code"
+        required: false
+        type: string
+        default: "sdks"
+      generate-docs:
+        description: "Generate protobuf documentation"
+        required: false
+        type: boolean
+        default: false
+      skip-post-processing:
+        description: "Skip post-generation processing scripts"
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      artifacts-available:
+        description: "Whether protobuf artifacts were generated"
+        value: ${{ jobs.delegate.outputs.artifacts-available }}
+      go-files-generated:
+        description: "Number of Go files generated"
+        value: ${{ jobs.delegate.outputs.go-files-generated }}
+      python-files-generated:
+        description: "Number of Python files generated"
+        value: ${{ jobs.delegate.outputs.python-files-generated }}
+      docs-generated:
+        description: "Whether documentation was generated"
+        value: ${{ jobs.delegate.outputs.docs-generated }}
+
+permissions:
+  contents: read
+
+jobs:
+  delegate:
+    name: Generate Protobuf Artifacts
+    uses: ./.github/workflows/reusable-protobuf.yml
+    with:
+      config-path: ${{ inputs.config-path }}
+      protobuf-path: ${{ inputs.protobuf-path }}
+      output-path: ${{ inputs.output-path }}
+      generate-docs: ${{ inputs.generate-docs }}
+      skip-post-processing: ${{ inputs.skip-post-processing }}
+    secrets: inherit

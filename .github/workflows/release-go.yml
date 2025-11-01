@@ -1,0 +1,55 @@
+# file: .github/workflows/release-go.yml
+# version: 1.0.0
+# guid: release-go-workflow-2025-10
+
+name: Go Release Build
+
+on:
+  workflow_call:
+    inputs:
+      go-matrix:
+        description: "JSON encoded Go build matrix"
+        required: true
+        type: string
+      protobuf-artifacts:
+        description: "Whether protobuf artifacts were generated"
+        required: false
+        type: string
+        default: "false"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-go:
+    name: Build Go (${{ matrix.go-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.go-matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download protobuf artifacts
+        if: inputs.protobuf-artifacts == 'true'
+        uses: actions/download-artifact@v6
+        with:
+          name: protobuf-generated
+          path: proto-generated
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Build Go project
+        run: go build -v ./...
+
+      - name: Test Go project
+        run: go test -v -race ./...

@@ -1,0 +1,58 @@
+# file: .github/workflows/release-frontend.yml
+# version: 1.0.0
+# guid: release-frontend-workflow-2025-10
+
+name: Frontend Release Build
+
+on:
+  workflow_call:
+    inputs:
+      frontend-matrix:
+        description: "JSON encoded frontend build matrix"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-frontend:
+    name: Build Frontend (${{ matrix.node-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.frontend-matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run frontend tests
+        run: |
+          if npm run | grep -q "\btest\b"; then
+            npm test -- --watch=false
+          else
+            echo "No test script defined; skipping."
+          fi
+
+      - name: Build frontend bundle
+        run: |
+          if npm run | grep -q "\bbuild\b"; then
+            npm run build
+          else
+            echo "No build script defined; skipping."
+          fi

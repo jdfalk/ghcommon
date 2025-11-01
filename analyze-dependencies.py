@@ -1,33 +1,60 @@
 #!/usr/bin/env python3
-"""
-Comprehensive dependency analyzer for ghcommon repository
-Generates multiple graph formats: ASCII, DOT, HTML, and Mermaid.js
+# file: analyze-dependencies.py
+# version: 1.1.0
+# guid: 9b7e2c3d-4f5a-6b7c-8d9e-0f1a2b3c4d5e
+"""Comprehensive dependency analyzer for the ghcommon repository.
+
+Generates multiple graph formats: ASCII, DOT, HTML, and Mermaid.js.
+
+Usage examples:
+    python3 analyze-dependencies.py --full
+    python3 analyze-dependencies.py --exclude .git,node_modules,.venv --mermaid-max-files 500 --mermaid-max-edges 5000
 """
 
-import os
-import json
-import re
-from pathlib import Path
+import argparse
 from collections import defaultdict
-from typing import Dict, Set, List, Tuple
+from datetime import datetime
+import json
+import logging
+from pathlib import Path
+import re
 
 
 class DependencyAnalyzer:
-    def __init__(self, root_path: str):
+    """Analyze project files and build dependency graphs.
+
+    Attributes:
+        root: The repository root path.
+        exclude_dirs: Directory names to exclude anywhere in a path.
+        mermaid_max_files_per_category: Node limit per category in Mermaid output (None for unlimited).
+        mermaid_max_edges: Edge limit for Mermaid output (None for unlimited).
+    """
+
+    def __init__(
+        self,
+        root_path: str,
+        exclude_dirs: list[str] | None = None,
+        mermaid_max_files_per_category: int = 20,
+        mermaid_max_edges: int = 50,
+    ):
+        """Initialize the analyzer with paths and limits."""
         self.root = Path(root_path)
-        self.dependencies = defaultdict(set)
-        self.file_types = defaultdict(set)
-        self.references = defaultdict(set)
-        self.orphans = set()
-        self.progress_log = []
+        self.dependencies: dict[str, set[str]] = defaultdict(set)
+        self.file_types: dict[str, set[str]] = defaultdict(set)
+        self.references: dict[str, set[str]] = defaultdict(set)
+        self.orphans: set[str] = set()
+        self.progress_log: list[str] = []
+        self.exclude_dirs = set(exclude_dirs or [])
+        self.mermaid_max_files_per_category = mermaid_max_files_per_category
+        self.mermaid_max_edges = mermaid_max_edges
 
     def log(self, message: str):
-        """Log progress"""
-        print(message)
+        """Log progress."""
+        logging.info(message)
         self.progress_log.append(message)
 
-    def analyze_file(self, file_path: Path) -> Dict:
-        """Analyze a single file for dependencies"""
+    def analyze_file(self, file_path: Path) -> dict:
+        """Analyze a single file for dependencies."""
         rel_path = file_path.relative_to(self.root)
         suffix = file_path.suffix
 
@@ -108,11 +135,11 @@ class DependencyAnalyzer:
         return {str(rel_path): list(refs)}
 
     def scan_directory(self, dir_path: Path, category: str):
-        """Scan a directory for files"""
+        """Scan a directory for files."""
         self.log(f"\n📁 Scanning {category}: {dir_path.relative_to(self.root)}")
 
         if not dir_path.exists():
-            self.log(f"  ⚠️  Directory does not exist")
+            self.log("  ⚠️  Directory does not exist")
             return
 
         patterns = [
@@ -133,7 +160,9 @@ class DependencyAnalyzer:
         self.log(f"  📊 Found {len(files_found)} files")
 
         for file_path in sorted(files_found):
-            if ".git" in str(file_path) or "node_modules" in str(file_path):
+            parts = set(file_path.parts)
+            # Skip excluded directories (by name) anywhere in the path
+            if any(ex in parts for ex in self.exclude_dirs):
                 continue
 
             rel_path = str(file_path.relative_to(self.root))
@@ -145,16 +174,20 @@ class DependencyAnalyzer:
                     for target in targets:
                         # Normalize path
                         if isinstance(target, tuple):
-                            target = target[1] if len(target) > 1 else target[0]
-                        self.dependencies[source].add(target)
-                        self.references[target].add(source)
+                            normalized_target = (
+                                target[1] if len(target) > 1 else target[0]
+                            )
+                        else:
+                            normalized_target = target
+                        self.dependencies[source].add(normalized_target)
+                        self.references[normalized_target].add(source)
 
     def find_orphans(self):
-        """Identify files that are not referenced by anything"""
+        """Identify files that are not referenced by anything."""
         self.log("\n🔍 Finding orphaned files...")
 
         all_files = set()
-        for category, files in self.file_types.items():
+        for files in self.file_types.values():
             all_files.update(files)
 
         referenced_files = set(self.references.keys())
@@ -182,7 +215,7 @@ class DependencyAnalyzer:
         self.log(f"  📊 Found {len(self.orphans)} potentially orphaned files")
 
     def generate_ascii_graph(self) -> str:
-        """Generate ASCII art dependency graph"""
+        """Generate ASCII art dependency graph."""
         lines = ["# ASCII Dependency Graph", ""]
 
         for category, files in sorted(self.file_types.items()):
@@ -200,7 +233,7 @@ class DependencyAnalyzer:
         return "\n".join(lines)
 
     def generate_dot_graph(self) -> str:
-        """Generate Graphviz DOT format"""
+        """Generate Graphviz DOT format."""
         lines = [
             "digraph ghcommon_dependencies {",
             "  rankdir=LR;",
@@ -217,6 +250,7 @@ class DependencyAnalyzer:
             "tools": "#6c5ce7",
             "templates": "#a29bfe",
             "examples": "#fd79a8",
+            "tests": "#2ecc71",
         }
 
         for category, color in colors.items():
@@ -253,14 +287,17 @@ class DependencyAnalyzer:
         return "\n".join(lines)
 
     def generate_mermaid_graph(self) -> str:
-        """Generate Mermaid.js format"""
+        """Generate Mermaid.js format."""
         lines = ["```mermaid", "graph TD", ""]
 
         # Group by category
         for category, files in sorted(self.file_types.items()):
             lines.append(f"  subgraph {category}")
 
-            for file in sorted(files)[:20]:  # Limit to prevent huge graphs
+            limit = self.mermaid_max_files_per_category
+            for file in sorted(files)[
+                : (limit if limit and limit > 0 else None)
+            ]:
                 safe_name = (
                     file.replace("/", "_").replace(".", "_").replace("-", "_")
                 )
@@ -272,8 +309,9 @@ class DependencyAnalyzer:
 
         # Add key relationships (limit to most important)
         edge_count = 0
+        max_edges = self.mermaid_max_edges
         for source, targets in sorted(self.dependencies.items()):
-            if edge_count > 50:  # Limit edges
+            if max_edges and edge_count >= max_edges:
                 break
             safe_source = (
                 source.replace("/", "_").replace(".", "_").replace("-", "_")
@@ -289,9 +327,7 @@ class DependencyAnalyzer:
         return "\n".join(lines)
 
     def generate_html_report(self) -> str:
-        """Generate interactive HTML report"""
-        from datetime import datetime
-
+        """Generate interactive HTML report."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         total_files = sum(len(files) for files in self.file_types.values())
         total_deps = sum(len(deps) for deps in self.dependencies.values())
@@ -391,7 +427,7 @@ class DependencyAnalyzer:
         return html
 
     def run_analysis(self):
-        """Run complete analysis"""
+        """Run complete analysis."""
         self.log("=" * 60)
         self.log("🔍 Starting comprehensive dependency analysis")
         self.log("=" * 60)
@@ -460,7 +496,66 @@ class DependencyAnalyzer:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Analyze repository dependencies and generate multiple graph outputs."
+    )
+    default_root = str(Path(__file__).resolve().parent)
+    parser.add_argument(
+        "--root",
+        default=default_root,
+        help="Root path to analyze (default: script directory)",
+    )
+    parser.add_argument(
+        "--exclude",
+        default=".git,node_modules,.venv",
+        help="Comma-separated directory names to exclude anywhere in paths.",
+    )
+    parser.add_argument(
+        "--full",
+        action="store_true",
+        help="Generate full-size Mermaid output (no node/edge limits).",
+    )
+    parser.add_argument(
+        "--mermaid-max-files",
+        type=int,
+        default=20,
+        help="Maximum nodes per category for Mermaid output (ignored with --full).",
+    )
+    parser.add_argument(
+        "--mermaid-max-edges",
+        type=int,
+        default=50,
+        help="Maximum edges for Mermaid output (ignored with --full).",
+    )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level.",
+    )
+
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level), format="%(message)s"
+    )
+
+    exclude = [s.strip() for s in args.exclude.split(",") if s.strip()]
+    max_files = None if args.full else args.mermaid_max_files
+    max_edges = None if args.full else args.mermaid_max_edges
+
     analyzer = DependencyAnalyzer(
-        "/Users/jdfalk/repos/github.com/jdfalk/ghcommon"
+        args.root,
+        exclude_dirs=exclude,
+        mermaid_max_files_per_category=max_files
+        if max_files is not None
+        else 0
+        if args.full
+        else args.mermaid_max_files,
+        mermaid_max_edges=max_edges
+        if max_edges is not None
+        else 0
+        if args.full
+        else args.mermaid_max_edges,
     )
     analyzer.run_analysis()

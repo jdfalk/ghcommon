@@ -158,13 +158,13 @@ jobs:
 
       - name: Configure workflow script path
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Setup environment variables
         id: env-setup
         run: |
-          echo "registry=${REGISTRY}" >> $GITHUB_OUTPUT
-          echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "registry=${REGISTRY}" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Detect project languages and generate matrices
         id: detect
@@ -318,7 +318,7 @@ jobs:
 
       - name: Configure workflow script path
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Get version
         id: version
@@ -326,7 +326,7 @@ jobs:
           DETECTED_RELEASE_TAG: ${{ needs.detect-languages.outputs.release-tag }}
         run: |
           VERSION="$DETECTED_RELEASE_TAG"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         id: changelog
@@ -337,7 +337,7 @@ jobs:
           AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft }}
         run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" generate-changelog
+          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" "generate-changelog"
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v6
@@ -347,77 +347,9 @@ jobs:
 
       - name: Package and organize release artifacts
         id: package-artifacts
-        env:
-          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          echo "📦 Organizing and packaging release artifacts..."
-
-          # Create release directory structure
-          mkdir -p release-assets/{sdks,binaries,packages,documentation}
-
-          # Move and organize SDK packages
-          if find ./artifacts -name "*-sdk.*" -type f | grep -q .; then
-            echo "Moving SDK packages..."
-            find ./artifacts -name "*-sdk.*" -type f -exec mv {} release-assets/sdks/ \;
-            ls -la release-assets/sdks/
-          fi
-
-          # Move documentation packages
-          if find ./artifacts -name "*docs.*" -type f | grep -q .; then
-            echo "Moving documentation packages..."
-            find ./artifacts -name "*docs.*" -type f -exec mv {} release-assets/documentation/ \;
-          fi
-
-          # Move binary files (executables)
-          if find ./artifacts -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" | grep -q .; then
-            echo "Moving binary packages..."
-            find ./artifacts \( -name "*.exe" -o -name "*-linux-*" -o -name "*-darwin-*" -o -name "*-windows-*" \) -type f -exec mv {} release-assets/binaries/ \;
-          fi
-
-          # Move other packages (wheels, containers, etc.)
-          if find ./artifacts -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" | grep -q .; then
-            echo "Moving other packages..."
-            find ./artifacts \( -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" \) -type f -exec mv {} release-assets/packages/ \;
-          fi
-
-          # Create a comprehensive release manifest
-          echo "Creating release manifest..."
-          {
-            echo "# Release Manifest - ${RELEASE_VERSION}"
-            echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-            echo ""
-            echo "## SDK Packages"
-            if [ -d "release-assets/sdks" ] && [ "$(ls -A release-assets/sdks 2>/dev/null)" ]; then
-              ls -la release-assets/sdks/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
-            else
-              echo "- No SDK packages"
-            fi
-            echo ""
-            echo "## Documentation"
-            if [ -d "release-assets/documentation" ] && [ "$(ls -A release-assets/documentation 2>/dev/null)" ]; then
-              ls -la release-assets/documentation/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
-            else
-              echo "- No documentation packages"
-            fi
-            echo ""
-            echo "## Binaries"
-            if [ -d "release-assets/binaries" ] && [ "$(ls -A release-assets/binaries 2>/dev/null)" ]; then
-              ls -la release-assets/binaries/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
-            else
-              echo "- No binary packages"
-            fi
-            echo ""
-            echo "## Other Packages"
-            if [ -d "release-assets/packages" ] && [ "$(ls -A release-assets/packages 2>/dev/null)" ]; then
-              ls -la release-assets/packages/ | tail -n +2 | awk '{print "- " $9 " (" $5 " bytes)"}'
-            else
-              echo "- No other packages"
-            fi
-          } > release-assets/MANIFEST.md
-
-          # Show summary
-          echo "Release assets organized:"
-          find release-assets -type f | wc -l | xargs echo "Total files:"
+          # shellcheck disable=SC2086
+          python3 "scripts/workflows/package_release_assets.py" "${{ steps.version.outputs.version }}"
           du -sh release-assets/ | awk '{print "Total size: " $1}'
 
           # Set output indicating packaging completion
@@ -459,13 +391,20 @@ jobs:
         env:
           RELEASE_OUTCOME: ${{ steps.release.outcome }}
         run: |
-          if [ "$RELEASE_OUTCOME" = "success" ]; then
-            echo "created=true" >> $GITHUB_OUTPUT
-            echo "release-created=true" >> $GITHUB_OUTPUT
-          else
-            echo "created=false" >> $GITHUB_OUTPUT
-            echo "release-created=false" >> $GITHUB_OUTPUT
-          fi
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          from pathlib import Path
+
+          outcome = os.environ.get("RELEASE_OUTCOME", "failure")
+          created = outcome == "success"
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          output_path.write_text(
+              f"created={'true' if created else 'false'}\nrelease-created={'true' if created else 'false'}\n",
+              encoding="utf-8",
+          )
+          PY
 
   publish-github-packages:
     name: Publish GitHub Packages
@@ -501,7 +440,7 @@ jobs:
 
       - name: Configure workflow script path
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Download release artifacts for publishing
         uses: actions/download-artifact@v5
@@ -519,19 +458,37 @@ jobs:
           RELEASE_TAG: ${{ needs.detect-languages.outputs.release-tag }}
           RELEASE_STRATEGY: ${{ needs.detect-languages.outputs.release-branch-strategy }}
           BRANCH_NAME: ${{ github.ref_name }}
+          GHCOMMON_SCRIPTS_DIR: ${{ env.GHCOMMON_SCRIPTS_DIR }}
         run: |
-          set -euo pipefail
-          EXTRA_ARGS=()
-          if [ "${RELEASE_STRATEGY}" = "stable" ]; then
-            EXTRA_ARGS+=(--is-stable)
-          fi
-          python3 "$GHCOMMON_SCRIPTS_DIR/publish_to_github_packages.py" \
-            --language "${PRIMARY_LANGUAGE}" \
-            --tag "${RELEASE_TAG}" \
-            --branch "${BRANCH_NAME}" \
-            "${EXTRA_ARGS[@]}" \
-            --artifacts-dir "packages" \
-            --require-github
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          import subprocess
+          from pathlib import Path
+
+          scripts_dir = os.environ["GHCOMMON_SCRIPTS_DIR"]
+          script_path = Path(scripts_dir) / "publish_to_github_packages.py"
+
+          args = [
+              "python3",
+              str(script_path),
+              "--language",
+              os.environ.get("PRIMARY_LANGUAGE", "unknown"),
+              "--tag",
+              os.environ.get("RELEASE_TAG", ""),
+              "--branch",
+              os.environ.get("BRANCH_NAME", ""),
+              "--artifacts-dir",
+              "packages",
+              "--require-github",
+          ]
+
+          if os.environ.get("RELEASE_STRATEGY") == "stable":
+              args.append("--is-stable")
+
+          subprocess.run(args, check=True)
+          PY
 
   # Final status check
   build-status:

@@ -1,0 +1,65 @@
+# file: .github/workflows/release-python.yml
+# version: 1.0.0
+# guid: release-python-workflow-2025-10
+
+name: Python Release Build
+
+on:
+  workflow_call:
+    inputs:
+      python-matrix:
+        description: "JSON encoded Python build matrix"
+        required: true
+        type: string
+      protobuf-artifacts:
+        description: "Whether protobuf artifacts were generated"
+        required: false
+        type: string
+        default: "false"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-python:
+    name: Build Python (${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.python-matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download protobuf artifacts
+        if: inputs.protobuf-artifacts == 'true'
+        uses: actions/download-artifact@v6
+        with:
+          name: protobuf-generated
+          path: proto-generated
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f pyproject.toml ]; then
+            pip install -e ".[build]" || pip install -e .
+          fi
+
+      - name: Run Python tests
+        run: |
+          if [ -d tests ]; then
+            pip install pytest
+            pytest -m "not slow" --maxfail=1 --disable-warnings
+          else
+            echo "No Python tests detected; skipping."
+          fi

@@ -1,5 +1,5 @@
 <!-- file: dependency-analysis.md -->
-<!-- version: 2.0.0 -->
+<!-- version: 2.1.0 -->
 <!-- guid: a1b2c3d4-e5f6-7890-1234-567890abcdef -->
 
 # Dependency Analysis for ghcommon Repository
@@ -8,16 +8,25 @@
 **Purpose:** Map all file dependencies to identify unused files and cleanup opportunities
 **Status:** ✅ **COMPLETE**
 
+> Update (v2.1.0): Analyzer now supports CLI options, default excludes, and a "full" mode for large Mermaid/DOT outputs. See enhancements and usage below.
+
 ## 📊 Executive Summary
 
 The comprehensive dependency analysis has been completed successfully!
 
 ### Key Statistics
 
-- **Total Files Analyzed:** 1,807
-- **Dependencies Found:** Thousands of relationships mapped
-- **File Categories:** 8 major categories
-- **Potentially Unused Files:** 674 files (37.3% of repository)
+- Latest run (with default excludes and full output):
+- root: 1,503 files
+- docs: 163 files
+- scripts: 62 files
+- workflows: 59 files
+- tools: 2 files
+- templates: 4 files
+- examples: 16 files
+- tests: 13 files
+- Potentially Unused Files (current): 320
+- Note: Category totals are listed individually; the root category overlaps with subfolders.
 
 ### Files Generated
 
@@ -29,6 +38,29 @@ All analysis outputs are located in the `dependency-analysis/` directory:
 4. **dependencies.html** - Interactive HTML report (open in browser)
 5. **dependencies.json** - Raw JSON data for programmatic analysis
 6. **analysis.log** - Complete progress log
+
+---
+
+## ✨ Enhancements (v2.1.0)
+
+- Added CLI with options:
+- `--root` to select the analysis root
+- `--exclude` to skip noisy directories (default: `.git,node_modules,.venv`)
+- `--full` to remove Mermaid node/edge limits (enables very large graphs)
+- `--mermaid-max-files`, `--mermaid-max-edges` to tune Mermaid output size
+- `--log-level` to adjust verbosity
+- Fixed HTML generation robustness and improved logging.
+- Explanation of size differences:
+- Mermaid intentionally defaults to conservative limits for readability and performance; JSON/DOT/ASCII are exhaustive. Use `--full` to lift limits.
+
+### How to run
+
+From the repository root (uses the repo’s virtualenv):
+
+- Full graph with default excludes:
+- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.venv/bin/python analyze-dependencies.py --root . --exclude .git,node_modules,.venv --full`
+- Tuned Mermaid limits (example):
+- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.venv/bin/python analyze-dependencies.py --root . --mermaid-max-files 500 --mermaid-max-edges 5000`
 
 ## Analysis Progress
 

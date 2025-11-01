@@ -1,0 +1,58 @@
+# file: .github/workflows/release-rust.yml
+# version: 1.0.0
+# guid: release-rust-workflow-2025-10
+
+name: Rust Release Build
+
+on:
+  workflow_call:
+    inputs:
+      release-version:
+        description: "Release version tag"
+        required: false
+        type: string
+      protobuf-artifacts:
+        description: "Whether protobuf artifacts were generated"
+        required: false
+        type: string
+        default: "false"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-rust:
+    name: Build Rust (stable)
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ inputs.release-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download protobuf artifacts
+        if: inputs.protobuf-artifacts == 'true'
+        uses: actions/download-artifact@v6
+        with:
+          name: protobuf-generated
+          path: proto-generated
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Test
+        run: cargo test --release --all-targets
+
+      - name: Package binaries (primary target)
+        run: |
+          mkdir -p packages/rust
+          find target/release -maxdepth 1 -type f -perm /111 -exec cp {} packages/rust \;
