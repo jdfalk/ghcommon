@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.1.1
+# version: 1.2.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -205,6 +205,50 @@ jobs:
           CI_LINT_FILES: ${{ steps.changes.outputs.lint_files }}
         run: python3 .github/workflows/scripts/ci_workflow.py debug-filter
 
+  workflow-lint:
+    name: Workflow Lint
+    needs: detect-changes
+    if: needs.detect-changes.outputs.workflow-files == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install actionlint
+        run: |
+          set -euo pipefail
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Run actionlint
+        id: lint
+        run: |
+          set -euo pipefail
+          actionlint -color never | tee actionlint.log
+
+      - name: Publish workflow summary
+        if: always()
+        run: |
+          echo "## Workflow Lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s actionlint.log ]; then
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            cat actionlint.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "✅ No workflow issues detected." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload actionlint log
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: workflow-lint-report
+          path: actionlint.log
+          if-no-files-found: ignore
+
   # Protobuf generation (if applicable)
   protobuf-generation:
     name: Generate Protobuf
@@ -372,7 +416,15 @@ jobs:
   # Summary job
   ci-summary:
     name: CI Summary
-    needs: [detect-changes, go-ci, python-ci, rust-ci, frontend-ci]
+    needs:
+      [
+        detect-changes,
+        workflow-lint,
+        go-ci,
+        python-ci,
+        rust-ci,
+        frontend-ci,
+      ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -381,10 +433,14 @@ jobs:
 
       - name: Generate summary
         env:
+          JOB_DETECT_CHANGES: ${{ needs.detect-changes.result || 'skipped' }}
+          JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
           JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
           JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
           JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
           JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
+          JOB_DOCKER: skipped
+          JOB_DOCS: skipped
           CI_GO_FILES: ${{ needs.detect-changes.outputs.go-files }}
           CI_PYTHON_FILES: ${{ needs.detect-changes.outputs.python-files }}
           CI_RUST_FILES: ${{ needs.detect-changes.outputs.rust-files }}
@@ -392,12 +448,16 @@ jobs:
           CI_DOCKER_FILES: ${{ needs.detect-changes.outputs.docker-files }}
           CI_DOCS_FILES: ${{ needs.detect-changes.outputs.docs-files }}
           CI_WORKFLOW_FILES: ${{ needs.detect-changes.outputs.workflow-files }}
+          CI_LINT_FILES: ${{ needs.detect-changes.outputs.lint-files }}
         run: python3 .github/workflows/scripts/ci_workflow.py generate-ci-summary
 
       - name: Check overall status
         env:
+          JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
           JOB_GO: ${{ needs.go-ci.result || 'skipped' }}
           JOB_PYTHON: ${{ needs.python-ci.result || 'skipped' }}
           JOB_RUST: ${{ needs.rust-ci.result || 'skipped' }}
           JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
+          JOB_DOCKER: skipped
+          JOB_DOCS: skipped
         run: python3 .github/workflows/scripts/ci_workflow.py check-ci-status

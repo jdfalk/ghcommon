@@ -241,11 +241,13 @@ def test_generate_ci_summary(tmp_path, monkeypatch):
     summary_path = tmp_path / "summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary_path))
     monkeypatch.setenv("JOB_DETECT_CHANGES", "success")
-    monkeypatch.setenv("JOB_LINT", "success")
-    monkeypatch.setenv("JOB_TEST_GO", "success")
-    monkeypatch.setenv("JOB_TEST_PYTHON", "skipped")
-    monkeypatch.setenv("JOB_TEST_RUST", "failure")
-    monkeypatch.setenv("JOB_TEST_FRONTEND", "success")
+    monkeypatch.setenv("JOB_WORKFLOW_LINT", "success")
+    monkeypatch.setenv("JOB_GO", "success")
+    monkeypatch.setenv("JOB_PYTHON", "skipped")
+    monkeypatch.setenv("JOB_RUST", "failure")
+    monkeypatch.setenv("JOB_FRONTEND", "success")
+    monkeypatch.setenv("JOB_DOCKER", "skipped")
+    monkeypatch.setenv("JOB_DOCS", "skipped")
     monkeypatch.setenv("CI_GO_FILES", "true")
     monkeypatch.setenv("CI_PYTHON_FILES", "false")
     monkeypatch.setenv("CI_RUST_FILES", "true")
@@ -253,18 +255,22 @@ def test_generate_ci_summary(tmp_path, monkeypatch):
     monkeypatch.setenv("CI_DOCKER_FILES", "false")
     monkeypatch.setenv("CI_DOCS_FILES", "true")
     monkeypatch.setenv("CI_WORKFLOW_FILES", "false")
+    monkeypatch.setenv("CI_LINT_FILES", "true")
 
     ci_workflow.generate_ci_summary(argparse.Namespace())
     content = summary_path.read_text()
     assert "CI Pipeline Summary" in content
-    assert "| Test Rust | failure |" in content
+    assert "| Rust CI | failure |" in content
+    assert "- Lint Config: true" in content
 
 
 def test_check_ci_status_failure(monkeypatch):
-    monkeypatch.setenv("JOB_LINT", "success")
-    monkeypatch.setenv("JOB_TEST_GO", "success")
-    monkeypatch.setenv("JOB_TEST_PYTHON", "failure")
-    monkeypatch.setenv("JOB_TEST_RUST", "success")
-    monkeypatch.setenv("JOB_TEST_FRONTEND", "success")
+    monkeypatch.setenv("JOB_WORKFLOW_LINT", "success")
+    monkeypatch.setenv("JOB_GO", "success")
+    monkeypatch.setenv("JOB_PYTHON", "failure")
+    monkeypatch.setenv("JOB_RUST", "success")
+    monkeypatch.setenv("JOB_FRONTEND", "success")
+    monkeypatch.setenv("JOB_DOCKER", "skipped")
+    monkeypatch.setenv("JOB_DOCS", "skipped")
     with pytest.raises(SystemExit):
         ci_workflow.check_ci_status(argparse.Namespace())

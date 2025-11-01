@@ -729,22 +729,16 @@ def generate_matrices(_: argparse.Namespace) -> None:
 
 def generate_ci_summary(_: argparse.Namespace) -> None:
     primary_language = os.environ.get("PRIMARY_LANGUAGE", "unknown")
-    steps = {
-        "Detect Changes": os.environ.get("JOB_DETECT_CHANGES", "unknown"),
-        "Detect Languages": os.environ.get("JOB_DETECT_LANGUAGES", "unknown"),
-        "Check Overrides": os.environ.get("JOB_CHECK_OVERRIDES", "unknown"),
-        "Lint": os.environ.get("JOB_LINT", "unknown"),
-        "Test Go": os.environ.get("JOB_TEST_GO", "unknown"),
-        "Test Frontend": os.environ.get("JOB_TEST_FRONTEND", "unknown"),
-        "Test Python": os.environ.get("JOB_TEST_PYTHON", "unknown"),
-        "Test Rust": os.environ.get("JOB_TEST_RUST", "unknown"),
-        "Rust Coverage": os.environ.get("JOB_RUST_COVERAGE", "unknown"),
-        "Test Docker": os.environ.get("JOB_TEST_DOCKER", "unknown"),
-        "Test Docs": os.environ.get("JOB_TEST_DOCS", "unknown"),
-        "Release Build": os.environ.get("JOB_RELEASE_BUILD", "unknown"),
-        "Security Scan": os.environ.get("JOB_SECURITY_SCAN", "unknown"),
-        "Performance Test": os.environ.get("JOB_PERFORMANCE_TEST", "unknown"),
-    }
+    steps = [
+        ("Detect Changes", os.environ.get("JOB_DETECT_CHANGES", "skipped")),
+        ("Workflow Lint", os.environ.get("JOB_WORKFLOW_LINT", "skipped")),
+        ("Go CI", os.environ.get("JOB_GO", "skipped")),
+        ("Python CI", os.environ.get("JOB_PYTHON", "skipped")),
+        ("Rust CI", os.environ.get("JOB_RUST", "skipped")),
+        ("Frontend CI", os.environ.get("JOB_FRONTEND", "skipped")),
+        ("Docker CI", os.environ.get("JOB_DOCKER", "skipped")),
+        ("Docs CI", os.environ.get("JOB_DOCS", "skipped")),
+    ]
 
     files_changed = {
         "Go": os.environ.get("CI_GO_FILES", "false"),
@@ -754,6 +748,7 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
         "Docker": os.environ.get("CI_DOCKER_FILES", "false"),
         "Docs": os.environ.get("CI_DOCS_FILES", "false"),
         "Workflows": os.environ.get("CI_WORKFLOW_FILES", "false"),
+        "Lint Config": os.environ.get("CI_LINT_FILES", "false"),
     }
 
     languages = {
@@ -782,7 +777,7 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
         ]
     )
     summary_lines.extend(
-        f"| {job} | {status} |" for job, status in steps.items()
+        f"| {job} | {status} |" for job, status in steps
     )
     summary_lines.extend(
         [
@@ -800,16 +795,20 @@ def generate_ci_summary(_: argparse.Namespace) -> None:
 
 def check_ci_status(_: argparse.Namespace) -> None:
     job_envs = {
-        "Lint": os.environ.get("JOB_LINT"),
-        "Test Go": os.environ.get("JOB_TEST_GO"),
-        "Test Frontend": os.environ.get("JOB_TEST_FRONTEND"),
-        "Test Python": os.environ.get("JOB_TEST_PYTHON"),
-        "Test Rust": os.environ.get("JOB_TEST_RUST"),
-        "Test Docker": os.environ.get("JOB_TEST_DOCKER"),
-        "Release Build": os.environ.get("JOB_RELEASE_BUILD"),
+        "Workflow Lint": os.environ.get("JOB_WORKFLOW_LINT"),
+        "Go CI": os.environ.get("JOB_GO"),
+        "Frontend CI": os.environ.get("JOB_FRONTEND"),
+        "Python CI": os.environ.get("JOB_PYTHON"),
+        "Rust CI": os.environ.get("JOB_RUST"),
+        "Docker CI": os.environ.get("JOB_DOCKER"),
+        "Docs CI": os.environ.get("JOB_DOCS"),
     }
 
-    failures = [job for job, status in job_envs.items() if status == "failure"]
+    failures = [
+        job
+        for job, status in job_envs.items()
+        if status in {"failure", "cancelled"}
+    ]
     if failures:
         print(f"❌ CI Pipeline failed: {', '.join(failures)}")
         raise SystemExit(1)
