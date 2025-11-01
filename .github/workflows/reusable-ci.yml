@@ -239,7 +239,7 @@ jobs:
         run: |
           set -euo pipefail
           ACTIONLINT_BIN="$(go env GOPATH)/bin/actionlint"
-          "$ACTIONLINT_BIN" -color=never | tee actionlint.log
+          "$ACTIONLINT_BIN" -no-color | tee actionlint.log
 
       - name: Publish workflow summary
         if: always()
