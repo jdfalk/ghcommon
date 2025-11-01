@@ -89,8 +89,8 @@ truth in `.github/repository-config.yml`.
 
 - Helpers should live under `.github/workflows/scripts/` with pytest coverage in
   `tests/workflow_scripts/`.
-- Each reusable workflow should have a matching entry in
-  reusable Python test job once new helpers land.
+- Each reusable workflow should have a matching entry in reusable Python test job once new helpers
+  land.
 - When deprecating legacy workflows (e.g., per-language release ones), keep them temporarily but
   emit warnings pointing maintainers to the consolidated workflow.
 - Promote the helper scripts as versioned assets if we want external repos to pin specific revisions
@@ -387,7 +387,8 @@ workflows (`ci-tests.yml`, etc.).
    - Migrate necessary coverage/benchmark tasks into `reusable-ci.yml`.
 5. **Tests**
    - Add `test_maintenance_workflow.py`, `test_docs_workflow.py`.
-  - Expand reusable CI Python test coverage to include new suites.
+
+- Expand reusable CI Python test coverage to include new suites.
 
 ### Example Implementation Blueprint
 
