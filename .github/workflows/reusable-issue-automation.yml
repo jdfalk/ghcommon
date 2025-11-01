@@ -42,7 +42,7 @@ jobs:
   # Stale issue management
   stale-management:
     name: Manage Stale Issues
-    if: "!inputs.skip-stale-management"
+    if: ${{ !inputs.skip-stale-management }}
     runs-on: ubuntu-latest
     steps:
       - name: Mark and close stale issues
@@ -88,7 +88,7 @@ jobs:
   # Automatic labeling
   auto-labeling:
     name: Auto Label Issues and PRs
-    if: "!inputs.skip-auto-labeling && (github.event_name == 'issues' || github.event_name == 'pull_request')"
+    if: ${{ !inputs.skip-auto-labeling && (github.event_name == 'issues' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -171,7 +171,7 @@ jobs:
   # Automatic assignment
   auto-assignment:
     name: Auto Assign Issues and PRs
-    if: "!inputs.skip-auto-assignment && (github.event_name == 'issues' || github.event_name == 'pull_request')"
+    if: ${{ !inputs.skip-auto-assignment && (github.event_name == 'issues' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
       - name: Auto-assign based on content

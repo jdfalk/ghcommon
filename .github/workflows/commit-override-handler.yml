@@ -134,35 +134,23 @@ jobs:
 
           # Summary
           {
-            cat <<EOF
-## 🔍 Commit Override Analysis
-
-| Override Type | Status |
-|---------------|--------|
-| Skip Tests | $SKIP_TESTS |
-| Skip Validation | $SKIP_VALIDATION |
-| Skip CI | $SKIP_CI |
-| Skip Build | $SKIP_BUILD |
-
-EOF
+            printf '## 🔍 Commit Override Analysis\n\n'
+            printf '| Override Type | Status |\n'
+            printf '|---------------|--------|\n'
+            printf '| Skip Tests | %s |\n' "$SKIP_TESTS"
+            printf '| Skip Validation | %s |\n' "$SKIP_VALIDATION"
+            printf '| Skip CI | %s |\n' "$SKIP_CI"
+            printf '| Skip Build | %s |\n\n' "$SKIP_BUILD"
           } >> "${GITHUB_STEP_SUMMARY}"
 
           if [ "$SKIP_TESTS" = "true" ] || [ "$SKIP_VALIDATION" = "true" ] || [ "$SKIP_CI" = "true" ] || [ "$SKIP_BUILD" = "true" ]; then
             {
-              cat <<EOF
-⚠️ **Warning**: Some CI checks have been disabled via commit message overrides.
-
-**Commit Messages Analyzed:**
-\`\`\`
-${COMMITS}
-\`\`\`
-
-EOF
+              printf '⚠️ **Warning**: Some CI checks have been disabled via commit message overrides.\n\n'
+              printf '**Commit Messages Analyzed:**\n```\n%s\n```\n\n' "$COMMITS"
             } >> "${GITHUB_STEP_SUMMARY}"
           else
             {
-              echo "✅ **All CI checks enabled** - No override keywords detected."
-              echo ""
+              printf '✅ **All CI checks enabled** - No override keywords detected.\n\n'
             } >> "${GITHUB_STEP_SUMMARY}"
           fi
 

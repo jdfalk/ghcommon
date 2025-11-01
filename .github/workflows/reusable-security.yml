@@ -93,7 +93,7 @@ jobs:
   codeql-analysis:
     name: CodeQL Analysis
     needs: detect-languages
-    if: "!inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null"
+    if: ${{ !inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -141,7 +141,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     needs: detect-languages
-    if: "!inputs.skip-dependency-review && github.event_name == 'pull_request'"
+    if: ${{ !inputs.skip-dependency-review && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -157,7 +157,7 @@ jobs:
   security-audit:
     name: Security Audit
     needs: detect-languages
-    if: "!inputs.skip-security-audit"
+    if: ${{ !inputs.skip-security-audit }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -201,7 +201,7 @@ jobs:
   trivy-scan:
     name: Trivy Security Scan
     needs: detect-languages
-    if: "!inputs.skip-security-audit"
+    if: ${{ !inputs.skip-security-audit }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

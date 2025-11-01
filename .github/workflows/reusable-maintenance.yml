@@ -36,7 +36,7 @@ jobs:
   # Dependency Updates
   dependency-updates:
     name: Check Dependency Updates
-    if: "!inputs.skip-dependency-updates"
+    if: ${{ !inputs.skip-dependency-updates }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -86,7 +86,7 @@ jobs:
   # Repository Cleanup
   cleanup-tasks:
     name: Repository Cleanup
-    if: "!inputs.skip-cleanup"
+    if: ${{ !inputs.skip-cleanup }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -148,7 +148,7 @@ jobs:
   # License Compliance Check
   license-check:
     name: License Compliance
-    if: "!inputs.skip-license-check"
+    if: ${{ !inputs.skip-license-check }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

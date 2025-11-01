@@ -204,7 +204,7 @@ jobs:
   build-protobuf:
     name: Generate Protocol Buffers
     needs: [detect-languages]
-    if: needs.detect-languages.outputs.protobuf-needed == 'true'
+    if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
     uses: ./.github/workflows/release-protobuf.yml
     secrets: inherit
 
