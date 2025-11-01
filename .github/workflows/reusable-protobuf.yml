@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-protobuf.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: f1e2d3c4-b5a6-9788-c0d1-2e3f4a5b6c7d
 
 name: Reusable Protobuf Generation
@@ -68,66 +68,77 @@ jobs:
 
       - name: Load repository configuration
         id: load-config
+        env:
+          CONFIG_PATH: ${{ inputs.config-path }}
         run: |
-          if [ -f "${{ inputs.config-path }}" ]; then
-            echo "config-loaded=true" >> $GITHUB_OUTPUT
-            echo "Configuration file found: ${{ inputs.config-path }}"
+          if [ -f "$CONFIG_PATH" ]; then
+            printf 'config-loaded=true\n' >> "$GITHUB_OUTPUT"
+            echo "Configuration file found: $CONFIG_PATH"
           else
-            echo "config-loaded=false" >> $GITHUB_OUTPUT
-            echo "Configuration file not found: ${{ inputs.config-path }}"
+            printf 'config-loaded=false\n' >> "$GITHUB_OUTPUT"
+            echo "Configuration file not found: $CONFIG_PATH"
             echo "Using default configuration"
           fi
 
       - name: Parse configuration
         id: parse-config
+        env:
+          CONFIG_PATH: ${{ inputs.config-path }}
         run: |
-          python3 -c "
-          import yaml
+          python3 - <<'PY'
+          from __future__ import annotations
+
           import json
           import os
+          from pathlib import Path
 
-          config_path = '${{ inputs.config-path }}'
+          import yaml
 
-          # Default configuration
+          config_path = Path(os.environ["CONFIG_PATH"])
+
           config = {
-              'languages': {
-                  'go': {'enabled': False},
-                  'python': {'enabled': False},
-                  'rust': {'enabled': False}
+              "languages": {
+                  "go": {"enabled": False},
+                  "python": {"enabled": False},
+                  "rust": {"enabled": False},
               },
-              'protobuf': {
-                  'enabled': False,
-                  'buf_version': '1.56.0',
-                  'protoc_version': '28.2',
-                  'source_path': 'proto',
-                  'output_path': 'sdks',
-                  'generate_docs': False
-              }
+              "protobuf": {
+                  "enabled": False,
+                  "buf_version": "1.56.0",
+                  "protoc_version": "28.2",
+                  "source_path": "proto",
+                  "output_path": "sdks",
+                  "generate_docs": False,
+              },
           }
 
-          # Load actual configuration if available
-          if os.path.exists(config_path):
+          if config_path.exists():
               try:
-                  with open(config_path, 'r') as f:
-                      loaded_config = yaml.safe_load(f)
-                      if loaded_config:
-                          config.update(loaded_config)
-              except Exception as e:
-                  print(f'Error loading config: {e}')
+                  with config_path.open("r", encoding="utf-8") as handle:
+                      loaded_config = yaml.safe_load(handle)
+                  if loaded_config:
+                      config.update(loaded_config)
+              except Exception as exc:  # pylint: disable=broad-except
+                  print(f"Error loading config: {exc}")
 
-          # Extract values
-          languages = config.get('languages', {})
-          protobuf = config.get('protobuf', {})
+          languages = config.get("languages", {})
+          protobuf = config.get("protobuf", {})
 
-          # Set outputs
-          print(f'protobuf-enabled={str(protobuf.get(\"enabled\", False)).lower()}')
-          print(f'go-enabled={str(languages.get(\"go\", {}).get(\"enabled\", False)).lower()}')
-          print(f'python-enabled={str(languages.get(\"python\", {}).get(\"enabled\", False)).lower()}')
-          print(f'rust-enabled={str(languages.get(\"rust\", {}).get(\"enabled\", False)).lower()}')
-          print(f'buf-version={protobuf.get(\"buf_version\", \"1.56.0\")}')
-          print(f'protoc-version={protobuf.get(\"protoc_version\", \"28.2\")}')
-          print(f'protobuf-config={json.dumps(protobuf)}')
-          " >> $GITHUB_OUTPUT
+          outputs = {
+              "protobuf-enabled": str(protobuf.get("enabled", False)).lower(),
+              "go-enabled": str(languages.get("go", {}).get("enabled", False)).lower(),
+              "python-enabled": str(languages.get("python", {}).get("enabled", False)).lower(),
+              "rust-enabled": str(languages.get("rust", {}).get("enabled", False)).lower(),
+              "buf-version": protobuf.get("buf_version", "1.56.0"),
+              "protoc-version": protobuf.get("protoc_version", "28.2"),
+              "protobuf-config": json.dumps(protobuf),
+          }
+
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          with output_path.open("a", encoding="utf-8") as handle:
+              for key, value in outputs.items():
+                  handle.write(f"{key}={value}\n")
+          PY
 
   generate-protobuf:
     name: Generate Protobuf Code

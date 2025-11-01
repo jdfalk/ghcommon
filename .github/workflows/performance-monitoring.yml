@@ -1,5 +1,5 @@
 # file: .github/workflows/performance-monitoring.yml
-# version: 1.0.1
+# version: 1.1.0
 # guid: performance-monitoring-workflow-2025
 
 name: Performance Monitoring
@@ -23,6 +23,10 @@ jobs:
   rust-benchmarks:
     name: Rust Benchmarks
     runs-on: ubuntu-latest
+    outputs:
+      average: ${{ steps.capture.outputs.average }}
+      best: ${{ steps.capture.outputs.best }}
+      worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@v5
 
@@ -32,25 +36,76 @@ jobs:
       - name: Restore cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Run cargo bench
-        id: rust-bench
-        continue-on-error: true
-        run: |
-          if [ -f Cargo.toml ]; then
-            cargo bench -- --output-format bencher | tee rust-benchmark.txt
-          else
-            echo "No Cargo.toml detected; skipping Rust benchmarks." > rust-benchmark.txt
-          fi
+      - name: Build benchmark target
+        run: cargo build --manifest-path testdata/rust/Cargo.toml --release
 
-      - name: Upload rust benchmarks
+      - name: Prepare benchmark directories
+        run: |
+          mkdir -p benchmarks
+          mkdir -p .github/benchmark-data
+
+      - name: Measure Rust benchmark
+        run: |
+          python3 scripts/benchmarks/measure_command.py \
+            --label "Rust Fixture Execution" \
+            --command "./target/release/ghcommon-test-fixture" \
+            --workdir testdata/rust \
+            --iterations 10 \
+            --output benchmarks/rust.json \
+            --metadata "command: ./target/release/ghcommon-test-fixture"
+
+      - name: Capture benchmark metrics
+        id: capture
+        run: |
+          python3 - <<'PY'
+          import json
+          import math
+          import os
+
+          with open("benchmarks/rust.json", "r", encoding="utf-8") as handle:
+              entry = json.load(handle)[0]
+
+          def fmt(value: float | None) -> str:
+              if value is None or (isinstance(value, float) and math.isnan(value)):
+                  return "n/a"
+              return f"{value:.6f}"
+
+          average = entry.get("average_seconds", entry.get("value"))
+          best = entry.get("best_seconds", entry.get("value"))
+          worst = entry.get("worst_seconds", entry.get("value"))
+
+          output = os.environ["GITHUB_OUTPUT"]
+          with open(output, "a", encoding="utf-8") as fh:
+              fh.write(f"average={fmt(average)}\n")
+              fh.write(f"best={fmt(best)}\n")
+              fh.write(f"worst={fmt(worst)}\n")
+          PY
+
+      - name: Publish benchmark result
+        uses: jdfalk/github-action-benchmark@main
+        with:
+          name: Rust Fixture Execution
+          tool: "customSmallerIsBetter"
+          output-file-path: benchmarks/rust.json
+          summary-always: true
+          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          external-data-json-path: .github/benchmark-data/rust.json
+
+      - name: Upload rust benchmark artifacts
         uses: actions/upload-artifact@v5
         with:
           name: rust-benchmarks
-          path: rust-benchmark.txt
+          path: |
+            benchmarks/rust.json
+            .github/benchmark-data/rust.json
 
   node-benchmarks:
     name: Node.js Benchmarks
     runs-on: ubuntu-latest
+    outputs:
+      average: ${{ steps.capture.outputs.average }}
+      best: ${{ steps.capture.outputs.best }}
+      worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@v5
 
@@ -59,32 +114,76 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm ci || npm install
-          else
-            echo "No package.json detected; skipping install."
-          fi
+        working-directory: testdata/node
+        run: npm install
 
-      - name: Run npm benchmarks
-        id: node-bench
-        continue-on-error: true
+      - name: Prepare benchmark directories
         run: |
-          if [ -f package.json ] && npm run | grep -q "benchmark"; then
-            npm run benchmark | tee node-benchmark.txt
-          else
-            echo "No benchmark script defined; skipping." > node-benchmark.txt
-          fi
+          mkdir -p benchmarks
+          mkdir -p .github/benchmark-data
 
-      - name: Upload node benchmarks
+      - name: Measure Node.js benchmark
+        run: |
+          python3 scripts/benchmarks/measure_command.py \
+            --label "Node Fixture Execution" \
+            --command "node index.js" \
+            --workdir testdata/node \
+            --iterations 10 \
+            --output benchmarks/node.json \
+            --metadata "command: node index.js"
+
+      - name: Capture benchmark metrics
+        id: capture
+        run: |
+          python3 - <<'PY'
+          import json
+          import math
+          import os
+
+          with open("benchmarks/node.json", "r", encoding="utf-8") as handle:
+              entry = json.load(handle)[0]
+
+          def fmt(value: float | None) -> str:
+              if value is None or (isinstance(value, float) and math.isnan(value)):
+                  return "n/a"
+              return f"{value:.6f}"
+
+          average = entry.get("average_seconds", entry.get("value"))
+          best = entry.get("best_seconds", entry.get("value"))
+          worst = entry.get("worst_seconds", entry.get("value"))
+
+          output = os.environ["GITHUB_OUTPUT"]
+          with open(output, "a", encoding="utf-8") as fh:
+              fh.write(f"average={fmt(average)}\n")
+              fh.write(f"best={fmt(best)}\n")
+              fh.write(f"worst={fmt(worst)}\n")
+          PY
+
+      - name: Publish benchmark result
+        uses: jdfalk/github-action-benchmark@main
+        with:
+          name: Node Fixture Execution
+          tool: "customSmallerIsBetter"
+          output-file-path: benchmarks/node.json
+          summary-always: true
+          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          external-data-json-path: .github/benchmark-data/node.json
+
+      - name: Upload node benchmark artifacts
         uses: actions/upload-artifact@v5
         with:
           name: node-benchmarks
-          path: node-benchmark.txt
+          path: |
+            benchmarks/node.json
+            .github/benchmark-data/node.json
 
   python-benchmarks:
     name: Python Benchmarks
     runs-on: ubuntu-latest
+    outputs:
+      average: ${{ steps.capture.outputs.average }}
+      best: ${{ steps.capture.outputs.best }}
+      worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@v5
 
@@ -92,42 +191,65 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install benchmark tooling
+      - name: Prepare benchmark directories
         run: |
-          pip install --upgrade pip
-          pip install pytest pytest-benchmark
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt || true
-          fi
+          mkdir -p benchmarks
+          mkdir -p .github/benchmark-data
 
-      - name: Run pytest benchmarks
-        id: python-bench
-        continue-on-error: true
+      - name: Measure Python benchmark
         run: |
-          if find tests -name "test_*.py" | head -1 | grep -q .; then
-            pytest --benchmark-only --benchmark-save=python-benchmark || true
-          else
-            echo "No Python benchmark tests found." > python-benchmark.txt
-          fi
+          python3 scripts/benchmarks/measure_command.py \
+            --label "Python Fixture Execution" \
+            --command "python hello_world.py" \
+            --workdir testdata/python \
+            --iterations 10 \
+            --output benchmarks/python.json \
+            --metadata "command: python hello_world.py"
 
-      - name: Collect benchmark output
-        if: steps.python-bench.outcome != 'skipped'
+      - name: Capture benchmark metrics
+        id: capture
         run: |
-          if [ -d .benchmarks ]; then
-            tar -czf python-benchmarks.tgz .benchmarks
-          elif [ -f python-benchmark.txt ]; then
-            cp python-benchmark.txt python-benchmarks.txt
-          else
-            echo "No benchmark artifacts generated." > python-benchmarks.txt
-          fi
+          python3 - <<'PY'
+          import json
+          import math
+          import os
 
-      - name: Upload python benchmarks
+          with open("benchmarks/python.json", "r", encoding="utf-8") as handle:
+              entry = json.load(handle)[0]
+
+          def fmt(value: float | None) -> str:
+              if value is None or (isinstance(value, float) and math.isnan(value)):
+                  return "n/a"
+              return f"{value:.6f}"
+
+          average = entry.get("average_seconds", entry.get("value"))
+          best = entry.get("best_seconds", entry.get("value"))
+          worst = entry.get("worst_seconds", entry.get("value"))
+
+          output = os.environ["GITHUB_OUTPUT"]
+          with open(output, "a", encoding="utf-8") as fh:
+              fh.write(f"average={fmt(average)}\n")
+              fh.write(f"best={fmt(best)}\n")
+              fh.write(f"worst={fmt(worst)}\n")
+          PY
+
+      - name: Publish benchmark result
+        uses: jdfalk/github-action-benchmark@main
+        with:
+          name: Python Fixture Execution
+          tool: "customSmallerIsBetter"
+          output-file-path: benchmarks/python.json
+          summary-always: true
+          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          external-data-json-path: .github/benchmark-data/python.json
+
+      - name: Upload python benchmark artifacts
         uses: actions/upload-artifact@v5
         with:
           name: python-benchmarks
           path: |
-            python-benchmarks.tgz
-            python-benchmarks.txt
+            benchmarks/python.json
+            .github/benchmark-data/python.json
           if-no-files-found: ignore
 
   benchmark-summary:
@@ -137,13 +259,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Summarize results
+        env:
+          RUST_AVG: ${{ needs.rust-benchmarks.outputs.average }}
+          RUST_BEST: ${{ needs.rust-benchmarks.outputs.best }}
+          RUST_WORST: ${{ needs.rust-benchmarks.outputs.worst }}
+          NODE_AVG: ${{ needs.node-benchmarks.outputs.average }}
+          NODE_BEST: ${{ needs.node-benchmarks.outputs.best }}
+          NODE_WORST: ${{ needs.node-benchmarks.outputs.worst }}
+          PYTHON_AVG: ${{ needs.python-benchmarks.outputs.average }}
+          PYTHON_BEST: ${{ needs.python-benchmarks.outputs.best }}
+          PYTHON_WORST: ${{ needs.python-benchmarks.outputs.worst }}
         run: |
-          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
-          ## Benchmark Summary
-
-          | Suite | Result |
-          |-------|--------|
-          | Rust | ${{ needs.rust-benchmarks.result }} |
-          | Node.js | ${{ needs.node-benchmarks.result }} |
-          | Python | ${{ needs.python-benchmarks.result }} |
-          EOF
+          {
+            printf '## Benchmark Summary\n\n'
+            printf '| Suite | Average (s) | Best (s) | Worst (s) |\n'
+            printf '|-------|-------------|----------|-----------|\n'
+            printf '| Rust | %s | %s | %s |\n' "${RUST_AVG:-n/a}" "${RUST_BEST:-n/a}" "${RUST_WORST:-n/a}"
+            printf '| Node.js | %s | %s | %s |\n' "${NODE_AVG:-n/a}" "${NODE_BEST:-n/a}" "${NODE_WORST:-n/a}"
+            printf '| Python | %s | %s | %s |\n' "${PYTHON_AVG:-n/a}" "${PYTHON_BEST:-n/a}" "${PYTHON_WORST:-n/a}"
+            printf '\n_View individual suite logs for regression alerts and charts._\n'
+          } >> "$GITHUB_STEP_SUMMARY"

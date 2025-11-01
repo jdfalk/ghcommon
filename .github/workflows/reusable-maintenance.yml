@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-maintenance.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: reusable-maintenance-2025-09-24-core-workflow
 
 name: Reusable Maintenance Workflow
