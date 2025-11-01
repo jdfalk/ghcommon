@@ -1,18 +1,23 @@
 <!-- file: README.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: 1eaf4c01-aed3-438a-8df9-6904adba092c -->
 
 # GitHub Common Workflows
+
+[![Continuous Integration](https://github.com/jdfalk/ghcommon/actions/workflows/ci.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/ci.yml)
+[![CI Self Tests](https://github.com/jdfalk/ghcommon/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/ci-tests.yml)
+[![CodeQL](https://github.com/jdfalk/ghcommon/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/github-code-scanning/codeql)
+[![Security Scans](https://github.com/jdfalk/ghcommon/actions/workflows/security.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/security.yml)
 
 ## Table of Contents
 
 - [GitHub Common Workflows](#github-common-workflows)
   - [Table of Contents](#table-of-contents)
   - [🚀 Quick Start](#-quick-start)
-    - [For Complete CI/CD Pipeline](#for-complete-ci-cd-pipeline)
+    - [For Complete CI/CD Pipeline](#for-complete-cicd-pipeline)
     - [For Container-Only Projects](#for-container-only-projects)
-    - [For Library/Package Projects](#for-library-package-projects)
-  - [📋 What's Included](#-what-s-included)
+    - [For Library/Package Projects](#for-librarypackage-projects)
+  - [📋 What's Included](#-whats-included)
     - [Reusable Workflows](#reusable-workflows)
     - [Templates](#templates)
     - [Supporting Tools](#supporting-tools)
@@ -28,33 +33,32 @@
     - [Automatic Release](#automatic-release)
     - [Issue Management Workflow](#issue-management-workflow)
     - [Label Synchronization Workflow](#label-synchronization-workflow)
-- [Usage examples](#usage-examples)
-  - [🛡️ Security Features](#-security-features)
+  - [🛡️ Security Features](#️-security-features)
   - [🔒 Requirements](#-requirements)
     - [Repository Permissions](#repository-permissions)
     - [Required Secrets (Optional)](#required-secrets-optional)
   - [📚 Documentation](#-documentation)
     - [Setup Guides](#setup-guides)
-    - [Templates](#templates)
+    - [Templates](#templates-1)
   - [🚦 Validation](#-validation)
   - [🤝 Contributing](#-contributing)
     - [Development Setup](#development-setup)
   - [📄 License](#-license)
   - [🆘 Support](#-support)
-  - [🏷️ Versioning](#-versioning)
+  - [🏷️ Versioning](#️-versioning)
   - [🙏 Acknowledgments](#-acknowledgments)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
-  - [AI Rebase Improvements\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvements-n-workflow-now-auto-merges-prs-after-successful-rebase)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase-1)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase-2)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase-3)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase-4)
+  - [AI Rebase Improvements\\n- Workflow now auto-merges PRs after successful rebase](#ai-rebase-improvementsn--workflow-now-auto-merges-prs-after-successful-rebase-5)
   - [Protobuf Definitions](#protobuf-definitions)
   - [Queue Module](#queue-module)
-- [Queue Module](#queue-module)
-  - [Queue Module\n\nTODO: Add content for this section](#queue-module-n-ntodo-add-content-for-this-section)
-- [Protobuf Definitions](#protobuf-definitions)
-  - [Protobuf Definitions\n\n*Moved to gcommon repository.*](#protobuf-definitions-n-n-moved-to-gcommon-repository)
+- [Queue Module](#queue-module-1)
+  - [Queue Module\\n\\nTODO: Add content for this section](#queue-modulenntodo-add-content-for-this-section)
+- [Protobuf Definitions](#protobuf-definitions-1)
+  - [Protobuf Definitions\\n\\n*Moved to gcommon repository.*](#protobuf-definitionsnnmoved-to-gcommon-repository)
 
 ## 🚀 Quick Start
 
