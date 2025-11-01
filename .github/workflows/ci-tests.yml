@@ -1,14 +1,10 @@
 # file: .github/workflows/ci-tests.yml
-# version: 1.1.1
+# version: 1.1.2
 # guid: ci-tests-workflow-2025-automation
 
-name: CI Tests
+name: CI Self Tests
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -22,47 +18,9 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  detect-changes:
-    name: Detect Changes
-    runs-on: ubuntu-latest
-    outputs:
-      rust: ${{ steps.filter.outputs.rust }}
-      python: ${{ steps.filter.outputs.python }}
-      javascript: ${{ steps.filter.outputs.javascript }}
-      docs: ${{ steps.filter.outputs.docs }}
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
-
-      - name: Filter paths
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            rust:
-              - 'src/**/*.rs'
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-            python:
-              - 'scripts/**/*.py'
-              - 'tests/**/*.py'
-              - 'pyproject.toml'
-              - 'requirements*.txt'
-            javascript:
-              - 'src/**/*.{js,jsx,ts,tsx}'
-              - 'package*.json'
-              - 'yarn.lock'
-              - 'pnpm-lock.yaml'
-            docs:
-              - 'docs/**'
-              - '**/*.md'
-              - '.github/workflows/**'
 
   rust-tests:
     name: Rust Tests
-    needs: detect-changes
-    if: needs.detect-changes.outputs.rust == 'true' || github.event_name == 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -154,8 +112,6 @@ jobs:
 
   python-tests:
     name: Python Tests
-    needs: detect-changes
-    if: needs.detect-changes.outputs.python == 'true' || github.event_name == 'schedule'
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -210,8 +166,6 @@ jobs:
 
   javascript-tests:
     name: JavaScript / TypeScript Tests
-    needs: detect-changes
-    if: needs.detect-changes.outputs.javascript == 'true' || github.event_name == 'schedule'
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -253,7 +207,6 @@ jobs:
   ci-summary:
     name: Test Summary
     needs:
-      - detect-changes
       - rust-tests
       - rust-benchmarks
       - python-tests
