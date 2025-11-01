@@ -244,15 +244,16 @@ jobs:
       - name: Publish workflow summary
         if: always()
         run: |
-          echo "## Workflow Lint" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [ -s actionlint.log ]; then
-            echo '```text' >> "$GITHUB_STEP_SUMMARY"
-            cat actionlint.log >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "✅ No workflow issues detected." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          {
+            printf '## Workflow Lint\n\n'
+            if [ -s actionlint.log ]; then
+              printf '```text\n'
+              cat actionlint.log
+              printf '\n```\n'
+            else
+              printf "✅ No workflow issues detected.\n"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload actionlint log
         if: always()
@@ -300,14 +301,14 @@ jobs:
       - name: Lint JavaScript/TypeScript workflow scripts
         run: |
           set -euo pipefail
-          mapfile -d '' JS_TS_FILES < <(find .github -type f \( -path "./.github/scripts/*" -o -path "./.github/actions/*" \) \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \) -print0)
-          if [ ${#JS_TS_FILES[@]} -gt 0 ]; then
-            TARGET_DIRS=".github/scripts"
+          mapfile -d '' -t js_ts_files < <(find .github -type f \( -path "./.github/scripts/*" -o -path "./.github/actions/*" \) \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \) -print0)
+          if [ "${#js_ts_files[@]}" -gt 0 ]; then
+            directories=(".github/scripts")
             if [ -d ".github/actions" ]; then
-              TARGET_DIRS="$TARGET_DIRS .github/actions"
+              directories+=(".github/actions")
             fi
-            npx --yes eslint@9.13.0 --config .eslintrc.yml --ext .js,.ts,.tsx $TARGET_DIRS
-            printf '%s\0' "${JS_TS_FILES[@]}" | xargs -0 npx --yes prettier@3.3.3 --check
+            npx --yes eslint@9.13.0 --config .eslintrc.yml --ext .js,.ts,.tsx "${directories[@]}"
+            printf '%s\0' "${js_ts_files[@]}" | xargs -0 npx --yes prettier@3.3.3 --check
           else
             echo "No JavaScript/TypeScript workflow scripts detected."
           fi
@@ -315,10 +316,11 @@ jobs:
       - name: Publish workflow script summary
         if: always()
         run: |
-          echo "## Workflow Script Lint" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Python scripts linted with Ruff and Black." >> "$GITHUB_STEP_SUMMARY"
-          echo "- JavaScript/TypeScript scripts linted with ESLint and checked with Prettier." >> "$GITHUB_STEP_SUMMARY"
+          {
+            printf '## Workflow Script Lint\n\n'
+            printf '- Python scripts linted with Ruff and Black.\n'
+            printf '- JavaScript/TypeScript scripts linted with ESLint and checked with Prettier.\n'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # Protobuf generation (if applicable)
   protobuf-generation:

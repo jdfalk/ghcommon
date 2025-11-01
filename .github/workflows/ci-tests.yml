@@ -135,15 +135,16 @@ jobs:
 
       - name: Publish benchmark summary
         run: |
-          echo "## Rust Benchmarks" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [ -s benchmark-results.txt ]; then
-            echo '```text' >> "$GITHUB_STEP_SUMMARY"
-            cat benchmark-results.txt >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "_Benchmark output not available._" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          {
+            printf '## Rust Benchmarks\n\n'
+            if [ -s benchmark-results.txt ]; then
+              printf '```text\n'
+              cat benchmark-results.txt
+              printf '\n```\n'
+            else
+              printf '_Benchmark output not available._\n'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload benchmark artifact
         uses: actions/upload-artifact@v5

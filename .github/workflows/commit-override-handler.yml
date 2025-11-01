@@ -64,18 +64,22 @@ jobs:
 
       - name: Check commit messages for override keywords
         id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PULL_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           echo "Checking commit messages for override keywords..."
 
           # Determine base branch ref (prefer PR base if available)
-          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          BASE_BRANCH="$PULL_BASE_REF"
           if [ -z "$BASE_BRANCH" ] || [ "$BASE_BRANCH" = "null" ]; then
-            BASE_BRANCH="${{ github.event.repository.default_branch }}"
+            BASE_BRANCH="$DEFAULT_BRANCH"
           fi
 
           # Attempt to gather commit messages relative to base; fall back gracefully on errors
           set +e
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "$EVENT_NAME" = "pull_request" ]; then
             COMMITS=$(git log --pretty=format:"%s" "origin/${BASE_BRANCH}..HEAD" 2>/dev/null)
             STATUS=$?
             if [ $STATUS -ne 0 ] || [ -z "$COMMITS" ]; then

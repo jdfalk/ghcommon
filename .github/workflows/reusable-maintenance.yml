@@ -94,50 +94,50 @@ jobs:
 
       - name: Clean up temporary files
         run: |
-          echo "## Cleanup Tasks" > cleanup-report.md
-          echo "" >> cleanup-report.md
+          {
+            echo "## Cleanup Tasks"
+            echo ""
 
-          # Remove common temporary files
-          CLEANED=0
-          for pattern in "*.tmp" "*.temp" "*.log" "*.cache" ".DS_Store" "Thumbs.db"; do
-            if find . -name "$pattern" -type f -not -path "./.git/*" | head -1 | grep -q .; then
-              echo "Removing $pattern files:" >> cleanup-report.md
-              find . -name "$pattern" -type f -not -path "./.git/*" -delete
-              CLEANED=1
+            CLEANED=0
+            for pattern in "*.tmp" "*.temp" "*.log" "*.cache" ".DS_Store" "Thumbs.db"; do
+              if find . -name "$pattern" -type f -not -path "./.git/*" | head -1 | grep -q .; then
+                echo "Removing $pattern files:"
+                find . -name "$pattern" -type f -not -path "./.git/*" -delete
+                CLEANED=1
+              fi
+            done
+
+            echo ""
+            echo "### Large Files Check"
+            find . -type f -size +10M -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./venv/*" -not -path "./target/*" |
+              while IFS= read -r file; do
+                echo "Large file detected: $file ($(du -h "$file" | cut -f1))"
+              done
+
+            if [ "$CLEANED" -eq 0 ]; then
+              echo "No cleanup needed - repository is clean"
             fi
-          done
-
-          # Check for large files that shouldn't be in git
-          echo "" >> cleanup-report.md
-          echo "### Large Files Check" >> cleanup-report.md
-          find . -type f -size +10M -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./venv/*" -not -path "./target/*" | while read file; do
-            echo "Large file detected: $file ($(du -h "$file" | cut -f1))" >> cleanup-report.md
-          done
-
-          if [ $CLEANED -eq 0 ]; then
-            echo "No cleanup needed - repository is clean" >> cleanup-report.md
-          fi
+          } > cleanup-report.md
 
       - name: Check for unused dependencies
         run: |
-          echo "" >> cleanup-report.md
-          echo "### Unused Dependencies Check" >> cleanup-report.md
+          {
+            echo ""
+            echo "### Unused Dependencies Check"
 
-          # Go unused dependencies
-          if [ -f go.mod ]; then
-            go mod tidy
-            if git diff --quiet go.mod go.sum; then
-              echo "Go dependencies are clean" >> cleanup-report.md
-            else
-              echo "Go mod tidy made changes - consider reviewing dependencies" >> cleanup-report.md
+            if [ -f go.mod ]; then
+              go mod tidy
+              if git diff --quiet go.mod go.sum; then
+                echo "Go dependencies are clean"
+              else
+                echo "Go mod tidy made changes - consider reviewing dependencies"
+              fi
             fi
-          fi
 
-          # Python unused imports (basic check)
-          if command -v python3 >/dev/null && find . -name "*.py" -not -path "./venv/*" | head -1 | grep -q .; then
-            # This is a basic check - could be enhanced with proper tools
-            echo "Python files present - consider running tools like unimport or autoflake" >> cleanup-report.md
-          fi
+            if command -v python3 >/dev/null && find . -name "*.py" -not -path "./venv/*" | head -1 | grep -q .; then
+              echo "Python files present - consider running tools like unimport or autoflake"
+            fi
+          } >> cleanup-report.md
 
       - name: Upload cleanup report
         uses: actions/upload-artifact@v5
@@ -211,9 +211,9 @@ jobs:
         id: changes
         run: |
           if ! git diff --quiet; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "changes=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Commit changes
@@ -243,29 +243,43 @@ jobs:
           merge-multiple: true
 
       - name: Generate summary
+        env:
+          RESULT_DEPENDENCY: ${{ needs.dependency-updates.result || 'skipped' }}
+          RESULT_CLEANUP: ${{ needs.cleanup-tasks.result || 'skipped' }}
+          RESULT_LICENSE: ${{ needs.license-check.result || 'skipped' }}
+          RESULT_COMMIT: ${{ needs.commit-changes.result || 'skipped' }}
         run: |
-          echo "## Maintenance Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Updates | ${{ needs.dependency-updates.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cleanup Tasks | ${{ needs.cleanup-tasks.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| License Check | ${{ needs.license-check.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Auto Commit | ${{ needs.commit-changes.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            printf '## Maintenance Summary\n\n'
+            printf '| Task | Status |\n'
+            printf '|------|--------|\n'
+            printf '| Dependency Updates | %s |\n' "$RESULT_DEPENDENCY"
+            printf '| Cleanup Tasks | %s |\n' "$RESULT_CLEANUP"
+            printf '| License Check | %s |\n' "$RESULT_LICENSE"
+            printf '| Auto Commit | %s |\n' "$RESULT_COMMIT"
+            printf '\n'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          # Include report contents if they exist
           if [ -f maintenance-report.md ]; then
-            echo "### Dependency Report" >> $GITHUB_STEP_SUMMARY
-            cat maintenance-report.md >> $GITHUB_STEP_SUMMARY
+            {
+              printf '### Dependency Report\n'
+              cat maintenance-report.md
+              printf '\n'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f cleanup-report.md ]; then
-            echo "### Cleanup Report" >> $GITHUB_STEP_SUMMARY
-            cat cleanup-report.md >> $GITHUB_STEP_SUMMARY
+            {
+              printf '### Cleanup Report\n'
+              cat cleanup-report.md
+              printf '\n'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f license-report.md ]; then
-            echo "### License Report" >> $GITHUB_STEP_SUMMARY
-            cat license-report.md >> $GITHUB_STEP_SUMMARY
+            {
+              printf '### License Report\n'
+              cat license-report.md
+              printf '\n'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi

@@ -268,12 +268,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate summary
+        env:
+          RESULT_STALE: ${{ needs.stale-management.result || 'skipped' }}
+          RESULT_LABEL: ${{ needs.auto-labeling.result || 'skipped' }}
+          RESULT_ASSIGN: ${{ needs.auto-assignment.result || 'skipped' }}
+          RESULT_TEMPLATE: ${{ needs.template-compliance.result || 'skipped' }}
         run: |
-          echo "## Issue Automation Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Stale Management | ${{ needs.stale-management.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Auto Labeling | ${{ needs.auto-labeling.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Auto Assignment | ${{ needs.auto-assignment.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Template Compliance | ${{ needs.template-compliance.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          {
+            printf '## Issue Automation Summary\n\n'
+            printf '| Task | Status |\n'
+            printf '|------|--------|\n'
+            printf '| Stale Management | %s |\n' "$RESULT_STALE"
+            printf '| Auto Labeling | %s |\n' "$RESULT_LABEL"
+            printf '| Auto Assignment | %s |\n' "$RESULT_ASSIGN"
+            printf '| Template Compliance | %s |\n' "$RESULT_TEMPLATE"
+          } >> "$GITHUB_STEP_SUMMARY"
