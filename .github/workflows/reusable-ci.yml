@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -376,6 +376,9 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Generate summary
         env:
           JOB_GO: ${{ needs.go-ci.result || 'skipped' }}

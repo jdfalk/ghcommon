@@ -1,5 +1,5 @@
 # file: .github/workflows/issue-automation.yml
-# version: 2.0.0
+# version: 2.0.1
 # guid: f6g7h8i9-j0k1-l2m3-n4o5-p6q7r8s9t0u1
 
 name: Issue Automation
@@ -43,6 +43,11 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
 
 jobs:
   issue-automation:
