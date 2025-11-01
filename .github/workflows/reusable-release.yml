@@ -347,13 +347,21 @@ jobs:
 
       - name: Package and organize release artifacts
         id: package-artifacts
+        env:
+          RELEASE_VERSION_ARG: ${{ steps.version.outputs.version }}
+        shell: python
         run: |
-          # shellcheck disable=SC2086
-          python3 "scripts/workflows/package_release_assets.py" "${{ steps.version.outputs.version }}"
-          du -sh release-assets/ | awk '{print "Total size: " $1}'
+          import os
+          import subprocess
 
-          # Set output indicating packaging completion
-          echo "packaging-complete=true" >> $GITHUB_OUTPUT
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/workflows/package_release_assets.py",
+                  os.environ.get("RELEASE_VERSION_ARG", "unknown"),
+              ],
+              check=True,
+          )
 
       - name: Create GitHub Release
         id: release

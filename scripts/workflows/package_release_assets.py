@@ -77,6 +77,11 @@ def main() -> None:
     for rel_path, size in moved_files[:10]:
         print(f"  {rel_path} ({size} bytes)")
 
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if output_path:
+        with Path(output_path).open("a", encoding="utf-8") as handle:
+            handle.write("packaging-complete=true\n")
+
 
 if __name__ == "__main__":
     main()
