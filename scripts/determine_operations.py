@@ -27,7 +27,9 @@ def check_directory_has_json_files(directory: str) -> int:
     return count
 
 
-def check_for_files(issue_updates_file: str, issue_updates_directory: str) -> dict:
+def check_for_files(
+    issue_updates_file: str, issue_updates_directory: str
+) -> dict:
     """Check for issue update files"""
     has_legacy_file = check_file_exists(issue_updates_file)
     has_update_files = False
@@ -38,7 +40,9 @@ def check_for_files(issue_updates_file: str, issue_updates_directory: str) -> di
     json_files_count = check_directory_has_json_files(issue_updates_directory)
     if json_files_count > 0:
         has_update_files = True
-        print(f"📁 Found {json_files_count} issue update files in {issue_updates_directory}")
+        print(
+            f"📁 Found {json_files_count} issue update files in {issue_updates_directory}"
+        )
 
     has_issue_updates = has_legacy_file or has_update_files
 
@@ -139,7 +143,9 @@ def determine_operations(
         # Scheduled events
         if event_name == "schedule":
             operations.extend(["close-duplicates", "codeql-alerts"])
-            print("  ✓ Added close-duplicates and codeql-alerts (scheduled event)")
+            print(
+                "  ✓ Added close-duplicates and codeql-alerts (scheduled event)"
+            )
 
         # Workflow dispatch can run all operations
         if event_name == "workflow_dispatch":
@@ -201,8 +207,12 @@ def main():
     # Get inputs from environment
     operations_input = os.environ.get("OPERATIONS_INPUT", "auto")
     event_name = os.environ.get("EVENT_NAME", "workflow_dispatch")
-    issue_updates_file = os.environ.get("ISSUE_UPDATES_FILE", "issue_updates.json")
-    issue_updates_directory = os.environ.get("ISSUE_UPDATES_DIRECTORY", ".github/issue-updates")
+    issue_updates_file = os.environ.get(
+        "ISSUE_UPDATES_FILE", "issue_updates.json"
+    )
+    issue_updates_directory = os.environ.get(
+        "ISSUE_UPDATES_DIRECTORY", ".github/issue-updates"
+    )
 
     print(f"🔧 Determining operations for event: {event_name}")
     print(f"📋 Operations input: {operations_input}")
@@ -211,14 +221,18 @@ def main():
     file_check = check_for_files(issue_updates_file, issue_updates_directory)
 
     # Determine operations
-    operations = determine_operations(operations_input, event_name, file_check["has_issue_updates"])
+    operations = determine_operations(
+        operations_input, event_name, file_check["has_issue_updates"]
+    )
 
     # Create JSON output
     operations_json = create_operations_json(operations)
 
     # Set outputs
     set_github_output("operations", operations_json)
-    set_github_output("has_issue_updates", str(file_check["has_issue_updates"]).lower())
+    set_github_output(
+        "has_issue_updates", str(file_check["has_issue_updates"]).lower()
+    )
 
     if operations:
         print(f"🎯 Final operations to run: {', '.join(operations)}")

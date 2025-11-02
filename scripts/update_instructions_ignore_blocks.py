@@ -16,8 +16,8 @@ Safety:
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
+import re
 
 WORKSPACE_REPOS = [
     "subtitle-manager",

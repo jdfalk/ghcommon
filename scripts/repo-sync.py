@@ -16,14 +16,14 @@ for all shared files and propagates them to target repositories.
 """
 
 import argparse
+from dataclasses import asdict, dataclass
+from datetime import datetime
 import hashlib
 import json
+from pathlib import Path
 import re
 import shutil
 import sys
-from dataclasses import asdict, dataclass
-from datetime import datetime
-from pathlib import Path
 
 
 @dataclass
@@ -106,7 +106,9 @@ class RepoSynchronizer:
                     content_hash = hashlib.md5(content.encode()).hexdigest()
                     source_files[file_path] = (version, guid, content_hash)
                 except Exception as e:
-                    print(f"Warning: Could not load {file_path} from source: {e}")
+                    print(
+                        f"Warning: Could not load {file_path} from source: {e}"
+                    )
 
         return source_files
 
@@ -132,7 +134,9 @@ class RepoSynchronizer:
 
         return sorted(repositories)
 
-    def _analyze_target_file(self, repo_path: Path, file_path: str) -> tuple[str, str, str, bool]:
+    def _analyze_target_file(
+        self, repo_path: Path, file_path: str
+    ) -> tuple[str, str, str, bool]:
         """Analyze target file status"""
         full_path = repo_path / file_path
 
@@ -178,8 +182,12 @@ class RepoSynchronizer:
         if source_version != "no-version" and target_version != "no-version":
             try:
                 # Simple version comparison (assumes semantic versioning)
-                source_parts = [int(x) for x in source_version.replace("v", "").split(".")]
-                target_parts = [int(x) for x in target_version.replace("v", "").split(".")]
+                source_parts = [
+                    int(x) for x in source_version.replace("v", "").split(".")
+                ]
+                target_parts = [
+                    int(x) for x in target_version.replace("v", "").split(".")
+                ]
 
                 # Pad to same length
                 max_len = max(len(source_parts), len(target_parts))
@@ -207,7 +215,9 @@ class RepoSynchronizer:
         target_path = target_repo / source_file
 
         if self.dry_run:
-            print(f"    [DRY RUN] Would copy {source_file} to {target_repo.name}")
+            print(
+                f"    [DRY RUN] Would copy {source_file} to {target_repo.name}"
+            )
             return True
 
         try:
@@ -220,7 +230,9 @@ class RepoSynchronizer:
             return True
 
         except Exception as e:
-            print(f"    ✗ Failed to copy {source_file} to {target_repo.name}: {e}")
+            print(
+                f"    ✗ Failed to copy {source_file} to {target_repo.name}: {e}"
+            )
             return False
 
     def sync_repository(self, repo_path: Path) -> list[SyncOperation]:
@@ -229,14 +241,18 @@ class RepoSynchronizer:
         repo_operations = []
 
         for file_path in self.TRACKED_FILES:
-            target_status, target_version, target_guid, is_current = self._analyze_target_file(
-                repo_path, file_path
+            target_status, target_version, target_guid, is_current = (
+                self._analyze_target_file(repo_path, file_path)
             )
 
-            should_sync, reason = self._should_sync_file(file_path, target_status, target_version)
+            should_sync, reason = self._should_sync_file(
+                file_path, target_status, target_version
+            )
 
             if should_sync:
-                operation_type = "copy" if target_status == "missing" else "update"
+                operation_type = (
+                    "copy" if target_status == "missing" else "update"
+                )
                 success = self._copy_file(file_path, repo_path)
 
                 if not success and not self.dry_run:
@@ -251,7 +267,11 @@ class RepoSynchronizer:
                     file_path=file_path,
                     operation_type=operation_type,
                     source_version=source_version,
-                    target_version=(target_version if target_version != "no-version" else None),
+                    target_version=(
+                        target_version
+                        if target_version != "no-version"
+                        else None
+                    ),
                     reason=reason,
                 )
 
@@ -268,7 +288,11 @@ class RepoSynchronizer:
                     file_path=file_path,
                     operation_type="skip",
                     source_version=source_version,
-                    target_version=(target_version if target_version != "no-version" else None),
+                    target_version=(
+                        target_version
+                        if target_version != "no-version"
+                        else None
+                    ),
                     reason=reason,
                 )
 
@@ -296,10 +320,18 @@ class RepoSynchronizer:
 
         # Generate summary
         summary = {
-            "copy": sum(1 for op in all_operations if op.operation_type == "copy"),
-            "update": sum(1 for op in all_operations if op.operation_type == "update"),
-            "skip": sum(1 for op in all_operations if op.operation_type == "skip"),
-            "failed": sum(1 for op in all_operations if op.operation_type == "failed"),
+            "copy": sum(
+                1 for op in all_operations if op.operation_type == "copy"
+            ),
+            "update": sum(
+                1 for op in all_operations if op.operation_type == "update"
+            ),
+            "skip": sum(
+                1 for op in all_operations if op.operation_type == "skip"
+            ),
+            "failed": sum(
+                1 for op in all_operations if op.operation_type == "failed"
+            ),
         }
 
         report = SyncReport(
@@ -420,7 +452,9 @@ Examples:
             print(f"\nDetailed report saved to: {report_file}")
 
         # Show any failed operations
-        failed_ops = [op for op in report.operations if op.operation_type == "failed"]
+        failed_ops = [
+            op for op in report.operations if op.operation_type == "failed"
+        ]
         if failed_ops:
             print(f"\n⚠️  {len(failed_ops)} operations failed:")
             for op in failed_ops:

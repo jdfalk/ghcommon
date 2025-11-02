@@ -19,10 +19,10 @@ from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
 
 def run(cmd: list[str], cwd: Path) -> None:
@@ -43,7 +43,9 @@ def main(argv: list[str]) -> int:
         required=True,
         help="Repository name on GitHub (e.g., my-template-repo)",
     )
-    parser.add_argument("--owner", required=True, help="GitHub username or org (e.g., jdfalk)")
+    parser.add_argument(
+        "--owner", required=True, help="GitHub username or org (e.g., jdfalk)"
+    )
     parser.add_argument(
         "--private",
         action="store_true",
@@ -63,7 +65,9 @@ def main(argv: list[str]) -> int:
         print("git is not installed or not in PATH", file=sys.stderr)
         return 2
     if not shutil.which("gh"):
-        print("GitHub CLI (gh) is not installed or not in PATH", file=sys.stderr)
+        print(
+            "GitHub CLI (gh) is not installed or not in PATH", file=sys.stderr
+        )
         return 2
 
     # Ensure we're not inside another repo when initializing (avoid nested repos/submodules)
@@ -138,7 +142,9 @@ def main(argv: list[str]) -> int:
         cwd=target,
     )
 
-    print(f"Repository created and pushed: https://github.com/{args.owner}/{args.repo}")
+    print(
+        f"Repository created and pushed: https://github.com/{args.owner}/{args.repo}"
+    )
     return 0
 
 

@@ -20,19 +20,21 @@ Featu                self.logger.info(f"Archived: {repo_info.get('isArchived', '
 """
 
 import argparse
+from datetime import datetime
 import json
 import logging
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from datetime import datetime
-from pathlib import Path
 
 
 class RepositoryCleanup:
     """Main class for repository cleanup operations."""
 
-    def __init__(self, base_path: str, dry_run: bool = True, interactive: bool = True):
+    def __init__(
+        self, base_path: str, dry_run: bool = True, interactive: bool = True
+    ):
         """Initialize the repository cleanup tool.
 
         Args:
@@ -44,7 +46,9 @@ class RepositoryCleanup:
         self.dry_run = dry_run
         self.interactive = interactive
         self.log_file = (
-            Path.home() / "logs" / f"repo-cleanup-{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            Path.home()
+            / "logs"
+            / f"repo-cleanup-{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         )
 
         # Ensure logs directory exists
@@ -87,7 +91,9 @@ class RepositoryCleanup:
         )
         self.logger = logging.getLogger(__name__)
 
-    def _run_command(self, cmd: list[str], cwd: Path | None = None) -> tuple[bool, str, str]:
+    def _run_command(
+        self, cmd: list[str], cwd: Path | None = None
+    ) -> tuple[bool, str, str]:
         """Run a shell command and return success status and output.
 
         Args:
@@ -144,7 +150,11 @@ class RepositoryCleanup:
         # Handle different URL formats
         if url.startswith("git@github.com:"):
             # SSH format: git@github.com:owner/repo.git
-            parts = url.replace("git@github.com:", "").replace(".git", "").split("/")
+            parts = (
+                url.replace("git@github.com:", "")
+                .replace(".git", "")
+                .split("/")
+            )
         elif "github.com" in url:
             # HTTPS format: https://github.com/owner/repo.git
             parts = url.split("github.com/")[-1].replace(".git", "").split("/")
@@ -179,13 +189,19 @@ class RepositoryCleanup:
             try:
                 return json.loads(stdout)
             except json.JSONDecodeError as e:
-                self.logger.error(f"Failed to parse JSON for {owner}/{repo}: {e}")
+                self.logger.error(
+                    f"Failed to parse JSON for {owner}/{repo}: {e}"
+                )
                 return None
         else:
-            self.logger.warning(f"Failed to get info for {owner}/{repo}: {stderr}")
+            self.logger.warning(
+                f"Failed to get info for {owner}/{repo}: {stderr}"
+            )
             return None
 
-    def _should_remove_repository(self, repo_info: dict, repo_path: Path) -> tuple[bool, str]:
+    def _should_remove_repository(
+        self, repo_info: dict, repo_path: Path
+    ) -> tuple[bool, str]:
         """Determine if a repository should be removed based on its status.
 
         Args:
@@ -212,14 +228,18 @@ class RepositoryCleanup:
                     if updated_at.endswith("Z"):
                         updated_at = updated_at[:-1] + "+00:00"
                     updated_date = datetime.fromisoformat(updated_at)
-                    days_since_update = (datetime.now(timezone.utc) - updated_date).days
+                    days_since_update = (
+                        datetime.now(timezone.utc) - updated_date
+                    ).days
                     if days_since_update > 1095:  # 3 years for private repos
                         return (
                             True,
                             f"Private repository hasn't been updated in {days_since_update} days (appears abandoned)",
                         )
                 except Exception as e:
-                    self.logger.warning(f"Failed to parse update date {updated_at}: {e}")
+                    self.logger.warning(
+                        f"Failed to parse update date {updated_at}: {e}"
+                    )
 
         # Check if repository hasn't been updated in over 2 years
         updated_at = repo_info.get("updatedAt")
@@ -232,14 +252,18 @@ class RepositoryCleanup:
                 if updated_at.endswith("Z"):
                     updated_at = updated_at[:-1] + "+00:00"
                 updated_date = datetime.fromisoformat(updated_at)
-                days_since_update = (datetime.now(timezone.utc) - updated_date).days
+                days_since_update = (
+                    datetime.now(timezone.utc) - updated_date
+                ).days
                 if days_since_update > 730:  # 2 years
                     return (
                         True,
                         f"Repository hasn't been updated in {days_since_update} days",
                     )
             except Exception as e:
-                self.logger.warning(f"Failed to parse update date {updated_at}: {e}")
+                self.logger.warning(
+                    f"Failed to parse update date {updated_at}: {e}"
+                )
 
         return False, "Repository is active"
 
@@ -327,7 +351,9 @@ class RepositoryCleanup:
                 # Get remote URL
                 remote_url = self._get_remote_url(repo_path)
                 if not remote_url:
-                    self.logger.warning(f"No remote URL found for {repo_path.name}")
+                    self.logger.warning(
+                        f"No remote URL found for {repo_path.name}"
+                    )
                     self.stats["skipped"] += 1
                     continue
 
@@ -351,13 +377,23 @@ class RepositoryCleanup:
                     continue
 
                 # Display repository status
-                self.logger.info(f"Archived: {repo_info.get('archived', 'Unknown')}")
-                self.logger.info(f"Disabled: {repo_info.get('disabled', 'Unknown')}")
-                self.logger.info(f"Visibility: {repo_info.get('visibility', 'Unknown')}")
-                self.logger.info(f"Last updated: {repo_info.get('updatedAt', 'Unknown')}")
+                self.logger.info(
+                    f"Archived: {repo_info.get('archived', 'Unknown')}"
+                )
+                self.logger.info(
+                    f"Disabled: {repo_info.get('disabled', 'Unknown')}"
+                )
+                self.logger.info(
+                    f"Visibility: {repo_info.get('visibility', 'Unknown')}"
+                )
+                self.logger.info(
+                    f"Last updated: {repo_info.get('updatedAt', 'Unknown')}"
+                )
 
                 # Determine if repository should be removed
-                should_remove, reason = self._should_remove_repository(repo_info, repo_path)
+                should_remove, reason = self._should_remove_repository(
+                    repo_info, repo_path
+                )
 
                 if should_remove:
                     self.stats["archived_repos"] += 1
@@ -385,8 +421,12 @@ class RepositoryCleanup:
         self.logger.info(f"\n{'=' * 60}")
         self.logger.info("CLEANUP SUMMARY")
         self.logger.info(f"{'=' * 60}")
-        self.logger.info(f"Total repositories scanned: {self.stats['total_repos']}")
-        self.logger.info(f"Archived/outdated repositories found: {self.stats['archived_repos']}")
+        self.logger.info(
+            f"Total repositories scanned: {self.stats['total_repos']}"
+        )
+        self.logger.info(
+            f"Archived/outdated repositories found: {self.stats['archived_repos']}"
+        )
         self.logger.info(f"Repositories removed: {self.stats['removed_repos']}")
         self.logger.info(f"Repositories skipped: {self.stats['skipped']}")
         self.logger.info(f"Errors encountered: {self.stats['errors']}")
@@ -409,10 +449,14 @@ class RepositoryCleanup:
         # Check if gh CLI is available
         success, stdout, stderr = self._run_command(["gh", "--version"])
         if not success:
-            self.logger.error("GitHub CLI (gh) is not available. Please install it first.")
+            self.logger.error(
+                "GitHub CLI (gh) is not available. Please install it first."
+            )
             sys.exit(1)
 
-        self.logger.info(f"GitHub CLI version: {stdout.split()[0] if stdout else 'Unknown'}")
+        self.logger.info(
+            f"GitHub CLI version: {stdout.split()[0] if stdout else 'Unknown'}"
+        )
 
         # Scan for repositories
         repositories = self.scan_repositories()
@@ -482,7 +526,9 @@ Examples:
         help="Run without confirmation prompts",
     )
 
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--verbose", action="store_true", help="Enable verbose logging"
+    )
 
     args = parser.parse_args()
 

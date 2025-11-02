@@ -7,9 +7,9 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 import os
 import sys
-from collections import OrderedDict
 
 from workflow_common import (
     append_summary,
@@ -56,7 +56,9 @@ def main() -> None:
 
     append_summary(build_release_summary(context))
 
-    failures = any(status.lower() == "failure" for status in components.values())
+    failures = any(
+        status.lower() == "failure" for status in components.values()
+    )
     if failures:
         append_summary_line("❌ **Some components failed**")
         sys.exit(1)

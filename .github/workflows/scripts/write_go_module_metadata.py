@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import json
 import os
-from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -22,7 +22,9 @@ def main() -> None:
         "repository": repository,
         "commit": commit_sha,
         "tag": tag_name,
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": datetime.now(timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        ),
     }
 
     output_path = Path("module-metadata.json")

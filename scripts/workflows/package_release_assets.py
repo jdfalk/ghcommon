@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
+from pathlib import Path
 import shutil
 import sys
-from pathlib import Path
 
 
 def _categorize(name: str) -> str | None:
@@ -27,7 +27,9 @@ def _categorize(name: str) -> str | None:
 
 def main() -> None:
     release_version = (
-        sys.argv[1] if len(sys.argv) > 1 else os.environ.get("RELEASE_VERSION", "unknown")
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else os.environ.get("RELEASE_VERSION", "unknown")
     )
     artifacts_root = Path("artifacts")
     target_root = Path("release-assets")
@@ -73,12 +75,16 @@ def main() -> None:
         if files:
             for item in files:
                 if item.is_file():
-                    manifest_sections.append(f"- {item.name} ({item.stat().st_size} bytes)")
+                    manifest_sections.append(
+                        f"- {item.name} ({item.stat().st_size} bytes)"
+                    )
         else:
             manifest_sections.append("- None")
         manifest_sections.append("")
 
-    (target_root / "MANIFEST.md").write_text("\n".join(manifest_sections), encoding="utf-8")
+    (target_root / "MANIFEST.md").write_text(
+        "\n".join(manifest_sections), encoding="utf-8"
+    )
 
     total_files = sum(1 for _ in target_root.rglob("*"))
     print("📦 Organizing and packaging release artifacts...")

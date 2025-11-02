@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 from typing import Any
 
 LEDGER_PATH = Path(".codex_submitted_jobs.json")
@@ -76,7 +76,9 @@ def process_jobs(jobs: list[dict[str, Any]], ledger: set[str]) -> None:
 
 def main() -> int:
     """Program entry point."""
-    parser = argparse.ArgumentParser(description="Submit codex jobs from a JSON file.")
+    parser = argparse.ArgumentParser(
+        description="Submit codex jobs from a JSON file."
+    )
     parser.add_argument("path", type=Path, help="Path to JSON job file.")
     args = parser.parse_args()
 

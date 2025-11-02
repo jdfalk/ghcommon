@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import glob
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 PROJECT_ROOT = Path.cwd()
 
@@ -53,7 +53,9 @@ def main() -> None:
             ).returncode
         raise SystemExit(result)
 
-    print("No tests found in this repository. This is a configuration/shared repository.")
+    print(
+        "No tests found in this repository. This is a configuration/shared repository."
+    )
     print("Creating a placeholder test result to avoid failure.")
     coverage = PROJECT_ROOT / "coverage.xml"
     coverage.write_text(

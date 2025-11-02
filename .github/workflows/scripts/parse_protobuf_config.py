@@ -60,13 +60,17 @@ def emit_output(name: str, value: str) -> None:
 
 
 def main() -> None:
-    config_path = Path(os.environ.get("CONFIG_PATH", ".github/repository-config.yml"))
+    config_path = Path(
+        os.environ.get("CONFIG_PATH", ".github/repository-config.yml")
+    )
     config = load_config(config_path)
 
     languages = config.get("languages", {})
     protobuf = config.get("protobuf", {})
 
-    emit_output("protobuf-enabled", bool_str(bool(protobuf.get("enabled", False))))
+    emit_output(
+        "protobuf-enabled", bool_str(bool(protobuf.get("enabled", False)))
+    )
     emit_output(
         "go-enabled",
         bool_str(bool(languages.get("go", {}).get("enabled", False))),

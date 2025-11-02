@@ -6,9 +6,9 @@
 """Upload release artifacts to GitHub release."""
 
 import os
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 
 def upload_artifacts(release_id, artifacts_dir):
@@ -41,7 +41,9 @@ def upload_artifacts(release_id, artifacts_dir):
             os.environ.get("GITHUB_REPOSITORY", ""),
         ]
 
-        result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, check=False, capture_output=True, text=True
+        )
         if result.returncode == 0:
             print(f"  ✓ Uploaded {artifact.name}")
         else:
@@ -51,7 +53,9 @@ def upload_artifacts(release_id, artifacts_dir):
 def main():
     """Main entry point."""
     if len(sys.argv) < 3:
-        print("Usage: sync-release-upload-artifacts.py <release_id> <artifacts_dir>")
+        print(
+            "Usage: sync-release-upload-artifacts.py <release_id> <artifacts_dir>"
+        )
         sys.exit(1)
 
     release_id = sys.argv[1]

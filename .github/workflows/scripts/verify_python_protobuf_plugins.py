@@ -19,7 +19,10 @@ def main() -> None:
             missing.append(module)
 
     if missing:
-        print("::error::Missing required Python protobuf plugins: " + ", ".join(missing))
+        print(
+            "::error::Missing required Python protobuf plugins: "
+            + ", ".join(missing)
+        )
         raise SystemExit(1)
 
 

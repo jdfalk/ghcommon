@@ -1,7 +1,7 @@
 """Tests for workflow helper scripts."""
 
-import sys
 from pathlib import Path
+import sys
 
 SCRIPT_DIR = Path(__file__).resolve().parents[2] / ".github/workflows/scripts"
 SCRIPT_PATH = str(SCRIPT_DIR)

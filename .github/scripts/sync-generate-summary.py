@@ -5,9 +5,9 @@
 
 """Generate synchronization summary for GitHub Actions step summary."""
 
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
 
 
 def generate_summary():

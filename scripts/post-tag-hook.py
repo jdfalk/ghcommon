@@ -17,8 +17,8 @@ Environment Variables:
     CI: Automatically detected in CI environments
 """
 
-import sys
 from pathlib import Path
+import sys
 
 # Add the scripts directory to the path so we can import the module tagger
 sys.path.insert(0, str(Path(__file__).parent))

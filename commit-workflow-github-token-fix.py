@@ -99,7 +99,9 @@ def main():
             success_count += 1
 
     print("\n=== Summary ===")
-    print(f"Successfully processed {success_count} out of {len(repos)} repositories")
+    print(
+        f"Successfully processed {success_count} out of {len(repos)} repositories"
+    )
 
     if success_count == len(repos):
         print("All repositories processed successfully!")

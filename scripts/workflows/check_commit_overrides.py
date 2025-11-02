@@ -4,13 +4,15 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import re
 import subprocess
 import sys
-from pathlib import Path
 
 PATTERNS = {
-    "skip-tests": re.compile(r"\[(?:skip|no)[^\]]*tests?\]|skip.?tests?|no.?tests?", re.IGNORECASE),
+    "skip-tests": re.compile(
+        r"\[(?:skip|no)[^\]]*tests?\]|skip.?tests?|no.?tests?", re.IGNORECASE
+    ),
     "skip-validation": re.compile(
         r"\[(?:skip|no)[^\]]*(?:validation|lint)\]|skip.?validation|no.?validation|skip.?lint|no.?lint",
         re.IGNORECASE,
@@ -19,7 +21,9 @@ PATTERNS = {
         r"\[(?:skip.?ci|ci.?skip|skip.?actions)\]|skip.?ci|ci.?skip",
         re.IGNORECASE,
     ),
-    "skip-build": re.compile(r"\[(?:skip|no)[^\]]*build\]|skip.?build|no.?build", re.IGNORECASE),
+    "skip-build": re.compile(
+        r"\[(?:skip|no)[^\]]*build\]|skip.?build|no.?build", re.IGNORECASE
+    ),
 }
 
 
@@ -56,7 +60,9 @@ def gather_commits(event_name: str, base_branch: str) -> list[str]:
 
 def detect_overrides(messages: list[str]) -> dict[str, bool]:
     joined = "\n".join(messages)
-    return {key: bool(pattern.search(joined)) for key, pattern in PATTERNS.items()}
+    return {
+        key: bool(pattern.search(joined)) for key, pattern in PATTERNS.items()
+    }
 
 
 def write_outputs(overrides: dict[str, bool], messages: list[str]) -> None:
@@ -95,7 +101,9 @@ def format_summary(overrides: dict[str, bool], messages: list[str]) -> str:
             ]
         )
     else:
-        lines.append("✅ **All CI checks enabled** - No override keywords detected.\n")
+        lines.append(
+            "✅ **All CI checks enabled** - No override keywords detected.\n"
+        )
 
     return "\n".join(lines)
 
@@ -110,7 +118,9 @@ def main() -> None:
     event_name = os.environ.get("EVENT_NAME", "").strip() or "push"
     default_branch = os.environ.get("DEFAULT_BRANCH", "main")
     base_ref = os.environ.get("PULL_BASE_REF", "").strip()
-    base_branch = base_ref if base_ref and base_ref != "null" else default_branch
+    base_branch = (
+        base_ref if base_ref and base_ref != "null" else default_branch
+    )
 
     print("Checking commit messages for override keywords...")
     messages = gather_commits(event_name, base_branch)

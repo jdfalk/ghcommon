@@ -16,8 +16,8 @@ Usage:
 """
 
 import json
-import sys
 from pathlib import Path
+import sys
 
 import yaml
 
@@ -105,7 +105,9 @@ class LinterValidator:
         for key, expected, reason in checks:
             if key in config:
                 if config[key] == expected:
-                    self.log(f"Prettier {key}={expected} ✓ ({reason})", "success")
+                    self.log(
+                        f"Prettier {key}={expected} ✓ ({reason})", "success"
+                    )
                 else:
                     self.log(
                         f"Prettier {key}={config[key]}, expected {expected}. {reason}",
@@ -130,7 +132,9 @@ class LinterValidator:
         # Check for Google style guide extends
         if "extends" in config:
             extends = (
-                config["extends"] if isinstance(config["extends"], list) else [config["extends"]]
+                config["extends"]
+                if isinstance(config["extends"], list)
+                else [config["extends"]]
             )
             if any("google" in str(ext).lower() for ext in extends):
                 self.log("ESLint extends Google style guide", "success")
@@ -183,7 +187,10 @@ class LinterValidator:
 
             # Google Python style uses 80 char lines
             if "max-line-length" in content:
-                if "max-line-length=80" in content or "max-line-length = 80" in content:
+                if (
+                    "max-line-length=80" in content
+                    or "max-line-length = 80" in content
+                ):
                     self.log(
                         "Pylint max-line-length set to 80 (Google Python style)",
                         "success",
@@ -311,7 +318,9 @@ class LinterValidator:
                 if config_path and not config_path.startswith("#"):
                     full_path = self.repo_root / config_path
                     if full_path.exists():
-                        self.log(f"{env_file}: {var_name}={config_path} ✓", "success")
+                        self.log(
+                            f"{env_file}: {var_name}={config_path} ✓", "success"
+                        )
                     else:
                         self.log(
                             f"{env_file}: {var_name}={config_path} NOT FOUND",
@@ -356,10 +365,14 @@ class LinterValidator:
         print(f"{RED}❌ Errors: {len(self.errors)}{RESET}\n")
 
         if self.errors:
-            print(f"{RED}Validation FAILED with {len(self.errors)} errors{RESET}")
+            print(
+                f"{RED}Validation FAILED with {len(self.errors)} errors{RESET}"
+            )
             return False
         if self.warnings:
-            print(f"{YELLOW}Validation passed with {len(self.warnings)} warnings{RESET}")
+            print(
+                f"{YELLOW}Validation passed with {len(self.warnings)} warnings{RESET}"
+            )
             return True
         print(f"{GREEN}All validations PASSED!{RESET}")
         return True
@@ -369,9 +382,15 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Validate linter configurations")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-    parser.add_argument("--repo-root", default=".", help="Repository root directory")
+    parser = argparse.ArgumentParser(
+        description="Validate linter configurations"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Verbose output"
+    )
+    parser.add_argument(
+        "--repo-root", default=".", help="Repository root directory"
+    )
 
     args = parser.parse_args()
 

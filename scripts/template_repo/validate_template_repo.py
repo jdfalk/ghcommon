@@ -14,11 +14,11 @@ It never uploads data anywhere. All checks are local-only.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
 import os
+from pathlib import Path
 import re
 import sys
-from collections.abc import Iterable
-from pathlib import Path
 
 DEFAULT_IGNORE_DIRS = {
     ".git",
@@ -66,7 +66,9 @@ PATTERNS: list[tuple[str, re.Pattern]] = [
     ("GitHub Token", re.compile(r"gh[pousr]_[A-Za-z0-9_]{30,}")),
     (
         "JWT",
-        re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
+        re.compile(
+            r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+        ),
     ),
     (
         "Private Key Block",

@@ -8,8 +8,8 @@ Reads from repositories.txt and outputs repository names.
 """
 
 import os
-import sys
 from pathlib import Path
+import sys
 
 
 def get_target_repos():

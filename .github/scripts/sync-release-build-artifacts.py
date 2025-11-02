@@ -11,9 +11,9 @@ Replaces embedded bash build scripts with reliable Python-based build logic.
 
 import json
 import os
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 
 def log(message: str, level: str = "INFO") -> None:
@@ -24,7 +24,9 @@ def log(message: str, level: str = "INFO") -> None:
 def run_command(cmd: list, cwd: str = None, env: dict = None) -> tuple:
     """Run a command and return (success, stdout, stderr)."""
     try:
-        result = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, check=False)
+        result = subprocess.run(
+            cmd, cwd=cwd, env=env, capture_output=True, text=True, check=False
+        )
         return result.returncode == 0, result.stdout, result.stderr
     except Exception as e:
         return False, "", str(e)
@@ -252,7 +254,9 @@ def build_javascript_artifacts() -> bool:
             scripts = package_data.get("scripts", {})
 
             if "build" in scripts:
-                build_success, stdout, stderr = run_command(["npm", "run", "build"])
+                build_success, stdout, stderr = run_command(
+                    ["npm", "run", "build"]
+                )
                 if build_success:
                     log("Successfully built JavaScript project")
                     return True
@@ -268,7 +272,11 @@ def build_javascript_artifacts() -> bool:
 
 def main():
     """Main execution function."""
-    language = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("LANGUAGE", "unknown")
+    language = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else os.environ.get("LANGUAGE", "unknown")
+    )
 
     log(f"Building artifacts for language: {language}")
 

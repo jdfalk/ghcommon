@@ -51,7 +51,11 @@ def load_build_config() -> dict[str, Any]:
                 continue
 
             # Detect leaving build section (new top-level key)
-            if in_build and not line.startswith(" ") and not stripped.startswith("build:"):
+            if (
+                in_build
+                and not line.startswith(" ")
+                and not stripped.startswith("build:")
+            ):
                 # Reached a new top-level key; stop parsing build
                 break
 
@@ -77,7 +81,9 @@ def load_build_config() -> dict[str, Any]:
             key, remainder = key_match.groups()
 
             if remainder == "":  # list start or empty value
-                current_list_key = key if key.endswith("s") else None  # heuristic
+                current_list_key = (
+                    key if key.endswith("s") else None
+                )  # heuristic
                 if current_list_key:
                     build.setdefault(current_list_key, [])
                 continue
@@ -109,7 +115,9 @@ has_python = (
     else False
 )
 has_frontend = exists_any("package.json", "yarn.lock", "pnpm-lock.yaml")
-has_docker = exists_any("Dockerfile", "docker-compose.yml", "docker-compose.yaml")
+has_docker = exists_any(
+    "Dockerfile", "docker-compose.yml", "docker-compose.yaml"
+)
 has_rust = exists_any("Cargo.toml")
 protobuf_needed = (
     (build_cfg.get("enable_protobuf") is True)
@@ -163,7 +171,9 @@ operating_systems = build_cfg.get("operating_systems") or ["ubuntu-latest"]
 platforms = build_cfg.get("platforms") or ["linux/amd64", "linux/arm64"]
 
 go_matrix = (
-    build_matrix("go", go_versions, operating_systems, "go-version") if has_go else {"include": []}
+    build_matrix("go", go_versions, operating_systems, "go-version")
+    if has_go
+    else {"include": []}
 )
 python_matrix = (
     build_matrix("python", python_versions, operating_systems, "python-version")
