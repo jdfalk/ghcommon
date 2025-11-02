@@ -86,9 +86,7 @@ def test_generate_version_from_tag(monkeypatch, tmp_path):
     monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
 
     monkeypatch.setattr(release_workflow, "_latest_tag_from_api", lambda: "")
-    monkeypatch.setattr(
-        release_workflow, "_latest_tag_from_git", lambda: "v1.2.3"
-    )
+    monkeypatch.setattr(release_workflow, "_latest_tag_from_git", lambda: "v1.2.3")
 
     def fake_run(args, check=False):
         cmd = tuple(args)

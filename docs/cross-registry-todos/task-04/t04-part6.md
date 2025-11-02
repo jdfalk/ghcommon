@@ -1010,7 +1010,7 @@ Task 04 is complete when:
 
 ---
 
-## 🎉 Task 04 Complete!
+## 🎉 Task 04 Complete
 
 The Go module publishing feature is now fully implemented, tested, documented, and ready for
 production use.

@@ -14,8 +14,16 @@ test_repos = [
 
 # Simulate what the inquirer would return (this is what was causing the bug)
 fake_inquirer_response = [
-    {"name": "test-repo-1 (🌍) - Test repo 1", "value": "test-repo-1", "checked": True},
-    {"name": "test-repo-2 (🔒) - Test repo 2", "value": "test-repo-2", "checked": True},
+    {
+        "name": "test-repo-1 (🌍) - Test repo 1",
+        "value": "test-repo-1",
+        "checked": True,
+    },
+    {
+        "name": "test-repo-2 (🔒) - Test repo 2",
+        "value": "test-repo-2",
+        "checked": True,
+    },
 ]
 
 # Test the bug fix logic

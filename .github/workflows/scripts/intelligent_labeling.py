@@ -3,22 +3,17 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import os
-from typing import List
+from collections.abc import Iterable
 
 import requests
 
 
-def analyze_pr_content(
-    title: str, body: str | None, changed_files: Iterable[str]
-) -> List[str]:
+def analyze_pr_content(title: str, body: str | None, changed_files: Iterable[str]) -> list[str]:
     labels: list[str] = []
     text = (title + " " + (body or "")).lower()
 
-    if any(
-        word in text for word in ["fix", "bug", "error", "issue", "problem"]
-    ):
+    if any(word in text for word in ["fix", "bug", "error", "issue", "problem"]):
         labels.append("bug")
     if any(word in text for word in ["feature", "add", "new", "implement"]):
         labels.append("enhancement")
@@ -51,9 +46,7 @@ def main() -> None:
     pr_number = os.environ.get("PR_NUMBER")
 
     if not all([github_token, repo, pr_number]):
-        print(
-            "Missing required environment variables; skipping intelligent labeling"
-        )
+        print("Missing required environment variables; skipping intelligent labeling")
         return
 
     headers = {
@@ -76,17 +69,13 @@ def main() -> None:
         return
 
     changed_files = [item["filename"] for item in files_response.json()]
-    suggested_labels = analyze_pr_content(
-        pr_data["title"], pr_data.get("body"), changed_files
-    )
+    suggested_labels = analyze_pr_content(pr_data["title"], pr_data.get("body"), changed_files)
 
     print(f"Suggested labels for PR #{pr_number}: {suggested_labels}")
     if not suggested_labels:
         return
 
-    labels_url = (
-        f"https://api.github.com/repos/{repo}/issues/{pr_number}/labels"
-    )
+    labels_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/labels"
     labels_response = requests.post(
         labels_url,
         headers=headers,

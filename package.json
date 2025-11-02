@@ -9,7 +9,15 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3"
+    "@commitlint/config-conventional": "^18.4.3",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "eslint": "^9.39.0",
+    "eslint-plugin": "^1.0.1",
+    "globals": "^16.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
   },
   "keywords": [
     "github",
@@ -22,5 +30,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "npmx": "^0.0.0"
   }
 }

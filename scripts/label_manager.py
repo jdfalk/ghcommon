@@ -24,7 +24,7 @@ import argparse
 import json
 import os
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any
 from urllib.parse import quote
 
 try:
@@ -125,7 +125,7 @@ class GitHubLabelAPI:
         self.repo = repo
         self.headers = self._get_headers()
 
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         """Return HTTP headers for the GitHub API."""
         # Detect token type and set appropriate authorization header
         if self.token.startswith("github_pat_"):
@@ -161,7 +161,7 @@ class GitHubLabelAPI:
             print(f"Error testing GitHub API access: {e}", file=sys.stderr)
             return False
 
-    def get_labels(self) -> Optional[List[Dict[str, Any]]]:
+    def get_labels(self) -> list[dict[str, Any]] | None:
         """Get all labels from the repository."""
         try:
             url = f"https://api.github.com/repos/{self.repo}/labels"
@@ -189,17 +189,13 @@ class GitHubLabelAPI:
             print(f"Error fetching labels: {e}", file=sys.stderr)
             return None
 
-    def create_label(
-        self, name: str, color: str, description: str = ""
-    ) -> bool:
+    def create_label(self, name: str, color: str, description: str = "") -> bool:
         """Create a new label."""
         try:
             url = f"https://api.github.com/repos/{self.repo}/labels"
             data = {"name": name, "color": color, "description": description}
 
-            response = requests.post(
-                url, headers=self.headers, json=data, timeout=10
-            )
+            response = requests.post(url, headers=self.headers, json=data, timeout=10)
             if response.status_code == 201:
                 return True
             print(
@@ -211,9 +207,7 @@ class GitHubLabelAPI:
                 print(f"Details: {error_data}", file=sys.stderr)
             return False
         except requests.RequestException as e:
-            print(
-                f"Network error creating label '{name}': {e}", file=sys.stderr
-            )
+            print(f"Network error creating label '{name}': {e}", file=sys.stderr)
             return False
 
     def update_label(
@@ -237,9 +231,7 @@ class GitHubLabelAPI:
             if description is not None:
                 data["description"] = description
 
-            response = requests.patch(
-                url, headers=self.headers, json=data, timeout=10
-            )
+            response = requests.patch(url, headers=self.headers, json=data, timeout=10)
             if response.status_code == 200:
                 return True
             print(
@@ -248,9 +240,7 @@ class GitHubLabelAPI:
             )
             return False
         except requests.RequestException as e:
-            print(
-                f"Network error updating label '{name}': {e}", file=sys.stderr
-            )
+            print(f"Network error updating label '{name}': {e}", file=sys.stderr)
             return False
 
     def delete_label(self, name: str) -> bool:
@@ -269,9 +259,7 @@ class GitHubLabelAPI:
             )
             return False
         except requests.RequestException as e:
-            print(
-                f"Network error deleting label '{name}': {e}", file=sys.stderr
-            )
+            print(f"Network error deleting label '{name}': {e}", file=sys.stderr)
             return False
 
 
@@ -288,9 +276,7 @@ class LabelManager:
         self.token = token
         self.dry_run = dry_run
 
-    def load_label_config(
-        self, config_file: str
-    ) -> Optional[List[Dict[str, Any]]]:
+    def load_label_config(self, config_file: str) -> list[dict[str, Any]] | None:
         """Load label configuration from JSON file."""
         try:
             with open(config_file, encoding="utf-8") as f:
@@ -335,7 +321,7 @@ class LabelManager:
     def sync_labels_to_repo(
         self,
         repo: str,
-        target_labels: List[Dict[str, Any]],
+        target_labels: list[dict[str, Any]],
         delete_extra: bool = False,
     ) -> LabelSyncResult:
         """Sync labels to a single repository.
@@ -382,17 +368,14 @@ class LabelManager:
                 # Check if update is needed
                 current = current_label_map[name]
                 needs_update = (
-                    current["color"] != color
-                    or current.get("description", "") != description
+                    current["color"] != color or current.get("description", "") != description
                 )
 
                 if needs_update:
                     if self.dry_run:
                         print(f"   Would update: {name}")
                         result.add_updated(name)
-                    elif api.update_label(
-                        name, color=color, description=description
-                    ):
+                    elif api.update_label(name, color=color, description=description):
                         print(f"   ✅ Updated: {name}")
                         result.add_updated(name)
                     else:
@@ -420,15 +403,13 @@ class LabelManager:
                         print(f"   🗑️ Deleted: {current_name}")
                         result.add_deleted(current_name)
                     else:
-                        result.add_error(
-                            f"Failed to delete label: {current_name}"
-                        )
+                        result.add_error(f"Failed to delete label: {current_name}")
 
         return result
 
     def sync_labels_to_repos(
-        self, repos: List[str], config_file: str, delete_extra: bool = False
-    ) -> Dict[str, LabelSyncResult]:
+        self, repos: list[str], config_file: str, delete_extra: bool = False
+    ) -> dict[str, LabelSyncResult]:
         """Sync labels to multiple repositories.
 
         Args:
@@ -450,9 +431,7 @@ class LabelManager:
         results = {}
         for repo in repos:
             try:
-                results[repo] = self.sync_labels_to_repo(
-                    repo, target_labels, delete_extra
-                )
+                results[repo] = self.sync_labels_to_repo(repo, target_labels, delete_extra)
             except Exception as e:
                 result = LabelSyncResult()
                 result.add_error(f"Unexpected error: {e}")
@@ -461,25 +440,19 @@ class LabelManager:
         return results
 
 
-def parse_repo_list(repos_arg: str) -> List[str]:
+def parse_repo_list(repos_arg: str) -> list[str]:
     """Parse comma-separated repository list."""
     return [repo.strip() for repo in repos_arg.split(",") if repo.strip()]
 
 
-def load_repos_from_file(file_path: str) -> List[str]:
+def load_repos_from_file(file_path: str) -> list[str]:
     """Load repository list from file (one repo per line)."""
     try:
         with open(file_path, encoding="utf-8") as f:
-            repos = [
-                line.strip()
-                for line in f
-                if line.strip() and not line.startswith("#")
-            ]
+            repos = [line.strip() for line in f if line.strip() and not line.startswith("#")]
         return repos
     except FileNotFoundError:
-        print(
-            f"Error: Repository file '{file_path}' not found", file=sys.stderr
-        )
+        print(f"Error: Repository file '{file_path}' not found", file=sys.stderr)
         return []
 
 
@@ -496,23 +469,13 @@ Examples:
         """,
     )
 
-    subparsers = parser.add_subparsers(
-        dest="command", help="Available commands"
-    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Sync labels command
-    sync_parser = subparsers.add_parser(
-        "sync-labels", help="Sync labels to repositories"
-    )
-    sync_parser.add_argument(
-        "--config", required=True, help="Path to labels configuration file"
-    )
-    sync_parser.add_argument(
-        "--repos", help="Comma-separated list of repositories (owner/name)"
-    )
-    sync_parser.add_argument(
-        "--repos-file", help="File containing repository list (one per line)"
-    )
+    sync_parser = subparsers.add_parser("sync-labels", help="Sync labels to repositories")
+    sync_parser.add_argument("--config", required=True, help="Path to labels configuration file")
+    sync_parser.add_argument("--repos", help="Comma-separated list of repositories (owner/name)")
+    sync_parser.add_argument("--repos-file", help="File containing repository list (one per line)")
     sync_parser.add_argument(
         "--delete-extra",
         action="store_true",
@@ -556,9 +519,7 @@ Examples:
 
         # Initialize manager and sync
         manager = LabelManager(token, dry_run=args.dry_run)
-        results = manager.sync_labels_to_repos(
-            repos, args.config, args.delete_extra
-        )
+        results = manager.sync_labels_to_repos(repos, args.config, args.delete_extra)
 
         # Print summary
         print("\n" + "=" * 60)

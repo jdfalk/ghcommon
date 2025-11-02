@@ -16,11 +16,10 @@ Generates a comprehensive comparison chart and identifies repositories that need
 """
 
 import argparse
-from dataclasses import dataclass
 import json
-from pathlib import Path
 import re
-from typing import Dict, Optional, Tuple
+from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -28,8 +27,8 @@ class FileInfo:
     """Information about a file in a repository."""
 
     path: str
-    version: Optional[str] = None
-    guid: Optional[str] = None
+    version: str | None = None
+    guid: str | None = None
     exists: bool = False
     size: int = 0
 
@@ -40,7 +39,7 @@ class RepoInfo:
 
     name: str
     path: str
-    files: Dict[str, FileInfo]
+    files: dict[str, FileInfo]
     is_git_repo: bool = False
 
 
@@ -49,7 +48,7 @@ class RepoAuditor:
 
     def __init__(self, base_path: str):
         self.base_path = Path(base_path)
-        self.repos: Dict[str, RepoInfo] = {}
+        self.repos: dict[str, RepoInfo] = {}
         self.reference_repo = "ghcommon"  # Use ghcommon as the reference
 
         # Files to audit (relative to repo root)
@@ -74,9 +73,7 @@ class RepoAuditor:
             ".github/instructions/r.instructions.md",
         ]
 
-    def extract_version_and_guid(
-        self, file_path: Path
-    ) -> Tuple[Optional[str], Optional[str]]:
+    def extract_version_and_guid(self, file_path: Path) -> tuple[str | None, str | None]:
         """Extract version and GUID from file headers."""
         if not file_path.exists():
             return None, None
@@ -224,7 +221,7 @@ class RepoAuditor:
 
         return "\n".join(output)
 
-    def generate_detailed_report(self) -> Dict:
+    def generate_detailed_report(self) -> dict:
         """Generate a detailed JSON report of all repositories."""
         report = {
             "scan_time": str(Path().cwd()),
@@ -239,9 +236,7 @@ class RepoAuditor:
 
         reference_repo = self.repos.get(self.reference_repo)
         if not reference_repo:
-            print(
-                f"Warning: Reference repository '{self.reference_repo}' not found"
-            )
+            print(f"Warning: Reference repository '{self.reference_repo}' not found")
 
         repos_needing_updates = 0
 
@@ -302,17 +297,13 @@ class RepoAuditor:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Audit repositories for file consistency"
-    )
+    parser = argparse.ArgumentParser(description="Audit repositories for file consistency")
     parser.add_argument(
         "--base-path",
         default="/Users/jdfalk/repos/github.com/jdfalk",
         help="Base path containing repositories",
     )
-    parser.add_argument(
-        "--output-dir", default=".", help="Directory to save reports"
-    )
+    parser.add_argument("--output-dir", default=".", help="Directory to save reports")
     parser.add_argument(
         "--format",
         choices=["table", "json", "both"],
@@ -351,25 +342,17 @@ def main():
         print("AUDIT SUMMARY")
         print("=" * 80)
         print(f"Total repositories scanned: {report['summary']['total_repos']}")
-        print(
-            f"Total files tracked: {report['summary']['total_files_tracked']}"
-        )
-        print(
-            f"Repositories needing updates: {report['summary']['repos_needing_updates']}"
-        )
+        print(f"Total files tracked: {report['summary']['total_files_tracked']}")
+        print(f"Repositories needing updates: {report['summary']['repos_needing_updates']}")
 
         print("\nRepositories needing updates:")
         for repo_name, repo_data in report["repositories"].items():
             if repo_data["needs_update"]:
                 print(f"  - {repo_name}:")
                 if repo_data["missing_files"]:
-                    print(
-                        f"    Missing files: {len(repo_data['missing_files'])}"
-                    )
+                    print(f"    Missing files: {len(repo_data['missing_files'])}")
                 if repo_data["outdated_files"]:
-                    print(
-                        f"    Outdated files: {len(repo_data['outdated_files'])}"
-                    )
+                    print(f"    Outdated files: {len(repo_data['outdated_files'])}")
 
 
 if __name__ == "__main__":

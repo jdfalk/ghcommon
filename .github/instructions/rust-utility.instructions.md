@@ -20,9 +20,10 @@ Instructions for using the copilot-agent-util Rust utility as the primary tool f
 
 ### Option 1: Download from GitHub Releases (Recommended)
 
-**Download from:** https://github.com/jdfalk/copilot-agent-util-rust/releases
+**Download from:** <https://github.com/jdfalk/copilot-agent-util-rust/releases>
 
 Available binaries for:
+
 - **macOS**: `copilot-agent-util-macos-arm64` and `copilot-agent-util-macos-x86_64`
 - **Linux**: `copilot-agent-util-linux-arm64` and `copilot-agent-util-linux-x86_64`
 - **Windows**: `copilot-agent-util-windows-x86_64.exe`
@@ -36,7 +37,7 @@ sudo mv copilot-agent-util /usr/local/bin/
 
 ### Option 2: Build from Source
 
-**Source code:** https://github.com/jdfalk/copilot-agent-util-rust
+**Source code:** <https://github.com/jdfalk/copilot-agent-util-rust>
 
 ```bash
 # Clone and build

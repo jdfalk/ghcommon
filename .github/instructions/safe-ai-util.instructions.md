@@ -20,9 +20,10 @@ Instructions for using the safe-ai-util Rust utility as the primary tool for dev
 
 ### Option 1: Download from GitHub Releases (Recommended)
 
-**Download from:** https://github.com/jdfalk/safe-ai-util/releases
+**Download from:** <https://github.com/jdfalk/safe-ai-util/releases>
 
 Available binaries for:
+
 - **macOS**: `safe-ai-util-macos-arm64` and `safe-ai-util-macos-x86_64`
 - **Linux**: `safe-ai-util-linux-arm64` and `safe-ai-util-linux-x86_64`
 - **Windows**: `safe-ai-util-windows-x86_64.exe`
@@ -39,7 +40,7 @@ sudo mv safe-ai-util /usr/local/bin/
 
 ### Option 2: Build from Source
 
-**Source code:** https://github.com/jdfalk/safe-ai-util
+**Source code:** <https://github.com/jdfalk/safe-ai-util>
 
 ```bash
 # Clone and build

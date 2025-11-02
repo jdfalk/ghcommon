@@ -14,12 +14,11 @@ It never uploads data anywhere. All checks are local-only.
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterable
 import os
-from pathlib import Path
 import re
 import sys
-from typing import List, Tuple
+from collections.abc import Iterable
+from pathlib import Path
 
 DEFAULT_IGNORE_DIRS = {
     ".git",
@@ -52,7 +51,7 @@ TEXT_FILE_EXTENSIONS = {
 }
 
 # Common secret-like patterns. Intentionally generic to catch accidents.
-PATTERNS: List[Tuple[str, re.Pattern]] = [
+PATTERNS: list[tuple[str, re.Pattern]] = [
     (
         "Generic API Key",
         re.compile(
@@ -67,9 +66,7 @@ PATTERNS: List[Tuple[str, re.Pattern]] = [
     ("GitHub Token", re.compile(r"gh[pousr]_[A-Za-z0-9_]{30,}")),
     (
         "JWT",
-        re.compile(
-            r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
-        ),
+        re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
     ),
     (
         "Private Key Block",
@@ -109,8 +106,8 @@ def iter_files(root: Path) -> Iterable[Path]:
             yield p
 
 
-def scan_file(path: Path) -> List[Tuple[str, int, str]]:
-    results: List[Tuple[str, int, str]] = []
+def scan_file(path: Path) -> list[tuple[str, int, str]]:
+    results: list[tuple[str, int, str]] = []
     if not looks_text_file(path):
         return results
     try:
@@ -129,7 +126,7 @@ def scan_file(path: Path) -> List[Tuple[str, int, str]]:
     return results
 
 
-def main(argv: List[str]) -> int:
+def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         description="Validate a directory contains no obvious secrets."
     )

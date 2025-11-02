@@ -57,7 +57,7 @@ protobuf-release.yml
 
 **1. Buf Schema Registry Account**
 
-- Create account: https://buf.build/
+- Create account: <https://buf.build/>
 - Organization: `buf.build/your-org`
 - Repository: `buf.build/your-org/your-repo`
 

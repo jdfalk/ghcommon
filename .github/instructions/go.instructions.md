@@ -316,6 +316,7 @@ This style guide provides comprehensive conventions for writing clean, readable,
 **Indentation:** Use tabs for indentation (handled automatically by gofmt).
 
 **Spacing:** Let gofmt handle spacing. Generally:
+
 - No space inside parentheses: `f(a, b)`
 - Space around binary operators: `a + b`
 - No space around unary operators: `!condition`
@@ -323,6 +324,7 @@ This style guide provides comprehensive conventions for writing clean, readable,
 #### Naming Conventions
 
 **Packages:**
+
 - Short, concise, evocative names
 - Lowercase, no underscores or mixedCaps
 - Often single words
@@ -339,6 +341,7 @@ package http_util
 ```
 
 **Interfaces:**
+
 - Use -er suffix for single-method interfaces
 - Use MixedCaps
 
@@ -359,6 +362,7 @@ type IReader interface {  // Don't prefix with I
 ```
 
 **Functions and Methods:**
+
 - Use MixedCaps
 - Exported functions start with capital letter
 - Unexported functions start with lowercase letter
@@ -376,6 +380,7 @@ func validateInput(input string) bool {
 ```
 
 **Variables:**
+
 - Use MixedCaps
 - Short names for short scopes
 - Longer descriptive names for longer scopes
@@ -403,6 +408,7 @@ func processUserData(d map[string]interface{}) error {  // 'd' too short for sco
 ```
 
 **Constants:**
+
 - Use MixedCaps
 - Group related constants in blocks
 
@@ -423,6 +429,7 @@ const STATUS_OK = 200  // Don't use underscores
 #### Package Organization
 
 **Package Names:**
+
 - Choose package names that are both short and clear
 - Avoid generic names like "util", "common", "misc"
 - Package name should describe what it provides, not what it contains
@@ -439,6 +446,7 @@ package stuff    // Too vague
 ```
 
 **Import Organization:**
+
 - Group imports: standard library, third-party, local
 - Use goimports to handle this automatically
 
@@ -462,6 +470,7 @@ import (
 #### Error Handling
 
 **Error Strings:**
+
 - Don't capitalize error messages
 - Don't end with punctuation
 - Be descriptive but concise
@@ -477,6 +486,7 @@ return errors.New("error")  // Too vague
 ```
 
 **Error Wrapping:**
+
 - Use fmt.Errorf with %w verb to wrap errors
 - Add context to errors as they bubble up
 
@@ -496,6 +506,7 @@ func processUser(id string) error {
 ```
 
 **Error Checking:**
+
 - Check errors immediately after operations
 - Don't ignore errors (use _ only when truly appropriate)
 
@@ -520,6 +531,7 @@ if file == nil {  // Too late to handle properly
 **Function Length:** Keep functions short and focused. If a function is very long, consider breaking it up.
 
 **Function Signature:**
+
 - Related parameters should be grouped
 - Use meaningful parameter names
 
@@ -546,6 +558,7 @@ func CreateUser(a, b, c string, d int) *User {  // Unclear parameter names
 ```
 
 **Return Values:**
+
 - Return errors as the last value
 - Use named return parameters sparingly
 
@@ -568,6 +581,7 @@ func split(path string) (dir, file string) {
 #### Struct Design
 
 **Field Organization:**
+
 - Group related fields together
 - Consider field alignment for memory efficiency
 
@@ -591,6 +605,7 @@ type User struct {
 ```
 
 **Constructor Functions:**
+
 - Use New prefix for constructor functions
 - Return pointers for structs that will be modified
 
@@ -608,6 +623,7 @@ func NewUser(username, email string) *User {
 #### Concurrency
 
 **Goroutines:**
+
 - Use goroutines for independent tasks
 - Always consider how goroutines will exit
 
@@ -629,6 +645,7 @@ func processItems(items []Item) {
 ```
 
 **Channels:**
+
 - Use channels for communication between goroutines
 - Close channels when done sending
 
@@ -650,6 +667,7 @@ func consumer(ch <-chan int) {
 #### Comments and Documentation
 
 **Package Comments:**
+
 - Every package should have a package comment
 - Use complete sentences
 
@@ -660,6 +678,7 @@ package user
 ```
 
 **Function Comments:**
+
 - Document all exported functions
 - Start with the function name
 - Explain what the function does, not how
@@ -676,6 +695,7 @@ func CalculateTotal(price, taxRate float64) (float64, error) {
 ```
 
 **Inline Comments:**
+
 - Use for complex logic or non-obvious code
 - Explain why, not what
 
@@ -689,6 +709,7 @@ sort.Slice(items, func(i, j int) bool {
 #### Testing
 
 **Test Functions:**
+
 - Use TestXxx naming convention
 - Use t.Run for subtests
 
@@ -2426,7 +2447,7 @@ func RetryOperation(maxRetries int, operation func() error) error {
 
 ### When to Use
 
-#### ✅ Use Integer Range When:
+#### ✅ Use Integer Range When
 
 - **Simple counter loops**: Iterating a fixed number of times
 - **Zero-based sequences**: When you need 0, 1, 2, ..., n-1
@@ -2435,7 +2456,7 @@ func RetryOperation(maxRetries int, operation func() error) error {
 - **Retry logic**: Fixed number of retry attempts
 - **Test data generation**: Creating n test objects
 
-#### ❌ Use Traditional Loop When:
+#### ❌ Use Traditional Loop When
 
 - **Non-zero start**: Loops that don't start at 0
 - **Custom increment**: Loops with step != 1 (e.g., `i += 2`)

@@ -17,7 +17,7 @@ python -m pip install --upgrade pip
 # Install Python dependencies
 echo "📦 Installing Python dependencies..."
 if [ -f "requirements.txt" ]; then
-    pip install -r requirements.txt
+  pip install -r requirements.txt
 fi
 
 # Install development dependencies
@@ -27,7 +27,7 @@ pip install black pylint flake8 isort pytest mypy
 # Install additional dependencies for scripts
 echo "📦 Installing additional script dependencies..."
 if [ -f "scripts/copilot-firewall/requirements.txt" ]; then
-    pip install -r scripts/copilot-firewall/requirements.txt
+  pip install -r scripts/copilot-firewall/requirements.txt
 fi
 
 # Make scripts executable

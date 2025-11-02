@@ -24,18 +24,18 @@ REPOS_GITHUB_CREATED=0
 
 # Function to create .github structure and files
 create_github_structure() {
-    local repo_name="$1"
-    local created_structure=false
+  local repo_name="$1"
+  local created_structure=false
 
-    echo "   🏗️  Setting up .github structure..."
+  echo "   🏗️  Setting up .github structure..."
 
-    # Create .github directory structure
-    mkdir -p .github/{workflows,instructions,prompts,copilot,ISSUE_TEMPLATE,PULL_REQUEST_TEMPLATE}
+  # Create .github directory structure
+  mkdir -p .github/{workflows,instructions,prompts,copilot,ISSUE_TEMPLATE,PULL_REQUEST_TEMPLATE}
 
-    # Create copilot-instructions.md if it doesn't exist
-    if [ ! -f ".github/copilot-instructions.md" ]; then
-        echo "   📝 Creating copilot-instructions.md..."
-        cat > .github/copilot-instructions.md << 'EOF'
+  # Create copilot-instructions.md if it doesn't exist
+  if [ ! -f ".github/copilot-instructions.md" ]; then
+    echo "   📝 Creating copilot-instructions.md..."
+    cat >.github/copilot-instructions.md <<'EOF'
 <!-- file: .github/copilot-instructions.md -->
 <!-- version: 2.0.0 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
@@ -99,13 +99,13 @@ For full details, see the
 [general coding instructions](instructions/general-coding.instructions.md) and
 language-specific files in `.github/instructions/`.
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    # Create general-coding.instructions.md if it doesn't exist
-    if [ ! -f ".github/instructions/general-coding.instructions.md" ]; then
-        echo "   📝 Creating general-coding.instructions.md..."
-        cat > .github/instructions/general-coding.instructions.md << 'EOF'
+  # Create general-coding.instructions.md if it doesn't exist
+  if [ ! -f ".github/instructions/general-coding.instructions.md" ]; then
+    echo "   📝 Creating general-coding.instructions.md..."
+    cat >.github/instructions/general-coding.instructions.md <<'EOF'
 <!-- file: .github/instructions/general-coding.instructions.md -->
 <!-- version: 1.2.0 -->
 <!-- guid: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d -->
@@ -289,13 +289,13 @@ of direct edits:
 **Always use this system for documentation updates instead of direct file
 edits.**
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    # Create AGENTS.md if it doesn't exist
-    if [ ! -f ".github/AGENTS.md" ]; then
-        echo "   📝 Creating AGENTS.md..."
-        cat > .github/AGENTS.md << 'EOF'
+  # Create AGENTS.md if it doesn't exist
+  if [ ! -f ".github/AGENTS.md" ]; then
+    echo "   📝 Creating AGENTS.md..."
+    cat >.github/AGENTS.md <<'EOF'
 <!-- file: .github/AGENTS.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f -->
@@ -316,26 +316,26 @@ EOF
 For all agent, Copilot, or workflow tasks, **refer to the above files**. Do not
 duplicate or override these rules elsewhere.
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    # Copy workflow files from template repo if they don't exist
-    if [ ! -f ".github/workflows/pr-automation.yml" ] && [ -f "$TEMPLATE_DIR/.github/workflows/pr-automation.yml" ]; then
-        echo "   📝 Creating pr-automation.yml..."
-        cp "$TEMPLATE_DIR/.github/workflows/pr-automation.yml" ".github/workflows/pr-automation.yml"
-        created_structure=true
-    fi
+  # Copy workflow files from template repo if they don't exist
+  if [ ! -f ".github/workflows/pr-automation.yml" ] && [ -f "$TEMPLATE_DIR/.github/workflows/pr-automation.yml" ]; then
+    echo "   📝 Creating pr-automation.yml..."
+    cp "$TEMPLATE_DIR/.github/workflows/pr-automation.yml" ".github/workflows/pr-automation.yml"
+    created_structure=true
+  fi
 
-    if [ ! -f ".github/workflows/unified-automation.yml" ] && [ -f "$TEMPLATE_DIR/.github/workflows/unified-automation.yml" ]; then
-        echo "   📝 Creating unified-automation.yml..."
-        cp "$TEMPLATE_DIR/.github/workflows/unified-automation.yml" ".github/workflows/unified-automation.yml"
-        created_structure=true
-    fi
+  if [ ! -f ".github/workflows/unified-automation.yml" ] && [ -f "$TEMPLATE_DIR/.github/workflows/unified-automation.yml" ]; then
+    echo "   📝 Creating unified-automation.yml..."
+    cp "$TEMPLATE_DIR/.github/workflows/unified-automation.yml" ".github/workflows/unified-automation.yml"
+    created_structure=true
+  fi
 
-    # Create basic labeler.yml if it doesn't exist
-    if [ ! -f ".github/labeler.yml" ]; then
-        echo "   📝 Creating labeler.yml..."
-        cat > .github/labeler.yml << 'EOF'
+  # Create basic labeler.yml if it doesn't exist
+  if [ ! -f ".github/labeler.yml" ]; then
+    echo "   📝 Creating labeler.yml..."
+    cat >.github/labeler.yml <<'EOF'
 # file: .github/labeler.yml
 # version: 1.0.0
 # guid: 5a6b7c8d-9e0f-1234-5678-90abcdef1234
@@ -399,14 +399,14 @@ security:
       - '**/*auth*'
       - '**/*secret*'
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    # Create issue templates
-    if [ ! -f ".github/ISSUE_TEMPLATE/bug_report.yml" ]; then
-        echo "   📝 Creating bug report template..."
-        mkdir -p .github/ISSUE_TEMPLATE
-        cat > .github/ISSUE_TEMPLATE/bug_report.yml << 'EOF'
+  # Create issue templates
+  if [ ! -f ".github/ISSUE_TEMPLATE/bug_report.yml" ]; then
+    echo "   📝 Creating bug report template..."
+    mkdir -p .github/ISSUE_TEMPLATE
+    cat >.github/ISSUE_TEMPLATE/bug_report.yml <<'EOF'
 name: Bug Report
 description: File a bug report to help us improve
 title: "bug: [Brief description]"
@@ -458,12 +458,12 @@ body:
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    if [ ! -f ".github/ISSUE_TEMPLATE/feature_request.yml" ]; then
-        echo "   📝 Creating feature request template..."
-        cat > .github/ISSUE_TEMPLATE/feature_request.yml << 'EOF'
+  if [ ! -f ".github/ISSUE_TEMPLATE/feature_request.yml" ]; then
+    echo "   📝 Creating feature request template..."
+    cat >.github/ISSUE_TEMPLATE/feature_request.yml <<'EOF'
 name: Feature Request
 description: Suggest an idea for this project
 title: "feat: [Brief description]"
@@ -509,13 +509,13 @@ body:
     validations:
       required: false
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    # Create pull request template
-    if [ ! -f ".github/PULL_REQUEST_TEMPLATE.md" ]; then
-        echo "   📝 Creating pull request template..."
-        cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
+  # Create pull request template
+  if [ ! -f ".github/PULL_REQUEST_TEMPLATE.md" ]; then
+    echo "   📝 Creating pull request template..."
+    cat >.github/PULL_REQUEST_TEMPLATE.md <<'EOF'
 <!-- file: .github/PULL_REQUEST_TEMPLATE.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 6b7c8d9e-0f12-3456-789a-bcdef0123456 -->
@@ -563,17 +563,17 @@ Any additional context, screenshots, or important information
 
 Closes #123, #456, #789
 EOF
-        created_structure=true
-    fi
+    created_structure=true
+  fi
 
-    if [ "$created_structure" = true ]; then
-        echo "   ✅ Created .github structure and files"
-        ((REPOS_GITHUB_CREATED++))
-        return 0
-    else
-        echo "   ℹ️  .github structure already exists"
-        return 1
-    fi
+  if [ "$created_structure" = true ]; then
+    echo "   ✅ Created .github structure and files"
+    ((REPOS_GITHUB_CREATED++))
+    return 0
+  else
+    echo "   ℹ️  .github structure already exists"
+    return 1
+  fi
 }
 
 # Change to the base directory
@@ -581,140 +581,140 @@ cd "$BASE_DIR"
 
 # Find all directories that contain .git folders (repositories)
 for repo_dir in */; do
-    repo_name=$(basename "$repo_dir")
+  repo_name=$(basename "$repo_dir")
 
-    # Skip if not a git repository
-    if [ ! -d "$repo_dir/.git" ]; then
-        echo "⏭️  Skipping $repo_name (not a git repository)"
-        ((REPOS_SKIPPED++))
-        continue
-    fi
+  # Skip if not a git repository
+  if [ ! -d "$repo_dir/.git" ]; then
+    echo "⏭️  Skipping $repo_name (not a git repository)"
+    ((REPOS_SKIPPED++))
+    continue
+  fi
 
-    echo "📁 Processing repository: $repo_name"
-    cd "$repo_dir"
+  echo "📁 Processing repository: $repo_name"
+  cd "$repo_dir"
 
-    ((REPOS_PROCESSED++))
+  ((REPOS_PROCESSED++))
 
-    # Create .github structure if needed
-    github_created=$(create_github_structure "$repo_name")
-    structure_created=$?
+  # Create .github structure if needed
+  github_created=$(create_github_structure "$repo_name")
+  structure_created=$?
 
-    # Check for any changes in .github directory (not just workflows)
-    GITHUB_CHANGES=$(git status --porcelain .github/ 2>/dev/null || echo "")
+  # Check for any changes in .github directory (not just workflows)
+  GITHUB_CHANGES=$(git status --porcelain .github/ 2>/dev/null || echo "")
 
-    if [ -z "$GITHUB_CHANGES" ]; then
-        echo "   ✅ No .github changes detected"
-        cd "$BASE_DIR"
-        continue
-    fi
+  if [ -z "$GITHUB_CHANGES" ]; then
+    echo "   ✅ No .github changes detected"
+    cd "$BASE_DIR"
+    continue
+  fi
 
-    echo "   🔍 Found .github changes:"
-    echo "$GITHUB_CHANGES" | sed 's/^/      /'
-    ((REPOS_WITH_CHANGES++))
+  echo "   🔍 Found .github changes:"
+  echo "$GITHUB_CHANGES" | sed 's/^/      /'
+  ((REPOS_WITH_CHANGES++))
 
-    # Check if unified-automation workflow exists and get its version
-    UNIFIED_WORKFLOW=".github/workflows/unified-automation.yml"
-    PR_AUTOMATION_WORKFLOW=".github/workflows/pr-automation.yml"
+  # Check if unified-automation workflow exists and get its version
+  UNIFIED_WORKFLOW=".github/workflows/unified-automation.yml"
+  PR_AUTOMATION_WORKFLOW=".github/workflows/pr-automation.yml"
 
-    UNIFIED_VERSION=""
-    PR_VERSION=""
+  UNIFIED_VERSION=""
+  PR_VERSION=""
 
-    if [ -f "$UNIFIED_WORKFLOW" ]; then
-        UNIFIED_VERSION=$(grep "# version:" "$UNIFIED_WORKFLOW" | head -1 | sed 's/.*version: //' | tr -d ' ')
-        echo "   📝 unified-automation.yml version: $UNIFIED_VERSION"
-    else
-        echo "   ⚠️  unified-automation.yml not found"
-    fi
+  if [ -f "$UNIFIED_WORKFLOW" ]; then
+    UNIFIED_VERSION=$(grep "# version:" "$UNIFIED_WORKFLOW" | head -1 | sed 's/.*version: //' | tr -d ' ')
+    echo "   📝 unified-automation.yml version: $UNIFIED_VERSION"
+  else
+    echo "   ⚠️  unified-automation.yml not found"
+  fi
 
-    if [ -f "$PR_AUTOMATION_WORKFLOW" ]; then
-        PR_VERSION=$(grep "# version:" "$PR_AUTOMATION_WORKFLOW" | head -1 | sed 's/.*version: //' | tr -d ' ')
-        echo "   📝 pr-automation.yml version: $PR_VERSION"
-    else
-        echo "   ⚠️  pr-automation.yml not found"
-    fi
+  if [ -f "$PR_AUTOMATION_WORKFLOW" ]; then
+    PR_VERSION=$(grep "# version:" "$PR_AUTOMATION_WORKFLOW" | head -1 | sed 's/.*version: //' | tr -d ' ')
+    echo "   📝 pr-automation.yml version: $PR_VERSION"
+  else
+    echo "   ⚠️  pr-automation.yml not found"
+  fi
 
-    # Stage .github changes
-    echo "   📦 Staging .github changes..."
-    git add .github/
+  # Stage .github changes
+  echo "   📦 Staging .github changes..."
+  git add .github/
 
-    # Check if there are actually staged changes
-    STAGED_CHANGES=$(git diff --cached --name-only .github/ 2>/dev/null || echo "")
+  # Check if there are actually staged changes
+  STAGED_CHANGES=$(git diff --cached --name-only .github/ 2>/dev/null || echo "")
 
-    if [ -z "$STAGED_CHANGES" ]; then
-        echo "   ℹ️  No changes to commit after staging"
-        cd "$BASE_DIR"
-        continue
-    fi
+  if [ -z "$STAGED_CHANGES" ]; then
+    echo "   ℹ️  No changes to commit after staging"
+    cd "$BASE_DIR"
+    continue
+  fi
 
-    # Create detailed commit message
-    echo "   ✍️  Creating commit message..."
+  # Create detailed commit message
+  echo "   ✍️  Creating commit message..."
 
-    # Count different types of changes
-    WORKFLOW_FILES=$(echo "$STAGED_CHANGES" | grep "workflows/" | grep -v "\.backup$" | wc -l | tr -d ' ')
-    INSTRUCTION_FILES=$(echo "$STAGED_CHANGES" | grep "instructions/" | wc -l | tr -d ' ')
-    TEMPLATE_FILES=$(echo "$STAGED_CHANGES" | grep -E "(ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE)" | wc -l | tr -d ' ')
-    BACKUP_FILES=$(echo "$STAGED_CHANGES" | grep "\.backup$" | wc -l | tr -d ' ')
-    OTHER_FILES=$(echo "$STAGED_CHANGES" | grep -v -E "(workflows/|instructions/|TEMPLATE|\.backup$)" | wc -l | tr -d ' ')
+  # Count different types of changes
+  WORKFLOW_FILES=$(echo "$STAGED_CHANGES" | grep "workflows/" | grep -v "\.backup$" | wc -l | tr -d ' ')
+  INSTRUCTION_FILES=$(echo "$STAGED_CHANGES" | grep "instructions/" | wc -l | tr -d ' ')
+  TEMPLATE_FILES=$(echo "$STAGED_CHANGES" | grep -E "(ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE)" | wc -l | tr -d ' ')
+  BACKUP_FILES=$(echo "$STAGED_CHANGES" | grep "\.backup$" | wc -l | tr -d ' ')
+  OTHER_FILES=$(echo "$STAGED_CHANGES" | grep -v -E "(workflows/|instructions/|TEMPLATE|\.backup$)" | wc -l | tr -d ' ')
 
-    # Determine commit type based on changes
-    if [ "$WORKFLOW_FILES" -gt 0 ] || [ "$structure_created" -eq 0 ]; then
-        COMMIT_TYPE="feat"
-        COMMIT_SCOPE="github"
-        COMMIT_DESC="setup complete GitHub automation and structure"
-    else
-        COMMIT_TYPE="chore"
-        COMMIT_SCOPE="github"
-        COMMIT_DESC="update GitHub configuration files"
-    fi
+  # Determine commit type based on changes
+  if [ "$WORKFLOW_FILES" -gt 0 ] || [ "$structure_created" -eq 0 ]; then
+    COMMIT_TYPE="feat"
+    COMMIT_SCOPE="github"
+    COMMIT_DESC="setup complete GitHub automation and structure"
+  else
+    COMMIT_TYPE="chore"
+    COMMIT_SCOPE="github"
+    COMMIT_DESC="update GitHub configuration files"
+  fi
 
-    # Create commit message
-    COMMIT_MSG="$COMMIT_TYPE($COMMIT_SCOPE): $COMMIT_DESC
+  # Create commit message
+  COMMIT_MSG="$COMMIT_TYPE($COMMIT_SCOPE): $COMMIT_DESC
 
 Set up comprehensive GitHub automation system with unified workflows,
 coding instructions, issue templates, and standardized configuration.
 
 Files changed:"
 
-    # Add file details with proper categorization
-    while IFS= read -r file; do
-        if [[ "$file" == *".backup"* ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+  # Add file details with proper categorization
+  while IFS= read -r file; do
+    if [[ $file == *".backup"* ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Backup of previous version"
-        elif [[ "$file" == *"workflows/pr-automation.yml" ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"workflows/pr-automation.yml" ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Unified PR automation workflow v2.0.0"
-        elif [[ "$file" == *"workflows/unified-automation.yml" ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"workflows/unified-automation.yml" ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Central automation orchestrator"
-        elif [[ "$file" == *"workflows/"* ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"workflows/"* ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Workflow configuration updates"
-        elif [[ "$file" == *"instructions/"* ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"instructions/"* ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Copilot/AI coding instructions"
-        elif [[ "$file" == *"copilot-instructions.md" ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"copilot-instructions.md" ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Copilot system documentation"
-        elif [[ "$file" == *"AGENTS.md" ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"AGENTS.md" ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - AI agent configuration pointer"
-        elif [[ "$file" == *"labeler.yml" ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"labeler.yml" ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - Automatic issue/PR labeling rules"
-        elif [[ "$file" == *"ISSUE_TEMPLATE"* ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"ISSUE_TEMPLATE"* ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - GitHub issue template"
-        elif [[ "$file" == *"PULL_REQUEST_TEMPLATE"* ]]; then
-            COMMIT_MSG="$COMMIT_MSG
+    elif [[ $file == *"PULL_REQUEST_TEMPLATE"* ]]; then
+      COMMIT_MSG="$COMMIT_MSG
 - $file - GitHub pull request template"
-        else
-            COMMIT_MSG="$COMMIT_MSG
+    else
+      COMMIT_MSG="$COMMIT_MSG
 - $file - GitHub configuration"
-        fi
-    done <<< "$STAGED_CHANGES"
+    fi
+  done <<<"$STAGED_CHANGES"
 
-    # Add summary information
-    COMMIT_MSG="$COMMIT_MSG
+  # Add summary information
+  COMMIT_MSG="$COMMIT_MSG
 
 Summary:
 - Workflow files: $WORKFLOW_FILES
@@ -724,34 +724,34 @@ Summary:
 - Other GitHub files: $OTHER_FILES
 - Repository: $repo_name"
 
-    if [ "$structure_created" -eq 0 ]; then
-        COMMIT_MSG="$COMMIT_MSG
+  if [ "$structure_created" -eq 0 ]; then
+    COMMIT_MSG="$COMMIT_MSG
 - Created complete .github structure"
-    fi
+  fi
 
-    if [ -n "$UNIFIED_VERSION" ]; then
-        COMMIT_MSG="$COMMIT_MSG
+  if [ -n "$UNIFIED_VERSION" ]; then
+    COMMIT_MSG="$COMMIT_MSG
 - Unified automation version: $UNIFIED_VERSION"
-    fi
+  fi
 
-    if [ -n "$PR_VERSION" ]; then
-        COMMIT_MSG="$COMMIT_MSG
+  if [ -n "$PR_VERSION" ]; then
+    COMMIT_MSG="$COMMIT_MSG
 - PR automation version: $PR_VERSION"
-    fi
+  fi
 
-    # Commit the changes
-    echo "   💾 Committing GitHub setup..."
-    echo "$COMMIT_MSG" | git commit -F -
+  # Commit the changes
+  echo "   💾 Committing GitHub setup..."
+  echo "$COMMIT_MSG" | git commit -F -
 
-    if [ $? -eq 0 ]; then
-        echo "   ✅ Successfully committed GitHub setup"
-        ((REPOS_COMMITTED++))
-    else
-        echo "   ❌ Failed to commit changes"
-    fi
+  if [ $? -eq 0 ]; then
+    echo "   ✅ Successfully committed GitHub setup"
+    ((REPOS_COMMITTED++))
+  else
+    echo "   ❌ Failed to commit changes"
+  fi
 
-    echo ""
-    cd "$BASE_DIR"
+  echo ""
+  cd "$BASE_DIR"
 done
 
 # Final summary
@@ -766,15 +766,15 @@ echo "   • New .github structures created: $REPOS_GITHUB_CREATED"
 echo ""
 
 if [ $REPOS_COMMITTED -gt 0 ]; then
-    echo "✅ Successfully set up GitHub automation in $REPOS_COMMITTED repositories"
-    echo ""
-    echo "🚀 Next steps:"
-    echo "   1. Review the commits in each repository"
-    echo "   2. Push the changes: git push"
-    echo "   3. Monitor the new workflows and automation in action"
-    echo "   4. Update any repo-specific configurations as needed"
+  echo "✅ Successfully set up GitHub automation in $REPOS_COMMITTED repositories"
+  echo ""
+  echo "🚀 Next steps:"
+  echo "   1. Review the commits in each repository"
+  echo "   2. Push the changes: git push"
+  echo "   3. Monitor the new workflows and automation in action"
+  echo "   4. Update any repo-specific configurations as needed"
 else
-    echo "ℹ️  No repositories required GitHub setup updates"
+  echo "ℹ️  No repositories required GitHub setup updates"
 fi
 
 echo ""

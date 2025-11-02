@@ -79,7 +79,7 @@ curl -I https://external-api.example.com/health
 
 ### Step 5: Analyze Distributed Traces
 
-1. Navigate to Jaeger UI: http://jaeger:16686
+1. Navigate to Jaeger UI: <http://jaeger:16686>
 2. Search for failed traces: Service="api-service", Tags="error=true"
 3. Identify common failure points in trace timeline
 4. Check span duration for performance bottlenecks

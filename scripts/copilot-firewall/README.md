@@ -20,7 +20,7 @@ environment variable across multiple GitHub repositories.
 
 ### Prerequisites
 
-1. **GitHub CLI**: Install from https://cli.github.com/manual/installation
+1. **GitHub CLI**: Install from <https://cli.github.com/manual/installation>
 2. **Python 3.8+**: Required for the script
 3. **Authentication**: Run `gh auth login` to authenticate with GitHub
 
@@ -194,7 +194,7 @@ The GitHub CLI must be authenticated with appropriate permissions to modify repo
    GitHub CLI (gh) is not installed. Please install it first.
    ```
 
-   Solution: Install GitHub CLI from https://cli.github.com/
+   Solution: Install GitHub CLI from <https://cli.github.com/>
 
 2. **Not authenticated**
 

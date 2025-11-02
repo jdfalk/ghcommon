@@ -8,11 +8,10 @@ Designed to work autonomously with the copilot-agent-util for execution.
 """
 
 import os
-from pathlib import Path
 import re
 import subprocess
 import sys
-from typing import Dict, List
+from pathlib import Path
 
 
 class MassProtobufFixer:
@@ -21,9 +20,7 @@ class MassProtobufFixer:
         self.pkg_dir = self.repo_root / "pkg"
         self.fixes_applied = 0
 
-    def remove_unused_imports_from_file(
-        self, proto_file: Path, unused_imports: List[str]
-    ):
+    def remove_unused_imports_from_file(self, proto_file: Path, unused_imports: list[str]):
         """Remove unused imports from a proto file."""
         if not proto_file.exists():
             return False
@@ -41,9 +38,7 @@ class MassProtobufFixer:
                 if f'import "{unused_import}"' in line:
                     should_remove = True
                     self.fixes_applied += 1
-                    print(
-                        f"Removing unused import: {line.strip()} from {proto_file}"
-                    )
+                    print(f"Removing unused import: {line.strip()} from {proto_file}")
                     break
 
             if not should_remove:
@@ -56,7 +51,7 @@ class MassProtobufFixer:
             return True
         return False
 
-    def fix_enum_prefixes(self, proto_file: Path, enum_fixes: List[Dict]):
+    def fix_enum_prefixes(self, proto_file: Path, enum_fixes: list[dict]):
         """Fix enum value prefixes."""
         if not proto_file.exists():
             return False
@@ -71,14 +66,9 @@ class MassProtobufFixer:
             new_name = fix["new"]
             # Replace enum value declarations
             content = re.sub(rf"\b{re.escape(old_name)}\b", new_name, content)
-            if (
-                old_name in original_content
-                and new_name not in original_content
-            ):
+            if old_name in original_content and new_name not in original_content:
                 self.fixes_applied += 1
-                print(
-                    f"Fixed enum prefix: {old_name} -> {new_name} in {proto_file}"
-                )
+                print(f"Fixed enum prefix: {old_name} -> {new_name} in {proto_file}")
 
         if content != original_content:
             with open(proto_file, "w", encoding="utf-8") as f:
@@ -115,9 +105,7 @@ class MassProtobufFixer:
             dir_path = self.repo_root / proto_dir
             if dir_path.exists():
                 for proto_file in dir_path.glob("*.proto"):
-                    self.remove_unused_imports_from_file(
-                        proto_file, imports_to_remove
-                    )
+                    self.remove_unused_imports_from_file(proto_file, imports_to_remove)
 
     def fix_all_buf_lint_issues(self):
         """Fix all issues identified by buf lint."""
@@ -179,15 +167,11 @@ class MassProtobufFixer:
     def fix_unused_import_line(self, line: str):
         """Fix a single unused import line."""
         # Example: pkg/queue/proto/ack_request.proto:17:1:Import "pkg/common/proto/request_metadata.proto" is unused.
-        match = re.search(
-            r'(pkg/[^:]+\.proto):\d+:\d+:Import "([^"]+)" is unused', line
-        )
+        match = re.search(r'(pkg/[^:]+\.proto):\d+:\d+:Import "([^"]+)" is unused', line)
         if match:
             proto_file_path = self.repo_root / match.group(1)
             unused_import = match.group(2)
-            self.remove_unused_imports_from_file(
-                proto_file_path, [unused_import]
-            )
+            self.remove_unused_imports_from_file(proto_file_path, [unused_import])
 
     def fix_enum_prefix_line(self, line: str):
         """Fix a single enum prefix line."""
@@ -200,14 +184,8 @@ class MassProtobufFixer:
             proto_file_path = self.repo_root / match.group(1)
             old_name = match.group(2)
             prefix = match.group(3)
-            new_name = (
-                prefix + old_name.split("_", 2)[-1]
-                if "_" in old_name
-                else prefix + old_name
-            )
-            self.fix_enum_prefixes(
-                proto_file_path, [{"old": old_name, "new": new_name}]
-            )
+            new_name = prefix + old_name.split("_", 2)[-1] if "_" in old_name else prefix + old_name
+            self.fix_enum_prefixes(proto_file_path, [{"old": old_name, "new": new_name}])
 
     def fix_enum_suffix_line(self, line: str):
         """Fix a single enum suffix line."""
@@ -221,9 +199,7 @@ class MassProtobufFixer:
             old_name = match.group(2)
             suffix = match.group(3)
             new_name = old_name + suffix
-            self.fix_enum_prefixes(
-                proto_file_path, [{"old": old_name, "new": new_name}]
-            )
+            self.fix_enum_prefixes(proto_file_path, [{"old": old_name, "new": new_name}])
 
 
 def main():
@@ -242,9 +218,7 @@ def main():
             print(f"All issues fixed in {pass_num} passes!")
             break
         if pass_num == max_passes:
-            print(
-                f"Reached maximum passes ({max_passes}). Manual intervention may be needed."
-            )
+            print(f"Reached maximum passes ({max_passes}). Manual intervention may be needed.")
 
 
 if __name__ == "__main__":

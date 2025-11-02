@@ -364,136 +364,136 @@ function sanitizeHeaders(headers: any): any {
 package logging
 
 import (
-	"os"
-	"time"
+ "os"
+ "time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
+ "go.uber.org/zap"
+ "go.uber.org/zap/zapcore"
+ "gopkg.in/natefinch/lumberjack.v2"
 )
 
 // Config holds logging configuration
 type Config struct {
-	Level       string
-	Service     string
-	Environment string
-	LogFile     string
-	MaxSize     int // megabytes
-	MaxBackups  int
-	MaxAge      int // days
+ Level       string
+ Service     string
+ Environment string
+ LogFile     string
+ MaxSize     int // megabytes
+ MaxBackups  int
+ MaxAge      int // days
 }
 
 // NewLogger creates a new Zap logger
 func NewLogger(cfg Config) (*zap.Logger, error) {
-	// Parse log level
-	level := zap.NewAtomicLevel()
-	if err := level.UnmarshalText([]byte(cfg.Level)); err != nil {
-		return nil, err
-	}
+ // Parse log level
+ level := zap.NewAtomicLevel()
+ if err := level.UnmarshalText([]byte(cfg.Level)); err != nil {
+  return nil, err
+ }
 
-	// Encoder config
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		FunctionKey:    zapcore.OmitKey,
-		MessageKey:     "message",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
+ // Encoder config
+ encoderConfig := zapcore.EncoderConfig{
+  TimeKey:        "timestamp",
+  LevelKey:       "level",
+  NameKey:        "logger",
+  CallerKey:      "caller",
+  FunctionKey:    zapcore.OmitKey,
+  MessageKey:     "message",
+  StacktraceKey:  "stacktrace",
+  LineEnding:     zapcore.DefaultLineEnding,
+  EncodeLevel:    zapcore.LowercaseLevelEncoder,
+  EncodeTime:     zapcore.ISO8601TimeEncoder,
+  EncodeDuration: zapcore.SecondsDurationEncoder,
+  EncodeCaller:   zapcore.ShortCallerEncoder,
+ }
 
-	// Create cores
-	var cores []zapcore.Core
+ // Create cores
+ var cores []zapcore.Core
 
-	// Console core
-	consoleEncoder := zapcore.NewJSONEncoder(encoderConfig)
-	consoleCore := zapcore.NewCore(
-		consoleEncoder,
-		zapcore.AddSync(os.Stdout),
-		level,
-	)
-	cores = append(cores, consoleCore)
+ // Console core
+ consoleEncoder := zapcore.NewJSONEncoder(encoderConfig)
+ consoleCore := zapcore.NewCore(
+  consoleEncoder,
+  zapcore.AddSync(os.Stdout),
+  level,
+ )
+ cores = append(cores, consoleCore)
 
-	// File core with rotation
-	if cfg.LogFile != "" {
-		fileWriter := zapcore.AddSync(&lumberjack.Logger{
-			Filename:   cfg.LogFile,
-			MaxSize:    cfg.MaxSize,
-			MaxBackups: cfg.MaxBackups,
-			MaxAge:     cfg.MaxAge,
-			Compress:   true,
-		})
+ // File core with rotation
+ if cfg.LogFile != "" {
+  fileWriter := zapcore.AddSync(&lumberjack.Logger{
+   Filename:   cfg.LogFile,
+   MaxSize:    cfg.MaxSize,
+   MaxBackups: cfg.MaxBackups,
+   MaxAge:     cfg.MaxAge,
+   Compress:   true,
+  })
 
-		fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
-		fileCore := zapcore.NewCore(
-			fileEncoder,
-			fileWriter,
-			level,
-		)
-		cores = append(cores, fileCore)
-	}
+  fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
+  fileCore := zapcore.NewCore(
+   fileEncoder,
+   fileWriter,
+   level,
+  )
+  cores = append(cores, fileCore)
+ }
 
-	// Create logger
-	core := zapcore.NewTee(cores...)
-	logger := zap.New(core,
-		zap.AddCaller(),
-		zap.AddStacktrace(zapcore.ErrorLevel),
-		zap.Fields(
-			zap.String("service", cfg.Service),
-			zap.String("environment", cfg.Environment),
-		),
-	)
+ // Create logger
+ core := zapcore.NewTee(cores...)
+ logger := zap.New(core,
+  zap.AddCaller(),
+  zap.AddStacktrace(zapcore.ErrorLevel),
+  zap.Fields(
+   zap.String("service", cfg.Service),
+   zap.String("environment", cfg.Environment),
+  ),
+ )
 
-	logger.Info("Logger initialized",
-		zap.String("level", cfg.Level),
-		zap.String("service", cfg.Service),
-		zap.String("environment", cfg.Environment),
-	)
+ logger.Info("Logger initialized",
+  zap.String("level", cfg.Level),
+  zap.String("service", cfg.Service),
+  zap.String("environment", cfg.Environment),
+ )
 
-	return logger, nil
+ return logger, nil
 }
 
 // HTTPRequestFields returns common HTTP request log fields
 func HTTPRequestFields(
-	method, path, requestID, remoteAddr, userAgent string,
-	status int,
-	duration time.Duration,
+ method, path, requestID, remoteAddr, userAgent string,
+ status int,
+ duration time.Duration,
 ) []zap.Field {
-	return []zap.Field{
-		zap.String("method", method),
-		zap.String("path", path),
-		zap.Int("status", status),
-		zap.Duration("duration", duration),
-		zap.String("request_id", requestID),
-		zap.String("remote_addr", remoteAddr),
-		zap.String("user_agent", userAgent),
-	}
+ return []zap.Field{
+  zap.String("method", method),
+  zap.String("path", path),
+  zap.Int("status", status),
+  zap.Duration("duration", duration),
+  zap.String("request_id", requestID),
+  zap.String("remote_addr", remoteAddr),
+  zap.String("user_agent", userAgent),
+ }
 }
 
 // DatabaseFields returns database operation log fields
 func DatabaseFields(
-	operation, table string,
-	duration time.Duration,
-	rowsAffected int64,
-	err error,
+ operation, table string,
+ duration time.Duration,
+ rowsAffected int64,
+ err error,
 ) []zap.Field {
-	fields := []zap.Field{
-		zap.String("operation", operation),
-		zap.String("table", table),
-		zap.Duration("duration", duration),
-		zap.Int64("rows_affected", rowsAffected),
-	}
+ fields := []zap.Field{
+  zap.String("operation", operation),
+  zap.String("table", table),
+  zap.Duration("duration", duration),
+  zap.Int64("rows_affected", rowsAffected),
+ }
 
-	if err != nil {
-		fields = append(fields, zap.Error(err))
-	}
+ if err != nil {
+  fields = append(fields, zap.Error(err))
+ }
 
-	return fields
+ return fields
 }
 ```
 
@@ -507,106 +507,106 @@ func DatabaseFields(
 package middleware
 
 import (
-	"time"
+ "time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
+ "github.com/gin-gonic/gin"
+ "github.com/google/uuid"
+ "go.uber.org/zap"
 )
 
 // LoggingMiddleware creates a Gin middleware for logging
 func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Generate request ID
-		requestID := uuid.New().String()
-		c.Set("request_id", requestID)
-		c.Header("X-Request-ID", requestID)
+ return func(c *gin.Context) {
+  // Generate request ID
+  requestID := uuid.New().String()
+  c.Set("request_id", requestID)
+  c.Header("X-Request-ID", requestID)
 
-		// Start timer
-		start := time.Now()
+  // Start timer
+  start := time.Now()
 
-		// Extract request info
-		method := c.Request.Method
-		path := c.Request.URL.Path
-		query := c.Request.URL.RawQuery
-		remoteAddr := c.ClientIP()
-		userAgent := c.Request.UserAgent()
+  // Extract request info
+  method := c.Request.Method
+  path := c.Request.URL.Path
+  query := c.Request.URL.RawQuery
+  remoteAddr := c.ClientIP()
+  userAgent := c.Request.UserAgent()
 
-		// Create child logger
-		reqLogger := logger.With(
-			zap.String("request_id", requestID),
-			zap.String("method", method),
-			zap.String("path", path),
-			zap.String("remote_addr", remoteAddr),
-			zap.String("user_agent", userAgent),
-		)
+  // Create child logger
+  reqLogger := logger.With(
+   zap.String("request_id", requestID),
+   zap.String("method", method),
+   zap.String("path", path),
+   zap.String("remote_addr", remoteAddr),
+   zap.String("user_agent", userAgent),
+  )
 
-		// Store logger in context
-		c.Set("logger", reqLogger)
+  // Store logger in context
+  c.Set("logger", reqLogger)
 
-		// Log request start
-		reqLogger.Info("HTTP request started",
-			zap.String("query", query),
-		)
+  // Log request start
+  reqLogger.Info("HTTP request started",
+   zap.String("query", query),
+  )
 
-		// Process request
-		c.Next()
+  // Process request
+  c.Next()
 
-		// Calculate duration
-		duration := time.Since(start)
-		status := c.Writer.Status()
+  // Calculate duration
+  duration := time.Since(start)
+  status := c.Writer.Status()
 
-		// Determine log level based on status
-		logFunc := reqLogger.Info
-		if status >= 500 {
-			logFunc = reqLogger.Error
-		} else if status >= 400 {
-			logFunc = reqLogger.Warn
-		}
+  // Determine log level based on status
+  logFunc := reqLogger.Info
+  if status >= 500 {
+   logFunc = reqLogger.Error
+  } else if status >= 400 {
+   logFunc = reqLogger.Warn
+  }
 
-		// Log request completion
-		logFunc("HTTP request completed",
-			zap.Int("status", status),
-			zap.Duration("duration", duration),
-			zap.Int("size", c.Writer.Size()),
-		)
-	}
+  // Log request completion
+  logFunc("HTTP request completed",
+   zap.Int("status", status),
+   zap.Duration("duration", duration),
+   zap.Int("size", c.Writer.Size()),
+  )
+ }
 }
 
 // RecoveryMiddleware logs panics and recovers
 func RecoveryMiddleware(logger *zap.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				// Get logger from context
-				reqLogger, exists := c.Get("logger")
-				if !exists {
-					reqLogger = logger
-				}
+ return func(c *gin.Context) {
+  defer func() {
+   if err := recover(); err != nil {
+    // Get logger from context
+    reqLogger, exists := c.Get("logger")
+    if !exists {
+     reqLogger = logger
+    }
 
-				reqLogger.(*zap.Logger).Error("Panic recovered",
-					zap.Any("error", err),
-					zap.String("method", c.Request.Method),
-					zap.String("path", c.Request.URL.Path),
-				)
+    reqLogger.(*zap.Logger).Error("Panic recovered",
+     zap.Any("error", err),
+     zap.String("method", c.Request.Method),
+     zap.String("path", c.Request.URL.Path),
+    )
 
-				// Return 500 error
-				c.AbortWithStatus(500)
-			}
-		}()
+    // Return 500 error
+    c.AbortWithStatus(500)
+   }
+  }()
 
-		c.Next()
-	}
+  c.Next()
+ }
 }
 
 // GetLogger retrieves the logger from Gin context
 func GetLogger(c *gin.Context) *zap.Logger {
-	logger, exists := c.Get("logger")
-	if !exists {
-		// Fallback to global logger
-		return zap.L()
-	}
-	return logger.(*zap.Logger)
+ logger, exists := c.Get("logger")
+ if !exists {
+  // Fallback to global logger
+  return zap.L()
+ }
+ return logger.(*zap.Logger)
 }
 ```
 

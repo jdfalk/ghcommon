@@ -18,17 +18,17 @@ module github.com/jdfalk/ghcommon
 go 1.21
 
 require (
-	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.18.2
-	gopkg.in/yaml.v3 v3.0.1
-	github.com/rs/zerolog v1.31.0
+ github.com/spf13/cobra v1.8.0
+ github.com/spf13/viper v1.18.2
+ gopkg.in/yaml.v3 v3.0.1
+ github.com/rs/zerolog v1.31.0
 )
 
 require (
-	// Indirect dependencies (managed automatically)
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
-	// ... more indirect dependencies
+ // Indirect dependencies (managed automatically)
+ github.com/inconshreveable/mousetrap v1.1.0 // indirect
+ github.com/spf13/pflag v1.0.5 // indirect
+ // ... more indirect dependencies
 )
 
 // Replace directives for security patches or forks

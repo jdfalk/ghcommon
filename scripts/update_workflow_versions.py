@@ -9,8 +9,8 @@ This ensures consistency between the source repository (ghcommon) and all
 target repositories that received the CI fixes.
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 # Define version mappings
 VERSION_UPDATES = {
@@ -44,9 +44,7 @@ def update_workflow_version(file_path: Path, new_version: str):
     new_version_line = f"# version: {new_version}"
 
     # Replace the version line
-    updated_content = re.sub(
-        version_pattern, new_version_line, content, flags=re.MULTILINE
-    )
+    updated_content = re.sub(version_pattern, new_version_line, content, flags=re.MULTILINE)
 
     if updated_content != content:
         file_path.write_text(updated_content)
@@ -58,9 +56,7 @@ def update_workflow_version(file_path: Path, new_version: str):
 
 def main():
     """Update all workflow versions."""
-    workflows_dir = Path(
-        "/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows"
-    )
+    workflows_dir = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows")
 
     if not workflows_dir.exists():
         print("❌ Workflows directory not found")
@@ -76,9 +72,7 @@ def main():
         else:
             print(f"⚠️  File not found: {filename}")
 
-    print(
-        f"\n📊 Summary: {updated_count}/{len(VERSION_UPDATES)} workflow files updated"
-    )
+    print(f"\n📊 Summary: {updated_count}/{len(VERSION_UPDATES)} workflow files updated")
     return updated_count > 0
 
 

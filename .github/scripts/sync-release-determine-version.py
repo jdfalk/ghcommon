@@ -8,10 +8,10 @@ Usage: sync-release-determine-version.py <language> <manual_release_type> <githu
 """
 
 import json
-from pathlib import Path
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 def get_current_version_rust():
@@ -123,9 +123,7 @@ def run_semantic_release_dry_run(github_token):
         output = result.stdout + result.stderr
 
         # Look for version in output
-        version_match = re.search(
-            r"The next release version is ([0-9.]+)", output
-        )
+        version_match = re.search(r"The next release version is ([0-9.]+)", output)
         if version_match:
             return version_match.group(1)
 
@@ -182,16 +180,12 @@ def main():
             # Manual release
             print(f"Manual release type specified: {manual_release_type}")
 
-            new_version = increment_version(
-                current_version, manual_release_type
-            )
+            new_version = increment_version(current_version, manual_release_type)
 
             set_github_output("version", new_version)
             set_github_output("tag", f"v{new_version}")
             set_github_output("should-release", "true")
-            set_github_output(
-                "changelog", f"Manual {manual_release_type} release"
-            )
+            set_github_output("changelog", f"Manual {manual_release_type} release")
 
             print(f"Manual release version: {new_version}")
 

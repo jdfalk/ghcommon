@@ -6,4 +6,4 @@
 
 __version__ = "1.0.0"
 __author__ = "jdfalk"
-__email__ = "your.email@example.com"
+__email__ = "jdfalk@users.noreply.github.com"

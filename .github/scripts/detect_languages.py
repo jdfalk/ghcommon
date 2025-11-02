@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from typing import Any, Dict, List
+from typing import Any
 
 CONFIG_PATH = ".github/workflow-config.yaml"
 
@@ -29,7 +29,7 @@ def _strip_quotes(value: str) -> str:
     return value
 
 
-def load_build_config() -> Dict[str, Any]:
+def load_build_config() -> dict[str, Any]:
     """Very small, dependency-free YAML subset parser for the build section.
 
     We avoid PyYAML to keep the workflow zero-install. Only the needed keys
@@ -39,7 +39,7 @@ def load_build_config() -> Dict[str, Any]:
     if not os.path.exists(CONFIG_PATH):
         return {}
 
-    build: Dict[str, Any] = {}
+    build: dict[str, Any] = {}
     in_build = False
     current_list_key: str | None = None
 
@@ -51,11 +51,7 @@ def load_build_config() -> Dict[str, Any]:
                 continue
 
             # Detect leaving build section (new top-level key)
-            if (
-                in_build
-                and not line.startswith(" ")
-                and not stripped.startswith("build:")
-            ):
+            if in_build and not line.startswith(" ") and not stripped.startswith("build:"):
                 # Reached a new top-level key; stop parsing build
                 break
 
@@ -81,9 +77,7 @@ def load_build_config() -> Dict[str, Any]:
             key, remainder = key_match.groups()
 
             if remainder == "":  # list start or empty value
-                current_list_key = (
-                    key if key.endswith("s") else None
-                )  # heuristic
+                current_list_key = key if key.endswith("s") else None  # heuristic
                 if current_list_key:
                     build.setdefault(current_list_key, [])
                 continue
@@ -115,9 +109,7 @@ has_python = (
     else False
 )
 has_frontend = exists_any("package.json", "yarn.lock", "pnpm-lock.yaml")
-has_docker = exists_any(
-    "Dockerfile", "docker-compose.yml", "docker-compose.yaml"
-)
+has_docker = exists_any("Dockerfile", "docker-compose.yml", "docker-compose.yaml")
 has_rust = exists_any("Cargo.toml")
 protobuf_needed = (
     (build_cfg.get("enable_protobuf") is True)
@@ -138,9 +130,9 @@ else:
 
 
 def build_matrix(
-    kind: str, versions: List[str], os_list: List[str], version_key: str
-) -> Dict[str, Any]:
-    include: List[Dict[str, Any]] = []
+    kind: str, versions: list[str], os_list: list[str], version_key: str
+) -> dict[str, Any]:
+    include: list[dict[str, Any]] = []
     if not versions or not os_list:
         return {"include": include}
     primary_set = False
@@ -160,7 +152,7 @@ raw_node_versions = build_cfg.get("node_versions")
 if config_loaded:
     if raw_node_versions is None:
         has_frontend = False
-        node_versions: List[str] = []
+        node_versions: list[str] = []
     else:
         node_versions = raw_node_versions or []
         if not node_versions:
@@ -171,9 +163,7 @@ operating_systems = build_cfg.get("operating_systems") or ["ubuntu-latest"]
 platforms = build_cfg.get("platforms") or ["linux/amd64", "linux/arm64"]
 
 go_matrix = (
-    build_matrix("go", go_versions, operating_systems, "go-version")
-    if has_go
-    else {"include": []}
+    build_matrix("go", go_versions, operating_systems, "go-version") if has_go else {"include": []}
 )
 python_matrix = (
     build_matrix("python", python_versions, operating_systems, "python-version")

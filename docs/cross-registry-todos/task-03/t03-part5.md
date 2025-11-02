@@ -151,7 +151,7 @@ index = "sparse+https://api.github.com/$REPO/cargo/"
 
 **Secrets to add:**
 
-- `CRATES_IO_TOKEN`: Create at https://crates.io/me/tokens
+- `CRATES_IO_TOKEN`: Create at <https://crates.io/me/tokens>
 
 ### Workspace Publishing
 

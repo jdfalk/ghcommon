@@ -14,48 +14,48 @@ readonly SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 
 # Functions
 print_info() {
-    local message="$1"
-    echo "[INFO] ${message}"
+  local message="$1"
+  echo "[INFO] ${message}"
 }
 
 print_error() {
-    local message="$1"
-    echo "[ERROR] ${message}" >&2
+  local message="$1"
+  echo "[ERROR] ${message}" >&2
 }
 
 validate_input() {
-    local input="$1"
+  local input="$1"
 
-    if [[ -z "${input}" ]]; then
-        print_error "Input cannot be empty"
-        return 1
-    fi
+  if [[ -z ${input} ]]; then
+    print_error "Input cannot be empty"
+    return 1
+  fi
 
-    print_info "Input validated: ${input}"
-    return 0
+  print_info "Input validated: ${input}"
+  return 0
 }
 
 # Main function
 main() {
-    print_info "Starting ${SCRIPT_NAME}"
+  print_info "Starting ${SCRIPT_NAME}"
 
-    # Array example
-    local files=("file1.txt" "file2.txt" "file3.txt")
+  # Array example
+  local files=("file1.txt" "file2.txt" "file3.txt")
 
-    # Loop example
-    for file in "${files[@]}"; do
-        print_info "Processing: ${file}"
-    done
+  # Loop example
+  for file in "${files[@]}"; do
+    print_info "Processing: ${file}"
+  done
 
-    # Conditional example
-    if validate_input "test"; then
-        print_info "Validation successful"
-    else
-        print_error "Validation failed"
-        exit 1
-    fi
+  # Conditional example
+  if validate_input "test"; then
+    print_info "Validation successful"
+  else
+    print_error "Validation failed"
+    exit 1
+  fi
 
-    print_info "Script completed successfully"
+  print_info "Script completed successfully"
 }
 
 # Entry point

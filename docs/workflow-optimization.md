@@ -554,22 +554,23 @@ additional guidance.
 - needs: detect-changes
 - runs-on: ubuntu-latest
 
-* needs: [load-config, detect-changes]
-* strategy:
-*      fail-fast: false
-*      matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
-* runs-on: ${{ matrix.os }}
-* env:
-*      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
+- needs: [load-config, detect-changes]
+- strategy:
+-      fail-fast: false
+-      matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
+- runs-on: ${{ matrix.os }}
+- env:
+-      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
+
   @@
 
 -      - uses: actions/setup-go@v6
 -        with:
 -          go-version: ${{ inputs.go-version }}
 
-*      - uses: actions/setup-go@v6
-*        with:
-*          go-version: ${{ matrix.go-version }}
+-      - uses: actions/setup-go@v6
+-        with:
+-          go-version: ${{ matrix.go-version }}
   ```
   *(Repeat matrix substitution blocks for Python, Rust, and Frontend jobs.)*
   ```

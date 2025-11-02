@@ -395,59 +395,59 @@ docs: docs-rust docs-python docs-js docs-guide
 
 # Build Rust documentation
 docs-rust:
-	@echo "Building Rust documentation..."
-	cargo doc --no-deps --all-features --document-private-items
-	@echo "Rust docs built at target/doc/"
+ @echo "Building Rust documentation..."
+ cargo doc --no-deps --all-features --document-private-items
+ @echo "Rust docs built at target/doc/"
 
 # Build Python documentation
 docs-python:
-	@echo "Building Python documentation..."
-	cd docs && sphinx-build -b html source build/html
-	@echo "Python docs built at docs/build/html/"
+ @echo "Building Python documentation..."
+ cd docs && sphinx-build -b html source build/html
+ @echo "Python docs built at docs/build/html/"
 
 # Build JavaScript documentation
 docs-js:
-	@echo "Building JavaScript documentation..."
-	pnpm run docs:build
-	@echo "JS docs built at docs/api/"
+ @echo "Building JavaScript documentation..."
+ pnpm run docs:build
+ @echo "JS docs built at docs/api/"
 
 # Build user guide (mdBook)
 docs-guide:
-	@echo "Building user guide..."
-	mdbook build
-	@echo "User guide built at docs/book/"
+ @echo "Building user guide..."
+ mdbook build
+ @echo "User guide built at docs/book/"
 
 # Serve documentation locally
 docs-serve:
-	@echo "Starting documentation server..."
-	@echo "Rust docs: http://localhost:8000/rust/"
-	@echo "Python docs: http://localhost:8000/python/"
-	@echo "JS docs: http://localhost:8000/js/"
-	@echo "User guide: http://localhost:8000/guide/"
-	python3 -m http.server 8000 --directory docs-combined/
+ @echo "Starting documentation server..."
+ @echo "Rust docs: http://localhost:8000/rust/"
+ @echo "Python docs: http://localhost:8000/python/"
+ @echo "JS docs: http://localhost:8000/js/"
+ @echo "User guide: http://localhost:8000/guide/"
+ python3 -m http.server 8000 --directory docs-combined/
 
 # Clean built documentation
 docs-clean:
-	@echo "Cleaning documentation..."
-	rm -rf target/doc/
-	rm -rf docs/build/
-	rm -rf docs/api/
-	rm -rf docs/book/
-	rm -rf docs-combined/
-	@echo "Documentation cleaned"
+ @echo "Cleaning documentation..."
+ rm -rf target/doc/
+ rm -rf docs/build/
+ rm -rf docs/api/
+ rm -rf docs/book/
+ rm -rf docs-combined/
+ @echo "Documentation cleaned"
 
 # Check documentation
 docs-check:
-	@echo "Checking documentation..."
-	cargo doc --no-deps 2>&1 | grep -E "warning:" || echo "✅ Rust docs OK"
-	cd docs && sphinx-build -b linkcheck source build/linkcheck
-	markdownlint-cli2 "**/*.md"
-	@echo "Documentation check complete"
+ @echo "Checking documentation..."
+ cargo doc --no-deps 2>&1 | grep -E "warning:" || echo "✅ Rust docs OK"
+ cd docs && sphinx-build -b linkcheck source build/linkcheck
+ markdownlint-cli2 "**/*.md"
+ @echo "Documentation check complete"
 
 # Watch and rebuild on changes
 docs-watch:
-	@echo "Watching for documentation changes..."
-	mdbook serve --open
+ @echo "Watching for documentation changes..."
+ mdbook serve --open
 ```
 
 ## Documentation Maintenance Workflow

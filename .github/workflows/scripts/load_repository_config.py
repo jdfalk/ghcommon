@@ -21,9 +21,7 @@ def emit_output(name: str, value: str) -> None:
 
 
 def main() -> None:
-    config_file = Path(
-        os.environ.get("CONFIG_FILE", ".github/repository-config.yml")
-    )
+    config_file = Path(os.environ.get("CONFIG_FILE", ".github/repository-config.yml"))
 
     if not config_file.exists() or yaml is None:
         emit_output("has-config", "false")

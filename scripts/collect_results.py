@@ -7,10 +7,9 @@ Collects operation results and file changes for workflow summary reporting.
 import os
 import subprocess
 import sys
-from typing import Dict, List
 
 
-def get_changed_files() -> List[str]:
+def get_changed_files() -> list[str]:
     """Get list of changed files in the repository"""
     try:
         result = subprocess.run(
@@ -27,7 +26,7 @@ def get_changed_files() -> List[str]:
         return []
 
 
-def check_repository_changes() -> Dict[str, str]:
+def check_repository_changes() -> dict[str, str]:
     """Check for repository changes and return summary"""
     try:
         # Check if there are any changes

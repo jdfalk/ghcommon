@@ -258,9 +258,9 @@ git reset --hard HEAD~1
 
 ### Resources
 
-- GitHub Actions Documentation: https://docs.github.com/en/actions
-- GitHub Packages Documentation: https://docs.github.com/en/packages
-- Workflow Syntax: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+- GitHub Actions Documentation: <https://docs.github.com/en/actions>
+- GitHub Packages Documentation: <https://docs.github.com/en/packages>
+- Workflow Syntax: <https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions>
 
 ### Debug Commands
 

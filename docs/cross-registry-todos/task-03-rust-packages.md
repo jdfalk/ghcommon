@@ -729,7 +729,7 @@ gh run view --log | grep -A 50 "publish-rust-crate"
 2. build-rust jobs complete successfully
 3. publish-rust-crate job runs
 4. Crate is published to GitHub Packages
-5. Package appears at: https://github.com/jdfalk/ubuntu-autoinstall-agent/packages
+5. Package appears at: <https://github.com/jdfalk/ubuntu-autoinstall-agent/packages>
 
 ### Validation 6: Verify Package Publication
 
@@ -869,7 +869,7 @@ publish-rust-crate:
 
 ### Issue 3: Version Already Exists
 
-**Symptom**: `error: crate version `X.Y.Z` is already uploaded`
+**Symptom**: `error: crate version`X.Y.Z`is already uploaded`
 
 **Expected Behavior**: The check-published step should prevent this
 

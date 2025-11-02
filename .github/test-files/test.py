@@ -8,8 +8,6 @@
 Purpose: Test Python linting with Black, Pylint, Flake8, isort, and mypy.
 """
 
-from typing import List, Optional
-
 
 class TestClass:
     """Test class for Python linting."""
@@ -45,7 +43,7 @@ class TestClass:
         return self.value
 
 
-def process_list(items: List[str], filter_empty: bool = True) -> List[str]:
+def process_list(items: list[str], filter_empty: bool = True) -> list[str]:
     """Process a list of items.
 
     Args:
@@ -60,7 +58,7 @@ def process_list(items: List[str], filter_empty: bool = True) -> List[str]:
     return [item.strip() for item in items]
 
 
-def find_item(items: List[str], target: str) -> Optional[int]:
+def find_item(items: list[str], target: str) -> int | None:
     """Find the index of a target item.
 
     Args:

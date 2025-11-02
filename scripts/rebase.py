@@ -17,12 +17,11 @@ Features:
 """
 
 import argparse
-from datetime import datetime
-from enum import Enum
 import json
 import subprocess
 import sys
-from typing import List
+from datetime import datetime
+from enum import Enum
 
 
 class RebaseMode(Enum):
@@ -150,7 +149,7 @@ class SmartRebase:
             print(f"\033[0;36m[VERBOSE]\033[0m {message}")
 
     def run_command(
-        self, cmd: List[str], capture_output: bool = True, check: bool = True
+        self, cmd: list[str], capture_output: bool = True, check: bool = True
     ) -> subprocess.CompletedProcess:
         """Run a shell command with optional output capture.
 
@@ -172,9 +171,7 @@ class SmartRebase:
             return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
 
         try:
-            result = subprocess.run(
-                cmd, capture_output=capture_output, text=True, check=check
-            )
+            result = subprocess.run(cmd, capture_output=capture_output, text=True, check=check)
 
             if self.verbose and result.stdout:
                 self.log_verbose(f"stdout: {result.stdout.strip()}")
@@ -197,9 +194,7 @@ class SmartRebase:
     def branch_exists(self, branch_name: str) -> bool:
         """Check if a Git branch exists"""
         try:
-            self.run_command(
-                ["git", "show-ref", "--verify", f"refs/heads/{branch_name}"]
-            )
+            self.run_command(["git", "show-ref", "--verify", f"refs/heads/{branch_name}"])
             return True
         except GitRebaseError:
             return False
@@ -223,12 +218,10 @@ class SmartRebase:
         self.summary["backup_branch"] = backup_name
         return backup_name
 
-    def get_conflicted_files(self) -> List[str]:
+    def get_conflicted_files(self) -> list[str]:
         """Get list of files with merge conflicts"""
         try:
-            result = self.run_command(
-                ["git", "diff", "--name-only", "--diff-filter=U"]
-            )
+            result = self.run_command(["git", "diff", "--name-only", "--diff-filter=U"])
             return [f.strip() for f in result.stdout.split("\n") if f.strip()]
         except GitRebaseError:
             return []
@@ -299,9 +292,7 @@ class SmartRebase:
         try:
             # Save current version
             current_file = f"{file_path}.current"
-            self.run_command(
-                ["git", "show", f"HEAD:{file_path}"], capture_output=True
-            )
+            self.run_command(["git", "show", f"HEAD:{file_path}"], capture_output=True)
             result = self.run_command(["git", "show", f"HEAD:{file_path}"])
 
             if not self.dry_run:
@@ -310,9 +301,7 @@ class SmartRebase:
 
             # Save incoming version
             incoming_file = f"{file_path}.incoming"
-            result = self.run_command(
-                ["git", "show", f"MERGE_HEAD:{file_path}"]
-            )
+            result = self.run_command(["git", "show", f"MERGE_HEAD:{file_path}"])
 
             if not self.dry_run:
                 with open(incoming_file, "w") as f:
@@ -322,9 +311,7 @@ class SmartRebase:
             self.run_command(["git", "checkout", "--theirs", file_path])
             self.run_command(["git", "add", file_path])
 
-            self.log_warning(
-                f"Saved both versions: {current_file}, {incoming_file}"
-            )
+            self.log_warning(f"Saved both versions: {current_file}, {incoming_file}")
             self.log_warning(f"Using incoming version for {file_path}")
             self.log_warning("Please review and merge manually if needed")
 
@@ -369,9 +356,7 @@ class SmartRebase:
 
             if mode == RebaseMode.INTERACTIVE:
                 # In interactive mode, prompt user for each conflict
-                self.log_warning(
-                    f"Conflict in {file_path} - please resolve manually"
-                )
+                self.log_warning(f"Conflict in {file_path} - please resolve manually")
                 response = input("Continue after resolving? (y/n): ")
                 if response.lower() != "y":
                     return False
@@ -379,9 +364,7 @@ class SmartRebase:
             else:
                 # Automated resolution based on file type
                 strategy = self.determine_conflict_strategy(file_path)
-                self.log_verbose(
-                    f"Using strategy {strategy.value} for {file_path}"
-                )
+                self.log_verbose(f"Using strategy {strategy.value} for {file_path}")
 
                 success = False
                 if strategy == ConflictStrategy.PREFER_INCOMING:
@@ -394,9 +377,7 @@ class SmartRebase:
                     success = self.resolve_conflict_smart_merge(file_path)
                 else:
                     # Manual review - prefer incoming as safe default
-                    self.log_warning(
-                        f"Manual review needed for {file_path}, using incoming"
-                    )
+                    self.log_warning(f"Manual review needed for {file_path}, using incoming")
                     success = self.resolve_conflict_prefer_incoming(file_path)
 
                 if success:
@@ -408,14 +389,10 @@ class SmartRebase:
                     self.log_error(f"Failed to resolve conflict in {file_path}")
                     return False
 
-        self.log_success(
-            f"Resolved {resolved_count}/{len(conflicted_files)} conflicts"
-        )
+        self.log_success(f"Resolved {resolved_count}/{len(conflicted_files)} conflicts")
         return resolved_count == len(conflicted_files)
 
-    def perform_rebase(
-        self, target_branch: str, mode: RebaseMode
-    ) -> RebaseResult:
+    def perform_rebase(self, target_branch: str, mode: RebaseMode) -> RebaseResult:
         """Perform the Git rebase operation.
 
         Args:
@@ -425,9 +402,7 @@ class SmartRebase:
         Returns:
             RebaseResult indicating the outcome
         """
-        self.log_info(
-            f"Starting rebase onto {target_branch} in {mode.value} mode"
-        )
+        self.log_info(f"Starting rebase onto {target_branch} in {mode.value} mode")
 
         try:
             # Start the rebase
@@ -459,9 +434,7 @@ class SmartRebase:
                 return RebaseResult.CONFLICTS
 
             # Check rebase status
-            result = self.run_command(
-                ["git", "status", "--porcelain"], check=False
-            )
+            result = self.run_command(["git", "status", "--porcelain"], check=False)
             if result.returncode == 0 and not result.stdout.strip():
                 return RebaseResult.SUCCESS
             return RebaseResult.FAILED
@@ -481,9 +454,7 @@ class SmartRebase:
         """
         try:
             self.log_info(f"Force pushing {branch_name} to remote")
-            self.run_command(
-                ["git", "push", "--force-with-lease", "origin", branch_name]
-            )
+            self.run_command(["git", "push", "--force-with-lease", "origin", branch_name])
             self.log_success("Force push completed successfully")
             return True
         except GitRebaseError as e:
@@ -500,9 +471,7 @@ class SmartRebase:
             Path to the generated summary file
         """
         self.summary["result"] = result.value
-        self.summary["execution_time"] = (
-            datetime.now() - self.start_time
-        ).total_seconds()
+        self.summary["execution_time"] = (datetime.now() - self.start_time).total_seconds()
 
         # Add recovery instructions based on result
         if result == RebaseResult.SUCCESS:
@@ -534,33 +503,21 @@ class SmartRebase:
 
         if not self.dry_run:
             with open(summary_file, "w") as f:
-                f.write(
-                    f"# Git Rebase Summary - {self.summary['timestamp']}\n\n"
-                )
+                f.write(f"# Git Rebase Summary - {self.summary['timestamp']}\n\n")
                 f.write("## Operation Details\n\n")
                 f.write(f"- **Mode**: {self.summary['mode']}\n")
-                f.write(
-                    f"- **Target Branch**: {self.summary['target_branch']}\n"
-                )
-                f.write(
-                    f"- **Source Branch**: {self.summary['source_branch']}\n"
-                )
+                f.write(f"- **Target Branch**: {self.summary['target_branch']}\n")
+                f.write(f"- **Source Branch**: {self.summary['source_branch']}\n")
                 f.write(f"- **Result**: {self.summary['result']}\n")
-                f.write(
-                    f"- **Execution Time**: {self.summary['execution_time']:.2f} seconds\n"
-                )
-                f.write(
-                    f"- **Backup Branch**: {self.summary['backup_branch']}\n\n"
-                )
+                f.write(f"- **Execution Time**: {self.summary['execution_time']:.2f} seconds\n")
+                f.write(f"- **Backup Branch**: {self.summary['backup_branch']}\n\n")
 
                 if self.summary["conflicts_resolved"]:
                     f.write(
                         f"## Conflicts Resolved ({len(self.summary['conflicts_resolved'])})\n\n"
                     )
                     for conflict in self.summary["conflicts_resolved"]:
-                        f.write(
-                            f"- **{conflict['file']}**: {conflict['strategy']}\n"
-                        )
+                        f.write(f"- **{conflict['file']}**: {conflict['strategy']}\n")
                     f.write("\n")
 
                 if self.summary["errors"]:
@@ -607,9 +564,7 @@ class SmartRebase:
 
             # Validate target branch exists
             if not self.branch_exists(target_branch):
-                raise GitRebaseError(
-                    f"Target branch '{target_branch}' does not exist"
-                )
+                raise GitRebaseError(f"Target branch '{target_branch}' does not exist")
 
             # Create backup branch
             self.create_backup_branch(source_branch)
@@ -686,9 +641,7 @@ automatic backup creation, and comprehensive logging.
         help="Show what would be done without executing",
     )
 
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     return parser
 

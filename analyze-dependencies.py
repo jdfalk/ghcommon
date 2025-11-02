@@ -12,12 +12,12 @@ Usage examples:
 """
 
 import argparse
-from collections import defaultdict
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 import re
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 
 
 class DependencyAnalyzer:
@@ -69,9 +69,7 @@ class DependencyAnalyzer:
         # Shell scripts
         if suffix in [".sh", ".bash"]:
             # source, includes, script calls
-            refs.update(
-                re.findall(r'source\s+["\']?([^"\'\s]+)["\']?', content)
-            )
+            refs.update(re.findall(r'source\s+["\']?([^"\'\s]+)["\']?', content))
             refs.update(re.findall(r"\.\s+([^\s]+\.sh)", content))
             refs.update(re.findall(r"bash\s+([^\s]+\.sh)", content))
             refs.update(re.findall(r"sh\s+([^\s]+\.sh)", content))
@@ -96,20 +94,12 @@ class DependencyAnalyzer:
                     content,
                 )
             )
-            refs.update(
-                re.findall(r"uses:\s*\.github/workflows/([^\s]+)", content)
-            )
-            refs.update(
-                re.findall(r"uses:\s*\./\.github/workflows/([^\s]+)", content)
-            )
-            refs.update(
-                re.findall(r'\.github/workflows/scripts/([^\s"\']+)', content)
-            )
+            refs.update(re.findall(r"uses:\s*\.github/workflows/([^\s]+)", content))
+            refs.update(re.findall(r"uses:\s*\./\.github/workflows/([^\s]+)", content))
+            refs.update(re.findall(r'\.github/workflows/scripts/([^\s"\']+)', content))
             refs.update(re.findall(r'scripts/([^\s"\']+)', content))
             refs.update(re.findall(r'tools/([^\s"\']+)', content))
-            refs.update(
-                re.findall(r'\$\{\{\s*hashFiles\(["\']([^"\']+)', content)
-            )
+            refs.update(re.findall(r'\$\{\{\s*hashFiles\(["\']([^"\']+)', content))
 
         # Markdown files
         elif suffix == ".md":
@@ -174,9 +164,7 @@ class DependencyAnalyzer:
                     for target in targets:
                         # Normalize path
                         if isinstance(target, tuple):
-                            normalized_target = (
-                                target[1] if len(target) > 1 else target[0]
-                            )
+                            normalized_target = target[1] if len(target) > 1 else target[0]
                         else:
                             normalized_target = target
                         self.dependencies[source].add(normalized_target)
@@ -207,9 +195,7 @@ class DependencyAnalyzer:
         ]
 
         self.orphans = {
-            f
-            for f in self.orphans
-            if not any(pattern in f for pattern in important_patterns)
+            f for f in self.orphans if not any(pattern in f for pattern in important_patterns)
         }
 
         self.log(f"  📊 Found {len(self.orphans)} potentially orphaned files")
@@ -260,27 +246,17 @@ class DependencyAnalyzer:
                 lines.append(f'    color="{color}";')
 
                 for file in self.file_types[category]:
-                    safe_name = (
-                        file.replace("/", "_")
-                        .replace(".", "_")
-                        .replace("-", "_")
-                    )
-                    lines.append(
-                        f'    {safe_name} [label="{Path(file).name}"];'
-                    )
+                    safe_name = file.replace("/", "_").replace(".", "_").replace("-", "_")
+                    lines.append(f'    {safe_name} [label="{Path(file).name}"];')
 
                 lines.append("  }")
                 lines.append("")
 
         # Add edges
         for source, targets in self.dependencies.items():
-            safe_source = (
-                source.replace("/", "_").replace(".", "_").replace("-", "_")
-            )
+            safe_source = source.replace("/", "_").replace(".", "_").replace("-", "_")
             for target in targets:
-                safe_target = (
-                    target.replace("/", "_").replace(".", "_").replace("-", "_")
-                )
+                safe_target = target.replace("/", "_").replace(".", "_").replace("-", "_")
                 lines.append(f"  {safe_source} -> {safe_target};")
 
         lines.append("}")
@@ -295,12 +271,8 @@ class DependencyAnalyzer:
             lines.append(f"  subgraph {category}")
 
             limit = self.mermaid_max_files_per_category
-            for file in sorted(files)[
-                : (limit if limit and limit > 0 else None)
-            ]:
-                safe_name = (
-                    file.replace("/", "_").replace(".", "_").replace("-", "_")
-                )
+            for file in sorted(files)[: (limit if limit and limit > 0 else None)]:
+                safe_name = file.replace("/", "_").replace(".", "_").replace("-", "_")
                 display_name = Path(file).name[:30]
                 lines.append(f'    {safe_name}["{display_name}"]')
 
@@ -313,13 +285,9 @@ class DependencyAnalyzer:
         for source, targets in sorted(self.dependencies.items()):
             if max_edges and edge_count >= max_edges:
                 break
-            safe_source = (
-                source.replace("/", "_").replace(".", "_").replace("-", "_")
-            )
+            safe_source = source.replace("/", "_").replace(".", "_").replace("-", "_")
             for target in list(targets)[:3]:  # Max 3 deps per file
-                safe_target = (
-                    target.replace("/", "_").replace(".", "_").replace("-", "_")
-                )
+                safe_target = target.replace("/", "_").replace(".", "_").replace("-", "_")
                 lines.append(f"  {safe_source} --> {safe_target}")
                 edge_count += 1
 
@@ -536,9 +504,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=getattr(logging, args.log_level), format="%(message)s"
-    )
+    logging.basicConfig(level=getattr(logging, args.log_level), format="%(message)s")
 
     exclude = [s.strip() for s in args.exclude.split(",") if s.strip()]
     max_files = None if args.full else args.mermaid_max_files
@@ -547,15 +513,11 @@ if __name__ == "__main__":
     analyzer = DependencyAnalyzer(
         args.root,
         exclude_dirs=exclude,
-        mermaid_max_files_per_category=max_files
-        if max_files is not None
-        else 0
-        if args.full
-        else args.mermaid_max_files,
-        mermaid_max_edges=max_edges
-        if max_edges is not None
-        else 0
-        if args.full
-        else args.mermaid_max_edges,
+        mermaid_max_files_per_category=(
+            max_files if max_files is not None else 0 if args.full else args.mermaid_max_files
+        ),
+        mermaid_max_edges=(
+            max_edges if max_edges is not None else 0 if args.full else args.mermaid_max_edges
+        ),
     )
     analyzer.run_analysis()

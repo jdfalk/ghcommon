@@ -26,17 +26,16 @@ import datetime as dt
 import json
 import os
 import sys
-from typing import Dict, List, Optional, Tuple
 from urllib import error, request
 
 API_BASE = os.environ.get("GITHUB_API_URL", "https://api.github.com")
 
 
-def get_token() -> Optional[str]:
+def get_token() -> str | None:
     return os.environ.get("JF_CI_GH_PAT") or os.environ.get("GITHUB_TOKEN")
 
 
-def gh_headers() -> Dict[str, str]:
+def gh_headers() -> dict[str, str]:
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "ghcommon-monitor-rollout",
@@ -47,7 +46,7 @@ def gh_headers() -> Dict[str, str]:
     return headers
 
 
-def http_get(url: str) -> Tuple[int, Dict]:
+def http_get(url: str) -> tuple[int, dict]:
     req = request.Request(url, headers=gh_headers())
     try:
         with request.urlopen(req, timeout=30) as resp:
@@ -71,28 +70,24 @@ def now_utc() -> dt.datetime:
     return dt.datetime.now(dt.timezone.utc)
 
 
-def parse_iso8601(s: str) -> Optional[dt.datetime]:
+def parse_iso8601(s: str) -> dt.datetime | None:
     try:
         return dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
     except Exception:
         return None
 
 
-def load_target_repos(explicit: Optional[str]) -> List[str]:
+def load_target_repos(explicit: str | None) -> list[str]:
     if explicit:
-        parts = [
-            p.strip() for p in explicit.replace(",", " ").split() if p.strip()
-        ]
+        parts = [p.strip() for p in explicit.replace(",", " ").split() if p.strip()]
         return parts
     env_repos = os.environ.get("TARGET_REPOS")
     if env_repos:
-        parts = [
-            p.strip() for p in env_repos.replace(",", " ").split() if p.strip()
-        ]
+        parts = [p.strip() for p in env_repos.replace(",", " ").split() if p.strip()]
         return parts
     # Fallback to repositories.txt
     repos_file = os.path.join(os.getcwd(), ".github", "repositories.txt")
-    repos: List[str] = []
+    repos: list[str] = []
     if os.path.exists(repos_file):
         with open(repos_file, encoding="utf-8") as f:
             for line in f:
@@ -107,7 +102,7 @@ def load_target_repos(explicit: Optional[str]) -> List[str]:
     return repos
 
 
-def list_recent_runs(repo: str, per_page: int) -> List[Dict]:
+def list_recent_runs(repo: str, per_page: int) -> list[dict]:
     url = f"{API_BASE}/repos/{repo}/actions/runs?per_page={per_page}"
     status, payload = http_get(url)
     if status != 200:
@@ -116,21 +111,19 @@ def list_recent_runs(repo: str, per_page: int) -> List[Dict]:
 
 
 def pick_latest(
-    runs: List[Dict], name_contains: List[str], since_cutoff: dt.datetime
-) -> Optional[Dict]:
+    runs: list[dict], name_contains: list[str], since_cutoff: dt.datetime
+) -> dict | None:
     name_lc = [n.lower() for n in name_contains]
     for run in runs:
         n = (run.get("name") or "").lower()
-        created_at = parse_iso8601(
-            run.get("created_at") or run.get("run_started_at") or ""
-        )
+        created_at = parse_iso8601(run.get("created_at") or run.get("run_started_at") or "")
         if all(term in n for term in name_lc):
             if created_at and created_at >= since_cutoff:
                 return run
     return None
 
 
-def summarize_repo(repo: str, per_page: int, since_hours: int) -> Dict:
+def summarize_repo(repo: str, per_page: int, since_hours: int) -> dict:
     runs = list_recent_runs(repo, per_page)
     cutoff = now_utc() - dt.timedelta(hours=since_hours)
     sec = pick_latest(runs, ["security"], cutoff)
@@ -140,7 +133,7 @@ def summarize_repo(repo: str, per_page: int, since_hours: int) -> Dict:
         runs, ["repo", "sync"], cutoff
     )
 
-    def status_of(run: Optional[Dict]) -> str:
+    def status_of(run: dict | None) -> str:
         if not run:
             return "missing"
         # conclusion may be None while in progress
@@ -180,7 +173,7 @@ def write_step_summary(md: str) -> None:
         print(f"Failed writing step summary: {e}", file=sys.stderr)
 
 
-def build_markdown(results: List[Dict]) -> str:
+def build_markdown(results: list[dict]) -> str:
     lines = ["# Rollout Verification Summary", ""]
     ok_all = True
     for r in results:
@@ -221,9 +214,7 @@ def build_markdown(results: List[Dict]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Monitor rollout across target repositories"
-    )
+    parser = argparse.ArgumentParser(description="Monitor rollout across target repositories")
     parser.add_argument("--per-page", type=int, default=10)
     parser.add_argument("--since-hours", type=int, default=72)
     parser.add_argument("--repos", type=str, default="")
@@ -234,16 +225,12 @@ def main():
         print("No target repositories found.")
         return 1
     if not get_token():
-        print(
-            "Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits."
-        )
+        print("Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits.")
 
-    results: List[Dict] = []
+    results: list[dict] = []
     for repo in repos:
         try:
-            results.append(
-                summarize_repo(repo, args.per_page, args.since_hours)
-            )
+            results.append(summarize_repo(repo, args.per_page, args.since_hours))
         except Exception as e:
             results.append(
                 {
@@ -266,8 +253,7 @@ def main():
                 return st in ("success", "completed")
 
             all_ok = all(
-                ok_status(r["security"]["status"])
-                and ok_status(r["release"]["status"])  # type: ignore[index]
+                ok_status(r["security"]["status"]) and ok_status(r["release"]["status"])  # type: ignore[index]
                 for r in results
             )
             with open(github_output, "a", encoding="utf-8") as f:

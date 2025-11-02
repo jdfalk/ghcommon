@@ -13,7 +13,6 @@ actual file changes.
 import json
 import os
 import sys
-from typing import Dict
 
 
 def get_env_bool(key: str, default: bool = False) -> bool:
@@ -22,7 +21,7 @@ def get_env_bool(key: str, default: bool = False) -> bool:
     return value in ("true", "1", "yes", "on")
 
 
-def determine_security_languages() -> Dict[str, any]:
+def determine_security_languages() -> dict[str, any]:
     """Determine which languages need security scanning based on file changes.
 
     Returns:
@@ -54,9 +53,7 @@ def determine_security_languages() -> Dict[str, any]:
     else:
         matrix = {"language": languages_with_changes}
         has_languages = True
-        print(
-            f"Languages for security scanning: {', '.join(languages_with_changes)}"
-        )
+        print(f"Languages for security scanning: {', '.join(languages_with_changes)}")
 
     result = {
         "matrix": matrix,
@@ -95,9 +92,7 @@ def main() -> None:
 
         # Write outputs for GitHub Actions
         write_github_output("matrix", json.dumps(result["matrix"]))
-        write_github_output(
-            "has-languages", str(result["has_languages"]).lower()
-        )
+        write_github_output("has-languages", str(result["has_languages"]).lower())
         write_github_output("language-count", str(result["language_count"]))
         write_github_output("languages", ",".join(result["languages"]))
 

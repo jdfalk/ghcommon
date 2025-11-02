@@ -18,13 +18,13 @@ git config user.email "test@example.com"
 git config user.name "Test User"
 
 # Create some test files to simulate different project types
-echo '{}' > package.json
-echo 'module example.com/test' > go.mod
+echo '{}' >package.json
+echo 'module example.com/test' >go.mod
 touch main.go
-echo '[package]' > Cargo.toml
-echo 'name = "test"' >> Cargo.toml
-echo 'version = "0.1.0"' >> Cargo.toml
-echo 'edition = "2021"' >> Cargo.toml
+echo '[package]' >Cargo.toml
+echo 'name = "test"' >>Cargo.toml
+echo 'version = "0.1.0"' >>Cargo.toml
+echo 'edition = "2021"' >>Cargo.toml
 touch buf.yaml
 
 # Test language detection script
@@ -46,27 +46,27 @@ bash "$OLDPWD/.github/workflows/scripts/detect-languages.sh"
 
 # Check output
 if grep -q "has-go=true" "$GITHUB_OUTPUT"; then
-    echo "✅ Go detection working"
+  echo "✅ Go detection working"
 else
-    echo "❌ Go detection failed"
+  echo "❌ Go detection failed"
 fi
 
 if grep -q "has-frontend=true" "$GITHUB_OUTPUT"; then
-    echo "✅ Frontend detection working"
+  echo "✅ Frontend detection working"
 else
-    echo "❌ Frontend detection failed"
+  echo "❌ Frontend detection failed"
 fi
 
 if grep -q "has-rust=true" "$GITHUB_OUTPUT"; then
-    echo "✅ Rust detection working"
+  echo "✅ Rust detection working"
 else
-    echo "❌ Rust detection failed"
+  echo "❌ Rust detection failed"
 fi
 
 if grep -q "protobuf-needed=true" "$GITHUB_OUTPUT"; then
-    echo "✅ Protobuf detection working"
+  echo "✅ Protobuf detection working"
 else
-    echo "❌ Protobuf detection failed"
+  echo "❌ Protobuf detection failed"
 fi
 
 # Test release strategy script
@@ -78,11 +78,11 @@ export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=stable" "$GITHUB_OUTPUT" && grep -q "auto-draft=true" "$GITHUB_OUTPUT"; then
-    echo "✅ Main branch strategy working (stable release as draft)"
+  echo "✅ Main branch strategy working (stable release as draft)"
 else
-    echo "❌ Main branch strategy failed"
-    echo "Expected: strategy=stable, auto-draft=true"
-    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
+  echo "❌ Main branch strategy failed"
+  echo "Expected: strategy=stable, auto-draft=true"
+  grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 rm -f "$GITHUB_OUTPUT"
@@ -91,11 +91,11 @@ export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=prerelease" "$GITHUB_OUTPUT" && grep -q "auto-draft=false" "$GITHUB_OUTPUT"; then
-    echo "✅ Develop branch strategy working (prerelease published directly)"
+  echo "✅ Develop branch strategy working (prerelease published directly)"
 else
-    echo "❌ Develop branch strategy failed"
-    echo "Expected: strategy=prerelease, auto-draft=false"
-    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
+  echo "❌ Develop branch strategy failed"
+  echo "Expected: strategy=prerelease, auto-draft=false"
+  grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 rm -f "$GITHUB_OUTPUT"
@@ -104,15 +104,15 @@ export INPUT_PRERELEASE="false"
 export INPUT_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/release-strategy.sh"
 if grep -q "strategy=prerelease" "$GITHUB_OUTPUT" && grep -q "auto-draft=false" "$GITHUB_OUTPUT"; then
-    echo "✅ Feature branch strategy working (prerelease published directly)"
+  echo "✅ Feature branch strategy working (prerelease published directly)"
 else
-    echo "❌ Feature branch strategy failed"
-    echo "Expected: strategy=prerelease, auto-draft=false"
-    grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
+  echo "❌ Feature branch strategy failed"
+  echo "Expected: strategy=prerelease, auto-draft=false"
+  grep "strategy=\|auto-draft=" "$GITHUB_OUTPUT" || echo "No strategy/draft output found"
 fi
 
 # Create a test commit and tag for version testing
-echo "test" > test.txt
+echo "test" >test.txt
 git add test.txt
 git commit -m "test: initial commit"
 git tag v1.0.0
@@ -127,10 +127,10 @@ export AUTO_PRERELEASE="false"
 export AUTO_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/generate-version.sh"
 if grep -q "tag=v1.0.1" "$GITHUB_OUTPUT"; then
-    echo "✅ Main branch version increment working"
+  echo "✅ Main branch version increment working"
 else
-    echo "❌ Main branch version increment failed"
-    grep "tag=" "$GITHUB_OUTPUT" || echo "No tag output found"
+  echo "❌ Main branch version increment failed"
+  grep "tag=" "$GITHUB_OUTPUT" || echo "No tag output found"
 fi
 
 # Test changelog generation
@@ -144,9 +144,9 @@ export AUTO_PRERELEASE="false"
 export AUTO_DRAFT="false"
 bash "$OLDPWD/.github/workflows/scripts/generate-changelog.sh"
 if grep -q "changelog_content" "$GITHUB_OUTPUT"; then
-    echo "✅ Changelog generation working"
+  echo "✅ Changelog generation working"
 else
-    echo "❌ Changelog generation failed"
+  echo "❌ Changelog generation failed"
 fi
 
 # Cleanup

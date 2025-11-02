@@ -8,10 +8,10 @@
 
 ### Step 1: Generate PyPI API Tokens
 
-#### For Production PyPI:
+#### For Production PyPI
 
 1. **Go to PyPI Account Settings:**
-   - Visit: https://pypi.org/manage/account/
+   - Visit: <https://pypi.org/manage/account/>
    - Login with your PyPI account
 
 2. **Create API Token:**
@@ -30,10 +30,10 @@
    # Value: [paste the token]
    ```
 
-#### For Test PyPI:
+#### For Test PyPI
 
 1. **Go to Test PyPI Account Settings:**
-   - Visit: https://test.pypi.org/manage/account/
+   - Visit: <https://test.pypi.org/manage/account/>
    - Create account if needed (separate from production PyPI)
 
 2. **Create API Token:**
@@ -75,10 +75,10 @@
 
 Trusted Publishing eliminates the need for API tokens by using OIDC.
 
-#### For PyPI:
+#### For PyPI
 
 1. **Register GitHub Actions Publisher:**
-   - Visit: https://pypi.org/manage/account/publishing/
+   - Visit: <https://pypi.org/manage/account/publishing/>
    - Click "Add a new publisher"
    - Fill in:
      - Repository owner: `jdfalk`
@@ -182,10 +182,10 @@ env:
 
 ### Secrets Required
 
-| Secret                | Purpose              | Where to Get                          |
-| --------------------- | -------------------- | ------------------------------------- |
-| `PYPI_API_TOKEN`      | PyPI publishing      | https://pypi.org/manage/account/      |
-| `TEST_PYPI_API_TOKEN` | Test PyPI publishing | https://test.pypi.org/manage/account/ |
+| Secret                | Purpose              | Where to Get                            |
+| --------------------- | -------------------- | --------------------------------------- |
+| `PYPI_API_TOKEN`      | PyPI publishing      | <https://pypi.org/manage/account/>      |
+| `TEST_PYPI_API_TOKEN` | Test PyPI publishing | <https://test.pypi.org/manage/account/> |
 
 ## Installation
 
@@ -413,7 +413,7 @@ EOF
    ```
 
 2. **Check package name availability:**
-   - Visit https://pypi.org/project/your-package-name/
+   - Visit <https://pypi.org/project/your-package-name/>
    - Name may be taken
    - Choose unique name
 
@@ -586,7 +586,7 @@ chmod +x complete-workflow-test.sh
 
 ### Post-Publishing Checklist
 
-- [ ] Verify package on PyPI: https://pypi.org/project/your-package/
+- [ ] Verify package on PyPI: <https://pypi.org/project/your-package/>
 - [ ] Test installation: `pip install your-package`
 - [ ] Verify package version: `pip show your-package`
 - [ ] Test package functionality

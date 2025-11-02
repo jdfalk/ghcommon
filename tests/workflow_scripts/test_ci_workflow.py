@@ -116,17 +116,13 @@ def test_go_setup_skips_without_go_mod(tmp_path, monkeypatch, capsys):
 
 def test_go_test_runs_commands(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "go.mod").write_text(
-        "module example.com/test\n", encoding="utf-8"
-    )
+    (tmp_path / "go.mod").write_text("module example.com/test\n", encoding="utf-8")
     commands = []
 
     def fake_run(cmd, check=False, capture_output=False, text=False, **kwargs):
         commands.append((tuple(cmd), check, capture_output))
         if "-func" in cmd:
-            return subprocess.CompletedProcess(
-                cmd, 0, stdout="total: (statements) 75.0%\n"
-            )
+            return subprocess.CompletedProcess(cmd, 0, stdout="total: (statements) 75.0%\n")
         return subprocess.CompletedProcess(cmd, 0)
 
     monkeypatch.setenv("COVERAGE_THRESHOLD", "70")
@@ -172,7 +168,7 @@ def test_rust_format_skips_without_cargo(tmp_path, monkeypatch, capsys):
 def test_rust_clippy_runs_with_defaults(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "Cargo.toml").write_text(
-        "[package]\nname = \"example\"\nversion = \"0.1.0\"\n", encoding="utf-8"
+        '[package]\nname = "example"\nversion = "0.1.0"\n', encoding="utf-8"
     )
 
     commands = []
@@ -203,7 +199,7 @@ def test_rust_clippy_runs_with_defaults(tmp_path, monkeypatch):
 
 def test_rust_clippy_uses_environment_overrides(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "Cargo.toml").write_text("[package]\nname=\"test\"\n", encoding="utf-8")
+    (tmp_path / "Cargo.toml").write_text('[package]\nname="test"\n', encoding="utf-8")
 
     commands = []
 
@@ -233,9 +229,7 @@ def test_rust_clippy_uses_environment_overrides(tmp_path, monkeypatch):
 
 def test_go_test_uses_config_threshold(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "go.mod").write_text(
-        "module example.com/test\n", encoding="utf-8"
-    )
+    (tmp_path / "go.mod").write_text("module example.com/test\n", encoding="utf-8")
 
     config = {"testing": {"coverage": {"threshold": 90}}}
     monkeypatch.setenv("REPOSITORY_CONFIG", json.dumps(config))
@@ -246,9 +240,7 @@ def test_go_test_uses_config_threshold(tmp_path, monkeypatch):
     def fake_run(cmd, check=False, capture_output=False, text=False, **kwargs):
         commands.append((tuple(cmd), capture_output))
         if "-func" in cmd:
-            return subprocess.CompletedProcess(
-                cmd, 0, stdout="total: (statements) 95.0%\n"
-            )
+            return subprocess.CompletedProcess(cmd, 0, stdout="total: (statements) 95.0%\n")
         return subprocess.CompletedProcess(cmd, 0)
 
     monkeypatch.setattr(ci_workflow.subprocess, "run", fake_run)
@@ -283,9 +275,7 @@ def test_generate_matrices_uses_repository_config(tmp_path, monkeypatch):
 
     ci_workflow.generate_matrices(argparse.Namespace())
 
-    outputs = dict(
-        line.split("=", 1) for line in output_file.read_text().splitlines()
-    )
+    outputs = dict(line.split("=", 1) for line in output_file.read_text().splitlines())
     go_matrix = json.loads(outputs["go-matrix"])
     python_matrix = json.loads(outputs["python-matrix"])
     coverage_threshold = outputs["coverage-threshold"]
@@ -293,9 +283,7 @@ def test_generate_matrices_uses_repository_config(tmp_path, monkeypatch):
     assert go_matrix["include"][0]["go-version"] == "1.22"
     assert python_matrix["include"][0]["python-version"] == "3.11"
     assert python_matrix["include"][0]["os"] == "ubuntu-latest"
-    assert any(
-        entry["os"] == "macos-latest" for entry in python_matrix["include"]
-    )
+    assert any(entry["os"] == "macos-latest" for entry in python_matrix["include"])
     assert coverage_threshold == "85"
 
 

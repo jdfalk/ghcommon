@@ -7,13 +7,12 @@
 Designed to work with the copilot-agent-util for logging and execution.
 """
 
-from collections import defaultdict, deque
 import os
-from pathlib import Path
 import re
 import subprocess
 import sys
-from typing import Dict, List, Tuple
+from collections import defaultdict, deque
+from pathlib import Path
 
 
 class ProtobufCycleFixer:
@@ -25,7 +24,7 @@ class ProtobufCycleFixer:
         self.cycles = []
         self.unused_imports = []
 
-    def analyze_proto_file(self, proto_path: Path) -> Tuple[str, List[str]]:
+    def analyze_proto_file(self, proto_path: Path) -> tuple[str, list[str]]:
         """Extract package name and imports from a proto file."""
         package_name = ""
         imports = []
@@ -44,9 +43,7 @@ class ProtobufCycleFixer:
             if import_path.startswith("pkg/"):
                 # Convert import path to package name
                 parts = (
-                    import_path.replace("pkg/", "")
-                    .replace("/proto/", ".")
-                    .replace(".proto", "")
+                    import_path.replace("pkg/", "").replace("/proto/", ".").replace(".proto", "")
                 )
                 imports.append(f"gcommon.v1.{parts}")
 
@@ -63,7 +60,7 @@ class ProtobufCycleFixer:
                     self.import_graph[package_name].add(imported_package)
                     self.reverse_graph[imported_package].add(package_name)
 
-    def detect_cycles(self) -> List[List[str]]:
+    def detect_cycles(self) -> list[list[str]]:
         """Detect all cycles in the import graph using DFS."""
         visited = set()
         rec_stack = set()
@@ -95,7 +92,7 @@ class ProtobufCycleFixer:
         self.cycles = cycles
         return cycles
 
-    def generate_cycle_breaking_plan(self) -> Dict[str, List[str]]:
+    def generate_cycle_breaking_plan(self) -> dict[str, list[str]]:
         """Generate a plan to break cycles by identifying redundant imports."""
         breaking_plan = defaultdict(list)
 
@@ -134,7 +131,7 @@ class ProtobufCycleFixer:
 
         return False
 
-    def fix_proto_file(self, package_name: str, imports_to_remove: List[str]):
+    def fix_proto_file(self, package_name: str, imports_to_remove: list[str]):
         """Remove specified imports from proto files of a package."""
         # Find proto files for this package
         pkg_parts = package_name.replace("gcommon.v1.", "").split(".")
@@ -147,9 +144,7 @@ class ProtobufCycleFixer:
         for proto_file in pkg_dir.glob("*.proto"):
             self.remove_imports_from_file(proto_file, imports_to_remove)
 
-    def remove_imports_from_file(
-        self, proto_file: Path, imports_to_remove: List[str]
-    ):
+    def remove_imports_from_file(self, proto_file: Path, imports_to_remove: list[str]):
         """Remove specific imports from a proto file."""
         with open(proto_file, encoding="utf-8") as f:
             content = f.read()
@@ -163,10 +158,7 @@ class ProtobufCycleFixer:
             for import_to_remove in imports_to_remove:
                 # Convert package name back to import path
                 import_path = (
-                    import_to_remove.replace("gcommon.v1.", "pkg/").replace(
-                        ".", "/"
-                    )
-                    + ".proto"
+                    import_to_remove.replace("gcommon.v1.", "pkg/").replace(".", "/") + ".proto"
                 )
                 if f'import "{import_path}"' in line:
                     should_remove = True
@@ -181,7 +173,7 @@ class ProtobufCycleFixer:
             with open(proto_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(new_lines))
 
-    def run_buf_lint(self) -> Tuple[int, str]:
+    def run_buf_lint(self) -> tuple[int, str]:
         """Run buf lint and return results."""
         try:
             result = subprocess.run(

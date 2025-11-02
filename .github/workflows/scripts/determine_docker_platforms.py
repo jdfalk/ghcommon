@@ -12,21 +12,18 @@ Outputs:
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import json
 import os
-from typing import List
+from collections.abc import Iterable
 
 DEFAULT_PLATFORMS = ("linux/amd64", "linux/arm64")
 
 
-def normalize_platforms(raw_platforms: str, raw_matrix: str) -> List[str]:
+def normalize_platforms(raw_platforms: str, raw_matrix: str) -> list[str]:
     platforms: list[str] = []
 
     if raw_platforms:
-        platforms.extend(
-            value.strip() for value in raw_platforms.split(",") if value.strip()
-        )
+        platforms.extend(value.strip() for value in raw_platforms.split(",") if value.strip())
     elif raw_matrix:
         try:
             matrix = json.loads(raw_matrix)
@@ -36,9 +33,7 @@ def normalize_platforms(raw_platforms: str, raw_matrix: str) -> List[str]:
         if isinstance(matrix, dict):
             values = matrix.get("platform") or []
             if isinstance(values, list):
-                platforms.extend(
-                    str(item).strip() for item in values if str(item).strip()
-                )
+                platforms.extend(str(item).strip() for item in values if str(item).strip())
             includes = matrix.get("include") or []
             if isinstance(includes, list):
                 for entry in includes:
@@ -64,7 +59,7 @@ def normalize_platforms(raw_platforms: str, raw_matrix: str) -> List[str]:
     return ordered
 
 
-def derive_qemu_arches(platforms: Iterable[str]) -> List[str]:
+def derive_qemu_arches(platforms: Iterable[str]) -> list[str]:
     arches: list[str] = []
     for platform in platforms:
         arch = platform.split("/", 1)[1] if "/" in platform else platform

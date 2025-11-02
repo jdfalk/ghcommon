@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import argparse
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tarfile
 import tempfile
+from pathlib import Path
 
 from workflow_common import (
     append_summary_line,
@@ -75,10 +75,7 @@ def _run_gh_api(
         print("::error::GitHub CLI (gh) not found on PATH")
         raise SystemExit(1)
 
-    url = (
-        f"/repos/{repository}/packages/generic/"
-        f"{package_name}/{version}/{tarball.name}"
-    )
+    url = f"/repos/{repository}/packages/generic/{package_name}/{version}/{tarball.name}"
     command = [
         "gh",
         "api",
@@ -132,8 +129,7 @@ def publish_github_package(
         )
     )
     log_notice(
-        f"Published {package_name} version {version} "
-        f"with artifacts from {artifacts_dir}",
+        f"Published {package_name} version {version} with artifacts from {artifacts_dir}",
     )
 
 

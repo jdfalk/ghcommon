@@ -15,9 +15,7 @@ def test_set_parameters_repo_dispatch(tmp_path, monkeypatch):
     monkeypatch.setenv("CLIENT_PAYLOAD_VERBOSE_LOGGING", "false")
 
     sync_receiver.set_parameters(argparse.Namespace())
-    result = dict(
-        line.split("=", 1) for line in output_path.read_text().splitlines()
-    )
+    result = dict(line.split("=", 1) for line in output_path.read_text().splitlines())
     assert result["sync_type"] == "scripts"
     assert result["source_repo"] == "upstream/repo"
     assert result["force_sync"] == "true"
@@ -26,20 +24,12 @@ def test_set_parameters_repo_dispatch(tmp_path, monkeypatch):
 def test_sync_files_fallback_copies_files(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     source_root = tmp_path / "ghcommon-source"
-    (source_root / ".github" / "instructions").mkdir(
-        parents=True, exist_ok=True
-    )
-    (source_root / ".github" / "instructions" / "guide.md").write_text(
-        "# Guide", encoding="utf-8"
-    )
+    (source_root / ".github" / "instructions").mkdir(parents=True, exist_ok=True)
+    (source_root / ".github" / "instructions" / "guide.md").write_text("# Guide", encoding="utf-8")
     (source_root / ".github" / "prompts").mkdir(parents=True, exist_ok=True)
-    (source_root / ".github" / "prompts" / "prompt.txt").write_text(
-        "Prompt", encoding="utf-8"
-    )
+    (source_root / ".github" / "prompts" / "prompt.txt").write_text("Prompt", encoding="utf-8")
     (source_root / "scripts").mkdir(parents=True, exist_ok=True)
-    (source_root / "scripts" / "tool.py").write_text(
-        "print('tool')", encoding="utf-8"
-    )
+    (source_root / "scripts" / "tool.py").write_text("print('tool')", encoding="utf-8")
     (source_root / ".github" / "scripts").mkdir(parents=True, exist_ok=True)
     (source_root / ".github" / "scripts" / "helper.py").write_text(
         "print('helper')", encoding="utf-8"

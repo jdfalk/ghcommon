@@ -6,14 +6,14 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 try:
     import yaml
 except ImportError:  # pragma: no cover
     yaml = None
 
-DEFAULT_CONFIG: Dict[str, Any] = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "languages": {
         "go": {"enabled": False},
         "python": {"enabled": False},
@@ -34,7 +34,7 @@ def bool_str(value: bool) -> str:
     return "true" if value else "false"
 
 
-def load_config(path: Path) -> Dict[str, Any]:
+def load_config(path: Path) -> dict[str, Any]:
     if not path.exists() or yaml is None:
         return DEFAULT_CONFIG.copy()
 
@@ -60,17 +60,13 @@ def emit_output(name: str, value: str) -> None:
 
 
 def main() -> None:
-    config_path = Path(
-        os.environ.get("CONFIG_PATH", ".github/repository-config.yml")
-    )
+    config_path = Path(os.environ.get("CONFIG_PATH", ".github/repository-config.yml"))
     config = load_config(config_path)
 
     languages = config.get("languages", {})
     protobuf = config.get("protobuf", {})
 
-    emit_output(
-        "protobuf-enabled", bool_str(bool(protobuf.get("enabled", False)))
-    )
+    emit_output("protobuf-enabled", bool_str(bool(protobuf.get("enabled", False))))
     emit_output(
         "go-enabled",
         bool_str(bool(languages.get("go", {}).get("enabled", False))),

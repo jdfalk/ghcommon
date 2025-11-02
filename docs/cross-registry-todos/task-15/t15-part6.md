@@ -395,7 +395,7 @@ Always specify units:
 
 ## 3. Dashboard Variables
 
-### Use template variables for flexibility:
+### Use template variables for flexibility
 
 ```yaml
 variables:
@@ -412,7 +412,7 @@ variables:
     query: label_values(up{cluster="$cluster",namespace="$namespace"}, service)
 ```
 
-### Benefits:
+### Benefits
 
 - Single dashboard for multiple environments
 - Filter by service, region, cluster
@@ -485,7 +485,7 @@ route:
 
 ## 3. Alert Fatigue Prevention
 
-### Strategies:
+### Strategies
 
 1. **Use inhibition rules**: Suppress redundant alerts
 

@@ -27,11 +27,10 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import os
-from pathlib import Path
 import sys
-from typing import Dict, List, Tuple
+from pathlib import Path
 
-SUPPORTED_LICENSES: Dict[str, str] = {
+SUPPORTED_LICENSES: dict[str, str] = {
     "MIT": """MIT License
 
 Copyright (c) {year} {owner}
@@ -184,7 +183,7 @@ jobs:
           PYTHON_FLAKE8_CONFIG_FILE: .flake8
 """
 
-    blocks: List[str] = [base]
+    blocks: list[str] = [base]
 
     if include_go:
         go_block = """  go:
@@ -528,9 +527,9 @@ def render_license(license_id: str, owner: str, year: str) -> str:
     return template.format(owner=owner, year=year)
 
 
-def plan_files(opts: Options) -> List[Tuple[Path, str]]:
+def plan_files(opts: Options) -> list[tuple[Path, str]]:
     root = opts.target_dir
-    files: List[Tuple[Path, str]] = []
+    files: list[tuple[Path, str]] = []
 
     files.append(
         (
@@ -544,9 +543,7 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
     )
     # Agent pointer at repo root
     files.append((root / "AGENTS.md", AGENTS_POINTER))
-    files.append(
-        (root / "LICENSE", render_license(opts.license, opts.owner, opts.year))
-    )
+    files.append((root / "LICENSE", render_license(opts.license, opts.owner, opts.year)))
     files.append((root / "CODE_OF_CONDUCT.md", CODE_OF_CONDUCT))
     files.append((root / "CONTRIBUTING.md", CONTRIBUTING))
     files.append((root / "SECURITY.md", SECURITY))
@@ -568,9 +565,7 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
             CODEOWNERS.replace("OWNER_USERNAME", opts.owner),
         )
     )
-    files.append(
-        (root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE)
-    )
+    files.append((root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE))
     files.append(
         (
             root / ".github" / "ISSUE_TEMPLATE" / "bug_report.md",
@@ -586,9 +581,7 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
     files.append(
         (
             root / ".github" / "workflows" / "ci.yml",
-            render_ci_yaml(
-                include_go=opts.with_go, include_python=opts.with_python
-            ),
+            render_ci_yaml(include_go=opts.with_go, include_python=opts.with_python),
         )
     )
     files.append((root / ".github" / "commit-messages.md", COMMIT_MESSAGES_MD))
@@ -601,15 +594,10 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
     files.append((root / ".github" / "test-generation.md", TEST_GENERATION_MD))
 
     # AI instructions scaffolding
-    files.append(
-        (root / ".github" / "copilot-instructions.md", COPILOT_INSTRUCTIONS_MD)
-    )
+    files.append((root / ".github" / "copilot-instructions.md", COPILOT_INSTRUCTIONS_MD))
     files.append(
         (
-            root
-            / ".github"
-            / "instructions"
-            / "general-coding.instructions.md",
+            root / ".github" / "instructions" / "general-coding.instructions.md",
             GENERAL_CODING_INSTRUCTIONS_MD,
         )
     )
@@ -623,9 +611,7 @@ def plan_files(opts: Options) -> List[Tuple[Path, str]]:
 
     # Optional Dependabot
     if opts.with_dependabot:
-        files.append(
-            (root / ".github" / "dependabot.yml", render_dependabot_yaml(opts))
-        )
+        files.append((root / ".github" / "dependabot.yml", render_dependabot_yaml(opts)))
 
     # Optional release workflows
     if opts.with_releases:
@@ -639,7 +625,7 @@ def module_path(opts: Options) -> str:
     return f"github.com/{opts.owner}/{opts.name}"
 
 
-def plan_go_overlay(opts: Options) -> List[Tuple[Path, str]]:
+def plan_go_overlay(opts: Options) -> list[tuple[Path, str]]:
     root = opts.target_dir
     mod = f"// file: go.mod\n// version: 1.0.0\n// guid: c1e1c1e1-1111-4111-8111-c1e1c1e1c1e1\n\nmodule {module_path(opts)}\n\ngo 1.22\n"
 
@@ -683,7 +669,7 @@ func TestGreet(t *testing.T) {
     ]
 
 
-def plan_python_overlay(opts: Options) -> List[Tuple[Path, str]]:
+def plan_python_overlay(opts: Options) -> list[tuple[Path, str]]:
     root = opts.target_dir
     req = """# file: requirements-dev.txt
 # version: 1.0.0
@@ -714,7 +700,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from pkg.sample import add  # type: ignore
+from pkg.sample import add  # type: ignore  # noqa: PGH003
 
 
 def test_add():
@@ -758,9 +744,9 @@ def render_dependabot_yaml(opts: Options) -> str:
     return header + "\n".join(lines) + "\n"
 
 
-def plan_release_workflows(opts: Options) -> List[Tuple[Path, str]]:
+def plan_release_workflows(opts: Options) -> list[tuple[Path, str]]:
     root = opts.target_dir
-    out: List[Tuple[Path, str]] = []
+    out: list[tuple[Path, str]] = []
 
     if opts.with_go:
         go_rel = """# file: .github/workflows/release-go.yml
@@ -832,9 +818,7 @@ jobs:
         run: |
           python -m twine upload dist/*
 """
-        out.append(
-            (root / ".github" / "workflows" / "release-python.yml", py_rel)
-        )
+        out.append((root / ".github" / "workflows" / "release-python.yml", py_rel))
 
     readme = """# file: .github/workflows/README.md
 # version: 1.0.0
@@ -866,7 +850,7 @@ def write_file(path: Path, content: str, force: bool) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def print_plan(files: List[Tuple[Path, str]]) -> None:
+def print_plan(files: list[tuple[Path, str]]) -> None:
     for p, _ in files:
         print(p)
 
@@ -875,24 +859,18 @@ def normalize_path(p: str) -> Path:
     return Path(os.path.expanduser(os.path.expandvars(p))).resolve()
 
 
-def parse_args(argv: List[str]) -> Options:
+def parse_args(argv: list[str]) -> Options:
     parser = argparse.ArgumentParser(
         description="Scaffold a public-safe template repository (no secrets, no submodules)."
     )
-    parser.add_argument(
-        "--name", required=True, help="Repository name (e.g., my-template-repo)"
-    )
+    parser.add_argument("--name", required=True, help="Repository name (e.g., my-template-repo)")
     parser.add_argument(
         "--owner",
         required=True,
         help="GitHub owner/org (used for CODEOWNERS and copyright)",
     )
-    parser.add_argument(
-        "--description", default="A minimal public-safe template repository."
-    )
-    parser.add_argument(
-        "--license", choices=list(SUPPORTED_LICENSES.keys()), default="MIT"
-    )
+    parser.add_argument("--description", default="A minimal public-safe template repository.")
+    parser.add_argument("--license", choices=list(SUPPORTED_LICENSES.keys()), default="MIT")
     parser.add_argument("--year", default="2025")
     parser.add_argument(
         "--target",
@@ -960,7 +938,7 @@ def assert_no_nested_repo(target_dir: Path) -> None:
         )
 
 
-def main(argv: List[str]) -> int:
+def main(argv: list[str]) -> int:
     opts = parse_args(argv)
     assert_no_nested_repo(opts.target_dir)
     files = plan_files(opts)
@@ -973,9 +951,7 @@ def main(argv: List[str]) -> int:
         write_file(path, content, force=opts.force)
 
     print(f"Scaffold complete at: {opts.target_dir}")
-    print(
-        "Note: No git commands were executed. Use push_with_gh.py if you want to publish."
-    )
+    print("Note: No git commands were executed. Use push_with_gh.py if you want to publish.")
     return 0
 
 

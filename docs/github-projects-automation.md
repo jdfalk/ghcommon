@@ -183,10 +183,10 @@ Check workflow runs in Actions tab:
 
 ## Project URLs Reference
 
-| Project                      | Number | URL                                         |
-| ---------------------------- | ------ | ------------------------------------------- |
-| ghcommon Cleanup             | #9     | https://github.com/users/jdfalk/projects/9  |
-| ghcommon Core Improvements   | #10    | https://github.com/users/jdfalk/projects/10 |
-| ghcommon Testing & Quality   | #11    | https://github.com/users/jdfalk/projects/11 |
-| Subtitle Manager Development | #5     | https://github.com/users/jdfalk/projects/5  |
-| gCommon Development          | #2     | https://github.com/users/jdfalk/projects/2  |
+| Project                      | Number | URL                                           |
+| ---------------------------- | ------ | --------------------------------------------- |
+| ghcommon Cleanup             | #9     | <https://github.com/users/jdfalk/projects/9>  |
+| ghcommon Core Improvements   | #10    | <https://github.com/users/jdfalk/projects/10> |
+| ghcommon Testing & Quality   | #11    | <https://github.com/users/jdfalk/projects/11> |
+| Subtitle Manager Development | #5     | <https://github.com/users/jdfalk/projects/5>  |
+| gCommon Development          | #2     | <https://github.com/users/jdfalk/projects/2>  |
