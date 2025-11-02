@@ -169,6 +169,68 @@ def test_rust_format_skips_without_cargo(tmp_path, monkeypatch, capsys):
     assert "No Cargo.toml" in capsys.readouterr().out
 
 
+def test_rust_clippy_runs_with_defaults(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "Cargo.toml").write_text(
+        "[package]\nname = \"example\"\nversion = \"0.1.0\"\n", encoding="utf-8"
+    )
+
+    commands = []
+
+    def fake_run(cmd, check=True, **kwargs):
+        commands.append((tuple(cmd), check))
+        return subprocess.CompletedProcess(cmd, 0)
+
+    for env_var in (
+        "CLIPPY_ALL_FEATURES",
+        "CLIPPY_FEATURES",
+        "CLIPPY_NO_DEFAULT_FEATURES",
+        "CLIPPY_EXTRA_ARGS",
+    ):
+        monkeypatch.delenv(env_var, raising=False)
+
+    monkeypatch.setattr(ci_workflow.subprocess, "run", fake_run)
+    ci_workflow.rust_clippy(argparse.Namespace())
+
+    assert commands, "expected cargo clippy to run"
+    cmd, check = commands[0]
+    assert check is True
+    assert cmd[:3] == ("cargo", "clippy", "--all-targets")
+    assert "--" in cmd
+    dash_index = cmd.index("--")
+    assert cmd[dash_index + 1 : dash_index + 3] == ("-D", "warnings")
+
+
+def test_rust_clippy_uses_environment_overrides(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "Cargo.toml").write_text("[package]\nname=\"test\"\n", encoding="utf-8")
+
+    commands = []
+
+    def fake_run(cmd, check=True, **kwargs):
+        commands.append(tuple(cmd))
+        return subprocess.CompletedProcess(cmd, 0)
+
+    monkeypatch.setenv("CLIPPY_ALL_FEATURES", "true")
+    monkeypatch.setenv("CLIPPY_FEATURES", "extra")
+    monkeypatch.setenv("CLIPPY_NO_DEFAULT_FEATURES", "true")
+    monkeypatch.setenv("CLIPPY_EXTRA_ARGS", "--workspace -- -Wclippy::all")
+
+    monkeypatch.setattr(ci_workflow.subprocess, "run", fake_run)
+    ci_workflow.rust_clippy(argparse.Namespace())
+
+    assert commands, "expected cargo clippy command to be executed"
+    cmd = commands[0]
+    assert "--all-features" in cmd
+    assert "--features" in cmd
+    features_index = cmd.index("--features")
+    assert cmd[features_index + 1] == "extra"
+    assert "--no-default-features" in cmd
+    # Extra args should be appended exactly and should not include default warning flag.
+    assert "-D" not in cmd
+    assert "--workspace" in cmd
+
+
 def test_go_test_uses_config_threshold(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "go.mod").write_text(

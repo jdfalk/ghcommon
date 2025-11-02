@@ -550,6 +550,33 @@ def rust_format(_: argparse.Namespace) -> None:
     subprocess.run(["cargo", "fmt", "--all", "--", "--check"], check=True)
 
 
+def rust_clippy(_: argparse.Namespace) -> None:
+    """Run cargo clippy with sensible defaults when a Cargo project exists."""
+    if not Path("Cargo.toml").is_file():
+        print("ℹ️ No Cargo.toml found; skipping cargo clippy.")
+        return
+
+    command = ["cargo", "clippy", "--all-targets"]
+
+    if os.environ.get("CLIPPY_ALL_FEATURES", "false").lower() == "true":
+        command.append("--all-features")
+
+    features = os.environ.get("CLIPPY_FEATURES", "").strip()
+    if features:
+        command.extend(["--features", features])
+
+    if os.environ.get("CLIPPY_NO_DEFAULT_FEATURES", "false").lower() == "true":
+        command.append("--no-default-features")
+
+    extra_args = os.environ.get("CLIPPY_EXTRA_ARGS", "").strip()
+    if extra_args:
+        command.extend(extra_args.split())
+    else:
+        command.extend(["--", "-D", "warnings"])
+
+    subprocess.run(command, check=True)
+
+
 def ensure_cargo_llvm_cov(_: argparse.Namespace) -> None:
     if shutil.which("cargo-llvm-cov"):
         print("cargo-llvm-cov already installed")
@@ -846,6 +873,7 @@ def build_parser() -> argparse.ArgumentParser:
         "python-run-tests": python_run_tests,
         "ensure-cargo-llvm-cov": ensure_cargo_llvm_cov,
         "rust-format": rust_format,
+        "rust-clippy": rust_clippy,
         "generate-rust-lcov": generate_rust_lcov,
         "generate-rust-html": generate_rust_html,
         "compute-rust-coverage": compute_rust_coverage,
