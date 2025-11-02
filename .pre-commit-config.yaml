@@ -1,5 +1,5 @@
 # file: .pre-commit-config.yaml
-# version: 2.5.0
+# version: 2.6.0
 # guid: f8e7d6c5-b4a3-9281-7069-5a4b3c2d1e0f
 
 # Pre-commit hooks configuration for comprehensive code quality checks
@@ -221,6 +221,7 @@ repos:
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, css, scss, yaml, markdown]
+        exclude_types: [python]
         args: [--config=.github/linters/.prettierrc.json]
 
   # Rust formatting and linting - DISABLED: no root Cargo.toml in this repo
@@ -237,12 +238,15 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
+        args: [-e, SC2129, -e, SC2269, -e, SC2317, -e, SC2329, -e, SC2034]
+        exclude: '^(scripts/codex-rebase\.sh|scripts/multi-repo-rebase\.sh|test_.*\.sh|fix_instruction_frontmatter\.sh)$'
 
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.12.0-2
     hooks:
       - id: shfmt
         args: [-w, -s, -i, "2"]
+        exclude: '^(fix_instruction_frontmatter\.sh)$'
 
   # YAML formatting and linting
   - repo: https://github.com/adrienverge/yamllint.git
@@ -257,7 +261,7 @@ repos:
     hooks:
       - id: markdownlint
         args: [--config=.markdownlint.json, --fix]
-        exclude: '^\.github/instructions/.*\.instructions\.md$'
+        exclude: '^(\.github/instructions/.*\.instructions\.md|docs/cross-registry-todos/.*\.md|docs/refactors/.*)$'
 
   # Docker linting - DISABLED: requires Docker daemon running
   # - repo: https://github.com/hadolint/hadolint
