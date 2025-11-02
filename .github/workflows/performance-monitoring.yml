@@ -30,6 +30,25 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Checkout benchmark action
+        uses: actions/checkout@v5
+        with:
+          repository: jdfalk/github-action-benchmark
+          path: github-action-benchmark
+
+      - name: Set up Node.js for benchmark action
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: github-action-benchmark/package-lock.json
+
+      - name: Build benchmark action
+        run: |
+          cd github-action-benchmark
+          npm ci
+          npm run build
+
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
 
@@ -48,11 +67,11 @@ jobs:
         run: |
           python3 scripts/benchmarks/measure_command.py \
             --label "Rust Fixture Execution" \
-            --command "./target/release/ghcommon-test-fixture" \
+            --command "cargo run --manifest-path testdata/rust/Cargo.toml --release --quiet" \
             --workdir testdata/rust \
             --iterations 10 \
             --output benchmarks/rust.json \
-            --metadata "command: ./target/release/ghcommon-test-fixture"
+            --metadata "command: cargo run --manifest-path testdata/rust/Cargo.toml --release --quiet"
 
       - name: Capture benchmark metrics
         id: capture
@@ -82,7 +101,7 @@ jobs:
           PY
 
       - name: Publish benchmark result
-        uses: jdfalk/github-action-benchmark@main
+        uses: ./github-action-benchmark
         with:
           name: Rust Fixture Execution
           tool: "customSmallerIsBetter"
@@ -109,9 +128,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Checkout benchmark action
+        uses: actions/checkout@v5
+        with:
+          repository: jdfalk/github-action-benchmark
+          path: github-action-benchmark
+
       - uses: actions/setup-node@v6
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: github-action-benchmark/package-lock.json
+
+      - name: Build benchmark action
+        run: |
+          cd github-action-benchmark
+          npm ci
+          npm run build
 
       - name: Install dependencies
         working-directory: testdata/node
@@ -160,7 +193,7 @@ jobs:
           PY
 
       - name: Publish benchmark result
-        uses: jdfalk/github-action-benchmark@main
+        uses: ./github-action-benchmark
         with:
           name: Node Fixture Execution
           tool: "customSmallerIsBetter"
@@ -186,6 +219,25 @@ jobs:
       worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@v5
+
+      - name: Checkout benchmark action
+        uses: actions/checkout@v5
+        with:
+          repository: jdfalk/github-action-benchmark
+          path: github-action-benchmark
+
+      - name: Set up Node.js for benchmark action
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: github-action-benchmark/package-lock.json
+
+      - name: Build benchmark action
+        run: |
+          cd github-action-benchmark
+          npm ci
+          npm run build
 
       - uses: actions/setup-python@v6
         with:
@@ -234,7 +286,7 @@ jobs:
           PY
 
       - name: Publish benchmark result
-        uses: jdfalk/github-action-benchmark@main
+        uses: ./github-action-benchmark
         with:
           name: Python Fixture Execution
           tool: "customSmallerIsBetter"
