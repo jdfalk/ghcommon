@@ -39,9 +39,9 @@ on:
   # Scheduled operations
   schedule:
     # Close duplicates daily at 2 AM UTC
-    - cron: "0 2 * * *"
+    - cron: '0 2 * * *'
     # CodeQL alert tickets twice daily at 9 AM and 9 PM UTC
-    - cron: "0 9,21 * * *"
+    - cron: '0 9,21 * * *'
 
   # Manual triggers with advanced options
   workflow_dispatch:
@@ -59,24 +59,24 @@ on:
           - update-issues,copilot-tickets
           - close-duplicates,codeql-alerts
           - update-issues,copilot-tickets,close-duplicates,codeql-alerts
-        default: "auto"
+        default: 'auto'
       dry_run:
-        description: "Run in dry-run mode (no changes)"
+        description: 'Run in dry-run mode (no changes)'
         required: false
         type: boolean
         default: false
       force_update:
-        description: "Force update existing tickets"
+        description: 'Force update existing tickets'
         required: false
         type: boolean
         default: false
       issue_updates_file:
-        description: "Path to issue updates JSON file"
+        description: 'Path to issue updates JSON file'
         required: false
         type: string
-        default: "issue_updates.json"
+        default: 'issue_updates.json'
       cleanup_after_processing:
-        description: "Clean up issue updates file after processing"
+        description: 'Clean up issue updates file after processing'
         required: false
         type: boolean
         default: true
@@ -122,7 +122,7 @@ jobs:
       force_update: ${{ github.event.inputs.force_update == 'true' }}
       issue_updates_file: ${{ needs.detect-issue-updates.outputs.issue_updates_file }}
       cleanup_issue_updates: ${{ github.event.inputs.cleanup_after_processing != 'false' }}
-      python_version: "3.13"
+      python_version: '3.13'
     secrets: inherit
 
   # Post-processing notifications (optional)

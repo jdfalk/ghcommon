@@ -463,8 +463,10 @@ function calculateLeadTime(
   stagingTimestamp: Date,
   productionTimestamp: Date
 ): LeadTimeMetrics {
-  const commitToMerge = (mergeTimestamp.getTime() - commitTimestamp.getTime()) / 1000 / 60;
-  const mergeToStaging = (stagingTimestamp.getTime() - mergeTimestamp.getTime()) / 1000 / 60;
+  const commitToMerge =
+    (mergeTimestamp.getTime() - commitTimestamp.getTime()) / 1000 / 60;
+  const mergeToStaging =
+    (stagingTimestamp.getTime() - mergeTimestamp.getTime()) / 1000 / 60;
   const stagingToProduction =
     (productionTimestamp.getTime() - stagingTimestamp.getTime()) / 1000 / 60;
   const totalLeadTime = commitToMerge + mergeToStaging + stagingToProduction;

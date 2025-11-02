@@ -486,7 +486,9 @@ test.describe('Workflow Dashboard', () => {
     await page.reload();
 
     // Assert: Error message displayed
-    await expect(page.locator('.error-message')).toContainText('Failed to load workflows');
+    await expect(page.locator('.error-message')).toContainText(
+      'Failed to load workflows'
+    );
   });
 });
 
@@ -518,7 +520,9 @@ test.describe('Workflow Details Page', () => {
     await page.click('[data-testid="confirm-button"]');
 
     // Assert: Success notification
-    await expect(page.locator('.toast-success')).toContainText('Workflow run triggered');
+    await expect(page.locator('.toast-success')).toContainText(
+      'Workflow run triggered'
+    );
   });
 
   test('should view workflow logs', async ({ page }) => {

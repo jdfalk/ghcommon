@@ -20,26 +20,26 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: "Which operation(s) to run"
+        description: 'Which operation(s) to run'
         required: false
-        default: "all"
+        default: 'all'
         type: choice
         options:
-          - "all"
-          - "issues"
-          - "docs"
-          - "label"
-          - "lint"
-          - "intelligent-labeling"
+          - 'all'
+          - 'issues'
+          - 'docs'
+          - 'label'
+          - 'lint'
+          - 'intelligent-labeling'
 
       config_file:
-        description: "Path to configuration file (optional)"
+        description: 'Path to configuration file (optional)'
         required: false
-        default: ".github/unified-automation-config.json"
+        default: '.github/unified-automation-config.json'
         type: string
 
       dry_run:
-        description: "Run in dry-run mode (no changes made)"
+        description: 'Run in dry-run mode (no changes made)'
         required: false
         default: false
         type: boolean
@@ -48,13 +48,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - ".github/issue-updates/**"
-      - ".github/doc-updates/**"
-      - "issue_updates.json"
+      - '.github/issue-updates/**'
+      - '.github/doc-updates/**'
+      - 'issue_updates.json'
 
   schedule:
     # Run maintenance tasks daily at 2 AM UTC
-    - cron: "0 2 * * *"
+    - cron: '0 2 * * *'
 
   # Handle issue and PR events
   issues:

@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         # Customize based on your language/runtime
-        version: ["18", "20", "21"] # Node.js versions
+        version: ['18', '20', '21'] # Node.js versions
         # python-version: ['3.8', '3.9', '3.10', '3.11']  # Python versions
         # go-version: ['1.19', '1.20', '1.21']  # Go versions
 
@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.version }}
-          cache: "npm"
+          cache: 'npm'
 
       # Customize based on your language
       - name: Install dependencies
@@ -78,8 +78,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -134,9 +134,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          registry-url: "https://registry.npmjs.org"
-          cache: "npm"
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci

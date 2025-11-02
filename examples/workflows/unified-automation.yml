@@ -23,10 +23,10 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: "Which automation tasks to run"
+        description: 'Which automation tasks to run'
         required: false
         type: string
-        default: "all"
+        default: 'all'
 
 jobs:
   automation:

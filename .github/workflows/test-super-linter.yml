@@ -8,32 +8,32 @@ on:
   workflow_dispatch:
     inputs:
       test_scenario:
-        description: "Test scenario to run"
+        description: 'Test scenario to run'
         required: true
         type: choice
         options:
-          - "all"
-          - "minimal"
-          - "full"
-          - "autofix"
-          - "config-paths"
-          - "filter-patterns"
-          - "disabled-validators"
-          - "markdown-only"
-          - "python-only"
-          - "javascript-only"
-          - "rust-only"
-          - "go-only"
-          - "yaml-only"
-        default: "all"
+          - 'all'
+          - 'minimal'
+          - 'full'
+          - 'autofix'
+          - 'config-paths'
+          - 'filter-patterns'
+          - 'disabled-validators'
+          - 'markdown-only'
+          - 'python-only'
+          - 'javascript-only'
+          - 'rust-only'
+          - 'go-only'
+          - 'yaml-only'
+        default: 'all'
   push:
     branches:
-      - "test-super-linter/**"
+      - 'test-super-linter/**'
     paths:
-      - "super-linter-*.env"
-      - ".github/workflows/test-super-linter.yml"
-      - ".github/test-configs/**"
-      - ".github/test-files/**"
+      - 'super-linter-*.env'
+      - '.github/workflows/test-super-linter.yml'
+      - '.github/test-configs/**'
+      - '.github/test-files/**'
 
 permissions:
   contents: read

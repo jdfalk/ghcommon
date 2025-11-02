@@ -9,8 +9,8 @@ This script ensures all repositories have the latest version of the general codi
 instructions with the critical version increment requirement.
 """
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 # Source repository (ghcommon)
 GHCOMMON_PATH = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon")

@@ -18,8 +18,8 @@ Used by the unified automation workflow to decide between:
 import json
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(

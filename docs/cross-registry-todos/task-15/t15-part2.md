@@ -136,8 +136,15 @@ export function metricsMiddleware(req: any, res: any, next: any): void {
  * }
  * ```
  */
-export function timeFunction(histogram: Histogram<string>, labels: Record<string, string>) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function timeFunction(
+  histogram: Histogram<string>,
+  labels: Record<string, string>
+) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
@@ -271,7 +278,10 @@ export async function shutdownTracing(sdk: NodeSDK): Promise<void> {
  * });
  * ```
  */
-export function traced<T extends (...args: any[]) => Promise<any>>(name: string, fn: T): T {
+export function traced<T extends (...args: any[]) => Promise<any>>(
+  name: string,
+  fn: T
+): T {
   return (async (...args: any[]) => {
     const tracer = trace.getTracer('default');
     return tracer.startActiveSpan(name, async span => {
@@ -298,7 +308,9 @@ export function traced<T extends (...args: any[]) => Promise<any>>(name: string,
  *
  * @param attributes - Key-value pairs to add
  */
-export function addSpanAttributes(attributes: Record<string, string | number>): void {
+export function addSpanAttributes(
+  attributes: Record<string, string | number>
+): void {
   const span = trace.getActiveSpan();
   if (span) {
     Object.entries(attributes).forEach(([key, value]) => {

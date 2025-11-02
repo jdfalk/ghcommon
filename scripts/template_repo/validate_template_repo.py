@@ -14,11 +14,11 @@ It never uploads data anywhere. All checks are local-only.
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterable
 import os
-from pathlib import Path
 import re
 import sys
+from collections.abc import Iterable
+from pathlib import Path
 
 DEFAULT_IGNORE_DIRS = {
     ".git",

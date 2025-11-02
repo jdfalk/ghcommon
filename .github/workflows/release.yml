@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: "Release type"
+        description: 'Release type'
         required: true
         type: choice
         options:
@@ -18,7 +18,7 @@ on:
           - patch
         default: auto
       build-target:
-        description: "Build target"
+        description: 'Build target'
         required: false
         type: choice
         options:
@@ -31,12 +31,12 @@ on:
           - protobuf
         default: all
       prerelease:
-        description: "Create prerelease"
+        description: 'Create prerelease'
         required: false
         type: boolean
         default: false
       draft:
-        description: "Create draft release"
+        description: 'Create draft release'
         required: false
         type: boolean
         default: false

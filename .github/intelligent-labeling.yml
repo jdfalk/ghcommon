@@ -17,163 +17,227 @@ patterns:
   # Issue type patterns
   issue_types:
     bug:
-      keywords: ["bug", "error", "fail", "broken", "issue", "problem", "crash", "exception"]
+      keywords:
+        [
+          'bug',
+          'error',
+          'fail',
+          'broken',
+          'issue',
+          'problem',
+          'crash',
+          'exception',
+        ]
       title_weight: 1.2 # Higher weight for title matches
       confidence: 0.8
 
     enhancement:
-      keywords: ["feature", "enhancement", "improve", "add", "new", "implement", "support"]
+      keywords:
+        [
+          'feature',
+          'enhancement',
+          'improve',
+          'add',
+          'new',
+          'implement',
+          'support',
+        ]
       confidence: 0.8
 
     documentation:
-      keywords: ["doc", "documentation", "readme", "guide", "manual", "tutorial", "wiki"]
+      keywords:
+        [
+          'doc',
+          'documentation',
+          'readme',
+          'guide',
+          'manual',
+          'tutorial',
+          'wiki',
+        ]
       confidence: 0.9
 
     question:
-      keywords: ["question", "help", "how", "why", "what", "clarification", "doubt"]
+      keywords:
+        ['question', 'help', 'how', 'why', 'what', 'clarification', 'doubt']
       confidence: 0.7
 
   # Priority patterns
   priority:
     priority-high:
-      keywords: ["urgent", "critical", "blocker", "asap", "emergency", "severe", "major"]
+      keywords:
+        [
+          'urgent',
+          'critical',
+          'blocker',
+          'asap',
+          'emergency',
+          'severe',
+          'major',
+        ]
       confidence: 0.9
 
     priority-medium:
-      keywords: ["medium", "moderate", "normal", "standard"]
+      keywords: ['medium', 'moderate', 'normal', 'standard']
       confidence: 0.6
       default: true # Apply when no other priority matches
 
     priority-low:
-      keywords: ["low priority", "minor", "nice to have", "enhancement", "cleanup"]
+      keywords:
+        ['low priority', 'minor', 'nice to have', 'enhancement', 'cleanup']
       confidence: 0.8
 
   # Technology patterns
   technology:
     tech:go:
-      keywords: ["go", "golang", ".go", "gofmt", "go.mod", "go.sum"]
-      file_patterns: ["*.go", "go.mod", "go.sum"]
+      keywords: ['go', 'golang', '.go', 'gofmt', 'go.mod', 'go.sum']
+      file_patterns: ['*.go', 'go.mod', 'go.sum']
       confidence: 0.85
 
     tech:python:
-      keywords: ["python", ".py", "pip", "pytest", "requirements.txt", "setup.py"]
-      file_patterns: ["*.py", "requirements.txt", "setup.py", "pyproject.toml"]
+      keywords:
+        ['python', '.py', 'pip', 'pytest', 'requirements.txt', 'setup.py']
+      file_patterns: ['*.py', 'requirements.txt', 'setup.py', 'pyproject.toml']
       confidence: 0.85
 
     tech:javascript:
-      keywords: ["javascript", "js", ".js", "npm", "node", "package.json"]
-      file_patterns: ["*.js", "package.json", "package-lock.json"]
+      keywords: ['javascript', 'js', '.js', 'npm', 'node', 'package.json']
+      file_patterns: ['*.js', 'package.json', 'package-lock.json']
       confidence: 0.85
 
     tech:typescript:
-      keywords: ["typescript", "ts", ".ts", "tsconfig"]
-      file_patterns: ["*.ts", "tsconfig.json"]
+      keywords: ['typescript', 'ts', '.ts', 'tsconfig']
+      file_patterns: ['*.ts', 'tsconfig.json']
       confidence: 0.85
 
     tech:protobuf:
-      keywords: ["protobuf", "proto", ".proto", "grpc", "buf.yaml"]
-      file_patterns: ["*.proto", "buf.yaml", "buf.gen.yaml"]
+      keywords: ['protobuf', 'proto', '.proto', 'grpc', 'buf.yaml']
+      file_patterns: ['*.proto', 'buf.yaml', 'buf.gen.yaml']
       confidence: 0.85
 
     tech:docker:
-      keywords: ["docker", "dockerfile", "container", "image", "docker-compose"]
-      file_patterns: ["Dockerfile*", "docker-compose*.yml", "*.dockerfile"]
+      keywords: ['docker', 'dockerfile', 'container', 'image', 'docker-compose']
+      file_patterns: ['Dockerfile*', 'docker-compose*.yml', '*.dockerfile']
       confidence: 0.85
 
     tech:kubernetes:
-      keywords: ["kubernetes", "k8s", "kubectl", "helm", "deployment", "service"]
-      file_patterns: ["*.yaml", "*.yml"]
+      keywords:
+        ['kubernetes', 'k8s', 'kubectl', 'helm', 'deployment', 'service']
+      file_patterns: ['*.yaml', '*.yml']
       confidence: 0.8
 
     tech:shell:
-      keywords: ["bash", "shell", ".sh", "script", "zsh", "fish"]
-      file_patterns: ["*.sh", "*.bash", "*.zsh"]
+      keywords: ['bash', 'shell', '.sh', 'script', 'zsh', 'fish']
+      file_patterns: ['*.sh', '*.bash', '*.zsh']
       confidence: 0.85
 
   # Module patterns
   modules:
     module:auth:
-      keywords: ["auth", "authentication", "login", "password", "oauth", "jwt", "token"]
+      keywords:
+        ['auth', 'authentication', 'login', 'password', 'oauth', 'jwt', 'token']
       confidence: 0.8
 
     module:cache:
-      keywords: ["cache", "redis", "memcache", "caching", "ttl", "expiration"]
+      keywords: ['cache', 'redis', 'memcache', 'caching', 'ttl', 'expiration']
       confidence: 0.8
 
     module:config:
-      keywords: ["config", "configuration", "settings", "env", "environment", "vars"]
+      keywords:
+        ['config', 'configuration', 'settings', 'env', 'environment', 'vars']
       confidence: 0.8
 
     module:database:
-      keywords: ["database", "db", "sql", "mysql", "postgres", "mongodb", "orm"]
+      keywords: ['database', 'db', 'sql', 'mysql', 'postgres', 'mongodb', 'orm']
       confidence: 0.8
 
     module:metrics:
-      keywords: ["metrics", "monitoring", "prometheus", "grafana", "telemetry", "observability"]
+      keywords:
+        [
+          'metrics',
+          'monitoring',
+          'prometheus',
+          'grafana',
+          'telemetry',
+          'observability',
+        ]
       confidence: 0.8
 
     module:queue:
-      keywords: ["queue", "job", "worker", "task", "background", "async", "celery"]
+      keywords:
+        ['queue', 'job', 'worker', 'task', 'background', 'async', 'celery']
       confidence: 0.8
 
     module:web:
-      keywords: ["web", "http", "server", "api", "rest", "endpoint", "handler"]
+      keywords: ['web', 'http', 'server', 'api', 'rest', 'endpoint', 'handler']
       confidence: 0.8
 
     module:ui:
-      keywords: ["ui", "interface", "frontend", "html", "css", "react", "vue"]
+      keywords: ['ui', 'interface', 'frontend', 'html', 'css', 'react', 'vue']
       confidence: 0.8
 
   # Workflow patterns
   workflows:
     workflow:automation:
-      keywords: ["automation", "script", "workflow", "ci/cd", "pipeline", "deploy"]
+      keywords:
+        ['automation', 'script', 'workflow', 'ci/cd', 'pipeline', 'deploy']
       confidence: 0.8
 
     workflow:github-actions:
-      keywords: ["github actions", "workflow", ".yml", "action", ".github"]
-      file_patterns: [".github/workflows/*.yml", ".github/workflows/*.yaml"]
+      keywords: ['github actions', 'workflow', '.yml', 'action', '.github']
+      file_patterns: ['.github/workflows/*.yml', '.github/workflows/*.yaml']
       confidence: 0.8
 
     workflow:ci-cd:
-      keywords: ["ci", "cd", "continuous integration", "continuous deployment", "build", "test"]
+      keywords:
+        [
+          'ci',
+          'cd',
+          'continuous integration',
+          'continuous deployment',
+          'build',
+          'test',
+        ]
       confidence: 0.8
 
     workflow:deployment:
-      keywords: ["deploy", "deployment", "release", "production", "staging"]
+      keywords: ['deploy', 'deployment', 'release', 'production', 'staging']
       confidence: 0.8
 
   # Special patterns
   special:
     security:
-      keywords: ["security", "vulnerability", "cve", "exploit", "attack", "breach"]
+      keywords:
+        ['security', 'vulnerability', 'cve', 'exploit', 'attack', 'breach']
       confidence: 0.9
 
     performance:
-      keywords: ["performance", "slow", "optimize", "speed", "latency", "throughput"]
+      keywords:
+        ['performance', 'slow', 'optimize', 'speed', 'latency', 'throughput']
       confidence: 0.8
 
     breaking-change:
-      keywords: ["breaking", "break", "compatibility", "backward", "migration"]
+      keywords: ['breaking', 'break', 'compatibility', 'backward', 'migration']
       confidence: 0.8
 
     good first issue:
-      keywords: ["good first issue", "beginner", "starter", "easy", "newcomer"]
+      keywords: ['good first issue', 'beginner', 'starter', 'easy', 'newcomer']
       confidence: 0.9
 
     help wanted:
-      keywords: ["help wanted", "need help", "assistance", "volunteer"]
+      keywords: ['help wanted', 'need help', 'assistance', 'volunteer']
       confidence: 0.8
 
     dependencies:
-      keywords: ["dependency", "dependencies", "update", "upgrade", "version"]
-      file_patterns: ["package.json", "go.mod", "requirements.txt", "Cargo.toml"]
+      keywords: ['dependency', 'dependencies', 'update', 'upgrade', 'version']
+      file_patterns:
+        ['package.json', 'go.mod', 'requirements.txt', 'Cargo.toml']
       confidence: 0.8
 
 # AI fallback configuration
 ai_fallback:
   enabled: true
-  model: "gpt-4o-mini"
+  model: 'gpt-4o-mini'
   max_tokens: 500
   temperature: 0.3
   trigger_conditions:
@@ -189,38 +253,43 @@ ai_fallback:
 
 # Label categories for reference
 label_categories:
-  issue_types: ["bug", "enhancement", "documentation", "question"]
-  priorities: ["priority-high", "priority-medium", "priority-low"]
+  issue_types: ['bug', 'enhancement', 'documentation', 'question']
+  priorities: ['priority-high', 'priority-medium', 'priority-low']
   technologies:
     [
-      "tech:go",
-      "tech:python",
-      "tech:javascript",
-      "tech:typescript",
-      "tech:protobuf",
-      "tech:docker",
-      "tech:kubernetes",
-      "tech:shell",
+      'tech:go',
+      'tech:python',
+      'tech:javascript',
+      'tech:typescript',
+      'tech:protobuf',
+      'tech:docker',
+      'tech:kubernetes',
+      'tech:shell',
     ]
   modules:
     [
-      "module:auth",
-      "module:cache",
-      "module:config",
-      "module:database",
-      "module:metrics",
-      "module:queue",
-      "module:web",
-      "module:ui",
+      'module:auth',
+      'module:cache',
+      'module:config',
+      'module:database',
+      'module:metrics',
+      'module:queue',
+      'module:web',
+      'module:ui',
     ]
   workflows:
-    ["workflow:automation", "workflow:github-actions", "workflow:ci-cd", "workflow:deployment"]
+    [
+      'workflow:automation',
+      'workflow:github-actions',
+      'workflow:ci-cd',
+      'workflow:deployment',
+    ]
   special:
     [
-      "security",
-      "performance",
-      "breaking-change",
-      "good first issue",
-      "help wanted",
-      "dependencies",
+      'security',
+      'performance',
+      'breaking-change',
+      'good first issue',
+      'help wanted',
+      'dependencies',
     ]

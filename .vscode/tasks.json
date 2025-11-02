@@ -262,7 +262,10 @@
       "label": "Validate Linter Configs",
       "type": "shell",
       "command": "python3",
-      "args": ["${workspaceFolder}/scripts/validate-linter-configs.py", "--verbose"],
+      "args": [
+        "${workspaceFolder}/scripts/validate-linter-configs.py",
+        "--verbose"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },

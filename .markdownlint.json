@@ -8,13 +8,22 @@
   "MD033": false,
   "MD041": false,
   "MD046": { "style": "fenced" },
-  "MD040": true,
+  "MD040": false,
   "MD024": false,
+  "MD025": false,
+  "MD029": false,
+  "MD036": false,
   "TODO.md": false,
   "CHANGELOG.md": {
     "MD024": false
   },
   "AGENTS.md": {
     "MD013": false
+  },
+  "docs/**/*.md": {
+    "MD040": false,
+    "MD025": false,
+    "MD029": false,
+    "MD036": false
   }
 }

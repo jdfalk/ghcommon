@@ -27,8 +27,8 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 SUPPORTED_LICENSES: dict[str, str] = {
     "MIT": """MIT License

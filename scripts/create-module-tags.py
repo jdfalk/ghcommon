@@ -20,9 +20,9 @@ Usage:
     python3 scripts/create-module-tags.py v1.3.0
 """
 
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 
 def run_command(cmd, check=True):

@@ -11,15 +11,15 @@ on:
 
   # Run on schedule for batch processing
   schedule:
-    - cron: "0 2 * * *" # Daily at 2 AM UTC
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
 
   # Manual trigger
   workflow_dispatch:
     inputs:
       operation:
-        description: "Which operation to run"
+        description: 'Which operation to run'
         required: false
-        default: "all"
+        default: 'all'
         type: choice
         options:
           - all
@@ -30,7 +30,7 @@ on:
           - lint
           - rebase
       dry_run:
-        description: "Run in dry-run mode"
+        description: 'Run in dry-run mode'
         required: false
         default: false
         type: boolean
@@ -53,7 +53,7 @@ jobs:
       operation: ${{ inputs.operation || 'all' }}
 
       # Issue Management Configuration
-      im_operations: "auto"
+      im_operations: 'auto'
       im_dry_run: ${{ inputs.dry_run || false }}
       im_force_update: false
       im_cleanup_issue_updates: true
@@ -83,7 +83,7 @@ jobs:
       sl_auto_commit_fixes: true
 
       # AI Rebase Configuration
-      rebase_model: "openai/gpt-4o"
+      rebase_model: 'openai/gpt-4o'
 
     secrets:
       github-token: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}

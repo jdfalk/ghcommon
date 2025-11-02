@@ -8,14 +8,14 @@ name: AI Rebase Example
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
   ai-rebase:
     uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@main
     with:
-      base-branch: "main"
-      model: "openai/gpt-4o"
+      base-branch: 'main'
+      model: 'openai/gpt-4o'
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}

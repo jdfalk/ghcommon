@@ -15,9 +15,9 @@ on:
   workflow_dispatch:
     inputs:
       sync_type:
-        description: "Type of sync to perform"
+        description: 'Type of sync to perform'
         required: false
-        default: "all"
+        default: 'all'
         type: choice
         options:
           - all
@@ -28,12 +28,12 @@ on:
           - linters
           - labels
       force_sync:
-        description: "Force sync even if no changes detected"
+        description: 'Force sync even if no changes detected'
         required: false
         default: false
         type: boolean
       verbose_logging:
-        description: "Enable verbose logging to see all file operations"
+        description: 'Enable verbose logging to see all file operations'
         required: false
         default: true
         type: boolean

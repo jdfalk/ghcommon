@@ -214,7 +214,8 @@ validate-frontend-package:
 publish-npm:
   name: Publish to npm
   runs-on: ubuntu-latest
-  needs: [detect-frontend-package, build-frontend-package, validate-frontend-package]
+  needs:
+    [detect-frontend-package, build-frontend-package, validate-frontend-package]
   if: |
     needs.detect-frontend-package.outputs.has-package == 'true' &&
     env.PUBLISH_TO_NPM == 'true' &&
@@ -296,7 +297,8 @@ publish-npm:
 publish-github-packages:
   name: Publish to GitHub Packages
   runs-on: ubuntu-latest
-  needs: [detect-frontend-package, build-frontend-package, validate-frontend-package]
+  needs:
+    [detect-frontend-package, build-frontend-package, validate-frontend-package]
   if: |
     needs.detect-frontend-package.outputs.has-package == 'true' &&
     env.PUBLISH_TO_GITHUB_PACKAGES == 'true' &&

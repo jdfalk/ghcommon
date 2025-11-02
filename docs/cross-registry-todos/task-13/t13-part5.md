@@ -211,8 +211,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name:
-            python-${{ matrix.test-type }}-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          name: python-${{ matrix.test-type }}-results-${{ matrix.os }}-py${{ matrix.python-version }}
           path: test-results/
           retention-days: 7
 
@@ -395,7 +394,14 @@ jobs:
 
   test-report:
     name: Aggregate Test Results
-    needs: [rust-unit-tests, rust-integration-tests, python-tests, javascript-tests, e2e-tests]
+    needs:
+      [
+        rust-unit-tests,
+        rust-integration-tests,
+        python-tests,
+        javascript-tests,
+        e2e-tests,
+      ]
     if: always()
     runs-on: ubuntu-latest
     permissions:

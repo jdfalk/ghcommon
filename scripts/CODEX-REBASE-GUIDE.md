@@ -105,7 +105,14 @@ Add these tasks to your `.vscode/tasks.json` for easy access:
       "label": "Rebase: Force Shell Implementation",
       "type": "shell",
       "command": "./scripts/rebase",
-      "args": ["--implementation", "shell", "--mode", "automated", "--force-push", "main"],
+      "args": [
+        "--implementation",
+        "shell",
+        "--mode",
+        "automated",
+        "--force-push",
+        "main"
+      ],
       "group": "build",
       "detail": "Use shell fallback implementation"
     }

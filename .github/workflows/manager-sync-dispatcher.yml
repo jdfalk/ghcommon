@@ -24,9 +24,9 @@ on:
   workflow_dispatch:
     inputs:
       sync_type:
-        description: "Type of sync to perform"
+        description: 'Type of sync to perform'
         required: false
-        default: "all"
+        default: 'all'
         type: choice
         options:
           - all
@@ -38,9 +38,9 @@ on:
           - linters
           - labels
       target_repos:
-        description: "Target repositories (comma-separated)"
+        description: 'Target repositories (comma-separated)'
         required: false
-        default: "auto"
+        default: 'auto'
 
 permissions:
   contents: read
@@ -70,7 +70,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Create repositories list
         id: repos

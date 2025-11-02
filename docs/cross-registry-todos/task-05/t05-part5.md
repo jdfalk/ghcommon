@@ -83,7 +83,13 @@ publish-test-pypi:
 publish-pypi:
   name: Publish to PyPI
   runs-on: ubuntu-latest
-  needs: [detect-python-package, build-python-package, validate-python-package, publish-test-pypi]
+  needs:
+    [
+      detect-python-package,
+      build-python-package,
+      validate-python-package,
+      publish-test-pypi,
+    ]
   if: |
     needs.detect-python-package.outputs.has-package == 'true' &&
     env.PUBLISH_TO_PYPI == 'true' &&

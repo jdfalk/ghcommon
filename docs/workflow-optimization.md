@@ -899,8 +899,7 @@ jobs:
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
         env:
-          COVERAGE_THRESHOLD:
-            ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
+          COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
         run: python3 .github/workflows/scripts/ci_workflow.py go-test
 
   python-ci:
@@ -1999,7 +1998,15 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [detect-languages, build-go, build-python, build-rust, build-frontend, build-docker]
+    needs:
+      [
+        detect-languages,
+        build-go,
+        build-python,
+        build-rust,
+        build-frontend,
+        build-docker,
+      ]
     if: |
       always() &&
       !failure() &&

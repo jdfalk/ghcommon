@@ -22,15 +22,15 @@ Arguments:
 """
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta, timezone
 import os
 import sys
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta, timezone
 
-from dotenv import load_dotenv
 import requests
+from dotenv import load_dotenv
 
 
 class GitHubNotificationCleaner:

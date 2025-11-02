@@ -8,14 +8,14 @@ on:
   workflow_call:
     inputs:
       go-matrix:
-        description: "JSON encoded Go build matrix"
+        description: 'JSON encoded Go build matrix'
         required: true
         type: string
       protobuf-artifacts:
-        description: "Whether protobuf artifacts were generated"
+        description: 'Whether protobuf artifacts were generated'
         required: false
         type: string
-        default: "false"
+        default: 'false'
 
 permissions:
   contents: read

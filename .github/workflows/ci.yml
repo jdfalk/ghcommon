@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: "0 0 * * 0" # Weekly on Sunday
+    - cron: '0 0 * * 0' # Weekly on Sunday
   workflow_dispatch:
 
 permissions:
@@ -32,11 +32,11 @@ jobs:
     name: Continuous Integration
     uses: ./.github/workflows/reusable-ci.yml
     with:
-      go-version: "1.24"
-      node-version: "22"
-      python-version: "3.13"
-      rust-version: "1.76"
-      coverage-threshold: "80"
+      go-version: '1.24'
+      node-version: '22'
+      python-version: '3.13'
+      rust-version: '1.76'
+      coverage-threshold: '80'
       skip-protobuf: false
       skip-tests: false
       skip-linting: false

@@ -12,12 +12,12 @@ Usage examples:
 """
 
 import argparse
-from collections import defaultdict
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 import re
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 
 
 class DependencyAnalyzer:

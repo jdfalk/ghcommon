@@ -10,10 +10,10 @@ on:
       lookback-days:
         description: Number of days to analyze (default 30).
         required: false
-        default: "30"
+        default: '30'
         type: string
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: '0 3 * * 1'
 
 permissions:
   actions: read
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Collect workflow metrics
         env:

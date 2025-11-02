@@ -8,27 +8,27 @@ on:
   workflow_call:
     inputs:
       stale-days:
-        description: "Days before marking issues as stale"
+        description: 'Days before marking issues as stale'
         required: false
         type: number
         default: 60
       close-days:
-        description: "Days before closing stale issues"
+        description: 'Days before closing stale issues'
         required: false
         type: number
         default: 14
       skip-stale-management:
-        description: "Skip stale issue management"
+        description: 'Skip stale issue management'
         required: false
         type: boolean
         default: false
       skip-auto-labeling:
-        description: "Skip automatic labeling"
+        description: 'Skip automatic labeling'
         required: false
         type: boolean
         default: false
       skip-auto-assignment:
-        description: "Skip automatic assignment"
+        description: 'Skip automatic assignment'
         required: false
         type: boolean
         default: false
@@ -78,10 +78,10 @@ jobs:
             If you'd like to continue with these changes, please reopen the PR or create a new one.
           days-before-stale: ${{ inputs.stale-days }}
           days-before-close: ${{ inputs.close-days }}
-          stale-issue-label: "stale"
-          stale-pr-label: "stale"
-          exempt-issue-labels: "keep-open,bug,security,enhancement"
-          exempt-pr-labels: "keep-open,work-in-progress,security"
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          exempt-issue-labels: 'keep-open,bug,security,enhancement'
+          exempt-pr-labels: 'keep-open,work-in-progress,security'
           exempt-draft-pr: true
           operations-per-run: 100
 
@@ -263,7 +263,8 @@ jobs:
   # Issue automation summary
   automation-summary:
     name: Issue Automation Summary
-    needs: [stale-management, auto-labeling, auto-assignment, template-compliance]
+    needs:
+      [stale-management, auto-labeling, auto-assignment, template-compliance]
     if: always()
     runs-on: ubuntu-latest
     steps:

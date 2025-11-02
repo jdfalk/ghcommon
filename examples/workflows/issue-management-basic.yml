@@ -37,12 +37,12 @@ on:
   workflow_dispatch:
     inputs:
       operations:
-        description: "Operations to run (update-issues, copilot-tickets, close-duplicates, codeql-alerts, or auto)"
+        description: 'Operations to run (update-issues, copilot-tickets, close-duplicates, codeql-alerts, or auto)'
         required: false
         type: string
-        default: "auto"
+        default: 'auto'
       dry_run:
-        description: "Run in dry-run mode"
+        description: 'Run in dry-run mode'
         required: false
         type: boolean
         default: false

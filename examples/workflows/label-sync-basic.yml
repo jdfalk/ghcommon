@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   schedule:
     # Run monthly on the 1st at 3 AM UTC
-    - cron: "0 3 1 * *"
+    - cron: '0 3 1 * *'
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
       # Use labels.json from ghcommon repository
-      config-file: "labels.json"
+      config-file: 'labels.json'
       # Sync to current repository only
       repositories: ${{ github.repository }}
       # Don't delete extra labels (safe mode)
@@ -27,6 +27,6 @@ jobs:
       # Not a dry run - make actual changes
       dry-run: false
       # Fetch configuration from ghcommon
-      source-repo: "jdfalk/ghcommon"
-      source-branch: "main"
+      source-repo: 'jdfalk/ghcommon'
+      source-branch: 'main'
     secrets: inherit

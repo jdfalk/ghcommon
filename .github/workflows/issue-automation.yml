@@ -11,31 +11,31 @@ on:
     types: [created, edited]
   schedule:
     # Run stale issue check daily at 2 AM UTC
-    - cron: "0 2 * * *"
+    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       stale-days:
-        description: "Days before marking issues as stale"
+        description: 'Days before marking issues as stale'
         required: false
         type: number
         default: 60
       close-days:
-        description: "Days before closing stale issues"
+        description: 'Days before closing stale issues'
         required: false
         type: number
         default: 14
       skip-stale-management:
-        description: "Skip stale issue management"
+        description: 'Skip stale issue management'
         required: false
         type: boolean
         default: false
       skip-auto-labeling:
-        description: "Skip automatic labeling"
+        description: 'Skip automatic labeling'
         required: false
         type: boolean
         default: false
       skip-auto-assignment:
-        description: "Skip automatic assignment"
+        description: 'Skip automatic assignment'
         required: false
         type: boolean
         default: false

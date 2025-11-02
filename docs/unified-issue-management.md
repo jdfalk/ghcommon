@@ -310,7 +310,8 @@ on:
     inputs:
       operation:
         type: choice
-        options: [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
+        options:
+          [update-issues, copilot-tickets, close-duplicates, codeql-alerts]
         required: true
       dry_run:
         type: boolean

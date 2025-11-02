@@ -12,19 +12,19 @@ on:
   workflow_call:
     outputs:
       skip-tests:
-        description: "Whether to skip test execution"
+        description: 'Whether to skip test execution'
         value: ${{ jobs.check-overrides.outputs.skip-tests }}
       skip-validation:
-        description: "Whether to skip validation/linting"
+        description: 'Whether to skip validation/linting'
         value: ${{ jobs.check-overrides.outputs.skip-validation }}
       skip-ci:
-        description: "Whether to skip CI entirely"
+        description: 'Whether to skip CI entirely'
         value: ${{ jobs.check-overrides.outputs.skip-ci }}
       skip-build:
-        description: "Whether to skip build steps"
+        description: 'Whether to skip build steps'
         value: ${{ jobs.check-overrides.outputs.skip-build }}
       commit-message:
-        description: "The commit message(s) analyzed"
+        description: 'The commit message(s) analyzed'
         value: ${{ jobs.check-overrides.outputs.commit-message }}
   push:
     branches: [main, master, develop]

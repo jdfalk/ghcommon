@@ -395,8 +395,7 @@ jobs:
         uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE:
-            ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 ```
 
 ### Configuration Files

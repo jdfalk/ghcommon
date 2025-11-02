@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       frontend-matrix:
-        description: "JSON encoded frontend build matrix"
+        description: 'JSON encoded frontend build matrix'
         required: true
         type: string
 

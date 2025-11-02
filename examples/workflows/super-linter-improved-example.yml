@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       show-details:
-        description: "Show detailed processing info (for debugging)"
+        description: 'Show detailed processing info (for debugging)'
         required: false
         default: false
         type: boolean
@@ -71,7 +71,7 @@ jobs:
       enable-auto-fix: true
       auto-commit-fixes: true
       show-detailed-summary: false # Clean, focused output
-      commit-message: "style: auto-fix code formatting [skip ci]"
+      commit-message: 'style: auto-fix code formatting [skip ci]'
       run-security: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}

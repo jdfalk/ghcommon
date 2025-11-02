@@ -6,34 +6,34 @@ name: Enhanced Documentation Updates Example
 on:
   push:
     paths:
-      - ".github/doc-updates/**"
+      - '.github/doc-updates/**'
   schedule:
     # Run daily at 3 AM UTC
-    - cron: "0 3 * * *"
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       enable_chronological_processing:
-        description: "Enable chronological processing"
+        description: 'Enable chronological processing'
         required: false
         default: true
         type: boolean
       enable_timestamp_migration:
-        description: "Migrate legacy files to v2.0"
+        description: 'Migrate legacy files to v2.0'
         required: false
         default: false
         type: boolean
       continue_on_error:
-        description: "Continue on errors"
+        description: 'Continue on errors'
         required: false
         default: true
         type: boolean
       dry_run:
-        description: "Show what would be done without executing"
+        description: 'Show what would be done without executing'
         required: false
         default: false
         type: boolean
       verbose:
-        description: "Enable verbose logging"
+        description: 'Enable verbose logging'
         required: false
         default: false
         type: boolean
@@ -48,7 +48,7 @@ jobs:
   enhanced-docs-update:
     uses: jdfalk/ghcommon/.github/workflows/reusable-enhanced-docs-update.yml@main
     with:
-      updates_dir: ".github/doc-updates"
+      updates_dir: '.github/doc-updates'
       create_pr: true
       cleanup: true
       enable_chronological_processing: ${{ github.event.inputs.enable_chronological_processing || true }}

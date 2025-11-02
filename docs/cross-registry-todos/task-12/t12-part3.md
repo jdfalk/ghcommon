@@ -605,10 +605,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ matrix.registry }}
-          username:
-            ${{ matrix.registry == 'ghcr.io' && github.actor || secrets.DOCKERHUB_USERNAME }}
-          password:
-            ${{ matrix.registry == 'ghcr.io' && secrets.GITHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
+          username: ${{ matrix.registry == 'ghcr.io' && github.actor || secrets.DOCKERHUB_USERNAME }}
+          password: ${{ matrix.registry == 'ghcr.io' && secrets.GITHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
 
       - name: Determine image name
         id: image

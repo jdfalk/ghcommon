@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/docker-detect.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: d1e2f3g4-h5i6-j7k8-l9m0-n1o2p3q4r5s6
 
 """Docker configuration detection script for matrix build system.
@@ -62,13 +62,11 @@ def check_docker_compose():
 
 def should_build_docker(event_name, ref):
     """Determine if Docker image should be built and pushed."""
-    if (
+    return (
         (event_name == "push" and ref == "refs/heads/main")
         or event_name == "release"
         or event_name == "workflow_dispatch"
-    ):
-        return True
-    return False
+    )
 
 
 def generate_docker_matrix():

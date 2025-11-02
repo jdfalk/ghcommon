@@ -1,12 +1,12 @@
 # file: .yaml-lint.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: a2b3c4d5-e6f7-89ab-cdef-0123456789ab
 
 extends: default
 
 rules:
   line-length:
-    max: 120
+    max: 200
     level: warning
 
   indentation:

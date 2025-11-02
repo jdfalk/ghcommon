@@ -94,7 +94,8 @@ scrape_configs:
         action: replace
         target_label: __metrics_path__
         regex: (.+)
-      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+      - source_labels:
+          [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
         action: replace
         regex: ([^:]+)(?::\d+)?;(\d+)
         replacement: $1:$2
@@ -177,8 +178,7 @@ groups:
           category: performance
         annotations:
           summary: 'High P95 latency detected'
-          description:
-            'P95 latency is {{ $value }}s for {{ $labels.service }} on route {{ $labels.route }}'
+          description: 'P95 latency is {{ $value }}s for {{ $labels.service }} on route {{ $labels.route }}'
 
       # High latency (P99)
       - alert: HighLatencyP99
@@ -218,8 +218,7 @@ groups:
           category: database
         annotations:
           summary: 'Slow database queries detected'
-          description:
-            'P95 query duration is {{ $value }}s for {{ $labels.operation }} on {{ $labels.table }}'
+          description: 'P95 query duration is {{ $value }}s for {{ $labels.operation }} on {{ $labels.table }}'
 
       # Memory leak detection (increasing memory over time)
       - alert: PossibleMemoryLeak
@@ -304,8 +303,7 @@ groups:
           category: memory
         annotations:
           summary: 'Out of memory imminent'
-          description:
-            'Only {{ $value | humanizePercentage }} memory available on {{ $labels.instance }}'
+          description: 'Only {{ $value | humanizePercentage }} memory available on {{ $labels.instance }}'
 
       # High disk usage
       - alert: HighDiskUsage

@@ -307,7 +307,13 @@
               }
             ],
             "options": {
-              "columns": ["Service", "Operation", "Duration", "Start Time", "Trace ID"]
+              "columns": [
+                "Service",
+                "Operation",
+                "Duration",
+                "Start Time",
+                "Trace ID"
+              ]
             }
           }
         ]
@@ -382,7 +388,10 @@ export function createLogToTraceLink(traceId: string): DataLink {
 /**
  * Create data link from metric to logs
  */
-export function createMetricToLogsLink(service: string, timestamp: number): DataLink {
+export function createMetricToLogsLink(
+  service: string,
+  timestamp: number
+): DataLink {
   const start = timestamp - 300000; // 5 minutes before
   const end = timestamp + 300000; // 5 minutes after
 
@@ -398,7 +407,10 @@ export function createMetricToLogsLink(service: string, timestamp: number): Data
 /**
  * Create data link from trace to logs
  */
-export function createTraceToLogsLink(traceId: string, spanId: string): DataLink {
+export function createTraceToLogsLink(
+  traceId: string,
+  spanId: string
+): DataLink {
   const lokiQuery = encodeURIComponent(`{} |= "${traceId}"`);
 
   return {

@@ -9,8 +9,8 @@ This ensures consistency between the source repository (ghcommon) and all
 target repositories that received the CI fixes.
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 # Define version mappings
 VERSION_UPDATES = {

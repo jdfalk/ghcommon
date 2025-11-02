@@ -44,7 +44,10 @@ export function createLogger(config: LoggerConfig): winston.Logger {
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.printf(({ timestamp, level, message, metadata }) => {
-          const meta = Object.keys(metadata).length > 0 ? JSON.stringify(metadata, null, 2) : '';
+          const meta =
+            Object.keys(metadata).length > 0
+              ? JSON.stringify(metadata, null, 2)
+              : '';
           return `${timestamp} [${level}] ${message} ${meta}`;
         })
       ),
@@ -145,7 +148,8 @@ export function loggingMiddleware(logger: winston.Logger) {
       const status = res.statusCode;
 
       // Log based on status
-      const logLevel = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info';
+      const logLevel =
+        status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info';
 
       req.logger.log(logLevel, 'HTTP request completed', {
         status,
@@ -182,7 +186,14 @@ function sanitizeBody(body: any): any {
     return body;
   }
 
-  const sensitiveFields = ['password', 'token', 'apiKey', 'secret', 'creditCard', 'ssn'];
+  const sensitiveFields = [
+    'password',
+    'token',
+    'apiKey',
+    'secret',
+    'creditCard',
+    'ssn',
+  ];
 
   const sanitized = { ...body };
 
@@ -715,7 +726,9 @@ export function createSanitizingLogger(logger: any) {
         ['log', 'info', 'warn', 'error', 'debug'].includes(prop)
       ) {
         return function (...args: any[]) {
-          const sanitized = args.map(arg => (typeof arg === 'object' ? sanitizeObject(arg) : arg));
+          const sanitized = args.map(arg =>
+            typeof arg === 'object' ? sanitizeObject(arg) : arg
+          );
           return original.apply(target, sanitized);
         };
       }

@@ -9,7 +9,7 @@ on:
     branches: [main]
   schedule:
     # Run weekly to catch new vulnerabilities
-    - cron: "0 2 * * 1"
+    - cron: '0 2 * * 1'
   workflow_dispatch:
 
 # Required permissions for dependency submission
@@ -30,6 +30,6 @@ jobs:
         uses: advanced-security/component-detection-dependency-submission-action@v0.0.3
         with:
           # Optional: Exclude specific directories from scanning
-          directoryExclusionList: "test,tests,__tests__,node_modules,.git,.vscode"
+          directoryExclusionList: 'test,tests,__tests__,node_modules,.git,.vscode'
           # Optional: Specify which detectors to use (removes this line to auto-detect all)
           # detectorsFilter: "Go,Npm,Pip,Rust,Maven"

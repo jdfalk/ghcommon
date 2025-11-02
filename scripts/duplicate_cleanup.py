@@ -21,14 +21,14 @@ Usage:
 """
 
 import argparse
-from collections import defaultdict
-from datetime import datetime
 import json
 import os
 import re
 import sys
-from typing import Any
 import uuid
+from collections import defaultdict
+from datetime import datetime
+from typing import Any
 
 # Add the scripts directory to the path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

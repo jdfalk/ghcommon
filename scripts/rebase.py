@@ -17,11 +17,11 @@ Features:
 """
 
 import argparse
-from datetime import datetime
-from enum import Enum
 import json
 import subprocess
 import sys
+from datetime import datetime
+from enum import Enum
 
 
 class RebaseMode(Enum):

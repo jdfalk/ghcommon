@@ -9,8 +9,8 @@ This script addresses the systematic CI failures caused by incorrect Super Linte
 configuration file references across all repositories.
 """
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 # Source repository (ghcommon)
 GHCOMMON_PATH = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon")

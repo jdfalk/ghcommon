@@ -135,8 +135,7 @@ jobs:
       - name: Scan images with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref:
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}:${{ steps.meta.outputs.version }}
+          image-ref: ${{ env.REGISTRY_GHCR }}/${{ github.repository }}:${{ steps.meta.outputs.version }}
           format: 'sarif'
           output: 'trivy-results.sarif'
 

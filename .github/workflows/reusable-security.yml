@@ -8,22 +8,22 @@ on:
   workflow_call:
     inputs:
       skip-codeql:
-        description: "Skip CodeQL analysis"
+        description: 'Skip CodeQL analysis'
         required: false
         type: boolean
         default: false
       skip-dependency-review:
-        description: "Skip dependency review"
+        description: 'Skip dependency review'
         required: false
         type: boolean
         default: false
       skip-security-audit:
-        description: "Skip security audit"
+        description: 'Skip security audit'
         required: false
         type: boolean
         default: false
       languages:
-        description: "Languages for CodeQL analysis (JSON array)"
+        description: 'Languages for CodeQL analysis (JSON array)'
         required: false
         type: string
         default: '["go", "javascript", "python"]'
@@ -134,7 +134,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: "/language:${{ matrix.language }}"
+          category: '/language:${{ matrix.language }}'
 
   # Dependency Review
   dependency-review:
@@ -149,7 +149,7 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          config-file: "./.github/dependency-review-config.yml"
+          config-file: './.github/dependency-review-config.yml'
           fail-on-severity: moderate
 
   # Security Audit
@@ -209,21 +209,28 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: "fs"
-          scan-ref: "."
-          format: "sarif"
-          output: "trivy-results.sarif"
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: 'trivy-results.sarif'
 
   # Security summary
   security-summary:
     name: Security Summary
-    needs: [detect-languages, codeql-analysis, dependency-review, security-audit, trivy-scan]
+    needs:
+      [
+        detect-languages,
+        codeql-analysis,
+        dependency-review,
+        security-audit,
+        trivy-scan,
+      ]
     if: always()
     runs-on: ubuntu-latest
     steps:

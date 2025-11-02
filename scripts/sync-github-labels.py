@@ -12,10 +12,10 @@ import argparse
 import json
 import os
 import sys
-from typing import Any
 import urllib.error
 import urllib.parse
 import urllib.request
+from typing import Any
 
 
 class GitHubLabelsSync:

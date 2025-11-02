@@ -412,7 +412,14 @@ jobs:
 
   create-verification-report:
     name: Create Verification Report
-    needs: [verify-binaries, verify-containers, verify-packages, verify-sboms, verify-documentation]
+    needs:
+      [
+        verify-binaries,
+        verify-containers,
+        verify-packages,
+        verify-sboms,
+        verify-documentation,
+      ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -585,10 +592,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ matrix.registry }}
-          username:
-            ${{ matrix.registry == 'ghcr.io' && github.actor || secrets.DOCKERHUB_USERNAME }}
-          password:
-            ${{ matrix.registry == 'ghcr.io' && secrets.GITHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
+          username: ${{ matrix.registry == 'ghcr.io' && github.actor || secrets.DOCKERHUB_USERNAME }}
+          password: ${{ matrix.registry == 'ghcr.io' && secrets.GITHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
 
       - name: Retag previous release as latest
         run: |

@@ -149,7 +149,9 @@ test('complete workflow creation flow', async ({ page }) => {
 
   // Assert: Workflow created and visible
   await expect(page.locator('.success-toast')).toBeVisible();
-  await expect(page.locator('[data-testid="workflow-list"]')).toContainText('E2E Test Workflow');
+  await expect(page.locator('[data-testid="workflow-list"]')).toContainText(
+    'E2E Test Workflow'
+  );
 });
 ```
 

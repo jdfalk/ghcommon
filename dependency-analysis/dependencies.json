@@ -948,7 +948,9 @@
       "README.md",
       "../copilot-instructions.md"
     ],
-    ".github/instructions/copilot-instructions.md": ["instructions/copilot-instructions.md"],
+    ".github/instructions/copilot-instructions.md": [
+      "instructions/copilot-instructions.md"
+    ],
     ".github/instructions/general-coding.instructions.md": [
       "instructions/general-coding.instructions.md",
       "# file: path/to/file.py",
@@ -1015,7 +1017,9 @@
     ".github/instructions/rust-utility.instructions.md": [
       "instructions/rust-utility.instructions.md"
     ],
-    ".github/instructions/rust.instructions.md": ["instructions/rust.instructions.md"],
+    ".github/instructions/rust.instructions.md": [
+      "instructions/rust.instructions.md"
+    ],
     ".github/instructions/safe-ai-util.instructions.md": [
       "instructions/safe-ai-util.instructions.md"
     ],
@@ -1136,7 +1140,11 @@
       "prompts/test-generation.prompt.md",
       "../instructions/general-coding.instructions.md"
     ],
-    ".github/scripts/README.md": ["README.md", "scripts/README.md", "reusable-super-linter.yml"],
+    ".github/scripts/README.md": [
+      "README.md",
+      "scripts/README.md",
+      "reusable-super-linter.yml"
+    ],
     ".github/scripts/detect-build-matrix.py": [
       "setup.py",
       "*.py",
@@ -1167,8 +1175,19 @@
       "Dict",
       "os"
     ],
-    ".github/scripts/docker-detect.py": ["subprocess", "json", "docker-detect.py", "sys", "os"],
-    ".github/scripts/docker-security.py": ["docker-security.py", "sys", "subprocess", "json"],
+    ".github/scripts/docker-detect.py": [
+      "subprocess",
+      "json",
+      "docker-detect.py",
+      "sys",
+      "os"
+    ],
+    ".github/scripts/docker-security.py": [
+      "docker-security.py",
+      "sys",
+      "subprocess",
+      "json"
+    ],
     ".github/scripts/monitor-rollout.py": [
       "typing",
       "json",
@@ -1181,7 +1200,12 @@
       "urllib",
       "error"
     ],
-    ".github/scripts/parse_config_json.py": ["sys", "os", "parse_config_json.py", "json"],
+    ".github/scripts/parse_config_json.py": [
+      "sys",
+      "os",
+      "parse_config_json.py",
+      "json"
+    ],
     ".github/scripts/run_buf_generate.py": [
       "run_buf_generate.py",
       "subprocess",
@@ -1190,7 +1214,10 @@
       "__future__",
       "os"
     ],
-    ".github/scripts/sync-auto-commit.py": ["subprocess", "sync-auto-commit.py"],
+    ".github/scripts/sync-auto-commit.py": [
+      "subprocess",
+      "sync-auto-commit.py"
+    ],
     ".github/scripts/sync-complete-workflow-modernizer.py": [
       "re",
       "subprocess",
@@ -1383,12 +1410,17 @@
     ".github/workflow-status.md": ["workflow-status.md"],
     ".github/workflows/auto-module-tagging.yml": ["create-module-tags.py"],
     ".github/workflows/ci.yml": ["reusable-ci.yml"],
-    ".github/workflows/commit-override-handler.yml": ["workflows/check_commit_overrides.py"],
+    ".github/workflows/commit-override-handler.yml": [
+      "workflows/check_commit_overrides.py"
+    ],
     ".github/workflows/documentation.yml": ["docs_workflow.py"],
     ".github/workflows/issue-automation.yml": ["reusable-issue-automation.yml"],
     ".github/workflows/maintenance.yml": ["reusable-maintenance.yml"],
     ".github/workflows/manager-sync-dispatcher.yml": ["**"],
-    ".github/workflows/performance-monitoring.yml": ["**", "benchmarks/measure_command.py"],
+    ".github/workflows/performance-monitoring.yml": [
+      "**",
+      "benchmarks/measure_command.py"
+    ],
     ".github/workflows/pr-automation.yml": ["ai-rebase.sh"],
     ".github/workflows/release-protobuf.yml": ["reusable-protobuf.yml"],
     ".github/workflows/release.yml": ["reusable-release.yml"],
@@ -1563,7 +1595,12 @@
       "Any",
       "Iterable"
     ],
-    ".github/workflows/scripts/download_nltk_data.py": ["annotations", "__future__", "os", "nltk"],
+    ".github/workflows/scripts/download_nltk_data.py": [
+      "annotations",
+      "__future__",
+      "os",
+      "nltk"
+    ],
     ".github/workflows/scripts/generate_release_summary.py": [
       "sys",
       "workflow_common",
@@ -1766,14 +1803,27 @@
       ".github/commit-messages.md",
       "security-guidelines.md"
     ],
-    "CHANGELOG.md": ["workflow-config.yaml", "workflow_common.py", "publish_to_github_packages.py"],
-    "CLAUDE.md": ["instructions/", "copilot-instructions.md", "prompts/", "doc-updates/."],
+    "CHANGELOG.md": [
+      "workflow-config.yaml",
+      "workflow_common.py",
+      "publish_to_github_packages.py"
+    ],
+    "CLAUDE.md": [
+      "instructions/",
+      "copilot-instructions.md",
+      "prompts/",
+      "doc-updates/."
+    ],
     "COMMITLINT_SETUP.md": [
       ".github/workflows/reusable-super-linter.yml",
       "workflows/reusable-super-linter.yml",
       "super-linter.env"
     ],
-    "CONTRIBUTING.md": ["validate-setup.sh", "security-guidelines.md", "setup-repository.sh"],
+    "CONTRIBUTING.md": [
+      "validate-setup.sh",
+      "security-guidelines.md",
+      "setup-repository.sh"
+    ],
     "GITHUB_PROJECTS_SETUP.md": [
       "create-projects.sh",
       "workflows/reusable-add-to-project.yml",
@@ -1785,7 +1835,10 @@
       "scripts/test-project-automation.sh",
       "workflows/add-to-project.yml"
     ],
-    "PHASE_2_PROGRESS.md": ["workflows/reusable-release.yml@main", "release-*-v1-deprecated.yml"],
+    "PHASE_2_PROGRESS.md": [
+      "workflows/reusable-release.yml@main",
+      "release-*-v1-deprecated.yml"
+    ],
     "README.md": [
       "create-issue-update.sh",
       ".github/repository-setup.md",
@@ -3203,7 +3256,11 @@
       "en/options.html#prose-wrap",
       "https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md"
     ],
-    "docs/PROMPT_CATEGORIZATION.md": ["prompts/", "PROMPT_CATEGORIZATION.md", "linters/"],
+    "docs/PROMPT_CATEGORIZATION.md": [
+      "prompts/",
+      "PROMPT_CATEGORIZATION.md",
+      "linters/"
+    ],
     "docs/README.md": [
       ".github/prompts/onboarding.prompt.md",
       "docs/dependency-submission-and-labeling.md",
@@ -4101,7 +4158,9 @@
       "workflows/test-coverage.yml",
       "setup-pre-commit.sh"
     ],
-    "docs/cross-registry-todos/task-13/t13-part4.md": ["cross-registry-todos/task-13/t13-part4.md"],
+    "docs/cross-registry-todos/task-13/t13-part4.md": [
+      "cross-registry-todos/task-13/t13-part4.md"
+    ],
     "docs/cross-registry-todos/task-13/t13-part5.md": [
       "workflows/automated-testing.yml",
       "workflows/workflow-{id}.yml",
@@ -4230,8 +4289,12 @@
       "collect-system-metrics.py",
       "cross-registry-todos/task-15/t15-part2.md"
     ],
-    "docs/cross-registry-todos/task-15/t15-part3.md": ["cross-registry-todos/task-15/t15-part3.md"],
-    "docs/cross-registry-todos/task-15/t15-part4.md": ["cross-registry-todos/task-15/t15-part4.md"],
+    "docs/cross-registry-todos/task-15/t15-part3.md": [
+      "cross-registry-todos/task-15/t15-part3.md"
+    ],
+    "docs/cross-registry-todos/task-15/t15-part4.md": [
+      "cross-registry-todos/task-15/t15-part4.md"
+    ],
     "docs/cross-registry-todos/task-15/t15-part5.md": [
       "workflows/benchmarks.yml",
       "export-k6-metrics.py",
@@ -4239,35 +4302,59 @@
       "cross-registry-todos/task-15/t15-part5.md",
       "check-performance-thresholds.py"
     ],
-    "docs/cross-registry-todos/task-15/t15-part6.md": ["cross-registry-todos/task-15/t15-part6.md"],
-    "docs/cross-registry-todos/task-16/t16-part1.md": ["cross-registry-todos/task-16/t16-part1.md"],
-    "docs/cross-registry-todos/task-16/t16-part2.md": ["cross-registry-todos/task-16/t16-part2.md"],
-    "docs/cross-registry-todos/task-16/t16-part3.md": ["cross-registry-todos/task-16/t16-part3.md"],
+    "docs/cross-registry-todos/task-15/t15-part6.md": [
+      "cross-registry-todos/task-15/t15-part6.md"
+    ],
+    "docs/cross-registry-todos/task-16/t16-part1.md": [
+      "cross-registry-todos/task-16/t16-part1.md"
+    ],
+    "docs/cross-registry-todos/task-16/t16-part2.md": [
+      "cross-registry-todos/task-16/t16-part2.md"
+    ],
+    "docs/cross-registry-todos/task-16/t16-part3.md": [
+      "cross-registry-todos/task-16/t16-part3.md"
+    ],
     "docs/cross-registry-todos/task-16/t16-part4.md": [
       "rollback-deployment.sh",
       "promote-canary.sh",
       "cross-registry-todos/task-16/t16-part4.md",
       "workflows/progressive-deployment.yml"
     ],
-    "docs/cross-registry-todos/task-16/t16-part5.md": ["cross-registry-todos/task-16/t16-part5.md"],
-    "docs/cross-registry-todos/task-16/t16-part6.md": ["cross-registry-todos/task-16/t16-part6.md"],
-    "docs/cross-registry-todos/task-17/t17-part1.md": ["cross-registry-todos/task-17/t17-part1.md"],
-    "docs/cross-registry-todos/task-17/t17-part2.md": ["cross-registry-todos/task-17/t17-part2.md"],
-    "docs/cross-registry-todos/task-17/t17-part3.md": ["cross-registry-todos/task-17/t17-part3.md"],
-    "docs/cross-registry-todos/task-17/t17-part4.md": ["cross-registry-todos/task-17/t17-part4.md"],
+    "docs/cross-registry-todos/task-16/t16-part5.md": [
+      "cross-registry-todos/task-16/t16-part5.md"
+    ],
+    "docs/cross-registry-todos/task-16/t16-part6.md": [
+      "cross-registry-todos/task-16/t16-part6.md"
+    ],
+    "docs/cross-registry-todos/task-17/t17-part1.md": [
+      "cross-registry-todos/task-17/t17-part1.md"
+    ],
+    "docs/cross-registry-todos/task-17/t17-part2.md": [
+      "cross-registry-todos/task-17/t17-part2.md"
+    ],
+    "docs/cross-registry-todos/task-17/t17-part3.md": [
+      "cross-registry-todos/task-17/t17-part3.md"
+    ],
+    "docs/cross-registry-todos/task-17/t17-part4.md": [
+      "cross-registry-todos/task-17/t17-part4.md"
+    ],
     "docs/cross-registry-todos/task-17/t17-part5.md": [
       "cross-registry-todos/task-17/t17-part5.md",
       "alerting-strategy.md",
       "anomaly_detection.py",
       "alert_deduplication.py"
     ],
-    "docs/cross-registry-todos/task-17/t17-part6.md": ["cross-registry-todos/task-17/t17-part6.md"],
+    "docs/cross-registry-todos/task-17/t17-part6.md": [
+      "cross-registry-todos/task-17/t17-part6.md"
+    ],
     "docs/cross-registry-todos/task-18/t18-part1.md": [
       "integration/data-flow.yaml",
       "integration/dependencies.rs",
       "cross-registry-todos/task-18/t18-part1.md"
     ],
-    "docs/cross-registry-todos/task-18/t18-part2.md": ["cross-registry-todos/task-18/t18-part2.md"],
+    "docs/cross-registry-todos/task-18/t18-part2.md": [
+      "cross-registry-todos/task-18/t18-part2.md"
+    ],
     "docs/cross-registry-todos/task-18/t18-part3.md": [
       "cross-registry-todos/task-18/t18-part3.md",
       "troubleshooting/prometheus-queries.md",
@@ -5004,7 +5091,9 @@
       "workflows/auto-module-tagging.yml",
       "workflows/reusable-advanced-cache.yml"
     ],
-    "docs/workflows/performance-monitoring-todo.md": ["workflows/performance-monitoring-todo.md"],
+    "docs/workflows/performance-monitoring-todo.md": [
+      "workflows/performance-monitoring-todo.md"
+    ],
     "examples/migration-guides/subtitle-manager-migration.md": [
       "issue_manager.py",
       "scripts/issue_manager.py",
@@ -5015,22 +5104,36 @@
       "workflows/reusable-unified-issue-management.yml"
     ],
     "examples/workflows/ai-rebase-example.yml": ["reusable-ai-rebase.yml"],
-    "examples/workflows/enhanced-docs-update-example.yml": ["reusable-enhanced-docs-update.yml"],
+    "examples/workflows/enhanced-docs-update-example.yml": [
+      "reusable-enhanced-docs-update.yml"
+    ],
     "examples/workflows/enhanced-issue-management-example.yml": [
       "reusable-enhanced-issue-management.yml"
     ],
-    "examples/workflows/issue-management-advanced.yml": ["reusable-unified-issue-management.yml"],
-    "examples/workflows/issue-management-basic.yml": ["reusable-unified-issue-management.yml"],
+    "examples/workflows/issue-management-advanced.yml": [
+      "reusable-unified-issue-management.yml"
+    ],
+    "examples/workflows/issue-management-basic.yml": [
+      "reusable-unified-issue-management.yml"
+    ],
     "examples/workflows/label-sync-advanced.yml": ["reusable-label-sync.yml"],
     "examples/workflows/label-sync-basic.yml": ["reusable-label-sync.yml"],
     "examples/workflows/pr-labeler-example.yml": ["reusable-labeler.yml"],
-    "examples/workflows/super-linter-example.yml": ["reusable-super-linter.yml"],
-    "examples/workflows/super-linter-improved-example.yml": ["reusable-super-linter.yml"],
-    "examples/workflows/unified-automation-complete.yml": ["reusable-unified-automation.yml"],
+    "examples/workflows/super-linter-example.yml": [
+      "reusable-super-linter.yml"
+    ],
+    "examples/workflows/super-linter-improved-example.yml": [
+      "reusable-super-linter.yml"
+    ],
+    "examples/workflows/unified-automation-complete.yml": [
+      "reusable-unified-automation.yml"
+    ],
     "examples/workflows/unified-automation-with-intelligent-labeling.yml": [
       "reusable-unified-automation.yml"
     ],
-    "examples/workflows/unified-automation.yml": ["reusable-unified-automation.yml"],
+    "examples/workflows/unified-automation.yml": [
+      "reusable-unified-automation.yml"
+    ],
     "fix_instruction_frontmatter.py": ["re", "Path", "shutil", "pathlib", "os"],
     "scripts/CODEX-REBASE-GUIDE.md": ["*", "CODEX-REBASE-GUIDE.md", "rebase"],
     "scripts/README-cleanup-tool.md": [
@@ -5125,7 +5228,10 @@
       "os",
       "  collect_results.py"
     ],
-    "scripts/copilot-firewall/README.md": ["copilot-firewall", "copilot-firewall/README.md"],
+    "scripts/copilot-firewall/README.md": [
+      "copilot-firewall",
+      "copilot-firewall/README.md"
+    ],
     "scripts/copilot-firewall/copilot_firewall/__init__.py": [
       "copilot-firewall/copilot_firewall/__init__.py"
     ],
@@ -5446,7 +5552,12 @@
       "update_instructions_ignore_blocks.py",
       "__future__"
     ],
-    "scripts/update_workflow_versions.py": ["re", "pathlib", "Path", "update_workflow_versions.py"],
+    "scripts/update_workflow_versions.py": [
+      "re",
+      "pathlib",
+      "Path",
+      "update_workflow_versions.py"
+    ],
     "scripts/validate-linter-configs.py": [
       "re",
       "Path",
@@ -5516,7 +5627,9 @@
       "reusable-semantic-versioning.yml",
       "automatic-release.yml"
     ],
-    "templates/workflows/repository-defaults.yml": ["reusable-repo-settings.yml"],
+    "templates/workflows/repository-defaults.yml": [
+      "reusable-repo-settings.yml"
+    ],
     "test_instruction_context.sh": ["scripts/multi-repo-rebase.sh"],
     "testdata/README.md": ["python/hello_world.py"],
     "tests/test_basic.py": ["json", "sys", "os", "unittest", "standard"],
@@ -5669,29 +5782,43 @@
       "collections",
       "os"
     ],
-    "workflow-templates/example-reusable-ai-rebase.yml": ["reusable-ai-rebase.yml"],
+    "workflow-templates/example-reusable-ai-rebase.yml": [
+      "reusable-ai-rebase.yml"
+    ],
     "workflow-templates/example-reusable-ci.yml": ["reusable-ci.yml"],
     "workflow-templates/example-reusable-codeql.yml": ["reusable-codeql.yml"],
-    "workflow-templates/example-reusable-docker-build.yml": ["reusable-docker-build.yml"],
-    "workflow-templates/example-reusable-docs-update.yml": ["reusable-docs-update.yml"],
+    "workflow-templates/example-reusable-docker-build.yml": [
+      "reusable-docker-build.yml"
+    ],
+    "workflow-templates/example-reusable-docs-update.yml": [
+      "reusable-docs-update.yml"
+    ],
     "workflow-templates/example-reusable-enhanced-docs-update.yml": [
       "reusable-enhanced-docs-update.yml"
     ],
     "workflow-templates/example-reusable-enhanced-issue-management.yml": [
       "reusable-enhanced-issue-management.yml"
     ],
-    "workflow-templates/example-reusable-goreleaser.yml": ["reusable-goreleaser.yml"],
+    "workflow-templates/example-reusable-goreleaser.yml": [
+      "reusable-goreleaser.yml"
+    ],
     "workflow-templates/example-reusable-intelligent-issue-labeling.yml": [
       "reusable-intelligent-issue-labeling.yml"
     ],
-    "workflow-templates/example-reusable-label-sync.yml": ["reusable-label-sync.yml"],
+    "workflow-templates/example-reusable-label-sync.yml": [
+      "reusable-label-sync.yml"
+    ],
     "workflow-templates/example-reusable-labeler.yml": ["reusable-labeler.yml"],
-    "workflow-templates/example-reusable-repo-settings.yml": ["reusable-repo-settings.yml"],
+    "workflow-templates/example-reusable-repo-settings.yml": [
+      "reusable-repo-settings.yml"
+    ],
     "workflow-templates/example-reusable-semantic-versioning.yml": [
       "reusable-semantic-versioning.yml"
     ],
     "workflow-templates/example-reusable-stale.yml": ["reusable-stale.yml"],
-    "workflow-templates/example-reusable-super-linter.yml": ["reusable-super-linter.yml"],
+    "workflow-templates/example-reusable-super-linter.yml": [
+      "reusable-super-linter.yml"
+    ],
     "workflow-templates/example-reusable-unified-automation.yml": [
       "reusable-unified-automation.yml"
     ],
@@ -5708,7 +5835,10 @@
       "dependency-analysis/dependencies.json",
       ".devcontainer/post-create.sh"
     ],
-    "PULL_REQUEST_TEMPLATE.md": [".github/PULL_REQUEST_TEMPLATE.md", "docs/README.md"],
+    "PULL_REQUEST_TEMPLATE.md": [
+      ".github/PULL_REQUEST_TEMPLATE.md",
+      "docs/README.md"
+    ],
     "workflows/matrix-build.yml": [".github/WORKFLOW_CONFIG_GUIDE.md"],
     "prompts/ai-rebase-*.md": [".github/WORKFLOW_CONFIG_GUIDE.md"],
     "workflows/pr-automation.yml": [
@@ -5724,10 +5854,16 @@
       ".github/WORKFLOW_CONFIG_GUIDE.md",
       "current_status_20251031_025909.md"
     ],
-    "super-linter.env": ["COMMITLINT_SETUP.md", ".github/WORKFLOW_CONFIG_GUIDE.md"],
+    "super-linter.env": [
+      "COMMITLINT_SETUP.md",
+      ".github/WORKFLOW_CONFIG_GUIDE.md"
+    ],
     "unified-automation-config.json": [".github/WORKFLOW_CONFIG_GUIDE.md"],
     "scripts/ai-rebase.sh": [".github/WORKFLOW_CONFIG_GUIDE.md"],
-    "ai-rebase.sh": [".github/WORKFLOW_CONFIG_GUIDE.md", ".github/workflows/pr-automation.yml"],
+    "ai-rebase.sh": [
+      ".github/WORKFLOW_CONFIG_GUIDE.md",
+      ".github/workflows/pr-automation.yml"
+    ],
     "WORKFLOW_CONFIG_GUIDE.md": [".github/WORKFLOW_CONFIG_GUIDE.md"],
     "instructions/": [
       "CLAUDE.md",
@@ -5745,7 +5881,9 @@
       ".github/WORKFLOW_CONFIG_GUIDE.md",
       "dependency-analysis/dependencies.json"
     ],
-    "workflows/reusable-matrix-build.yml@main": [".github/WORKFLOW_CONFIG_GUIDE.md"],
+    "workflows/reusable-matrix-build.yml@main": [
+      ".github/WORKFLOW_CONFIG_GUIDE.md"
+    ],
     "reusable-matrix-build.yml": [".github/WORKFLOW_CONFIG_GUIDE.md"],
     "workflows/ci.yml": [
       ".github/instructions/github-actions.instructions.md",
@@ -5872,7 +6010,9 @@
       "scripts/README.md",
       ".github/scripts/README.md"
     ],
-    "api.md](docs/api.md": [".github/instructions/commit-messages.instructions.md"],
+    "api.md](docs/api.md": [
+      ".github/instructions/commit-messages.instructions.md"
+    ],
     "instructions/*.instructions.md": [
       ".github/instructions/commit-messages.instructions.md",
       "docs/refactors/workflows/v2/README.md",
@@ -5917,8 +6057,12 @@
       ".github/instructions/copilot-instructions.md",
       "docs/README.md"
     ],
-    "# file: path/to/file.py": [".github/instructions/general-coding.instructions.md"],
-    "deploy-production.yml": [".github/instructions/github-actions.instructions.md"],
+    "# file: path/to/file.py": [
+      ".github/instructions/general-coding.instructions.md"
+    ],
+    "deploy-production.yml": [
+      ".github/instructions/github-actions.instructions.md"
+    ],
     "instructions/github-actions.instructions.md": [
       "docs/refactors/workflows/v2/phases/phase-2-release-consolidation.md",
       "docs/refactors/workflows/v2/README.md",
@@ -5927,7 +6071,9 @@
       ".github/instructions/github-actions.instructions.md",
       "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
     ],
-    "workflows/*.{yml,yaml}": [".github/instructions/github-actions.instructions.md"],
+    "workflows/*.{yml,yaml}": [
+      ".github/instructions/github-actions.instructions.md"
+    ],
     "workflows/": [
       "docs/cross-registry-todos/task-03/t03-part3.md",
       "docs/refactors/workflows/v2/operations/migration-guide.md",
@@ -5983,7 +6129,9 @@
       ".github/instructions/pull-request-descriptions.instructions.md",
       "docs/README.md"
     ],
-    "./README.md": [".github/instructions/pull-request-descriptions.instructions.md"],
+    "./README.md": [
+      ".github/instructions/pull-request-descriptions.instructions.md"
+    ],
     "setup.py": [
       "dependency-analysis/dependencies.json",
       ".github/workflows/scripts/release_workflow.py",
@@ -6014,7 +6162,10 @@
       ".github/instructions/python.instructions.md"
     ],
     "jodie.py": [".github/instructions/python.instructions.md"],
-    "instructions/r.instructions.md": ["docs/README.md", ".github/instructions/r.instructions.md"],
+    "instructions/r.instructions.md": [
+      "docs/README.md",
+      ".github/instructions/r.instructions.md"
+    ],
     "instructions/rust-utility.instructions.md": [
       "docs/README.md",
       ".github/instructions/rust-utility.instructions.md"
@@ -6091,7 +6242,10 @@
       "docs/documentation-updates.md",
       ".github/prompts/ai-architecture.prompt.md"
     ],
-    "prompts/ai-changelog.prompt.md": [".github/prompts/ai-changelog.prompt.md", "docs/README.md"],
+    "prompts/ai-changelog.prompt.md": [
+      ".github/prompts/ai-changelog.prompt.md",
+      "docs/README.md"
+    ],
     "prompts/ai-contribution.prompt.md": [
       "docs/README.md",
       ".github/prompts/ai-contribution.prompt.md"
@@ -6100,14 +6254,23 @@
       "docs/README.md",
       ".github/prompts/ai-issue-triage.prompt.md"
     ],
-    "prompts/ai-migration.prompt.md": ["docs/README.md", ".github/prompts/ai-migration.prompt.md"],
+    "prompts/ai-migration.prompt.md": [
+      "docs/README.md",
+      ".github/prompts/ai-migration.prompt.md"
+    ],
     "prompts/ai-rebase-context.md": [
       "docs/README.md",
       ".github/prompts/ai-rebase-context.md",
       ".github/prompts/ai-rebase-system.prompt.md"
     ],
-    "commit-messages.md": ["AGENTS.md", ".github/prompts/ai-rebase-context.md", "codex/AGENTS.md"],
-    "instructions/[language].instructions.md": [".github/prompts/ai-rebase-context.template.md"],
+    "commit-messages.md": [
+      "AGENTS.md",
+      ".github/prompts/ai-rebase-context.md",
+      "codex/AGENTS.md"
+    ],
+    "instructions/[language].instructions.md": [
+      ".github/prompts/ai-rebase-context.template.md"
+    ],
     "prompts/ai-rebase-context.template.md": [
       "docs/README.md",
       ".github/prompts/ai-rebase-context.template.md"
@@ -6116,16 +6279,30 @@
       "docs/README.md",
       ".github/prompts/ai-rebase-system.prompt.md"
     ],
-    "ai-rebase-context.template.md": [".github/prompts/ai-rebase-system.prompt.md"],
-    "prompts/ai-refactor.prompt.md": [".github/prompts/ai-refactor.prompt.md", "docs/README.md"],
+    "ai-rebase-context.template.md": [
+      ".github/prompts/ai-rebase-system.prompt.md"
+    ],
+    "prompts/ai-refactor.prompt.md": [
+      ".github/prompts/ai-refactor.prompt.md",
+      "docs/README.md"
+    ],
     "prompts/ai-release-notes.prompt.md": [
       ".github/prompts/ai-release-notes.prompt.md",
       "docs/README.md"
     ],
-    "prompts/ai-roadmap.prompt.md": ["docs/README.md", ".github/prompts/ai-roadmap.prompt.md"],
-    "prompts/bug-report.prompt.md": [".github/prompts/bug-report.prompt.md", "docs/README.md"],
+    "prompts/ai-roadmap.prompt.md": [
+      "docs/README.md",
+      ".github/prompts/ai-roadmap.prompt.md"
+    ],
+    "prompts/bug-report.prompt.md": [
+      ".github/prompts/bug-report.prompt.md",
+      "docs/README.md"
+    ],
     "../review-selection.md": [".github/prompts/code-review.prompt.md"],
-    "prompts/code-review.prompt.md": ["docs/README.md", ".github/prompts/code-review.prompt.md"],
+    "prompts/code-review.prompt.md": [
+      "docs/README.md",
+      ".github/prompts/code-review.prompt.md"
+    ],
     "../commit-messages.md": [".github/prompts/commit-message.prompt.md"],
     "prompts/commit-message.prompt.md": [
       ".github/prompts/commit-message.prompt.md",
@@ -6139,9 +6316,17 @@
       ".github/prompts/feature-request.prompt.md",
       "docs/README.md"
     ],
-    "prompts/onboarding.prompt.md": [".github/prompts/onboarding.prompt.md", "docs/README.md"],
-    "prompts/pull-request.prompt.md": ["docs/README.md", ".github/prompts/pull-request.prompt.md"],
-    "../pull-request-descriptions.md": [".github/prompts/pull-request.prompt.md"],
+    "prompts/onboarding.prompt.md": [
+      ".github/prompts/onboarding.prompt.md",
+      "docs/README.md"
+    ],
+    "prompts/pull-request.prompt.md": [
+      "docs/README.md",
+      ".github/prompts/pull-request.prompt.md"
+    ],
+    "../pull-request-descriptions.md": [
+      ".github/prompts/pull-request.prompt.md"
+    ],
     "prompts/security-review.prompt.md": [
       ".github/prompts/security-review.prompt.md",
       "docs/README.md"
@@ -6343,7 +6528,9 @@
       "scripts/submit_codex_jobs.py"
     ],
     "detect-build-matrix.py": [".github/scripts/detect-build-matrix.py"],
-    "python3 .github/scripts/docker-detect.py": [".github/scripts/detect-build-matrix.py"],
+    "python3 .github/scripts/docker-detect.py": [
+      ".github/scripts/detect-build-matrix.py"
+    ],
     "os": [
       ".github/workflows/scripts/collect_rust_crate_metadata.py",
       "fix_instruction_frontmatter.py",
@@ -6587,7 +6774,9 @@
       ".github/workflows/scripts/run_python_release_tests.py",
       "scripts/submit_codex_jobs.py"
     ],
-    "determine-security-languages.py": [".github/scripts/determine-security-languages.py"],
+    "determine-security-languages.py": [
+      ".github/scripts/determine-security-languages.py"
+    ],
     "Dict": [
       "scripts/template_repo/scaffold_template_repo.py",
       "scripts/repo-sync.py",
@@ -6857,9 +7046,15 @@
       ".github/scripts/sync-generate-summary.py",
       ".github/scripts/sync-receiver-sync-files.py"
     ],
-    "sync-receiver-check-changes.py": [".github/scripts/sync-receiver-check-changes.py"],
-    "sync-receiver-commit-push.py": [".github/scripts/sync-receiver-commit-push.py"],
-    "sync-receiver-generate-summary.py": [".github/scripts/sync-receiver-generate-summary.py"],
+    "sync-receiver-check-changes.py": [
+      ".github/scripts/sync-receiver-check-changes.py"
+    ],
+    "sync-receiver-commit-push.py": [
+      ".github/scripts/sync-receiver-commit-push.py"
+    ],
+    "sync-receiver-generate-summary.py": [
+      ".github/scripts/sync-receiver-generate-summary.py"
+    ],
     "sync-receiver-sync-files.py": [
       "dependency-analysis/dependencies.json",
       ".github/workflows/scripts/sync_receiver.py",
@@ -6903,7 +7098,9 @@
       ".github/scripts/sync-receiver-sync-files.py",
       ".github/workflows/scripts/parse_protobuf_config.py"
     ],
-    "update_version.py": [".github/scripts/sync-release-create-semantic-config.py"],
+    "update_version.py": [
+      ".github/scripts/sync-release-create-semantic-config.py"
+    ],
     "__init__.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/phases/phase-0-foundation.md",
@@ -6912,7 +7109,9 @@
       ".github/scripts/sync-release-determine-version.py",
       ".github/scripts/sync-release-handle-manual-release.py"
     ],
-    "sync-workflow-modernizer.py": [".github/scripts/sync-workflow-modernizer.py"],
+    "sync-workflow-modernizer.py": [
+      ".github/scripts/sync-workflow-modernizer.py"
+    ],
     "List": [
       "scripts/determine_operations.py",
       "scripts/intelligent_sync_to_repos.py",
@@ -6932,7 +7131,10 @@
       "README.md"
     ],
     "test-files/test.json": [".github/test-files/README.md"],
-    "test-files/test.md": [".github/test-files/test.md", ".github/test-files/README.md"],
+    "test-files/test.md": [
+      ".github/test-files/test.md",
+      ".github/test-files/README.md"
+    ],
     "test-files/test.js": [".github/test-files/README.md"],
     "test-files/test.rs": [".github/test-files/README.md"],
     ".github/workflows/test-super-linter.yml": [
@@ -6979,7 +7181,10 @@
     "test-files/README.md": [".github/test-files/README.md"],
     "test-files/test.dockerfile": [".github/test-files/README.md"],
     "test.py": [".github/test-files/README.md"],
-    "SUPER_LINTER_STRATEGY.md": ["docs/SUPER_LINTER_STRATEGY.md", ".github/test-files/README.md"],
+    "SUPER_LINTER_STRATEGY.md": [
+      "docs/SUPER_LINTER_STRATEGY.md",
+      ".github/test-files/README.md"
+    ],
     "workflows/test-super-linter.yml": [
       "dependency-analysis/dependencies.json",
       "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md",
@@ -7015,7 +7220,9 @@
       ".github/workflows/ci.yml",
       "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
     ],
-    "workflows/check_commit_overrides.py": [".github/workflows/commit-override-handler.yml"],
+    "workflows/check_commit_overrides.py": [
+      ".github/workflows/commit-override-handler.yml"
+    ],
     "docs_workflow.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
@@ -7037,7 +7244,9 @@
       ".github/workflows/maintenance.yml",
       "docs/workflows/consolidation-map.md"
     ],
-    "benchmarks/measure_command.py": [".github/workflows/performance-monitoring.yml"],
+    "benchmarks/measure_command.py": [
+      ".github/workflows/performance-monitoring.yml"
+    ],
     "reusable-protobuf.yml": [
       ".github/workflows/release-protobuf.yml",
       ".github/workflows/reusable-ci.yml",
@@ -7132,7 +7341,9 @@
       "docs/workflow-optimization.md"
     ],
     "release-protobuf.yml": [".github/workflows/reusable-release.yml"],
-    "workflows/package_release_assets.py": [".github/workflows/reusable-release.yml"],
+    "workflows/package_release_assets.py": [
+      ".github/workflows/reusable-release.yml"
+    ],
     "generate_release_summary.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/reference/workflow-reference.md",
@@ -7157,7 +7368,9 @@
     "generate-version.sh": [".github/workflows/scripts/README.md"],
     "detect-languages.sh": [".github/workflows/scripts/README.md"],
     "generate-changelog.sh": [".github/workflows/scripts/README.md"],
-    "workflows/scripts/detect-languages.sh": [".github/workflows/scripts/README.md"],
+    "workflows/scripts/detect-languages.sh": [
+      ".github/workflows/scripts/README.md"
+    ],
     "workflows/scripts/README.md": [".github/workflows/scripts/README.md"],
     "release-strategy.sh": [".github/workflows/scripts/README.md"],
     "test-scripts.sh": [".github/workflows/scripts/README.md"],
@@ -7190,7 +7403,10 @@
       ".github/workflows/scripts/docs_workflow.py",
       ".github/workflows/scripts/automation_workflow.py"
     ],
-    "hashlib": ["scripts/repo-sync.py", ".github/workflows/scripts/automation_workflow.py"],
+    "hashlib": [
+      "scripts/repo-sync.py",
+      ".github/workflows/scripts/automation_workflow.py"
+    ],
     "collections": [
       "analyze-dependencies.py",
       ".github/workflows/scripts/automation_workflow.py",
@@ -7235,7 +7451,10 @@
       "scripts/benchmarks/measure_command.py",
       "scripts/mark_old_notifications_done.py"
     ],
-    "urllib.request": ["scripts/sync-github-labels.py", ".github/workflows/scripts/ci_workflow.py"],
+    "urllib.request": [
+      "scripts/sync-github-labels.py",
+      ".github/workflows/scripts/ci_workflow.py"
+    ],
     "*_test.py": [".github/workflows/scripts/ci_workflow.py"],
     "test_*.py": [".github/workflows/scripts/ci_workflow.py"],
     "urllib.parse": [
@@ -7289,10 +7508,16 @@
       "tests/workflow_scripts/test_publish_to_github_packages.py",
       "CHANGELOG.md"
     ],
-    "tests/**/*_test.py": [".github/workflows/scripts/run_python_release_tests.py"],
-    "tests/**/test_*.py": [".github/workflows/scripts/run_python_release_tests.py"],
+    "tests/**/*_test.py": [
+      ".github/workflows/scripts/run_python_release_tests.py"
+    ],
+    "tests/**/test_*.py": [
+      ".github/workflows/scripts/run_python_release_tests.py"
+    ],
     "glob": [".github/workflows/scripts/run_python_release_tests.py"],
-    "\u2705 Copied sync-github-labels.py": [".github/workflows/scripts/sync_receiver.py"],
+    "\u2705 Copied sync-github-labels.py": [
+      ".github/workflows/scripts/sync_receiver.py"
+    ],
     ".github/scripts/sync-receiver-sync-files.py": [
       "dependency-analysis/dependencies.json",
       ".github/workflows/scripts/sync_receiver.py",
@@ -7310,7 +7535,9 @@
     "\"$OLDPWD/.github/workflows/scripts/generate-changelog.sh": [
       ".github/workflows/scripts/test-scripts.sh"
     ],
-    "importlib": [".github/workflows/scripts/verify_python_protobuf_plugins.py"],
+    "importlib": [
+      ".github/workflows/scripts/verify_python_protobuf_plugins.py"
+    ],
     "workflow_common.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
@@ -7386,7 +7613,11 @@
     "pull-request-descriptions.md": ["AGENTS.md", "codex/AGENTS.md"],
     "repository-setup.md": ["AGENTS.md", "README.md"],
     "review-selection.md": ["AGENTS.md", "codex/AGENTS.md"],
-    ".github/security-guidelines.md": ["AGENTS.md", "README.md", "docs/README.md"],
+    ".github/security-guidelines.md": [
+      "AGENTS.md",
+      "README.md",
+      "docs/README.md"
+    ],
     "workflow-usage.md": ["AGENTS.md", "README.md"],
     ".github/commit-messages.md": ["AGENTS.md"],
     ".github/repository-setup.md": ["AGENTS.md", "README.md"],
@@ -7401,7 +7632,11 @@
       "README.md",
       "COMMITLINT_SETUP.md"
     ],
-    "validate-setup.sh": ["dependency-analysis/dependencies.json", "CONTRIBUTING.md", "README.md"],
+    "validate-setup.sh": [
+      "dependency-analysis/dependencies.json",
+      "CONTRIBUTING.md",
+      "README.md"
+    ],
     "setup-repository.sh": [
       "dependency-analysis/dependencies.json",
       "CONTRIBUTING.md",
@@ -7472,14 +7707,22 @@
       "dependency-analysis/dependencies.json",
       "README.md"
     ],
-    "unified-issue-management.md](docs/unified-issue-management.md": ["README.md"],
-    "library-release.yml": ["dependency-analysis/dependencies.json", "README.md"],
+    "unified-issue-management.md](docs/unified-issue-management.md": [
+      "README.md"
+    ],
+    "library-release.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
     "documentation-updates.md](docs/documentation-updates.md": ["README.md"],
     "workflows/reusable-unified-automation.yml": [
       "dependency-analysis/dependencies.json",
       "README.md"
     ],
-    "container-only.yml": ["dependency-analysis/dependencies.json", "README.md"],
+    "container-only.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
     ".github/workflows/reusable-unified-issue-management.yml": [
       "dependency-analysis/dependencies.json",
       "README.md"
@@ -7502,12 +7745,19 @@
     ],
     "workflows/automatic-release.yml@main": ["README.md"],
     "workflows/reusable-semantic-versioning.yml@main": ["README.md"],
-    "issue-updates/*.json": ["README.md", "codex/AGENTS.md", "docs/unified-issue-management.md"],
+    "issue-updates/*.json": [
+      "README.md",
+      "codex/AGENTS.md",
+      "docs/unified-issue-management.md"
+    ],
     "workflows/reusable-semantic-versioning.yml": [
       "dependency-analysis/dependencies.json",
       "README.md"
     ],
-    "workflows/reusable-label-sync.yml@main": ["README.md", "docs/label-synchronization.md"],
+    "workflows/reusable-label-sync.yml@main": [
+      "README.md",
+      "docs/label-synchronization.md"
+    ],
     ".github/workflows/unified-automation.yml": [
       "dependency-analysis/dependencies.json",
       "README.md",
@@ -7522,7 +7772,10 @@
       "dependency-analysis/dependencies.json",
       "README.md"
     ],
-    "workflows/automatic-release.yml": ["dependency-analysis/dependencies.json", "README.md"],
+    "workflows/automatic-release.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
     "unified-automation.yml": [
       "dependency-analysis/dependencies.json",
       "docs/unified-automation.md",
@@ -7578,9 +7831,18 @@
       "examples/workflows/unified-automation-complete.yml"
     ],
     "CONTRIBUTING.md": ["README.md", "docs/README.md"],
-    "workflows/buildah-multiarch.yml": ["dependency-analysis/dependencies.json", "README.md"],
-    "complete-ci-cd.yml": ["dependency-analysis/dependencies.json", "README.md"],
-    "unified-issue-management.yml": ["dependency-analysis/dependencies.json", "README.md"],
+    "workflows/buildah-multiarch.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
+    "complete-ci-cd.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
+    "unified-issue-management.yml": [
+      "dependency-analysis/dependencies.json",
+      "README.md"
+    ],
     ".github/workflows/buildah-multiarch.yml": [
       "dependency-analysis/dependencies.json",
       "README.md"
@@ -7758,7 +8020,9 @@
       "docs/cross-registry-todos/task-14/t14-part1.md",
       "current_status_20251031_025909.md"
     ],
-    "refactors/workflows/v2/reference/helper-scripts-api.md": ["current_status_20251031_025909.md"],
+    "refactors/workflows/v2/reference/helper-scripts-api.md": [
+      "current_status_20251031_025909.md"
+    ],
     "test_automation_workflow.py": [
       "dependency-analysis/dependencies.json",
       "tests/workflow_scripts/test_automation_workflow.py",
@@ -7952,7 +8216,10 @@
       "dependency-analysis/dependencies.json",
       "docs/unified-issue-management.md"
     ],
-    "sync-receiver.yml": ["dependency-analysis/dependencies.json", "docs/workflow-optimization.md"],
+    "sync-receiver.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/workflow-optimization.md"
+    ],
     "python-security-audit.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-12/t12-part6.md"
@@ -8089,7 +8356,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-11/t11-part6.md"
     ],
-    ".venv/lib/python3.13/site-packages/pip/__main__.py": ["dependency-analysis/dependencies.json"],
+    ".venv/lib/python3.13/site-packages/pip/__main__.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/resolvelib/compat/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -8129,7 +8398,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part6.md"
     ],
-    "workflow-templates/sync-receiver.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/sync-receiver.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "compare-old-new-workflow.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-09/t09-part2.md"
@@ -8155,7 +8426,10 @@
       "docs/cross-registry-todos/task-03/t03-part6.md",
       "docs/cross-registry-todos/task-01/t01-part6.md"
     ],
-    "sync-repo-setup.py": ["dependency-analysis/dependencies.json", "scripts/sync-repo-setup.py"],
+    "sync-repo-setup.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/sync-repo-setup.py"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/pygments/formatters/irc.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -8166,7 +8440,9 @@
       "dependency-analysis/dependencies.json",
       "docs/workflows/consolidation-map.md"
     ],
-    "scripts/install-pre-commit-hooks.sh": ["dependency-analysis/dependencies.json"],
+    "scripts/install-pre-commit-hooks.sh": [
+      "dependency-analysis/dependencies.json"
+    ],
     "helpers/release_workflow.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/reference/config-schema.md"
@@ -8190,8 +8466,12 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/resolution/resolvelib/candidates.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/update_instructions_ignore_blocks.py": ["dependency-analysis/dependencies.json"],
-    "scripts/workflows/check_commit_overrides.py": ["dependency-analysis/dependencies.json"],
+    "scripts/update_instructions_ignore_blocks.py": [
+      "dependency-analysis/dependencies.json"
+    ],
+    "scripts/workflows/check_commit_overrides.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/file.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/README.md"
@@ -8208,7 +8488,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/urllib3/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "workflow-templates/example-reusable-codeql.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-codeql.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/release-frontend-v1-deprecated.yml": [
       "dependency-analysis/dependencies.json",
       "docs/workflows/consolidation-map.md"
@@ -8315,7 +8597,10 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/packaging/_manylinux.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "cleanup-repos.sh": ["dependency-analysis/dependencies.json", "scripts/README-cleanup-tool.md"],
+    "cleanup-repos.sh": [
+      "dependency-analysis/dependencies.json",
+      "scripts/README-cleanup-tool.md"
+    ],
     "test-multiplatform-local-registry.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part3.md"
@@ -8357,7 +8642,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/main.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/copilot-firewall/test_fix.py": ["dependency-analysis/dependencies.json"],
+    "scripts/copilot-firewall/test_fix.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "/examples/workflows/issue-management-basic.yml": [
       "dependency-analysis/dependencies.json",
       "docs/unified-issue-management.md"
@@ -8401,7 +8688,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/models/format_control.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/cleanup-archived-repos.py": ["dependency-analysis/dependencies.json"],
+    "scripts/cleanup-archived-repos.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/index/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -8457,7 +8746,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/resolvelib/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/copilot-firewall/copilot_firewall/main.py": ["dependency-analysis/dependencies.json"],
+    "scripts/copilot-firewall/copilot_firewall/main.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/pygments/formatters/pangomarkup.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -8494,7 +8785,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-11/t11-part4.md"
     ],
-    "scripts/template_repo/push_with_gh.py": ["dependency-analysis/dependencies.json"],
+    "scripts/template_repo/push_with_gh.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "gcommon/scripts/github_project_manager.py": [
       "dependency-analysis/dependencies.json",
       "scripts/cleanup-summary.py"
@@ -8527,8 +8820,12 @@
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/version-policy.md"
     ],
-    "scripts/template_repo/scaffold_template_repo.py": ["dependency-analysis/dependencies.json"],
-    "scripts/unified_github_project_manager_v2.py": ["dependency-analysis/dependencies.json"],
+    "scripts/template_repo/scaffold_template_repo.py": [
+      "dependency-analysis/dependencies.json"
+    ],
+    "scripts/unified_github_project_manager_v2.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/cli/status_codes.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -8538,7 +8835,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/commands/help.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/set-copilot-firewall.sh": ["dependency-analysis/dependencies.json"],
+    "scripts/set-copilot-firewall.sh": [
+      "dependency-analysis/dependencies.json"
+    ],
     "integration-test-migration.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-09/t09-part1.md"
@@ -8639,7 +8938,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/commands/search.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "workflow-templates/example-reusable-ai-rebase.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-ai-rebase.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/configuration.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9059,7 +9360,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/utils/filesystem.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/template_repo/validate_template_repo.py": ["dependency-analysis/dependencies.json"],
+    "scripts/template_repo/validate_template_repo.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "apply-yaml-fix.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part4.md"
@@ -9113,7 +9416,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-18/t18-part5.md"
     ],
-    "examples/workflows/label-sync-basic.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/label-sync-basic.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "go-security-audit.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-12/t12-part6.md"
@@ -9129,7 +9434,10 @@
     "scripts/copilot-firewall/copilot_firewall/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "push_with_gh.py": ["dependency-analysis/dependencies.json", "scripts/template_repo/README.md"],
+    "push_with_gh.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/template_repo/README.md"
+    ],
     "verify-ghcr-package.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part4.md"
@@ -9263,7 +9571,10 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-09/t09-part4.md"
     ],
-    "smart-rebase.sh": ["dependency-analysis/dependencies.json", "scripts/README-rebase.md"],
+    "smart-rebase.sh": [
+      "dependency-analysis/dependencies.json",
+      "scripts/README-rebase.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/idna/idnadata.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9338,8 +9649,13 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/terminal_theme.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/mark_old_notifications_done.py": ["dependency-analysis/dependencies.json"],
-    "repo-sync.py": ["dependency-analysis/dependencies.json", "scripts/repo-sync.py"],
+    "scripts/mark_old_notifications_done.py": [
+      "dependency-analysis/dependencies.json"
+    ],
+    "repo-sync.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/repo-sync.py"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/operations/build/wheel_editable.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9463,7 +9779,10 @@
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/implementation/ci-workflows.md"
     ],
-    "repo-audit.py": ["dependency-analysis/dependencies.json", "scripts/repo-audit.py"],
+    "repo-audit.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/repo-audit.py"
+    ],
     "workflows/scripts/tests/test_maintenance_workflow.py": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/phases/phase-4-maintenance-automation.md"
@@ -9520,7 +9839,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/operations/prepare.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "examples/workflows/ai-rebase-example.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/ai-rebase-example.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/cachecontrol/serialize.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9532,7 +9853,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/idna/uts46data.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "project does not have a setup.py": ["dependency-analysis/dependencies.json"],
+    "project does not have a setup.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "test-cache-optimization.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part3.md"
@@ -9541,7 +9864,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part5.md"
     ],
-    "examples/workflows/label-sync-advanced.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/label-sync-advanced.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/jupyter.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9588,7 +9913,10 @@
       "scripts/unified_github_project_manager_v2.py",
       "scripts/unified_github_project_manager_v3.py"
     ],
-    "  collect_results.py": ["dependency-analysis/dependencies.json", "scripts/collect_results.py"],
+    "  collect_results.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/collect_results.py"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/pyproject_hooks/_compat.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9628,7 +9956,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/pygments/__main__.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/fix-markdown-headers.py": ["dependency-analysis/dependencies.json"],
+    "scripts/fix-markdown-headers.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "{path}.py": ["dependency-analysis/dependencies.json"],
     ".venv/lib/python3.13/site-packages/pip/_vendor/requests/certs.py": [
       "dependency-analysis/dependencies.json"
@@ -9640,7 +9970,10 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/cli/index_command.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "docs-update.yml": ["dependency-analysis/dependencies.json", "docs/documentation-updates.md"],
+    "docs-update.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/documentation-updates.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/urllib3/packages/backports/makefile.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9655,7 +9988,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/operations/build/metadata_legacy.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "examples/universal-dependency-submission.yml": ["dependency-analysis/dependencies.json"],
+    "examples/universal-dependency-submission.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/release-rust.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-03/t03-part3.md",
@@ -9742,7 +10077,10 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/_wrap.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "_pb2.py": ["dependency-analysis/dependencies.json", "docs/SUPER_LINTER_CONFIG_COMPARISON.md"],
+    "_pb2.py": [
+      "dependency-analysis/dependencies.json",
+      "docs/SUPER_LINTER_CONFIG_COMPARISON.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/_log_render.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -9780,7 +10118,9 @@
       "docs/cross-registry-todos/task-02/t02-part6.md",
       "docs/cross-registry-todos/task-02-docker-packages.md"
     ],
-    "scripts/update-repository-automation.py": ["dependency-analysis/dependencies.json"],
+    "scripts/update-repository-automation.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "scripts/cleanup-summary.py": ["dependency-analysis/dependencies.json"],
     "workflows/release-*.yml": [
       "dependency-analysis/dependencies.json",
@@ -9802,7 +10142,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/operations/install/editable_legacy.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/migrate-instruction-files.sh": ["dependency-analysis/dependencies.json"],
+    "scripts/migrate-instruction-files.sh": [
+      "dependency-analysis/dependencies.json"
+    ],
     "monitor-pr-checks.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part4.md"
@@ -9843,7 +10185,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/panel.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "workflow-templates/example-reusable-label-sync.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-label-sync.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "reusable-stale.yml": [
       "dependency-analysis/dependencies.json",
       "workflow-templates/example-reusable-stale.yml"
@@ -9860,7 +10204,9 @@
       "scripts/README-cleanup-tool.md",
       "scripts/cleanup-archived-repos.py"
     ],
-    "commit-workflow-github-token-fix.py": ["dependency-analysis/dependencies.json"],
+    "commit-workflow-github-token-fix.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/pyproject_hooks/_impl.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10008,7 +10354,10 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/distlib/util.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "script-name.py": ["dependency-analysis/dependencies.json", "scripts/README.md"],
+    "script-name.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/README.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/typing_extensions.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10092,7 +10441,9 @@
       "dependency-analysis/dependencies.json",
       "docs/ENHANCED_SCRIPTS_UPDATE.md"
     ],
-    "scripts/propagate_instructions_updates.py": ["dependency-analysis/dependencies.json"],
+    "scripts/propagate_instructions_updates.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/security.yml": [
       "dependency-analysis/dependencies.json",
       "docs/workflows/consolidation-map.md"
@@ -10148,7 +10499,9 @@
       "scripts/validate-linter-configs.py",
       "docs/LINTER_VALIDATION.md"
     ],
-    "workflow-templates/example-reusable-ci.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-ci.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/reusable-docker.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-10/t10-part2.md"
@@ -10213,7 +10566,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/_windows_renderer.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "templates/workflows/repository-defaults.yml": ["dependency-analysis/dependencies.json"],
+    "templates/workflows/repository-defaults.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflow-versions.yml": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/operations/migration-guide.md",
@@ -10341,7 +10696,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/pygments/console.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/determine_operations.py": ["dependency-analysis/dependencies.json"],
+    "scripts/determine_operations.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/cachecontrol/heuristics.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10487,7 +10844,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-13/t13-part3.md"
     ],
-    "examples/workflows/unified-automation-complete.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/unified-automation-complete.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/syntax.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10512,11 +10871,16 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/cachecontrol/cache.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "codex-rebase.sh": ["dependency-analysis/dependencies.json", "scripts/README-rebase.md"],
+    "codex-rebase.sh": [
+      "dependency-analysis/dependencies.json",
+      "scripts/README-rebase.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/metadata/importlib/_dists.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "scripts/benchmarks/measure_command.py": ["dependency-analysis/dependencies.json"],
+    "scripts/benchmarks/measure_command.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/urllib3/packages/backports/__init__.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10534,7 +10898,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-10/t10-part4.md"
     ],
-    "scripts/unified_operations_detector.py": ["dependency-analysis/dependencies.json"],
+    "scripts/unified_operations_detector.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/metadata/_json.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10690,7 +11056,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-11/t11-part6.md"
     ],
-    "templates/codeql/advanced-codeql.yml": ["dependency-analysis/dependencies.json"],
+    "templates/codeql/advanced-codeql.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "examples/go-release.yml": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/implementation/release-workflows.md"
@@ -10764,7 +11132,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part3.md"
     ],
-    "tests/workflow_scripts/test_misc_scripts.py": ["dependency-analysis/dependencies.json"],
+    "tests/workflow_scripts/test_misc_scripts.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10911,8 +11281,13 @@
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/reference/workflow-catalog.md"
     ],
-    "scripts/cleanup-notifications.sh": ["dependency-analysis/dependencies.json"],
-    "documentation.yml": ["dependency-analysis/dependencies.json", "docs/workflow-optimization.md"],
+    "scripts/cleanup-notifications.sh": [
+      "dependency-analysis/dependencies.json"
+    ],
+    "documentation.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/workflow-optimization.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/distlib/wheel.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10940,7 +11315,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/align.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "tests/workflow_scripts/test_sync_receiver.py": ["dependency-analysis/dependencies.json"],
+    "tests/workflow_scripts/test_sync_receiver.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/*docker*.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-08/t08-part3.md",
@@ -10963,7 +11340,9 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-08/t08-part5.md"
     ],
-    "workflow-templates/example-reusable-stale.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-stale.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/diagnose.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -10971,7 +11350,10 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/commands/check.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "pr-automation.yml": ["dependency-analysis/dependencies.json", "docs/workflow-optimization.md"],
+    "pr-automation.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/workflow-optimization.md"
+    ],
     "setup-cache-alerts.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part5.md"
@@ -11006,7 +11388,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/pygments/formatters/img.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "examples/workflows/super-linter-example.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/super-linter-example.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "workflows/rust-security.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-10/t10-part3.md"
@@ -11081,7 +11465,9 @@
     ".venv/lib/python3.13/site-packages/pip/_internal/index/sources.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "workflow-templates/example-reusable-labeler.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-labeler.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "create-pr.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part4.md"
@@ -11119,7 +11505,10 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/rich/tree.py": [
       "dependency-analysis/dependencies.json"
     ],
-    "cleanup-summary.py": ["dependency-analysis/dependencies.json", "scripts/cleanup-summary.py"],
+    "cleanup-summary.py": [
+      "dependency-analysis/dependencies.json",
+      "scripts/cleanup-summary.py"
+    ],
     "verify-yaml-fix.sh": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-01/t01-part2.md"
@@ -11318,12 +11707,16 @@
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/reference/config-schema.md"
     ],
-    "scripts/update_workflow_versions.py": ["dependency-analysis/dependencies.json"],
+    "scripts/update_workflow_versions.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "manage-project-structure.sh": [
       "dependency-analysis/dependencies.json",
       "scripts/README-unified-project-manager.md"
     ],
-    "examples/workflows/pr-labeler-example.yml": ["dependency-analysis/dependencies.json"],
+    "examples/workflows/pr-labeler-example.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     "linters/.eslintrc.yml": [
       "dependency-analysis/dependencies.json",
       "docs/SUPER_LINTER_STRATEGY.md",
@@ -11345,7 +11738,9 @@
       "dependency-analysis/dependencies.json",
       "docs/unified-automation.md"
     ],
-    "workflow-templates/example-reusable-goreleaser.yml": ["dependency-analysis/dependencies.json"],
+    "workflow-templates/example-reusable-goreleaser.yml": [
+      "dependency-analysis/dependencies.json"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_vendor/idna/compat.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -11356,8 +11751,14 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part3.md"
     ],
-    "maintenance.yml": ["dependency-analysis/dependencies.json", "docs/workflow-optimization.md"],
-    "security.yml": ["dependency-analysis/dependencies.json", "docs/workflow-optimization.md"],
+    "maintenance.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/workflow-optimization.md"
+    ],
+    "security.yml": [
+      "dependency-analysis/dependencies.json",
+      "docs/workflow-optimization.md"
+    ],
     ".venv/lib/python3.13/site-packages/pip/_internal/utils/logging.py": [
       "dependency-analysis/dependencies.json"
     ],
@@ -11368,7 +11769,9 @@
     ".venv/lib/python3.13/site-packages/pip/_vendor/urllib3/poolmanager.py": [
       "dependency-analysis/dependencies.json"
     ],
-    ".venv/lib/python3.13/site-packages/pip/__init__.py": ["dependency-analysis/dependencies.json"],
+    ".venv/lib/python3.13/site-packages/pip/__init__.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "linters/.yaml-lint.yml": [
       "dependency-analysis/dependencies.json",
       "docs/refactors/workflows/v2/implementation/ci-workflows.md"
@@ -11407,7 +11810,10 @@
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-02/t02-part5.md"
     ],
-    "python/hello_world.py": ["dependency-analysis/dependencies.json", "testdata/README.md"],
+    "python/hello_world.py": [
+      "dependency-analysis/dependencies.json",
+      "testdata/README.md"
+    ],
     "Users should now use: ghcommon/scripts/unified_github_project_manager_v2.py": [
       "dependency-analysis/dependencies.json",
       "scripts/cleanup-summary.py"
@@ -11468,7 +11874,9 @@
       "dependency-analysis/dependencies.json",
       "docs/workflows/consolidation-map.md"
     ],
-    "scripts/unified_github_project_manager_v3.py": ["dependency-analysis/dependencies.json"],
+    "scripts/unified_github_project_manager_v3.py": [
+      "dependency-analysis/dependencies.json"
+    ],
     "cargo-audit.yml": [
       "dependency-analysis/dependencies.json",
       "docs/cross-registry-todos/task-12/t12-part6.md"
@@ -11527,21 +11935,32 @@
       "dependency-analysis/dependencies.json"
     ],
     "DOCKER_CACHING_STRATEGY.md": ["docs/DOCKER_CACHING_STRATEGY.md"],
-    "ENHANCED_SCRIPTS_UPDATE.md": ["docs/ENHANCED_SCRIPTS_UPDATE.md", "docs/README.md"],
+    "ENHANCED_SCRIPTS_UPDATE.md": [
+      "docs/ENHANCED_SCRIPTS_UPDATE.md",
+      "docs/README.md"
+    ],
     "ENHANCED_WORKFLOW_MIGRATION.md": [
       "docs/ENHANCED_WORKFLOW_MIGRATION.md",
       "docs/ENHANCED_WORKFLOW_SUMMARY.md",
       "docs/README.md"
     ],
-    "issue-updates/feature_request.json": ["docs/ENHANCED_WORKFLOW_MIGRATION.md"],
-    "doc-updates": ["docs/ENHANCED_WORKFLOW_MIGRATION.md", "docs/ENHANCED_WORKFLOW_SUMMARY.md"],
+    "issue-updates/feature_request.json": [
+      "docs/ENHANCED_WORKFLOW_MIGRATION.md"
+    ],
+    "doc-updates": [
+      "docs/ENHANCED_WORKFLOW_MIGRATION.md",
+      "docs/ENHANCED_WORKFLOW_SUMMARY.md"
+    ],
     "issue-updates/**": ["docs/ENHANCED_WORKFLOW_MIGRATION.md"],
     "doc-updates/readme_update.json": ["docs/ENHANCED_WORKFLOW_MIGRATION.md"],
     "workflows/reusable-enhanced-issue-management.yml@main": [
       "docs/ENHANCED_WORKFLOW_MIGRATION.md",
       "docs/ENHANCED_WORKFLOW_SUMMARY.md"
     ],
-    "ENHANCED_WORKFLOW_SUMMARY.md": ["docs/ENHANCED_WORKFLOW_SUMMARY.md", "docs/README.md"],
+    "ENHANCED_WORKFLOW_SUMMARY.md": [
+      "docs/ENHANCED_WORKFLOW_SUMMARY.md",
+      "docs/README.md"
+    ],
     "issue-updates/example.json": ["docs/ENHANCED_WORKFLOW_SUMMARY.md"],
     "JSCPD_CONFIGURATION.md": ["docs/JSCPD_CONFIGURATION.md"],
     "https://github.com/super-linter/super-linter/blob/main/docs/linters/jscpd.md": [
@@ -11550,7 +11969,9 @@
     "linters/jscpd.md": ["docs/JSCPD_CONFIGURATION.md"],
     "templates/**": ["docs/JSCPD_CONFIGURATION.md"],
     "instructions/**": ["docs/JSCPD_CONFIGURATION.md"],
-    "../.github/instructions/general-coding.instructions.md": ["docs/LINTER_CONFIG_LOCATIONS.md"],
+    "../.github/instructions/general-coding.instructions.md": [
+      "docs/LINTER_CONFIG_LOCATIONS.md"
+    ],
     "PROMPT_CATEGORIZATION.md": [
       "docs/PROMPT_CATEGORIZATION.md",
       "docs/LINTER_CONFIG_LOCATIONS.md"
@@ -11585,30 +12006,45 @@
     "https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md": [
       "docs/PRETTIER_MARKDOWNLINT_STRATEGY.md"
     ],
-    "PRETTIER_MARKDOWNLINT_STRATEGY.md": ["docs/PRETTIER_MARKDOWNLINT_STRATEGY.md"],
+    "PRETTIER_MARKDOWNLINT_STRATEGY.md": [
+      "docs/PRETTIER_MARKDOWNLINT_STRATEGY.md"
+    ],
     "en/options.html#prose-wrap": ["docs/PRETTIER_MARKDOWNLINT_STRATEGY.md"],
-    "super-linter-improvements.md": ["docs/super-linter-improvements.md", "docs/README.md"],
+    "super-linter-improvements.md": [
+      "docs/super-linter-improvements.md",
+      "docs/README.md"
+    ],
     "COMMITLINT_SETUP.md": ["docs/README.md"],
-    "workflow-debug-output/reports/summary_report_20250811_135842.md": ["docs/README.md"],
+    "workflow-debug-output/reports/summary_report_20250811_135842.md": [
+      "docs/README.md"
+    ],
     "labels.md": ["docs/README.md"],
     ".github/instructions/html-css.instructions.md": ["docs/README.md"],
     "README-unified-project-manager.md": [
       "scripts/README-unified-project-manager.md",
       "docs/README.md"
     ],
-    "workflow-debug-output/reports/summary_report_20250811_130247.md": ["docs/README.md"],
+    "workflow-debug-output/reports/summary_report_20250811_130247.md": [
+      "docs/README.md"
+    ],
     "codex/AGENTS.md": ["docs/README.md"],
     ".github/instructions/commit-messages.instructions.md": ["docs/README.md"],
     "docs/super-linter-improvements.md": ["docs/README.md"],
-    "scripts/workflow-debug-output/reports/summary_report_20250811_130247.md": ["docs/README.md"],
+    "scripts/workflow-debug-output/reports/summary_report_20250811_130247.md": [
+      "docs/README.md"
+    ],
     "docs/intelligent-issue-labeling.md": ["docs/README.md"],
     ".github/instructions/python.instructions.md": ["docs/README.md"],
     ".github/WORKFLOW_CONFIG_GUIDE.md": ["docs/README.md"],
     "WORKFLOW_MODERNIZATION_REPORT.md": ["docs/README.md"],
     ".github/instructions/general-coding.instructions.md": ["docs/README.md"],
-    "copilot-firewall/README.md](scripts/copilot-firewall/README.md": ["docs/README.md"],
+    "copilot-firewall/README.md](scripts/copilot-firewall/README.md": [
+      "docs/README.md"
+    ],
     ".github/scripts/README.md": ["docs/README.md"],
-    "README-notifications.md](scripts/README-notifications.md": ["docs/README.md"],
+    "README-notifications.md](scripts/README-notifications.md": [
+      "docs/README.md"
+    ],
     ".github/instructions/javascript.instructions.md": ["docs/README.md"],
     ".github/REUSABLE_WORKFLOW_ANALYSIS.md": ["docs/README.md"],
     "docs/github-projects-automation.md": ["docs/README.md"],
@@ -11620,13 +12056,18 @@
     "docs/README.md": ["docs/README.md"],
     ".github/prompts/ai-architecture.prompt.md": ["docs/README.md"],
     "scripts/copilot-firewall/README.md": ["docs/README.md"],
-    "documentation-updates.md": ["docs/documentation-updates.md", "docs/README.md"],
+    "documentation-updates.md": [
+      "docs/documentation-updates.md",
+      "docs/README.md"
+    ],
     "GITHUB_PROJECTS_SETUP.md": ["docs/README.md"],
     ".github/prompts/ai-refactor.prompt.md": ["docs/README.md"],
     "scripts/README-notifications.md": ["docs/README.md"],
     ".github/prompts/commit-message.prompt.md": ["docs/README.md"],
     ".github/README.md": ["docs/README.md"],
-    "scripts/workflow-debug-output/reports/summary_report_20250811_132335.md": ["docs/README.md"],
+    "scripts/workflow-debug-output/reports/summary_report_20250811_132335.md": [
+      "docs/README.md"
+    ],
     "docs/dependency-submission-and-labeling.md": ["docs/README.md"],
     "CLAUDE.md": ["docs/README.md"],
     ".github/prompts/feature-request.prompt.md": ["docs/README.md"],
@@ -11634,12 +12075,19 @@
     ".github/instructions/rust-utility.instructions.md": ["docs/README.md"],
     "REUSABLE_WORKFLOW_ANALYSIS.md": ["docs/README.md"],
     ".github/instructions/security.instructions.md": ["docs/README.md"],
-    "intelligent-issue-labeling.md": ["docs/README.md", "docs/intelligent-issue-labeling.md"],
+    "intelligent-issue-labeling.md": [
+      "docs/README.md",
+      "docs/intelligent-issue-labeling.md"
+    ],
     ".github/instructions/go.instructions.md": ["docs/README.md"],
     ".github/instructions/rust.instructions.md": ["docs/README.md"],
-    "examples/migration-guides/subtitle-manager-migration.md": ["docs/README.md"],
+    "examples/migration-guides/subtitle-manager-migration.md": [
+      "docs/README.md"
+    ],
     "docs/ENHANCED_SCRIPTS_UPDATE.md": ["docs/README.md"],
-    "scripts/workflow-debug-output/reports/summary_report_20250811_135842.md": ["docs/README.md"],
+    "scripts/workflow-debug-output/reports/summary_report_20250811_135842.md": [
+      "docs/README.md"
+    ],
     "docs/ENHANCED_WORKFLOW_SUMMARY.md": ["docs/README.md"],
     ".github/instructions/r.instructions.md": ["docs/README.md"],
     ".github/instructions/shell.instructions.md": ["docs/README.md"],
@@ -11659,8 +12107,13 @@
     ],
     "docs/label-synchronization.md": ["docs/README.md"],
     ".github/instructions/github-actions.instructions.md": ["docs/README.md"],
-    "workflow-debug-output/reports/summary_report_20250811_132335.md": ["docs/README.md"],
-    "label-synchronization.md": ["docs/README.md", "docs/label-synchronization.md"],
+    "workflow-debug-output/reports/summary_report_20250811_132335.md": [
+      "docs/README.md"
+    ],
+    "label-synchronization.md": [
+      "docs/README.md",
+      "docs/label-synchronization.md"
+    ],
     ".github/prompts/ai-issue-triage.prompt.md": ["docs/README.md"],
     "TODO.md": ["docs/README.md"],
     "scripts/README-unified-project-manager.md": ["docs/README.md"],
@@ -11669,9 +12122,15 @@
     ".github/prompts/test-generation.prompt.md": ["docs/README.md"],
     ".github/prompts/security-review.prompt.md": ["docs/README.md"],
     "WORKFLOW_MODERNIZATION_PLAN.md": ["docs/README.md"],
-    "README-cleanup-tool.md": ["docs/README.md", "scripts/README-cleanup-tool.md"],
+    "README-cleanup-tool.md": [
+      "docs/README.md",
+      "scripts/README-cleanup-tool.md"
+    ],
     ".github/workflow-status.md": ["docs/README.md"],
-    "CODEX-REBASE-GUIDE.md": ["scripts/CODEX-REBASE-GUIDE.md", "docs/README.md"],
+    "CODEX-REBASE-GUIDE.md": [
+      "scripts/CODEX-REBASE-GUIDE.md",
+      "docs/README.md"
+    ],
     "docs/go-module-tagging.md": ["docs/README.md"],
     ".github/instructions/markdown.instructions.md": ["docs/README.md"],
     ".github/prompts/ai-rebase-context.template.md": ["docs/README.md"],
@@ -11683,16 +12142,26 @@
     ".github/CLAUDE.md": ["docs/README.md"],
     ".github/prompts/bug-report.prompt.md": ["docs/README.md"],
     ".github/instructions/typescript.instructions.md": ["docs/README.md"],
-    "workflow-debug-output/reports/summary_report_20250811_133609.md": ["docs/README.md"],
-    ".github/instructions/pull-request-descriptions.instructions.md": ["docs/README.md"],
+    "workflow-debug-output/reports/summary_report_20250811_133609.md": [
+      "docs/README.md"
+    ],
+    ".github/instructions/pull-request-descriptions.instructions.md": [
+      "docs/README.md"
+    ],
     "unified-automation.md": ["docs/README.md", "docs/unified-automation.md"],
     "README-rebase.md": ["scripts/README-rebase.md", "docs/README.md"],
     ".github/prompts/code-review.prompt.md": ["docs/README.md"],
-    "WORKFLOW_CONFIG_GUIDE.md](.github/WORKFLOW_CONFIG_GUIDE.md": ["docs/README.md"],
+    "WORKFLOW_CONFIG_GUIDE.md](.github/WORKFLOW_CONFIG_GUIDE.md": [
+      "docs/README.md"
+    ],
     "COSIGN_VERIFICATION.md": ["docs/README.md"],
-    "scripts/workflow-debug-output/reports/summary_report_20250811_133609.md": ["docs/README.md"],
+    "scripts/workflow-debug-output/reports/summary_report_20250811_133609.md": [
+      "docs/README.md"
+    ],
     ".github/prompts/ai-contribution.prompt.md": ["docs/README.md"],
-    "SUPER_LINTER_CONFIG_COMPARISON.md": ["docs/SUPER_LINTER_CONFIG_COMPARISON.md"],
+    "SUPER_LINTER_CONFIG_COMPARISON.md": [
+      "docs/SUPER_LINTER_CONFIG_COMPARISON.md"
+    ],
     "linters/.pylintrc": ["docs/SUPER_LINTER_CONFIG_COMPARISON.md"],
     "linters/.python-black": [
       "docs/refactors/workflows/v2/implementation/ci-workflows.md",
@@ -11704,12 +12173,22 @@
     "./SUPER_LINTER_CONFIG_COMPARISON.md": ["docs/SUPER_LINTER_STRATEGY.md"],
     "./LINTER_CONFIG_LOCATIONS.md": ["docs/SUPER_LINTER_STRATEGY.md"],
     "./LINTER_VALIDATION.md": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
-    "./PRETTIER_MARKDOWNLINT_STRATEGY.md": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
+    "./PRETTIER_MARKDOWNLINT_STRATEGY.md": [
+      "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"
+    ],
     "test-configs/*.env": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
-    "./SUPER_LINTER_STRATEGY.md": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
-    "SUPER_LINTER_TEST_FAILURE_ANALYSIS.md": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
-    "test-configs/test-full.env": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
-    "test-configs/test-autofix.env": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
+    "./SUPER_LINTER_STRATEGY.md": [
+      "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"
+    ],
+    "SUPER_LINTER_TEST_FAILURE_ANALYSIS.md": [
+      "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"
+    ],
+    "test-configs/test-full.env": [
+      "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"
+    ],
+    "test-configs/test-autofix.env": [
+      "docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"
+    ],
     "linters/.eslintrc.yml]": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
     "test-configs/test-*.env": ["docs/SUPER_LINTER_TEST_FAILURE_ANALYSIS.md"],
     "workflows/scripts/": [
@@ -11723,16 +12202,32 @@
     "cross-registry-todos/TASK_GENERATION_STATUS.md": [
       "docs/cross-registry-todos/TASK_GENERATION_STATUS.md"
     ],
-    "cross-registry-todos/task-01/t01-part1.md": ["docs/cross-registry-todos/task-01/t01-part1.md"],
-    "cross-registry-todos/task-01/t01-part2.md": ["docs/cross-registry-todos/task-01/t01-part2.md"],
-    "cross-registry-todos/task-01/t01-part3.md": ["docs/cross-registry-todos/task-01/t01-part3.md"],
-    "pull-request-descriptions.instructions.md": ["docs/cross-registry-todos/task-01/t01-part4.md"],
-    "workflows/release-rust.yml\\": ["docs/cross-registry-todos/task-01/t01-part4.md"],
-    "cross-registry-todos/task-01/t01-part4.md": ["docs/cross-registry-todos/task-01/t01-part4.md"],
+    "cross-registry-todos/task-01/t01-part1.md": [
+      "docs/cross-registry-todos/task-01/t01-part1.md"
+    ],
+    "cross-registry-todos/task-01/t01-part2.md": [
+      "docs/cross-registry-todos/task-01/t01-part2.md"
+    ],
+    "cross-registry-todos/task-01/t01-part3.md": [
+      "docs/cross-registry-todos/task-01/t01-part3.md"
+    ],
+    "pull-request-descriptions.instructions.md": [
+      "docs/cross-registry-todos/task-01/t01-part4.md"
+    ],
+    "workflows/release-rust.yml\\": [
+      "docs/cross-registry-todos/task-01/t01-part4.md"
+    ],
+    "cross-registry-todos/task-01/t01-part4.md": [
+      "docs/cross-registry-todos/task-01/t01-part4.md"
+    ],
     "workflows/README.md": ["docs/cross-registry-todos/task-01/t01-part5.md"],
     "monitoring": ["docs/cross-registry-todos/task-01/t01-part5.md"],
-    "cross-registry-todos/task-01/t01-part5.md": ["docs/cross-registry-todos/task-01/t01-part5.md"],
-    "cross-registry-todos/task-01/t01-part6.md": ["docs/cross-registry-todos/task-01/t01-part6.md"],
+    "cross-registry-todos/task-01/t01-part5.md": [
+      "docs/cross-registry-todos/task-01/t01-part5.md"
+    ],
+    "cross-registry-todos/task-01/t01-part6.md": [
+      "docs/cross-registry-todos/task-01/t01-part6.md"
+    ],
     "workflows": [
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
       "docs/refactors/workflows/v2/operations/migration-guide.md",
@@ -11743,23 +12238,43 @@
     "cross-registry-todos/task-01-fix-yaml-syntax.md": [
       "docs/cross-registry-todos/task-01-fix-yaml-syntax.md"
     ],
-    "cross-registry-todos/task-02/t02-part1.md": ["docs/cross-registry-todos/task-02/t02-part1.md"],
-    "cross-registry-todos/task-02/t02-part2.md": ["docs/cross-registry-todos/task-02/t02-part2.md"],
-    "cross-registry-todos/task-02/t02-part3.md": ["docs/cross-registry-todos/task-02/t02-part3.md"],
-    "cross-registry-todos/task-02/t02-part4.md": ["docs/cross-registry-todos/task-02/t02-part4.md"],
-    "cross-registry-todos/task-02/t02-part5.md": ["docs/cross-registry-todos/task-02/t02-part5.md"],
-    "cross-registry-todos/task-02/t02-part6.md": ["docs/cross-registry-todos/task-02/t02-part6.md"],
+    "cross-registry-todos/task-02/t02-part1.md": [
+      "docs/cross-registry-todos/task-02/t02-part1.md"
+    ],
+    "cross-registry-todos/task-02/t02-part2.md": [
+      "docs/cross-registry-todos/task-02/t02-part2.md"
+    ],
+    "cross-registry-todos/task-02/t02-part3.md": [
+      "docs/cross-registry-todos/task-02/t02-part3.md"
+    ],
+    "cross-registry-todos/task-02/t02-part4.md": [
+      "docs/cross-registry-todos/task-02/t02-part4.md"
+    ],
+    "cross-registry-todos/task-02/t02-part5.md": [
+      "docs/cross-registry-todos/task-02/t02-part5.md"
+    ],
+    "cross-registry-todos/task-02/t02-part6.md": [
+      "docs/cross-registry-todos/task-02/t02-part6.md"
+    ],
     "cross-registry-todos/task-02-docker-packages.md": [
       "docs/cross-registry-todos/task-02-docker-packages.md"
     ],
-    "docs/docker-package-publishing.md": ["docs/cross-registry-todos/task-02-docker-packages.md"],
-    "docker-package-publishing.md": ["docs/cross-registry-todos/task-02-docker-packages.md"],
-    "workflows/release.yml:": ["docs/cross-registry-todos/task-03/t03-part1.md"],
+    "docs/docker-package-publishing.md": [
+      "docs/cross-registry-todos/task-02-docker-packages.md"
+    ],
+    "docker-package-publishing.md": [
+      "docs/cross-registry-todos/task-02-docker-packages.md"
+    ],
+    "workflows/release.yml:": [
+      "docs/cross-registry-todos/task-03/t03-part1.md"
+    ],
     "workflows/release-rust.yml@main": [
       "docs/cross-registry-todos/task-03/t03-part4.md",
       "docs/cross-registry-todos/task-03/t03-part1.md"
     ],
-    "cross-registry-todos/task-03/t03-part1.md": ["docs/cross-registry-todos/task-03/t03-part1.md"],
+    "cross-registry-todos/task-03/t03-part1.md": [
+      "docs/cross-registry-todos/task-03/t03-part1.md"
+    ],
     "workflows/release-rust.yml.backup-20250115-103000": [
       "docs/cross-registry-todos/task-03/t03-part2.md"
     ],
@@ -11767,42 +12282,106 @@
       "docs/cross-registry-todos/task-03-rust-packages.md",
       "docs/cross-registry-todos/task-03/t03-part2.md"
     ],
-    "workflows/$BACKUP_NAME": ["docs/cross-registry-todos/task-03/t03-part2.md"],
-    "cross-registry-todos/task-03/t03-part2.md": ["docs/cross-registry-todos/task-03/t03-part2.md"],
-    "workflows/release-rust.yml.backup-*": ["docs/cross-registry-todos/task-03/t03-part3.md"],
-    "cross-registry-todos/task-03/t03-part3.md": ["docs/cross-registry-todos/task-03/t03-part3.md"],
-    "cross-registry-todos/task-03/t03-part4.md": ["docs/cross-registry-todos/task-03/t03-part4.md"],
-    "cross-registry-todos/task-03/t03-part5.md": ["docs/cross-registry-todos/task-03/t03-part5.md"],
-    "cross-registry-todos/task-03/t03-part6.md": ["docs/cross-registry-todos/task-03/t03-part6.md"],
+    "workflows/$BACKUP_NAME": [
+      "docs/cross-registry-todos/task-03/t03-part2.md"
+    ],
+    "cross-registry-todos/task-03/t03-part2.md": [
+      "docs/cross-registry-todos/task-03/t03-part2.md"
+    ],
+    "workflows/release-rust.yml.backup-*": [
+      "docs/cross-registry-todos/task-03/t03-part3.md"
+    ],
+    "cross-registry-todos/task-03/t03-part3.md": [
+      "docs/cross-registry-todos/task-03/t03-part3.md"
+    ],
+    "cross-registry-todos/task-03/t03-part4.md": [
+      "docs/cross-registry-todos/task-03/t03-part4.md"
+    ],
+    "cross-registry-todos/task-03/t03-part5.md": [
+      "docs/cross-registry-todos/task-03/t03-part5.md"
+    ],
+    "cross-registry-todos/task-03/t03-part6.md": [
+      "docs/cross-registry-todos/task-03/t03-part6.md"
+    ],
     "../PUBLISHING.md": ["docs/cross-registry-todos/task-03-rust-packages.md"],
-    "workflows/release-rust.yml.backup": ["docs/cross-registry-todos/task-03-rust-packages.md"],
+    "workflows/release-rust.yml.backup": [
+      "docs/cross-registry-todos/task-03-rust-packages.md"
+    ],
     "cross-registry-todos/task-03-rust-packages.md": [
       "docs/cross-registry-todos/task-03-rust-packages.md"
     ],
-    "using-published-crate.md": ["docs/cross-registry-todos/task-03-rust-packages.md"],
-    "cross-registry-todos/task-04/t04-part1.md": ["docs/cross-registry-todos/task-04/t04-part1.md"],
-    "cross-registry-todos/task-04/t04-part2.md": ["docs/cross-registry-todos/task-04/t04-part2.md"],
-    "cross-registry-todos/task-04/t04-part3.md": ["docs/cross-registry-todos/task-04/t04-part3.md"],
-    "cross-registry-todos/task-04/t04-part4.md": ["docs/cross-registry-todos/task-04/t04-part4.md"],
-    "workflows/release-go.yml;": ["docs/cross-registry-todos/task-04/t04-part5.md"],
-    "cross-registry-todos/task-04/t04-part5.md": ["docs/cross-registry-todos/task-04/t04-part5.md"],
-    "../../docs/go-module-publishing.md": ["docs/cross-registry-todos/task-04/t04-part6.md"],
-    "workflows/README-release-go.md": ["docs/cross-registry-todos/task-04/t04-part6.md"],
-    "cross-registry-todos/task-04/t04-part6.md": ["docs/cross-registry-todos/task-04/t04-part6.md"],
-    "docs/go-module-publishing.md": ["docs/cross-registry-todos/task-04/t04-part6.md"],
-    "go-module-publishing.md": ["docs/cross-registry-todos/task-04/t04-part6.md"],
-    "cross-registry-todos/task-05/t05-part1.md": ["docs/cross-registry-todos/task-05/t05-part1.md"],
-    "cross-registry-todos/task-05/t05-part2.md": ["docs/cross-registry-todos/task-05/t05-part2.md"],
-    "cross-registry-todos/task-05/t05-part3.md": ["docs/cross-registry-todos/task-05/t05-part3.md"],
-    "cross-registry-todos/task-05/t05-part4.md": ["docs/cross-registry-todos/task-05/t05-part4.md"],
-    "cross-registry-todos/task-05/t05-part5.md": ["docs/cross-registry-todos/task-05/t05-part5.md"],
-    "docs/python-package-publishing.md": ["docs/cross-registry-todos/task-05/t05-part6.md"],
-    "cross-registry-todos/task-05/t05-part6.md": ["docs/cross-registry-todos/task-05/t05-part6.md"],
-    "python-package-publishing.md": ["docs/cross-registry-todos/task-05/t05-part6.md"],
-    "frontend-package-publishing.md": ["docs/cross-registry-todos/task-06/t06-part1.md"],
-    "cross-registry-todos/task-06/t06-part1.md": ["docs/cross-registry-todos/task-06/t06-part1.md"],
-    "cross-registry-todos/task-06/t06-part2.md": ["docs/cross-registry-todos/task-06/t06-part2.md"],
-    "cross-registry-todos/task-06/t06-part3.md": ["docs/cross-registry-todos/task-06/t06-part3.md"],
+    "using-published-crate.md": [
+      "docs/cross-registry-todos/task-03-rust-packages.md"
+    ],
+    "cross-registry-todos/task-04/t04-part1.md": [
+      "docs/cross-registry-todos/task-04/t04-part1.md"
+    ],
+    "cross-registry-todos/task-04/t04-part2.md": [
+      "docs/cross-registry-todos/task-04/t04-part2.md"
+    ],
+    "cross-registry-todos/task-04/t04-part3.md": [
+      "docs/cross-registry-todos/task-04/t04-part3.md"
+    ],
+    "cross-registry-todos/task-04/t04-part4.md": [
+      "docs/cross-registry-todos/task-04/t04-part4.md"
+    ],
+    "workflows/release-go.yml;": [
+      "docs/cross-registry-todos/task-04/t04-part5.md"
+    ],
+    "cross-registry-todos/task-04/t04-part5.md": [
+      "docs/cross-registry-todos/task-04/t04-part5.md"
+    ],
+    "../../docs/go-module-publishing.md": [
+      "docs/cross-registry-todos/task-04/t04-part6.md"
+    ],
+    "workflows/README-release-go.md": [
+      "docs/cross-registry-todos/task-04/t04-part6.md"
+    ],
+    "cross-registry-todos/task-04/t04-part6.md": [
+      "docs/cross-registry-todos/task-04/t04-part6.md"
+    ],
+    "docs/go-module-publishing.md": [
+      "docs/cross-registry-todos/task-04/t04-part6.md"
+    ],
+    "go-module-publishing.md": [
+      "docs/cross-registry-todos/task-04/t04-part6.md"
+    ],
+    "cross-registry-todos/task-05/t05-part1.md": [
+      "docs/cross-registry-todos/task-05/t05-part1.md"
+    ],
+    "cross-registry-todos/task-05/t05-part2.md": [
+      "docs/cross-registry-todos/task-05/t05-part2.md"
+    ],
+    "cross-registry-todos/task-05/t05-part3.md": [
+      "docs/cross-registry-todos/task-05/t05-part3.md"
+    ],
+    "cross-registry-todos/task-05/t05-part4.md": [
+      "docs/cross-registry-todos/task-05/t05-part4.md"
+    ],
+    "cross-registry-todos/task-05/t05-part5.md": [
+      "docs/cross-registry-todos/task-05/t05-part5.md"
+    ],
+    "docs/python-package-publishing.md": [
+      "docs/cross-registry-todos/task-05/t05-part6.md"
+    ],
+    "cross-registry-todos/task-05/t05-part6.md": [
+      "docs/cross-registry-todos/task-05/t05-part6.md"
+    ],
+    "python-package-publishing.md": [
+      "docs/cross-registry-todos/task-05/t05-part6.md"
+    ],
+    "frontend-package-publishing.md": [
+      "docs/cross-registry-todos/task-06/t06-part1.md"
+    ],
+    "cross-registry-todos/task-06/t06-part1.md": [
+      "docs/cross-registry-todos/task-06/t06-part1.md"
+    ],
+    "cross-registry-todos/task-06/t06-part2.md": [
+      "docs/cross-registry-todos/task-06/t06-part2.md"
+    ],
+    "cross-registry-todos/task-06/t06-part3.md": [
+      "docs/cross-registry-todos/task-06/t06-part3.md"
+    ],
     "cross-registry-todos/task-06/t06-part4.md": [
       "docs/cross-registry-todos/task-06/t06-part6.md",
       "docs/cross-registry-todos/task-06/t06-part4.md"
@@ -11811,8 +12390,12 @@
       "docs/cross-registry-todos/task-06/t06-part6.md",
       "docs/cross-registry-todos/task-06/t06-part5.md"
     ],
-    "cross-registry-todos/task-06/": ["docs/cross-registry-todos/task-06/t06-part6.md"],
-    "cross-registry-todos/task-06/t06-part6.md": ["docs/cross-registry-todos/task-06/t06-part6.md"],
+    "cross-registry-todos/task-06/": [
+      "docs/cross-registry-todos/task-06/t06-part6.md"
+    ],
+    "cross-registry-todos/task-06/t06-part6.md": [
+      "docs/cross-registry-todos/task-06/t06-part6.md"
+    ],
     "cross-registry-todos/task-07/t07-part1.md": [
       "docs/cross-registry-todos/task-07/t07-part6.md",
       "docs/cross-registry-todos/task-07/t07-part1.md"
@@ -11851,14 +12434,22 @@
       "docs/cross-registry-todos/task-14/t14-part5.md",
       "docs/cross-registry-todos/task-14/t14-part6.md"
     ],
-    "cross-registry-todos/task-07/": ["docs/cross-registry-todos/task-07/t07-part6.md"],
-    "cross-registry-todos/task-07/t07-part6.md": ["docs/cross-registry-todos/task-07/t07-part6.md"],
-    "cross-registry-todos/task-08/t08-part1.md": ["docs/cross-registry-todos/task-08/t08-part1.md"],
+    "cross-registry-todos/task-07/": [
+      "docs/cross-registry-todos/task-07/t07-part6.md"
+    ],
+    "cross-registry-todos/task-07/t07-part6.md": [
+      "docs/cross-registry-todos/task-07/t07-part6.md"
+    ],
+    "cross-registry-todos/task-08/t08-part1.md": [
+      "docs/cross-registry-todos/task-08/t08-part1.md"
+    ],
     "workflows/reusable-ci-consolidated.yml@main": [
       "docs/cross-registry-todos/task-08/t08-part1.md",
       "docs/cross-registry-todos/task-08/t08-part5.md"
     ],
-    "cross-registry-todos/task-08/t08-part2.md": ["docs/cross-registry-todos/task-08/t08-part2.md"],
+    "cross-registry-todos/task-08/t08-part2.md": [
+      "docs/cross-registry-todos/task-08/t08-part2.md"
+    ],
     "workflows/**": [
       "docs/refactors/workflows/v2/implementation/testing-strategy.md",
       "docs/cross-registry-todos/task-09/t09-part2.md",
@@ -11873,8 +12464,12 @@
       "docs/cross-registry-todos/task-08/t08-part2.md",
       "docs/cross-registry-todos/task-09/t09-part2.md"
     ],
-    "cross-registry-todos/task-08/t08-part3.md": ["docs/cross-registry-todos/task-08/t08-part3.md"],
-    "cross-registry-todos/task-08/t08-part4.md": ["docs/cross-registry-todos/task-08/t08-part4.md"],
+    "cross-registry-todos/task-08/t08-part3.md": [
+      "docs/cross-registry-todos/task-08/t08-part3.md"
+    ],
+    "cross-registry-todos/task-08/t08-part4.md": [
+      "docs/cross-registry-todos/task-08/t08-part4.md"
+    ],
     "workflows-archive/": [
       "docs/cross-registry-todos/task-08/t08-part5.md",
       "docs/cross-registry-todos/task-09/t09-part2.md"
@@ -11884,16 +12479,26 @@
       "docs/cross-registry-todos/task-08/t08-part5.md",
       "docs/cross-registry-todos/task-09/t09-part2.md"
     ],
-    "cross-registry-todos/task-08/t08-part5.md": ["docs/cross-registry-todos/task-08/t08-part5.md"],
+    "cross-registry-todos/task-08/t08-part5.md": [
+      "docs/cross-registry-todos/task-08/t08-part5.md"
+    ],
     "workflows-archive": [
       "docs/cross-registry-todos/task-08/t08-part5.md",
       "docs/cross-registry-todos/task-09/t09-part2.md"
     ],
-    "cross-registry-todos/task-08/t08-part6.md": ["docs/cross-registry-todos/task-08/t08-part6.md"],
+    "cross-registry-todos/task-08/t08-part6.md": [
+      "docs/cross-registry-todos/task-08/t08-part6.md"
+    ],
     ":": ["docs/cross-registry-todos/task-08/t08-part6.md"],
-    "cross-registry-todos/task-09/t09-part1.md": ["docs/cross-registry-todos/task-09/t09-part1.md"],
-    "cross-registry-todos/task-09/t09-part2.md": ["docs/cross-registry-todos/task-09/t09-part2.md"],
-    "repository-config.yml.bak": ["docs/cross-registry-todos/task-09/t09-part2.md"],
+    "cross-registry-todos/task-09/t09-part1.md": [
+      "docs/cross-registry-todos/task-09/t09-part1.md"
+    ],
+    "cross-registry-todos/task-09/t09-part2.md": [
+      "docs/cross-registry-todos/task-09/t09-part2.md"
+    ],
+    "repository-config.yml.bak": [
+      "docs/cross-registry-todos/task-09/t09-part2.md"
+    ],
     "workflows/reusable-ci.yml@main": [
       "docs/cross-registry-todos/task-09/t09-part4.md",
       "docs/cross-registry-todos/task-09/t09-part3.md",
@@ -11904,90 +12509,210 @@
       "docs/cross-registry-todos/task-09/t09-part3.md",
       "docs/refactors/workflows/v2/implementation/ci-workflows.md"
     ],
-    "workflows/ci.yml.backup": ["docs/cross-registry-todos/task-09/t09-part3.md"],
+    "workflows/ci.yml.backup": [
+      "docs/cross-registry-todos/task-09/t09-part3.md"
+    ],
     "workflows/ci.yml\\": ["docs/cross-registry-todos/task-09/t09-part3.md"],
-    "cross-registry-todos/task-09/t09-part3.md": ["docs/cross-registry-todos/task-09/t09-part3.md"],
-    "repository-config.yml\\": ["docs/cross-registry-todos/task-09/t09-part3.md"],
-    "cross-registry-todos/task-09/t09-part4.md": ["docs/cross-registry-todos/task-09/t09-part4.md"],
-    "cross-registry-todos/task-09/t09-part5.md": ["docs/cross-registry-todos/task-09/t09-part5.md"],
-    "cross-registry-todos/task-09/t09-part6.md": ["docs/cross-registry-todos/task-09/t09-part6.md"],
-    "cross-registry-todos/task-10/t10-part1.md": ["docs/cross-registry-todos/task-10/t10-part1.md"],
-    "cross-registry-todos/task-10/t10-part2.md": ["docs/cross-registry-todos/task-10/t10-part2.md"],
-    "cross-registry-todos/task-10/t10-part3.md": ["docs/cross-registry-todos/task-10/t10-part3.md"],
-    "cross-registry-todos/task-10/t10-part4.md": ["docs/cross-registry-todos/task-10/t10-part4.md"],
-    "cross-registry-todos/task-10/t10-part5.md": ["docs/cross-registry-todos/task-10/t10-part5.md"],
-    "cross-registry-todos/task-10/t10-part6.md": ["docs/cross-registry-todos/task-10/t10-part6.md"],
-    "cross-registry-todos/task-11/t11-part1.md": ["docs/cross-registry-todos/task-11/t11-part1.md"],
-    "cross-registry-todos/task-11/t11-part2.md": ["docs/cross-registry-todos/task-11/t11-part2.md"],
-    "cross-registry-todos/task-11/t11-part3.md": ["docs/cross-registry-todos/task-11/t11-part3.md"],
-    "cross-registry-todos/task-11/t11-part4.md": ["docs/cross-registry-todos/task-11/t11-part4.md"],
-    "cross-registry-todos/task-11/t11-part5.md": ["docs/cross-registry-todos/task-11/t11-part5.md"],
-    "cross-registry-todos/task-11/t11-part6.md": ["docs/cross-registry-todos/task-11/t11-part6.md"],
+    "cross-registry-todos/task-09/t09-part3.md": [
+      "docs/cross-registry-todos/task-09/t09-part3.md"
+    ],
+    "repository-config.yml\\": [
+      "docs/cross-registry-todos/task-09/t09-part3.md"
+    ],
+    "cross-registry-todos/task-09/t09-part4.md": [
+      "docs/cross-registry-todos/task-09/t09-part4.md"
+    ],
+    "cross-registry-todos/task-09/t09-part5.md": [
+      "docs/cross-registry-todos/task-09/t09-part5.md"
+    ],
+    "cross-registry-todos/task-09/t09-part6.md": [
+      "docs/cross-registry-todos/task-09/t09-part6.md"
+    ],
+    "cross-registry-todos/task-10/t10-part1.md": [
+      "docs/cross-registry-todos/task-10/t10-part1.md"
+    ],
+    "cross-registry-todos/task-10/t10-part2.md": [
+      "docs/cross-registry-todos/task-10/t10-part2.md"
+    ],
+    "cross-registry-todos/task-10/t10-part3.md": [
+      "docs/cross-registry-todos/task-10/t10-part3.md"
+    ],
+    "cross-registry-todos/task-10/t10-part4.md": [
+      "docs/cross-registry-todos/task-10/t10-part4.md"
+    ],
+    "cross-registry-todos/task-10/t10-part5.md": [
+      "docs/cross-registry-todos/task-10/t10-part5.md"
+    ],
+    "cross-registry-todos/task-10/t10-part6.md": [
+      "docs/cross-registry-todos/task-10/t10-part6.md"
+    ],
+    "cross-registry-todos/task-11/t11-part1.md": [
+      "docs/cross-registry-todos/task-11/t11-part1.md"
+    ],
+    "cross-registry-todos/task-11/t11-part2.md": [
+      "docs/cross-registry-todos/task-11/t11-part2.md"
+    ],
+    "cross-registry-todos/task-11/t11-part3.md": [
+      "docs/cross-registry-todos/task-11/t11-part3.md"
+    ],
+    "cross-registry-todos/task-11/t11-part4.md": [
+      "docs/cross-registry-todos/task-11/t11-part4.md"
+    ],
+    "cross-registry-todos/task-11/t11-part5.md": [
+      "docs/cross-registry-todos/task-11/t11-part5.md"
+    ],
+    "cross-registry-todos/task-11/t11-part6.md": [
+      "docs/cross-registry-todos/task-11/t11-part6.md"
+    ],
     "RELEASE_AUTOMATION.md": ["docs/cross-registry-todos/task-11/t11-part6.md"],
-    "cross-registry-todos/task-12/t12-part1.md": ["docs/cross-registry-todos/task-12/t12-part1.md"],
-    "cross-registry-todos/task-12/t12-part2.md": ["docs/cross-registry-todos/task-12/t12-part2.md"],
-    "cross-registry-todos/task-12/t12-part3.md": ["docs/cross-registry-todos/task-12/t12-part3.md"],
-    "cross-registry-todos/task-12/t12-part4.md": ["docs/cross-registry-todos/task-12/t12-part4.md"],
-    "cross-registry-todos/task-12/t12-part5.md": ["docs/cross-registry-todos/task-12/t12-part5.md"],
-    "DEPENDENCY_MANAGEMENT.md": ["docs/cross-registry-todos/task-12/t12-part6.md"],
-    "cross-registry-todos/task-12/t12-part6.md": ["docs/cross-registry-todos/task-12/t12-part6.md"],
-    "cross-registry-todos/task-13/t13-part1.md": ["docs/cross-registry-todos/task-13/t13-part1.md"],
-    "cross-registry-todos/task-13/t13-part2.md": ["docs/cross-registry-todos/task-13/t13-part2.md"],
-    "cross-registry-todos/task-13/t13-part3.md": ["docs/cross-registry-todos/task-13/t13-part3.md"],
-    "cross-registry-todos/task-13/t13-part4.md": ["docs/cross-registry-todos/task-13/t13-part4.md"],
-    "cross-registry-todos/task-13/t13-part5.md": ["docs/cross-registry-todos/task-13/t13-part5.md"],
-    "cross-registry-todos/task-13/t13-part6.md": ["docs/cross-registry-todos/task-13/t13-part6.md"],
+    "cross-registry-todos/task-12/t12-part1.md": [
+      "docs/cross-registry-todos/task-12/t12-part1.md"
+    ],
+    "cross-registry-todos/task-12/t12-part2.md": [
+      "docs/cross-registry-todos/task-12/t12-part2.md"
+    ],
+    "cross-registry-todos/task-12/t12-part3.md": [
+      "docs/cross-registry-todos/task-12/t12-part3.md"
+    ],
+    "cross-registry-todos/task-12/t12-part4.md": [
+      "docs/cross-registry-todos/task-12/t12-part4.md"
+    ],
+    "cross-registry-todos/task-12/t12-part5.md": [
+      "docs/cross-registry-todos/task-12/t12-part5.md"
+    ],
+    "DEPENDENCY_MANAGEMENT.md": [
+      "docs/cross-registry-todos/task-12/t12-part6.md"
+    ],
+    "cross-registry-todos/task-12/t12-part6.md": [
+      "docs/cross-registry-todos/task-12/t12-part6.md"
+    ],
+    "cross-registry-todos/task-13/t13-part1.md": [
+      "docs/cross-registry-todos/task-13/t13-part1.md"
+    ],
+    "cross-registry-todos/task-13/t13-part2.md": [
+      "docs/cross-registry-todos/task-13/t13-part2.md"
+    ],
+    "cross-registry-todos/task-13/t13-part3.md": [
+      "docs/cross-registry-todos/task-13/t13-part3.md"
+    ],
+    "cross-registry-todos/task-13/t13-part4.md": [
+      "docs/cross-registry-todos/task-13/t13-part4.md"
+    ],
+    "cross-registry-todos/task-13/t13-part5.md": [
+      "docs/cross-registry-todos/task-13/t13-part5.md"
+    ],
+    "cross-registry-todos/task-13/t13-part6.md": [
+      "docs/cross-registry-todos/task-13/t13-part6.md"
+    ],
     "best-practices": ["docs/cross-registry-todos/task-13/t13-part6.md"],
-    "cross-registry-todos/task-14/t14-part1.md": ["docs/cross-registry-todos/task-14/t14-part1.md"],
-    "cross-registry-todos/task-14/t14-part2.md": ["docs/cross-registry-todos/task-14/t14-part2.md"],
-    "./user-guide/managing-disks.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./troubleshooting/common-issues.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./deployment/kubernetes.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./deployment/production.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./troubleshooting/faq.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./user-guide/post-install.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "cross-registry-todos/task-14/t14-part1.md": [
+      "docs/cross-registry-todos/task-14/t14-part1.md"
+    ],
+    "cross-registry-todos/task-14/t14-part2.md": [
+      "docs/cross-registry-todos/task-14/t14-part2.md"
+    ],
+    "./user-guide/managing-disks.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./troubleshooting/common-issues.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./deployment/kubernetes.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./deployment/production.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./troubleshooting/faq.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./user-guide/post-install.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./license.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./user-guide/cloud-init.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./user-guide/cloud-init.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./api/disk-manager.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./deployment/docker.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./api/config-parser.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./developer/architecture.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./deployment/docker.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./api/config-parser.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./developer/architecture.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./api/iso-manager.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./developer/releases.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./developer/releases.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "book": [
       "docs/cross-registry-todos/task-14/t14-part5.md",
       "docs/cross-registry-todos/task-14/t14-part3.md"
     ],
-    "./reference/glossary.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./reference/glossary.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./api/overview.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./deployment/monitoring.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./deployment/monitoring.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "mlc_config.json": [
       "docs/cross-registry-todos/task-14/t14-part5.md",
       "docs/cross-registry-todos/task-14/t14-part6.md",
       "docs/cross-registry-todos/task-14/t14-part3.md"
     ],
-    "./user-guide/creating-installations.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./user-guide/creating-installations.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./introduction.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
     "src": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./getting-started/configuration.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./getting-started/configuration.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "./api/qemu-utils.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./user-guide/basic-setup.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./user-guide/basic-setup.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "mathjax.js": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./reference/configuration.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./reference/configuration.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "src/SUMMARY.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
     "./reference/cli.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
     "./changelog.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./user-guide/networking.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./developer/contributing.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./user-guide/networking.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./developer/contributing.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "src/{path}": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./troubleshooting/errors.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./developer/building.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./developer/testing.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./getting-started/installation.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "cross-registry-todos/task-14/t14-part3.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./getting-started/quick-start.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./user-guide/advanced-configuration.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
-    "./reference/environment.md": ["docs/cross-registry-todos/task-14/t14-part3.md"],
+    "./troubleshooting/errors.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./developer/building.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./developer/testing.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./getting-started/installation.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "cross-registry-todos/task-14/t14-part3.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./getting-started/quick-start.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./user-guide/advanced-configuration.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
+    "./reference/environment.md": [
+      "docs/cross-registry-todos/task-14/t14-part3.md"
+    ],
     "site": ["docs/cross-registry-todos/task-14/t14-part4.md"],
     "requirements.txt": [
       "docs/cross-registry-todos/task-14/t14-part4.md",
@@ -11997,7 +12722,9 @@
       "docs/refactors/workflows/v2/operations/troubleshooting.md"
     ],
     "index.html": ["docs/cross-registry-todos/task-14/t14-part4.md"],
-    "cross-registry-todos/task-14/t14-part4.md": ["docs/cross-registry-todos/task-14/t14-part4.md"],
+    "cross-registry-todos/task-14/t14-part4.md": [
+      "docs/cross-registry-todos/task-14/t14-part4.md"
+    ],
     "version-selector.html": ["docs/cross-registry-todos/task-14/t14-part4.md"],
     "build/html/": [
       "docs/cross-registry-todos/task-14/t14-part4.md",
@@ -12012,49 +12739,107 @@
     "rust/**": ["docs/cross-registry-todos/task-14/t14-part5.md"],
     "source/**": ["docs/cross-registry-todos/task-14/t14-part5.md"],
     "src/**": ["docs/cross-registry-todos/task-14/t14-part5.md"],
-    "cross-registry-todos/task-14/t14-part5.md": ["docs/cross-registry-todos/task-14/t14-part5.md"],
+    "cross-registry-todos/task-14/t14-part5.md": [
+      "docs/cross-registry-todos/task-14/t14-part5.md"
+    ],
     "build/": [
       "docs/cross-registry-todos/task-14/t14-part5.md",
       "docs/cross-registry-todos/task-14/t14-part6.md"
     ],
     "api/**": ["docs/cross-registry-todos/task-14/t14-part5.md"],
     "src/": ["docs/cross-registry-todos/task-14/t14-part6.md"],
-    "cross-registry-todos/task-14/t14-part6.md": ["docs/cross-registry-todos/task-14/t14-part6.md"],
+    "cross-registry-todos/task-14/t14-part6.md": [
+      "docs/cross-registry-todos/task-14/t14-part6.md"
+    ],
     "user-guide/": ["docs/cross-registry-todos/task-14/t14-part6.md"],
-    "cross-registry-todos/task-15/t15-part1.md": ["docs/cross-registry-todos/task-15/t15-part1.md"],
-    "cross-registry-todos/task-15/t15-part2.md": ["docs/cross-registry-todos/task-15/t15-part2.md"],
-    "cross-registry-todos/task-15/t15-part3.md": ["docs/cross-registry-todos/task-15/t15-part3.md"],
-    "cross-registry-todos/task-15/t15-part4.md": ["docs/cross-registry-todos/task-15/t15-part4.md"],
-    "cross-registry-todos/task-15/t15-part5.md": ["docs/cross-registry-todos/task-15/t15-part5.md"],
-    "cross-registry-todos/task-15/t15-part6.md": ["docs/cross-registry-todos/task-15/t15-part6.md"],
-    "cross-registry-todos/task-16/t16-part1.md": ["docs/cross-registry-todos/task-16/t16-part1.md"],
-    "cross-registry-todos/task-16/t16-part2.md": ["docs/cross-registry-todos/task-16/t16-part2.md"],
-    "cross-registry-todos/task-16/t16-part3.md": ["docs/cross-registry-todos/task-16/t16-part3.md"],
-    "cross-registry-todos/task-16/t16-part4.md": ["docs/cross-registry-todos/task-16/t16-part4.md"],
-    "cross-registry-todos/task-16/t16-part5.md": ["docs/cross-registry-todos/task-16/t16-part5.md"],
-    "cross-registry-todos/task-16/t16-part6.md": ["docs/cross-registry-todos/task-16/t16-part6.md"],
-    "cross-registry-todos/task-17/t17-part1.md": ["docs/cross-registry-todos/task-17/t17-part1.md"],
-    "cross-registry-todos/task-17/t17-part2.md": ["docs/cross-registry-todos/task-17/t17-part2.md"],
-    "cross-registry-todos/task-17/t17-part3.md": ["docs/cross-registry-todos/task-17/t17-part3.md"],
-    "cross-registry-todos/task-17/t17-part4.md": ["docs/cross-registry-todos/task-17/t17-part4.md"],
-    "cross-registry-todos/task-17/t17-part5.md": ["docs/cross-registry-todos/task-17/t17-part5.md"],
+    "cross-registry-todos/task-15/t15-part1.md": [
+      "docs/cross-registry-todos/task-15/t15-part1.md"
+    ],
+    "cross-registry-todos/task-15/t15-part2.md": [
+      "docs/cross-registry-todos/task-15/t15-part2.md"
+    ],
+    "cross-registry-todos/task-15/t15-part3.md": [
+      "docs/cross-registry-todos/task-15/t15-part3.md"
+    ],
+    "cross-registry-todos/task-15/t15-part4.md": [
+      "docs/cross-registry-todos/task-15/t15-part4.md"
+    ],
+    "cross-registry-todos/task-15/t15-part5.md": [
+      "docs/cross-registry-todos/task-15/t15-part5.md"
+    ],
+    "cross-registry-todos/task-15/t15-part6.md": [
+      "docs/cross-registry-todos/task-15/t15-part6.md"
+    ],
+    "cross-registry-todos/task-16/t16-part1.md": [
+      "docs/cross-registry-todos/task-16/t16-part1.md"
+    ],
+    "cross-registry-todos/task-16/t16-part2.md": [
+      "docs/cross-registry-todos/task-16/t16-part2.md"
+    ],
+    "cross-registry-todos/task-16/t16-part3.md": [
+      "docs/cross-registry-todos/task-16/t16-part3.md"
+    ],
+    "cross-registry-todos/task-16/t16-part4.md": [
+      "docs/cross-registry-todos/task-16/t16-part4.md"
+    ],
+    "cross-registry-todos/task-16/t16-part5.md": [
+      "docs/cross-registry-todos/task-16/t16-part5.md"
+    ],
+    "cross-registry-todos/task-16/t16-part6.md": [
+      "docs/cross-registry-todos/task-16/t16-part6.md"
+    ],
+    "cross-registry-todos/task-17/t17-part1.md": [
+      "docs/cross-registry-todos/task-17/t17-part1.md"
+    ],
+    "cross-registry-todos/task-17/t17-part2.md": [
+      "docs/cross-registry-todos/task-17/t17-part2.md"
+    ],
+    "cross-registry-todos/task-17/t17-part3.md": [
+      "docs/cross-registry-todos/task-17/t17-part3.md"
+    ],
+    "cross-registry-todos/task-17/t17-part4.md": [
+      "docs/cross-registry-todos/task-17/t17-part4.md"
+    ],
+    "cross-registry-todos/task-17/t17-part5.md": [
+      "docs/cross-registry-todos/task-17/t17-part5.md"
+    ],
     "alerting-strategy.md": ["docs/cross-registry-todos/task-17/t17-part5.md"],
-    "cross-registry-todos/task-17/t17-part6.md": ["docs/cross-registry-todos/task-17/t17-part6.md"],
-    "integration/dependencies.rs": ["docs/cross-registry-todos/task-18/t18-part1.md"],
-    "cross-registry-todos/task-18/t18-part1.md": ["docs/cross-registry-todos/task-18/t18-part1.md"],
-    "cross-registry-todos/task-18/t18-part2.md": ["docs/cross-registry-todos/task-18/t18-part2.md"],
-    "cross-registry-todos/task-18/t18-part3.md": ["docs/cross-registry-todos/task-18/t18-part3.md"],
-    "troubleshooting/prometheus-queries.md": ["docs/cross-registry-todos/task-18/t18-part3.md"],
-    "troubleshooting/loki-queries.md": ["docs/cross-registry-todos/task-18/t18-part3.md"],
-    "cross-registry-todos/task-18/t18-part4.md": ["docs/cross-registry-todos/task-18/t18-part4.md"],
+    "cross-registry-todos/task-17/t17-part6.md": [
+      "docs/cross-registry-todos/task-17/t17-part6.md"
+    ],
+    "integration/dependencies.rs": [
+      "docs/cross-registry-todos/task-18/t18-part1.md"
+    ],
+    "cross-registry-todos/task-18/t18-part1.md": [
+      "docs/cross-registry-todos/task-18/t18-part1.md"
+    ],
+    "cross-registry-todos/task-18/t18-part2.md": [
+      "docs/cross-registry-todos/task-18/t18-part2.md"
+    ],
+    "cross-registry-todos/task-18/t18-part3.md": [
+      "docs/cross-registry-todos/task-18/t18-part3.md"
+    ],
+    "troubleshooting/prometheus-queries.md": [
+      "docs/cross-registry-todos/task-18/t18-part3.md"
+    ],
+    "troubleshooting/loki-queries.md": [
+      "docs/cross-registry-todos/task-18/t18-part3.md"
+    ],
+    "cross-registry-todos/task-18/t18-part4.md": [
+      "docs/cross-registry-todos/task-18/t18-part4.md"
+    ],
     "**/*": [
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
       "docs/dependency-submission-and-labeling.md"
     ],
-    "workflows/reusable-labeler.yml@main": ["docs/dependency-submission-and-labeling.md"],
+    "workflows/reusable-labeler.yml@main": [
+      "docs/dependency-submission-and-labeling.md"
+    ],
     "../WORKFLOW_ARCHITECTURE.md": ["docs/documentation-updates.md"],
     "doc-updates/": ["docs/documentation-updates.md"],
-    "workflows/reusable-add-to-project.yml@main": ["docs/github-projects-automation.md"],
+    "workflows/reusable-add-to-project.yml@main": [
+      "docs/github-projects-automation.md"
+    ],
     "workflows/reusable-unified-automation.yml@main": [
       "docs/unified-automation.md",
       "docs/intelligent-issue-labeling.md"
@@ -12062,36 +12847,58 @@
     "workflows/reusable-intelligent-issue-labeling.yml@main": [
       "docs/intelligent-issue-labeling.md"
     ],
-    "phases/phase-2-release-consolidation.md": ["docs/refactors/workflows/v2/README.md"],
+    "phases/phase-2-release-consolidation.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "reference/config-schema.md": ["docs/refactors/workflows/v2/README.md"],
     "operations/monitoring.md": ["docs/refactors/workflows/v2/README.md"],
-    "phases/phase-4-automation-cleanup.md": ["docs/refactors/workflows/v2/README.md"],
-    "implementation/helper-scripts.md": ["docs/refactors/workflows/v2/README.md"],
-    "operations/deprecation-policy.md": ["docs/refactors/workflows/v2/README.md"],
-    "refactors/workflows/v2/README.md": ["docs/refactors/workflows/v2/README.md"],
-    "operations/rollback-procedures.md": ["docs/refactors/workflows/v2/README.md"],
+    "phases/phase-4-automation-cleanup.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
+    "implementation/helper-scripts.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
+    "operations/deprecation-policy.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
+    "refactors/workflows/v2/README.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
+    "operations/rollback-procedures.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "architecture.md": [
       "docs/refactors/workflows/v2/github-packages-setup.md",
       "docs/refactors/workflows/v2/version-policy.md",
       "docs/refactors/workflows/v2/phases/phase-2-release-consolidation.md",
       "docs/refactors/workflows/v2/README.md"
     ],
-    "phases/phase-3-maintenance-automation.md": ["docs/refactors/workflows/v2/README.md"],
+    "phases/phase-3-maintenance-automation.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "reference/workflow-catalog.md": ["docs/refactors/workflows/v2/README.md"],
-    "implementation/testing-guide.md": ["docs/refactors/workflows/v2/README.md"],
+    "implementation/testing-guide.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "reference/helper-api.md": [
       "docs/refactors/workflows/v2/version-policy.md",
       "docs/refactors/workflows/v2/README.md"
     ],
     "phases/phase-0-foundation.md": ["docs/refactors/workflows/v2/README.md"],
-    "phases/phase-1-ci-modernization.md": ["docs/refactors/workflows/v2/README.md"],
+    "phases/phase-1-ci-modernization.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "version-policy.md": ["docs/refactors/workflows/v2/README.md"],
-    "implementation/troubleshooting.md": ["docs/refactors/workflows/v2/README.md"],
+    "implementation/troubleshooting.md": [
+      "docs/refactors/workflows/v2/README.md"
+    ],
     "refactors/workflows/v2/rollout-checklist.md": [
       "docs/refactors/workflows/v2/architecture.md",
       "docs/refactors/workflows/v2/rollout-checklist.md"
     ],
-    "refactors/workflows/v2/architecture.md": ["docs/refactors/workflows/v2/architecture.md"],
+    "refactors/workflows/v2/architecture.md": [
+      "docs/refactors/workflows/v2/architecture.md"
+    ],
     "refactors/workflows/v2/github-packages-setup.md": [
       "docs/refactors/workflows/v2/github-packages-setup.md",
       "docs/refactors/workflows/v2/phases/phase-2-release-consolidation.md"
@@ -12103,14 +12910,18 @@
     "../phases/phase-1-ci-modernization.md": [
       "docs/refactors/workflows/v2/implementation/ci-workflows.md"
     ],
-    "linters/.python-black**:": ["docs/refactors/workflows/v2/implementation/ci-workflows.md"],
+    "linters/.python-black**:": [
+      "docs/refactors/workflows/v2/implementation/ci-workflows.md"
+    ],
     "../operations/troubleshooting.md": [
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
       "docs/refactors/workflows/v2/implementation/ci-workflows.md",
       "docs/refactors/workflows/v2/reference/workflow-catalog.md"
     ],
-    "linters/.markdown-lint.yml**:": ["docs/refactors/workflows/v2/implementation/ci-workflows.md"],
+    "linters/.markdown-lint.yml**:": [
+      "docs/refactors/workflows/v2/implementation/ci-workflows.md"
+    ],
     "../reference/helper-scripts-api.md": [
       "docs/refactors/workflows/v2/implementation/testing-strategy.md",
       "docs/refactors/workflows/v2/operations/troubleshooting.md",
@@ -12124,8 +12935,12 @@
     "refactors/workflows/v2/implementation/ci-workflows.md": [
       "docs/refactors/workflows/v2/implementation/ci-workflows.md"
     ],
-    "release-workflows.md": ["docs/refactors/workflows/v2/implementation/ci-workflows.md"],
-    "linters/.yaml-lint.yml**:": ["docs/refactors/workflows/v2/implementation/ci-workflows.md"],
+    "release-workflows.md": [
+      "docs/refactors/workflows/v2/implementation/ci-workflows.md"
+    ],
+    "linters/.yaml-lint.yml**:": [
+      "docs/refactors/workflows/v2/implementation/ci-workflows.md"
+    ],
     "refactors/workflows/v2/implementation/release-workflows.md": [
       "docs/refactors/workflows/v2/implementation/release-workflows.md"
     ],
@@ -12136,12 +12951,18 @@
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
       "docs/refactors/workflows/v2/reference/workflow-catalog.md"
     ],
-    "testing-strategy.md": ["docs/refactors/workflows/v2/implementation/release-workflows.md"],
+    "testing-strategy.md": [
+      "docs/refactors/workflows/v2/implementation/release-workflows.md"
+    ],
     "../phases/phase-2-release-consolidation.md": [
       "docs/refactors/workflows/v2/implementation/release-workflows.md"
     ],
-    "release-template.md": ["docs/refactors/workflows/v2/implementation/release-workflows.md"],
-    "tests/": ["docs/refactors/workflows/v2/implementation/testing-strategy.md"],
+    "release-template.md": [
+      "docs/refactors/workflows/v2/implementation/release-workflows.md"
+    ],
+    "tests/": [
+      "docs/refactors/workflows/v2/implementation/testing-strategy.md"
+    ],
     "../phases/phase-0-foundation.md": [
       "docs/refactors/workflows/v2/implementation/testing-strategy.md",
       "docs/refactors/workflows/v2/operations/migration-guide.md"
@@ -12149,8 +12970,12 @@
     "refactors/workflows/v2/implementation/testing-strategy.md": [
       "docs/refactors/workflows/v2/implementation/testing-strategy.md"
     ],
-    "workflows/scripts/tests/": ["docs/refactors/workflows/v2/implementation/testing-strategy.md"],
-    "ci-workflows.md": ["docs/refactors/workflows/v2/implementation/testing-strategy.md"],
+    "workflows/scripts/tests/": [
+      "docs/refactors/workflows/v2/implementation/testing-strategy.md"
+    ],
+    "ci-workflows.md": [
+      "docs/refactors/workflows/v2/implementation/testing-strategy.md"
+    ],
     "workflows/scripts": [
       "docs/refactors/workflows/v2/implementation/testing-strategy.md",
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
@@ -12161,7 +12986,9 @@
       "docs/refactors/workflows/v2/operations/troubleshooting.md",
       "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
     ],
-    "workflows/scripts/**": ["docs/refactors/workflows/v2/implementation/testing-strategy.md"],
+    "workflows/scripts/**": [
+      "docs/refactors/workflows/v2/implementation/testing-strategy.md"
+    ],
     "../implementation/release-workflows.md": [
       "docs/refactors/workflows/v2/operations/migration-guide.md",
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
@@ -12172,16 +12999,26 @@
       "docs/refactors/workflows/v2/operations/migration-guide.md",
       "docs/refactors/workflows/v2/operations/troubleshooting.md"
     ],
-    "workflows/release.yml;": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
-    "workflows/archive/v1": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
-    "workflows/archive/v1/": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
+    "workflows/release.yml;": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
+    "workflows/archive/v1": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
+    "workflows/archive/v1/": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
     "../implementation/testing-strategy.md": [
       "docs/refactors/workflows/v2/operations/migration-guide.md",
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
       "docs/refactors/workflows/v2/operations/troubleshooting.md"
     ],
-    "workflows/archive/v1/README.md": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
-    "workflows/archive/": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
+    "workflows/archive/v1/README.md": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
+    "workflows/archive/": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
     "workflows/scripts/requirements.txt": [
       "docs/refactors/workflows/v2/operations/migration-guide.md",
       "docs/refactors/workflows/v2/operations/troubleshooting.md"
@@ -12189,7 +13026,9 @@
     "refactors/workflows/v2/operations/migration-guide.md": [
       "docs/refactors/workflows/v2/operations/migration-guide.md"
     ],
-    "troubleshooting.md": ["docs/refactors/workflows/v2/operations/migration-guide.md"],
+    "troubleshooting.md": [
+      "docs/refactors/workflows/v2/operations/migration-guide.md"
+    ],
     "../implementation/ci-workflows.md": [
       "docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md",
       "docs/refactors/workflows/v2/operations/migration-guide.md",
@@ -12208,10 +13047,18 @@
     "refactors/workflows/v2/operations/rollback-procedures.md": [
       "docs/refactors/workflows/v2/operations/rollback-procedures.md"
     ],
-    "workflows/*.yml;": ["docs/refactors/workflows/v2/operations/rollback-procedures.md"],
-    "workflows/examples/": ["docs/refactors/workflows/v2/operations/troubleshooting.md"],
-    "migration-guide.md": ["docs/refactors/workflows/v2/operations/troubleshooting.md"],
-    "refactors/workflows/v2/": ["docs/refactors/workflows/v2/operations/troubleshooting.md"],
+    "workflows/*.yml;": [
+      "docs/refactors/workflows/v2/operations/rollback-procedures.md"
+    ],
+    "workflows/examples/": [
+      "docs/refactors/workflows/v2/operations/troubleshooting.md"
+    ],
+    "migration-guide.md": [
+      "docs/refactors/workflows/v2/operations/troubleshooting.md"
+    ],
+    "refactors/workflows/v2/": [
+      "docs/refactors/workflows/v2/operations/troubleshooting.md"
+    ],
     "refactors/workflows/v2/operations/troubleshooting.md": [
       "docs/refactors/workflows/v2/operations/troubleshooting.md"
     ],
@@ -12222,7 +13069,9 @@
       "docs/refactors/workflows/v2/phases/phase-0-foundation.md",
       "docs/refactors/workflows/v2/reference/config-schema.md"
     ],
-    "SECURITY_CHECKLIST.md": ["docs/refactors/workflows/v2/phases/phase-0-foundation.md"],
+    "SECURITY_CHECKLIST.md": [
+      "docs/refactors/workflows/v2/phases/phase-0-foundation.md"
+    ],
     "schemas/repository-config.schema.json": [
       "docs/refactors/workflows/v2/phases/phase-0-foundation.md"
     ],
@@ -12232,8 +13081,12 @@
     "refactors/workflows/v2/phases/phase-1-ci-modernization.md": [
       "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
     ],
-    "workflows/ci.yml\\n": ["docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"],
-    "actions/": ["docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"],
+    "workflows/ci.yml\\n": [
+      "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
+    ],
+    "actions/": [
+      "docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md"
+    ],
     "refactors/workflows/v2/phases/phase-2-release-consolidation.md": [
       "docs/refactors/workflows/v2/phases/phase-2-release-consolidation.md"
     ],
@@ -12264,31 +13117,51 @@
     "refactors/workflows/v2/phases/phase-5-advanced-features.md": [
       "docs/refactors/workflows/v2/phases/phase-5-advanced-features.md"
     ],
-    "helpers/config-schema.json": ["docs/refactors/workflows/v2/reference/config-schema.md"],
-    "architecture/dependencies.md": ["docs/refactors/workflows/v2/reference/helper-scripts-api.md"],
-    "api/auth.md": ["docs/refactors/workflows/v2/reference/helper-scripts-api.md"],
+    "helpers/config-schema.json": [
+      "docs/refactors/workflows/v2/reference/config-schema.md"
+    ],
+    "architecture/dependencies.md": [
+      "docs/refactors/workflows/v2/reference/helper-scripts-api.md"
+    ],
+    "api/auth.md": [
+      "docs/refactors/workflows/v2/reference/helper-scripts-api.md"
+    ],
     "config-schema.md": [
       "docs/refactors/workflows/v2/reference/helper-scripts-api.md",
       "docs/refactors/workflows/v2/reference/workflow-catalog.md"
     ],
-    "workflow-versions.yml.": ["docs/refactors/workflows/v2/reference/helper-scripts-api.md"],
-    "helper-scripts-api.md": ["docs/refactors/workflows/v2/reference/workflow-catalog.md"],
+    "workflow-versions.yml.": [
+      "docs/refactors/workflows/v2/reference/helper-scripts-api.md"
+    ],
+    "helper-scripts-api.md": [
+      "docs/refactors/workflows/v2/reference/workflow-catalog.md"
+    ],
     "refactors/workflows/v2/reference/workflow-reference.md": [
       "docs/refactors/workflows/v2/reference/workflow-reference.md"
     ],
-    "refactors/workflows/v2/version-policy.md": ["docs/refactors/workflows/v2/version-policy.md"],
-    "workflows/reusable-super-linter.yml@main": ["docs/super-linter-improvements.md"],
+    "refactors/workflows/v2/version-policy.md": [
+      "docs/refactors/workflows/v2/version-policy.md"
+    ],
+    "workflows/reusable-super-linter.yml@main": [
+      "docs/super-linter-improvements.md"
+    ],
     "issue-updates/processed/": ["docs/unified-issue-management.md"],
     "issue-updates/feature-123.json": ["docs/unified-issue-management.md"],
-    "issue-updates/feature-request-123.json": ["docs/unified-issue-management.md"],
+    "issue-updates/feature-request-123.json": [
+      "docs/unified-issue-management.md"
+    ],
     "issue-updates/bug-fix-456.json": ["docs/unified-issue-management.md"],
-    "issue-updates/processed/feature-123.json": ["docs/unified-issue-management.md"],
+    "issue-updates/processed/feature-123.json": [
+      "docs/unified-issue-management.md"
+    ],
     "issue-updates/processed/*.json": ["docs/unified-issue-management.md"],
     "_build": ["docs/workflow-optimization.md"],
     "**/*.md": ["docs/workflow-optimization.md"],
     "workflow-optimization.md": ["docs/workflow-optimization.md"],
     "workflows/consolidation-map.md": ["docs/workflows/consolidation-map.md"],
-    "workflows/performance-monitoring-todo.md": ["docs/workflows/performance-monitoring-todo.md"],
+    "workflows/performance-monitoring-todo.md": [
+      "docs/workflows/performance-monitoring-todo.md"
+    ],
     "**:": ["examples/migration-guides/subtitle-manager-migration.md"],
     "scripts/": ["examples/migration-guides/subtitle-manager-migration.md"],
     "rebase": ["scripts/CODEX-REBASE-GUIDE.md"],
@@ -12344,7 +13217,9 @@
     "base64": ["scripts/update-repository-automation.py"],
     "unittest": ["tests/test_basic.py"],
     "standard": ["tests/test_basic.py"],
-    "automation_workflow": ["tests/workflow_scripts/test_automation_workflow.py"],
+    "automation_workflow": [
+      "tests/workflow_scripts/test_automation_workflow.py"
+    ],
     "pytest": [
       "tests/workflow_scripts/test_automation_workflow.py",
       "tests/workflow_scripts/test_generate_release_summary.py",
@@ -12357,8 +13232,12 @@
     ],
     "ci_workflow": ["tests/workflow_scripts/test_ci_workflow.py"],
     "docs_workflow": ["tests/workflow_scripts/test_docs_workflow.py"],
-    "generate_release_summary": ["tests/workflow_scripts/test_generate_release_summary.py"],
-    "maintenance_workflow": ["tests/workflow_scripts/test_maintenance_workflow.py"],
+    "generate_release_summary": [
+      "tests/workflow_scripts/test_generate_release_summary.py"
+    ],
+    "maintenance_workflow": [
+      "tests/workflow_scripts/test_maintenance_workflow.py"
+    ],
     "write_go_module_metadata": ["tests/workflow_scripts/test_misc_scripts.py"],
     "load_repository_config": ["tests/workflow_scripts/test_misc_scripts.py"],
     "intelligent_labeling": ["tests/workflow_scripts/test_misc_scripts.py"],
@@ -12366,7 +13245,9 @@
     "detect_frontend_package": ["tests/workflow_scripts/test_misc_scripts.py"],
     "write_pypirc": ["tests/workflow_scripts/test_misc_scripts.py"],
     "configure_cargo_registry": ["tests/workflow_scripts/test_misc_scripts.py"],
-    "publish_to_github_packages": ["tests/workflow_scripts/test_publish_to_github_packages.py"],
+    "publish_to_github_packages": [
+      "tests/workflow_scripts/test_publish_to_github_packages.py"
+    ],
     "release_workflow": ["tests/workflow_scripts/test_release_workflow.py"],
     "sync_receiver": ["tests/workflow_scripts/test_sync_receiver.py"],
     "cycle": ["tools/mass-protobuf-fixer.py", "tools/protobuf-cycle-fixer.py"],

@@ -7,7 +7,7 @@
 
 # Valid YAML structure
 name: test-workflow
-version: "1.0.0"
+version: '1.0.0'
 
 # Configuration object
 config:

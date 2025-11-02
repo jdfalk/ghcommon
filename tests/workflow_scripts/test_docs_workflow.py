@@ -7,8 +7,8 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import textwrap
+from pathlib import Path
 
 import docs_workflow
 import pytest

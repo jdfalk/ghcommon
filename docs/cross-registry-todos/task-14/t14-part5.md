@@ -342,7 +342,14 @@ jobs:
   preview-comment:
     name: PR Documentation Preview
     if: github.event_name == 'pull_request'
-    needs: [build-rust-docs, build-python-docs, build-js-docs, build-mdbook, build-mkdocs]
+    needs:
+      [
+        build-rust-docs,
+        build-python-docs,
+        build-js-docs,
+        build-mdbook,
+        build-mkdocs,
+      ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

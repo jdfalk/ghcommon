@@ -7,12 +7,12 @@
 Designed to work with the copilot-agent-util for logging and execution.
 """
 
-from collections import defaultdict, deque
 import os
-from pathlib import Path
 import re
 import subprocess
 import sys
+from collections import defaultdict, deque
+from pathlib import Path
 
 
 class ProtobufCycleFixer:

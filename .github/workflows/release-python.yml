@@ -8,14 +8,14 @@ on:
   workflow_call:
     inputs:
       python-matrix:
-        description: "JSON encoded Python build matrix"
+        description: 'JSON encoded Python build matrix'
         required: true
         type: string
       protobuf-artifacts:
-        description: "Whether protobuf artifacts were generated"
+        description: 'Whether protobuf artifacts were generated'
         required: false
         type: string
-        default: "false"
+        default: 'false'
 
 permissions:
   contents: read

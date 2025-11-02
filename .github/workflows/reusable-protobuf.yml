@@ -8,42 +8,42 @@ on:
   workflow_call:
     inputs:
       config-path:
-        description: "Path to the repository configuration file"
+        description: 'Path to the repository configuration file'
         required: false
         type: string
-        default: ".github/repository-config.yml"
+        default: '.github/repository-config.yml'
       protobuf-path:
-        description: "Path to protobuf source files"
+        description: 'Path to protobuf source files'
         required: false
         type: string
-        default: "proto"
+        default: 'proto'
       output-path:
-        description: "Output path for generated code"
+        description: 'Output path for generated code'
         required: false
         type: string
-        default: "sdks"
+        default: 'sdks'
       generate-docs:
-        description: "Generate protobuf documentation"
+        description: 'Generate protobuf documentation'
         required: false
         type: boolean
         default: false
       skip-post-processing:
-        description: "Skip post-generation processing scripts"
+        description: 'Skip post-generation processing scripts'
         required: false
         type: boolean
         default: false
     outputs:
       artifacts-available:
-        description: "Whether protobuf artifacts were generated"
+        description: 'Whether protobuf artifacts were generated'
         value: ${{ jobs.generate-protobuf.outputs.artifacts-available }}
       go-files-generated:
-        description: "Number of Go files generated"
+        description: 'Number of Go files generated'
         value: ${{ jobs.generate-protobuf.outputs.go-files-generated }}
       python-files-generated:
-        description: "Number of Python files generated"
+        description: 'Number of Python files generated'
         value: ${{ jobs.generate-protobuf.outputs.python-files-generated }}
       docs-generated:
-        description: "Whether documentation was generated"
+        description: 'Whether documentation was generated'
         value: ${{ jobs.generate-protobuf.outputs.docs-generated }}
 
 permissions:
@@ -158,14 +158,14 @@ jobs:
         if: needs.load-config.outputs.go-enabled == 'true'
         uses: actions/setup-go@v6
         with:
-          go-version: "1.23"
+          go-version: '1.23'
           cache: false
 
       - name: Set up Python
         if: needs.load-config.outputs.python-enabled == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Set up Rust
         if: needs.load-config.outputs.rust-enabled == 'true'

@@ -8,9 +8,9 @@ Converts improperly formatted frontmatter to proper YAML frontmatter format.
 """
 
 import os
-from pathlib import Path
 import re
 import shutil
+from pathlib import Path
 
 
 # Colors for output

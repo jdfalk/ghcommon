@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
-from pathlib import Path
 import shutil
 import sys
+from pathlib import Path
 
 
 def _categorize(name: str) -> str | None:

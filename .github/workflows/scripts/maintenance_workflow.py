@@ -8,13 +8,13 @@
 from __future__ import annotations
 
 import argparse
+import json
+import re
+import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import json
 from pathlib import Path
-import re
-import sys
 from typing import Any
 
 from workflow_common import (
@@ -166,10 +166,7 @@ def parse_cargo_outdated(path: Path) -> list[DependencyUpdate]:
                 latest_version=latest,
                 update_type=update_type,
                 breaking=update_type == "major",
-                security=bool(
-                    item.get("is_direct")
-                    and item.get("rustsec_vulnerabilities")
-                ),
+                security=bool(item.get("is_direct") and item.get("rustsec_vulnerabilities")),
                 language="rust",
             )
         )
@@ -259,9 +256,7 @@ def write_dependency_summary(
     updates = list(updates)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if not updates:
-        output_path.write_text(
-            "No dependency updates found.\n", encoding="utf-8"
-        )
+        output_path.write_text("No dependency updates found.\n", encoding="utf-8")
         return
 
     lines = ["# Dependency Updates", ""]
@@ -331,9 +326,7 @@ def summarize_security_issues(issues: Iterable[SecurityIssue]) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def parse_stale_items(
-    data: Iterable[dict[str, Any]], days: int
-) -> list[StaleItem]:
+def parse_stale_items(data: Iterable[dict[str, Any]], days: int) -> list[StaleItem]:
     threshold = timedelta(days=days)
     items: list[StaleItem] = []
     now = datetime.utcnow()
@@ -364,35 +357,23 @@ def parse_stale_items(
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Maintenance workflow utilities"
-    )
+    parser = argparse.ArgumentParser(description="Maintenance workflow utilities")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     dep_parser = subparsers.add_parser(
         "summarize-dependencies", help="Summarize dependency updates"
     )
-    dep_parser.add_argument(
-        "--pip", type=Path, default=Path("maintenance/pip-outdated.json")
-    )
-    dep_parser.add_argument(
-        "--npm", type=Path, default=Path("maintenance/npm-outdated.json")
-    )
-    dep_parser.add_argument(
-        "--cargo", type=Path, default=Path("maintenance/cargo-outdated.json")
-    )
-    dep_parser.add_argument(
-        "--go", type=Path, default=Path("maintenance/go-outdated.json")
-    )
+    dep_parser.add_argument("--pip", type=Path, default=Path("maintenance/pip-outdated.json"))
+    dep_parser.add_argument("--npm", type=Path, default=Path("maintenance/npm-outdated.json"))
+    dep_parser.add_argument("--cargo", type=Path, default=Path("maintenance/cargo-outdated.json"))
+    dep_parser.add_argument("--go", type=Path, default=Path("maintenance/go-outdated.json"))
     dep_parser.add_argument(
         "--output",
         type=Path,
         default=Path("maintenance/dependency-summary.md"),
     )
 
-    stale_parser = subparsers.add_parser(
-        "summarize-stale", help="Summarize stale issues/PRs"
-    )
+    stale_parser = subparsers.add_parser("summarize-stale", help="Summarize stale issues/PRs")
     stale_parser.add_argument("--input", type=Path, required=True)
     stale_parser.add_argument("--days", type=int, default=60)
 
@@ -409,9 +390,7 @@ def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv or sys.argv[1:])
 
     if args.command == "summarize-dependencies":
-        updates = collect_dependency_updates(
-            args.pip, args.npm, args.cargo, args.go
-        )
+        updates = collect_dependency_updates(args.pip, args.npm, args.cargo, args.go)
         write_dependency_summary(updates, args.output)
         summarize_dependency_updates(updates)
         log_notice(f"Dependency summary written to {args.output}")
@@ -423,10 +402,7 @@ def main(argv: list[str] | None = None) -> None:
         if not items:
             append_summary_line("No stale issues found.")
             return
-        rows = [
-            (f"#{item.number} {item.title}", f"{item.days_stale} days stale")
-            for item in items
-        ]
+        rows = [(f"#{item.number} {item.title}", f"{item.days_stale} days stale") for item in items]
         append_summary_line(format_summary_table(rows))
         return
 

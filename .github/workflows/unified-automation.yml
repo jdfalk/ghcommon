@@ -10,20 +10,20 @@ name: Unified Automation
 
 on:
   schedule:
-    - cron: "0 0 * * 0" # Weekly on Sunday
+    - cron: '0 0 * * 0' # Weekly on Sunday
   workflow_dispatch:
     inputs:
       operation:
-        description: "Operation to perform"
+        description: 'Operation to perform'
         required: false
-        default: "issues"
+        default: 'issues'
         type: choice
         options:
           - issues
           - migrate
           - dependencies
       dry_run:
-        description: "Run in dry-run mode"
+        description: 'Run in dry-run mode'
         required: false
         default: false
         type: boolean
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |

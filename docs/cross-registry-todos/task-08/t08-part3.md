@@ -387,8 +387,7 @@ jobs:
         uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE:
-            ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           FILTER_REGEX_EXCLUDE: '.*/(node_modules|target|dist|build|__pycache__|\.venv|venv|htmlcov|\.pytest_cache|\.mypy_cache)/.*'
           # Enable general linters

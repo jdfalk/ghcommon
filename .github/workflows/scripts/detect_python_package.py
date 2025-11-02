@@ -6,9 +6,9 @@ from __future__ import annotations
 import configparser
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 module_name = ""
 module_version = ""
@@ -34,11 +34,7 @@ def read_pyproject() -> None:
         return
 
     project = data.get("project")
-    poetry = (
-        data.get("tool", {}).get("poetry")
-        if isinstance(data.get("tool"), dict)
-        else None
-    )
+    poetry = data.get("tool", {}).get("poetry") if isinstance(data.get("tool"), dict) else None
 
     if isinstance(project, dict):
         module_name = module_name or str(project.get("name") or "")
@@ -61,9 +57,7 @@ def read_setup_cfg() -> None:
     config.read(setup_cfg)
     if config.has_section("metadata"):
         module_name = module_name or config.get("metadata", "name", fallback="")
-        module_version = module_version or config.get(
-            "metadata", "version", fallback=""
-        )
+        module_version = module_version or config.get("metadata", "version", fallback="")
         build_system = "setuptools"
 
 
@@ -108,11 +102,7 @@ def main() -> None:
 
     print(json.dumps(output))
 
-    output_path = (
-        Path(os.environ["GITHUB_OUTPUT"])
-        if "GITHUB_OUTPUT" in os.environ
-        else None
-    )
+    output_path = Path(os.environ["GITHUB_OUTPUT"]) if "GITHUB_OUTPUT" in os.environ else None
     if output_path:
         with output_path.open("a", encoding="utf-8") as handle:
             for key, value in output.items():

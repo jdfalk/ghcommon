@@ -8,8 +8,8 @@ Outputs (written to $GITHUB_OUTPUT):
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import os
+from collections.abc import Iterable
 from pathlib import Path
 
 DOCKERFILE_CANDIDATES: Iterable[str] = (
@@ -42,9 +42,7 @@ def main() -> None:
             handle.write(f"dockerfile-path={dockerfile_path}\n")
             handle.write(f"should-build={should_build}\n")
 
-    print(
-        f"Detected Dockerfile: {dockerfile_path} (should_build={should_build})"
-    )
+    print(f"Detected Dockerfile: {dockerfile_path} (should_build={should_build})")
 
 
 if __name__ == "__main__":

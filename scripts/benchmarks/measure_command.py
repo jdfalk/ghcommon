@@ -9,13 +9,13 @@ and writes a JSON array where the first entry contains summary statistics that t
 from __future__ import annotations
 
 import argparse
-from collections.abc import Sequence
 import json
 import math
-from pathlib import Path
 import statistics
 import subprocess
 import time
+from collections.abc import Sequence
+from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:

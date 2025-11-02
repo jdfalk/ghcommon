@@ -12,7 +12,7 @@ updates:
     schedule:
       interval: weekly
       day: wednesday
-      time: "10:00"
+      time: '10:00'
       timezone: America/New_York
     open-pull-requests-limit: 5
     commit-message:
@@ -32,7 +32,7 @@ updates:
           - patch
       external-actions:
         patterns:
-          - "*"
+          - '*'
         exclude-patterns:
           - actions/*
           - github/*
@@ -57,16 +57,16 @@ updates:
       - dependency-type: direct
       - dependency-type: indirect
     ignore:
-      - dependency-name: "*"
+      - dependency-name: '*'
         update-types:
           - version-update:semver-major
     groups:
       dev-dependencies:
         patterns:
-          - "*eslint*"
-          - "*prettier*"
-          - "*commitlint*"
-          - "@types/*"
+          - '*eslint*'
+          - '*prettier*'
+          - '*commitlint*'
+          - '@types/*'
         update-types:
           - minor
           - patch
@@ -75,7 +75,7 @@ updates:
     schedule:
       interval: weekly
       day: tuesday
-      time: "11:00"
+      time: '11:00'
       timezone: America/New_York
     open-pull-requests-limit: 3
     commit-message:
@@ -87,7 +87,7 @@ updates:
     allow:
       - dependency-type: direct
     ignore:
-      - dependency-name: "*"
+      - dependency-name: '*'
         update-types:
           - version-update:semver-major
   - package-ecosystem: pip
@@ -95,7 +95,7 @@ updates:
     schedule:
       interval: weekly
       day: tuesday
-      time: "12:00"
+      time: '12:00'
       timezone: America/New_York
     open-pull-requests-limit: 3
     commit-message:
@@ -107,6 +107,6 @@ updates:
     allow:
       - dependency-type: direct
     ignore:
-      - dependency-name: "*"
+      - dependency-name: '*'
         update-types:
           - version-update:semver-major

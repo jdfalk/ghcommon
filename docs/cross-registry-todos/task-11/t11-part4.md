@@ -489,8 +489,7 @@ jobs:
     uses: ./.github/workflows/reusable-release.yml
     with:
       language: rust
-      platforms:
-        '["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"]'
+      platforms: '["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"]'
       publish-packages: true
     secrets: inherit
 

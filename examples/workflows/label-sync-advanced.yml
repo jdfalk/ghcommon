@@ -7,22 +7,22 @@ on:
   workflow_dispatch:
     inputs:
       dry-run:
-        description: "Perform a dry run"
+        description: 'Perform a dry run'
         required: false
         default: false
         type: boolean
       target-repos:
-        description: "Override default repository list"
+        description: 'Override default repository list'
         required: false
         type: string
   push:
     branches: [main]
     paths:
-      - "labels.json"
-      - "repo-list.txt"
+      - 'labels.json'
+      - 'repo-list.txt'
   schedule:
     # Run weekly on Sundays at 2 AM UTC
-    - cron: "0 2 * * 0"
+    - cron: '0 2 * * 0'
 
 permissions:
   contents: read
@@ -34,10 +34,10 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
     with:
       # Use local labels configuration
-      config-file: "labels.json"
+      config-file: 'labels.json'
       # Use input override or default to repo list file
       repositories: ${{ inputs.target-repos }}
-      repositories-file: "repo-list.txt"
+      repositories-file: 'repo-list.txt'
       # Clean up extra labels for consistency
       delete-extra-labels: true
       # Use dry-run input

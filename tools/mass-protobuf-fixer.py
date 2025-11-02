@@ -8,10 +8,10 @@ Designed to work autonomously with the copilot-agent-util for execution.
 """
 
 import os
-from pathlib import Path
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 class MassProtobufFixer:

@@ -88,7 +88,10 @@ providers:
             "legendFormat": "{{service}} - {{method}} {{route}}"
           }
         ],
-        "yaxes": [{ "format": "reqps", "label": "Requests/s" }, { "format": "short" }]
+        "yaxes": [
+          { "format": "reqps", "label": "Requests/s" },
+          { "format": "short" }
+        ]
       },
       {
         "id": 2,
@@ -101,7 +104,10 @@ providers:
             "legendFormat": "{{service}} error rate"
           }
         ],
-        "yaxes": [{ "format": "percentunit", "label": "Error Rate" }, { "format": "short" }],
+        "yaxes": [
+          { "format": "percentunit", "label": "Error Rate" },
+          { "format": "short" }
+        ],
         "alert": {
           "name": "High Error Rate",
           "conditions": [
@@ -290,7 +296,10 @@ providers:
             "legendFormat": "{{instance}}"
           }
         ],
-        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
+        "yaxes": [
+          { "format": "percent", "min": 0, "max": 100 },
+          { "format": "short" }
+        ]
       },
       {
         "id": 2,
@@ -303,7 +312,10 @@ providers:
             "legendFormat": "{{instance}}"
           }
         ],
-        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
+        "yaxes": [
+          { "format": "percent", "min": 0, "max": 100 },
+          { "format": "short" }
+        ]
       },
       {
         "id": 3,
@@ -316,7 +328,10 @@ providers:
             "legendFormat": "{{instance}} {{mountpoint}}"
           }
         ],
-        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }, { "format": "short" }]
+        "yaxes": [
+          { "format": "percent", "min": 0, "max": 100 },
+          { "format": "short" }
+        ]
       },
       {
         "id": 4,
@@ -490,7 +505,10 @@ providers:
             "legendFormat": "Target (1x)"
           }
         ],
-        "yaxes": [{ "format": "none", "label": "Burn Rate (x)" }, { "format": "short" }]
+        "yaxes": [
+          { "format": "none", "label": "Burn Rate (x)" },
+          { "format": "short" }
+        ]
       },
       {
         "id": 5,
@@ -507,7 +525,10 @@ providers:
             "legendFormat": "SLO Target (99.9%)"
           }
         ],
-        "yaxes": [{ "format": "percentunit", "min": 0.995, "max": 1.0 }, { "format": "short" }]
+        "yaxes": [
+          { "format": "percentunit", "min": 0.995, "max": 1.0 },
+          { "format": "short" }
+        ]
       },
       {
         "id": 6,
@@ -547,7 +568,9 @@ providers:
           "overrides": [
             {
               "matcher": { "id": "byName", "options": "Success Rate" },
-              "properties": [{ "id": "custom.displayMode", "value": "gradient-gauge" }]
+              "properties": [
+                { "id": "custom.displayMode", "value": "gradient-gauge" }
+              ]
             }
           ]
         }

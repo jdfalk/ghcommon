@@ -33,7 +33,7 @@ jobs:
     uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
     with:
       validate-all-codebase: true # Validate entire codebase
-      default-branch: "main"
+      default-branch: 'main'
       # Enable specific languages only
       run-python: true
       run-javascript: true
@@ -51,7 +51,7 @@ jobs:
       # Auto-fix configuration
       enable-auto-fix: true
       auto-commit-fixes: true
-      commit-message: "style: auto-fix linting issues [skip ci]"
+      commit-message: 'style: auto-fix linting issues [skip ci]'
       # Custom exclusion patterns
       filter-regex-exclude: ".*\\.git/.*|.*\\.vscode/.*|.*node_modules/.*|.*\\.cache/.*|vendor/.*"
     secrets: inherit

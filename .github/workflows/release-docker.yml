@@ -8,15 +8,15 @@ on:
   workflow_call:
     inputs:
       docker-matrix:
-        description: "JSON encoded Docker platform matrix"
+        description: 'JSON encoded Docker platform matrix'
         required: true
         type: string
       registry:
-        description: "Container registry hostname"
+        description: 'Container registry hostname'
         required: true
         type: string
       image-name:
-        description: "Container image name"
+        description: 'Container image name'
         required: true
         type: string
 

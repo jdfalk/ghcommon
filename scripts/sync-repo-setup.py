@@ -18,9 +18,9 @@ customizes the dependabot.yml configuration accordingly.
 
 import argparse
 import logging
-from pathlib import Path
 import re
 import shutil
+from pathlib import Path
 from typing import Any
 
 import yaml
