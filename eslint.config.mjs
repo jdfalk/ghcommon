@@ -7,7 +7,14 @@ import globals from 'globals';
 
 export default defineConfig(
   {
-    ignores: ['.github/test-files/**', 'testdata/**', '.commitlintrc.js'],
+    ignores: [
+      '.github/test-files/**',
+      'testdata/**',
+      '.commitlintrc.js',
+      '.vscode/**',
+      'dependency-analysis/**',
+      'logs/**',
+    ],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
