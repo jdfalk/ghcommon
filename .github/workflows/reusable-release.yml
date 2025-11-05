@@ -459,7 +459,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Download release artifacts for publishing
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: packages
           merge-multiple: true
