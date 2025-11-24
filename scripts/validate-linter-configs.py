@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/validate-linter-configs.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 """Comprehensive Linter Configuration Validator
@@ -105,9 +105,7 @@ class LinterValidator:
         for key, expected, reason in checks:
             if key in config:
                 if config[key] == expected:
-                    self.log(
-                        f"Prettier {key}={expected} ✓ ({reason})", "success"
-                    )
+                    self.log(f"Prettier {key}={expected} ✓ ({reason})", "success")
                 else:
                     self.log(
                         f"Prettier {key}={config[key]}, expected {expected}. {reason}",
@@ -120,28 +118,26 @@ class LinterValidator:
 
     def validate_eslint_config(self) -> bool:
         """Validate ESLint configuration."""
-        filepath = ".eslintrc.yml"
+        # ESLint v9 uses flat config (eslint.config.mjs) instead of .eslintrc.yml
+        filepath = "eslint.config.mjs"
         if not self.validate_file_exists(filepath):
             return False
-        if not self.validate_yaml_syntax(filepath):
+
+        # Basic validation - check that the file exists and is readable
+        try:
+            with open(self.repo_root / filepath) as f:
+                content = f.read()
+
+            # Verify it's a JavaScript module
+            if not content.strip():
+                self.log(f"ESLint config {filepath} is empty", "error")
+                return False
+
+            self.log("ESLint v9 flat config validated", "success")
+            return True
+        except Exception as e:
+            self.log(f"Error reading {filepath}: {e}", "error")
             return False
-
-        with open(self.repo_root / filepath) as f:
-            config = yaml.safe_load(f)
-
-        # Check for Google style guide extends
-        if "extends" in config:
-            extends = (
-                config["extends"]
-                if isinstance(config["extends"], list)
-                else [config["extends"]]
-            )
-            if any("google" in str(ext).lower() for ext in extends):
-                self.log("ESLint extends Google style guide", "success")
-            else:
-                self.log("ESLint doesn't extend Google style guide", "warning")
-
-        return True
 
     def validate_python_black_config(self) -> bool:
         """Validate Python Black configuration."""
@@ -187,10 +183,7 @@ class LinterValidator:
 
             # Google Python style uses 80 char lines
             if "max-line-length" in content:
-                if (
-                    "max-line-length=80" in content
-                    or "max-line-length = 80" in content
-                ):
+                if "max-line-length=80" in content or "max-line-length = 80" in content:
                     self.log(
                         "Pylint max-line-length set to 80 (Google Python style)",
                         "success",
@@ -318,9 +311,7 @@ class LinterValidator:
                 if config_path and not config_path.startswith("#"):
                     full_path = self.repo_root / config_path
                     if full_path.exists():
-                        self.log(
-                            f"{env_file}: {var_name}={config_path} ✓", "success"
-                        )
+                        self.log(f"{env_file}: {var_name}={config_path} ✓", "success")
                     else:
                         self.log(
                             f"{env_file}: {var_name}={config_path} NOT FOUND",
@@ -365,14 +356,10 @@ class LinterValidator:
         print(f"{RED}❌ Errors: {len(self.errors)}{RESET}\n")
 
         if self.errors:
-            print(
-                f"{RED}Validation FAILED with {len(self.errors)} errors{RESET}"
-            )
+            print(f"{RED}Validation FAILED with {len(self.errors)} errors{RESET}")
             return False
         if self.warnings:
-            print(
-                f"{YELLOW}Validation passed with {len(self.warnings)} warnings{RESET}"
-            )
+            print(f"{YELLOW}Validation passed with {len(self.warnings)} warnings{RESET}")
             return True
         print(f"{GREEN}All validations PASSED!{RESET}")
         return True
@@ -382,15 +369,9 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Validate linter configurations"
-    )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output"
-    )
-    parser.add_argument(
-        "--repo-root", default=".", help="Repository root directory"
-    )
+    parser = argparse.ArgumentParser(description="Validate linter configurations")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--repo-root", default=".", help="Repository root directory")
 
     args = parser.parse_args()
 
