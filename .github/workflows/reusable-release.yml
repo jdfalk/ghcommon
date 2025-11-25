@@ -205,7 +205,7 @@ jobs:
     name: Generate Protocol Buffers
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: ./.github/workflows/release-protobuf.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@main
     secrets: inherit
 
   # Go Build
@@ -216,7 +216,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-go == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'go')
-    uses: ./.github/workflows/release-go.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@main
     with:
       go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -230,7 +230,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-python == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'python')
-    uses: ./.github/workflows/release-python.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@main
     with:
       python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -244,7 +244,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: ./.github/workflows/release-rust.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@main
     with:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -258,7 +258,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: ./.github/workflows/release-frontend.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@main
     with:
       frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
     secrets: inherit
@@ -271,7 +271,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-docker == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
-    uses: ./.github/workflows/release-docker.yml
+    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@main
     with:
       docker-matrix: ${{ needs.detect-languages.outputs.docker-matrix }}
       registry: ${{ needs.detect-languages.outputs.registry }}
