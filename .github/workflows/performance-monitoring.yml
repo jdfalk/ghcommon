@@ -28,10 +28,10 @@ jobs:
       best: ${{ steps.capture.outputs.best }}
       worst: ${{ steps.capture.outputs.worst }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark
@@ -126,10 +126,10 @@ jobs:
       best: ${{ steps.capture.outputs.best }}
       worst: ${{ steps.capture.outputs.worst }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark
@@ -218,10 +218,10 @@ jobs:
       best: ${{ steps.capture.outputs.best }}
       worst: ${{ steps.capture.outputs.worst }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark

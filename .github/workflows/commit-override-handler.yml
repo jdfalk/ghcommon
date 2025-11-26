@@ -50,7 +50,7 @@ jobs:
       # 'fatal: bad revision' / exit 128 errors when computing commit range
       # on PRs. (Previously the job failed before producing outputs.)
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # Need full history (or at least all commits in PR) plus base branch ref for range comparisons
           fetch-depth: 0
