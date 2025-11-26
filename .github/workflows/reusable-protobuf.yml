@@ -64,7 +64,7 @@ jobs:
       protoc-version: ${{ steps.parse-config.outputs.protoc-version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load repository configuration
         id: load-config
@@ -152,7 +152,7 @@ jobs:
       docs-generated: ${{ steps.check-artifacts.outputs.docs-generated }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Go
         if: needs.load-config.outputs.go-enabled == 'true'

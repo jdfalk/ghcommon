@@ -29,7 +29,7 @@ jobs:
       RELEASE_VERSION: ${{ inputs.release-version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
