@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.4.0
+# version: 1.5.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -454,18 +454,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Get frontend working directory
+        id: frontend-dir
+        run: |
+          WORKING_DIR=$(echo '${{ needs.load-config.outputs.config }}' | python3 -c "import sys, json; config = json.load(sys.stdin); print(config.get('working_directories', {}).get('frontend', '.'))") || echo "."
+          echo "dir=${WORKING_DIR}" >> $GITHUB_OUTPUT
+          if [ "${WORKING_DIR}" != "." ]; then
+            echo "cache-path=${WORKING_DIR}/package-lock.json" >> $GITHUB_OUTPUT
+          else
+            echo "cache-path=package-lock.json" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+          cache-dependency-path: ${{ steps.frontend-dir.outputs.cache-path }}
 
       - name: Install dependencies
+        env:
+          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
         run: python3 .github/workflows/scripts/ci_workflow.py frontend-install
 
       - name: Lint frontend code
         if: ${{ !inputs.skip-linting }}
         env:
+          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
           FRONTEND_SCRIPT: lint
           FRONTEND_SUCCESS_MESSAGE: '✅ Linting passed'
           FRONTEND_FAILURE_MESSAGE: '❌ Linting failed or not configured'
@@ -473,6 +488,7 @@ jobs:
 
       - name: Build frontend
         env:
+          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
           FRONTEND_SCRIPT: build
           FRONTEND_SUCCESS_MESSAGE: '✅ Build successful'
           FRONTEND_FAILURE_MESSAGE: 'ℹ️ No build script configured'
@@ -481,6 +497,7 @@ jobs:
       - name: Test frontend
         if: ${{ !inputs.skip-tests }}
         env:
+          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
           FRONTEND_SCRIPT: test
           FRONTEND_SUCCESS_MESSAGE: '✅ Tests passed'
           FRONTEND_FAILURE_MESSAGE: 'ℹ️ No tests configured'

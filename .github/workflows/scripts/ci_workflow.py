@@ -4,20 +4,20 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterable
 import json
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 import textwrap
 import time
+from collections.abc import Iterable
+from pathlib import Path
 from typing import Any
 
 try:
-    import requests  # type: ignore
+    import requests  # type: ignore[import-untyped]
 except ModuleNotFoundError:  # pragma: no cover - fallback when requests unavailable
     requests = None
     from urllib.parse import urlencode
@@ -391,30 +391,56 @@ def _run_command(command: Iterable[str], check: bool = True) -> subprocess.Compl
 
 
 def frontend_install(_: argparse.Namespace) -> None:
-    if Path("package-lock.json").is_file():
-        _run_command(["npm", "ci"])
-    elif Path("yarn.lock").is_file():
-        _run_command(["yarn", "install", "--frozen-lockfile"])
-    elif Path("pnpm-lock.yaml").is_file():
-        _run_command(["npm", "install", "-g", "pnpm"])
-        _run_command(["pnpm", "install", "--frozen-lockfile"])
-    else:
-        _run_command(["npm", "install"])
+    working_dir = os.environ.get("FRONTEND_WORKING_DIR", ".")
+    original_dir = Path.cwd()
+
+    try:
+        if working_dir != ".":
+            target_dir = Path(working_dir)
+            if not target_dir.exists():
+                raise FileNotFoundError(f"Frontend working directory not found: {working_dir}")
+            os.chdir(target_dir)
+            print(f"Changed to frontend working directory: {working_dir}")
+
+        if Path("package-lock.json").is_file():
+            _run_command(["npm", "ci"])
+        elif Path("yarn.lock").is_file():
+            _run_command(["yarn", "install", "--frozen-lockfile"])
+        elif Path("pnpm-lock.yaml").is_file():
+            _run_command(["npm", "install", "-g", "pnpm"])
+            _run_command(["pnpm", "install", "--frozen-lockfile"])
+        else:
+            _run_command(["npm", "install"])
+    finally:
+        os.chdir(original_dir)
 
 
 def frontend_run(_: argparse.Namespace) -> None:
     script_name = os.environ.get("FRONTEND_SCRIPT", "")
     success_message = os.environ.get("FRONTEND_SUCCESS_MESSAGE", "Command succeeded")
     failure_message = os.environ.get("FRONTEND_FAILURE_MESSAGE", "Command failed")
+    working_dir = os.environ.get("FRONTEND_WORKING_DIR", ".")
 
     if not script_name:
         raise SystemExit("FRONTEND_SCRIPT environment variable is required")
 
-    result = subprocess.run(["npm", "run", script_name, "--if-present"], check=False)
-    if result.returncode == 0:
-        print(success_message)
-    else:
-        print(failure_message)
+    original_dir = Path.cwd()
+
+    try:
+        if working_dir != ".":
+            target_dir = Path(working_dir)
+            if not target_dir.exists():
+                raise FileNotFoundError(f"Frontend working directory not found: {working_dir}")
+            os.chdir(target_dir)
+            print(f"Changed to frontend working directory: {working_dir}")
+
+        result = subprocess.run(["npm", "run", script_name, "--if-present"], check=False)
+        if result.returncode == 0:
+            print(success_message)
+        else:
+            print(failure_message)
+    finally:
+        os.chdir(original_dir)
 
 
 def python_install(_: argparse.Namespace) -> None:
@@ -435,10 +461,7 @@ def python_install(_: argparse.Namespace) -> None:
 
 def python_run_tests(_: argparse.Namespace) -> None:
     def has_tests() -> bool:
-        for pattern in ("test_*.py", "*_test.py"):
-            if any(Path(".").rglob(pattern)):
-                return True
-        return False
+        return any(any(Path(".").rglob(pattern)) for pattern in ("test_*.py", "*_test.py"))
 
     if not has_tests():
         print("ℹ️ No Python tests found")
