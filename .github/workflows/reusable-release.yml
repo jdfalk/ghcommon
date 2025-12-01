@@ -361,15 +361,21 @@ jobs:
         run: |
           import os
           import subprocess
+          from pathlib import Path
 
-          subprocess.run(
-              [
-                  "python3",
-                  "scripts/workflows/package_release_assets.py",
-                  os.environ.get("RELEASE_VERSION_ARG", "unknown"),
-              ],
-              check=True,
-          )
+          # Use ghcommon script if available, otherwise skip
+          script_path = Path(os.environ.get("GHCOMMON_SCRIPTS_DIR", "")) / "package_release_assets.py"
+          if script_path.exists():
+              subprocess.run(
+                  [
+                      "python3",
+                      str(script_path),
+                      os.environ.get("RELEASE_VERSION_ARG", "unknown"),
+                  ],
+                  check=True,
+              )
+          else:
+              print("⚠️  Package release assets script not found, skipping artifact packaging")
 
       - name: Create GitHub Release
         id: release
