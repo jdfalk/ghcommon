@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/detect-languages.sh
-# version: 1.1.0
+# version: 1.2.0
 # guid: 8a9b0c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d
 
 set -euo pipefail
@@ -112,8 +112,9 @@ else
     primary_lang="go"
   fi
 
-  # Python detection
-  if [[ -f "setup.py" || -f "pyproject.toml" || -f "requirements.txt" || -f "poetry.lock" ]]; then
+  # Python detection - only detect if project has Python package files
+  # Exclude workflow scripts (.github/workflows/scripts/*.py) from detection
+  if [[ -f "setup.py" || -f "pyproject.toml" || -f "requirements.txt" || -f "poetry.lock" || -f "Pipfile" || -f "Pipfile.lock" ]]; then
     has_python="true"
     [[ $primary_lang == "unknown" ]] && primary_lang="python"
   fi
