@@ -99,12 +99,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Detect ghcommon ref
+        id: ghcommon-ref
+        run: |
+          if [ -f .github/ghcommon-ref.txt ]; then
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "ref=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
+          sparse-checkout: |
+            .github/workflows/scripts
+          path: .ghcommon
+
+      - name: Set up GHCOMMON_SCRIPTS_DIR
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+
       - name: Load repository configuration
         id: load-config
         env:
           CONFIG_FILE: .github/repository-config.yml
         run: |
-          python3 .github/workflows/scripts/load_repository_config.py
+          python3 "$GHCOMMON_SCRIPTS_DIR/load_repository_config.py"
 
   # Detect what languages/technologies are present
   detect-languages:
@@ -513,6 +535,31 @@ jobs:
     outputs:
       release-created: ${{ needs.create-release.outputs.release-created || 'false' }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Detect ghcommon ref
+        id: ghcommon-ref
+        run: |
+          if [ -f .github/ghcommon-ref.txt ]; then
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "ref=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
+          sparse-checkout: |
+            .github/workflows/scripts
+          path: .ghcommon
+
+      - name: Set up GHCOMMON_SCRIPTS_DIR
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+
       - name: Generate release summary
         env:
           SUMMARY_PRIMARY_LANGUAGE: ${{ needs.detect-languages.outputs.primary-language }}
@@ -530,4 +577,4 @@ jobs:
           SUMMARY_RELEASE_CREATED: ${{ needs.create-release.outputs.release-created || 'false' }}
           SUMMARY_AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease || 'false' }}
           SUMMARY_AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft || 'false' }}
-        run: python3 .github/workflows/scripts/generate_release_summary.py
+        run: python3 "$GHCOMMON_SCRIPTS_DIR/generate_release_summary.py"

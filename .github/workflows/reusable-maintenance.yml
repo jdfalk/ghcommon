@@ -8,22 +8,22 @@ on:
   workflow_call:
     inputs:
       skip-dependency-updates:
-        description: 'Skip dependency updates'
+        description: "Skip dependency updates"
         required: false
         type: boolean
         default: false
       skip-cleanup:
-        description: 'Skip cleanup tasks'
+        description: "Skip cleanup tasks"
         required: false
         type: boolean
         default: false
       skip-license-check:
-        description: 'Skip license compliance check'
+        description: "Skip license compliance check"
         required: false
         type: boolean
         default: false
       auto-commit:
-        description: 'Automatically commit maintenance changes'
+        description: "Automatically commit maintenance changes"
         required: false
         type: boolean
         default: false
@@ -41,6 +41,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Detect ghcommon ref
+        id: ghcommon-ref
+        run: |
+          if [ -f .github/ghcommon-ref.txt ]; then
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "ref=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
+          sparse-checkout: |
+            .github/workflows/scripts
+          path: .ghcommon
+
+      - name: Set up GHCOMMON_SCRIPTS_DIR
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
 
       - name: Collect Go dependency updates
         if: hashFiles('go.mod') != ''
@@ -72,7 +94,7 @@ jobs:
           fi
 
       - name: Summarize dependency updates
-        run: python3 .github/workflows/scripts/maintenance_workflow.py summarize-dependencies --pip maintenance/pip-outdated.json --npm maintenance/npm-outdated.json --cargo maintenance/cargo-outdated.json --go maintenance/go-outdated.json --output maintenance/dependency-summary.md
+        run: python3 "$GHCOMMON_SCRIPTS_DIR/maintenance_workflow.py" summarize-dependencies --pip maintenance/pip-outdated.json --npm maintenance/npm-outdated.json --cargo maintenance/cargo-outdated.json --go maintenance/go-outdated.json --output maintenance/dependency-summary.md
 
       - name: Upload dependency report
         uses: actions/upload-artifact@v5
@@ -81,7 +103,7 @@ jobs:
           path: maintenance
 
       - name: Summarize security advisories
-        run: python3 .github/workflows/scripts/maintenance_workflow.py summarize-security --input maintenance/security-alerts.json || true
+        run: python3 "$GHCOMMON_SCRIPTS_DIR/maintenance_workflow.py" summarize-security --input maintenance/security-alerts.json || true
 
   # Repository Cleanup
   cleanup-tasks:

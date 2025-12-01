@@ -42,15 +42,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Detect ghcommon ref
+        id: ghcommon-ref
+        run: |
+          if [ -f .github/ghcommon-ref.txt ]; then
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "ref=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
+          sparse-checkout: |
+            .github/workflows/scripts
+          path: .ghcommon
+
+      - name: Set up GHCOMMON_SCRIPTS_DIR
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Determine cache metadata
         id: metadata
         run: |
-          python .github/workflows/scripts/automation_workflow.py cache-plan \
+          python "$GHCOMMON_SCRIPTS_DIR/automation_workflow.py" cache-plan \
             --language "${{ inputs.language }}" \
             --github-output
 
@@ -62,7 +84,7 @@ jobs:
           if [ "${{ inputs.include-branch }}" = "true" ]; then
             INCLUDE_FLAG="--include-branch"
           fi
-          python .github/workflows/scripts/automation_workflow.py cache-key \
+          python "$GHCOMMON_SCRIPTS_DIR/automation_workflow.py" cache-key \
             --prefix "${{ inputs.cache-prefix }}" \
             --namespace "${{ inputs.language }}" \
             --files "${{ steps.metadata.outputs.files }}" \
