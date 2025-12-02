@@ -242,6 +242,7 @@ jobs:
     with:
       go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
+      release-version: ${{ needs.detect-languages.outputs.release-tag }}
     secrets: inherit
 
   # Python Build
@@ -405,14 +406,22 @@ jobs:
 
             This release includes organized packages for easy consumption:
 
+            ### Binaries
+            Pre-built binaries for multiple platforms with SHA256 checksums:
+            - **Windows**: `*-windows-amd64.exe`, `*-windows-arm64.exe`
+            - **Linux**: `*-linux-amd64`, `*-linux-arm64`
+            - **macOS**: `*-darwin-amd64`, `*-darwin-arm64`
+
+            Each binary includes a `.sha256` checksum file for verification.
+
             ### SDKs
-            - **Go SDK**: `gcommon-go-sdk.tar.gz` / `gcommon-go-sdk.zip`
-            - **Python SDK**: `gcommon-python-sdk.tar.gz` / `gcommon-python-sdk.zip`
+            - **Go SDK**: `*-go-sdk.tar.gz` / `*-go-sdk.zip`
+            - **Python SDK**: `*-python-sdk.tar.gz` / `*-python-sdk.zip`
 
             ### Documentation
-            - **API Documentation**: `gcommon-docs.tar.gz` / `gcommon-docs.zip`
+            - **API Documentation**: `*-docs.tar.gz` / `*-docs.zip`
 
-            See `MANIFEST.md` for a complete list of all assets and their sizes.
+            See `MANIFEST.md` in the release assets for a complete list of all files and their sizes.
 
             ---
             *Generated automatically from commit ${{ github.sha }}*
