@@ -1,5 +1,5 @@
 # file: .github/workflows/security.yml
-# version: 2.1.0
+# version: 3.0.0
 # guid: s3c4r5t6-y7a8-b9c0-d1e2-f3a4b5c6d7e8
 
 name: Security
@@ -10,21 +10,21 @@ on:
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: '0 6 * * 1' # Weekly on Monday at 6 AM UTC
+    - cron: "0 6 * * 1" # Weekly on Monday at 6 AM UTC
   workflow_dispatch:
     inputs:
       skip-codeql:
-        description: 'Skip CodeQL analysis'
+        description: "Skip CodeQL analysis"
         required: false
         type: boolean
         default: false
       skip-dependency-review:
-        description: 'Skip dependency review'
+        description: "Skip dependency review"
         required: false
         type: boolean
         default: false
       skip-security-audit:
-        description: 'Skip security audit'
+        description: "Skip security audit"
         required: false
         type: boolean
         default: false
@@ -39,11 +39,239 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  security:
-    name: Security Analysis
-    uses: ./.github/workflows/reusable-security.yml
-    with:
-      skip-codeql: ${{ inputs.skip-codeql || false }}
-      skip-dependency-review: ${{ inputs.skip-dependency-review || false }}
-      skip-security-audit: ${{ inputs.skip-security-audit || false }}
-    secrets: inherit
+  # Detect available languages
+  detect-languages:
+    name: Detect Languages
+    runs-on: ubuntu-latest
+    outputs:
+      languages: ${{ steps.detect.outputs.languages }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Detect available languages
+        id: detect
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(".")
+
+          def has_files(patterns: tuple[str, ...]) -> bool:
+              for pattern in patterns:
+                  if any(root.rglob(pattern)):
+                      return True
+              return False
+
+          languages: list[str] = []
+
+          if any(root.joinpath(name).exists() for name in ("go.mod", "go.work")):
+              languages.append("go")
+
+          if root.joinpath("package.json").exists() or has_files(("*.js", "*.ts", "*.jsx", "*.tsx")):
+              languages.append("javascript")
+
+          if any(root.joinpath(name).exists() for name in ("requirements.txt", "setup.py", "pyproject.toml")) or has_files(("*.py",)):
+              languages.append("python")
+
+          if any(root.joinpath(name).exists() for name in ("pom.xml", "build.gradle")) or has_files(("*.java",)):
+              languages.append("java")
+
+          if has_files(("*.c", "*.cpp", "*.cc", "*.cxx", "*.h", "*.hpp")):
+              languages.append("cpp")
+
+          if has_files(("*.csproj", "*.sln", "*.cs")):
+              languages.append("csharp")
+
+          detected = json.dumps(languages)
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          output_path.write_text(f"languages={detected}\n", encoding="utf-8")
+          print(f"Detected languages: {detected}")
+          PY
+
+  # CodeQL Analysis
+  codeql-analysis:
+    name: CodeQL Analysis
+    needs: detect-languages
+    if: ${{ !inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(needs.detect-languages.outputs.languages) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Set up language environment
+        run: |
+          case "${{ matrix.language }}" in
+            go)
+              if [ -f go.mod ]; then
+                go mod download
+              fi
+              ;;
+            javascript)
+              if [ -f package.json ]; then
+                npm ci || npm install
+              fi
+              ;;
+            python)
+              if [ -f requirements.txt ]; then
+                pip install -r requirements.txt
+              fi
+              ;;
+          esac
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # Dependency Review
+  dependency-review:
+    name: Dependency Review
+    needs: detect-languages
+    if: ${{ !inputs.skip-dependency-review && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          config-file: "./.github/dependency-review-config.yml"
+          fail-on-severity: moderate
+
+  # Security Audit
+  security-audit:
+    name: Security Audit
+    needs: detect-languages
+    if: ${{ !inputs.skip-security-audit }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Go security audit
+        if: hashFiles('go.mod') != ''
+        run: |
+          go install github.com/securecodewarrior/go-audit@latest
+          go list -json -deps ./... | go-audit
+
+      - name: Python security audit
+        if: hashFiles('requirements*.txt', 'pyproject.toml') != ''
+        run: |
+          pip install safety bandit
+          if [ -f requirements.txt ]; then
+            safety check -r requirements.txt
+          fi
+          if find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*" | head -1 | grep -q .; then
+            bandit -r . -x ./venv,./venv3,./.venv -f json -o bandit-report.json || true
+            if [ -f bandit-report.json ]; then
+              echo "Bandit security scan completed. Report:"
+              cat bandit-report.json
+            fi
+          fi
+
+      - name: Node.js security audit
+        if: hashFiles('package*.json') != ''
+        run: |
+          if [ -f package.json ]; then
+            npm audit --audit-level=moderate || true
+          fi
+
+      - name: Rust security audit
+        if: hashFiles('Cargo.toml') != ''
+        run: |
+          cargo install cargo-audit
+          cargo audit
+
+  # Trivy vulnerability scanning
+  trivy-scan:
+    name: Trivy Security Scan
+    needs: detect-languages
+    if: ${{ !inputs.skip-security-audit }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  # Security summary
+  security-summary:
+    name: Security Summary
+    needs: [detect-languages, codeql-analysis, dependency-review, security-audit, trivy-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate security summary
+        env:
+          RESULT_CODEQL: ${{ needs.codeql-analysis.result || 'skipped' }}
+          RESULT_DEP_REVIEW: ${{ needs.dependency-review.result || 'skipped' }}
+          RESULT_SECURITY_AUDIT: ${{ needs.security-audit.result || 'skipped' }}
+          RESULT_TRIVY: ${{ needs.trivy-scan.result || 'skipped' }}
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          from pathlib import Path
+
+          results = {
+              "CodeQL Analysis": os.environ.get("RESULT_CODEQL", "skipped"),
+              "Dependency Review": os.environ.get("RESULT_DEP_REVIEW", "skipped"),
+              "Security Audit": os.environ.get("RESULT_SECURITY_AUDIT", "skipped"),
+              "Trivy Scan": os.environ.get("RESULT_TRIVY", "skipped"),
+          }
+
+          summary_lines = [
+              "## Security Scan Summary",
+              "",
+              "| Scan Type | Status |",
+              "|-----------|--------|",
+          ]
+
+          for label, status in results.items():
+              summary_lines.append(f"| {label} | {status} |")
+
+          warning_required = any(status == "failure" for status in results.values())
+          summary_lines.append("")
+          if warning_required:
+              summary_lines.append("⚠️ **Security issues detected. Please review the scan results.**")
+          else:
+              summary_lines.append("✅ **All security scans passed.**")
+
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+          if warning_required:
+              raise SystemExit(1)
+          PY

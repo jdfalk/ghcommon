@@ -77,7 +77,7 @@ jobs:
             --version "${{ inputs.release-version }}"
 
       - name: Upload Go binaries and checksums
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: go-binaries
           path: |
