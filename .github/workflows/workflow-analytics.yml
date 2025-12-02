@@ -10,10 +10,10 @@ on:
       lookback-days:
         description: Number of days to analyze (default 30).
         required: false
-        default: '30'
+        default: "30"
         type: string
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: "0 3 * * 1"
 
 permissions:
   actions: read
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Collect workflow metrics
         env:
@@ -117,7 +117,7 @@ jobs:
           cat workflow-analytics.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload analytics artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: workflow-analytics
           path: |

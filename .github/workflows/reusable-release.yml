@@ -363,7 +363,7 @@ jobs:
           python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" "generate-changelog"
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           path: ./artifacts
           merge-multiple: true
@@ -488,7 +488,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Download release artifacts for publishing
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           path: packages
           merge-multiple: true

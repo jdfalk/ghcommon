@@ -59,7 +59,7 @@ jobs:
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: protobuf-generated
           path: proto-generated
@@ -77,7 +77,7 @@ jobs:
             --version "${{ inputs.release-version }}"
 
       - name: Upload Go binaries and checksums
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: go-binaries
           path: |

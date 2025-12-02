@@ -8,14 +8,14 @@ on:
   workflow_call:
     inputs:
       python-matrix:
-        description: 'JSON encoded Python build matrix'
+        description: "JSON encoded Python build matrix"
         required: true
         type: string
       protobuf-artifacts:
-        description: 'Whether protobuf artifacts were generated'
+        description: "Whether protobuf artifacts were generated"
         required: false
         type: string
-        default: 'false'
+        default: "false"
 
 permissions:
   contents: read
@@ -34,7 +34,7 @@ jobs:
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: protobuf-generated
           path: proto-generated

@@ -6,14 +6,14 @@ name: Performance Monitoring
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: "0 3 * * *"
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'benchmarks/**'
-      - 'scripts/**'
-      - '.github/workflows/performance-monitoring.yml'
+      - "benchmarks/**"
+      - "scripts/**"
+      - ".github/workflows/performance-monitoring.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -104,14 +104,14 @@ jobs:
         uses: ./github-action-benchmark
         with:
           name: Rust Fixture Execution
-          tool: 'customSmallerIsBetter'
+          tool: "customSmallerIsBetter"
           output-file-path: benchmarks/rust.json
           summary-always: true
           github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/rust.json
 
       - name: Upload rust benchmark artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: rust-benchmarks
           path: |
@@ -196,14 +196,14 @@ jobs:
         uses: ./github-action-benchmark
         with:
           name: Node Fixture Execution
-          tool: 'customSmallerIsBetter'
+          tool: "customSmallerIsBetter"
           output-file-path: benchmarks/node.json
           summary-always: true
           github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/node.json
 
       - name: Upload node benchmark artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: node-benchmarks
           path: |
@@ -241,7 +241,7 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Prepare benchmark directories
         run: |
@@ -289,14 +289,14 @@ jobs:
         uses: ./github-action-benchmark
         with:
           name: Python Fixture Execution
-          tool: 'customSmallerIsBetter'
+          tool: "customSmallerIsBetter"
           output-file-path: benchmarks/python.json
           summary-always: true
           github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/python.json
 
-      - name: Upload python benchmark artifacts
-        uses: actions/upload-artifact@v5
+      - name: Upload Python benchmark results
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: python-benchmarks
           path: |

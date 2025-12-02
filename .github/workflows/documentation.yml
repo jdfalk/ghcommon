@@ -8,16 +8,16 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/**'
-      - '**/*.md'
-      - '.github/workflows/documentation.yml'
+      - "docs/**"
+      - "**/*.md"
+      - ".github/workflows/documentation.yml"
   pull_request:
     paths:
-      - 'docs/**'
-      - '**/*.md'
-      - '.github/workflows/documentation.yml'
+      - "docs/**"
+      - "**/*.md"
+      - ".github/workflows/documentation.yml"
   schedule:
-    - cron: '0 5 * * 1'
+    - cron: "0 5 * * 1"
   workflow_dispatch:
 
 concurrency:
@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload documentation artifact
         if: steps.detect.outputs.tool != 'none'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: documentation-build
           path: |
@@ -108,7 +108,7 @@ jobs:
         if: env.DOCS_DEPLOY_TOKEN != ''
 
       - name: Download documentation artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         if: env.DOCS_DEPLOY_TOKEN != ''
         with:
           name: documentation-build
