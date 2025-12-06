@@ -480,12 +480,19 @@ jobs:
       - name: Get frontend working directory
         id: frontend-dir
         run: |
-          WORKING_DIR=$(echo '${{ needs.load-config.outputs.config }}' | python3 -c "import sys, json; config = json.load(sys.stdin); print(config.get('working_directories', {}).get('frontend', '.'))") || echo "."
-          echo "dir=${WORKING_DIR}" >> $GITHUB_OUTPUT
+          WORKING_DIR=$(python3 - <<'PY'
+          import json
+
+          CONFIG = json.loads('${{ needs.load-config.outputs.config }}')
+          print(CONFIG.get("working_directories", {}).get("frontend", "."))
+          PY
+          )
+          : "${WORKING_DIR:=.}"
+          echo "dir=${WORKING_DIR}" >> "$GITHUB_OUTPUT"
           if [ "${WORKING_DIR}" != "." ]; then
-            echo "cache-path=${WORKING_DIR}/package-lock.json" >> $GITHUB_OUTPUT
+            echo "cache-path=${WORKING_DIR}/package-lock.json" >> "$GITHUB_OUTPUT"
           else
-            echo "cache-path=package-lock.json" >> $GITHUB_OUTPUT
+            echo "cache-path=package-lock.json" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Node.js

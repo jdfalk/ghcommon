@@ -94,7 +94,13 @@ jobs:
           fi
 
       - name: Summarize dependency updates
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/maintenance_workflow.py" summarize-dependencies --pip maintenance/pip-outdated.json --npm maintenance/npm-outdated.json --cargo maintenance/cargo-outdated.json --go maintenance/go-outdated.json --output maintenance/dependency-summary.md
+        run: |
+          python3 "$GHCOMMON_SCRIPTS_DIR/maintenance_workflow.py" summarize-dependencies \
+            --pip maintenance/pip-outdated.json \
+            --npm maintenance/npm-outdated.json \
+            --cargo maintenance/cargo-outdated.json \
+            --go maintenance/go-outdated.json \
+            --output maintenance/dependency-summary.md
 
       - name: Upload dependency graph
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
