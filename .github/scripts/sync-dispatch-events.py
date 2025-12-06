@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-dispatch-events.py
-# version: 1.1.0
+# version: 1.1.1
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
 """Dispatch repository events to target repositories for synchronization."""
 
+import contextlib
 import json
 import os
 import subprocess
@@ -119,10 +120,8 @@ def main():
 
     print(f"Dispatching '{event_type}' events to target repositories...")
     print(f"Source: {source_repo}@{source_sha}")
-    try:
+    with contextlib.suppress(Exception):
         print(f"Client payload: {json.dumps(client_payload, separators=(',', ':'))}")
-    except Exception:
-        pass
 
     target_repos = get_target_repos()
 

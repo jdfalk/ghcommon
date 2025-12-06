@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-receiver-generate-summary.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c
 
 """Generate synchronization summary for sync receiver workflow."""
@@ -53,7 +53,7 @@ def get_changed_files_summary():
         "other": [],
     }
 
-    for status, file_path in changes:
+    for _status, file_path in changes:
         if ".github/workflows/" in file_path:
             categories["workflows"].append(file_path)
         elif ".github/instructions/" in file_path or "copilot-instructions.md" in file_path:

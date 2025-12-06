@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/monitor-rollout.py
-# version: 1.1.0
+# version: 1.1.1
 # guid: 7f1a3b2c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
 
 """Monitor rollout across target repositories:
@@ -19,7 +19,7 @@ Optional flags:
 
 Auth:
   - Uses JF_CI_GH_PAT or GITHUB_TOKEN from environment
-"""
+"""  # noqa: D415
 
 import argparse
 import datetime as dt
@@ -117,9 +117,8 @@ def pick_latest(
     for run in runs:
         n = (run.get("name") or "").lower()
         created_at = parse_iso8601(run.get("created_at") or run.get("run_started_at") or "")
-        if all(term in n for term in name_lc):
-            if created_at and created_at >= since_cutoff:
-                return run
+        if all(term in n for term in name_lc) and created_at and created_at >= since_cutoff:
+            return run
     return None
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-determine-target-repos.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 """Determine target repositories for sync operations.
@@ -27,10 +27,7 @@ def get_target_repos():
                 line = line.strip()
                 if line and not line.startswith("#"):
                     # Extract repo name from owner/repo format
-                    if "/" in line:
-                        repo_name = line.split("/")[-1]
-                    else:
-                        repo_name = line
+                    repo_name = line.split("/")[-1] if "/" in line else line
                     repos.append(repo_name)
     except Exception as e:
         print(f"Error reading repositories.txt: {e}", file=sys.stderr)

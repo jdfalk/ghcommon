@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/sync-workflow-modernizer.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: e1f2a3b4-c5d6-7e8f-9a0b-1c2d3e4f5a6b
 
 """Workflow Modernization Script
@@ -139,7 +139,7 @@ class WorkflowModernizer:
 
         updated_workflows = []
 
-        for language in self.language_workflows.keys():
+        for language in self.language_workflows:
             if self.modernize_workflow(language):
                 updated_workflows.append(language)
 
