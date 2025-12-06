@@ -1,5 +1,4 @@
 {
-  // Python formatting - use Ruff only
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -8,7 +7,6 @@
       "source.organizeImports": "explicit"
     }
   },
-  // JavaScript/TypeScript - use Prettier
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
@@ -25,29 +23,23 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  // Markdown - use Prettier
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  // YAML - use Prettier
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  // Ruff settings
   "ruff.enable": true,
   "ruff.organizeImports": true,
   "ruff.fixAll": true,
   "ruff.lint.run": "onType",
-  // Disable competing Python formatters
   "python.formatting.provider": "none",
   "black-formatter.importStrategy": "fromEnvironment",
   "isort.check": false,
-  // Prettier settings
   "prettier.configPath": ".github/linters/.prettierrc.json",
   "prettier.requireConfig": true,
-  // Editor settings
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "files.trimTrailingWhitespace": true,
