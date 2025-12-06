@@ -509,8 +509,8 @@ additional guidance.
 ## E.1 Phase 1 – CI Modernisation
 
 1. **Update `.github/workflows/scripts/ci_workflow.py`**
-   - Replace the file contents with the canonical version in [Appendix F.1](#f1-ci_workflowpy)
-     (copy/paste the entire code block).
+   - Replace the file contents with the canonical version in
+     [Appendix F.2](#f2-githubworkflowsscriptsci_workflowpy) (copy/paste the entire code block).
 
 2. **Update `.github/workflows/reusable-ci.yml`**
    - Apply the diff (can be pasted into `git apply`):
@@ -549,31 +549,27 @@ additional guidance.
      +        run: python3 .github/workflows/scripts/ci_workflow.py generate-matrices
      @@
       go-ci:
+     @@
+     -    needs: detect-changes
+     -    runs-on: ubuntu-latest
+     -    steps:
+     -      - uses: actions/setup-go@v6
+     -        with:
+     -          go-version: ${{ inputs.go-version }}
+     +    needs: [load-config, detect-changes]
+     +    strategy:
+     +      fail-fast: false
+     +      matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
+     +    runs-on: ${{ matrix.os }}
+     +    env:
+     +      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
+     +    steps:
+     +      - uses: actions/setup-go@v6
+     +        with:
+     +          go-version: ${{ matrix.go-version }}
      ```
 
-- needs: detect-changes
-- runs-on: ubuntu-latest
-
-- needs: [load-config, detect-changes]
-- strategy:
--      fail-fast: false
--      matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
-- runs-on: ${{ matrix.os }}
-- env:
--      REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
-
-  @@
-
--      - uses: actions/setup-go@v6
--        with:
--          go-version: ${{ inputs.go-version }}
-
--      - uses: actions/setup-go@v6
--        with:
--          go-version: ${{ matrix.go-version }}
-  ```
-  *(Repeat matrix substitution blocks for Python, Rust, and Frontend jobs.)*
-  ```
+     _(Repeat matrix substitution blocks for Python, Rust, and Frontend jobs.)_
 
 3. **Run tests**
    ```bash
@@ -584,7 +580,7 @@ additional guidance.
 ## E.2 Phase 2 – Release Consolidation
 
 1. **Create/replace `.github/workflows/scripts/release_workflow.py`**
-   - Copy the full implementation from [Appendix F.2](#f2-release_workflowpy) into the file.
+   - Copy the full implementation from [Appendix F.4](#f4-githubworkflowsscriptsrelease_workflowpy) into the file.
 
 2. **Update `.github/workflows/reusable-release.yml`**
 

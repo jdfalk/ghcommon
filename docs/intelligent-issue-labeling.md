@@ -1,5 +1,5 @@
 <!-- file: docs/intelligent-issue-labeling.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.0.1 -->
 <!-- guid: 1b2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e -->
 
 # Intelligent Issue Labeling
@@ -382,6 +382,12 @@ For issues, questions, or contributions:
 
 This workflow is part of the ghcommon repository and follows the same license terms.
 
-# Technology Stack
+## Technology Stack
 
-### Technology Stack\n\n- `tech:go` - Go programming language\n- `tech:python` - Python programming language\n- `tech:javascript` - JavaScript/Node.js\n- `tech:typescript` - TypeScript\n- `tech:docker` - Docker containerization\n- `tech:kubernetes` - Kubernetes orchestration\n- `tech:shell` - Shell scripting
+- `tech:go` - Go programming language
+- `tech:python` - Python programming language
+- `tech:javascript` - JavaScript/Node.js
+- `tech:typescript` - TypeScript
+- `tech:docker` - Docker containerization
+- `tech:kubernetes` - Kubernetes orchestration
+- `tech:shell` - Shell scripting
