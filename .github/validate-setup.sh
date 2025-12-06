@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: copilot/validate-setup.sh
-# version: 1.0.0
+# version: 1.0.1
 # guid: 9e2f5a8b-3c6d-4e9f-5a2b-8e3f5a9e2f5a
 
 # Repository Validation Script
@@ -59,7 +59,8 @@ check_workflows() {
     log_pass ".github/workflows directory exists"
 
     # Check for workflow files
-    local workflow_count=$(find .github/workflows -name "*.yml" -o -name "*.yaml" | wc -l)
+    local workflow_count
+    workflow_count=$(find .github/workflows -name "*.yml" -o -name "*.yaml" | wc -l)
     if [ "$workflow_count" -gt 0 ]; then
       log_pass "Found $workflow_count workflow file(s)"
 
@@ -132,7 +133,8 @@ check_git_config() {
 
   # Check for remote origin
   if git remote get-url origin >/dev/null 2>&1; then
-    local remote_url=$(git remote get-url origin)
+    local remote_url
+    remote_url=$(git remote get-url origin)
     log_pass "Git remote origin configured: $remote_url"
 
     # Check if it's a GitHub repository
@@ -151,7 +153,8 @@ check_conventional_commits() {
   log_info "Checking recent commits for conventional commit format..."
 
   # Get last 10 commit messages
-  local commit_messages=$(git log --oneline -10 --pretty=format:"%s" 2>/dev/null || echo "")
+  local commit_messages
+  commit_messages=$(git log --oneline -10 --pretty=format:"%s" 2>/dev/null || echo "")
 
   if [ -z "$commit_messages" ]; then
     log_warning "No commit history found"

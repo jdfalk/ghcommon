@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: fix_instruction_frontmatter.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: f1e2d3c4-b5a6-9e8f-7d6c-5b4a3e2f1d0e
 
 """Fix malformed frontmatter in instruction files across all repositories.
@@ -61,7 +61,7 @@ def fix_instruction_file(file_path):
         in_frontmatter = False
         frontmatter_started = False
 
-        for i, line in enumerate(lines):
+        for _i, line in enumerate(lines):
             # Keep header comments
             if line.startswith("<!--") or (line.strip() == "" and not frontmatter_started):
                 fixed_lines.append(line)

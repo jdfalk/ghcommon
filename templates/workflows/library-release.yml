@@ -149,15 +149,15 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public
 
-      # Example for other package managers:
-      # - name: Publish to PyPI (Python)
-      #   env:
-      #     TWINE_USERNAME: __token__
-      #     TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      #   run: |
-      #     python -m pip install --upgrade twine
-      #     python -m twine upload dist/*
+        # Example for other package managers:
+        # - name: Publish to PyPI (Python)
+        #   env:
+        #     TWINE_USERNAME: __token__
+        #     TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        #   run: |
+        #     python -m pip install --upgrade twine
+        #     python -m twine upload dist/*
 
-      # - name: Publish to Go Proxy (Go)
-      #   run: |
-      #     GOPROXY=proxy.golang.org go list -m github.com/${{ github.repository }}@${{ needs.release.outputs.release-tag }}
+        # - name: Publish to Go Proxy (Go)
+        #   run: |
+        #     GOPROXY=proxy.golang.org go list -m github.com/${{ github.repository }}@${{ needs.release.outputs.release-tag }}
