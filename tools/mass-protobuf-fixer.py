@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: tools/mass-protobuf-fixer.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: 9f8e7d6c-5b4a-3f9e-8d7c-6b5a4f3e2d1c
 
 """Mass protobuf import cycle and unused import fixer.
@@ -128,7 +128,8 @@ class MassProtobufFixer:
             return True
 
         buf_output = result.stderr
-        print(f"Processing {len(buf_output.split('\\n'))} lint issues...")
+        lint_issue_count = len(buf_output.split("\n"))
+        print(f"Processing {lint_issue_count} lint issues...")
 
         # Parse and fix issues
         for line in buf_output.split("\n"):
@@ -161,7 +162,8 @@ class MassProtobufFixer:
         if result.returncode == 0:
             print("SUCCESS: All buf lint issues fixed!")
             return True
-        print(f"Still have {len(result.stderr.split('\\n'))} issues remaining")
+        remaining_issues = len(result.stderr.split("\n"))
+        print(f"Still have {remaining_issues} issues remaining")
         return False
 
     def fix_unused_import_line(self, line: str):
@@ -203,17 +205,14 @@ class MassProtobufFixer:
 
 
 def main():
-    if len(sys.argv) > 1:
-        repo_root = sys.argv[1]
-    else:
-        repo_root = os.getcwd()
+    repo_root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
 
     fixer = MassProtobufFixer(repo_root)
 
     # Run multiple passes until clean
     max_passes = 5
     for pass_num in range(1, max_passes + 1):
-        print(f"\\n=== Pass {pass_num} ===")
+        print(f"\n=== Pass {pass_num} ===")
         if fixer.fix_all_buf_lint_issues():
             print(f"All issues fixed in {pass_num} passes!")
             break

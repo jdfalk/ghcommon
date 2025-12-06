@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: tools/protobuf-cycle-fixer.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: 8f7e6d5c-4b3a-2f9e-8d7c-6b5a4f3e2d1c
 
 """Automated protobuf import cycle detection and resolution tool.
@@ -252,10 +252,7 @@ class ProtobufCycleFixer:
 
 
 def main():
-    if len(sys.argv) > 1:
-        repo_root = sys.argv[1]
-    else:
-        repo_root = os.getcwd()
+    repo_root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
 
     fixer = ProtobufCycleFixer(repo_root)
     fixer.fix_all_cycles()
