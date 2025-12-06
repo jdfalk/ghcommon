@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/automation_workflow.py
-# version: 1.2.0
+# version: 1.2.1
 # guid: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
 
 """Advanced automation workflow helper.
@@ -56,9 +56,9 @@ class CacheStrategy:
     """Represents the cache key and related metadata."""
 
     key: str
-    restore_keys: tuple[str, ...] = tuple()
+    restore_keys: tuple[str, ...] = ()
     metadata: dict[str, Any] = field(default_factory=dict)
-    paths: tuple[str, ...] = tuple()
+    paths: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serialisable representation."""
@@ -379,7 +379,7 @@ def collect_workflow_metrics(
             workflows={},
             start_time=None,
             end_time=None,
-            runs=tuple(),
+            runs=(),
         )
 
     runs_by_workflow: dict[str, list[WorkflowRun]] = defaultdict(list)

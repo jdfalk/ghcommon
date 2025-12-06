@@ -33,11 +33,6 @@ def detect_package() -> tuple[bool, str, str, str]:
         name = data.get("name")
         version = data.get("version") or ""
         if name:
-            manager = "npm"
-            for filename, value in LOCK_FILES.items():
-                if (candidate.parent / filename).exists():
-                    manager = value
-                    break
             return True, candidate.parent.as_posix(), str(name), str(version)
     return False, ".", "", ""
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/release-strategy.sh
-# version: 1.1.0
+# version: 1.1.1
 # guid: 9b0c1d2e-3f4a-5b6c-7d8e-9f0a1b2c3d4e
 
 set -euo pipefail
@@ -11,6 +11,7 @@ set -euo pipefail
 BRANCH_NAME="${BRANCH_NAME}"
 INPUT_PRERELEASE="${INPUT_PRERELEASE:-false}"
 INPUT_DRAFT="${INPUT_DRAFT:-false}"
+OUTPUT_PATH="${GITHUB_OUTPUT:-}"
 
 # Determine release strategy based on branch and manual inputs
 if [[ $BRANCH_NAME == "main" ]]; then
@@ -36,9 +37,11 @@ if [[ $INPUT_DRAFT == "true" ]]; then
   AUTO_DRAFT="true"
 fi
 
-echo "strategy=$STRATEGY" >>$GITHUB_OUTPUT
-echo "auto-prerelease=$AUTO_PRERELEASE" >>$GITHUB_OUTPUT
-echo "auto-draft=$AUTO_DRAFT" >>$GITHUB_OUTPUT
+if [ -n "$OUTPUT_PATH" ]; then
+  echo "strategy=$STRATEGY" >>"$OUTPUT_PATH"
+  echo "auto-prerelease=$AUTO_PRERELEASE" >>"$OUTPUT_PATH"
+  echo "auto-draft=$AUTO_DRAFT" >>"$OUTPUT_PATH"
+fi
 
 echo "🔄 Release strategy for branch '$BRANCH_NAME': $STRATEGY"
 echo "📋 Auto-prerelease: $AUTO_PRERELEASE"

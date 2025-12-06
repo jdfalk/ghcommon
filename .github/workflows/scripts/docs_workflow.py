@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/docs_workflow.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: e4f5a6b7-c8d9-0e1f-2a3b-4c5d6e7f8a9b
 
 """Documentation generation workflow helper.
@@ -42,7 +42,6 @@ from workflow_common import (
     append_summary_line,
     config_path,
     format_summary_table,
-    get_repository_config,
     log_notice,
     log_warning,
 )
@@ -309,7 +308,6 @@ def _derive_version(version: str | None) -> str:
     env_version = os.environ.get("DOC_VERSION")
     if env_version:
         return env_version
-    config = get_repository_config()
     doc_version = config_path(None, "documentation", "version")
     if isinstance(doc_version, str) and doc_version:
         return doc_version

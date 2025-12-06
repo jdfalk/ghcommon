@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/detect-languages.sh
-# version: 1.2.0
+# version: 1.2.1
 # guid: 8a9b0c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d
 
 set -euo pipefail
@@ -16,6 +16,7 @@ RUST_ENABLED="${RUST_ENABLED:-auto}"
 FRONTEND_ENABLED="${FRONTEND_ENABLED:-auto}"
 DOCKER_ENABLED="${DOCKER_ENABLED:-auto}"
 PROTOBUF_ENABLED="${PROTOBUF_ENABLED:-auto}"
+OUTPUT_PATH="${GITHUB_OUTPUT:-}"
 
 normalize_override() {
   local value="${1:-auto}"
@@ -89,13 +90,15 @@ if [[ $SKIP_DETECTION == "true" ]]; then
     primary_lang="docker"
   fi
 
-  echo "has-go=$has_go" >>$GITHUB_OUTPUT
-  echo "has-python=$has_python" >>$GITHUB_OUTPUT
-  echo "has-rust=$has_rust" >>$GITHUB_OUTPUT
-  echo "has-frontend=$has_frontend" >>$GITHUB_OUTPUT
-  echo "has-docker=$has_docker" >>$GITHUB_OUTPUT
-  echo "protobuf-needed=$protobuf_needed" >>$GITHUB_OUTPUT
-  echo "primary-language=$primary_lang" >>$GITHUB_OUTPUT
+  if [ -n "$OUTPUT_PATH" ]; then
+    echo "has-go=$has_go" >>"$OUTPUT_PATH"
+    echo "has-python=$has_python" >>"$OUTPUT_PATH"
+    echo "has-rust=$has_rust" >>"$OUTPUT_PATH"
+    echo "has-frontend=$has_frontend" >>"$OUTPUT_PATH"
+    echo "has-docker=$has_docker" >>"$OUTPUT_PATH"
+    echo "protobuf-needed=$protobuf_needed" >>"$OUTPUT_PATH"
+    echo "primary-language=$primary_lang" >>"$OUTPUT_PATH"
+  fi
 else
   # Auto-detect languages
   has_go="false"
@@ -141,18 +144,22 @@ else
     protobuf_needed="true"
   fi
 
-  echo "has-go=$has_go" >>$GITHUB_OUTPUT
-  echo "has-python=$has_python" >>$GITHUB_OUTPUT
-  echo "has-rust=$has_rust" >>$GITHUB_OUTPUT
-  echo "has-frontend=$has_frontend" >>$GITHUB_OUTPUT
-  echo "has-docker=$has_docker" >>$GITHUB_OUTPUT
-  echo "protobuf-needed=$protobuf_needed" >>$GITHUB_OUTPUT
-  echo "primary-language=$primary_lang" >>$GITHUB_OUTPUT
+  if [ -n "$OUTPUT_PATH" ]; then
+    echo "has-go=$has_go" >>"$OUTPUT_PATH"
+    echo "has-python=$has_python" >>"$OUTPUT_PATH"
+    echo "has-rust=$has_rust" >>"$OUTPUT_PATH"
+    echo "has-frontend=$has_frontend" >>"$OUTPUT_PATH"
+    echo "has-docker=$has_docker" >>"$OUTPUT_PATH"
+    echo "protobuf-needed=$protobuf_needed" >>"$OUTPUT_PATH"
+    echo "primary-language=$primary_lang" >>"$OUTPUT_PATH"
+  fi
 fi
 
 # Generate build matrices (simplified for reusable workflow)
-echo 'go-matrix={"go-version":["1.22","1.23","1.24"],"os":["ubuntu-latest","macos-latest"]}' >>$GITHUB_OUTPUT
-echo 'python-matrix={"python-version":["3.11","3.12","3.13"],"os":["ubuntu-latest","macos-latest"]}' >>$GITHUB_OUTPUT
-echo 'rust-matrix={"rust-version":["stable","beta"],"os":["ubuntu-latest","macos-latest"]}' >>$GITHUB_OUTPUT
-echo 'frontend-matrix={"node-version":["18","20","22"],"os":["ubuntu-latest"]}' >>$GITHUB_OUTPUT
-echo 'docker-matrix={"platform":["linux/amd64","linux/arm64"]}' >>$GITHUB_OUTPUT
+if [ -n "$OUTPUT_PATH" ]; then
+  echo 'go-matrix={"go-version":["1.22","1.23","1.24"],"os":["ubuntu-latest","macos-latest"]}' >>"$OUTPUT_PATH"
+  echo 'python-matrix={"python-version":["3.11","3.12","3.13"],"os":["ubuntu-latest","macos-latest"]}' >>"$OUTPUT_PATH"
+  echo 'rust-matrix={"rust-version":["stable","beta"],"os":["ubuntu-latest","macos-latest"]}' >>"$OUTPUT_PATH"
+  echo 'frontend-matrix={"node-version":["18","20","22"],"os":["ubuntu-latest"]}' >>"$OUTPUT_PATH"
+  echo 'docker-matrix={"platform":["linux/amd64","linux/arm64"]}' >>"$OUTPUT_PATH"
+fi

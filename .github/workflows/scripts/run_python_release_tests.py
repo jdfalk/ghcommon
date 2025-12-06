@@ -13,10 +13,7 @@ PROJECT_ROOT = Path.cwd()
 
 def have_tests() -> bool:
     patterns = ["tests/**/test_*.py", "tests/**/*_test.py"]
-    for pattern in patterns:
-        if glob.glob(pattern, recursive=True):
-            return True
-    return False
+    return any(glob.glob(pattern, recursive=True) for pattern in patterns)
 
 
 def run_pytest(test_files_present: bool) -> int:

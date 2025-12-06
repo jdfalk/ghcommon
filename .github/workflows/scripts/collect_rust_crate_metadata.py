@@ -24,7 +24,7 @@ def load_toml(path: Path) -> dict:
         try:
             import tomllib  # Python 3.11+
         except ModuleNotFoundError:  # pragma: no cover
-            import tomli as tomllib  # type: ignore
+            import tomli as tomllib  # type: ignore[import-not-found]
     except ModuleNotFoundError:  # pragma: no cover
         print("::error::Python tomllib/tomli module is required", file=sys.stderr)
         raise SystemExit(1)

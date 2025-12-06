@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/generate-version.sh
-# version: 1.3.0
+# version: 1.3.1
 # guid: 0c1d2e3f-4a5b-6c7d-8e9f-0a1b2c3d4e5f
 
 set -euo pipefail
@@ -12,6 +12,7 @@ RELEASE_TYPE="${RELEASE_TYPE:-auto}"
 BRANCH_NAME="${BRANCH_NAME}"
 AUTO_PRERELEASE="${AUTO_PRERELEASE:-false}"
 AUTO_DRAFT="${AUTO_DRAFT:-false}"
+OUTPUT_PATH="${GITHUB_OUTPUT:-}"
 
 echo "🔍 Detecting latest version..."
 
@@ -109,7 +110,7 @@ if [[ $AUTO_PRERELEASE == "true" ]]; then
     VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-dev.$(date +%Y%m%d%H%M)"
   else
     # Feature branches get alpha pre-release versions
-    SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+    SAFE_BRANCH=${BRANCH_NAME//[^a-zA-Z0-9]/-}
     VERSION_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-alpha.$(date +%Y%m%d%H%M)"
   fi
 else
@@ -176,4 +177,6 @@ else
   echo "✅ No tag conflicts found"
 fi
 
-echo "tag=$VERSION_TAG" >>$GITHUB_OUTPUT
+if [ -n "$OUTPUT_PATH" ]; then
+  echo "tag=$VERSION_TAG" >>"$OUTPUT_PATH"
+fi

@@ -26,7 +26,7 @@ def read_pyproject() -> None:
     try:
         import tomllib
     except ModuleNotFoundError:  # pragma: no cover
-        import tomli as tomllib  # type: ignore
+        import tomli as tomllib  # type: ignore[import-not-found]
     try:
         data = tomllib.loads(pyproject.read_text("utf-8"))
     except Exception as exc:  # pragma: no cover

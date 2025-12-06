@@ -120,10 +120,7 @@ def main() -> None:
             print(f"\n{category.title()}:")
             for rel_path, size in files_in_category[:10]:
                 size_mb = size / (1024 * 1024)
-                if size_mb < 0.01:
-                    size_str = f"{size} bytes"
-                else:
-                    size_str = f"{size_mb:.2f} MB"
+                size_str = f"{size} bytes" if size_mb < 0.01 else f"{size_mb:.2f} MB"
                 print(f"  ✅ {rel_path} ({size_str})")
             if len(files_in_category) > 10:
                 print(f"  ... and {len(files_in_category) - 10} more")

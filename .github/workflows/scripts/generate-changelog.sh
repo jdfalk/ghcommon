@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/workflows/scripts/generate-changelog.sh
-# version: 1.0.0
+# version: 1.0.1
 # guid: 1d2e3f4a-5b6c-7d8e-9f0a-1b2c3d4e5f6a
 
 set -euo pipefail
@@ -13,6 +13,7 @@ PRIMARY_LANGUAGE="${PRIMARY_LANGUAGE:-unknown}"
 RELEASE_STRATEGY="${RELEASE_STRATEGY:-stable}"
 AUTO_PRERELEASE="${AUTO_PRERELEASE:-false}"
 AUTO_DRAFT="${AUTO_DRAFT:-false}"
+OUTPUT_PATH="${GITHUB_OUTPUT:-}"
 
 CHANGELOG="## 🚀 What's Changed\n\n"
 
@@ -22,7 +23,7 @@ if [[ -n $LAST_TAG ]]; then
   CHANGELOG+="### 📋 Commits since $LAST_TAG:\n"
   while IFS= read -r commit; do
     CHANGELOG+="- $commit\n"
-  done < <(git log ${LAST_TAG}..HEAD --oneline --format="%s (%h)")
+  done < <(git log "${LAST_TAG}"..HEAD --oneline --format="%s (%h)")
 else
   CHANGELOG+="### 📋 Initial Release Commits:\n"
   while IFS= read -r commit; do
@@ -44,6 +45,8 @@ if [[ $AUTO_DRAFT == "true" ]]; then
 fi
 
 # Store changelog content for use in release
-echo "changelog_content<<EOF" >>$GITHUB_OUTPUT
-echo -e "$CHANGELOG" >>$GITHUB_OUTPUT
-echo "EOF" >>$GITHUB_OUTPUT
+if [ -n "$OUTPUT_PATH" ]; then
+  echo "changelog_content<<EOF" >>"$OUTPUT_PATH"
+  echo -e "$CHANGELOG" >>"$OUTPUT_PATH"
+  echo "EOF" >>"$OUTPUT_PATH"
+fi
