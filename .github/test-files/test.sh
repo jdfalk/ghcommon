@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: .github/test-files/test.sh
-# version: 1.0.0
+# version: 1.0.1
 # guid: a6b7c8d9-e0f1-2a3b-4c5d-6e7f8a9b0c1d
 
 # Test Shell Script
@@ -9,8 +9,10 @@
 set -euo pipefail
 
 # Constants
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
+readonly SCRIPT_NAME
 
 # Functions
 print_info() {
