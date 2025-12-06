@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/migrate-instruction-files.sh
-# version: 1.0.0
+# version: 1.0.1
 # guid: mig12345-e89b-12d3-a456-426614174000
 
 set -euo pipefail
@@ -43,7 +43,8 @@ log_error() {
 # Function to backup old files
 backup_old_files() {
   local repo_dir="$1"
-  local backup_dir="$repo_dir/.github/instructions-backup-$(date +%Y%m%d-%H%M%S)"
+  local backup_dir
+  backup_dir="$repo_dir/.github/instructions-backup-$(date +%Y%m%d-%H%M%S)"
 
   # Backup old standalone files if they exist
   local old_files=(
@@ -239,7 +240,8 @@ update_copilot_instructions() {
 # Function to process a single repository
 process_repository() {
   local repo_dir="$1"
-  local repo_name=$(basename "$repo_dir")
+  local repo_name
+  repo_name=$(basename "$repo_dir")
 
   log_info "Processing repository: $repo_name"
 

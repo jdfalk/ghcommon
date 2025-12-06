@@ -142,18 +142,17 @@ def determine_operations(
             print("  ✓ Added close-duplicates and codeql-alerts (scheduled event)")
 
         # Workflow dispatch can run all operations
-        if event_name == "workflow_dispatch":
-            if not operations:  # Only add defaults if none were auto-detected
-                operations.extend(
-                    [
-                        "update-issues",
-                        "copilot-tickets",
-                        "close-duplicates",
-                        "codeql-alerts",
-                        "update-permalinks",
-                    ]
-                )
-                print("  ✓ Added all operations (manual workflow dispatch)")
+        if event_name == "workflow_dispatch" and not operations:
+            operations.extend(
+                [
+                    "update-issues",
+                    "copilot-tickets",
+                    "close-duplicates",
+                    "codeql-alerts",
+                    "update-permalinks",
+                ]
+            )
+            print("  ✓ Added all operations (manual workflow dispatch)")
 
         # Default fallback if no operations determined
         if not operations:

@@ -41,4 +41,4 @@ docker images subtitle-manager:latest --format "table {{.Repository}}\t{{.Tag}}\
 
 echo ""
 echo "💡 To run the container:"
-echo 'docker run -p 8080:8080 -v $(pwd)/config:/config subtitle-manager:latest'
+echo "docker run -p 8080:8080 -v $(pwd)/config:/config subtitle-manager:latest"

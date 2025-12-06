@@ -125,10 +125,8 @@ class RepoSynchronizer:
         repositories = []
 
         for item in self.base_path.iterdir():
-            if item.is_dir() and (item / ".git").exists():
-                # Skip the source repository
-                if item.name != self.source_repo:
-                    repositories.append(item)
+            if item.is_dir() and (item / ".git").exists() and item.name != self.source_repo:
+                repositories.append(item)
 
         return sorted(repositories)
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: scripts/rebase
-# version: 1.3.0
+# version: 1.3.1
 # guid: e542f3f2-f992-4f03-a755-a2f8b9fc2790
 
 # Smart Git Rebase Launcher
@@ -278,9 +278,11 @@ finalize_repository() {
   fi
 
   log_info "Force pushing $branch"
-  git push --force-with-lease origin "$branch" >/dev/null 2>&1 &&
-    log_success "Force push completed" ||
+  if git push --force-with-lease origin "$branch" >/dev/null 2>&1; then
+    log_success "Force push completed"
+  else
     log_warning "Force push failed"
+  fi
 }
 
 # Determine which implementation to use

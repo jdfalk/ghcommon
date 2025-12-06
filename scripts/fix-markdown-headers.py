@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/fix-markdown-headers-clean.py
-# version: 1.4.0
+# version: 1.4.1
 # guid: 4b8e9f2a-3c5d-4e7f-8a9b-1c2d3e4f5a6b
 
 import argparse
@@ -71,7 +71,6 @@ def fix_header(content, file_path):
     header_line_indices = []
 
     for i, line in enumerate(lines[:10]):
-        stripped = line.strip()
         if re.match(r"^# file: ", line):
             header_info["file"] = line
             header_line_indices.append(i)

@@ -260,7 +260,8 @@ resolve_conflict_intelligently() {
 # Smart merge for configuration files
 smart_merge_config() {
   local file="$1"
-  local temp_dir=$(mktemp -d)
+  local temp_dir
+  temp_dir=$(mktemp -d)
   local current_file="$temp_dir/current"
   local incoming_file="$temp_dir/incoming"
   local merged_file="$temp_dir/merged"

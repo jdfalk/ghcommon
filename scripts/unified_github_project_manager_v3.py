@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/unified_github_project_manager_v2.py
-# version: 3.3.0
+# version: 3.3.1
 # guid: 4a5b6c7d-8e9f-0123-4567-89abcdef0123
 
 """Unified GitHub Project Manager v3
@@ -1248,7 +1248,7 @@ class UnifiedGitHubProjectManager:
         """Create a new GitHub project (idempotent)."""
         # Check if project already exists (case-insensitive)
         existing_projects = self._get_existing_projects()
-        existing_names_lower = {name.lower(): name for name in existing_projects.keys()}
+        existing_names_lower = {name.lower(): name for name in existing_projects}
 
         if project_name.lower() in existing_names_lower:
             actual_name = existing_names_lower[project_name.lower()]

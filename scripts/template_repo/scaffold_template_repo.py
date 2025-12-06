@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/template_repo/scaffold_template_repo.py
-# version: 1.3.2
+# version: 1.3.3
 # guid: 7f2d3a2e-4b5c-8d9e-0f1a-2b3c4d5e6f70
 
 """Scaffold a minimal, public-safe template repository to a target directory.
@@ -700,7 +700,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from pkg.sample import add  # type: ignore  # noqa: PGH003
+from pkg.sample import add  # noqa: PGH003
 
 
 def test_add():

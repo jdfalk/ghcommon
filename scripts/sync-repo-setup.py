@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/sync-repo-setup.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6
 
 """Sync repository setup files from ghcommon to other repositories.
@@ -577,9 +577,10 @@ class RepoSetupSyncer:
                         result["directories_skipped"].append((dir_path, reason))
 
             # Generate dependabot.yml
-            if self._should_generate_dependabot(result["languages"]):
-                if self._generate_dependabot(target_repo, result["languages"]):
-                    result["dependabot_generated"] = True
+            if self._should_generate_dependabot(result["languages"]) and self._generate_dependabot(
+                target_repo, result["languages"]
+            ):
+                result["dependabot_generated"] = True
 
         except Exception as e:
             result["errors"].append(str(e))
@@ -635,11 +636,7 @@ class RepoSetupSyncer:
                         if dcmp.left_only or dcmp.right_only or dcmp.diff_files or dcmp.funny_files:
                             return False
 
-                        for sub_dcmp in dcmp.subdirs.values():
-                            if not dirs_identical(sub_dcmp):
-                                return False
-
-                        return True
+                        return all(dirs_identical(sub_dcmp) for sub_dcmp in dcmp.subdirs.values())
 
                     if dirs_identical(comparison):
                         logger.debug(

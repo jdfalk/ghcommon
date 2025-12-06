@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/workflow-debugger.py
-# version: 2.1.0
+# version: 2.1.1
 # guid: 9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d
 
 """Enhanced Workflow Debugger
@@ -383,7 +383,7 @@ class WorkflowDebugger:
                     combined_logs.append("\n=== DOWNLOADED ARTIFACTS ===\n")
 
                     # Read artifact files
-                    for root, dirs, files in os.walk(temp_dir):
+                    for root, _dirs, files in os.walk(temp_dir):
                         for file in files:
                             file_path = os.path.join(root, file)
                             try:
@@ -537,10 +537,7 @@ class WorkflowDebugger:
                     categories.add(pattern_info["category"])
 
         # Determine primary category
-        if categories:
-            primary_category = list(categories)[0]  # Take first category
-        else:
-            primary_category = "unknown"
+        primary_category = list(categories)[0] if categories else "unknown"
 
         return found_patterns, primary_category, log_snippets
 

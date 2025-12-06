@@ -577,9 +577,12 @@ class SmartRebase:
             result = self.perform_rebase(target_branch, mode)
 
             # Force push if requested and rebase succeeded
-            if result == RebaseResult.SUCCESS and force_push:
-                if not self.force_push_changes(source_branch):
-                    self.log_warning("Rebase succeeded but force push failed")
+            if (
+                result == RebaseResult.SUCCESS
+                and force_push
+                and not self.force_push_changes(source_branch)
+            ):
+                self.log_warning("Rebase succeeded but force push failed")
 
             return result
 
