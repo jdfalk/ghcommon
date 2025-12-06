@@ -1,12 +1,12 @@
 <!-- file: CONTRIBUTING.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.0.2 -->
 <!-- guid: 6e181790-9ce9-4f83-ab5a-059d0831cd78 -->
 
 # file: CONTRIBUTING.md
 
 ## Table of Contents
 
-- [file: CONTRIBUTING.md](#file-contributing-md)
+- [file: CONTRIBUTING.md](#file-contributingmd)
   - [Table of Contents](#table-of-contents)
   - [Code of Conduct](#code-of-conduct)
   - [How to Contribute](#how-to-contribute)
@@ -23,8 +23,7 @@
       - [Example Workflow Structure](#example-workflow-structure)
     - [Documentation Standards](#documentation-standards)
       - [File Headers](#file-headers)
-- [file: path/to/file.md](#file-path-to-file-md) - [Structure](#structure) -
-  [Code Examples](#code-examples)
+- [File Headers](#file-headers) - [Structure](#structure) - [Code Examples](#code-examples)
   - [Testing](#testing)
     - [Workflow Testing](#workflow-testing)
     - [Script Testing](#script-testing)
