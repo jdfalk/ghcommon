@@ -26,9 +26,7 @@ from typing import Any
 import yaml
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -77,9 +75,7 @@ def compare_versions(version1: str, version2: str) -> int:
         return 0
 
 
-def should_overwrite_file(
-    source_file: Path, target_file: Path
-) -> tuple[bool, str]:
+def should_overwrite_file(source_file: Path, target_file: Path) -> tuple[bool, str]:
     """Check if source file should overwrite target file based on version."""
     if not target_file.exists():
         return True, "target file doesn't exist"
@@ -239,12 +235,8 @@ class RepositoryAnalyzer:
         structure = {
             "has_github_dir": (repo_path / ".github").exists(),
             "has_workflows": (repo_path / ".github" / "workflows").exists(),
-            "has_instructions": (
-                repo_path / ".github" / "instructions"
-            ).exists(),
-            "has_dependabot": (
-                repo_path / ".github" / "dependabot.yml"
-            ).exists(),
+            "has_instructions": (repo_path / ".github" / "instructions").exists(),
+            "has_dependabot": (repo_path / ".github" / "dependabot.yml").exists(),
         }
 
         return structure
@@ -256,9 +248,7 @@ class DependabotGenerator:
     def __init__(self):
         self.base_config = {"version": 2, "updates": []}
 
-    def generate_config(
-        self, languages: dict[str, bool], repo_name: str
-    ) -> dict[str, Any]:
+    def generate_config(self, languages: dict[str, bool], repo_name: str) -> dict[str, Any]:
         """Generate dependabot configuration based on detected languages."""
         config = self.base_config.copy()
         config["updates"] = []
@@ -441,16 +431,12 @@ class RepoSetupSyncer:
                 "100",
             ]
 
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, check=True
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
             github_repos = json.loads(result.stdout)
 
             # Get current user
             user_cmd = ["gh", "api", "user", "--jq", ".login"]
-            user_result = subprocess.run(
-                user_cmd, capture_output=True, text=True, check=True
-            )
+            user_result = subprocess.run(user_cmd, capture_output=True, text=True, check=True)
             current_user = user_result.stdout.strip()
 
             logger.info(
@@ -464,9 +450,7 @@ class RepoSetupSyncer:
                 if repo["owner"]["login"] == current_user and not repo["isFork"]
             ]
 
-            logger.info(
-                f"Filtered to {len(owned_repos)} owned repositories (excluding forks)"
-            )
+            logger.info(f"Filtered to {len(owned_repos)} owned repositories (excluding forks)")
 
             # Find local clones of these repositories
             # Look in common Git hosting directory structures
@@ -483,10 +467,7 @@ class RepoSetupSyncer:
             current_path = self.source_repo.absolute()
             for i in range(len(current_path.parts)):
                 potential_base = Path(*current_path.parts[: i + 1])
-                if (
-                    potential_base.name == current_user
-                    and potential_base.parent.exists()
-                ):
+                if potential_base.name == current_user and potential_base.parent.exists():
                     possible_base_dirs.append(potential_base)
 
             logger.debug(
@@ -507,10 +488,7 @@ class RepoSetupSyncer:
                         continue
 
                     local_repo_path = base_dir / repo_name
-                    if (
-                        local_repo_path.exists()
-                        and (local_repo_path / ".git").exists()
-                    ):
+                    if local_repo_path.exists() and (local_repo_path / ".git").exists():
                         repos.append(local_repo_path)
                         logger.debug(f"  Found local clone: {local_repo_path}")
                         found_local = True
@@ -565,9 +543,7 @@ class RepoSetupSyncer:
         try:
             # Analyze the repository
             result["languages"] = self.analyzer.detect_languages(target_repo)
-            result["structure"] = self.analyzer.get_directory_structure(
-                target_repo
-            )
+            result["structure"] = self.analyzer.get_directory_structure(target_repo)
 
             # Ensure .github directory exists
             github_dir = target_repo / ".github"
@@ -594,9 +570,7 @@ class RepoSetupSyncer:
                 target_dir = target_repo / dir_path
 
                 if source_dir.exists():
-                    synced, reason = self._sync_directory(
-                        source_dir, target_dir
-                    )
+                    synced, reason = self._sync_directory(source_dir, target_dir)
                     if synced:
                         result["directories_synced"].append(dir_path)
                     else:
@@ -613,18 +587,14 @@ class RepoSetupSyncer:
 
         return result
 
-    def _sync_file(
-        self, source_file: Path, target_file: Path
-    ) -> tuple[bool, str]:
+    def _sync_file(self, source_file: Path, target_file: Path) -> tuple[bool, str]:
         """Sync a single file with version checking."""
         try:
             # Create parent directory if needed
             target_file.parent.mkdir(parents=True, exist_ok=True)
 
             # Check if we should overwrite the file
-            should_overwrite, reason = should_overwrite_file(
-                source_file, target_file
-            )
+            should_overwrite, reason = should_overwrite_file(source_file, target_file)
 
             if not should_overwrite:
                 logger.debug(
@@ -649,9 +619,7 @@ class RepoSetupSyncer:
             logger.error(f"  Error syncing file {source_file}: {e}")
             return False, f"error: {e}"
 
-    def _sync_directory(
-        self, source_dir: Path, target_dir: Path
-    ) -> tuple[bool, str]:
+    def _sync_directory(self, source_dir: Path, target_dir: Path) -> tuple[bool, str]:
         """Sync a directory recursively."""
         try:
             # Check if directories are identical
@@ -660,18 +628,11 @@ class RepoSetupSyncer:
                     # Use filecmp to compare directory trees
                     import filecmp
 
-                    comparison = filecmp.dircmp(
-                        str(source_dir), str(target_dir)
-                    )
+                    comparison = filecmp.dircmp(str(source_dir), str(target_dir))
 
                     def dirs_identical(dcmp):
                         """Recursively check if directories are identical."""
-                        if (
-                            dcmp.left_only
-                            or dcmp.right_only
-                            or dcmp.diff_files
-                            or dcmp.funny_files
-                        ):
+                        if dcmp.left_only or dcmp.right_only or dcmp.diff_files or dcmp.funny_files:
                             return False
 
                         for sub_dcmp in dcmp.subdirs.values():
@@ -700,9 +661,7 @@ class RepoSetupSyncer:
                 shutil.copytree(source_dir, target_dir)
 
             action = "Would sync" if self.dry_run else "Synced"
-            logger.info(
-                f"  {action} directory: {target_dir.relative_to(target_dir.parents[1])}"
-            )
+            logger.info(f"  {action} directory: {target_dir.relative_to(target_dir.parents[1])}")
             return True, "directories differ"
 
         except Exception as e:
@@ -721,21 +680,15 @@ class RepoSetupSyncer:
         ]
         return any(languages.get(lang, False) for lang in supported_languages)
 
-    def _generate_dependabot(
-        self, target_repo: Path, languages: dict[str, bool]
-    ) -> bool:
+    def _generate_dependabot(self, target_repo: Path, languages: dict[str, bool]) -> bool:
         """Generate dependabot.yml configuration."""
         try:
-            config, comment = self.dependabot_generator.generate_config(
-                languages, target_repo.name
-            )
+            config, comment = self.dependabot_generator.generate_config(languages, target_repo.name)
 
             target_file = target_repo / ".github" / "dependabot.yml"
 
             # Create the YAML content with comment
-            yaml_content = yaml.dump(
-                config, default_flow_style=False, sort_keys=False
-            )
+            yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False)
             new_content = comment + "\n" + yaml_content
 
             # Check if the content is already identical
@@ -745,9 +698,7 @@ class RepoSetupSyncer:
                         existing_content = f.read()
 
                     if existing_content == new_content:
-                        logger.debug(
-                            "  Skipped dependabot.yml (already up-to-date)"
-                        )
+                        logger.debug("  Skipped dependabot.yml (already up-to-date)")
                         return False  # Return False to indicate no generation was needed
                 except Exception:
                     # If we can't read the file, proceed with generation
@@ -813,11 +764,7 @@ class RepoSetupSyncer:
             print(f"\n{status} {repo_name}")
 
             # Show detected languages
-            detected_langs = [
-                lang
-                for lang, detected in result["languages"].items()
-                if detected
-            ]
+            detected_langs = [lang for lang, detected in result["languages"].items() if detected]
             if detected_langs:
                 print(f"  Languages: {', '.join(detected_langs)}")
 
@@ -863,9 +810,7 @@ class RepoSetupSyncer:
         print(f"Dependabot configs generated: {dependabot_generated}")
 
         if self.dry_run:
-            print(
-                "\nThis was a dry run. Remove --dry-run to make actual changes."
-            )
+            print("\nThis was a dry run. Remove --dry-run to make actual changes.")
 
 
 def main():
@@ -883,9 +828,7 @@ def main():
         action="store_true",
         help="Show what would be synced without making changes",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
 
     args = parser.parse_args()
 

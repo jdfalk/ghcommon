@@ -8,19 +8,19 @@ on:
   workflow_call:
     inputs:
       go-matrix:
-        description: "JSON encoded Go build matrix"
+        description: 'JSON encoded Go build matrix'
         required: true
         type: string
       protobuf-artifacts:
-        description: "Whether protobuf artifacts were generated"
+        description: 'Whether protobuf artifacts were generated'
         required: false
         type: string
-        default: "false"
+        default: 'false'
       release-version:
-        description: "Release version to embed in binaries"
+        description: 'Release version to embed in binaries'
         required: false
         type: string
-        default: ""
+        default: ''
 
 permissions:
   contents: read
@@ -67,7 +67,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: "stable"
+          go-version: 'stable'
           cache: true
 
       - name: Build cross-platform binaries with checksums

@@ -66,9 +66,7 @@ PATTERNS: list[tuple[str, re.Pattern]] = [
     ("GitHub Token", re.compile(r"gh[pousr]_[A-Za-z0-9_]{30,}")),
     (
         "JWT",
-        re.compile(
-            r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
-        ),
+        re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
     ),
     (
         "Private Key Block",

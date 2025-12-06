@@ -51,9 +51,7 @@ def scan_image_with_trivy(image_ref, output_format="sarif", output_file=None):
     return True, output_file
 
 
-def scan_filesystem_with_trivy(
-    scan_path=".", output_file="trivy-fs-results.txt"
-):
+def scan_filesystem_with_trivy(scan_path=".", output_file="trivy-fs-results.txt"):
     """Scan filesystem with Trivy."""
     print(f"Scanning filesystem {scan_path} with Trivy...")
 
@@ -103,11 +101,7 @@ def test_image_functionality(image_ref):
         {
             "name": "Container Startup",
             "passed": success,
-            "message": (
-                "Container starts successfully"
-                if success
-                else f"Failed: {stderr}"
-            ),
+            "message": ("Container starts successfully" if success else f"Failed: {stderr}"),
         }
     )
 
@@ -120,9 +114,7 @@ def test_image_functionality(image_ref):
             "name": "Application Files",
             "passed": success,
             "message": (
-                "Application files present"
-                if success
-                else "Application structure unknown"
+                "Application files present" if success else "Application structure unknown"
             ),
         }
     )
@@ -131,20 +123,13 @@ def test_image_functionality(image_ref):
     print("Checking health configuration...")
     cmd = f'docker inspect {image_ref} --format="{{{{.Config.Healthcheck}}}}"'
     success, stdout, stderr = run_command(cmd, check=False)
-    has_healthcheck = (
-        success
-        and stdout != "none"
-        and stdout != "<nil>"
-        and stdout.strip() != ""
-    )
+    has_healthcheck = success and stdout != "none" and stdout != "<nil>" and stdout.strip() != ""
     tests.append(
         {
             "name": "Health Check",
             "passed": has_healthcheck,
             "message": (
-                "Health check configured"
-                if has_healthcheck
-                else "No health check configured"
+                "Health check configured" if has_healthcheck else "No health check configured"
             ),
         }
     )
@@ -165,9 +150,7 @@ def validate_compose_files(compose_files):
             {
                 "file": compose_file,
                 "valid": success,
-                "message": (
-                    "Valid configuration" if success else f"Invalid: {stderr}"
-                ),
+                "message": ("Valid configuration" if success else f"Invalid: {stderr}"),
             }
         )
 
@@ -213,9 +196,7 @@ def generate_security_summary(scan_results, test_results, compose_results=None):
         summary.append("## 🐳 Docker Compose Validation")
         for result in compose_results:
             status = "✅" if result["valid"] else "❌"
-            summary.append(
-                f"- **{result['file']}**: {status} {result['message']}"
-            )
+            summary.append(f"- **{result['file']}**: {status} {result['message']}")
         summary.append("")
 
     return "\n".join(summary)

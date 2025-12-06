@@ -19,12 +19,8 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Measure command execution time."
-    )
-    parser.add_argument(
-        "--label", required=True, help="Benchmark label to report."
-    )
+    parser = argparse.ArgumentParser(description="Measure command execution time.")
+    parser.add_argument("--label", required=True, help="Benchmark label to report.")
     parser.add_argument(
         "--command",
         required=True,
@@ -110,9 +106,7 @@ def write_results(
             "name": label,
             "unit": "seconds",
             "value": average,
-            "range": (
-                f"{to_human(best)} … {to_human(worst)}" if durations else ""
-            ),
+            "range": (f"{to_human(best)} … {to_human(worst)}" if durations else ""),
             "extra": "\n".join(extra_lines),
             "average_seconds": average,
             "best_seconds": best_value,

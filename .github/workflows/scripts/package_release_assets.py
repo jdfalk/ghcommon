@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
-from pathlib import Path
 import shutil
 import sys
+from pathlib import Path
 
 
 def _categorize(name: str) -> str | None:
@@ -29,11 +29,7 @@ def _categorize(name: str) -> str | None:
         return "binaries"
 
     # Checksum files go with binaries
-    if (
-        lower.endswith(".sha256")
-        or lower.endswith(".sha512")
-        or lower.endswith(".md5")
-    ):
+    if lower.endswith(".sha256") or lower.endswith(".sha512") or lower.endswith(".md5"):
         return "binaries"
 
     # Package archives
@@ -49,9 +45,7 @@ def _categorize(name: str) -> str | None:
 
 def main() -> None:
     release_version = (
-        sys.argv[1]
-        if len(sys.argv) > 1
-        else os.environ.get("RELEASE_VERSION", "unknown")
+        sys.argv[1] if len(sys.argv) > 1 else os.environ.get("RELEASE_VERSION", "unknown")
     )
     artifacts_root = Path("artifacts")
     target_root = Path("release-assets")
@@ -109,14 +103,10 @@ def main() -> None:
             manifest_sections.append("- None")
         manifest_sections.append("")
 
-    (target_root / "MANIFEST.md").write_text(
-        "\n".join(manifest_sections), encoding="utf-8"
-    )
+    (target_root / "MANIFEST.md").write_text("\n".join(manifest_sections), encoding="utf-8")
 
     total_files = sum(1 for _ in target_root.rglob("*") if _.is_file())
-    total_size = sum(
-        f.stat().st_size for f in target_root.rglob("*") if f.is_file()
-    )
+    total_size = sum(f.stat().st_size for f in target_root.rglob("*") if f.is_file())
 
     print("📦 Organizing and packaging release artifacts...")
     print(f"Total files: {total_files}")
@@ -124,8 +114,7 @@ def main() -> None:
 
     # Print organized by category
     for category, files_in_category in {
-        cat: [(rel, sz) for rel, sz, c in moved_files if c == cat]
-        for cat in categories
+        cat: [(rel, sz) for rel, sz, c in moved_files if c == cat] for cat in categories
     }.items():
         if files_in_category:
             print(f"\n{category.title()}:")

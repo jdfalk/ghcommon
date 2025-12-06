@@ -14,9 +14,7 @@ def main():
     """Run semantic-release."""
     # Ensure npm dependencies are installed
     print("Installing npm dependencies...")
-    result = subprocess.run(
-        ["npm", "install"], check=False, capture_output=True, text=True
-    )
+    result = subprocess.run(["npm", "install"], check=False, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Failed to install npm dependencies: {result.stderr}")
         sys.exit(1)

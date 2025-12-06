@@ -29,14 +29,10 @@ def main() -> None:
     cargo_dir.mkdir(parents=True, exist_ok=True)
 
     config_path = cargo_dir / "config.toml"
-    config_path.write_text(
-        CONFIG_TEMPLATE.format(repository=repository), encoding="utf-8"
-    )
+    config_path.write_text(CONFIG_TEMPLATE.format(repository=repository), encoding="utf-8")
 
     credentials_path = cargo_dir / "credentials.toml"
-    credentials_path.write_text(
-        CREDENTIALS_TEMPLATE.format(token=token), encoding="utf-8"
-    )
+    credentials_path.write_text(CREDENTIALS_TEMPLATE.format(token=token), encoding="utf-8")
     credentials_path.chmod(0o600)
 
     print(f"Configured Cargo registry credentials at {credentials_path}")

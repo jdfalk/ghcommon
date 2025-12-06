@@ -105,9 +105,7 @@ def get_python_config():
         [
             [
                 "@semantic-release/exec",
-                {
-                    "prepareCmd": "python scripts/update_version.py ${nextRelease.version}"
-                },
+                {"prepareCmd": "python scripts/update_version.py ${nextRelease.version}"},
             ],
             ["@semantic-release/changelog", {"changelogFile": "CHANGELOG.md"}],
             [

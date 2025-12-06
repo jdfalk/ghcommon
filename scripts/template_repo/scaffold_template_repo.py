@@ -543,9 +543,7 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
     )
     # Agent pointer at repo root
     files.append((root / "AGENTS.md", AGENTS_POINTER))
-    files.append(
-        (root / "LICENSE", render_license(opts.license, opts.owner, opts.year))
-    )
+    files.append((root / "LICENSE", render_license(opts.license, opts.owner, opts.year)))
     files.append((root / "CODE_OF_CONDUCT.md", CODE_OF_CONDUCT))
     files.append((root / "CONTRIBUTING.md", CONTRIBUTING))
     files.append((root / "SECURITY.md", SECURITY))
@@ -567,9 +565,7 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
             CODEOWNERS.replace("OWNER_USERNAME", opts.owner),
         )
     )
-    files.append(
-        (root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE)
-    )
+    files.append((root / ".github" / "pull_request_template.md", PULL_REQUEST_TEMPLATE))
     files.append(
         (
             root / ".github" / "ISSUE_TEMPLATE" / "bug_report.md",
@@ -585,9 +581,7 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
     files.append(
         (
             root / ".github" / "workflows" / "ci.yml",
-            render_ci_yaml(
-                include_go=opts.with_go, include_python=opts.with_python
-            ),
+            render_ci_yaml(include_go=opts.with_go, include_python=opts.with_python),
         )
     )
     files.append((root / ".github" / "commit-messages.md", COMMIT_MESSAGES_MD))
@@ -600,15 +594,10 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
     files.append((root / ".github" / "test-generation.md", TEST_GENERATION_MD))
 
     # AI instructions scaffolding
-    files.append(
-        (root / ".github" / "copilot-instructions.md", COPILOT_INSTRUCTIONS_MD)
-    )
+    files.append((root / ".github" / "copilot-instructions.md", COPILOT_INSTRUCTIONS_MD))
     files.append(
         (
-            root
-            / ".github"
-            / "instructions"
-            / "general-coding.instructions.md",
+            root / ".github" / "instructions" / "general-coding.instructions.md",
             GENERAL_CODING_INSTRUCTIONS_MD,
         )
     )
@@ -622,9 +611,7 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
 
     # Optional Dependabot
     if opts.with_dependabot:
-        files.append(
-            (root / ".github" / "dependabot.yml", render_dependabot_yaml(opts))
-        )
+        files.append((root / ".github" / "dependabot.yml", render_dependabot_yaml(opts)))
 
     # Optional release workflows
     if opts.with_releases:
@@ -831,9 +818,7 @@ jobs:
         run: |
           python -m twine upload dist/*
 """
-        out.append(
-            (root / ".github" / "workflows" / "release-python.yml", py_rel)
-        )
+        out.append((root / ".github" / "workflows" / "release-python.yml", py_rel))
 
     readme = """# file: .github/workflows/README.md
 # version: 1.0.0
@@ -878,20 +863,14 @@ def parse_args(argv: list[str]) -> Options:
     parser = argparse.ArgumentParser(
         description="Scaffold a public-safe template repository (no secrets, no submodules)."
     )
-    parser.add_argument(
-        "--name", required=True, help="Repository name (e.g., my-template-repo)"
-    )
+    parser.add_argument("--name", required=True, help="Repository name (e.g., my-template-repo)")
     parser.add_argument(
         "--owner",
         required=True,
         help="GitHub owner/org (used for CODEOWNERS and copyright)",
     )
-    parser.add_argument(
-        "--description", default="A minimal public-safe template repository."
-    )
-    parser.add_argument(
-        "--license", choices=list(SUPPORTED_LICENSES.keys()), default="MIT"
-    )
+    parser.add_argument("--description", default="A minimal public-safe template repository.")
+    parser.add_argument("--license", choices=list(SUPPORTED_LICENSES.keys()), default="MIT")
     parser.add_argument("--year", default="2025")
     parser.add_argument(
         "--target",
@@ -972,9 +951,7 @@ def main(argv: list[str]) -> int:
         write_file(path, content, force=opts.force)
 
     print(f"Scaffold complete at: {opts.target_dir}")
-    print(
-        "Note: No git commands were executed. Use push_with_gh.py if you want to publish."
-    )
+    print("Note: No git commands were executed. Use push_with_gh.py if you want to publish.")
     return 0
 
 

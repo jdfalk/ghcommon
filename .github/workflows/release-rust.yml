@@ -8,14 +8,14 @@ on:
   workflow_call:
     inputs:
       release-version:
-        description: "Release version tag"
+        description: 'Release version tag'
         required: false
         type: string
       protobuf-artifacts:
-        description: "Whether protobuf artifacts were generated"
+        description: 'Whether protobuf artifacts were generated'
         required: false
         type: string
-        default: "false"
+        default: 'false'
 
 permissions:
   contents: read

@@ -52,9 +52,7 @@ def fix_instruction_file(file_path):
             return False
 
         if re.search(r"^---\s*$", content, re.MULTILINE):
-            log_info(
-                f"  Skipping (already has proper frontmatter): {file_path}"
-            )
+            log_info(f"  Skipping (already has proper frontmatter): {file_path}")
             os.remove(backup_path)
             return False
 
@@ -65,9 +63,7 @@ def fix_instruction_file(file_path):
 
         for i, line in enumerate(lines):
             # Keep header comments
-            if line.startswith("<!--") or (
-                line.strip() == "" and not frontmatter_started
-            ):
+            if line.startswith("<!--") or (line.strip() == "" and not frontmatter_started):
                 fixed_lines.append(line)
             # Start frontmatter when we find applyTo
             elif line.startswith("applyTo:"):
@@ -78,9 +74,7 @@ def fix_instruction_file(file_path):
                 fixed_lines.append(line)
             # Handle description lines
             elif in_frontmatter and (
-                line.startswith("description:")
-                or line.startswith("  ")
-                or line.startswith("\t")
+                line.startswith("description:") or line.startswith("  ") or line.startswith("\t")
             ):
                 fixed_lines.append(line)
             # End frontmatter when we hit content
@@ -148,9 +142,7 @@ def main():
             if fix_instruction_file(str(file_path)):
                 fixed_count += 1
 
-    log_success(
-        f"Processing complete! Fixed {fixed_count}/{total_count} instruction files."
-    )
+    log_success(f"Processing complete! Fixed {fixed_count}/{total_count} instruction files.")
     log_info("Backup files created with .backup extension")
 
 

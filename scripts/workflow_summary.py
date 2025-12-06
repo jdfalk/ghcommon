@@ -87,14 +87,10 @@ def generate_workflow_summary() -> None:
     write_summary(
         f"**Run ID:** [`{run_id}`](https://github.com/{repository}/actions/runs/{run_id})"
     )
-    write_summary(
-        f"**Repository:** [`{repository}`](https://github.com/{repository})"
-    )
+    write_summary(f"**Repository:** [`{repository}`](https://github.com/{repository})")
     write_summary(f"**Triggered by:** {event_name}")
     write_summary(f"**Actor:** {triggered_by}")
-    write_summary(
-        f"**Timestamp:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}"
-    )
+    write_summary(f"**Timestamp:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}")
     write_summary("")
 
     # Show overall workflow status
@@ -108,9 +104,7 @@ def generate_workflow_summary() -> None:
         if issue_management_result == "success":
             write_summary("✅ **Status:** Completed successfully")
             write_summary("")
-            write_summary(
-                f"📋 **Operations executed:** `{', '.join(operations)}`"
-            )
+            write_summary(f"📋 **Operations executed:** `{', '.join(operations)}`")
             write_summary("")
 
             # Show results table
@@ -137,13 +131,9 @@ def generate_workflow_summary() -> None:
 
             for operation in operations:
                 icon = operation_icons.get(operation, "❓")
-                detail = operation_details.get(
-                    operation, "Custom operation executed"
-                )
+                detail = operation_details.get(operation, "Custom operation executed")
                 operation_title = operation.replace("-", " ").title()
-                write_summary(
-                    f"| {icon} {operation_title} | ✅ Completed | {detail} |"
-                )
+                write_summary(f"| {icon} {operation_title} | ✅ Completed | {detail} |")
 
             write_summary("")
             write_summary(f"**Total operations:** {len(operations)}")
@@ -157,9 +147,7 @@ def generate_workflow_summary() -> None:
                     if file.strip():
                         write_summary(f"- `{file.strip()}`")
             else:
-                write_summary(
-                    "**Repository changes:** ℹ️  No files were modified"
-                )
+                write_summary("**Repository changes:** ℹ️  No files were modified")
 
             write_summary("")
             write_summary(
@@ -169,19 +157,13 @@ def generate_workflow_summary() -> None:
         elif issue_management_result == "failure":
             write_summary("❌ **Status:** Failed")
             write_summary("")
-            write_summary(
-                f"📋 **Operations attempted:** `{', '.join(operations)}`"
-            )
+            write_summary(f"📋 **Operations attempted:** `{', '.join(operations)}`")
             write_summary("")
-            write_summary(
-                "🔍 Check the job logs above for detailed error information."
-            )
+            write_summary("🔍 Check the job logs above for detailed error information.")
         else:
             write_summary("⏭️ **Status:** Skipped")
             write_summary("")
-            write_summary(
-                f"📋 **Operations requested:** `{', '.join(operations)}`"
-            )
+            write_summary(f"📋 **Operations requested:** `{', '.join(operations)}`")
 
     # Show configuration
     write_summary("")
@@ -195,19 +177,11 @@ def generate_workflow_summary() -> None:
     # Show quick links
     write_summary("")
     write_summary("## 🔗 Quick Links")
-    write_summary(
-        f"- [🔄 Workflow runs](https://github.com/{repository}/actions)"
-    )
+    write_summary(f"- [🔄 Workflow runs](https://github.com/{repository}/actions)")
     write_summary(f"- [🐛 Issues](https://github.com/{repository}/issues)")
-    write_summary(
-        f"- [🔒 Security alerts](https://github.com/{repository}/security)"
-    )
-    write_summary(
-        f"- [📋 Pull requests](https://github.com/{repository}/pulls)"
-    )
-    write_summary(
-        "- [🏠 ghcommon repository](https://github.com/jdfalk/ghcommon)"
-    )
+    write_summary(f"- [🔒 Security alerts](https://github.com/{repository}/security)")
+    write_summary(f"- [📋 Pull requests](https://github.com/{repository}/pulls)")
+    write_summary("- [🏠 ghcommon repository](https://github.com/jdfalk/ghcommon)")
 
     # Show recent activity links
     write_summary("")

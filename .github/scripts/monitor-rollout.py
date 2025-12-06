@@ -79,15 +79,11 @@ def parse_iso8601(s: str) -> dt.datetime | None:
 
 def load_target_repos(explicit: str | None) -> list[str]:
     if explicit:
-        parts = [
-            p.strip() for p in explicit.replace(",", " ").split() if p.strip()
-        ]
+        parts = [p.strip() for p in explicit.replace(",", " ").split() if p.strip()]
         return parts
     env_repos = os.environ.get("TARGET_REPOS")
     if env_repos:
-        parts = [
-            p.strip() for p in env_repos.replace(",", " ").split() if p.strip()
-        ]
+        parts = [p.strip() for p in env_repos.replace(",", " ").split() if p.strip()]
         return parts
     # Fallback to repositories.txt
     repos_file = os.path.join(os.getcwd(), ".github", "repositories.txt")
@@ -120,9 +116,7 @@ def pick_latest(
     name_lc = [n.lower() for n in name_contains]
     for run in runs:
         n = (run.get("name") or "").lower()
-        created_at = parse_iso8601(
-            run.get("created_at") or run.get("run_started_at") or ""
-        )
+        created_at = parse_iso8601(run.get("created_at") or run.get("run_started_at") or "")
         if all(term in n for term in name_lc):
             if created_at and created_at >= since_cutoff:
                 return run
@@ -220,9 +214,7 @@ def build_markdown(results: list[dict]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Monitor rollout across target repositories"
-    )
+    parser = argparse.ArgumentParser(description="Monitor rollout across target repositories")
     parser.add_argument("--per-page", type=int, default=10)
     parser.add_argument("--since-hours", type=int, default=72)
     parser.add_argument("--repos", type=str, default="")
@@ -233,16 +225,12 @@ def main():
         print("No target repositories found.")
         return 1
     if not get_token():
-        print(
-            "Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits."
-        )
+        print("Warning: No token provided (JF_CI_GH_PAT/GITHUB_TOKEN). You may hit rate limits.")
 
     results: list[dict] = []
     for repo in repos:
         try:
-            results.append(
-                summarize_repo(repo, args.per_page, args.since_hours)
-            )
+            results.append(summarize_repo(repo, args.per_page, args.since_hours))
         except Exception as e:
             results.append(
                 {
@@ -265,8 +253,7 @@ def main():
                 return st in ("success", "completed")
 
             all_ok = all(
-                ok_status(r["security"]["status"])
-                and ok_status(r["release"]["status"])  # type: ignore[index]
+                ok_status(r["security"]["status"]) and ok_status(r["release"]["status"])  # type: ignore[index]
                 for r in results
             )
             with open(github_output, "a", encoding="utf-8") as f:

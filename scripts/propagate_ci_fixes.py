@@ -100,14 +100,10 @@ def increment_version_in_ci(target_repo: Path):
                 with open(ci_file, "w") as f:
                     f.write("\n".join(lines))
 
-                print(
-                    f"✅ Incremented CI workflow version to {new_version} in {target_repo.name}"
-                )
+                print(f"✅ Incremented CI workflow version to {new_version} in {target_repo.name}")
                 return True
 
-        print(
-            f"⚠️ No version header found in CI workflow for {target_repo.name}"
-        )
+        print(f"⚠️ No version header found in CI workflow for {target_repo.name}")
         return False
 
     except Exception as e:
@@ -152,9 +148,7 @@ def main():
 
         print()
 
-    print(
-        f"📊 Summary: {success_count}/{total_repos} repositories updated successfully"
-    )
+    print(f"📊 Summary: {success_count}/{total_repos} repositories updated successfully")
 
     if success_count == total_repos:
         print("🎉 All repositories updated! Ready to test CI workflows.")

@@ -76,9 +76,7 @@ def process_jobs(jobs: list[dict[str, Any]], ledger: set[str]) -> None:
 
 def main() -> int:
     """Program entry point."""
-    parser = argparse.ArgumentParser(
-        description="Submit codex jobs from a JSON file."
-    )
+    parser = argparse.ArgumentParser(description="Submit codex jobs from a JSON file.")
     parser.add_argument("path", type=Path, help="Path to JSON job file.")
     args = parser.parse_args()
 

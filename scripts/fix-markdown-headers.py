@@ -294,9 +294,7 @@ def process_file(file_path, dry_run=False, verbose=False):
             header_lines = generate_header(file_path)
 
             # Use smart insertion to handle special comment blocks
-            new_content = insert_header_after_special_comments(
-                content, header_lines
-            )
+            new_content = insert_header_after_special_comments(content, header_lines)
 
             was_fixed = True
 
@@ -354,9 +352,7 @@ def main():
         print(f"❌ Directory '{args.directory}' does not exist")
         sys.exit(1)
 
-    print(
-        f"🔍 Scanning for markdown files in: {os.path.abspath(args.directory)}"
-    )
+    print(f"🔍 Scanning for markdown files in: {os.path.abspath(args.directory)}")
     if args.dry_run:
         print("🔬 DRY RUN MODE - No files will be modified")
 
@@ -383,9 +379,7 @@ def main():
     if args.dry_run and fixed_count > 0:
         print("\n💡 Run without --dry-run to apply changes")
     elif fixed_count > 0:
-        print(
-            f"\n✅ Successfully processed {fixed_count} markdown files (fixes and additions)"
-        )
+        print(f"\n✅ Successfully processed {fixed_count} markdown files (fixes and additions)")
     else:
         print("\n✅ All markdown files already have correct headers")
 

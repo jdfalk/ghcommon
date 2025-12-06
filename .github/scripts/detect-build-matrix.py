@@ -74,8 +74,7 @@ def detect_build_requirements():
 
     # Check for Python projects
     if any(
-        os.path.exists(f)
-        for f in ["pyproject.toml", "requirements.txt", "setup.py"]
+        os.path.exists(f) for f in ["pyproject.toml", "requirements.txt", "setup.py"]
     ) or check_file_exists("*.py"):
         print("Python project detected")
         flags["has_python"] = True
@@ -155,9 +154,7 @@ def detect_build_requirements():
                 **pkg_data.get("devDependencies", {}),
             }
 
-            has_frontend_deps = any(
-                indicator in all_deps for indicator in frontend_indicators
-            )
+            has_frontend_deps = any(indicator in all_deps for indicator in frontend_indicators)
             has_build_scripts = any(
                 script in build_scripts
                 for script in script_indicators
@@ -200,9 +197,7 @@ def detect_build_requirements():
         print("Docker project detected")
         flags["has_docker"] = True
         # Use docker-detect.py script for detailed Docker configuration
-        success, output = run_command(
-            "python3 .github/scripts/docker-detect.py"
-        )
+        success, output = run_command("python3 .github/scripts/docker-detect.py")
         if success:
             print("Docker detection script completed successfully")
             # The docker-detect.py script will set its own outputs
@@ -220,9 +215,7 @@ def detect_build_requirements():
             }
 
     # Check for protobuf
-    if any(
-        os.path.exists(f) for f in ["buf.yaml", "buf.gen.yaml"]
-    ) or check_file_exists("*.proto"):
+    if any(os.path.exists(f) for f in ["buf.yaml", "buf.gen.yaml"]) or check_file_exists("*.proto"):
         print("Protobuf project detected")
         flags["protobuf_needed"] = True
 

@@ -29,12 +29,8 @@ REPOS = [
 
 def copy_instructions(target_repo: Path):
     """Copy the general coding instructions from ghcommon to target repository."""
-    source_file = (
-        GHCOMMON_PATH / ".github/instructions/general-coding.instructions.md"
-    )
-    target_file = (
-        target_repo / ".github/instructions/general-coding.instructions.md"
-    )
+    source_file = GHCOMMON_PATH / ".github/instructions/general-coding.instructions.md"
+    target_file = target_repo / ".github/instructions/general-coding.instructions.md"
 
     if source_file.exists():
         # Ensure target directory exists
@@ -48,9 +44,7 @@ def copy_instructions(target_repo: Path):
 
 def main():
     """Main function to propagate instructions to all repositories."""
-    print(
-        "🚀 Propagating updated general coding instructions from ghcommon to all repositories..."
-    )
+    print("🚀 Propagating updated general coding instructions from ghcommon to all repositories...")
     print()
 
     if not GHCOMMON_PATH.exists():
@@ -77,9 +71,7 @@ def main():
 
         print()
 
-    print(
-        f"📊 Summary: {success_count}/{total_repos} repositories updated successfully"
-    )
+    print(f"📊 Summary: {success_count}/{total_repos} repositories updated successfully")
 
     if success_count == total_repos:
         print("🎉 All repositories updated with latest instructions!")

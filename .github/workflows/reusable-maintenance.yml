@@ -8,22 +8,22 @@ on:
   workflow_call:
     inputs:
       skip-dependency-updates:
-        description: "Skip dependency updates"
+        description: 'Skip dependency updates'
         required: false
         type: boolean
         default: false
       skip-cleanup:
-        description: "Skip cleanup tasks"
+        description: 'Skip cleanup tasks'
         required: false
         type: boolean
         default: false
       skip-license-check:
-        description: "Skip license compliance check"
+        description: 'Skip license compliance check'
         required: false
         type: boolean
         default: false
       auto-commit:
-        description: "Automatically commit maintenance changes"
+        description: 'Automatically commit maintenance changes'
         required: false
         type: boolean
         default: false

@@ -52,7 +52,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Detect project languages (for linter toolchain setup)
         id: detect_langs
@@ -82,7 +82,7 @@ jobs:
         if: steps.detect_langs.outputs.go_present == 'true'
         uses: actions/setup-go@v6
         with:
-          go-version: "1.24"
+          go-version: '1.24'
           cache: true
 
       - name: Setup Rust (if Cargo.toml present)
@@ -96,7 +96,7 @@ jobs:
         if: steps.detect_langs.outputs.node_present == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: |
             **/package-lock.json
@@ -273,7 +273,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |
@@ -552,7 +552,15 @@ jobs:
   pr-summary:
     name: PR Automation Summary
     runs-on: ubuntu-latest
-    needs: [code-quality, auto-labeling, intelligent-labeling, pr-analysis, attestations, ai-rebase]
+    needs:
+      [
+        code-quality,
+        auto-labeling,
+        intelligent-labeling,
+        pr-analysis,
+        attestations,
+        ai-rebase,
+      ]
     if: always()
     steps:
       - name: Generate summary

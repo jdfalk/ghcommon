@@ -81,9 +81,7 @@ class GitHubManager:
                 capture_output=True,
             )
         except (subprocess.SubprocessError, FileNotFoundError):
-            console.print(
-                "[red]GitHub CLI (gh) is not installed. Please install it first.[/red]"
-            )
+            console.print("[red]GitHub CLI (gh) is not installed. Please install it first.[/red]")
             console.print("Visit: https://cli.github.com/manual/installation")
             return False
 
@@ -191,9 +189,7 @@ def display_repositories(repos: list[dict[str, Any]]) -> None:
     console.print(table)
 
 
-def filter_repositories(
-    repos: list[dict[str, Any]], filter_term: str = ""
-) -> list[dict[str, Any]]:
+def filter_repositories(repos: list[dict[str, Any]], filter_term: str = "") -> list[dict[str, Any]]:
     """
     Filter repositories by name or description.
 
@@ -387,14 +383,10 @@ def _set_variables(selected_repos: list[str], gh_manager: GitHubManager) -> None
 
     # Summary
     console.print("\n[bold]Operation completed![/bold]")
-    console.print(
-        f"[green]✅ Successfully set variable for {success_count} repositories[/green]"
-    )
+    console.print(f"[green]✅ Successfully set variable for {success_count} repositories[/green]")
 
     if failed_repos:
-        console.print(
-            f"[red]❌ Failed to set variable for {len(failed_repos)} repositories:[/red]"
-        )
+        console.print(f"[red]❌ Failed to set variable for {len(failed_repos)} repositories:[/red]")
         for repo in failed_repos:
             console.print(f"  • {repo}")
 
@@ -445,9 +437,7 @@ def main() -> None:
         return
 
     # Confirm before proceeding
-    if not inquirer.confirm(
-        "Proceed with setting the variable for selected repositories?"
-    ):
+    if not inquirer.confirm("Proceed with setting the variable for selected repositories?"):
         console.print("[yellow]Operation cancelled.[/yellow]")
         return
 

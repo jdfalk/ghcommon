@@ -106,12 +106,8 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Intelligently sync .github structure to target repos."
     )
-    parser.add_argument(
-        "--repos", required=True, help="Comma-separated list of target repos"
-    )
-    parser.add_argument(
-        "--branch", required=True, help="Branch name to push to"
-    )
+    parser.add_argument("--repos", required=True, help="Comma-separated list of target repos")
+    parser.add_argument("--branch", required=True, help="Branch name to push to")
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -125,9 +121,7 @@ def run(cmd: list[str], cwd=None, check=True, dry_run=False):
     if dry_run:
         logging.info("  [DRY RUN] Command not executed")
         return None
-    result = subprocess.run(
-        cmd, cwd=cwd, check=check, capture_output=True, text=True
-    )
+    result = subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
     if result.stdout:
         logging.info(result.stdout)
     if result.stderr:
@@ -141,9 +135,7 @@ def create_vscode_copilot_symlinks(repo_dir: str, dry_run: bool):
     github_instructions_dir = os.path.join(repo_dir, ".github", "instructions")
 
     if not os.path.exists(github_instructions_dir):
-        logging.info(
-            "  [SKIP] .github/instructions/ not found, skipping VS Code symlinks"
-        )
+        logging.info("  [SKIP] .github/instructions/ not found, skipping VS Code symlinks")
         return
 
     if dry_run:
@@ -168,9 +160,7 @@ def create_vscode_copilot_symlinks(repo_dir: str, dry_run: bool):
             )
 
 
-def sync_to_repo(
-    repo: str, branch: str, gh_token: str, summary: list[str], dry_run: bool
-):
+def sync_to_repo(repo: str, branch: str, gh_token: str, summary: list[str], dry_run: bool):
     logging.info(f"\n=== Syncing to {repo} ===")
 
     if dry_run:
@@ -192,13 +182,9 @@ def sync_to_repo(
         # Show VS Code symlinks that would be created
         logging.info("    VS Code Copilot symlinks:")
         for file in MANAGED_FILES:
-            if file.startswith(".github/instructions/") and file.endswith(
-                ".instructions.md"
-            ):
+            if file.startswith(".github/instructions/") and file.endswith(".instructions.md"):
                 basename = os.path.basename(file)
-                logging.info(
-                    f"      CREATE: .vscode/copilot/{basename} -> ../../{file}"
-                )
+                logging.info(f"      CREATE: .vscode/copilot/{basename} -> ../../{file}")
 
         summary.append(
             f"[DRY RUN] {repo}: Would sync {len(MANAGED_FILES)} files and clean up {len(OLD_FILES_TO_REMOVE)} old files"

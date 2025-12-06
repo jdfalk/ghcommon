@@ -7,10 +7,10 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 # Platform configurations for cross-compilation
 PLATFORMS = [
@@ -191,16 +191,12 @@ def build_all_platforms(
         "successful_count": len(successful_builds),
         "failed_count": len(failed_builds),
     }
-    manifest_path.write_text(
-        json.dumps(manifest_data, indent=2), encoding="utf-8"
-    )
+    manifest_path.write_text(json.dumps(manifest_data, indent=2), encoding="utf-8")
     print(f"\n📋 Build manifest: {manifest_path}")
 
     # Print summary
     print(f"\n{'=' * 60}")
-    print(
-        f"Build Summary: {len(successful_builds)}/{len(platforms)} successful"
-    )
+    print(f"Build Summary: {len(successful_builds)}/{len(platforms)} successful")
     print(f"{'=' * 60}")
     if successful_builds:
         print("✅ Successful builds:")
@@ -283,9 +279,7 @@ def main() -> int:
 
     # Download dependencies first
     print("Downloading Go dependencies...")
-    result = subprocess.run(
-        ["go", "mod", "download"], check=False, capture_output=True, text=True
-    )
+    result = subprocess.run(["go", "mod", "download"], check=False, capture_output=True, text=True)
     if result.returncode != 0:
         print(
             f"❌ Failed to download dependencies: {result.stderr}",
