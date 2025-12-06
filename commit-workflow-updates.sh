@@ -1,6 +1,6 @@
 #!/bin/bash
 # file: commit-workflow-updates.sh
-# version: 2.0.1
+# version: 2.0.2
 # guid: 123e4567-e89b-12d3-a456-426614174001
 
 set -e
@@ -609,7 +609,9 @@ for repo_dir in */; do
   fi
 
   echo "   🔍 Found .github changes:"
-  echo "$GITHUB_CHANGES" | sed 's/^/      /'
+  while IFS= read -r change_line; do
+    echo "      $change_line"
+  done <<<"$GITHUB_CHANGES"
   ((REPOS_WITH_CHANGES++))
 
   # Check if unified-automation workflow exists and get its version
@@ -650,11 +652,13 @@ for repo_dir in */; do
   echo "   ✍️  Creating commit message..."
 
   # Count different types of changes
-  WORKFLOW_FILES=$(echo "$STAGED_CHANGES" | grep "workflows/" | grep -v "\.backup$" | wc -l | tr -d ' ')
-  INSTRUCTION_FILES=$(echo "$STAGED_CHANGES" | grep "instructions/" | wc -l | tr -d ' ')
-  TEMPLATE_FILES=$(echo "$STAGED_CHANGES" | grep -E "(ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE)" | wc -l | tr -d ' ')
-  BACKUP_FILES=$(echo "$STAGED_CHANGES" | grep "\.backup$" | wc -l | tr -d ' ')
-  OTHER_FILES=$(echo "$STAGED_CHANGES" | grep -v -E "(workflows/|instructions/|TEMPLATE|\.backup$)" | wc -l | tr -d ' ')
+  WORKFLOW_FILES=$(printf "%s\n" "$STAGED_CHANGES" | grep -E "workflows/" | grep -vc "\\.backup$")
+  INSTRUCTION_FILES=$(printf "%s\n" "$STAGED_CHANGES" | grep -c "instructions/" || true)
+  TEMPLATE_FILES=$(printf "%s\n" "$STAGED_CHANGES" | grep -Ec "(ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE)" || true)
+  BACKUP_FILES=$(printf "%s\n" "$STAGED_CHANGES" | grep -c "\\.backup$" || true)
+  OTHER_FILES=$(
+    printf "%s\n" "$STAGED_CHANGES" | grep -Ev "(workflows/|instructions/|TEMPLATE|\\.backup$)" | grep -vc "^$" || true
+  )
 
   # Determine commit type based on changes
   if [ "$WORKFLOW_FILES" -gt 0 ] || [ "$structure_created" -eq 0 ]; then
@@ -741,9 +745,7 @@ Summary:
 
   # Commit the changes
   echo "   💾 Committing GitHub setup..."
-  echo "$COMMIT_MSG" | git commit -F -
-
-  if [ $? -eq 0 ]; then
+  if echo "$COMMIT_MSG" | git commit -F -; then
     echo "   ✅ Successfully committed GitHub setup"
     ((REPOS_COMMITTED++))
   else
