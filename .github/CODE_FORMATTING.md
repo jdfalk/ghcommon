@@ -2,7 +2,8 @@
 
 ## Overview
 
-This repository uses a **unified formatting strategy** to prevent conflicts between different formatters:
+This repository uses a **unified formatting strategy** to prevent conflicts between different
+formatters:
 
 ### Python
 

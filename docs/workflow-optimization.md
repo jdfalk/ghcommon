@@ -580,7 +580,8 @@ additional guidance.
 ## E.2 Phase 2 – Release Consolidation
 
 1. **Create/replace `.github/workflows/scripts/release_workflow.py`**
-   - Copy the full implementation from [Appendix F.4](#f4-githubworkflowsscriptsrelease_workflowpy) into the file.
+   - Copy the full implementation from [Appendix F.4](#f4-githubworkflowsscriptsrelease_workflowpy)
+     into the file.
 
 2. **Update `.github/workflows/reusable-release.yml`**
 
