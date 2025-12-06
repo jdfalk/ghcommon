@@ -107,7 +107,7 @@ jobs:
           tool: 'customSmallerIsBetter'
           output-file-path: benchmarks/rust.json
           summary-always: true
-          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/rust.json
 
       - name: Upload rust benchmark artifacts
@@ -195,11 +195,11 @@ jobs:
       - name: Publish benchmark result
         uses: ./github-action-benchmark
         with:
-          name: Node Fixture Execution
+          name: Go Fixture Execution
           tool: 'customSmallerIsBetter'
-          output-file-path: benchmarks/node.json
+          output-file-path: benchmarks/go.json
           summary-always: true
-          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/node.json
 
       - name: Upload node benchmark artifacts
@@ -292,7 +292,7 @@ jobs:
           tool: 'customSmallerIsBetter'
           output-file-path: benchmarks/python.json
           summary-always: true
-          github-token: ${{ secrets.BENCHMARK_ACTION_TOKEN || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/python.json
 
       - name: Upload Python benchmark results

@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: documentation
     env:
-      DOCS_DEPLOY_TOKEN: ${{ secrets.DOCS_DEPLOY_TOKEN }}
+      DOCS_DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check deployment token
         if: env.DOCS_DEPLOY_TOKEN == ''
