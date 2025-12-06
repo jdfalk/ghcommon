@@ -15,7 +15,5 @@ permissions:
 jobs:
   call-labeler:
     uses: ./.github/workflows/reusable-labeler.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

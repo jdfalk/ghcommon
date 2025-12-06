@@ -15,7 +15,5 @@ permissions:
 jobs:
   call-intelligent-issue-labeling:
     uses: ./.github/workflows/reusable-intelligent-issue-labeling.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

@@ -16,7 +16,5 @@ permissions:
 jobs:
   call-goreleaser:
     uses: ./.github/workflows/reusable-goreleaser.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

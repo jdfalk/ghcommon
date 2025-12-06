@@ -13,7 +13,5 @@ permissions:
 jobs:
   call-super-linter:
     uses: ./.github/workflows/reusable-super-linter.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

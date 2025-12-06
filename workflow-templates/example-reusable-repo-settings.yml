@@ -13,7 +13,5 @@ permissions:
 jobs:
   call-repo-settings:
     uses: ./.github/workflows/reusable-repo-settings.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

@@ -12,7 +12,5 @@ permissions:
 jobs:
   call-unified-automation:
     uses: ./.github/workflows/reusable-unified-automation.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

@@ -16,7 +16,5 @@ permissions:
 jobs:
   call-docker-build:
     uses: ./.github/workflows/reusable-docker-build.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

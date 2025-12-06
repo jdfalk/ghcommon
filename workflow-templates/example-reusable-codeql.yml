@@ -14,7 +14,5 @@ permissions:
 jobs:
   call-codeql:
     uses: ./.github/workflows/reusable-codeql.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

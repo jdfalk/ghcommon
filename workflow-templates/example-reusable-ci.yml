@@ -20,7 +20,5 @@ permissions:
 jobs:
   call-ci:
     uses: ./.github/workflows/reusable-ci.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

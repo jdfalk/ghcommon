@@ -13,7 +13,5 @@ permissions:
 jobs:
   call-enhanced-docs-update:
     uses: ./.github/workflows/reusable-enhanced-docs-update.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

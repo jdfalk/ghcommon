@@ -14,7 +14,5 @@ permissions:
 jobs:
   call-stale:
     uses: ./.github/workflows/reusable-stale.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

@@ -15,7 +15,5 @@ permissions:
 jobs:
   call-ai-rebase:
     uses: ./.github/workflows/reusable-ai-rebase.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

@@ -20,7 +20,5 @@ permissions:
 jobs:
   call-unified-issue-management:
     uses: ./.github/workflows/reusable-unified-issue-management.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

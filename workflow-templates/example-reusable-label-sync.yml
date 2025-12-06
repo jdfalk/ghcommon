@@ -15,7 +15,5 @@ permissions:
 jobs:
   call-label-sync:
     uses: ./.github/workflows/reusable-label-sync.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

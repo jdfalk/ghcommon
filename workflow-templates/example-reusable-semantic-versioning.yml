@@ -17,7 +17,5 @@ permissions:
 jobs:
   call-semantic-versioning:
     uses: ./.github/workflows/reusable-semantic-versioning.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here

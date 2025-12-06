@@ -16,7 +16,5 @@ permissions:
 jobs:
   call-docs-update:
     uses: ./.github/workflows/reusable-docs-update.yml
-    with:
-      # Add required inputs here
-    secrets:
-      # Add required secrets here
+    with: {} # Add required inputs here
+    secrets: {} # Add required secrets here
