@@ -1,5 +1,5 @@
 # file: .github/workflows/release-docker.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: release-docker-workflow-2025-10
 
 name: Docker Release Build
@@ -52,7 +52,10 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
         run: |
           set -euo pipefail
-          TAG="${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA::12}-${PLATFORM//\//-}"
+          # Extract platform and normalize for tag (e.g., linux/amd64 -> linux-amd64)
+          PLATFORM_TAG="${PLATFORM//\//-}"
+          TAG="${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA::12}-${PLATFORM_TAG}"
+
           docker buildx build \
             --platform "$PLATFORM" \
             --tag "$TAG" \
