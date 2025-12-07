@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: release-frontend-workflow-2025-10
 
 name: Frontend Release Build
@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
+          cache: ${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') != '' && 'npm' || '' }}
 
       - name: Install dependencies
         run: |
