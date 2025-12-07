@@ -1,0 +1,79 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "ghcommon"
+    }
+  ],
+  "settings": {
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+      }
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true,
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true
+    },
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[css]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "ruff.enable": true,
+    "ruff.organizeImports": true,
+    "ruff.fixAll": true,
+    "python.formatting.provider": "none",
+    "black-formatter.importStrategy": "fromEnvironment",
+    "isort.check": false,
+    "prettier.configPath": ".github/linters/.prettierrc.json",
+    "prettier.requireConfig": true,
+    "prettier.documentSelectors": [
+      "yaml",
+      "yml",
+      "json",
+      "jsonc",
+      "markdown",
+      "html",
+      "css",
+      "javascript",
+      "typescript"
+    ],
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [80, 120],
+    "editor.wordWrap": "off"
+  }
+}

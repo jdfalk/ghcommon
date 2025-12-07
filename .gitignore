@@ -634,6 +634,10 @@ FodyWeavers.xsd
 !.vscode/copilot
 !.vscode/copilot/*
 
+# Local VS Code workspace files (machine-specific paths)
+*.code-workspace
+!ghcommon.code-workspace.public
+
 # Local History for Visual Studio Code
 .history/
 

@@ -29,7 +29,9 @@
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
   },
   "ruff.enable": true,
   "ruff.organizeImports": true,
@@ -40,6 +42,17 @@
   "isort.check": false,
   "prettier.configPath": ".github/linters/.prettierrc.json",
   "prettier.requireConfig": true,
+  "prettier.documentSelectors": [
+    "yaml",
+    "yml",
+    "json",
+    "jsonc",
+    "markdown",
+    "html",
+    "css",
+    "javascript",
+    "typescript"
+  ],
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "files.trimTrailingWhitespace": true,
