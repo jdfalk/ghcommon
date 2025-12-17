@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/generate_release_summary.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: 9346b0d8-53f0-4a7e-95ff-bae25b782f6d
 
 """Generate GitHub Actions release summary from environment variables."""
@@ -8,13 +8,13 @@
 from __future__ import annotations
 
 import os
-import sys
 from collections import OrderedDict
 
 from workflow_common import (
     append_summary,
     append_summary_line,
     build_release_summary,
+    log_warning,
 )
 
 
@@ -59,9 +59,10 @@ def main() -> None:
     failures = any(status.lower() == "failure" for status in components.values())
     if failures:
         append_summary_line("❌ **Some components failed**")
-        sys.exit(1)
-
-    append_summary_line("✅ **All components completed successfully**")
+        log_warning("Some components failed - check the summary above")
+        # Don't exit with error code - let the CI summary job determine overall status
+    else:
+        append_summary_line("✅ **All components completed successfully**")
 
 
 if __name__ == "__main__":
