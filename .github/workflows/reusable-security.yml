@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-security.yml
-# version: 1.2.0
+# version: 1.2.1
 # guid: reusable-security-2025-09-24-core-workflow
 
 name: Reusable Security Workflow
@@ -62,7 +62,7 @@ jobs:
   codeql-analysis:
     name: CodeQL Analysis
     needs: detect-languages
-    if: ${{ !inputs.skip-codeql && fromJSON(needs.detect-languages.outputs.languages)[0] != null }}
+    if: ${{ !inputs.skip-codeql && needs.detect-languages.outputs.languages != '' && needs.detect-languages.outputs.languages != '[]' && fromJSON(needs.detect-languages.outputs.languages)[0] != null }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -214,13 +214,11 @@ jobs:
   security-summary:
     name: Security Summary
     needs:
-      [
-        detect-languages,
-        codeql-analysis,
-        dependency-review,
-        security-audit,
-        trivy-scan,
-      ]
+      - detect-languages
+      - codeql-analysis
+      - dependency-review
+      - security-audit
+      - trivy-scan
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -239,5 +237,8 @@ jobs:
           RESULT_DEP_REVIEW: ${{ needs.dependency-review.result || 'skipped' }}
           RESULT_SECURITY_AUDIT: ${{ needs.security-audit.result || 'skipped' }}
           RESULT_TRIVY: ${{ needs.trivy-scan.result || 'skipped' }}
+          SKIP_CODEQL: ${{ inputs.skip-codeql }}
+          SKIP_DEP_REVIEW: ${{ inputs.skip-dependency-review }}
+          SKIP_SECURITY_AUDIT: ${{ inputs.skip-security-audit }}
         run: |
           python3 .ghcommon/.github/scripts/generate-security-summary.py
