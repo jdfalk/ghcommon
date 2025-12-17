@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 2.3.0 -->
+<!-- version: 2.3.2 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
 
 # GitHub Common Workflows Repository - AI Agent Instructions
@@ -18,7 +18,10 @@ This repository serves as the **central infrastructure hub** for reusable GitHub
 
 ## 🔧 Critical AI Agent Workflows
 
-**Always use VS Code tasks for operations** - they integrate with `copilot-agent-util` for logging:
+Use VS Code tasks for non-git operations (build, lint, generate). For git operations, prefer:
+1) MCP GitHub tools (preferred), 2) safe-ai-util (fallback), 3) native git (last resort).
+
+Use specialized subagents when possible: CI Workflow Doctor, Dependency Auditor, Documentation Curator, Git Hygiene Guardian, Lint & Format Conductor, Protobuf Builder, Protobuf Cycle Resolver, and others in `.github/prompts/` for targeted expertise.
 
 ### Protobuf Operations (Core Focus)
 ```bash
@@ -30,15 +33,11 @@ This repository serves as the **central infrastructure hub** for reusable GitHub
 - Use `tools/protobuf-cycle-fixer.py` for import cycle resolution
 - Protobuf changes trigger the `protobuf-generation.yml` workflow
 
-### Git Operations with Enhanced Logging
-```bash
-"Git Add All" - Uses copilot-agent-util for consistent logging
-"Git Commit" - Prompts for message, logs to logs/ directory
-"Git Push" - Logs push results and handles authentication
-```
-- **CRITICAL**: All commits MUST use conventional commit format: `type(scope): description`
-- See `.github/instructions/commit-messages.instructions.md` for detailed commit message rules
-- Use `Git Commit` task which integrates with commit message validation
+### Git Operations (Policy)
+- Prefer MCP GitHub tools or safe-ai-util for all git actions (add/commit/push).
+- Avoid VS Code git tasks; keep git automation out of editor tasks.
+- All commits MUST use conventional commit format: `type(scope): description`.
+- See `.github/instructions/commit-messages.instructions.md` for detailed commit message rules.
 
 ## 🎯 Multi-Repository Management Patterns
 
