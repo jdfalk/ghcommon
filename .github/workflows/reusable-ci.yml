@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.2
+# version: 1.6.3
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -97,29 +97,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Get ghcommon workflow ref
-        id: ghcommon-ref
-        run: |
-          ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
-            ref="refs/heads/main"
-          fi
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
-        with:
-          repository: jdfalk/ghcommon
-          ref: ${{ steps.ghcommon-ref.outputs.ref }}
-          path: ghcommon-workflow-scripts
-          sparse-checkout: |
-            .github/workflows/scripts
-          sparse-checkout-cone-mode: false
-
-      - name: Configure workflow script path
-        run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Get ghcommon workflow ref
         id: ghcommon-ref
