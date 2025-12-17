@@ -214,7 +214,7 @@ jobs:
 
       - name: Upload Super Linter results
         if: always() && hashFiles('super-linter-output/**/*') != ''
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: super-linter-output-${{ github.run_id }}-${{ github.run_attempt }}
           path: super-linter-output/
@@ -704,7 +704,7 @@ jobs:
 
       - name: Upload SBOM artifact
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: sbom-${{ github.run_id }}-${{ github.run_attempt }}
           path: sbom.spdx.json
