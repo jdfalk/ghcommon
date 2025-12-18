@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-security.yml
-# version: 1.2.1
+# version: 1.2.2
 # guid: reusable-security-2025-09-24-core-workflow
 
 name: Reusable Security Workflow
@@ -40,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       languages: ${{ steps.detect.outputs.languages }}
+      has-languages: ${{ steps.detect.outputs.has-languages }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -62,7 +63,7 @@ jobs:
   codeql-analysis:
     name: CodeQL Analysis
     needs: detect-languages
-    if: ${{ !inputs.skip-codeql && needs.detect-languages.outputs.languages != '' && needs.detect-languages.outputs.languages != '[]' && fromJSON(needs.detect-languages.outputs.languages)[0] != null }}
+    if: ${{ !inputs.skip-codeql && needs.detect-languages.outputs.has-languages == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

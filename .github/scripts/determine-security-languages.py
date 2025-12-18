@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/scripts/determine-security-languages.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 """Determine which languages need security scanning based on file changes.
@@ -94,7 +94,7 @@ def main() -> None:
         write_github_output("matrix", json.dumps(result["matrix"]))
         write_github_output("has-languages", str(result["has_languages"]).lower())
         write_github_output("language-count", str(result["language_count"]))
-        write_github_output("languages", ",".join(result["languages"]))
+        write_github_output("languages", json.dumps(result["languages"]))  # Output as JSON array
 
         print("✅ Security language determination completed successfully")
 
