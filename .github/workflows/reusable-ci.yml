@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.4
+# version: 1.6.5
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -342,7 +342,16 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node-version }}
-          cache: ${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') != '' && 'npm' || '' }}
+
+      - name: Cache npm dependencies for workflow scripts
+        if: hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') != ''
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-workflow-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-workflow-
+            ${{ runner.os }}-npm-
 
       - name: Lint JavaScript/TypeScript workflow scripts
         run: |
