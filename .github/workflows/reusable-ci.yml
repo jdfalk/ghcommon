@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.3
+# version: 1.6.4
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -614,8 +614,14 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
-          cache-dependency-path: ${{ steps.frontend-dir.outputs.cache-path }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles(format('{0}/package-lock.json', steps.frontend-dir.outputs.dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       - name: Install dependencies
         env:
