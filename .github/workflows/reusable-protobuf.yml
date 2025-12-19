@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-protobuf.yml
-# version: 1.1.1
+# version: 1.1.2
 # guid: f1e2d3c4-b5a6-9788-c0d1-2e3f4a5b6c7d
 
 name: Reusable Protobuf Generation
@@ -84,61 +84,7 @@ jobs:
         id: parse-config
         env:
           CONFIG_PATH: ${{ inputs.config-path }}
-        run: |
-          python3 - <<'PY'
-          from __future__ import annotations
-
-          import json
-          import os
-          from pathlib import Path
-
-          import yaml
-
-          config_path = Path(os.environ["CONFIG_PATH"])
-
-          config = {
-              "languages": {
-                  "go": {"enabled": False},
-                  "python": {"enabled": False},
-                  "rust": {"enabled": False},
-              },
-              "protobuf": {
-                  "enabled": False,
-                  "buf_version": "1.56.0",
-                  "protoc_version": "28.2",
-                  "source_path": "proto",
-                  "output_path": "sdks",
-                  "generate_docs": False,
-              },
-          }
-
-          if config_path.exists():
-              try:
-                  with config_path.open("r", encoding="utf-8") as handle:
-                      loaded_config = yaml.safe_load(handle)
-                  if loaded_config:
-                      config.update(loaded_config)
-              except Exception as exc:  # pylint: disable=broad-except
-                  print(f"Error loading config: {exc}")
-
-          languages = config.get("languages", {})
-          protobuf = config.get("protobuf", {})
-
-          outputs = {
-              "protobuf-enabled": str(protobuf.get("enabled", False)).lower(),
-              "go-enabled": str(languages.get("go", {}).get("enabled", False)).lower(),
-              "python-enabled": str(languages.get("python", {}).get("enabled", False)).lower(),
-              "rust-enabled": str(languages.get("rust", {}).get("enabled", False)).lower(),
-              "buf-version": protobuf.get("buf_version", "1.56.0"),
-              "protoc-version": protobuf.get("protoc_version", "28.2"),
-              "protobuf-config": json.dumps(protobuf),
-          }
-
-          output_path = Path(os.environ["GITHUB_OUTPUT"])
-          with output_path.open("a", encoding="utf-8") as handle:
-              for key, value in outputs.items():
-                  handle.write(f"{key}={value}\n")
-          PY
+        run: python3 .github/workflows/scripts/parse_protobuf_config.py
 
   generate-protobuf:
     name: Generate Protobuf Code
@@ -388,50 +334,7 @@ jobs:
         id: check-artifacts
         env:
           PROTOBUF_OUTPUT: ${{ inputs.output-path }}
-        run: |
-          python3 - <<'PY'
-          from __future__ import annotations
-
-          import os
-          from pathlib import Path
-
-          output_dir = Path(os.environ["PROTOBUF_OUTPUT"]).resolve()
-          go_files = {p.resolve() for p in output_dir.rglob("*.pb.go")}
-          go_files.update(p.resolve() for p in output_dir.rglob("*_grpc.pb.go"))
-
-          python_files = {
-              p.resolve()
-              for pattern in ("*.py", "*.pyi")
-              for p in output_dir.rglob(pattern)
-              if "__pycache__" not in p.parts
-          }
-
-          docs_dir = Path("proto-docs")
-          doc_files = {p.resolve() for p in docs_dir.rglob("*.md")} if docs_dir.exists() else set()
-
-          output_path = Path(os.environ["GITHUB_OUTPUT"])
-          with output_path.open("a", encoding="utf-8") as handle:
-              handle.write(f"go-files-generated={len(go_files)}\n")
-              handle.write(f"python-files-generated={len(python_files)}\n")
-              handle.write(f"docs-generated={'true' if doc_files else 'false'}\n")
-              handle.write(f"artifacts-available={'true' if go_files or python_files else 'false'}\n")
-
-          print("=== Checking generated artifacts ===")
-          print(f"Generated Go files: {len(go_files)}")
-          print(f"Generated Python files: {len(python_files)}")
-          print(f"Documentation generated: {'yes' if doc_files else 'no'}")
-
-          if go_files or python_files:
-              print("✅ Protobuf artifacts generated successfully")
-          else:
-              print("❌ No protobuf artifacts were generated")
-
-          print("Sample generated files:")
-          for path in list(sorted(go_files))[:3]:
-              print(f"  {path}")
-          for path in list(sorted(python_files))[:3]:
-              print(f"  {path}")
-          PY
+        run: python3 .github/workflows/scripts/check_protobuf_artifacts.py
 
   status-summary:
     name: Protobuf Generation Summary
