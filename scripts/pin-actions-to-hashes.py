@@ -100,11 +100,21 @@ def update_workflow_file(file_path: Path, versions: dict[str, tuple[str, str]]) 
     updated = False
 
     for repo, (tag, commit) in versions.items():
-        # Pattern: jdfalk/repo-name@anything
-        pattern = rf"(jdfalk/{repo})@[a-f0-9]{{7,40}}(?:\s+#\s+v[\d.]+)?"
+        # Pattern 1: jdfalk/repo-name@hash (with or without comment)
+        pattern1 = rf"(jdfalk/{repo})@[a-f0-9]{{7,40}}(?:\s+#\s+v[\d.]+)?"
+        # Pattern 2: jdfalk/repo-name@vX.Y.Z (tag reference)
+        pattern2 = rf"(jdfalk/{repo})@v[\d.]+"
+        # Pattern 3: jdfalk/repo-name@v1 or @v2 (major version)
+        pattern3 = rf"(jdfalk/{repo})@v\d+"
+
         replacement = rf"\1@{commit} # {tag}"
 
-        new_content = re.sub(pattern, replacement, content)
+        # Try all patterns
+        new_content = content
+        new_content = re.sub(pattern1, replacement, new_content)
+        new_content = re.sub(pattern2, replacement, new_content)
+        new_content = re.sub(pattern3, replacement, new_content)
+
         if new_content != content:
             content = new_content
             updated = True
