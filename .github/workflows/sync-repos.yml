@@ -1,0 +1,65 @@
+name: Sync .github Structure to Repos
+
+on:
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: 'Comma-separated list of repos to sync (owner/repo format)'
+        required: true
+        default: 'jdfalk/audiobook-organizer,jdfalk/apt-cacher-go,jdfalk/subtitle-manager'
+      branch:
+        description: 'Branch name for sync changes'
+        required: false
+        default: 'chore/sync-copilot-infrastructure'
+      dry_run:
+        description: 'Run in dry-run mode (no changes)'
+        required: false
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+        default: 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: Sync to Target Repos
+    steps:
+      - name: Checkout ghcommon
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run sync script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/intelligent_sync_to_repos.py \
+            --repos "${{ github.event.inputs.repos }}" \
+            --branch "${{ github.event.inputs.branch }}" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Upload sync summary
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: sync-summary
+          path: intelligent-sync-summary.log
+          retention-days: 30
+
+      - name: Comment on workflow run
+        if: always()
+        run: |
+          echo "## Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f intelligent-sync-summary.log ]; then
+            cat intelligent-sync-summary.log >> $GITHUB_STEP_SUMMARY
+          fi
