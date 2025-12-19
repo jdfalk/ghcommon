@@ -80,6 +80,7 @@ jobs:
           fi
 
       - name: Upload documentation artifact
+        id: upload
         if: steps.detect.outputs.tool != 'none'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
@@ -110,13 +111,14 @@ jobs:
       - name: Download documentation artifact
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         if: env.DOCS_DEPLOY_TOKEN != ''
+        continue-on-error: true
         with:
           name: documentation-build
           path: docs-build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
-        if: env.DOCS_DEPLOY_TOKEN != ''
+        if: env.DOCS_DEPLOY_TOKEN != '' && hashFiles('docs-build/**') != ''
         with:
           github_token: ${{ env.DOCS_DEPLOY_TOKEN }}
           publish_dir: docs-build/site
