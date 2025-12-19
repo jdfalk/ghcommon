@@ -1394,3 +1394,369 @@ Error: proto directory 'proto' does not exist
   run: |
     python3 "${WORKFLOW_SCRIPTS}/ci_workflow.py"
 ```
+
+### Failure Category 4: Secret and Authentication Issues
+
+**Affected Workflows:**
+
+- `release-docker.yml` - Docker registry authentication
+- `release-python.yml` - PyPI token authentication
+- `sync-repos.yml` - GitHub token for cross-repo operations
+- `manager-sync-dispatcher.yml` - PAT token for workflow dispatch
+
+**Root Causes:**
+
+1. **Missing or Expired Secrets**
+
+**Problem:** Workflows fail when secrets are missing or expired
+
+**Example failures:**
+
+```
+Error: Input required and not supplied: token
+Error: 401 Unauthorized - Invalid or expired token
+Error: 403 Forbidden - Token missing required scopes
+```
+
+**Current problematic patterns:**
+
+```yaml
+# No fallback or validation
+- name: Publish to PyPI
+  env:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+  run: twine upload dist/*
+```
+
+**Fix:** Add validation and better error messages
+
+```yaml
+- name: Validate PyPI token
+  run: |
+    if [ -z "${{ secrets.PYPI_TOKEN }}" ]; then
+      echo "::error::PYPI_TOKEN secret is not set"
+      echo "Please configure PYPI_TOKEN in repository secrets"
+      echo "See: https://docs.github.com/en/actions/security-guides/encrypted-secrets"
+      exit 1
+    fi
+
+- name: Publish to PyPI
+  env:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+  run: |
+    # Test authentication first
+    twine check dist/*
+
+    # Upload with retry
+    twine upload dist/* --verbose
+```
+
+2. **Insufficient Token Permissions**
+
+**Problem:** Tokens lack required scopes for operations
+
+**Example from sync-repos.yml:**
+
+```yaml
+# Token needs repo, workflow, and admin:org scopes
+- name: Trigger workflow
+  uses: actions/github-script@v7
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }} # Insufficient permissions!
+```
+
+**Fix:** Use PAT with correct scopes
+
+```yaml
+- name: Trigger workflow
+  uses: actions/github-script@v7
+  with:
+    github-token: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }} # PAT with workflow scope
+    script: |
+      await github.rest.actions.createWorkflowDispatch({
+        owner: context.repo.owner,
+        repo: 'target-repo',
+        workflow_id: 'workflow.yml',
+        ref: 'main'
+      });
+```
+
+**Required secrets checklist:**
+
+- `PYPI_TOKEN` - For Python package publishing
+- `CARGO_REGISTRY_TOKEN` - For Rust crate publishing
+- `NPM_TOKEN` - For npm package publishing
+- `DOCKER_USERNAME` / `DOCKER_PASSWORD` - For Docker registry
+- `WORKFLOW_DISPATCH_TOKEN` - PAT with `repo` and `workflow` scopes
+- `SYNC_TOKEN` - PAT with `repo` scope for cross-repo sync
+
+3. **Docker Registry Authentication**
+
+**Problem:** Docker login fails or uses wrong credentials
+
+**Current code in release-docker.yml:**
+
+```yaml
+- name: Login to Docker Hub
+  uses: docker/login-action@v3
+  with:
+    username: ${{ secrets.DOCKER_USERNAME }}
+    password: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+**Issues:**
+
+- No validation that secrets exist
+- No fallback to GitHub Container Registry
+- No error handling for authentication failures
+
+**Fix:**
+
+```yaml
+- name: Determine Docker registry
+  id: registry
+  run: |
+    if [ -n "${{ secrets.DOCKER_USERNAME }}" ] && [ -n "${{ secrets.DOCKER_PASSWORD }}" ]; then
+      echo "registry=docker.io" >> $GITHUB_OUTPUT
+      echo "username=${{ secrets.DOCKER_USERNAME }}" >> $GITHUB_OUTPUT
+      echo "Using Docker Hub"
+    else
+      echo "registry=ghcr.io" >> $GITHUB_OUTPUT
+      echo "username=${{ github.actor }}" >> $GITHUB_OUTPUT
+      echo "Using GitHub Container Registry"
+    fi
+
+- name: Login to Container Registry
+  uses: docker/login-action@v3
+  with:
+    registry: ${{ steps.registry.outputs.registry }}
+    username: ${{ steps.registry.outputs.username }}
+    password:
+      ${{ steps.registry.outputs.registry == 'docker.io' && secrets.DOCKER_PASSWORD ||
+      secrets.GITHUB_TOKEN }}
+```
+
+---
+
+### Failure Category 5: Matrix Build Inconsistencies
+
+**Affected Workflows:**
+
+- `reusable-ci.yml` - Multi-OS and multi-Python builds
+- `test-super-linter.yml` - Linter tests across platforms
+
+**Root Causes:**
+
+1. **Platform-Specific Failures**
+
+**Problem:** Tests pass on Linux but fail on macOS/Windows
+
+**Example from reusable-ci.yml:**
+
+```yaml
+strategy:
+  matrix:
+    os: [ubuntu-latest, macos-latest, windows-latest]
+    python-version: ['3.11', '3.12', '3.13']
+```
+
+**Common failures:**
+
+- Path separators (`/` vs `\`)
+- Line endings (LF vs CRLF)
+- Case sensitivity
+- Available system commands
+
+**Fix:** Add platform normalization
+
+```yaml
+- name: Setup platform-specific settings
+  shell: bash
+  run: |
+    # Normalize paths
+    if [ "$RUNNER_OS" == "Windows" ]; then
+      echo "PATH_SEP=\\" >> $GITHUB_ENV
+      echo "LINE_ENDING=CRLF" >> $GITHUB_ENV
+    else
+      echo "PATH_SEP=/" >> $GITHUB_ENV
+      echo "LINE_ENDING=LF" >> $GITHUB_ENV
+    fi
+
+    # Set Python executable name
+    if [ "$RUNNER_OS" == "Windows" ]; then
+      echo "PYTHON=python" >> $GITHUB_ENV
+    else
+      echo "PYTHON=python3" >> $GITHUB_ENV
+    fi
+
+- name: Run tests (cross-platform)
+  shell: bash
+  run: |
+    ${{ env.PYTHON }} -m pytest tests/ \
+      --tb=short \
+      --maxfail=5
+```
+
+2. **Python Version Incompatibilities**
+
+**Problem:** Code uses features only available in Python 3.12+ but matrix includes 3.11
+
+**Example failures:**
+
+```python
+# Using 3.12+ type syntax fails on 3.11
+def process(data: list[dict[str, str]]) -> None:  # Error on Python 3.11
+```
+
+**Fix:** Either:
+
+1. Use `from __future__ import annotations` (preferred)
+2. Adjust matrix to only include compatible versions
+3. Use conditional imports
+
+```python
+# Option 1: Enable postponed evaluation (works on 3.11+)
+from __future__ import annotations
+
+def process(data: list[dict[str, str]]) -> None:
+    pass
+
+# Option 2: Use typing module for compatibility
+from typing import List, Dict
+
+def process(data: List[Dict[str, str]]) -> None:
+    pass
+```
+
+3. **Flaky Tests in Matrix**
+
+**Problem:** Tests pass sometimes but fail randomly, especially on certain OS/Python combos
+
+**Fix:** Add retries and better isolation
+
+```yaml
+- name: Run tests with retry
+  uses: nick-fields/retry@v2
+  with:
+    timeout_minutes: 10
+    max_attempts: 3
+    command: |
+      python -m pytest tests/ \
+        --tb=short \
+        --maxfail=5 \
+        -v \
+        --durations=10
+```
+
+---
+
+### Failure Category 6: Script Import and Module Errors
+
+**Affected Workflows:**
+
+- All workflows using Python scripts in `.github/workflows/scripts/`
+
+**Root Causes:**
+
+1. **Module Not Found Errors**
+
+**Problem:** Scripts cannot import from each other
+
+**Example failure:**
+
+```
+ModuleNotFoundError: No module named 'workflow_common'
+```
+
+**Current problematic setup:**
+
+```python
+# In .github/workflows/scripts/ci_workflow.py
+from workflow_common import setup_logging  # Fails!
+```
+
+**Root cause:** `.github/workflows/scripts/` is not a Python package (no `__init__.py`)
+
+**Fix:**
+
+```bash
+# Create package structure
+.github/workflows/scripts/
+├── __init__.py (empty)
+├── workflow_common.py
+├── ci_workflow.py
+└── ...
+```
+
+Update scripts to use absolute imports:
+
+```python
+# In ci_workflow.py
+import sys
+from pathlib import Path
+
+# Add scripts directory to Python path
+SCRIPTS_DIR = Path(__file__).parent
+sys.path.insert(0, str(SCRIPTS_DIR))
+
+from workflow_common import setup_logging
+```
+
+**Better fix:** Create proper package
+
+```python
+# .github/workflows/scripts/__init__.py
+"""GitHub Actions workflow automation scripts."""
+
+__version__ = "1.0.0"
+
+# .github/workflows/scripts/common/__init__.py
+"""Common utilities for workflow scripts."""
+
+from .logging import setup_logging
+from .paths import get_workspace_root
+
+__all__ = ["setup_logging", "get_workspace_root"]
+```
+
+2. **Dependency Imports Not Available**
+
+**Problem:** Scripts import packages not installed in workflow
+
+**Example:**
+
+```python
+import requests  # Not in default Python environment
+import yaml      # Not in default Python environment
+```
+
+**Fix:** Install dependencies before running scripts
+
+```yaml
+- name: Install script dependencies
+  run: |
+    pip install --upgrade pip
+    pip install requests pyyaml
+
+- name: Run workflow script
+  run: python3 .github/workflows/scripts/ci_workflow.py
+```
+
+**Better fix:** Create requirements file
+
+```txt
+# .github/workflows/scripts/requirements.txt
+requests>=2.31.0
+pyyaml>=6.0.1
+python-dateutil>=2.8.2
+```
+
+```yaml
+- name: Install script dependencies
+  run: |
+    pip install -r .github/workflows/scripts/requirements.txt
+```
+
+---
