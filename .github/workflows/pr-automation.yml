@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.5.1
+# version: 4.5.2
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
@@ -293,87 +293,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
-        run: |
-          set -euo pipefail
-          python <<'PY'
-          import os
-          import requests
-          from typing import Iterable, List
-
-
-          def analyze_pr_content(title: str, body: str | None, changed_files: Iterable[str]) -> List[str]:
-              """Basic intelligent labeling based on content analysis."""
-              labels: set[str] = set()
-              text = f"{title} {(body or '')}".lower()
-
-              if any(word in text for word in ("fix", "bug", "error", "issue", "problem")):
-                  labels.add("bug")
-              if any(word in text for word in ("feature", "add", "new", "implement")):
-                  labels.add("enhancement")
-              if any(word in text for word in ("doc", "readme", "documentation")):
-                  labels.add("documentation")
-              if any(word in text for word in ("test", "testing", "spec")):
-                  labels.add("tests")
-
-              for file_path in changed_files:
-                  lower_path = file_path.lower()
-                  if lower_path.endswith((".md", ".rst")):
-                      labels.add("documentation")
-                  elif lower_path.endswith(".go"):
-                      labels.add("go")
-                  elif lower_path.endswith((".js", ".ts", ".jsx", ".tsx")):
-                      labels.add("frontend")
-                  elif lower_path.endswith(".py"):
-                      labels.add("python")
-                  elif lower_path.endswith(("dockerfile", ".docker")):
-                      labels.add("docker")
-                  elif "test" in lower_path:
-                      labels.add("tests")
-
-              return sorted(labels)
-
-
-          github_token = os.environ.get("GITHUB_TOKEN")
-          repo = os.environ.get("GITHUB_REPOSITORY")
-          pr_number = os.environ.get("PR_NUMBER")
-
-          if not all((github_token, repo, pr_number)):
-              raise SystemExit("Missing required environment variables.")
-
-          headers = {
-              "Authorization": f"token {github_token}",
-              "Accept": "application/vnd.github.v3+json",
-          }
-
-          session = requests.Session()
-          session.headers.update(headers)
-
-          pr_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}"
-          pr_response = session.get(pr_url, timeout=30)
-          pr_response.raise_for_status()
-          pr_data = pr_response.json()
-
-          files_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files?per_page=100"
-          files_response = session.get(files_url, timeout=30)
-          files_response.raise_for_status()
-          changed_files = [item["filename"] for item in files_response.json()]
-
-          suggested_labels = analyze_pr_content(
-              pr_data.get("title", ""),
-              pr_data.get("body"),
-              changed_files,
-          )
-
-          print(f"Suggested labels for PR #{pr_number}: {suggested_labels}")
-
-          if suggested_labels:
-              labels_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/labels"
-              response = session.post(labels_url, json={"labels": suggested_labels}, timeout=30)
-              if response.ok:
-                  print(f"✅ Successfully applied labels: {suggested_labels}")
-              else:
-                  print(f"❌ Failed to apply labels: {response.status_code}")
-          PY
+        run: python .github/workflows/scripts/intelligent_labeling.py
 
   # PR size and complexity analysis
   pr-analysis:

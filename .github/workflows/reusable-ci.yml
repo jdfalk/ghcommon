@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.5
+# version: 1.6.6
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -580,21 +580,7 @@ jobs:
 
       - name: Get frontend working directory
         id: frontend-dir
-        run: |
-          WORKING_DIR=$(python3 - <<'PY'
-          import json
-
-          CONFIG = json.loads('${{ needs.load-config.outputs.config }}')
-          print(CONFIG.get("working_directories", {}).get("frontend", "."))
-          PY
-          )
-          : "${WORKING_DIR:=.}"
-          echo "dir=${WORKING_DIR}" >> "$GITHUB_OUTPUT"
-          if [ "${WORKING_DIR}" != "." ]; then
-            echo "cache-path=${WORKING_DIR}/package-lock.json" >> "$GITHUB_OUTPUT"
-          else
-            echo "cache-path=package-lock.json" >> "$GITHUB_OUTPUT"
-          fi
+        run: python3 .github/workflows/scripts/get_frontend_working_dir.py
 
       - name: Get ghcommon workflow ref
         id: ghcommon-ref

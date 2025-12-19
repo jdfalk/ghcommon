@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# file: .github/workflows/scripts/parse_protobuf_config.py
+# version: 1.0.1
+# guid: 2f1d0c3b-4a5e-6f7a-8b9c-0d1e2f3a4b5c
+
 """Parse protobuf configuration and emit workflow outputs."""
 
 from __future__ import annotations

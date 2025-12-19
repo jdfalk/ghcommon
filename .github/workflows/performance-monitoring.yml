@@ -1,5 +1,5 @@
 # file: .github/workflows/performance-monitoring.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: performance-monitoring-workflow-2025
 
 name: Performance Monitoring
@@ -75,30 +75,7 @@ jobs:
 
       - name: Capture benchmark metrics
         id: capture
-        run: |
-          python3 - <<'PY'
-          import json
-          import math
-          import os
-
-          with open("benchmarks/rust.json", "r", encoding="utf-8") as handle:
-              entry = json.load(handle)[0]
-
-          def fmt(value: float | None) -> str:
-              if value is None or (isinstance(value, float) and math.isnan(value)):
-                  return "n/a"
-              return f"{value:.6f}"
-
-          average = entry.get("average_seconds", entry.get("value"))
-          best = entry.get("best_seconds", entry.get("value"))
-          worst = entry.get("worst_seconds", entry.get("value"))
-
-          output = os.environ["GITHUB_OUTPUT"]
-          with open(output, "a", encoding="utf-8") as fh:
-              fh.write(f"average={fmt(average)}\n")
-              fh.write(f"best={fmt(best)}\n")
-              fh.write(f"worst={fmt(worst)}\n")
-          PY
+        run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/rust.json
 
       - name: Publish benchmark result
         uses: ./github-action-benchmark
@@ -167,30 +144,7 @@ jobs:
 
       - name: Capture benchmark metrics
         id: capture
-        run: |
-          python3 - <<'PY'
-          import json
-          import math
-          import os
-
-          with open("benchmarks/node.json", "r", encoding="utf-8") as handle:
-              entry = json.load(handle)[0]
-
-          def fmt(value: float | None) -> str:
-              if value is None or (isinstance(value, float) and math.isnan(value)):
-                  return "n/a"
-              return f"{value:.6f}"
-
-          average = entry.get("average_seconds", entry.get("value"))
-          best = entry.get("best_seconds", entry.get("value"))
-          worst = entry.get("worst_seconds", entry.get("value"))
-
-          output = os.environ["GITHUB_OUTPUT"]
-          with open(output, "a", encoding="utf-8") as fh:
-              fh.write(f"average={fmt(average)}\n")
-              fh.write(f"best={fmt(best)}\n")
-              fh.write(f"worst={fmt(worst)}\n")
-          PY
+        run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/node.json
 
       - name: Publish benchmark result
         uses: ./github-action-benchmark
@@ -260,30 +214,7 @@ jobs:
 
       - name: Capture benchmark metrics
         id: capture
-        run: |
-          python3 - <<'PY'
-          import json
-          import math
-          import os
-
-          with open("benchmarks/python.json", "r", encoding="utf-8") as handle:
-              entry = json.load(handle)[0]
-
-          def fmt(value: float | None) -> str:
-              if value is None or (isinstance(value, float) and math.isnan(value)):
-                  return "n/a"
-              return f"{value:.6f}"
-
-          average = entry.get("average_seconds", entry.get("value"))
-          best = entry.get("best_seconds", entry.get("value"))
-          worst = entry.get("worst_seconds", entry.get("value"))
-
-          output = os.environ["GITHUB_OUTPUT"]
-          with open(output, "a", encoding="utf-8") as fh:
-              fh.write(f"average={fmt(average)}\n")
-              fh.write(f"best={fmt(best)}\n")
-              fh.write(f"worst={fmt(worst)}\n")
-          PY
+        run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/python.json
 
       - name: Publish benchmark result
         uses: ./github-action-benchmark

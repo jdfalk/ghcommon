@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.0
+# version: 2.6.1
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -444,20 +444,14 @@ jobs:
         env:
           RELEASE_OUTCOME: ${{ steps.release.outcome }}
         run: |
-          python3 - <<'PY'
-          from __future__ import annotations
-
-          import os
-          from pathlib import Path
-
-          outcome = os.environ.get("RELEASE_OUTCOME", "failure")
-          created = outcome == "success"
-          output_path = Path(os.environ["GITHUB_OUTPUT"])
-          output_path.write_text(
-              f"created={'true' if created else 'false'}\nrelease-created={'true' if created else 'false'}\n",
-              encoding="utf-8",
-          )
-          PY
+          created=false
+          if [ "${RELEASE_OUTCOME:-failure}" = "success" ]; then
+            created=true
+          fi
+          {
+            echo "created=${created}"
+            echo "release-created=${created}"
+          } >> "$GITHUB_OUTPUT"
 
   publish-github-packages:
     name: Publish GitHub Packages
@@ -513,35 +507,24 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
           GHCOMMON_SCRIPTS_DIR: ${{ env.GHCOMMON_SCRIPTS_DIR }}
         run: |
-          python3 - <<'PY'
-          from __future__ import annotations
+          set -euo pipefail
+          SCRIPT_PATH="${GHCOMMON_SCRIPTS_DIR}/publish_to_github_packages.py"
 
-          import os
-          import subprocess
-          from pathlib import Path
+          ARGS=(
+            "python3"
+            "$SCRIPT_PATH"
+            "--language" "${PRIMARY_LANGUAGE:-unknown}"
+            "--tag" "${RELEASE_TAG:-}"
+            "--branch" "${BRANCH_NAME:-}"
+            "--artifacts-dir" "packages"
+            "--require-github"
+          )
 
-          scripts_dir = os.environ["GHCOMMON_SCRIPTS_DIR"]
-          script_path = Path(scripts_dir) / "publish_to_github_packages.py"
+          if [ "${RELEASE_STRATEGY:-}" = "stable" ]; then
+            ARGS+=("--is-stable")
+          fi
 
-          args = [
-              "python3",
-              str(script_path),
-              "--language",
-              os.environ.get("PRIMARY_LANGUAGE", "unknown"),
-              "--tag",
-              os.environ.get("RELEASE_TAG", ""),
-              "--branch",
-              os.environ.get("BRANCH_NAME", ""),
-              "--artifacts-dir",
-              "packages",
-              "--require-github",
-          ]
-
-          if os.environ.get("RELEASE_STRATEGY") == "stable":
-              args.append("--is-stable")
-
-          subprocess.run(args, check=True)
-          PY
+          "${ARGS[@]}"
 
   # Final status check
   build-status:

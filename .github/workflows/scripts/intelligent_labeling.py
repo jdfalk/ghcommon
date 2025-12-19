@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
+# file: .github/workflows/scripts/intelligent_labeling.py
+# version: 1.1.0
+# guid: 4c9b0d7e-2f14-4c62-8f1d-6b1b3a5e7c9d
+
 """Apply intelligent labels to GitHub PRs."""
 
 from __future__ import annotations
