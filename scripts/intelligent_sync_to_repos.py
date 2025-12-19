@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/intelligent_sync_to_repos.py
-# version: 1.1.0
+# version: 1.3.0
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
 """Intelligent sync script that understands the new modular .github structure.
@@ -10,6 +10,8 @@ This script:
 2. Cleans up old files that have been moved/restructured
 3. Preserves repo-specific files
 4. Creates proper VS Code symlinks for Copilot integration
+5. Automatically creates PRs for review and merge
+6. Closes superseded PRs from previous sync attempts
 """
 
 import argparse
@@ -148,7 +150,9 @@ def run(cmd: list[str], cwd=None, check=True, dry_run=False):
     if result.stdout:
         logging.info(result.stdout)
     if result.stderr:
-        logging.info(result.stderr)
+        logging.error(result.stderr)
+    if check and result.returncode != 0:
+        raise subprocess.CalledProcessError(result.returncode, cmd, result.stdout, result.stderr)
     return result
 
 
@@ -214,21 +218,21 @@ def sync_to_repo(repo: str, branch: str, gh_token: str, summary: list[str], dry_
         )
         return
 
-    repo_url = f"https://{gh_token}:x-oauth-basic@github.com/{repo}.git"
+    # Use GitHub token in URL for authentication
+    repo_url = f"https://x-oauth-basic:{gh_token}@github.com/{repo}.git"
 
     with tempfile.TemporaryDirectory() as tmpdir:
         # Clone the target repo
         run(["git", "clone", "--depth=1", repo_url, tmpdir], dry_run=dry_run)
 
         # Create/checkout branch
-        try:
-            run(
-                ["git", "checkout", branch],
-                cwd=tmpdir,
-                check=False,
-                dry_run=dry_run,
-            )
-        except subprocess.CalledProcessError:
+        result = run(
+            ["git", "checkout", branch],
+            cwd=tmpdir,
+            check=False,
+            dry_run=dry_run,
+        )
+        if result and result.returncode != 0:
             run(["git", "checkout", "-b", branch], cwd=tmpdir, dry_run=dry_run)
 
         changes_made = False
@@ -306,16 +310,117 @@ the new VS Code Copilot customization features."""
                     cwd=tmpdir,
                     dry_run=dry_run,
                 )
+            except subprocess.CalledProcessError:
+                summary.append(f"[SKIP] {repo}: No changes to commit")
+                return
+
+            try:
                 run(
                     ["git", "push", "-u", "origin", branch, "--force"],
                     cwd=tmpdir,
                     dry_run=dry_run,
                 )
                 summary.append(f"[OK] {repo}: Synced to branch {branch}")
-            except subprocess.CalledProcessError:
-                summary.append(f"[SKIP] {repo}: No changes to commit")
+
+                # Create or update PR after successful sync
+                if not dry_run:
+                    create_or_update_pr(repo, branch, summary)  # PR creation handled separately
+            except subprocess.CalledProcessError as e:
+                summary.append(f"[FAIL] {repo}: Push failed - {e!s}")
         else:
             summary.append(f"[SKIP] {repo}: No changes needed")
+
+
+def create_or_update_pr(repo, branch, summary):
+    """Create a PR for the synced changes or update existing one.
+
+    Also closes any superseded PRs from previous sync attempts.
+    """
+    owner, repo_name = repo.split("/")
+
+    # Close any existing open PRs for sync branches (superseded ones)
+    try:
+        result = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "list",
+                "--repo",
+                repo,
+                "--state",
+                "open",
+                "--json",
+                "number,headRefName,title",
+                "-q",
+                '.[] | select(.headRefName | startswith("chore/sync") or startswith("feature/sync")) | .number',
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        existing_prs = [int(x) for x in result.stdout.strip().split("\n") if x]
+
+        for pr_num in existing_prs:
+            logging.info(f"  Closing superseded PR #{pr_num}")
+            subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "close",
+                    str(pr_num),
+                    "--repo",
+                    repo,
+                    "--delete-branch",
+                ],
+                check=True,
+                capture_output=True,
+            )
+    except subprocess.CalledProcessError as e:
+        logging.warning(f"Could not close existing PRs: {e}")
+
+    # Create new PR
+    try:
+        result = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--repo",
+                repo,
+                "--base",
+                "main",
+                "--head",
+                branch,
+                "--title",
+                "chore(sync): sync .github structure from ghcommon",
+                "--body",
+                """## Overview
+Automated sync of centralized .github configuration from [jdfalk/ghcommon](https://github.com/jdfalk/ghcommon).
+
+## Changes
+- Updated instruction files from `.github/instructions/`
+- Synced prompt files from `.github/prompts/`
+- Added GitHub Copilot agents from `.github/agents/`
+- Created VS Code Copilot symlinks for proper integration
+- Removed deprecated code-style files
+
+## Review & Merge
+This PR is ready for immediate approval and merge once CI passes.
+The sync process is automated and this PR represents the latest state of the centralized configuration.
+
+## Related
+See [jdfalk/ghcommon](https://github.com/jdfalk/ghcommon) for the source of truth.""",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        pr_url = result.stdout.strip()
+        summary.append(f"[PR] {repo}: Created PR at {pr_url}")
+        logging.info(f"  Created PR: {pr_url}")
+    except subprocess.CalledProcessError as e:
+        logging.warning(f"Could not create PR for {repo}: {e.stderr}")
+        summary.append(f"[WARN] {repo}: Could not create PR - {e.stderr.strip()}")
 
 
 def main():
