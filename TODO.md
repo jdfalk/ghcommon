@@ -41,3 +41,220 @@
 - [x] Ensure helper scripts API reference reflects new modules and features
 - [x] Validate workflow catalog entries for new reusable workflows (CI, release, docs, maintenance,
       advanced)
+
+## 🔥 Critical - Action Repository CI Failures
+
+### Priority 1: Critical Failures (Missing Core Files)
+
+#### #todo release-docker-action - Create Missing Files
+
+**Status:** Blocked **Priority:** Critical **Repository:**
+[release-docker-action](https://github.com/jdfalk/release-docker-action)
+
+**Issues:**
+
+- Missing action.yml completely
+- Missing README.md
+- Missing test Dockerfile
+- Tests failing due to missing files
+
+**Action Items:**
+
+1. Create action.yml with complete action definition
+2. Create README.md with usage documentation
+3. Create test structure with sample Dockerfile
+4. Implement Docker build functionality
+5. Fix and test CI workflow
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-docker-action/TODO.md`
+
+---
+
+#### #todo release-go-action - Create Missing Files
+
+**Status:** Blocked **Priority:** Critical **Repository:**
+[release-go-action](https://github.com/jdfalk/release-go-action)
+
+**Issues:**
+
+- Missing action.yml completely
+- Missing README.md
+- No action implementation
+
+**Action Items:**
+
+1. Create action.yml with Go build configuration
+2. Create README.md with usage documentation
+3. Implement cross-compilation support
+4. Add release artifact handling
+5. Fix and test CI workflow
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-go-action/TODO.md`
+
+---
+
+### Priority 2: High Priority Failures (Lint/Config Issues)
+
+#### #todo auto-module-tagging-action - Fix YAML Linting
+
+**Status:** Open **Priority:** High **Repository:**
+[auto-module-tagging-action](https://github.com/jdfalk/auto-module-tagging-action)
+
+**Issues:**
+
+- 10 YAML line length violations (lines too long)
+- Test execution failing (exit code 128)
+- Cache restore warnings
+
+**Action Items:**
+
+1. Fix all yamllint line length errors in action.yml
+2. Investigate and fix test execution error (exit 128)
+3. Fix Go module cache configuration
+4. Test and verify CI passes
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/auto-module-tagging-action/TODO.md`
+
+---
+
+#### #todo release-frontend-action - Fix YAML Linting
+
+**Status:** Open **Priority:** High **Repository:**
+[release-frontend-action](https://github.com/jdfalk/release-frontend-action)
+
+**Issues:**
+
+- 6 YAML line length violations
+- Missing README.md
+- Cache dependencies error
+
+**Action Items:**
+
+1. Fix all yamllint line length errors in action.yml
+2. Create comprehensive README.md
+3. Fix cache dependencies configuration
+4. Test and verify CI passes
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-frontend-action/TODO.md`
+
+---
+
+#### #todo release-rust-action - Fix Cargo.toml Error
+
+**Status:** Open **Priority:** High **Repository:**
+[release-rust-action](https://github.com/jdfalk/release-rust-action)
+
+**Issues:**
+
+- rust-cache action cannot find Cargo.toml
+- Incorrectly treating composite action repo as Rust project
+- Test workflow needs restructuring
+
+**Action Items:**
+
+1. Remove or conditionally skip rust-cache in CI
+2. Restructure test workflow for composite action testing
+3. Create sample Rust project for integration testing
+4. Test and verify CI passes
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-rust-action/TODO.md`
+
+---
+
+### Priority 3: Working (No Immediate Action Required)
+
+#### #todo release-protobuf-action - Monitor
+
+**Status:** Passing **Priority:** Low **Repository:**
+[release-protobuf-action](https://github.com/jdfalk/release-protobuf-action)
+
+**Notes:**
+
+- CI currently passing
+- No failures detected
+- Ready for migration to reusable workflows
+
+**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-protobuf-action/TODO.md`
+
+---
+
+## 🔄 Migration to Reusable Workflows
+
+### #todo Phase 1: Fix All CI Failures First
+
+**Status:** In Progress **Priority:** Critical **Dependencies:** All above CI fixes must be
+completed
+
+**Completion Criteria:**
+
+- [ ] release-docker-action: CI passing
+- [ ] release-go-action: CI passing
+- [ ] auto-module-tagging-action: CI passing
+- [ ] release-frontend-action: CI passing
+- [ ] release-rust-action: CI passing
+- [ ] release-protobuf-action: CI verified passing
+
+---
+
+### #todo Phase 2: Migrate to Reusable Workflows
+
+**Status:** Blocked **Priority:** High **Dependencies:** Phase 1 must complete first
+
+**Action Items:**
+
+1. Update each action to use `.github/workflows/reusable-action-ci.yml`
+2. Update each action to use `.github/workflows/reusable-release.yml`
+3. Test workflows in each repository
+4. Pull and verify logs for each workflow run
+5. Document any issues or customizations needed
+
+**Repositories to Migrate:**
+
+- [ ] release-docker-action
+- [ ] release-go-action
+- [ ] auto-module-tagging-action
+- [ ] release-frontend-action
+- [ ] release-rust-action
+- [ ] release-protobuf-action
+
+---
+
+### #todo Phase 3: Continuous Testing and Validation
+
+**Status:** Blocked **Priority:** High **Dependencies:** Phase 2 must complete first
+
+**Testing Plan:**
+
+1. Run CI workflows in each repository
+2. Pull and analyze logs from each run
+3. Verify all jobs pass successfully
+4. Test release workflows with version bumps
+5. Verify artifact creation and uploads
+6. Document any issues found
+7. Iterate until all workflows are stable
+
+**Success Metrics:**
+
+- All CI workflows passing
+- All release workflows creating proper artifacts
+- Logs showing no errors or warnings
+- Documentation updated with any learnings
+
+---
+
+## 📊 Summary Status
+
+**Total Repositories:** 6 **Critical Failures:** 2 (release-docker-action, release-go-action) **High
+Priority Failures:** 3 (auto-module-tagging-action, release-frontend-action, release-rust-action)
+**Passing:** 1 (release-protobuf-action)
+
+**Estimated Timeline:**
+
+- Phase 1 (Fix CI): 2-3 days
+- Phase 2 (Migration): 1-2 days
+- Phase 3 (Testing): 1-2 days
+- **Total:** 4-7 days
+
+---
+
+**Last Updated:** 2025-12-19 **Next Review:** After critical failures are resolved
