@@ -336,8 +336,6 @@ def create_or_update_pr(repo, branch, summary):
 
     Also closes any superseded PRs from previous sync attempts.
     """
-    owner, repo_name = repo.split("/")
-
     # Close any existing open PRs for sync branches (superseded ones)
     try:
         result = subprocess.run(
