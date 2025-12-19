@@ -225,6 +225,28 @@ def sync_to_repo(repo: str, branch: str, gh_token: str, summary: list[str], dry_
         # Clone the target repo
         run(["git", "clone", "--depth=1", repo_url, tmpdir], dry_run=dry_run)
 
+        # Configure git credentials for push
+        run(
+            ["git", "config", "credential.helper", "store"],
+            cwd=tmpdir,
+            dry_run=dry_run,
+        )
+        run(
+            ["git", "config", "user.name", "ghcommon-sync-bot"],
+            cwd=tmpdir,
+            dry_run=dry_run,
+        )
+        run(
+            [
+                "git",
+                "config",
+                "user.email",
+                "ghcommon-sync-bot@users.noreply.github.com",
+            ],
+            cwd=tmpdir,
+            dry_run=dry_run,
+        )
+
         # Create/checkout branch
         result = run(
             ["git", "checkout", branch],
@@ -278,21 +300,6 @@ def sync_to_repo(repo: str, branch: str, gh_token: str, summary: list[str], dry_
         # 4. Commit and push changes
         if changes_made:
             run(["git", "add", "."], cwd=tmpdir, dry_run=dry_run)
-            run(
-                ["git", "config", "user.name", "ghcommon-sync-bot"],
-                cwd=tmpdir,
-                dry_run=dry_run,
-            )
-            run(
-                [
-                    "git",
-                    "config",
-                    "user.email",
-                    "ghcommon-sync-bot@users.noreply.github.com",
-                ],
-                cwd=tmpdir,
-                dry_run=dry_run,
-            )
 
             commit_msg = """chore(sync): sync .github structure from ghcommon
 
