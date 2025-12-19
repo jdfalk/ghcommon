@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # file: scripts/intelligent_sync_to_repos.py
-# version: 1.0.0
+# version: 1.1.0
 # guid: a1b2c3d4-e5f6-7890-1234-567890abcdef
 
 """Intelligent sync script that understands the new modular .github structure.
 
 This script:
-1. Syncs the new modular structure (.github/instructions/, .github/prompts/)
+1. Syncs the new modular structure (.github/instructions/, .github/prompts/, .github/agents/)
 2. Cleans up old files that have been moved/restructured
 3. Preserves repo-specific files
 4. Creates proper VS Code symlinks for Copilot integration
@@ -38,6 +38,27 @@ MANAGED_FILES = {
     ".github/instructions/r.instructions.md",
     ".github/instructions/shell.instructions.md",
     ".github/instructions/typescript.instructions.md",
+    ".github/instructions/commit-messages.instructions.md",
+    ".github/instructions/pull-request-descriptions.instructions.md",
+    # Agent files for GitHub Copilot
+    ".github/agents/CI Workflow Doctor.agent.md",
+    ".github/agents/Cross-Repo Sync Manager.agent.md",
+    ".github/agents/Dependency Auditor.agent.md",
+    ".github/agents/Documentation Curator.agent.md",
+    ".github/agents/Git Hygiene Guardian.agent.md",
+    ".github/agents/Go Static Analyzer.agent.md",
+    ".github/agents/Lint & Format Conductor.agent.md",
+    ".github/agents/Migration Planner.agent.md",
+    ".github/agents/Performance Micro-Bencher.agent.md",
+    ".github/agents/Protobuf Builder.agent.md",
+    ".github/agents/Protobuf Cycle Resolver.agent.md",
+    ".github/agents/Python Static Analyzer.agent.md",
+    ".github/agents/Release & Version Steward.agent.md",
+    ".github/agents/Rust Static Analyzer.agent.md",
+    ".github/agents/Security Scanner Coordinator.agent.md",
+    ".github/agents/Shell Workflow Assistant.agent.md",
+    ".github/agents/Test Orchestrator.agent.md",
+    ".github/agents/merge-conflict-resolution.agent.md",
     # Linter configurations (for GitHub Actions workflows)
     ".github/linters/.eslintrc.json",
     ".github/linters/.markdownlint.json",
@@ -66,9 +87,8 @@ MANAGED_FILES = {
     ".github/prompts/pull-request.prompt.md",
     ".github/prompts/security-review.prompt.md",
     ".github/prompts/test-generation.prompt.md",
-    # Core documentation (versioned)
-    ".github/commit-messages.md",
-    ".github/pull-request-descriptions.md",
+    # Core documentation (versioned) - DEPRECATED, moved to instructions/
+    # These are kept for backward compatibility but should be removed eventually
     ".github/test-generation.md",
     # Pointer files in root
     "AGENTS.md",
@@ -90,6 +110,9 @@ OLD_FILES_TO_REMOVE = {
     ".github/code-style-protobuf.md",
     ".github/code-style-r.md",
     ".github/code-style-github-actions.md",
+    # Redundant files (moved to instructions/)
+    ".github/commit-messages.md",
+    ".github/pull-request-descriptions.md",
 }
 
 # Repo-specific files that should NOT be overwritten
