@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.7
+# version: 1.6.8
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -102,7 +102,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -164,7 +164,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -409,7 +409,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -467,7 +467,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -521,7 +521,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -588,7 +588,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -674,7 +674,7 @@ jobs:
         id: ghcommon-ref
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
+          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
             ref="refs/heads/main"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
