@@ -1760,3 +1760,655 @@ python-dateutil>=2.8.2
 ```
 
 ---
+
+## Part 3: Remediation Action Plan
+
+### Phase 1: Critical Issues (Week 1) - HIGHEST PRIORITY
+
+**Objective:** Fix issues causing 50%+ of failures
+
+#### 1.1: Extract HEREDOC Scripts (Priority: CRITICAL)
+
+**Impact:** Fixes 10+ instances causing obscure syntax errors
+
+**Tasks:**
+
+- [ ] Create `.github/workflows/scripts/` directory structure
+- [ ] Extract all 10 HEREDOC instances to standalone Python scripts
+- [ ] Add proper error handling and logging
+- [ ] Create unit tests for each script
+- [ ] Update workflows to use new scripts
+
+**Scripts to create:**
+
+1. `generate_security_summary.py`
+2. `determine_working_dir.py`
+3. `collect_performance_metrics.py`
+4. `process_benchmark_data.py`
+5. `validate_protobuf_files.py`
+6. `validate_release_tag.py`
+7. `generate_release_notes.py`
+
+**Estimated time:** 8-12 hours
+
+**Success criteria:**
+
+- All HEREDOC blocks removed from workflows
+- All scripts pass local testing
+- Scripts have type hints and docstrings
+- At least 80% test coverage
+
+#### 1.2: Fix Python Formatting Issues (Priority: CRITICAL)
+
+**Impact:** Fixes 30-40% of CI failures
+
+**Tasks:**
+
+- [ ] Pin black/isort/ruff versions in `pyproject.toml`
+- [ ] Configure isort to be black-compatible
+- [ ] Standardize line length to 100 characters
+- [ ] Create `format_python_code.py` script
+- [ ] Set up pre-commit hooks
+- [ ] Update all workflow files to use pinned versions
+
+**Files to modify:**
+
+- `pyproject.toml` - Add tool configurations
+- `.github/workflows/reusable-ci.yml` - Update formatting step
+- `.github/workflows/ci-tests.yml` - Update formatting step
+- Create `.pre-commit-config.yaml`
+
+**Estimated time:** 4-6 hours
+
+**Success criteria:**
+
+- `black --check .` passes consistently
+- `isort --check .` passes consistently
+- Formatting is identical on all platforms
+
+#### 1.3: Fix Missing Dependencies (Priority: HIGH)
+
+**Impact:** Fixes 20-25% of build failures
+
+**Tasks:**
+
+- [ ] Create `.github/workflows/scripts/requirements.txt`
+- [ ] Add system dependency installation steps
+- [ ] Configure Go proxy and module settings
+- [ ] Create dependency verification script
+
+**Files to create/modify:**
+
+- `.github/workflows/scripts/requirements.txt`
+- `.github/workflows/reusable-ci.yml` - Add dependency installation
+- `.github/workflows/release-go.yml` - Add Go configuration
+
+**Estimated time:** 3-4 hours
+
+**Success criteria:**
+
+- All Python scripts install successfully
+- All Go modules download successfully
+- System dependencies install on all platforms
+
+---
+
+### Phase 2: High-Impact Issues (Week 2)
+
+#### 2.1: Fix Path and Working Directory Issues (Priority: HIGH)
+
+**Tasks:**
+
+- [ ] Audit all workflows for working directory assumptions
+- [ ] Add path validation steps
+- [ ] Convert relative paths to absolute
+- [ ] Create path normalization utilities
+
+**Scripts to create:**
+
+- `validate_paths.py` - Validate required paths exist
+- `normalize_paths.py` - Cross-platform path handling
+
+**Estimated time:** 4-6 hours
+
+#### 2.2: Improve Secret Management (Priority: HIGH)
+
+**Tasks:**
+
+- [ ] Document all required secrets
+- [ ] Add secret validation steps
+- [ ] Implement fallback authentication
+- [ ] Create secret management guide
+
+**Documentation to create:**
+
+- `docs/SECRETS.md` - Complete secret documentation
+- Update workflow files with secret validation
+
+**Estimated time:** 3-4 hours
+
+#### 2.3: Fix Matrix Build Issues (Priority: MEDIUM)
+
+**Tasks:**
+
+- [ ] Add platform normalization
+- [ ] Fix Python version compatibility
+- [ ] Add retry logic for flaky tests
+- [ ] Improve test isolation
+
+**Estimated time:** 4-6 hours
+
+---
+
+### Phase 3: Quality Improvements (Week 3)
+
+#### 3.1: Add Workflow Testing
+
+**Tasks:**
+
+- [ ] Create local workflow testing framework
+- [ ] Add unit tests for all Python scripts
+- [ ] Set up integration tests
+- [ ] Create workflow validation script
+
+**Estimated time:** 6-8 hours
+
+#### 3.2: Documentation and Standards
+
+**Tasks:**
+
+- [ ] Document workflow architecture
+- [ ] Create workflow authoring guide
+- [ ] Document common failure patterns
+- [ ] Create troubleshooting guide
+
+**Estimated time:** 4-6 hours
+
+#### 3.3: Monitoring and Observability
+
+**Tasks:**
+
+- [ ] Add workflow success/failure dashboards
+- [ ] Set up failure notifications
+- [ ] Create automated health checks
+- [ ] Implement workflow analytics
+
+**Estimated time:** 6-8 hours
+
+---
+
+## Part 4: Detailed File-by-File Remediation Plan
+
+### File: `.github/workflows/security.yml`
+
+**Current issues:**
+
+- HEREDOC inline script (2 instances)
+- No secret validation
+- Missing dependency checks
+
+**Changes required:**
+
+```yaml
+# OLD (lines 28-65)
+- name: Generate Security Summary
+  run: |
+    python3 - <<'PY'
+    # 40 lines of inline Python
+    PY
+
+# NEW
+- name: Generate Security Summary
+  run: python3 .github/workflows/scripts/generate_security_summary.py
+  env:
+    RESULT_CODEQL: ${{ steps.codeql.outcome }}
+    RESULT_DEP_REVIEW: ${{ steps.dep-review.outcome }}
+    RESULT_SECURITY_AUDIT: ${{ steps.security-audit.outcome }}
+    RESULT_TRIVY: ${{ steps.trivy.outcome }}
+```
+
+**Dependencies to add:** None - uses only stdlib
+
+**Estimated time:** 1 hour
+
+---
+
+### File: `.github/workflows/reusable-ci.yml`
+
+**Current issues:**
+
+- HEREDOC inline script (1 instance)
+- No dependency pinning
+- Missing system dependencies
+- Path resolution issues
+- No formatting tool version control
+
+**Changes required:**
+
+```yaml
+# Add at top of jobs
+jobs:
+  ci:
+    steps:
+      # NEW: Install system dependencies
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            python3-dev \
+            libxml2-dev \
+            libxslt-dev
+
+      # MODIFIED: Install Python dependencies with pinned versions
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r .github/workflows/scripts/requirements.txt
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      # MODIFIED: Determine working directory (remove HEREDOC)
+      - name: Determine working directory
+        id: working-dir
+        run: |
+          WORKING_DIR=$(python3 .github/workflows/scripts/determine_working_dir.py "${{ inputs.working-directory }}")
+          echo "dir=$WORKING_DIR" >> $GITHUB_OUTPUT
+
+      # MODIFIED: Check formatting with pinned versions
+      - name: Check Python formatting
+        if: inputs.language == 'python'
+        run: python3 .github/workflows/scripts/format_python_code.py --check
+```
+
+**Dependencies to add:**
+
+- Create `requirements.txt` for workflow scripts
+
+**Estimated time:** 3-4 hours
+
+---
+
+### File: `.github/workflows/reusable-protobuf.yml`
+
+**Current issues:**
+
+- HEREDOC inline scripts (2 instances)
+- No path validation
+- Missing buf configuration validation
+
+**Changes required:**
+
+```yaml
+# NEW: Validate configuration and paths
+- name: Validate Protobuf setup
+  run: |
+    python3 .github/workflows/scripts/validate_protobuf_files.py \
+      "${{ inputs.proto-directory }}"
+
+# MODIFIED: Generate with better error handling
+- name: Generate Protobuf
+  working-directory: ${{ inputs.working-directory }}
+  run: |
+    echo "Working directory: $(pwd)"
+    echo "Proto directory: ${{ inputs.proto-directory }}"
+    echo "Buf config: ${{ inputs.buf-config }}"
+
+    # Validate buf config exists
+    if [ ! -f "${{ inputs.buf-config }}" ]; then
+      echo "::error::Buf config not found: ${{ inputs.buf-config }}"
+      exit 1
+    fi
+
+    # Generate with error handling
+    buf generate \
+      --config "${{ inputs.buf-config }}" \
+      --path "${{ inputs.proto-directory }}" \
+      --output "${{ inputs.output-directory }}"
+```
+
+**Estimated time:** 2-3 hours
+
+---
+
+### File: `.github/workflows/performance-monitoring.yml`
+
+**Current issues:**
+
+- HEREDOC inline scripts (3 instances)
+- No psutil installation
+- Missing error handling
+
+**Changes required:**
+
+```yaml
+# NEW: Install dependencies
+- name: Install performance monitoring dependencies
+  run: |
+    pip install psutil
+
+# MODIFIED: Collect metrics (remove HEREDOC)
+- name: Collect Performance Metrics
+  run: python3 .github/workflows/scripts/collect_performance_metrics.py performance-metrics.json
+
+# MODIFIED: Process benchmarks (remove HEREDOC)
+- name: Process Benchmark Data
+  run:
+    python3 .github/workflows/scripts/process_benchmark_data.py "**/benchmark-*.json"
+    benchmark-summary.json
+
+# MODIFIED: Generate report (remove HEREDOC)
+- name: Generate Performance Report
+  run: python3 .github/workflows/scripts/generate_performance_report.py
+```
+
+**Dependencies to add:**
+
+- `psutil>=5.9.0` to requirements.txt
+
+**Estimated time:** 2-3 hours
+
+---
+
+### File: `.github/workflows/reusable-release.yml`
+
+**Current issues:**
+
+- HEREDOC inline scripts (2 instances)
+- No tag validation
+- Missing changelog parsing
+
+**Changes required:**
+
+```yaml
+# NEW: Validate release tag
+- name: Validate Release Tag
+  run: python3 .github/workflows/scripts/validate_release_tag.py "${{ github.ref_name }}"
+
+# MODIFIED: Generate release notes (remove HEREDOC)
+- name: Generate Release Notes
+  run: |
+    python3 .github/workflows/scripts/generate_release_notes.py \
+      "${{ github.ref_name }}" \
+      "CHANGELOG.md" \
+      "release-notes.md"
+
+# NEW: Validate release notes generated
+- name: Validate Release Notes
+  run: |
+    if [ ! -f release-notes.md ]; then
+      echo "::error::Release notes not generated"
+      exit 1
+    fi
+
+    if [ ! -s release-notes.md ]; then
+      echo "::error::Release notes file is empty"
+      exit 1
+    fi
+
+    echo "Release notes preview:"
+    head -20 release-notes.md
+```
+
+**Estimated time:** 2 hours
+
+---
+
+## Part 5: Testing and Validation Plan
+
+### Local Testing Strategy
+
+Before deploying workflow changes, test scripts locally:
+
+```bash
+# 1. Test individual scripts
+cd .github/workflows/scripts
+
+# Test security summary
+export RESULT_CODEQL=success
+export RESULT_DEP_REVIEW=success
+export RESULT_SECURITY_AUDIT=failure
+export RESULT_TRIVY=success
+export GITHUB_STEP_SUMMARY=/tmp/test-summary.md
+python3 generate_security_summary.py
+
+# Test working dir detection
+python3 determine_working_dir.py "."
+python3 determine_working_dir.py "cmd/myapp"
+
+# Test release tag validation
+python3 validate_release_tag.py "v1.2.3"
+python3 validate_release_tag.py "invalid-tag"  # Should fail
+
+# 2. Test formatting script
+python3 format_python_code.py --check
+
+# 3. Run unit tests (create these)
+pytest test_workflow_scripts.py -v
+
+# 4. Test workflow locally with act
+act -j ci --secret-file .secrets
+```
+
+### Workflow Validation Checklist
+
+Before merging workflow changes:
+
+- [ ] All HEREDOC blocks removed
+- [ ] All Python scripts have docstrings and type hints
+- [ ] All scripts tested locally
+- [ ] Unit tests created for scripts
+- [ ] Workflows validated with `act` or local simulation
+- [ ] Dependency versions pinned
+- [ ] Error handling improved
+- [ ] Documentation updated
+
+---
+
+## Part 6: Implementation Timeline
+
+### Week 1: Critical Fixes (Days 1-5)
+
+**Day 1-2: HEREDOC Extraction**
+
+- Create scripts directory structure
+- Extract 7 Python scripts from HEREDOC blocks
+- Add basic error handling
+- Local testing
+
+**Day 3: Python Formatting**
+
+- Pin versions in pyproject.toml
+- Configure isort compatibility
+- Create format_python_code.py
+- Run on entire codebase
+
+**Day 4: Dependencies**
+
+- Create requirements.txt for scripts
+- Add system dependency installation
+- Configure Go modules
+- Test on all platforms
+
+**Day 5: Testing and Validation**
+
+- Create unit tests
+- Local workflow testing
+- Fix any issues found
+- Merge critical fixes
+
+### Week 2: High-Impact Fixes (Days 6-10)
+
+**Day 6-7: Path Issues**
+
+- Audit all working directory usage
+- Add path validation
+- Convert to absolute paths
+- Test on all platforms
+
+**Day 8: Secret Management**
+
+- Document all required secrets
+- Add validation steps
+- Implement fallbacks
+- Create SECRETS.md
+
+**Day 9: Matrix Builds**
+
+- Add platform normalization
+- Fix Python version issues
+- Add retry logic
+- Test matrix combinations
+
+**Day 10: Integration Testing**
+
+- Run full test suite
+- Fix any remaining issues
+- Merge high-impact fixes
+
+### Week 3: Quality Improvements (Days 11-15)
+
+**Day 11-12: Workflow Testing**
+
+- Create testing framework
+- Add integration tests
+- Validation scripts
+- CI/CD improvements
+
+**Day 13-14: Documentation**
+
+- Workflow architecture docs
+- Authoring guide
+- Troubleshooting guide
+- Common patterns
+
+**Day 15: Monitoring**
+
+- Set up dashboards
+- Configure notifications
+- Health checks
+- Analytics
+
+---
+
+## Part 7: Success Metrics
+
+### Key Performance Indicators (KPIs)
+
+**Before Remediation:**
+
+- Workflow success rate: ~30%
+- Failed runs: 17/30 (57%)
+- Average time to fix: Unknown
+- HEREDOC instances: 10
+
+**Target After Phase 1:**
+
+- Workflow success rate: >70%
+- Failed runs: <10/30 (33%)
+- Average time to fix: <15 minutes
+- HEREDOC instances: 0
+
+**Target After Phase 2:**
+
+- Workflow success rate: >85%
+- Failed runs: <5/30 (17%)
+- Average time to fix: <10 minutes
+- Path issues: 0
+
+**Target After Phase 3:**
+
+- Workflow success rate: >95%
+- Failed runs: <2/30 (7%)
+- Average time to fix: <5 minutes
+- Full test coverage
+
+### Monitoring Dashboard
+
+Track these metrics weekly:
+
+- Workflow success/failure counts
+- Failure categories (formatting, dependencies, paths, etc.)
+- Average run duration
+- Time to fix failures
+- Test coverage percentage
+- Code quality scores
+
+---
+
+## Part 8: Risk Mitigation
+
+### Potential Risks
+
+**Risk 1: Breaking Existing Workflows**
+
+- **Mitigation:** Test all changes locally first, use feature branches, gradual rollout
+
+**Risk 2: New Script Failures**
+
+- **Mitigation:** Comprehensive unit tests, error handling, fallback mechanisms
+
+**Risk 3: Missing Dependencies**
+
+- **Mitigation:** Document all dependencies, create dependency validation script
+
+**Risk 4: Platform-Specific Issues**
+
+- **Mitigation:** Test on all platforms (Linux, macOS, Windows), use act for local testing
+
+**Risk 5: Secret Management**
+
+- **Mitigation:** Document all required secrets, add validation steps, implement fallbacks
+
+### Rollback Plan
+
+If issues arise after deployment:
+
+1. **Immediate:** Revert workflow file changes
+2. **Short-term:** Keep old HEREDOC versions commented out for quick restore
+3. **Long-term:** Maintain workflow changelog for tracking changes
+
+---
+
+## Conclusion
+
+This comprehensive analysis identifies **10 HEREDOC instances** requiring extraction and **6 major
+failure categories** affecting workflow reliability. The remediation plan is divided into 3 phases
+over 3 weeks:
+
+**Phase 1 (Week 1):** Critical fixes addressing HEREDOC extraction, Python formatting, and
+dependency issues - **Expected to reduce failures by 50%**
+
+**Phase 2 (Week 2):** High-impact fixes for paths, secrets, and matrix builds - **Expected to reduce
+remaining failures by 60%**
+
+**Phase 3 (Week 3):** Quality improvements including testing, documentation, and monitoring -
+**Expected to achieve >95% success rate**
+
+### Immediate Next Steps
+
+1. Create `.github/workflows/scripts/` directory
+2. Extract `generate_security_summary.py` (highest failure impact)
+3. Create `requirements.txt` for script dependencies
+4. Test locally before committing
+
+### Long-term Benefits
+
+- ✅ **Testable workflows:** All logic in testable Python scripts
+- ✅ **Better error messages:** Clear failure diagnostics
+- ✅ **Faster debugging:** IDE support for all automation code
+- ✅ **Reusable components:** Scripts can be used across repositories
+- ✅ **Higher reliability:** >95% success rate target
+- ✅ **Maintainable codebase:** No more HEREDOC debugging
+
+**Total estimated effort:** 60-80 hours over 3 weeks  
+**Expected ROI:** 75% reduction in workflow failures, 90% reduction in debugging time
+
+---
+
+**Document Version:** 1.0.0  
+**Last Updated:** 2025-12-19  
+**Status:** Ready for implementation  
+**Priority:** CRITICAL - Begin Phase 1 immediately
