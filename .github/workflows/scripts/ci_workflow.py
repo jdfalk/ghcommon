@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# file: .github/workflows/scripts/ci_workflow.py
+# version: 1.1.0
+# guid: d9c2b3a4-5e6f-47a8-9b0c-1d2e3f4a5b6c
 """Helper utilities invoked from GitHub Actions CI workflows."""
 
 from __future__ import annotations
@@ -505,7 +508,7 @@ def python_lint(_: argparse.Namespace) -> None:
     if not lint_targets:
         lint_targets = ["."]
 
-    required_tools = ["black", "ruff"]
+    required_tools = ["ruff"]
     missing_tools = [tool for tool in required_tools if shutil.which(tool) is None]
     if missing_tools:
         python = sys.executable
@@ -514,7 +517,7 @@ def python_lint(_: argparse.Namespace) -> None:
             check=True,
         )
 
-    subprocess.run(["black", "--check", *lint_targets], check=True)
+    subprocess.run(["ruff", "format", "--check", *lint_targets], check=True)
     subprocess.run(["ruff", "check", *lint_targets], check=True)
 
 
