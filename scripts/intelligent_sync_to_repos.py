@@ -21,6 +21,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
@@ -383,23 +384,31 @@ def create_or_update_pr(repo, branch, summary):
     except subprocess.CalledProcessError as e:
         logging.warning(f"Could not close existing PRs: {e}")
 
-    # Create new PR
-    try:
-        result = subprocess.run(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--repo",
-                repo,
-                "--base",
-                "main",
-                "--head",
-                branch,
-                "--title",
-                "chore(sync): sync .github structure from ghcommon",
-                "--body",
-                """## Overview
+    # Create new PR with retry logic (GitHub may need time to replicate the branch)
+    max_retries = 3
+    retry_delay = 2  # seconds
+
+    for attempt in range(max_retries):
+        try:
+            if attempt > 0:
+                logging.info(f"  Retry attempt {attempt}/{max_retries - 1}")
+                time.sleep(retry_delay)
+
+            result = subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "create",
+                    "--repo",
+                    repo,
+                    "--base",
+                    "main",
+                    "--head",
+                    branch,
+                    "--title",
+                    "chore(sync): sync .github structure from ghcommon",
+                    "--body",
+                    """## Overview
 Automated sync of centralized .github configuration from [jdfalk/ghcommon](https://github.com/jdfalk/ghcommon).
 
 ## Changes
@@ -415,17 +424,24 @@ The sync process is automated and this PR represents the latest state of the cen
 
 ## Related
 See [jdfalk/ghcommon](https://github.com/jdfalk/ghcommon) for the source of truth.""",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        pr_url = result.stdout.strip()
-        summary.append(f"[PR] {repo}: Created PR at {pr_url}")
-        logging.info(f"  Created PR: {pr_url}")
-    except subprocess.CalledProcessError as e:
-        logging.warning(f"Could not create PR for {repo}: {e.stderr}")
-        summary.append(f"[WARN] {repo}: Could not create PR - {e.stderr.strip()}")
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            pr_url = result.stdout.strip()
+            summary.append(f"[PR] {repo}: Created PR at {pr_url}")
+            logging.info(f"  Created PR: {pr_url}")
+            break  # Success, exit retry loop
+        except subprocess.CalledProcessError as e:
+            if attempt == max_retries - 1:
+                # Last attempt failed, log the error
+                logging.warning(
+                    f"Could not create PR for {repo} after {max_retries} attempts: {e.stderr}"
+                )
+                summary.append(f"[WARN] {repo}: Could not create PR - {e.stderr.strip()}")
+            else:
+                logging.info(f"  PR creation failed, waiting {retry_delay}s before retry...")
 
 
 def main():
