@@ -6,7 +6,7 @@ on:
       repos:
         description: 'Comma-separated list of repos to sync (owner/repo format)'
         required: true
-        default: 'jdfalk/audiobook-organizer,jdfalk/apt-cacher-go,jdfalk/subtitle-manager'
+        default: 'jdfalk/audiobook-organizer,jdfalk/apt-cacher-go,jdfalk/subtitle-manager,jdfalk/safe-ai-util,jdfalk/gcommon-proto,jdfalk/transcoderr,jdfalk/ubuntu-autoinstall-webhook,jdfalk/public-scratch,jdfalk/project-template,jdfalk/magnet-handler'
       branch:
         description: 'Branch name for sync changes'
         required: false
