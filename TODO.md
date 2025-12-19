@@ -258,3 +258,92 @@ Priority Failures:** 3 (auto-module-tagging-action, release-frontend-action, rel
 ---
 
 **Last Updated:** 2025-12-19 **Next Review:** After critical failures are resolved
+
+---
+
+## 🚀 New High Priority Tasks
+
+### #todo Tag release-go-action as v2.0.0
+
+**Status:** Ready **Priority:** Critical **Repository:**
+[release-go-action](https://github.com/jdfalk/release-go-action)
+
+**Context:** release-go-action has been completely rewritten to use GoReleaser instead of manual Go
+builds. This is a breaking change requiring v2.0.0.
+
+**Action Items:**
+
+1. [ ] Ensure release-go-action changes are committed and pushed
+2. [ ] Run `scripts/tag-release-go-v2.sh` to create v2.0.0, v2.0, and v2 tags
+3. [ ] Verify tags are pushed to GitHub
+4. [ ] Get commit hash for pinning in workflows
+5. [ ] Update ghcommon workflows to use v2
+
+**Script:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/tag-release-go-v2.sh`
+
+---
+
+### #todo Pin all actions to commit hashes
+
+**Status:** Ready **Priority:** High **Repository:** ghcommon
+
+**Context:** All jdfalk/\* actions should be pinned to specific commit hashes with version comments
+for security and reproducibility.
+
+**Action Items:**
+
+1. [ ] Run `scripts/pin-actions-to-hashes.py` to discover and pin actions
+2. [ ] Review generated ACTION_VERSIONS.md reference file
+3. [ ] Verify all workflows use `jdfalk/action@hash # vX.Y.Z` format
+4. [ ] Commit and push changes
+5. [ ] Update documentation with pinning policy
+
+**Script:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/pin-actions-to-hashes.py`
+
+**Output:** `ACTION_VERSIONS.md` - Version/hash reference table
+
+---
+
+### #todo Convert reusable workflows to new actions
+
+**Status:** Pending **Priority:** High **Repository:** ghcommon
+
+**Context:** Now that actions are extracted, convert reusable workflows to use the new jdfalk/\*
+actions.
+
+**Action Items:**
+
+1. [ ] Update `release-go.yml` to use `jdfalk/release-go-action@hash # v2.0.0`
+2. [ ] Update `release-docker.yml` to use `jdfalk/release-docker-action@hash # v1.0.0`
+3. [ ] Update `release-frontend.yml` to use `jdfalk/release-frontend-action@hash # v1.0.0`
+4. [ ] Update `release-python.yml` to use `jdfalk/release-python-action@hash # v1.0.0`
+5. [ ] Update `release-rust.yml` to use `jdfalk/release-rust-action@hash # v1.0.0`
+6. [ ] Update `release-protobuf.yml` to use `jdfalk/release-protobuf-action@hash # v1.0.0`
+7. [ ] Test each workflow conversion
+8. [ ] Document migration for repositories using these workflows
+
+**Dependencies:** Requires #todo Pin all actions to commit hashes
+
+---
+
+### #todo Monitor and fix remaining action CI failures
+
+**Status:** In Progress **Priority:** High **Repository:** All action repos
+
+**Context:** Some actions still have CI failures that need investigation and fixing.
+
+**Action Items:**
+
+1. [ ] Run `scripts/trigger-and-monitor-ci.sh` to check all action CI status
+2. [ ] Review failure logs in `logs/ci-failures/`
+3. [ ] Fix any remaining YAML linting errors
+4. [ ] Fix any test failures
+5. [ ] Ensure all actions pass CI before v1.0.0 release
+
+**Completed:**
+
+- ✅ Fixed action.yml shell parameter errors
+- ✅ Fixed input validation mismatches
+- ✅ Added GoReleaser support to release-go-action (v2.0.0)
+
+---
