@@ -58,8 +58,8 @@ jobs:
       - name: Comment on workflow run
         if: always()
         run: |
-          echo "## Sync Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Sync Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ -f intelligent-sync-summary.log ]; then
-            cat intelligent-sync-summary.log >> $GITHUB_STEP_SUMMARY
+            cat intelligent-sync-summary.log >> "$GITHUB_STEP_SUMMARY"
           fi
