@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.1
+# version: 2.6.2
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -103,9 +103,9 @@ jobs:
         id: ghcommon-ref
         run: |
           if [ -f .github/ghcommon-ref.txt ]; then
-            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=main" >> $GITHUB_OUTPUT
+            echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts
@@ -119,7 +119,7 @@ jobs:
 
       - name: Set up GHCOMMON_SCRIPTS_DIR
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Load repository configuration
         id: load-config
@@ -552,9 +552,9 @@ jobs:
         id: ghcommon-ref
         run: |
           if [ -f .github/ghcommon-ref.txt ]; then
-            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=main" >> $GITHUB_OUTPUT
+            echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts
@@ -568,7 +568,7 @@ jobs:
 
       - name: Set up GHCOMMON_SCRIPTS_DIR
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Generate release summary
         env:

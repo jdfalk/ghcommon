@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-maintenance.yml
-# version: 1.0.1
+# version: 1.0.2
 # guid: reusable-maintenance-2025-09-24-core-workflow
 
 name: Reusable Maintenance Workflow
@@ -46,9 +46,9 @@ jobs:
         id: ghcommon-ref
         run: |
           if [ -f .github/ghcommon-ref.txt ]; then
-            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=main" >> $GITHUB_OUTPUT
+            echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts
@@ -62,7 +62,7 @@ jobs:
 
       - name: Set up GHCOMMON_SCRIPTS_DIR
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Collect Go dependency updates
         if: hashFiles('go.mod') != ''

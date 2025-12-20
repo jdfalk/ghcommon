@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-advanced-cache.yml
-# version: 1.0.0
+# version: 1.0.1
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
 name: Reusable Advanced Caching
@@ -46,9 +46,9 @@ jobs:
         id: ghcommon-ref
         run: |
           if [ -f .github/ghcommon-ref.txt ]; then
-            echo "ref=$(cat .github/ghcommon-ref.txt)" >> $GITHUB_OUTPUT
+            echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=main" >> $GITHUB_OUTPUT
+            echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts
@@ -62,7 +62,7 @@ jobs:
 
       - name: Set up GHCOMMON_SCRIPTS_DIR
         run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> $GITHUB_ENV
+          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -89,7 +89,7 @@ jobs:
             --namespace "${{ inputs.language }}" \
             --files "${{ steps.metadata.outputs.files }}" \
             --paths "${{ steps.metadata.outputs.paths }}" \
-            ${INCLUDE_FLAG}
+            ${INCLUDE_FLAG:+"$INCLUDE_FLAG"}
 
       - name: Configure cache
         id: cache
