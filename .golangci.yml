@@ -71,92 +71,81 @@ linters:
     - scopelint # deprecated
     - varnamelen # too strict for short variable names
 
-  settings:
-    # Cyclomatic complexity
-    cyclop:
-      max-complexity: 15
-      package-average: 10.0
+linters-settings:
+  cyclop:
+    max-complexity: 15
+    package-average: 10.0
 
-    # Error handling
-    errcheck:
-      check-type-assertions: true
-      check-blank: true
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
 
-    # Function complexity
-    funlen:
-      lines: 60
-      statements: 40
+  funlen:
+    lines: 60
+    statements: 40
 
-    # Cognitive complexity
-    gocognit:
-      min-complexity: 15
+  gocognit:
+    min-complexity: 15
 
-    # Cyclomatic complexity
-    gocyclo:
-      min-complexity: 15
+  gocyclo:
+    min-complexity: 15
 
-    # Line length
-    lll:
-      line-length: 100
+  lll:
+    line-length: 100
 
-    # Naming conventions (Google Go Style)
-    revive:
-      rules:
-        - name: exported
-          severity: warning
-          disabled: false
-        - name: package-comments
-          severity: warning
-          disabled: false
-        - name: var-naming
-          severity: warning
-          disabled: false
-          arguments:
-            - - ID
-              - API
-              - URL
-              - HTTP
-              - JSON
-              - XML
-              - HTML
-              - CSS
-              - JS
-              - SQL
-              - DB
-              - OS
-              - UI
-              - UUID
-              - URI
-        - name: exported
-          arguments: [checkPrivateReceivers, disableStutteringCheck]
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+      - name: package-comments
+        severity: warning
+        disabled: false
+      - name: var-naming
+        severity: warning
+        disabled: false
+        arguments:
+          - ID
+          - API
+          - URL
+          - HTTP
+          - JSON
+          - XML
+          - HTML
+          - CSS
+          - JS
+          - SQL
+          - DB
+          - OS
+          - UI
+          - UUID
+          - URI
+      - name: exported
+        arguments: [checkPrivateReceivers, disableStutteringCheck]
 
-    # Unused parameters
-    unparam:
-      check-exported: false
+  unparam:
+    check-exported: false
 
-    # Unused code
-    unused:
-      field-writes-are-uses: true
-      exported-fields-are-used: true
-      parameters-are-used: true
-      local-variables-are-used: true
+  unused:
+    field-writes-are-uses: true
+    exported-fields-are-used: true
+    parameters-are-used: true
+    local-variables-are-used: true
 
-    # Go vet settings
-    govet:
-      enable:
-        - shadow
-      settings:
-        printf:
-          funcs:
-            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
-            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
-            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
-            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  govet:
+    enable:
+      - shadow
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
 
-    # Whitespace
-    whitespace:
-      multi-if: false
-      multi-func: false
+  whitespace:
+    multi-if: false
+    multi-func: false
 
 issues:
   max-issues-per-linter: 0
