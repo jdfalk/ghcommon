@@ -1,12 +1,11 @@
 # file: .golangci-v1.yml
-# version: 1.3.0
+# version: 1.3.1
 # guid: 4d5e6f7a-8b9c-0123-def4-56789abcdef0
 
+version: "2"
 run:
-  timeout: 5m
   issues-exit-code: 1
   tests: true
-
 linters:
   enable:
     - bodyclose
@@ -14,31 +13,22 @@ linters:
     - depguard
     - dogsled
     - dupl
-    - errcheck
     - errorlint
     - exhaustive
-    - exportloopref
     - forbidigo
     - funlen
-    - gci
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - godot
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
-    - gomnd
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
-    - govet
-    - ineffassign
     - lll
     - misspell
+    - mnd
     - nakedret
     - nilerr
     - nlreturn
@@ -49,16 +39,32 @@ linters:
     - revive
     - rowserrcheck
     - staticcheck
-    - structcheck
-    - stylecheck
     - unconvert
     - unparam
-    - unused
-    - varcheck
-
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   new: false
-
-default-severity: error
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
