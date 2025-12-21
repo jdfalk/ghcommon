@@ -60,6 +60,75 @@
       workflow; Integration Guide updated with before/after. - Acceptance Criteria: Green pipeline
       in canary repos; artifacts/releases intact; no inline scripts remain.
 
+### Standardize Action Repo Workflows (ci.yml, release.yml, integration)
+
+- Scope: Every action repo gets consistent CI (lint + parse + minimal run), Release (tag + moving
+  tags), and Integration (use action from tag in a sample run).
+- Steps: - Add `ci.yml` with actionlint, yamllint, markdownlint, shellcheck/pyflakes as applicable;
+  run an example job `uses: ./` and assert outputs. - Add `release.yml` to create vX.Y.Z, update vX
+  and vX.Y, generate GitHub Release notes, attach example snippets. - Add `test-integration.yml` to
+  `uses: owner/repo@v1` ensuring public consumption works.
+- Deliverables: Workflow files across all action repos; status badges in README.
+- Acceptance: All actions show green CI for push/PR; release workflow produces tags/releases.
+
+### Security Hardening for Workflows
+
+- Scope: Apply least-privilege permissions, pin actions to SHAs or major versions, add security
+  scanning.
+- Steps: - Set `permissions` per job; default to `read` and escalate only when needed (contents,
+  id-token, attestations, etc.). - Pin third-party actions (actionlint suggests), enable OIDC for
+  publishing when applicable. - Add CodeQL or basic SAST for helper code; add Trivy for containers
+  where relevant.
+- Deliverables: Updated workflows with pinned actions, permissions, security checks documented.
+- Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed for action pins.
+
+### Documentation Completeness (READMEs, Inputs/Outputs, Examples)
+
+- Scope: Ensure each action README includes inputs/outputs tables, examples for common and advanced
+  usage, and links to reusable workflow examples.
+- Steps: - Generate Inputs/Outputs from action.yml to markdown tables; add minimal and advanced
+  examples. - Add badges: CI, Release, Marketplace (if applicable), Version tags. - Cross-link to
+  ghcommon Integration Guide sections.
+- Deliverables: Updated READMEs across all actions; docs PR linking strategy.
+- Acceptance: Lint passes (markdownlint), and examples verified via integration workflow.
+
+### End-to-End Validation in Example Consumer Repo(s)
+
+- Scope: Create/refresh a small sample repo that consumes reusable-ci and reusable-release, and
+  exercises new actions in realistic paths (Go, Python, Frontend variants).
+- Steps: - Matrix run: Linux primary; optionally macOS/Windows smoke checks for action
+  portability. - Trigger CI and Release flows; verify artifacts, tags, releases, and summaries. -
+  Capture run IDs and logs; add to Verification Report.
+- Deliverables: `example-consumer` results logged and referenced; issues filed for any regressions.
+- Acceptance: Green end-to-end runs with artifacts/releases matching expectations.
+
+### Backward Compatibility & Deprecation Plan
+
+- Scope: Provide a safe migration off scripts to actions without breaking existing callers.
+- Steps: - Keep current workflows working; introduce new action-powered paths under a feature flag
+  window. - Emit warnings in summaries when legacy script path executed; set removal timeline. -
+  Document migration steps and timelines in ghcommon.
+- Deliverables: Deprecation notice, migration guide, feature flag defaults schedule.
+- Acceptance: No hard breaks during migration window; consumers adopt new actions successfully.
+
+### Governance & Protections
+
+- Scope: Ensure changes to workflows/actions require appropriate review and pass required checks.
+- Steps: - Update CODEOWNERS for `.github/workflows/**` and action repos; set required checks for
+  merges. - Enforce branch protection rules and conventional commit checks. - Add PR templates for
+  action repos with checklist (docs, tags, tests).
+- Deliverables: Governance config updates across repos.
+- Acceptance: Merges to main blocked without reviews + green checks; history clean via conventions.
+
+### Org-wide Monitoring & Summaries
+
+- Scope: Central visibility of runs, failures, tag creation, and adoption rate.
+- Steps: - Extend workflow-debugger to include action repo CI health and tag/release verification. -
+  Nightly job to aggregate status across repos and post summary artifact. - Track adoption of new
+  actions by repository and workflow.
+- Deliverables: Monitoring scripts/workflows and summary artifacts.
+- Acceptance: Weekly status reports show CI health and adoption metrics.
+
 ## ✅ Completed
 
 - [x] Phase 0: Shared workflow foundations (`workflow_common.py`, config schema, validation tooling,
