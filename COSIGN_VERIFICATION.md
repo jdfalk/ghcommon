@@ -4,8 +4,9 @@
 
 # Cosign Signature Verification
 
-This repository uses [Cosign](https://docs.sigstore.dev/cosign/overview/) to sign release artifacts,
-providing cryptographic verification of their authenticity and integrity.
+This repository uses [Cosign](https://docs.sigstore.dev/cosign/overview/) to
+sign release artifacts, providing cryptographic verification of their
+authenticity and integrity.
 
 ## What is Signed
 
@@ -34,10 +35,11 @@ go install github.com/sigstore/cosign/v2/cmd/cosign@latest
 
 ### Verification Steps
 
-1. **Download the artifacts and signature files** from the GitHub release or workflow artifacts
+1. **Download the artifacts and signature files** from the GitHub release or
+   workflow artifacts
 
-2. **Download the public key** (`cosign.pub`) from the GitHub release artifacts or from this
-   repository
+2. **Download the public key** (`cosign.pub`) from the GitHub release artifacts
+   or from this repository
 
 3. **Verify a signature**:
 
@@ -62,7 +64,8 @@ A successful verification will output:
 Verified OK
 ```
 
-If verification fails, cosign will exit with a non-zero status and provide an error message.
+If verification fails, cosign will exit with a non-zero status and provide an
+error message.
 
 ## Public Key Information
 
@@ -74,9 +77,11 @@ If verification fails, cosign will exit with a non-zero status and provide an er
 ## Security Notes
 
 - Always verify signatures before using release artifacts in production
-- The public key is included with each release to ensure you have the correct key
+- The public key is included with each release to ensure you have the correct
+  key
 - You can also find a copy of the current public key in this repository
-- If verification fails, do not use the artifact as it may have been tampered with
+- If verification fails, do not use the artifact as it may have been tampered
+  with
 - Report any signature verification failures as potential security issues
 
 ## Automation

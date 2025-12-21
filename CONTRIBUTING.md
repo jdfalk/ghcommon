@@ -23,7 +23,8 @@
       - [Example Workflow Structure](#example-workflow-structure)
     - [Documentation Standards](#documentation-standards)
       - [File Headers](#file-headers)
-- [File Headers](#file-headers) - [Structure](#structure) - [Code Examples](#code-examples)
+- [File Headers](#file-headers) - [Structure](#structure) -
+  [Code Examples](#code-examples)
   - [Testing](#testing)
     - [Workflow Testing](#workflow-testing)
     - [Script Testing](#script-testing)
@@ -45,8 +46,8 @@
 
 ## Code of Conduct
 
-This project adheres to a code of conduct that we expect all contributors to follow. Please be
-respectful and constructive in all interactions.
+This project adheres to a code of conduct that we expect all contributors to
+follow. Please be respectful and constructive in all interactions.
 
 ## How to Contribute
 

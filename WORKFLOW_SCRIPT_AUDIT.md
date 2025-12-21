@@ -4,27 +4,29 @@
 
 # Workflow Scripts to Actions Conversion Audit
 
-**Date:** December 20, 2025 **Purpose:** Comprehensive audit of workflow scripts for conversion to
-GitHub Actions **Status:** Phase 1 - Full Audit Complete
+**Date:** December 20, 2025 **Purpose:** Comprehensive audit of workflow scripts
+for conversion to GitHub Actions **Status:** Phase 1 - Full Audit Complete
 
 ## Executive Summary
 
-This repository currently has **38 Python/Shell scripts** (6,232 total lines) embedded in
-`.github/workflows/scripts/` that are referenced by reusable workflows. These scripts fail when
-called from other repositories because:
+This repository currently has **38 Python/Shell scripts** (6,232 total lines)
+embedded in `.github/workflows/scripts/` that are referenced by reusable
+workflows. These scripts fail when called from other repositories because:
 
 1. Scripts are fetched via sparse checkout during workflow execution
 2. External repos can't resolve the `$GHCOMMON_SCRIPTS_DIR` path properly
 3. Scripts have inter-dependencies that break when paths are misconfigured
 
-**Solution:** Convert scripts to **standalone GitHub Actions** following the pattern established by
-the existing 6 release actions (release-go-action, release-docker-action, etc.).
+**Solution:** Convert scripts to **standalone GitHub Actions** following the
+pattern established by the existing 6 release actions (release-go-action,
+release-docker-action, etc.).
 
 ---
 
 ## Existing Actions (Reference Pattern)
 
-These actions are in **separate repositories** and serve as the conversion template:
+These actions are in **separate repositories** and serve as the conversion
+template:
 
 | Action Repository                | Purpose                  | Key Pattern                                |
 | -------------------------------- | ------------------------ | ------------------------------------------ |
@@ -66,7 +68,8 @@ runs:
 
 ### Priority 1: Critical Infrastructure Scripts (Blocking Issues)
 
-These scripts are called by **ALL** reusable workflows and cause immediate failures:
+These scripts are called by **ALL** reusable workflows and cause immediate
+failures:
 
 | Script                      | Lines | Used By                  | Purpose                               | Complexity |
 | --------------------------- | ----- | ------------------------ | ------------------------------------- | ---------- |
@@ -76,7 +79,8 @@ These scripts are called by **ALL** reusable workflows and cause immediate failu
 **Action Conversions Needed:**
 
 - `jdfalk/load-config-action` - Standalone config loader
-- `jdfalk/workflow-common-action` - Shared utility library (or embed in each action)
+- `jdfalk/workflow-common-action` - Shared utility library (or embed in each
+  action)
 
 ---
 
@@ -100,7 +104,8 @@ python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" run-linters
 **Action Conversions Needed:**
 
 - `jdfalk/ci-generate-matrices-action` - Language detection + matrix generation
-- `jdfalk/ci-detect-changes-action` - File change detection (or use dorny/paths-filter)
+- `jdfalk/ci-detect-changes-action` - File change detection (or use
+  dorny/paths-filter)
 - `jdfalk/ci-run-linters-action` - Coordinated linter execution
 
 **Dependencies:**
@@ -156,12 +161,13 @@ python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" generate-changelog
 | `detect_frontend_package.py`     | (small) | `release-frontend.yml` | Detect Node.js package metadata  | **LOW**     |
 | `get_frontend_working_dir.py`    | (small) | `release-frontend.yml` | Find frontend build directory    | **LOW**     |
 
-**Status:** Most of this logic is **already embedded** in the separate release-\*-action
-repositories. However, some scripts are still referenced:
+**Status:** Most of this logic is **already embedded** in the separate
+release-\*-action repositories. However, some scripts are still referenced:
 
 **Action Conversions Needed:**
 
-- `jdfalk/detect-package-metadata-action` - Generic package metadata detection (all languages)
+- `jdfalk/detect-package-metadata-action` - Generic package metadata detection
+  (all languages)
 
 ---
 
@@ -188,7 +194,8 @@ repositories. However, some scripts are still referenced:
 | `determine_docker_platforms.py` | 111     | `release-docker.yml`       | Determine build platforms | **LOW**    |
 | `validate_docker_compose.py`    | (small) | `reusable-maintenance.yml` | Validate compose files    | **LOW**    |
 
-**Status:** Most logic is in `release-docker-action`, but some detection logic remains in scripts.
+**Status:** Most logic is in `release-docker-action`, but some detection logic
+remains in scripts.
 
 **Action Conversions Needed:**
 
@@ -232,7 +239,8 @@ repositories. However, some scripts are still referenced:
 
 **Action Conversions Needed:**
 
-- Most of these can remain as scripts OR be embedded into the larger actions above
+- Most of these can remain as scripts OR be embedded into the larger actions
+  above
 - `jdfalk/publish-packages-action` - Generic package publishing (all registries)
 
 ---

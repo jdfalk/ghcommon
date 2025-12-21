@@ -4,12 +4,13 @@
 
 # Workflow Script Usage Mapping
 
-**Date:** December 20, 2025 **Purpose:** Detailed call graph of script dependencies across workflows
-**Status:** Phase 2 - Workflow Mapping Complete
+**Date:** December 20, 2025 **Purpose:** Detailed call graph of script
+dependencies across workflows **Status:** Phase 2 - Workflow Mapping Complete
 
 ## Mapping Methodology
 
-This document maps **every script call** in the ghcommon workflow files to understand:
+This document maps **every script call** in the ghcommon workflow files to
+understand:
 
 1. Which workflows depend on which scripts
 2. How scripts are invoked (direct python call, shell wrapper, etc.)
@@ -54,8 +55,8 @@ This document maps **every script call** in the ghcommon workflow files to under
   run: python3 "$GHCOMMON_SCRIPTS_DIR/load_repository_config.py"
 ```
 
-**❌ Problem:** When called from external repos, the sparse checkout sometimes fails or the path
-resolution breaks.
+**❌ Problem:** When called from external repos, the sparse checkout sometimes
+fails or the path resolution breaks.
 
 **✅ Solution:** Replace with action calls:
 
@@ -70,8 +71,9 @@ resolution breaks.
 
 ## Workflow #1: reusable-ci.yml (730 lines)
 
-**Purpose:** Unified CI workflow for all languages **Usage:** Called by ALL repositories for
-continuous integration **Script Dependencies:** HIGH (3 scripts)
+**Purpose:** Unified CI workflow for all languages **Usage:** Called by ALL
+repositories for continuous integration **Script Dependencies:** HIGH (3
+scripts)
 
 ### Script Call Mapping
 
@@ -177,8 +179,8 @@ continuous integration **Script Dependencies:** HIGH (3 scripts)
 
 ## Workflow #2: reusable-release.yml (591 lines)
 
-**Purpose:** Orchestrate releases for all languages **Usage:** Called by repositories on release
-tags **Script Dependencies:** CRITICAL (5+ scripts)
+**Purpose:** Orchestrate releases for all languages **Usage:** Called by
+repositories on release tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ### Script Call Mapping
 
@@ -202,7 +204,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 #### Call #2: release_workflow.py detect-languages
 
-**Location:** Job `detect-languages`, Step "Detect project languages and generate matrices"
+**Location:** Job `detect-languages`, Step "Detect project languages and
+generate matrices"
 
 ```yaml
 - name: Detect project languages and generate matrices
@@ -253,7 +256,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 #### Call #3: release_workflow.py release-strategy
 
-**Location:** Job `detect-languages`, Step "Determine release strategy based on branch"
+**Location:** Job `detect-languages`, Step "Determine release strategy based on
+branch"
 
 ```yaml
 - name: Determine release strategy based on branch
@@ -376,7 +380,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
     # ... inline script loading ...
 ```
 
-**Note:** This is partially inlined, but imports from `package_release_assets.py`.
+**Note:** This is partially inlined, but imports from
+`package_release_assets.py`.
 
 **Inputs:**
 
@@ -393,7 +398,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ## Workflow #3: reusable-protobuf.yml
 
-**Purpose:** Generate Protocol Buffer code **Script Dependencies:** MEDIUM (2 scripts)
+**Purpose:** Generate Protocol Buffer code **Script Dependencies:** MEDIUM (2
+scripts)
 
 ### Script Call Mapping
 
@@ -445,7 +451,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ## Workflow #4: reusable-maintenance.yml
 
-**Purpose:** Dependency and security maintenance **Script Dependencies:** MEDIUM (2 scripts)
+**Purpose:** Dependency and security maintenance **Script Dependencies:** MEDIUM
+(2 scripts)
 
 ### Script Call Mapping
 
@@ -460,7 +467,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
       --input "$DEPENDENCY_FILE" --output maintenance/dependency-summary.json
 ```
 
-**Conversion Target:** `jdfalk/maintenance-summary-action@v1` (subcommand: dependencies)
+**Conversion Target:** `jdfalk/maintenance-summary-action@v1` (subcommand:
+dependencies)
 
 ---
 
@@ -473,13 +481,15 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
       --input maintenance/security-alerts.json
 ```
 
-**Conversion Target:** `jdfalk/maintenance-summary-action@v1` (subcommand: security)
+**Conversion Target:** `jdfalk/maintenance-summary-action@v1` (subcommand:
+security)
 
 ---
 
 ## Workflow #5: reusable-advanced-cache.yml
 
-**Purpose:** Intelligent caching strategy **Script Dependencies:** HIGH (1 massive script)
+**Purpose:** Intelligent caching strategy **Script Dependencies:** HIGH (1
+massive script)
 
 ### Script Call Mapping
 
@@ -513,7 +523,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ## Workflow #6: documentation.yml
 
-**Purpose:** Automated documentation generation **Script Dependencies:** HIGH (1 large script)
+**Purpose:** Automated documentation generation **Script Dependencies:** HIGH (1
+large script)
 
 ### Script Call Mapping
 
@@ -531,7 +542,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ## Workflow #7: issue-automation.yml
 
-**Purpose:** Intelligent PR/issue labeling **Script Dependencies:** MEDIUM (1 script)
+**Purpose:** Intelligent PR/issue labeling **Script Dependencies:** MEDIUM (1
+script)
 
 ### Script Call Mapping
 
@@ -548,7 +560,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ## Workflow #8: sync-receiver.yml
 
-**Purpose:** Receive cross-repo sync operations **Script Dependencies:** HIGH (1 large script)
+**Purpose:** Receive cross-repo sync operations **Script Dependencies:** HIGH (1
+large script)
 
 ### Script Call Mapping
 
@@ -567,7 +580,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 ### release-go.yml
 
-**Script:** `build_go_release.py` **Status:** ✅ **ALREADY IN ACTION** (`jdfalk/release-go-action`)
+**Script:** `build_go_release.py` **Status:** ✅ **ALREADY IN ACTION**
+(`jdfalk/release-go-action`)
 
 ---
 
@@ -579,8 +593,8 @@ tags **Script Dependencies:** CRITICAL (5+ scripts)
 - `run_python_release_tests.py`
 - `write_pypirc.py`
 
-**Status:** ✅ **MOSTLY IN ACTION** (`jdfalk/release-python-action`) **Remaining:** Some detection
-logic could be extracted
+**Status:** ✅ **MOSTLY IN ACTION** (`jdfalk/release-python-action`)
+**Remaining:** Some detection logic could be extracted
 
 ---
 
@@ -614,8 +628,8 @@ logic could be extracted
 - `determine_docker_platforms.py`
 - `validate_docker_compose.py`
 
-**Status:** ✅ **MOSTLY IN ACTION** (`jdfalk/release-docker-action`) **Remaining:** Detection
-scripts could be extracted for reuse
+**Status:** ✅ **MOSTLY IN ACTION** (`jdfalk/release-docker-action`)
+**Remaining:** Detection scripts could be extracted for reuse
 
 ---
 

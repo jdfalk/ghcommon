@@ -4,8 +4,8 @@
 
 # ghcommon Repository Labels
 
-This document provides a comprehensive overview of all labels in the ghcommon repository, organized
-by category.
+This document provides a comprehensive overview of all labels in the ghcommon
+repository, organized by category.
 
 **Total Labels:** 147
 

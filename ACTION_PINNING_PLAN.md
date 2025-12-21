@@ -295,7 +295,8 @@ If issues arise:
 
 ## Success Criteria
 
-- [ ] All actions tagged appropriately (v2.0.1 for release-go, v1.0.0 for others)
+- [ ] All actions tagged appropriately (v2.0.1 for release-go, v1.0.0 for
+      others)
 - [ ] All workflows use hash@commit # version format
 - [ ] ACTION_VERSIONS.md generated and committed
 - [ ] All action CI passes

@@ -2,143 +2,176 @@
 
 ## 🤖 Background Agent Queue (manage_todo_list sync)
 
-- [ ] Plan security workflow actionization - Goal: Move security scanning logic out of
-      reusable-security.yml into auditable composite actions with external scripts only. - Scope
-      (initial action repos): - jdfalk/security-codeql-action: Orchestrate codeql
-      init/analyze/upload (wraps actions/codeql) with repo config overrides. -
-      jdfalk/security-trivy-action: Trivy filesystem/image/vulnerability scan with SARIF output and
-      severity gating. - jdfalk/security-osv-scan-action: OSV-Scanner on repo dependencies (Go,
-      Python, Node, Rust) with SARIF output. - jdfalk/security-secrets-action: Gitleaks (or
-      repo-level secret scan wrapper) with allowlist support. - jdfalk/security-summary-action:
-      Aggregate SARIFs, gate on thresholds, and write step summary + artifacts. - Inputs/Outputs
-      (common): - Inputs: `paths`, `exclude`, `severity-threshold`, `fail-on`, `sarif-path`,
-      `upload-sarif` (true/false), `tool-args`. - Outputs: `sarif`, `findings-count`,
-      `critical-count`, `high-count`, `failed`. - Deliverables: - Each repo: action.yml, README with
-      usage, src/ implementation (Python/Bash), .github/workflows/ci.yml tests. - Tags: v1.0.0
-      initial, moving tags v1 and v1.0, GitHub Release with changelog. - Docs: ghcommon
-      ACTIONS_INTEGRATION_GUIDE.md section for security actions + examples. - Acceptance Criteria: -
-      Actions run on sample repos producing SARIF, respect thresholds, and publish summaries. -
-      reusable-security.yml refactored to call these actions; dry-run passes in 2 representative
-      repos. - Risks/Notes: Keep codeql on GH-hosted runners; avoid inline scripts; support matrix
-      by language as needed.
+- [ ] Plan security workflow actionization - Goal: Move security scanning logic
+      out of reusable-security.yml into auditable composite actions with
+      external scripts only. - Scope (initial action repos): -
+      jdfalk/security-codeql-action: Orchestrate codeql init/analyze/upload
+      (wraps actions/codeql) with repo config overrides. -
+      jdfalk/security-trivy-action: Trivy filesystem/image/vulnerability scan
+      with SARIF output and severity gating. - jdfalk/security-osv-scan-action:
+      OSV-Scanner on repo dependencies (Go, Python, Node, Rust) with SARIF
+      output. - jdfalk/security-secrets-action: Gitleaks (or repo-level secret
+      scan wrapper) with allowlist support. - jdfalk/security-summary-action:
+      Aggregate SARIFs, gate on thresholds, and write step summary +
+      artifacts. - Inputs/Outputs (common): - Inputs: `paths`, `exclude`,
+      `severity-threshold`, `fail-on`, `sarif-path`, `upload-sarif`
+      (true/false), `tool-args`. - Outputs: `sarif`, `findings-count`,
+      `critical-count`, `high-count`, `failed`. - Deliverables: - Each repo:
+      action.yml, README with usage, src/ implementation (Python/Bash),
+      .github/workflows/ci.yml tests. - Tags: v1.0.0 initial, moving tags v1 and
+      v1.0, GitHub Release with changelog. - Docs: ghcommon
+      ACTIONS_INTEGRATION_GUIDE.md section for security actions + examples. -
+      Acceptance Criteria: - Actions run on sample repos producing SARIF,
+      respect thresholds, and publish summaries. - reusable-security.yml
+      refactored to call these actions; dry-run passes in 2 representative
+      repos. - Risks/Notes: Keep codeql on GH-hosted runners; avoid inline
+      scripts; support matrix by language as needed.
 
 - [ ] Audit remaining workflows for action conversion - Inventory Targets: -
-      reusable-advanced-cache.yml → cache-strategy-action - reusable-maintenance.yml →
-      maintenance-summary-action - reusable-protobuf.yml → protobuf-config-action,
-      protobuf-verify-action (if not done) - documentation.yml → docs-generator-action -
+      reusable-advanced-cache.yml → cache-strategy-action -
+      reusable-maintenance.yml → maintenance-summary-action -
+      reusable-protobuf.yml → protobuf-config-action, protobuf-verify-action (if
+      not done) - documentation.yml → docs-generator-action -
       issue-automation.yml → intelligent-labeling-action - sync-receiver.yml →
-      sync-receiver-action - Steps: - Build call graph from WORKFLOW_SCRIPT_USAGE_MAP.md to confirm
-      dependencies. - Define action contracts (inputs/outputs) matching current scripts. - Draft
-      action repos list, ownership, and rollout order (P1→P4). - Deliverables: Updated
-      WORKFLOW_SCRIPT_AUDIT.md with status, risks, and ETA per action. - Acceptance Criteria:
-      Signed-off actionization plan with sequencing and test strategy.
+      sync-receiver-action - Steps: - Build call graph from
+      WORKFLOW_SCRIPT_USAGE_MAP.md to confirm dependencies. - Define action
+      contracts (inputs/outputs) matching current scripts. - Draft action repos
+      list, ownership, and rollout order (P1→P4). - Deliverables: Updated
+      WORKFLOW_SCRIPT_AUDIT.md with status, risks, and ETA per action. -
+      Acceptance Criteria: Signed-off actionization plan with sequencing and
+      test strategy.
 
-- [ ] Validate new composite actions CI/CD pipelines - Scope: Six already-created actions
-      (load-config, ci-generate-matrices, detect-languages, release-strategy, generate-version,
-      package-assets). - Tests to Run: - Lint/parse action.yml; run action unit tests via local
-      workflow in each repo. - Integration: use minimal sample repos to execute typical paths and
-      verify outputs + summaries. - Failure modes: missing configs, malformed inputs, matrix edge
-      cases. - Observability: Ensure GITHUB_STEP_SUMMARY is populated and outputs match docs
-      exactly. - Deliverables: ACTIONS_VERIFICATION_REPORT.md updated with run IDs and pass/fail
-      notes. - Acceptance Criteria: All action repos have green CI on main and successful
-      integration runs.
+- [ ] Validate new composite actions CI/CD pipelines - Scope: Six
+      already-created actions (load-config, ci-generate-matrices,
+      detect-languages, release-strategy, generate-version, package-assets). -
+      Tests to Run: - Lint/parse action.yml; run action unit tests via local
+      workflow in each repo. - Integration: use minimal sample repos to execute
+      typical paths and verify outputs + summaries. - Failure modes: missing
+      configs, malformed inputs, matrix edge cases. - Observability: Ensure
+      GITHUB_STEP_SUMMARY is populated and outputs match docs exactly. -
+      Deliverables: ACTIONS_VERIFICATION_REPORT.md updated with run IDs and
+      pass/fail notes. - Acceptance Criteria: All action repos have green CI on
+      main and successful integration runs.
 
-- [ ] Verify action tags and releases (v1/v1.0/v1.0.0) - Tag Policy: - Create immutable v1.0.0 tags;
-      create/update moving tags v1 and v1.0 to latest compatible. - Ensure GitHub Releases exist for
-      v1.0.0 with notes mirroring README features and changes. - Steps: - List tags in each action
-      repo; create missing moving tags; verify protection settings. - Confirm release metadata:
-      title, body, links to example workflows, and compatibility notes. - Deliverables: Tag and
-      Release checklist log per repo in ghcommon (logs/tags/...). - Acceptance Criteria: Consumers
-      can pin @v1, @v1.0, or @v1.0.0 consistently; Marketplace visibility OK.
+- [ ] Verify action tags and releases (v1/v1.0/v1.0.0) - Tag Policy: - Create
+      immutable v1.0.0 tags; create/update moving tags v1 and v1.0 to latest
+      compatible. - Ensure GitHub Releases exist for v1.0.0 with notes mirroring
+      README features and changes. - Steps: - List tags in each action repo;
+      create missing moving tags; verify protection settings. - Confirm release
+      metadata: title, body, links to example workflows, and compatibility
+      notes. - Deliverables: Tag and Release checklist log per repo in ghcommon
+      (logs/tags/...). - Acceptance Criteria: Consumers can pin @v1, @v1.0, or
+      @v1.0.0 consistently; Marketplace visibility OK.
 
-- [ ] Update reusable workflows to use new actions and verify - Targets: reusable-ci.yml (partially
-      done), reusable-release.yml (partially done), reusable-security.yml (new), protobuf workflow
-      (if applicable). - Steps: - Replace inline/scripted steps with uses: jdfalk/\*-action@v1. -
-      Keep dorny/paths-filter where fit; remove sparse-checkout logic entirely. - Add summary
-      checkpoints and robust outputs wiring between jobs. - Run on ghcommon (self) and
-      audiobook-organizer as canary; capture run logs. - Deliverables: PR/commit diffs for each
-      workflow; Integration Guide updated with before/after. - Acceptance Criteria: Green pipeline
-      in canary repos; artifacts/releases intact; no inline scripts remain.
+- [ ] Update reusable workflows to use new actions and verify - Targets:
+      reusable-ci.yml (partially done), reusable-release.yml (partially done),
+      reusable-security.yml (new), protobuf workflow (if applicable). - Steps: -
+      Replace inline/scripted steps with uses: jdfalk/\*-action@v1. - Keep
+      dorny/paths-filter where fit; remove sparse-checkout logic entirely. - Add
+      summary checkpoints and robust outputs wiring between jobs. - Run on
+      ghcommon (self) and audiobook-organizer as canary; capture run logs. -
+      Deliverables: PR/commit diffs for each workflow; Integration Guide updated
+      with before/after. - Acceptance Criteria: Green pipeline in canary repos;
+      artifacts/releases intact; no inline scripts remain.
 
 ### Standardize Action Repo Workflows (ci.yml, release.yml, integration)
 
-- Scope: Every action repo gets consistent CI (lint + parse + minimal run), Release (tag + moving
-  tags), and Integration (use action from tag in a sample run).
-- Steps: - Add `ci.yml` with actionlint, yamllint, markdownlint, shellcheck/pyflakes as applicable;
-  run an example job `uses: ./` and assert outputs. - Add `release.yml` to create vX.Y.Z, update vX
-  and vX.Y, generate GitHub Release notes, attach example snippets. - Add `test-integration.yml` to
+- Scope: Every action repo gets consistent CI (lint + parse + minimal run),
+  Release (tag + moving tags), and Integration (use action from tag in a sample
+  run).
+- Steps: - Add `ci.yml` with actionlint, yamllint, markdownlint,
+  shellcheck/pyflakes as applicable; run an example job `uses: ./` and assert
+  outputs. - Add `release.yml` to create vX.Y.Z, update vX and vX.Y, generate
+  GitHub Release notes, attach example snippets. - Add `test-integration.yml` to
   `uses: owner/repo@v1` ensuring public consumption works.
 - Deliverables: Workflow files across all action repos; status badges in README.
-- Acceptance: All actions show green CI for push/PR; release workflow produces tags/releases.
+- Acceptance: All actions show green CI for push/PR; release workflow produces
+  tags/releases.
 
 ### Security Hardening for Workflows
 
-- Scope: Apply least-privilege permissions, pin actions to SHAs or major versions, add security
-  scanning.
-- Steps: - Set `permissions` per job; default to `read` and escalate only when needed (contents,
-  id-token, attestations, etc.). - Pin third-party actions (actionlint suggests), enable OIDC for
-  publishing when applicable. - Add CodeQL or basic SAST for helper code; add Trivy for containers
-  where relevant.
-- Deliverables: Updated workflows with pinned actions, permissions, security checks documented.
-- Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed for action pins.
+- Scope: Apply least-privilege permissions, pin actions to SHAs or major
+  versions, add security scanning.
+- Steps: - Set `permissions` per job; default to `read` and escalate only when
+  needed (contents, id-token, attestations, etc.). - Pin third-party actions
+  (actionlint suggests), enable OIDC for publishing when applicable. - Add
+  CodeQL or basic SAST for helper code; add Trivy for containers where relevant.
+- Deliverables: Updated workflows with pinned actions, permissions, security
+  checks documented.
+- Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
+  for action pins.
 
 ### Documentation Completeness (READMEs, Inputs/Outputs, Examples)
 
-- Scope: Ensure each action README includes inputs/outputs tables, examples for common and advanced
-  usage, and links to reusable workflow examples.
-- Steps: - Generate Inputs/Outputs from action.yml to markdown tables; add minimal and advanced
-  examples. - Add badges: CI, Release, Marketplace (if applicable), Version tags. - Cross-link to
-  ghcommon Integration Guide sections.
+- Scope: Ensure each action README includes inputs/outputs tables, examples for
+  common and advanced usage, and links to reusable workflow examples.
+- Steps: - Generate Inputs/Outputs from action.yml to markdown tables; add
+  minimal and advanced examples. - Add badges: CI, Release, Marketplace (if
+  applicable), Version tags. - Cross-link to ghcommon Integration Guide
+  sections.
 - Deliverables: Updated READMEs across all actions; docs PR linking strategy.
-- Acceptance: Lint passes (markdownlint), and examples verified via integration workflow.
+- Acceptance: Lint passes (markdownlint), and examples verified via integration
+  workflow.
 
 ### End-to-End Validation in Example Consumer Repo(s)
 
-- Scope: Create/refresh a small sample repo that consumes reusable-ci and reusable-release, and
-  exercises new actions in realistic paths (Go, Python, Frontend variants).
-- Steps: - Matrix run: Linux primary; optionally macOS/Windows smoke checks for action
-  portability. - Trigger CI and Release flows; verify artifacts, tags, releases, and summaries. -
-  Capture run IDs and logs; add to Verification Report.
-- Deliverables: `example-consumer` results logged and referenced; issues filed for any regressions.
-- Acceptance: Green end-to-end runs with artifacts/releases matching expectations.
+- Scope: Create/refresh a small sample repo that consumes reusable-ci and
+  reusable-release, and exercises new actions in realistic paths (Go, Python,
+  Frontend variants).
+- Steps: - Matrix run: Linux primary; optionally macOS/Windows smoke checks for
+  action portability. - Trigger CI and Release flows; verify artifacts, tags,
+  releases, and summaries. - Capture run IDs and logs; add to Verification
+  Report.
+- Deliverables: `example-consumer` results logged and referenced; issues filed
+  for any regressions.
+- Acceptance: Green end-to-end runs with artifacts/releases matching
+  expectations.
 
 ### Backward Compatibility & Deprecation Plan
 
-- Scope: Provide a safe migration off scripts to actions without breaking existing callers.
-- Steps: - Keep current workflows working; introduce new action-powered paths under a feature flag
-  window. - Emit warnings in summaries when legacy script path executed; set removal timeline. -
-  Document migration steps and timelines in ghcommon.
-- Deliverables: Deprecation notice, migration guide, feature flag defaults schedule.
-- Acceptance: No hard breaks during migration window; consumers adopt new actions successfully.
+- Scope: Provide a safe migration off scripts to actions without breaking
+  existing callers.
+- Steps: - Keep current workflows working; introduce new action-powered paths
+  under a feature flag window. - Emit warnings in summaries when legacy script
+  path executed; set removal timeline. - Document migration steps and timelines
+  in ghcommon.
+- Deliverables: Deprecation notice, migration guide, feature flag defaults
+  schedule.
+- Acceptance: No hard breaks during migration window; consumers adopt new
+  actions successfully.
 
 ### Governance & Protections
 
-- Scope: Ensure changes to workflows/actions require appropriate review and pass required checks.
-- Steps: - Update CODEOWNERS for `.github/workflows/**` and action repos; set required checks for
-  merges. - Enforce branch protection rules and conventional commit checks. - Add PR templates for
-  action repos with checklist (docs, tags, tests).
+- Scope: Ensure changes to workflows/actions require appropriate review and pass
+  required checks.
+- Steps: - Update CODEOWNERS for `.github/workflows/**` and action repos; set
+  required checks for merges. - Enforce branch protection rules and conventional
+  commit checks. - Add PR templates for action repos with checklist (docs, tags,
+  tests).
 - Deliverables: Governance config updates across repos.
-- Acceptance: Merges to main blocked without reviews + green checks; history clean via conventions.
+- Acceptance: Merges to main blocked without reviews + green checks; history
+  clean via conventions.
 
 ### Org-wide Monitoring & Summaries
 
 - Scope: Central visibility of runs, failures, tag creation, and adoption rate.
-- Steps: - Extend workflow-debugger to include action repo CI health and tag/release verification. -
-  Nightly job to aggregate status across repos and post summary artifact. - Track adoption of new
-  actions by repository and workflow.
+- Steps: - Extend workflow-debugger to include action repo CI health and
+  tag/release verification. - Nightly job to aggregate status across repos and
+  post summary artifact. - Track adoption of new actions by repository and
+  workflow.
 - Deliverables: Monitoring scripts/workflows and summary artifacts.
 - Acceptance: Weekly status reports show CI health and adoption metrics.
 
 ## ✅ Completed
 
-- [x] Phase 0: Shared workflow foundations (`workflow_common.py`, config schema, validation tooling,
-      security checklist, core tests)
-- [x] Phase 1: CI modernization (change detection helper, reusable CI workflow, feature-flagged
-      caller, unit + integration tests)
-- [x] Phase 2: Release consolidation (branch-aware release helper, reusable release workflow,
-      feature-flagged caller, GitHub Packages docs/tests)
-- [x] GitHub Packages publishing job, helper script, rollout docs, automated tests, and summary
-      tooling
+- [x] Phase 0: Shared workflow foundations (`workflow_common.py`, config schema,
+      validation tooling, security checklist, core tests)
+- [x] Phase 1: CI modernization (change detection helper, reusable CI workflow,
+      feature-flagged caller, unit + integration tests)
+- [x] Phase 2: Release consolidation (branch-aware release helper, reusable
+      release workflow, feature-flagged caller, GitHub Packages docs/tests)
+- [x] GitHub Packages publishing job, helper script, rollout docs, automated
+      tests, and summary tooling
 
 ## 🚧 In Progress / Upcoming
 
@@ -146,30 +179,36 @@
 
 - [x] Build doc-change detection pipeline and reusable documentation workflow
 - [x] Implement auto-generated docs publishing and changelog updates
-- [x] Wire feature flag `use_new_docs` into workflows and repository configuration
+- [x] Wire feature flag `use_new_docs` into workflows and repository
+      configuration
 - [x] Add unit/integration tests for doc automation helpers and workflows
 
 ### Phase 4: Maintenance Automation
 
-- [x] Implement maintenance helpers for dependency updates (docs + summary tooling).
-- [x] Create reusable maintenance workflow and feature-flagged caller (wired to maintenance helper)
-- [x] Add scheduling + configuration hooks for maintenance jobs across repos (config-driven via
-      repository-config.yml)
+- [x] Implement maintenance helpers for dependency updates (docs + summary
+      tooling).
+- [x] Create reusable maintenance workflow and feature-flagged caller (wired to
+      maintenance helper)
+- [x] Add scheduling + configuration hooks for maintenance jobs across repos
+      (config-driven via repository-config.yml)
 - [x] Document maintenance automation runbooks and verification steps
 
 ### Phase 5: Advanced Features
 
 - [x] Add metrics/observability helpers and analytics integration
-- [x] Implement automation workflows for caching, analytics, and self-healing reporting
+- [x] Implement automation workflows for caching, analytics, and self-healing
+      reporting
 - [x] Extend workflow catalog/reference docs with advanced feature details
 
 ### Operations & Reference Tasks
 
-- [x] Finalize rollback procedures, troubleshooting, and migration playbooks for v2 workflows
-- [x] Update implementation guides (testing, release, CI) with new patterns and linters
+- [x] Finalize rollback procedures, troubleshooting, and migration playbooks for
+      v2 workflows
+- [x] Update implementation guides (testing, release, CI) with new patterns and
+      linters
 - [x] Ensure helper scripts API reference reflects new modules and features
-- [x] Validate workflow catalog entries for new reusable workflows (CI, release, docs, maintenance,
-      advanced)
+- [x] Validate workflow catalog entries for new reusable workflows (CI, release,
+      docs, maintenance, advanced)
 
 ## 🔥 Critical - Action Repository CI Failures
 
@@ -195,7 +234,8 @@
 4. Implement Docker build functionality
 5. Fix and test CI workflow
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-docker-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/release-docker-action/TODO.md`
 
 ---
 
@@ -218,7 +258,8 @@
 4. Add release artifact handling
 5. Fix and test CI workflow
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-go-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/release-go-action/TODO.md`
 
 ---
 
@@ -242,7 +283,8 @@
 3. Fix Go module cache configuration
 4. Test and verify CI passes
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/auto-module-tagging-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/auto-module-tagging-action/TODO.md`
 
 ---
 
@@ -264,7 +306,8 @@
 3. Fix cache dependencies configuration
 4. Test and verify CI passes
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-frontend-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/release-frontend-action/TODO.md`
 
 ---
 
@@ -286,7 +329,8 @@
 3. Create sample Rust project for integration testing
 4. Test and verify CI passes
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-rust-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/release-rust-action/TODO.md`
 
 ---
 
@@ -303,7 +347,8 @@
 - No failures detected
 - Ready for migration to reusable workflows
 
-**Tracking:** See `/Users/jdfalk/repos/github.com/jdfalk/release-protobuf-action/TODO.md`
+**Tracking:** See
+`/Users/jdfalk/repos/github.com/jdfalk/release-protobuf-action/TODO.md`
 
 ---
 
@@ -311,8 +356,8 @@
 
 ### #todo Phase 1: Fix All CI Failures First
 
-**Status:** In Progress **Priority:** Critical **Dependencies:** All above CI fixes must be
-completed
+**Status:** In Progress **Priority:** Critical **Dependencies:** All above CI
+fixes must be completed
 
 **Completion Criteria:**
 
@@ -327,7 +372,8 @@ completed
 
 ### #todo Phase 2: Migrate to Reusable Workflows
 
-**Status:** Blocked **Priority:** High **Dependencies:** Phase 1 must complete first
+**Status:** Blocked **Priority:** High **Dependencies:** Phase 1 must complete
+first
 
 **Action Items:**
 
@@ -350,7 +396,8 @@ completed
 
 ### #todo Phase 3: Continuous Testing and Validation
 
-**Status:** Blocked **Priority:** High **Dependencies:** Phase 2 must complete first
+**Status:** Blocked **Priority:** High **Dependencies:** Phase 2 must complete
+first
 
 **Testing Plan:**
 
@@ -373,9 +420,10 @@ completed
 
 ## 📊 Summary Status
 
-**Total Repositories:** 6 **Critical Failures:** 2 (release-docker-action, release-go-action) **High
-Priority Failures:** 3 (auto-module-tagging-action, release-frontend-action, release-rust-action)
-**Passing:** 1 (release-protobuf-action)
+**Total Repositories:** 6 **Critical Failures:** 2 (release-docker-action,
+release-go-action) **High Priority Failures:** 3 (auto-module-tagging-action,
+release-frontend-action, release-rust-action) **Passing:** 1
+(release-protobuf-action)
 
 **Estimated Timeline:**
 
@@ -386,7 +434,8 @@ Priority Failures:** 3 (auto-module-tagging-action, release-frontend-action, rel
 
 ---
 
-**Last Updated:** 2025-12-19 **Next Review:** After critical failures are resolved
+**Last Updated:** 2025-12-19 **Next Review:** After critical failures are
+resolved
 
 ---
 
@@ -397,8 +446,8 @@ Priority Failures:** 3 (auto-module-tagging-action, release-frontend-action, rel
 **Status:** Ready **Priority:** Critical **Repository:**
 [release-go-action](https://github.com/jdfalk/release-go-action)
 
-**Context:** release-go-action has been completely rewritten to use GoReleaser instead of manual Go
-builds. This is a breaking change requiring v2.0.0.
+**Context:** release-go-action has been completely rewritten to use GoReleaser
+instead of manual Go builds. This is a breaking change requiring v2.0.0.
 
 **Action Items:**
 
@@ -408,7 +457,8 @@ builds. This is a breaking change requiring v2.0.0.
 4. [ ] Get commit hash for pinning in workflows
 5. [ ] Update ghcommon workflows to use v2
 
-**Script:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/tag-release-go-v2.sh`
+**Script:**
+`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/tag-release-go-v2.sh`
 
 ---
 
@@ -416,8 +466,8 @@ builds. This is a breaking change requiring v2.0.0.
 
 **Status:** Ready **Priority:** High **Repository:** ghcommon
 
-**Context:** All jdfalk/\* actions should be pinned to specific commit hashes with version comments
-for security and reproducibility.
+**Context:** All jdfalk/\* actions should be pinned to specific commit hashes
+with version comments for security and reproducibility.
 
 **Action Items:**
 
@@ -427,7 +477,8 @@ for security and reproducibility.
 4. [ ] Commit and push changes
 5. [ ] Update documentation with pinning policy
 
-**Script:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/pin-actions-to-hashes.py`
+**Script:**
+`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/pin-actions-to-hashes.py`
 
 **Output:** `ACTION_VERSIONS.md` - Version/hash reference table
 
@@ -437,17 +488,22 @@ for security and reproducibility.
 
 **Status:** Pending **Priority:** High **Repository:** ghcommon
 
-**Context:** Now that actions are extracted, convert reusable workflows to use the new jdfalk/\*
-actions.
+**Context:** Now that actions are extracted, convert reusable workflows to use
+the new jdfalk/\* actions.
 
 **Action Items:**
 
 1. [ ] Update `release-go.yml` to use `jdfalk/release-go-action@hash # v2.0.1`
-2. [ ] Update `release-docker.yml` to use `jdfalk/release-docker-action@hash # v1.0.0`
-3. [ ] Update `release-frontend.yml` to use `jdfalk/release-frontend-action@hash # v1.0.0`
-4. [ ] Update `release-python.yml` to use `jdfalk/release-python-action@hash # v1.0.0`
-5. [ ] Update `release-rust.yml` to use `jdfalk/release-rust-action@hash # v1.0.0`
-6. [ ] Update `release-protobuf.yml` to use `jdfalk/release-protobuf-action@hash # v1.0.0`
+2. [ ] Update `release-docker.yml` to use
+       `jdfalk/release-docker-action@hash # v1.0.0`
+3. [ ] Update `release-frontend.yml` to use
+       `jdfalk/release-frontend-action@hash # v1.0.0`
+4. [ ] Update `release-python.yml` to use
+       `jdfalk/release-python-action@hash # v1.0.0`
+5. [ ] Update `release-rust.yml` to use
+       `jdfalk/release-rust-action@hash # v1.0.0`
+6. [ ] Update `release-protobuf.yml` to use
+       `jdfalk/release-protobuf-action@hash # v1.0.0`
 7. [ ] Test each workflow conversion
 8. [ ] Document migration for repositories using these workflows
 
@@ -459,7 +515,8 @@ actions.
 
 **Status:** In Progress **Priority:** High **Repository:** All action repos
 
-**Context:** Some actions still have CI failures that need investigation and fixing.
+**Context:** Some actions still have CI failures that need investigation and
+fixing.
 
 **Action Items:**
 

@@ -4,8 +4,9 @@
 
 # GitHub Actions Architecture Design
 
-**Date:** December 20, 2025 **Purpose:** Technical architecture and design patterns for workflow
-script conversion **Status:** Phase 3 - Architecture Design Complete
+**Date:** December 20, 2025 **Purpose:** Technical architecture and design
+patterns for workflow script conversion **Status:** Phase 3 - Architecture
+Design Complete
 
 ## Design Principles
 
@@ -107,7 +108,8 @@ runs:
 ### Action 1: load-config-action
 
 **Repository:** `jdfalk/load-config-action` **Purpose:** Load and parse
-`.github/repository-config.yml` **Replaces:** `load_repository_config.py` (43 lines)
+`.github/repository-config.yml` **Replaces:** `load_repository_config.py` (43
+lines)
 
 #### Technical Specification
 
@@ -117,7 +119,8 @@ runs:
 # guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
 
 name: 'Load Repository Config'
-description: 'Load and parse .github/repository-config.yml with fallback handling'
+description:
+  'Load and parse .github/repository-config.yml with fallback handling'
 author: 'jdfalk'
 
 branding:
@@ -304,8 +307,8 @@ jobs:
 - `append_summary()` - Write to GITHUB_STEP_SUMMARY
 - `get_repository_config()` - Parse config JSON from environment
 
-**Decision:** **DO NOT create a separate action.** Instead, **embed** these utilities into each
-action that needs them. Reasoning:
+**Decision:** **DO NOT create a separate action.** Instead, **embed** these
+utilities into each action that needs them. Reasoning:
 
 1. Functions are only ~10-20 lines each
 2. Creating a dependency action adds complexity
@@ -347,14 +350,17 @@ def get_repository_config():
 
 ### Action 3: ci-generate-matrices-action
 
-**Repository:** `jdfalk/ci-generate-matrices-action` **Purpose:** Generate language version matrices
-for CI testing **Replaces:** `ci_workflow.py generate-matrices` (partial, ~200 lines)
+**Repository:** `jdfalk/ci-generate-matrices-action` **Purpose:** Generate
+language version matrices for CI testing **Replaces:**
+`ci_workflow.py generate-matrices` (partial, ~200 lines)
 
 #### Technical Specification
 
 ```yaml
 name: 'Generate CI Matrices'
-description: 'Generate test matrices for Go, Python, Rust, and Node.js based on repository config'
+description:
+  'Generate test matrices for Go, Python, Rust, and Node.js based on repository
+  config'
 author: 'jdfalk'
 
 branding:
@@ -548,14 +554,17 @@ jobs:
 
 ### Action 4: detect-languages-action
 
-**Repository:** `jdfalk/detect-languages-action` **Purpose:** Detect project languages and
-technologies **Replaces:** `release_workflow.py detect-languages` (~150 lines)
+**Repository:** `jdfalk/detect-languages-action` **Purpose:** Detect project
+languages and technologies **Replaces:** `release_workflow.py detect-languages`
+(~150 lines)
 
 #### Technical Specification
 
 ```yaml
 name: 'Detect Project Languages'
-description: 'Automatically detect Go, Python, Rust, Frontend, Docker, and Protobuf in repository'
+description:
+  'Automatically detect Go, Python, Rust, Frontend, Docker, and Protobuf in
+  repository'
 author: 'jdfalk'
 
 branding:
@@ -569,7 +578,9 @@ inputs:
     default: 'false'
 
   build-target:
-    description: 'Comma-separated build targets (all, go, python, rust, frontend, docker, protobuf)'
+    description:
+      'Comma-separated build targets (all, go, python, rust, frontend, docker,
+      protobuf)'
     required: false
     default: 'all'
 
@@ -795,15 +806,16 @@ runs:
 
 ### Action 5: release-strategy-action
 
-**Repository:** `jdfalk/release-strategy-action` **Purpose:** Determine release strategy
-(stable/prerelease/draft) based on branch **Replaces:** `release_workflow.py release-strategy` (~50
-lines)
+**Repository:** `jdfalk/release-strategy-action` **Purpose:** Determine release
+strategy (stable/prerelease/draft) based on branch **Replaces:**
+`release_workflow.py release-strategy` (~50 lines)
 
 #### Technical Specification
 
 ```yaml
 name: 'Release Strategy'
-description: 'Determine release strategy (stable/prerelease/draft) based on Git branch'
+description:
+  'Determine release strategy (stable/prerelease/draft) based on Git branch'
 author: 'jdfalk'
 
 branding:
@@ -933,14 +945,16 @@ runs:
 
 ### Action 6: generate-version-action
 
-**Repository:** `jdfalk/generate-version-action` **Purpose:** Generate semantic version tags
-**Replaces:** `release_workflow.py generate-version` + `generate-version.sh` (~200 lines)
+**Repository:** `jdfalk/generate-version-action` **Purpose:** Generate semantic
+version tags **Replaces:** `release_workflow.py generate-version` +
+`generate-version.sh` (~200 lines)
 
 #### Technical Specification
 
 ```yaml
 name: 'Generate Semantic Version'
-description: 'Generate semantic version tag based on release type and existing tags'
+description:
+  'Generate semantic version tag based on release type and existing tags'
 author: 'jdfalk'
 
 branding:

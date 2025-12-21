@@ -6,8 +6,8 @@
 
 ## Overview
 
-All GitHub Actions repositories now have comprehensive CI/CD automation in place. Each action
-repository includes:
+All GitHub Actions repositories now have comprehensive CI/CD automation in
+place. Each action repository includes:
 
 1. **CI Workflow** - Continuous Integration testing and validation
 2. **Release Workflow** - Automated releases with semantic versioning
@@ -17,13 +17,15 @@ repository includes:
 
 ### 1. release-docker-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-docker-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-docker-action/.github/workflows/`
 
 **Workflows Created**:
 
 - ✅ `ci.yml` - Validates action.yml, tests Docker builds, runs yamllint
 - ✅ `release.yml` - Creates releases, updates major/minor version tags
-- ✅ `test-integration.yml` - Tests Docker builds, multi-platform builds, build arguments
+- ✅ `test-integration.yml` - Tests Docker builds, multi-platform builds, build
+  arguments
 
 **Key Features**:
 
@@ -36,7 +38,8 @@ repository includes:
 
 ### 2. release-go-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-go-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-go-action/.github/workflows/`
 
 **Workflows Created**:
 
@@ -48,14 +51,16 @@ repository includes:
 
 - Matrix testing across multiple Go versions (1.21, 1.22, 1.23)
 - Single platform build testing
-- Multi-platform build testing (linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64)
+- Multi-platform build testing (linux/amd64, linux/arm64, darwin/amd64,
+  darwin/arm64, windows/amd64)
 - LDFlags injection testing
 
 ---
 
 ### 3. release-frontend-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-frontend-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-frontend-action/.github/workflows/`
 
 **Workflows Created**:
 
@@ -73,7 +78,8 @@ repository includes:
 
 ### 4. release-python-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-python-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-python-action/.github/workflows/`
 
 **Workflows Created**:
 
@@ -91,7 +97,8 @@ repository includes:
 
 ### 5. release-rust-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-rust-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-rust-action/.github/workflows/`
 
 **Workflows Created**:
 
@@ -109,7 +116,8 @@ repository includes:
 
 ### 6. release-protobuf-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/release-protobuf-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/release-protobuf-action/.github/workflows/`
 
 **Workflows Created**:
 
@@ -127,7 +135,8 @@ repository includes:
 
 ### 7. auto-module-tagging-action
 
-**Location**: `/Users/jdfalk/repos/github.com/jdfalk/auto-module-tagging-action/.github/workflows/`
+**Location**:
+`/Users/jdfalk/repos/github.com/jdfalk/auto-module-tagging-action/.github/workflows/`
 
 **Workflows Created**:
 

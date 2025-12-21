@@ -4,8 +4,8 @@
 
 # Commitlint Setup
 
-This repository uses [commitlint](https://commitlint.js.org/) to enforce our conventional commit
-standards.
+This repository uses [commitlint](https://commitlint.js.org/) to enforce our
+conventional commit standards.
 
 ## Installation
 
@@ -33,7 +33,8 @@ npm run commitlint-ci
 
 ### Git Hooks (Optional)
 
-To automatically validate commits before they're created, you can install a git hook:
+To automatically validate commits before they're created, you can install a git
+hook:
 
 ```bash
 # Install husky (one-time setup)
@@ -48,8 +49,8 @@ npx husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
 
 The commitlint configuration is in `.commitlintrc.js` and follows our standards:
 
-- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `build`, `ci`,
-  `revert`
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`,
+  `chore`, `build`, `ci`, `revert`
 - **Format**: `type(scope): subject` (scope is optional)
 - **Subject**: 10-72 characters, lowercase, no period
 - **Body**: Should include "Files changed:" section

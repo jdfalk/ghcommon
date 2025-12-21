@@ -6,8 +6,9 @@
 
 ## Overview
 
-All action repositories have been created, configured with CI/CD, and are ready for review. All
-changes have been committed and pushed to their respective repositories.
+All action repositories have been created, configured with CI/CD, and are ready
+for review. All changes have been committed and pushed to their respective
+repositories.
 
 ## Action Repositories Status
 

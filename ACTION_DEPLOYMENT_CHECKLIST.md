@@ -4,14 +4,15 @@
 
 # Action Deployment Checklist
 
-This document provides a step-by-step checklist for deploying all GitHub Actions to their
-repositories.
+This document provides a step-by-step checklist for deploying all GitHub Actions
+to their repositories.
 
 ## Pre-Deployment Checklist
 
 ### ✅ Repository Structure Verification
 
-All 7 action repositories have been created locally with the following structure:
+All 7 action repositories have been created locally with the following
+structure:
 
 1. ✅ **release-docker-action**
    - action.yml ✓
@@ -160,7 +161,8 @@ for action in release-docker-action release-go-action release-frontend-action re
 done
 ```
 
-Expected output: Each repository should show a CI workflow run triggered by the push.
+Expected output: Each repository should show a CI workflow run triggered by the
+push.
 
 ### Step 4: Create Initial Releases
 
@@ -208,7 +210,8 @@ echo "🎉 All v1.0.0 releases created!"
 
 ### Step 5: Verify Version Tags
 
-After release workflows complete, verify that major and minor version tags are created:
+After release workflows complete, verify that major and minor version tags are
+created:
 
 ```bash
 # Check tags for each action
@@ -326,7 +329,8 @@ jobs:
 
 1. Check release workflow logs
 2. Verify git configuration in workflow
-3. Manually run: `git tag -fa v1 -m "Update v1 to v1.0.0" && git push origin v1 --force`
+3. Manually run:
+   `git tag -fa v1 -m "Update v1 to v1.0.0" && git push origin v1 --force`
 
 ---
 

@@ -6,8 +6,9 @@
 
 ## Issue Fixed
 
-**Problem:** All action repositories had invalid `shell: bash` declarations on `uses:` steps, which
-is not allowed in GitHub Actions. The `shell` key is only valid for `run:` steps.
+**Problem:** All action repositories had invalid `shell: bash` declarations on
+`uses:` steps, which is not allowed in GitHub Actions. The `shell` key is only
+valid for `run:` steps.
 
 **Error Example:**
 
@@ -17,7 +18,8 @@ Unexpected value 'shell' at Line: 80, Col: 7
 
 ## Solution Applied
 
-Removed all invalid `shell: bash` lines from `uses:` steps in all action.yml files across:
+Removed all invalid `shell: bash` lines from `uses:` steps in all action.yml
+files across:
 
 - ✓ release-docker-action
 - ✓ release-go-action
@@ -27,7 +29,8 @@ Removed all invalid `shell: bash` lines from `uses:` steps in all action.yml fil
 - ✓ release-protobuf-action
 - ✓ auto-module-tagging-action
 
-**Commits:** All fixes have been committed and pushed with conventional commit messages.
+**Commits:** All fixes have been committed and pushed with conventional commit
+messages.
 
 ## Next Steps
 
@@ -60,7 +63,8 @@ This script will:
 
 ### 3. Verify Releases
 
-After tagging, GitHub's release workflows will automatically create releases. Verify at:
+After tagging, GitHub's release workflows will automatically create releases.
+Verify at:
 
 - <https://github.com/jdfalk/release-docker-action/releases>
 - <https://github.com/jdfalk/release-go-action/releases>
@@ -81,8 +85,10 @@ The tagging script creates three tags:
 This follows GitHub Actions best practices where users can:
 
 - Pin to exact version: `uses: jdfalk/release-docker-action@v1.0.0`
-- Pin to minor: `uses: jdfalk/release-docker-action@v1.0` (gets patches automatically)
-- Pin to major: `uses: jdfalk/release-docker-action@v1` (gets all non-breaking updates)
+- Pin to minor: `uses: jdfalk/release-docker-action@v1.0` (gets patches
+  automatically)
+- Pin to major: `uses: jdfalk/release-docker-action@v1` (gets all non-breaking
+  updates)
 
 ## Force Tag Updates
 
@@ -107,8 +113,8 @@ All 7 action repositories are:
 
 **Question:** Do we need to generate packages for these actions?
 
-**Answer:** No, packages are not needed for GitHub Actions. Actions are consumed directly from
-GitHub repositories using:
+**Answer:** No, packages are not needed for GitHub Actions. Actions are consumed
+directly from GitHub repositories using:
 
 ```yaml
 uses: jdfalk/release-docker-action@v1

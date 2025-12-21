@@ -4,7 +4,8 @@
 
 # GitHub Actions Version Reference
 
-This file tracks the pinned versions and commit hashes for all jdfalk/\* actions.
+This file tracks the pinned versions and commit hashes for all jdfalk/\*
+actions.
 
 **Last Updated:** 2025-12-21 11:10:38
 

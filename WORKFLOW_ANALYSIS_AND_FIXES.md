@@ -1,14 +1,15 @@
 # GitHub Actions Workflow Analysis and Remediation Plan
 
-**Repository:** jdfalk/ghcommon **Analysis Date:** 2025-12-19 **Purpose:** Comprehensive analysis of
-workflow failures and HEREDOC usage requiring remediation
+**Repository:** jdfalk/ghcommon **Analysis Date:** 2025-12-19 **Purpose:**
+Comprehensive analysis of workflow failures and HEREDOC usage requiring
+remediation
 
 ---
 
 ## Executive Summary
 
-The ghcommon repository contains 28 workflow files with a **failure rate of approximately 70-80%**.
-Analysis of the last 30 workflow runs shows:
+The ghcommon repository contains 28 workflow files with a **failure rate of
+approximately 70-80%**. Analysis of the last 30 workflow runs shows:
 
 - **Total Runs Analyzed:** 30
 - **Failed:** 17 (57%)
@@ -17,7 +18,8 @@ Analysis of the last 30 workflow runs shows:
 
 ### Primary Issues Identified
 
-1. **HEREDOC Inline Scripts:** 10 instances across 5 workflow files that need extraction
+1. **HEREDOC Inline Scripts:** 10 instances across 5 workflow files that need
+   extraction
 2. **Python Formatting Failures:** Black/isort checks failing consistently
 3. **Dependency Issues:** Missing or incompatible dependencies
 4. **Path and Working Directory Problems:** Scripts expecting wrong paths
@@ -421,7 +423,9 @@ if __name__ == "__main__":
   run: pip install psutil
 
 - name: Collect Performance Metrics
-  run: python3 .github/workflows/scripts/collect_performance_metrics.py performance-metrics.json
+  run:
+    python3 .github/workflows/scripts/collect_performance_metrics.py
+    performance-metrics.json
 ```
 
 ---
@@ -549,8 +553,8 @@ if __name__ == "__main__":
 ```yaml
 - name: Process Benchmark Data
   run:
-    python3 .github/workflows/scripts/process_benchmark_data.py "**/benchmark-*.json"
-    benchmark-summary.json
+    python3 .github/workflows/scripts/process_benchmark_data.py
+    "**/benchmark-*.json" benchmark-summary.json
 ```
 
 ---
@@ -695,7 +699,9 @@ if __name__ == "__main__":
 
 ```yaml
 - name: Validate Protobuf Files
-  run: python3 .github/workflows/scripts/validate_protobuf_files.py "${{ inputs.proto-directory }}"
+  run:
+    python3 .github/workflows/scripts/validate_protobuf_files.py "${{
+    inputs.proto-directory }}"
 ```
 
 ---
@@ -805,7 +811,9 @@ if __name__ == "__main__":
 
 ```yaml
 - name: Validate Release Tag
-  run: python3 .github/workflows/scripts/validate_release_tag.py "${{ github.ref_name }}"
+  run:
+    python3 .github/workflows/scripts/validate_release_tag.py "${{
+    github.ref_name }}"
 ```
 
 ---
@@ -993,13 +1001,17 @@ if __name__ == "__main__":
 
 ### Scripts to Create
 
-1. `.github/workflows/scripts/generate_security_summary.py` - Security scan summary
-2. `.github/workflows/scripts/determine_working_dir.py` - Working directory detection
-3. `.github/workflows/scripts/collect_performance_metrics.py` - Performance metrics
+1. `.github/workflows/scripts/generate_security_summary.py` - Security scan
+   summary
+2. `.github/workflows/scripts/determine_working_dir.py` - Working directory
+   detection
+3. `.github/workflows/scripts/collect_performance_metrics.py` - Performance
+   metrics
 4. `.github/workflows/scripts/process_benchmark_data.py` - Benchmark aggregation
 5. `.github/workflows/scripts/validate_protobuf_files.py` - Protobuf validation
 6. `.github/workflows/scripts/validate_release_tag.py` - Release tag validation
-7. `.github/workflows/scripts/generate_release_notes.py` - Release notes generation
+7. `.github/workflows/scripts/generate_release_notes.py` - Release notes
+   generation
 
 ### Benefits After Remediation
 
@@ -1016,8 +1028,8 @@ if __name__ == "__main__":
 
 ### Overview of Failure Patterns
 
-Based on analysis of workflow files and common GitHub Actions patterns, the following failure
-categories have been identified:
+Based on analysis of workflow files and common GitHub Actions patterns, the
+following failure categories have been identified:
 
 ### Failure Category 1: Python Formatting and Linting Failures
 
@@ -1031,7 +1043,8 @@ categories have been identified:
 
 1. **Black Formatting Inconsistencies**
    - **Problem:** Black version mismatches between CI and local development
-   - **Evidence:** Workflows use `black==23.x` but developers may use different versions
+   - **Evidence:** Workflows use `black==23.x` but developers may use different
+     versions
    - **Impact:** 30-40% of CI runs fail on formatting
 
 ```yaml
@@ -1321,7 +1334,8 @@ Update workflow:
 
 1. **Incorrect Working Directory Assumptions**
 
-**Problem:** Scripts assume they're run from repository root but may be in subdirectory
+**Problem:** Scripts assume they're run from repository root but may be in
+subdirectory
 
 **Example failure from reusable-protobuf.yml:**
 
@@ -1534,8 +1548,8 @@ Error: 403 Forbidden - Token missing required scopes
     registry: ${{ steps.registry.outputs.registry }}
     username: ${{ steps.registry.outputs.username }}
     password:
-      ${{ steps.registry.outputs.registry == 'docker.io' && secrets.DOCKER_PASSWORD ||
-      secrets.GITHUB_TOKEN }}
+      ${{ steps.registry.outputs.registry == 'docker.io' &&
+      secrets.DOCKER_PASSWORD || secrets.GITHUB_TOKEN }}
 ```
 
 ---
@@ -1601,7 +1615,8 @@ strategy:
 
 2. **Python Version Incompatibilities**
 
-**Problem:** Code uses features only available in Python 3.12+ but matrix includes 3.11
+**Problem:** Code uses features only available in Python 3.12+ but matrix
+includes 3.11
 
 **Example failures:**
 
@@ -1632,7 +1647,8 @@ def process(data: List[Dict[str, str]]) -> None:
 
 3. **Flaky Tests in Matrix**
 
-**Problem:** Tests pass sometimes but fail randomly, especially on certain OS/Python combos
+**Problem:** Tests pass sometimes but fail randomly, especially on certain
+OS/Python combos
 
 **Fix:** Add retries and better isolation
 
@@ -1677,7 +1693,8 @@ ModuleNotFoundError: No module named 'workflow_common'
 from workflow_common import setup_logging  # Fails!
 ```
 
-**Root cause:** `.github/workflows/scripts/` is not a Python package (no `__init__.py`)
+**Root cause:** `.github/workflows/scripts/` is not a Python package (no
+`__init__.py`)
 
 **Fix:**
 
@@ -2091,13 +2108,15 @@ jobs:
 
 # MODIFIED: Collect metrics (remove HEREDOC)
 - name: Collect Performance Metrics
-  run: python3 .github/workflows/scripts/collect_performance_metrics.py performance-metrics.json
+  run:
+    python3 .github/workflows/scripts/collect_performance_metrics.py
+    performance-metrics.json
 
 # MODIFIED: Process benchmarks (remove HEREDOC)
 - name: Process Benchmark Data
   run:
-    python3 .github/workflows/scripts/process_benchmark_data.py "**/benchmark-*.json"
-    benchmark-summary.json
+    python3 .github/workflows/scripts/process_benchmark_data.py
+    "**/benchmark-*.json" benchmark-summary.json
 
 # MODIFIED: Generate report (remove HEREDOC)
 - name: Generate Performance Report
@@ -2125,7 +2144,9 @@ jobs:
 ```yaml
 # NEW: Validate release tag
 - name: Validate Release Tag
-  run: python3 .github/workflows/scripts/validate_release_tag.py "${{ github.ref_name }}"
+  run:
+    python3 .github/workflows/scripts/validate_release_tag.py "${{
+    github.ref_name }}"
 
 # MODIFIED: Generate release notes (remove HEREDOC)
 - name: Generate Release Notes
@@ -2344,7 +2365,8 @@ Track these metrics weekly:
 
 **Risk 1: Breaking Existing Workflows**
 
-- **Mitigation:** Test all changes locally first, use feature branches, gradual rollout
+- **Mitigation:** Test all changes locally first, use feature branches, gradual
+  rollout
 
 **Risk 2: New Script Failures**
 
@@ -2356,11 +2378,13 @@ Track these metrics weekly:
 
 **Risk 4: Platform-Specific Issues**
 
-- **Mitigation:** Test on all platforms (Linux, macOS, Windows), use act for local testing
+- **Mitigation:** Test on all platforms (Linux, macOS, Windows), use act for
+  local testing
 
 **Risk 5: Secret Management**
 
-- **Mitigation:** Document all required secrets, add validation steps, implement fallbacks
+- **Mitigation:** Document all required secrets, add validation steps, implement
+  fallbacks
 
 ### Rollback Plan
 
@@ -2374,18 +2398,18 @@ If issues arise after deployment:
 
 ## Conclusion
 
-This comprehensive analysis identifies **10 HEREDOC instances** requiring extraction and **6 major
-failure categories** affecting workflow reliability. The remediation plan is divided into 3 phases
-over 3 weeks:
+This comprehensive analysis identifies **10 HEREDOC instances** requiring
+extraction and **6 major failure categories** affecting workflow reliability.
+The remediation plan is divided into 3 phases over 3 weeks:
 
-**Phase 1 (Week 1):** Critical fixes addressing HEREDOC extraction, Python formatting, and
-dependency issues - **Expected to reduce failures by 50%**
+**Phase 1 (Week 1):** Critical fixes addressing HEREDOC extraction, Python
+formatting, and dependency issues - **Expected to reduce failures by 50%**
 
-**Phase 2 (Week 2):** High-impact fixes for paths, secrets, and matrix builds - **Expected to reduce
-remaining failures by 60%**
+**Phase 2 (Week 2):** High-impact fixes for paths, secrets, and matrix builds -
+**Expected to reduce remaining failures by 60%**
 
-**Phase 3 (Week 3):** Quality improvements including testing, documentation, and monitoring -
-**Expected to achieve >95% success rate**
+**Phase 3 (Week 3):** Quality improvements including testing, documentation, and
+monitoring - **Expected to achieve >95% success rate**
 
 ### Immediate Next Steps
 
@@ -2404,7 +2428,8 @@ remaining failures by 60%**
 - ✅ **Maintainable codebase:** No more HEREDOC debugging
 
 **Total estimated effort:** 60-80 hours over 3 weeks  
-**Expected ROI:** 75% reduction in workflow failures, 90% reduction in debugging time
+**Expected ROI:** 75% reduction in workflow failures, 90% reduction in debugging
+time
 
 ---
 

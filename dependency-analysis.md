@@ -4,11 +4,11 @@
 
 # Dependency Analysis for ghcommon Repository
 
-**Analysis Date:** November 1, 2025 **Purpose:** Map all file dependencies to identify unused files
-and cleanup opportunities **Status:** ✅ **COMPLETE**
+**Analysis Date:** November 1, 2025 **Purpose:** Map all file dependencies to
+identify unused files and cleanup opportunities **Status:** ✅ **COMPLETE**
 
-> Update (v2.1.0): Analyzer now supports CLI options, default excludes, and a "full" mode for large
-> Mermaid/DOT outputs. See enhancements and usage below.
+> Update (v2.1.0): Analyzer now supports CLI options, default excludes, and a
+> "full" mode for large Mermaid/DOT outputs. See enhancements and usage below.
 
 ## 📊 Executive Summary
 
@@ -26,7 +26,8 @@ The comprehensive dependency analysis has been completed successfully!
 - examples: 16 files
 - tests: 13 files
 - Potentially Unused Files (current): 320
-- Note: Category totals are listed individually; the root category overlaps with subfolders.
+- Note: Category totals are listed individually; the root category overlaps with
+  subfolders.
 
 ### Files Generated
 
@@ -52,8 +53,8 @@ All analysis outputs are located in the `dependency-analysis/` directory:
 - `--log-level` to adjust verbosity
 - Fixed HTML generation robustness and improved logging.
 - Explanation of size differences:
-- Mermaid intentionally defaults to conservative limits for readability and performance;
-  JSON/DOT/ASCII are exhaustive. Use `--full` to lift limits.
+- Mermaid intentionally defaults to conservative limits for readability and
+  performance; JSON/DOT/ASCII are exhaustive. Use `--full` to lift limits.
 
 ### How to run
 
@@ -103,7 +104,8 @@ From the repository root (uses the repo’s virtualenv):
 
 ### High Priority (Safe to Remove)
 
-Based on the orphan analysis, the following categories likely contain unused files:
+Based on the orphan analysis, the following categories likely contain unused
+files:
 
 1. **Virtual Environment (.venv/)** - Majority of orphans
    - **Action:** Exclude .venv/ from repository (add to .gitignore)

@@ -4,13 +4,15 @@
 
 # GitHub Workflows Consolidation Plan
 
-**Date**: 2025-12-19 **Author**: GitHub Copilot **Status**: Draft - Awaiting Approval
+**Date**: 2025-12-19 **Author**: GitHub Copilot **Status**: Draft - Awaiting
+Approval
 
 ## Executive Summary
 
-This plan outlines the consolidation of reusable GitHub Actions workflows from the `ghcommon`
-repository into separate, versioned GitHub Actions repositories. This will improve maintainability,
-versioning, discoverability, and reusability across all projects.
+This plan outlines the consolidation of reusable GitHub Actions workflows from
+the `ghcommon` repository into separate, versioned GitHub Actions repositories.
+This will improve maintainability, versioning, discoverability, and reusability
+across all projects.
 
 ## Current State Analysis
 
@@ -30,7 +32,8 @@ Based on analysis of `.github/workflows/*`, we have:
 #### Automation Workflows (Secondary Candidates)
 
 7. **auto-module-tagging.yml** - Automatic Go module tagging for SDKs
-8. **manager-sync-dispatcher.yml** - Repository synchronization dispatcher (DISABLED)
+8. **manager-sync-dispatcher.yml** - Repository synchronization dispatcher
+   (DISABLED)
 9. **sync-receiver.yml** - Repository synchronization receiver (DISABLED)
 
 #### Reusable Workflows (Already Modular, May Convert)
@@ -45,8 +48,10 @@ Based on analysis of `.github/workflows/*`, we have:
 
 - **ci.yml**, **ci-tests.yml** - Repository-specific CI
 - **documentation.yml** - Repository-specific docs generation
-- **issue-automation.yml**, **pr-automation.yml** - Automation specific to ghcommon
-- **performance-monitoring.yml**, **workflow-analytics.yml** - Monitoring specific to ghcommon
+- **issue-automation.yml**, **pr-automation.yml** - Automation specific to
+  ghcommon
+- **performance-monitoring.yml**, **workflow-analytics.yml** - Monitoring
+  specific to ghcommon
 - **security.yml** - Calls reusable-security.yml
 
 ## Proposed Action Repositories
@@ -55,8 +60,8 @@ Based on analysis of `.github/workflows/*`, we have:
 
 #### 1. `release-docker-action`
 
-**Repository**: `jdfalk/release-docker-action` **Purpose**: Build and publish Docker images to
-multiple registries **Source Workflow**: `release-docker.yml`
+**Repository**: `jdfalk/release-docker-action` **Purpose**: Build and publish
+Docker images to multiple registries **Source Workflow**: `release-docker.yml`
 
 **Key Features**:
 
@@ -101,8 +106,8 @@ inputs:
 
 #### 2. `release-go-action`
 
-**Repository**: `jdfalk/release-go-action` **Purpose**: Release Go modules with automatic SDK
-tagging support **Source Workflow**: `release-go.yml`
+**Repository**: `jdfalk/release-go-action` **Purpose**: Release Go modules with
+automatic SDK tagging support **Source Workflow**: `release-go.yml`
 
 **Key Features**:
 
@@ -145,8 +150,8 @@ inputs:
 
 #### 3. `release-python-action`
 
-**Repository**: `jdfalk/release-python-action` **Purpose**: Build and publish Python packages to
-PyPI **Source Workflow**: `release-python.yml`
+**Repository**: `jdfalk/release-python-action` **Purpose**: Build and publish
+Python packages to PyPI **Source Workflow**: `release-python.yml`
 
 **Key Features**:
 
@@ -185,8 +190,8 @@ inputs:
 
 #### 4. `release-rust-action`
 
-**Repository**: `jdfalk/release-rust-action` **Purpose**: Build and publish Rust crates **Source
-Workflow**: `release-rust.yml`
+**Repository**: `jdfalk/release-rust-action` **Purpose**: Build and publish Rust
+crates **Source Workflow**: `release-rust.yml`
 
 **Key Features**:
 
@@ -224,8 +229,8 @@ inputs:
 
 #### 5. `release-frontend-action`
 
-**Repository**: `jdfalk/release-frontend-action` **Purpose**: Build and release frontend
-applications **Source Workflow**: `release-frontend.yml`
+**Repository**: `jdfalk/release-frontend-action` **Purpose**: Build and release
+frontend applications **Source Workflow**: `release-frontend.yml`
 
 **Key Features**:
 
@@ -264,8 +269,9 @@ inputs:
 
 #### 6. `release-protobuf-action`
 
-**Repository**: `jdfalk/release-protobuf-action` **Purpose**: Validate, build, and release Protocol
-Buffer definitions **Source Workflow**: `release-protobuf.yml`
+**Repository**: `jdfalk/release-protobuf-action` **Purpose**: Validate, build,
+and release Protocol Buffer definitions **Source Workflow**:
+`release-protobuf.yml`
 
 **Key Features**:
 
@@ -285,7 +291,8 @@ inputs:
     required: false
     default: 'latest'
   generate-languages:
-    description: 'Languages to generate (comma-separated: go,python,typescript,rust)'
+    description:
+      'Languages to generate (comma-separated: go,python,typescript,rust)'
     required: false
     default: 'go'
   sdk-output-path:
@@ -306,8 +313,9 @@ inputs:
 
 #### 7. `auto-module-tagging-action`
 
-**Repository**: `jdfalk/auto-module-tagging-action` **Purpose**: Automatically create Go module tags
-for SDK packages **Source Workflow**: `auto-module-tagging.yml`
+**Repository**: `jdfalk/auto-module-tagging-action` **Purpose**: Automatically
+create Go module tags for SDK packages **Source Workflow**:
+`auto-module-tagging.yml`
 
 **Key Features**:
 
@@ -341,8 +349,8 @@ inputs:
 
 #### 8. `maintenance-action`
 
-**Repository**: `jdfalk/maintenance-action` **Purpose**: Automated repository maintenance tasks
-**Source Workflow**: `reusable-maintenance.yml`
+**Repository**: `jdfalk/maintenance-action` **Purpose**: Automated repository
+maintenance tasks **Source Workflow**: `reusable-maintenance.yml`
 
 **Key Features**:
 
@@ -354,8 +362,8 @@ inputs:
 
 #### 9. `security-scan-action`
 
-**Repository**: `jdfalk/security-scan-action` **Purpose**: Comprehensive security scanning **Source
-Workflow**: `reusable-security.yml`
+**Repository**: `jdfalk/security-scan-action` **Purpose**: Comprehensive
+security scanning **Source Workflow**: `reusable-security.yml`
 
 **Key Features**:
 
@@ -762,8 +770,8 @@ release-docker-action/
 | Phase 4 | Week 5    | Migration                  | Updated consuming repositories    |
 | Phase 5 | Ongoing   | Maintenance                | Continued support and updates     |
 
-**Total Initial Effort**: ~5 weeks for full implementation **Ongoing Effort**: ~4-8 hours/month for
-maintenance
+**Total Initial Effort**: ~5 weeks for full implementation **Ongoing Effort**:
+~4-8 hours/month for maintenance
 
 ## Questions for Consideration
 
@@ -772,17 +780,19 @@ maintenance
 3. Do we want to enable **GitHub Marketplace** listing?
 4. Should we include **telemetry/analytics** in actions?
 5. What **support level** are we committing to for these actions?
-6. Should we create a **mono-repo** for all actions or separate repos? (Recommendation: Separate)
+6. Should we create a **mono-repo** for all actions or separate repos?
+   (Recommendation: Separate)
 
 ## Conclusion
 
-This consolidation will significantly improve the maintainability, discoverability, and reusability
-of our release automation. By creating focused, well-documented GitHub Actions, we enable not only
-our own projects but potentially the broader community to benefit from our release workflows.
+This consolidation will significantly improve the maintainability,
+discoverability, and reusability of our release automation. By creating focused,
+well-documented GitHub Actions, we enable not only our own projects but
+potentially the broader community to benefit from our release workflows.
 
-**Recommendation**: Proceed with implementation, starting with Priority 1 actions
-(release-docker-action, release-go-action, release-python-action) as proof of concept, then expand
-to remaining actions based on learnings.
+**Recommendation**: Proceed with implementation, starting with Priority 1
+actions (release-docker-action, release-go-action, release-python-action) as
+proof of concept, then expand to remaining actions based on learnings.
 
 ---
 
