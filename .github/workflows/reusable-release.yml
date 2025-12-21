@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.2
+# version: 2.6.4
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -98,35 +98,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Detect ghcommon ref
-        id: ghcommon-ref
-        run: |
-          if [ -f .github/ghcommon-ref.txt ]; then
-            echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
-          else
-            echo "ref=main" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
-        with:
-          repository: jdfalk/ghcommon
-          ref: ${{ steps.ghcommon-ref.outputs.ref }}
-          sparse-checkout: |
-            .github/workflows/scripts
-          path: .ghcommon
-
-      - name: Set up GHCOMMON_SCRIPTS_DIR
-        run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$GITHUB_WORKSPACE/.ghcommon/.github/workflows/scripts" >> "$GITHUB_ENV"
-
       - name: Load repository configuration
         id: load-config
-        env:
-          CONFIG_FILE: .github/repository-config.yml
-        run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/load_repository_config.py"
+        uses: jdfalk/load-config-action@v1.0.0
+        with:
+          config-file: .github/repository-config.yml
+          fail-on-missing: false
 
   # Detect what languages/technologies are present
   detect-languages:
@@ -159,68 +136,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine ghcommon workflow ref
-        id: ghcommon-ref
-        run: |
-          ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
-            ref="refs/heads/main"
-          fi
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
-        with:
-          repository: jdfalk/ghcommon
-          ref: ${{ steps.ghcommon-ref.outputs.ref }}
-          path: ghcommon-workflow-scripts
-          sparse-checkout: |
-            .github/workflows/scripts
-          sparse-checkout-cone-mode: false
-
-      - name: Configure workflow script path
-        run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
-
       - name: Setup environment variables
         id: env-setup
         run: |
           echo "registry=${REGISTRY}" >> "$GITHUB_OUTPUT"
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-
       - name: Detect project languages and generate matrices
         id: detect
-        env:
-          REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
-          SKIP_LANGUAGE_DETECTION: ${{ inputs.skip-language-detection }}
-          BUILD_TARGET: ${{ inputs.build-target || 'all' }}
-          GO_ENABLED: ${{ inputs.go-enabled && 'true' || 'auto' }}
-          PYTHON_ENABLED: ${{ inputs.python-enabled && 'true' || 'auto' }}
-          RUST_ENABLED: ${{ inputs.rust-enabled && 'true' || 'auto' }}
-          FRONTEND_ENABLED: ${{ inputs.frontend-enabled && 'true' || 'auto' }}
-          DOCKER_ENABLED: ${{ inputs.docker-enabled && 'true' || 'auto' }}
-          PROTOBUF_ENABLED: ${{ inputs.protobuf-enabled && 'true' || 'auto' }}
-        run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" detect-languages
+        uses: jdfalk/detect-languages-action@v1.0.0
+        with:
+          skip-detection: ${{ inputs.skip-language-detection }}
+          build-target: ${{ inputs.build-target || 'all' }}
+          go-enabled: ${{ inputs.go-enabled && 'true' || 'auto' }}
+          python-enabled: ${{ inputs.python-enabled && 'true' || 'auto' }}
+          rust-enabled: ${{ inputs.rust-enabled && 'true' || 'auto' }}
+          frontend-enabled: ${{ inputs.frontend-enabled && 'true' || 'auto' }}
+          docker-enabled: ${{ inputs.docker-enabled && 'true' || 'auto' }}
+          protobuf-enabled: ${{ inputs.protobuf-enabled && 'true' || 'auto' }}
 
       - name: Determine release strategy based on branch
         id: release-strategy
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          INPUT_PRERELEASE: ${{ inputs.prerelease }}
-          INPUT_DRAFT: ${{ inputs.draft }}
-        run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" release-strategy
+        uses: jdfalk/release-strategy-action@v1.0.0
+        with:
+          branch-name: ${{ github.ref_name }}
+          force-prerelease: ${{ inputs.prerelease }}
+          force-draft: ${{ inputs.draft }}
 
       - name: Generate semantic release version
         id: version
-        env:
-          RELEASE_TYPE: ${{ inputs.release-type || 'auto' }}
-          BRANCH_NAME: ${{ github.ref_name }}
-          AUTO_PRERELEASE: ${{ steps.release-strategy.outputs.auto-prerelease }}
-          AUTO_DRAFT: ${{ steps.release-strategy.outputs.auto-draft }}
-        run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" generate-version
+        uses: jdfalk/generate-version-action@v1.0.0
+        with:
+          release-type: ${{ inputs.release-type || 'auto' }}
+          branch-name: ${{ github.ref_name }}
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
@@ -337,20 +284,6 @@ jobs:
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
-        with:
-          repository: jdfalk/ghcommon
-          ref: ${{ steps.ghcommon-ref.outputs.ref }}
-          path: ghcommon-workflow-scripts
-          sparse-checkout: |
-            .github/workflows/scripts
-          sparse-checkout-cone-mode: false
-
-      - name: Configure workflow script path
-        run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
-
       - name: Get version
         id: version
         env:
@@ -375,30 +308,11 @@ jobs:
         with:
           path: ./artifacts
           merge-multiple: true
-
       - name: Package and organize release artifacts
         id: package-artifacts
-        env:
-          RELEASE_VERSION_ARG: ${{ steps.version.outputs.version }}
-        shell: python
-        run: |
-          import os
-          import subprocess
-          from pathlib import Path
-
-          # Use ghcommon script if available, otherwise skip
-          script_path = Path(os.environ.get("GHCOMMON_SCRIPTS_DIR", "")) / "package_release_assets.py"
-          if script_path.exists():
-              subprocess.run(
-                  [
-                      "python3",
-                      str(script_path),
-                      os.environ.get("RELEASE_VERSION_ARG", "unknown"),
-                  ],
-                  check=True,
-              )
-          else:
-              print("⚠️  Package release assets script not found, skipping artifact packaging")
+        uses: jdfalk/package-assets-action@v1.0.0
+        with:
+          artifacts-dir: ./artifacts
 
       - name: Create GitHub Release
         id: release
@@ -436,7 +350,7 @@ jobs:
           draft: ${{ needs.detect-languages.outputs.auto-draft }}
           prerelease: ${{ needs.detect-languages.outputs.auto-prerelease }}
           files: |
-            release-assets/**/*
+            ./artifacts/**/*
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check release created
