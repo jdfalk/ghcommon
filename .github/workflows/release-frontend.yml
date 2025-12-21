@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build frontend via action
-        uses: jdfalk/release-frontend-action@4292378ebb1d6bc59160321c5705320df6957d03 # v1.0.0
+        uses: jdfalk/release-frontend-action@af38527b03cc70ea10e3c97a806312dfd6f65474 # v1.1.1
         with:
           node-version: ${{ matrix.node-version }}
           working-directory: .
