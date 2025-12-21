@@ -27,11 +27,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Detect frontend directory
+        id: frontend-dir
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "web/package.json" ]; then
+            echo "dir=web" >> "$GITHUB_OUTPUT"
+          elif [ -f "frontend/package.json" ]; then
+            echo "dir=frontend" >> "$GITHUB_OUTPUT"
+          elif [ -f "package.json" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No package.json found in ., web/, or frontend/.";
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build frontend via action
         uses: jdfalk/release-frontend-action@af38527b03cc70ea10e3c97a806312dfd6f65474 # v1.1.1
         with:
           node-version: ${{ matrix.node-version }}
-          working-directory: .
+          working-directory: ${{ steps.frontend-dir.outputs.dir }}
           package-manager: npm
           run-tests: 'true'
           run-lint: 'true'
