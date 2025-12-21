@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.1.1
+# version: 2.1.2
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -46,7 +46,7 @@ jobs:
         with:
           module-path: .
           tag: ${{ inputs.release-version || github.ref_name }}
-          go-version: '1.23'
+          go-version: '1.24'
           run-tests: 'true'
           run-linters: 'true'
           create-release: 'true'
