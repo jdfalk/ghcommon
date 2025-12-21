@@ -1,0 +1,73 @@
+name: Security Summary
+description: Generate a summary of security scan results for GitHub Actions workflows
+
+inputs:
+  codeql-result:
+    description: "CodeQL Analysis result status"
+    required: false
+    default: "skipped"
+  dependency-review-result:
+    description: "Dependency Review result status"
+    required: false
+    default: "skipped"
+  security-audit-result:
+    description: "Security Audit result status"
+    required: false
+    default: "skipped"
+  trivy-result:
+    description: "Trivy Scan result status"
+    required: false
+    default: "skipped"
+
+runs:
+  using: composite
+  steps:
+    - name: Generate security summary
+      shell: python3 {0}
+      env:
+        RESULT_CODEQL: ${{ inputs.codeql-result }}
+        RESULT_DEP_REVIEW: ${{ inputs.dependency-review-result }}
+        RESULT_SECURITY_AUDIT: ${{ inputs.security-audit-result }}
+        RESULT_TRIVY: ${{ inputs.trivy-result }}
+      run: |
+        #!/usr/bin/env python3
+        import os
+        from pathlib import Path
+
+        def build_results(env):
+            """Build results mapping from environment values."""
+            return {
+                "CodeQL Analysis": env.get("RESULT_CODEQL", "skipped") or "skipped",
+                "Dependency Review": env.get("RESULT_DEP_REVIEW", "skipped") or "skipped",
+                "Security Audit": env.get("RESULT_SECURITY_AUDIT", "skipped") or "skipped",
+                "Trivy Scan": env.get("RESULT_TRIVY", "skipped") or "skipped",
+            }
+
+        def generate_summary(results):
+            """Generate summary lines and return whether a warning is required."""
+            summary_lines = [
+                "## Security Scan Summary",
+                "",
+                "| Scan Type | Status |",
+                "|-----------|--------|",
+            ]
+
+            for label, status in results.items():
+                summary_lines.append(f"| {label} | {status} |")
+
+            warning_required = any(status == "failure" for status in results.values())
+            summary_lines.append("")
+            if warning_required:
+                summary_lines.append("⚠️ **Security issues detected. Please review the scan results.**")
+            else:
+                summary_lines.append("✅ **All security scans passed.**")
+
+            return summary_lines, warning_required
+
+        results = build_results(os.environ)
+        summary_lines, warning_required = generate_summary(results)
+
+        summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+        summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+        exit(1 if warning_required else 0)

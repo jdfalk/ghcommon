@@ -10,21 +10,21 @@ on:
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: '0 6 * * 1' # Weekly on Monday at 6 AM UTC
+    - cron: "0 6 * * 1" # Weekly on Monday at 6 AM UTC
   workflow_dispatch:
     inputs:
       skip-codeql:
-        description: 'Skip CodeQL analysis'
+        description: "Skip CodeQL analysis"
         required: false
         type: boolean
         default: false
       skip-dependency-review:
-        description: 'Skip dependency review'
+        description: "Skip dependency review"
         required: false
         type: boolean
         default: false
       skip-security-audit:
-        description: 'Skip security audit'
+        description: "Skip security audit"
         required: false
         type: boolean
         default: false
@@ -99,7 +99,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: '/language:${{ matrix.language }}'
+          category: "/language:${{ matrix.language }}"
 
   # Dependency Review
   dependency-review:
@@ -114,7 +114,7 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          config-file: './.github/dependency-review-config.yml'
+          config-file: "./.github/dependency-review-config.yml"
           fail-on-severity: moderate
 
   # Security Audit
@@ -174,33 +174,29 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
   # Security summary
   security-summary:
     name: Security Summary
-    needs:
-      [
-        detect-languages,
-        codeql-analysis,
-        dependency-review,
-        security-audit,
-        trivy-scan,
-      ]
+    needs: [detect-languages, codeql-analysis, dependency-review, security-audit, trivy-scan]
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Generate security summary
-        uses: jdfalk/security-summary-action@v1
+        uses: ./.github/actions/security-summary
         with:
           codeql-result: ${{ needs.codeql-analysis.result || 'skipped' }}
           dependency-review-result: ${{ needs.dependency-review.result || 'skipped' }}
