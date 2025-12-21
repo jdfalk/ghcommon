@@ -1,5 +1,5 @@
 # file: .github/workflows/release-docker.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: release-docker-workflow-2025-10
 
 name: Docker Release Build
@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build and push image via action
-        uses: jdfalk/release-docker-action@7a5440f # v1.0.0
+        uses: jdfalk/release-docker-action@5a2de7009f1c97c578f55f62a785558c9116859d # v1.0.0
         with:
           context: .
           dockerfile: Dockerfile
