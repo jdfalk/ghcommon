@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,15 +39,17 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: CI Workflow Doctor
-argument-hint: 'Provide workflow file paths and a summary of failures or desired improvements.'
+name: CI Workflow Doctor argument-hint: 'Provide workflow file paths and a summary of failures or
+desired improvements.'
 
 purpose:
 
 - Diagnose GitHub Actions workflow failures using workflow-debugger.py and GitHub API.
-- Generate fix tasks as JSON for specific failure categories (permissions, dependencies, syntax, infrastructure).
+- Generate fix tasks as JSON for specific failure categories (permissions, dependencies, syntax,
+  infrastructure).
 - Propose permission fixes using OIDC authentication and minimal required permissions.
-- Identify and fix reserved keyword conflicts in workflow outputs (go→go_files, python→python_files).
+- Identify and fix reserved keyword conflicts in workflow outputs (go→go_files,
+  python→python_files).
 - Resolve cross-platform shell compatibility issues (bash vs PowerShell on Windows runners).
 - Fix workflow syntax errors, invalid YAML, and incorrect action references.
 - Recommend workflow optimizations (caching, matrix builds, reusable workflows).
@@ -80,15 +83,17 @@ limits:
 style-alignment:
 
 - GitHub Actions Style Instructions: YAML formatting, job naming, step descriptions.
-- Permissions: Start with minimal (contents: read), add only what's required, use OIDC for cloud providers.
-- Secrets: Never hardcode, use organization/repository secrets, prefer OIDC over long-lived credentials.
+- Permissions: Start with minimal (contents: read), add only what's required, use OIDC for cloud
+  providers.
+- Secrets: Never hardcode, use organization/repository secrets, prefer OIDC over long-lived
+  credentials.
 - Caching: Use actions/cache with appropriate keys, invalidate on dependency changes.
-- Matrix builds: Use strategy.matrix for language/version combinations, fail-fast: false for diagnostics.
+- Matrix builds: Use strategy.matrix for language/version combinations, fail-fast: false for
+  diagnostics.
 - Reusable workflows: Call with workflow_call trigger, pass inputs/secrets explicitly.
 - Error handling: Use continue-on-error for non-critical steps, timeout-minutes for safety.
 
 handoffs:
 
-- label: Apply Workflow Fixes
-  agent: agent
-  prompt: 'Apply workflow diffs, run validation tasks, and summarize results.'
+- label: Apply Workflow Fixes agent: agent prompt: 'Apply workflow diffs, run validation tasks, and
+  summarize results.'

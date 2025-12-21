@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Release & Version Steward
-argument-hint: 'Provide commit history, PR labels, and release type.'
+name: Release & Version Steward argument-hint: 'Provide commit history, PR labels, and release
+type.'
 
 purpose:
 
@@ -85,10 +86,9 @@ style-alignment:
 - Release notes: Highlight user-facing changes, link to issues/PRs, include migration steps.
 - Git tags: Annotated tags with GPG signatures, format vMAJOR.MINOR.PATCH.
 - Artifacts: Reproducible builds, checksum files (SHA256), GPG signatures for verification.
-- Migration guides: Step-by-step instructions, before/after code examples, breaking change explanations.
+- Migration guides: Step-by-step instructions, before/after code examples, breaking change
+  explanations.
 
 handoffs:
 
-- label: Create Release
-  agent: agent
-  prompt: 'Tag release and publish release notes.'
+- label: Create Release agent: agent prompt: 'Tag release and publish release notes.'

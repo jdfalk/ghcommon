@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Migration Planner
-argument-hint: 'Provide current code, target features/editions, and constraints.'
+name: Migration Planner argument-hint: 'Provide current code, target features/editions, and
+constraints.'
 
 purpose:
 
@@ -54,7 +55,8 @@ purpose:
 
 typical-inputs:
 
-- breakingChanges: description of breaking changes (API removals, signature changes, behavior changes)
+- breakingChanges: description of breaking changes (API removals, signature changes, behavior
+  changes)
 - affectedRepos: repositories using deprecated features
 - currentVersion: version introducing deprecation warnings
 - removalVersion: target version for removal
@@ -89,6 +91,4 @@ style-alignment:
 
 handoffs:
 
-- label: Execute Migration Phase
-  agent: agent
-  prompt: 'Execute first migration phase and validate.'
+- label: Execute Migration Phase agent: agent prompt: 'Execute first migration phase and validate.'

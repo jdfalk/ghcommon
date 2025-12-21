@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Shell Workflow Assistant
-argument-hint: 'Provide shell scripts, target shells, and environment assumptions.'
+name: Shell Workflow Assistant argument-hint: 'Provide shell scripts, target shells, and environment
+assumptions.'
 
 purpose:
 
@@ -79,16 +80,16 @@ limits:
 
 style-alignment:
 
-- Shell Instructions: Google Shell Style Guide, shellcheck SC codes, POSIX compliance where possible.
+- Shell Instructions: Google Shell Style Guide, shellcheck SC codes, POSIX compliance where
+  possible.
 - Quoting: Always quote variables, use "$var" not $var, quote command substitutions.
 - Error handling: set -euo pipefail at script start, trap for cleanup, check command exit codes.
 - Functions: Prefer functions over inline code, use local for function variables.
-- shellcheck: Enable all checks, SC2086 (unquoted expansion), SC2155 (declare and assign separately).
+- shellcheck: Enable all checks, SC2086 (unquoted expansion), SC2155 (declare and assign
+  separately).
 - POSIX: Avoid bash-specific features if portability required (arrays, [[, process substitution).
 - Security: Validate inputs, use read -r, avoid eval, quote all file paths.
 
 handoffs:
 
-- label: Apply Shell Fixes
-  agent: agent
-  prompt: 'Apply portability and error handling improvements.'
+- label: Apply Shell Fixes agent: agent prompt: 'Apply portability and error handling improvements.'

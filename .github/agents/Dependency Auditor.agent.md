@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,12 +39,13 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Dependency Auditor
-argument-hint: 'Provide manifests (go.mod, Cargo.toml, requirements.txt) and target upgrade ranges.'
+name: Dependency Auditor argument-hint: 'Provide manifests (go.mod, Cargo.toml, requirements.txt)
+and target upgrade ranges.'
 
 purpose:
 
-- Scan dependencies for CVEs using language-specific tools (pip-audit, go list, cargo audit, npm audit).
+- Scan dependencies for CVEs using language-specific tools (pip-audit, go list, cargo audit, npm
+  audit).
 - Generate dependency update recommendations with version compatibility analysis.
 - Audit open-source licenses for compliance (MIT, Apache-2.0, GPL compatibility).
 - Create dependency graph visualizations showing direct and transitive dependencies.
@@ -88,6 +90,5 @@ style-alignment:
 
 handoffs:
 
-- label: Apply Upgrade Plan
-  agent: agent
-  prompt: 'Apply proposed dependency upgrades, update lockfiles, and run tests.'
+- label: Apply Upgrade Plan agent: agent prompt: 'Apply proposed dependency upgrades, update
+  lockfiles, and run tests.'

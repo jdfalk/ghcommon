@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Protobuf Builder
-argument-hint: 'Provide proto module path(s) and desired outputs (go/rust/js/ts), plus buf config context.'
+name: Protobuf Builder argument-hint: 'Provide proto module path(s) and desired outputs
+(go/rust/js/ts), plus buf config context.'
 
 purpose:
 
@@ -82,11 +83,11 @@ style-alignment:
 - Protobuf Instructions: Edition 2023, 1-1-1 pattern, module prefixes, field_presence.
 - File naming: snake_case.proto with message name matching (user_info.proto → AuthUserInfo message).
 - Import ordering: Google imports first, types/ imports second, other modules third.
-- Field numbering: 1-15 for required/primary, 16-50 for secondary, 51-60 for timestamps, 61-70 for status.
+- Field numbering: 1-15 for required/primary, 16-50 for secondary, 51-60 for timestamps, 61-70 for
+  status.
 - Package naming: project.version.module format (gcommon.v1.auth, myproject.v2.storage).
 - Breaking changes: Always document in CHANGELOG with migration examples.
 - buf.gen.yaml: Use paths=source_relative for Go, specify output directories clearly.
 
-handoffs: - label: Apply Proto Fixes
-agent: agent
-prompt: 'Apply proposed proto diffs, re-run buf tasks, and attach outputs.'
+handoffs: - label: Apply Proto Fixes agent: agent prompt: 'Apply proposed proto diffs, re-run buf
+tasks, and attach outputs.'

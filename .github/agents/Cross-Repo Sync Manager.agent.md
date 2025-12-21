@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Cross-Repo Sync Manager
-argument-hint: 'Provide source paths, target repo lists, exclusions, and versioning policy.'
+name: Cross-Repo Sync Manager argument-hint: 'Provide source paths, target repo lists, exclusions,
+and versioning policy.'
 
 purpose:
 
@@ -89,6 +90,4 @@ style-alignment:
 
 handoffs:
 
-- label: Execute Sync
-  agent: agent
-  prompt: 'Execute sync to target repositories with version bumps.'
+- label: Execute Sync agent: agent prompt: 'Execute sync to target repositories with version bumps.'

@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,8 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Protobuf Cycle Resolver
-argument-hint: 'Provide proto graph, module boundaries, and common types.'
+name: Protobuf Cycle Resolver argument-hint: 'Provide proto graph, module boundaries, and common
+types.'
 
 purpose:
 
@@ -89,6 +90,4 @@ style-alignment:
 
 handoffs:
 
-- label: Apply Cycle Fixes
-  agent: agent
-  prompt: 'Apply import rewrites and module refactoring.'
+- label: Apply Cycle Fixes agent: agent prompt: 'Apply import rewrites and module refactoring.'

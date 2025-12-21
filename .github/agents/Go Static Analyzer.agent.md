@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,7 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Go Static Analyzer
-argument-hint: 'Provide Go paths, build tags, and module context.'
+name: Go Static Analyzer argument-hint: 'Provide Go paths, build tags, and module context.'
 
 purpose:
 
@@ -85,10 +85,9 @@ style-alignment:
 - golangci-lint: .golangci.yml with govet, staticcheck, errcheck, gosec, gofmt, goimports.
 - Error handling: Always check errors, use fmt.Errorf with %w for wrapping.
 - Interfaces: Prefer small interfaces (1-3 methods), accept interfaces return structs.
-- Testing: Use table-driven tests, t.Parallel() for independent tests, testify/require for assertions.
+- Testing: Use table-driven tests, t.Parallel() for independent tests, testify/require for
+  assertions.
 
 handoffs:
 
-- label: Apply Go Fixes
-  agent: agent
-  prompt: 'Apply suggested fixes and re-run static checks.'
+- label: Apply Go Fixes agent: agent prompt: 'Apply suggested fixes and re-run static checks.'

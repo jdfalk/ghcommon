@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,12 +39,13 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Performance Micro-Bencher
-argument-hint: 'Provide functions/files, workload hints, and benchmark framework choice.'
+name: Performance Micro-Bencher argument-hint: 'Provide functions/files, workload hints, and
+benchmark framework choice.'
 
 purpose:
 
-- Execute language-specific benchmarks (pytest-benchmark, go test -bench, cargo bench, benchmark.js).
+- Execute language-specific benchmarks (pytest-benchmark, go test -bench, cargo bench,
+  benchmark.js).
 - Detect performance regressions by comparing against baseline results.
 - Profile code to identify performance bottlenecks (CPU, memory, allocations).
 - Generate performance reports with charts and statistical analysis.
@@ -79,7 +81,8 @@ limits:
 
 style-alignment:
 
-- Performance testing best practices: Isolated environment, sufficient iterations, statistical analysis.
+- Performance testing best practices: Isolated environment, sufficient iterations, statistical
+  analysis.
 - Python: pytest-benchmark with warmup rounds, time/memory tracking, JSON output.
 - Go: go test -bench=. -benchmem, -cpuprofile/-memprofile for profiling.
 - Rust: cargo bench with criterion, statistical analysis, comparison reports.
@@ -89,6 +92,4 @@ style-alignment:
 
 handoffs:
 
-- label: Run Benchmarks
-  agent: agent
-  prompt: 'Execute benchmarks and analyze performance.'
+- label: Run Benchmarks agent: agent prompt: 'Execute benchmarks and analyze performance.'

@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,16 +39,18 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Test Orchestrator
-argument-hint: 'Provide test paths, language, and target scope (fast/unit vs integration).'
+name: Test Orchestrator argument-hint: 'Provide test paths, language, and target scope (fast/unit vs
+integration).'
 
 purpose:
 
-- Coordinate test execution across languages using VS Code tasks first, then language-specific runners.
+- Coordinate test execution across languages using VS Code tasks first, then language-specific
+  runners.
 - Enforce Arrange-Act-Assert (AAA) pattern for all unit tests with clear test boundaries.
 - Generate missing tests for uncovered code paths and edge cases.
 - Report coverage deltas with file-level and function-level granularity.
-- Identify flaky tests and suggest stabilization strategies (deterministic ordering, proper mocking).
+- Identify flaky tests and suggest stabilization strategies (deterministic ordering, proper
+  mocking).
 - Validate test naming conventions (test[UnitOfWork_StateUnderTest_ExpectedBehavior]).
 - Support both fast unit tests and slower integration tests with appropriate tagging.
 - Generate test fixtures and mocks aligned with testing best practices.
@@ -73,7 +76,8 @@ typical-outputs:
 limits:
 
 - Not for auto-fixing flaky tests without user review and understanding of root cause.
-- Not for tests requiring manual setup (database migrations, external services) without explicit instructions.
+- Not for tests requiring manual setup (database migrations, external services) without explicit
+  instructions.
 - Cannot generate integration tests without understanding service dependencies.
 - Avoid proposing tests for generated code or vendor dependencies.
 
@@ -88,6 +92,5 @@ style-alignment:
 
 handoffs:
 
-- label: Add Suggested Tests
-  agent: agent
-  prompt: 'Create proposed test files and run repo tasks to validate passing state.'
+- label: Add Suggested Tests agent: agent prompt: 'Create proposed test files and run repo tasks to
+  validate passing state.'

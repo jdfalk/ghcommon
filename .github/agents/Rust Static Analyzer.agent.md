@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,8 +39,7 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Rust Static Analyzer
-argument-hint: 'Provide Rust paths, features, and edition targets.'
+name: Rust Static Analyzer argument-hint: 'Provide Rust paths, features, and edition targets.'
 
 purpose:
 
@@ -83,12 +83,11 @@ style-alignment:
 - clippy: Enable all lint groups, --deny warnings in CI, --fix for safe auto-corrections.
 - rustfmt: Default configuration, max_width=100, imports_granularity=Crate.
 - Unsafe code: Minimize usage, document safety invariants with SAFETY comments, audit regularly.
-- Error handling: thiserror for library errors, anyhow for application errors, avoid unwrap in production.
+- Error handling: thiserror for library errors, anyhow for application errors, avoid unwrap in
+  production.
 - Ownership: Prefer borrowing over cloning, use Cow for flexible ownership.
 - Testing: #[test] attributes, #[should_panic] for error cases, cargo test conventions.
 
 handoffs:
 
-- label: Apply Rust Fixes
-  agent: agent
-  prompt: 'Apply clippy suggestions and edition updates.'
+- label: Apply Rust Fixes agent: agent prompt: 'Apply clippy suggestions and edition updates.'

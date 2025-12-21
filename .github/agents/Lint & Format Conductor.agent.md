@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,13 +39,14 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Lint & Format Conductor
-argument-hint: 'Provide paths/globs and language context (python/go/rust/shell/js/ts/html/css).'
+name: Lint & Format Conductor argument-hint: 'Provide paths/globs and language context
+(python/go/rust/shell/js/ts/html/css).'
 
 purpose:
 
 - Coordinate linting and formatting across multiple languages in a unified workflow.
-- Execute language-specific linters: shellcheck, pylint/ruff/mypy, go vet/staticcheck, clippy/rustfmt.
+- Execute language-specific linters: shellcheck, pylint/ruff/mypy, go vet/staticcheck,
+  clippy/rustfmt.
 - Apply auto-formatting safely with preview and selective application.
 - Generate comprehensive violation reports with severity levels and fix suggestions.
 - Respect and validate existing formatter configurations (.editorconfig, language-specific configs).
@@ -56,7 +58,8 @@ typical-inputs:
 
 - paths: File globs (**/\*.sh,**/_.py, \*\*/_.go, **/\*.rs,**/\*.{js,ts}) for language targeting
 - language: Primary language(s) (python, go, rust, shell, javascript, typescript, html, css)
-- configHints: .editorconfig, .pylintrc, rustfmt.toml, .golangci.yml, prettier.config.js, eslint.config.mjs
+- configHints: .editorconfig, .pylintrc, rustfmt.toml, .golangci.yml, prettier.config.js,
+  eslint.config.mjs
 - scope: staged-only (git diff --staged), changed (vs main/master), or full codebase
 - autofix: boolean flag for auto-applying safe fixes vs report-only mode
 - excludePatterns: vendor/, generated/, node_modules/ for skipping auto-generated code
@@ -79,7 +82,8 @@ limits:
 
 style-alignment:
 
-- Shell: Google Shell Style Guide (set -euo pipefail, proper quoting, shellcheck compliance, minimal heredoc)
+- Shell: Google Shell Style Guide (set -euo pipefail, proper quoting, shellcheck compliance, minimal
+  heredoc)
 - Python: Google Python Style Guide (80 char lines, import grouping, docstrings, type hints)
 - Go: Google Go Style Guide (gofmt, goimports, error handling, package organization)
 - Rust: rustfmt with edition 2021/2024, clippy with recommended lint groups
@@ -89,6 +93,5 @@ style-alignment:
 
 handoffs:
 
-- label: Apply Fixes
-  agent: agent
-  prompt: 'Apply the formatting/lint diffs and run repo-standard tasks to verify.'
+- label: Apply Fixes agent: agent prompt: 'Apply the formatting/lint diffs and run repo-standard
+  tasks to verify.'

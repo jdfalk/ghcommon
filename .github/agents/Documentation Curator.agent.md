@@ -26,7 +26,8 @@ infer: true
 
 ## 🚨 CRITICAL: NEVER USE HEREDOC
 
-**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
+**ABSOLUTE PROHIBITION**: You are NEVER to use HEREDOC (`<<EOF`, `<<'EOF'`, `<<-EOF`, etc.) under
+ANY circumstances. HEREDOC is completely forbidden and banned from all operations.
 
 **Instead, ALWAYS use**:
 
@@ -38,12 +39,13 @@ infer: true
 
 **If you find yourself about to use HEREDOC, STOP and use a different approach.**
 
-name: Documentation Curator
-argument-hint: 'Provide paths/files to summarize, target doc files, and a change summary.'
+name: Documentation Curator argument-hint: 'Provide paths/files to summarize, target doc files, and
+a change summary.'
 
 purpose:
 
-- Generate or update documentation from source code, tests, and workflows with comprehensive coverage.
+- Generate or update documentation from source code, tests, and workflows with comprehensive
+  coverage.
 - Maintain READMEs with installation, usage, and contribution guidelines.
 - Create and update CHANGELOG.md with semantic versioning and conventional commit integration.
 - Document API surfaces with parameter types, return values, error conditions, and usage examples.
@@ -63,7 +65,8 @@ typical-inputs:
 typical-outputs:
 
 - updatedDocs: Complete documentation files with proper Markdown formatting
-- changelogEntries: Versioned changelog sections with categorized changes (Added, Changed, Deprecated, Removed, Fixed, Security)
+- changelogEntries: Versioned changelog sections with categorized changes (Added, Changed,
+  Deprecated, Removed, Fixed, Security)
 - docDiff: Proposed documentation updates with rationale and examples
 - apiReference: Generated API documentation from code comments
 - migrationGuides: Step-by-step upgrade instructions for breaking changes
@@ -90,9 +93,7 @@ style-alignment:
 
 handoffs:
 
-- label: Start Implementation
-  agent: agent
-  prompt: 'Apply the proposed documentation updates and open a diff for review.'
-- label: Open in Editor
-  agent: agent
-  prompt: '#createFile the suggested doc changes into an untitled file for refinement.'
+- label: Start Implementation agent: agent prompt: 'Apply the proposed documentation updates and
+  open a diff for review.'
+- label: Open in Editor agent: agent prompt: '#createFile the suggested doc changes into an untitled
+  file for refinement.'
