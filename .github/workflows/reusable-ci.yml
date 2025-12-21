@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.11
+# version: 1.6.12
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -214,15 +214,15 @@ jobs:
         run: |
           {
             printf '## Change Detection\n\n'
-            printf '- Go files: %s\n' "$CI_GO_FILES"
-            printf '- Python files: %s\n' "$CI_PYTHON_FILES"
-            printf '- Rust files: %s\n' "$CI_RUST_FILES"
-            printf '- Frontend files: %s\n' "$CI_FRONTEND_FILES"
-            printf '- Docker files: %s\n' "$CI_DOCKER_FILES"
-            printf '- Docs files: %s\n' "$CI_DOCS_FILES"
-            printf '- Workflow YAML: %s\n' "$CI_WORKFLOW_FILES"
-            printf '- Workflow scripts: %s\n' "$CI_WORKFLOW_SCRIPT_FILES"
-            printf '- Lint files: %s\n' "$CI_LINT_FILES"
+            printf -- '- Go files: %s\n' "$CI_GO_FILES"
+            printf -- '- Python files: %s\n' "$CI_PYTHON_FILES"
+            printf -- '- Rust files: %s\n' "$CI_RUST_FILES"
+            printf -- '- Frontend files: %s\n' "$CI_FRONTEND_FILES"
+            printf -- '- Docker files: %s\n' "$CI_DOCKER_FILES"
+            printf -- '- Docs files: %s\n' "$CI_DOCS_FILES"
+            printf -- '- Workflow YAML: %s\n' "$CI_WORKFLOW_FILES"
+            printf -- '- Workflow scripts: %s\n' "$CI_WORKFLOW_SCRIPT_FILES"
+            printf -- '- Lint files: %s\n' "$CI_LINT_FILES"
           } >> "$GITHUB_STEP_SUMMARY"
 
   workflow-lint:

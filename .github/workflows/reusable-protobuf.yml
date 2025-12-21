@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-protobuf.yml
-# version: 1.1.2
+# version: 1.1.3
 # guid: f1e2d3c4-b5a6-9788-c0d1-2e3f4a5b6c7d
 
 name: Reusable Protobuf Generation
@@ -366,10 +366,10 @@ jobs:
 
               if [ "$GENERATE_STATUS" = "success" ]; then
                 printf '**Generated Files:**\n'
-                printf '- Go files: %s\n' "$GO_COUNT"
-                printf '- Python files: %s\n' "$PYTHON_COUNT"
-                printf '- Documentation: %s\n' "$DOCS_GENERATED"
-                printf '- Artifacts Available: %s\n' "$ARTIFACTS_AVAILABLE"
+                printf -- '- Go files: %s\n' "$GO_COUNT"
+                printf -- '- Python files: %s\n' "$PYTHON_COUNT"
+                printf -- '- Documentation: %s\n' "$DOCS_GENERATED"
+                printf -- '- Artifacts Available: %s\n' "$ARTIFACTS_AVAILABLE"
               fi
             else
               printf '**Protobuf Enabled:** ❌ No\n\n'
