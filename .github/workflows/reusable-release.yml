@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.4
+# version: 2.6.5
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Load repository configuration
         id: load-config
-        uses: jdfalk/load-config-action@v1.0.0
+        uses: jdfalk/load-config-action@v1.0.1
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
