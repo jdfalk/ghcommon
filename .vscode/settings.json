@@ -40,7 +40,7 @@
   "python.formatting.provider": "none",
   "black-formatter.importStrategy": "fromEnvironment",
   "isort.check": false,
-  "prettier.configPath": ".github/linters/.prettierrc.json",
+  "prettier.configPath": ".prettierrc",
   "prettier.requireConfig": true,
   "prettier.documentSelectors": [
     "yaml",

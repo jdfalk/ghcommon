@@ -2,8 +2,8 @@
 
 ## Overview
 
-This repository uses a **unified formatting strategy** to prevent conflicts between different
-formatters:
+This repository uses a **unified formatting strategy** to prevent conflicts
+between different formatters:
 
 ### Python
 
@@ -16,7 +16,7 @@ formatters:
 
 - **Formatter**: Prettier
 - **Linter**: ESLint
-- **Config**: `.github/linters/.prettierrc.json` and `eslint.config.mjs`
+- **Config**: `.prettierrc` and `eslint.config.mjs`
 - **VS Code**: Configured to use `esbenp.prettier-vscode` extension
 
 ### Shell Scripts
@@ -61,7 +61,8 @@ pre-commit run --all-files
 
 ## Formatter Conflicts Resolution
 
-**Problem**: Multiple formatters (Ruff, Black, isort, Prettier) competing for Python files.
+**Problem**: Multiple formatters (Ruff, Black, isort, Prettier) competing for
+Python files.
 
 **Solution**:
 
@@ -83,7 +84,8 @@ The CI workflow uses the same configuration:
 
 1. Reload window: `Cmd+Shift+P` → "Reload Window"
 2. Check installed extensions: Ruff extension should be active for Python
-3. Verify settings: `.vscode/settings.json` should show Ruff as default formatter
+3. Verify settings: `.vscode/settings.json` should show Ruff as default
+   formatter
 
 ### If pre-commit still conflicts
 
