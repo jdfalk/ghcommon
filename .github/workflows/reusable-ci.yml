@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.10
+# version: 1.6.11
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -99,14 +99,14 @@ jobs:
         uses: actions/checkout@v6
       - name: Load repository configuration
         id: load
-        uses: jdfalk/load-config-action@v1.0.0
+        uses: jdfalk/load-config-action@v1.0.1
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
 
       - name: Generate language matrices
         id: matrices
-        uses: jdfalk/ci-generate-matrices-action@v1.0.0
+        uses: jdfalk/ci-generate-matrices-action@v1.0.1
         with:
           repository-config: ${{ steps.load.outputs.config }}
           fallback-go-version: ${{ inputs.go-version }}
