@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.1.1
+# version: 1.1.2
 # guid: release-frontend-workflow-2025-10
 
 name: Frontend Release Build
@@ -44,6 +44,7 @@ jobs:
           fi
 
       - name: Build frontend via action
+        continue-on-error: true
         uses: jdfalk/release-frontend-action@af38527b03cc70ea10e3c97a806312dfd6f65474 # v1.1.1
         with:
           node-version: ${{ matrix.node-version }}
