@@ -1,5 +1,23 @@
 # TODO
 
+## 🤖 Background Agent Queue (manage_todo_list sync)
+
+- [ ] Plan security workflow actionization
+- [ ] Audit remaining workflows for action conversion
+- [ ] Validate new composite actions CI/CD pipelines
+- [ ] Verify action tags and releases (v1/v1.0/v1.0.0)
+- [ ] Update reusable workflows to use new actions and verify
+
+### Next Actions (Security Workflow Actionization)
+
+- Create security-focused composite action repos (no inline scripts), scaffold `action.yml`,
+  `README.md`, and test workflows
+- Define inputs/outputs (branch/paths, severity thresholds, SARIF handling), and
+  `GITHUB_OUTPUT`/summary contracts
+- Implement CI for actions, cut `v1.0.0`, and add moving tags `v1` and `v1.0`; create GitHub
+  Releases like other actions
+- Patch `reusable-security.yml` to use new actions; dry-run in 1-2 repos and verify behavior
+
 ## ✅ Completed
 
 - [x] Phase 0: Shared workflow foundations (`workflow_common.py`, config schema, validation tooling,
