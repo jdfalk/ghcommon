@@ -2,21 +2,63 @@
 
 ## 🤖 Background Agent Queue (manage_todo_list sync)
 
-- [ ] Plan security workflow actionization
-- [ ] Audit remaining workflows for action conversion
-- [ ] Validate new composite actions CI/CD pipelines
-- [ ] Verify action tags and releases (v1/v1.0/v1.0.0)
-- [ ] Update reusable workflows to use new actions and verify
+- [ ] Plan security workflow actionization - Goal: Move security scanning logic out of
+      reusable-security.yml into auditable composite actions with external scripts only. - Scope
+      (initial action repos): - jdfalk/security-codeql-action: Orchestrate codeql
+      init/analyze/upload (wraps actions/codeql) with repo config overrides. -
+      jdfalk/security-trivy-action: Trivy filesystem/image/vulnerability scan with SARIF output and
+      severity gating. - jdfalk/security-osv-scan-action: OSV-Scanner on repo dependencies (Go,
+      Python, Node, Rust) with SARIF output. - jdfalk/security-secrets-action: Gitleaks (or
+      repo-level secret scan wrapper) with allowlist support. - jdfalk/security-summary-action:
+      Aggregate SARIFs, gate on thresholds, and write step summary + artifacts. - Inputs/Outputs
+      (common): - Inputs: `paths`, `exclude`, `severity-threshold`, `fail-on`, `sarif-path`,
+      `upload-sarif` (true/false), `tool-args`. - Outputs: `sarif`, `findings-count`,
+      `critical-count`, `high-count`, `failed`. - Deliverables: - Each repo: action.yml, README with
+      usage, src/ implementation (Python/Bash), .github/workflows/ci.yml tests. - Tags: v1.0.0
+      initial, moving tags v1 and v1.0, GitHub Release with changelog. - Docs: ghcommon
+      ACTIONS_INTEGRATION_GUIDE.md section for security actions + examples. - Acceptance Criteria: -
+      Actions run on sample repos producing SARIF, respect thresholds, and publish summaries. -
+      reusable-security.yml refactored to call these actions; dry-run passes in 2 representative
+      repos. - Risks/Notes: Keep codeql on GH-hosted runners; avoid inline scripts; support matrix
+      by language as needed.
 
-### Next Actions (Security Workflow Actionization)
+- [ ] Audit remaining workflows for action conversion - Inventory Targets: -
+      reusable-advanced-cache.yml → cache-strategy-action - reusable-maintenance.yml →
+      maintenance-summary-action - reusable-protobuf.yml → protobuf-config-action,
+      protobuf-verify-action (if not done) - documentation.yml → docs-generator-action -
+      issue-automation.yml → intelligent-labeling-action - sync-receiver.yml →
+      sync-receiver-action - Steps: - Build call graph from WORKFLOW_SCRIPT_USAGE_MAP.md to confirm
+      dependencies. - Define action contracts (inputs/outputs) matching current scripts. - Draft
+      action repos list, ownership, and rollout order (P1→P4). - Deliverables: Updated
+      WORKFLOW_SCRIPT_AUDIT.md with status, risks, and ETA per action. - Acceptance Criteria:
+      Signed-off actionization plan with sequencing and test strategy.
 
-- Create security-focused composite action repos (no inline scripts), scaffold `action.yml`,
-  `README.md`, and test workflows
-- Define inputs/outputs (branch/paths, severity thresholds, SARIF handling), and
-  `GITHUB_OUTPUT`/summary contracts
-- Implement CI for actions, cut `v1.0.0`, and add moving tags `v1` and `v1.0`; create GitHub
-  Releases like other actions
-- Patch `reusable-security.yml` to use new actions; dry-run in 1-2 repos and verify behavior
+- [ ] Validate new composite actions CI/CD pipelines - Scope: Six already-created actions
+      (load-config, ci-generate-matrices, detect-languages, release-strategy, generate-version,
+      package-assets). - Tests to Run: - Lint/parse action.yml; run action unit tests via local
+      workflow in each repo. - Integration: use minimal sample repos to execute typical paths and
+      verify outputs + summaries. - Failure modes: missing configs, malformed inputs, matrix edge
+      cases. - Observability: Ensure GITHUB_STEP_SUMMARY is populated and outputs match docs
+      exactly. - Deliverables: ACTIONS_VERIFICATION_REPORT.md updated with run IDs and pass/fail
+      notes. - Acceptance Criteria: All action repos have green CI on main and successful
+      integration runs.
+
+- [ ] Verify action tags and releases (v1/v1.0/v1.0.0) - Tag Policy: - Create immutable v1.0.0 tags;
+      create/update moving tags v1 and v1.0 to latest compatible. - Ensure GitHub Releases exist for
+      v1.0.0 with notes mirroring README features and changes. - Steps: - List tags in each action
+      repo; create missing moving tags; verify protection settings. - Confirm release metadata:
+      title, body, links to example workflows, and compatibility notes. - Deliverables: Tag and
+      Release checklist log per repo in ghcommon (logs/tags/...). - Acceptance Criteria: Consumers
+      can pin @v1, @v1.0, or @v1.0.0 consistently; Marketplace visibility OK.
+
+- [ ] Update reusable workflows to use new actions and verify - Targets: reusable-ci.yml (partially
+      done), reusable-release.yml (partially done), reusable-security.yml (new), protobuf workflow
+      (if applicable). - Steps: - Replace inline/scripted steps with uses: jdfalk/\*-action@v1. -
+      Keep dorny/paths-filter where fit; remove sparse-checkout logic entirely. - Add summary
+      checkpoints and robust outputs wiring between jobs. - Run on ghcommon (self) and
+      audiobook-organizer as canary; capture run logs. - Deliverables: PR/commit diffs for each
+      workflow; Integration Guide updated with before/after. - Acceptance Criteria: Green pipeline
+      in canary repos; artifacts/releases intact; no inline scripts remain.
 
 ## ✅ Completed
 
