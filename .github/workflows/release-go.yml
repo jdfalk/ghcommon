@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.0.0
+# version: 2.1.0
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -34,29 +34,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Determine ghcommon workflow ref
-        id: ghcommon-ref
-        run: |
-          ref="${GITHUB_WORKFLOW_REF##*@}"
-          if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
-            ref="refs/heads/main"
-          fi
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
-        with:
-          repository: jdfalk/ghcommon
-          ref: ${{ steps.ghcommon-ref.outputs.ref }}
-          path: ghcommon-workflow-scripts
-          sparse-checkout: |
-            .github/workflows/scripts
-          sparse-checkout-cone-mode: false
-
-      - name: Configure workflow script path
-        run: |
-          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
-
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
@@ -64,59 +41,22 @@ jobs:
           name: protobuf-generated
           path: proto-generated
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - name: Build and release Go via GoReleaser
+        uses: jdfalk/release-go-action@8e3ea4b # v2.0.1
         with:
-          go-version: 'stable'
-          cache: true
+          module-path: .
+          tag: ${{ inputs.release-version || github.ref_name }}
+          go-version: '1.23'
+          run-tests: 'true'
+          run-linters: 'true'
+          create-release: 'true'
+          skip-publish: 'false'
 
-      - name: Build cross-platform binaries with checksums
-        run: |
-          python3 "$GHCOMMON_SCRIPTS_DIR/build_go_release.py" \
-            --output-dir dist \
-            --version "${{ inputs.release-version }}"
-
-      - name: Upload Go binaries and checksums
+      - name: Upload Go artifacts
+        if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: go-binaries
-          path: |
-            dist/*
+          path: dist/**
           if-no-files-found: error
           retention-days: 7
-
-      - name: Generate build summary
-        if: always()
-        run: |
-          {
-            echo "## 🔨 Go Build Summary"
-            echo ""
-            if [ -f dist/build-manifest.json ]; then
-              echo "### Build Manifest"
-              echo '```json'
-              cat dist/build-manifest.json
-              echo '```'
-              echo ""
-              echo "### Built Binaries"
-              echo ""
-              echo "| Platform | Binary | Checksum | Size |"
-              echo "|----------|--------|----------|------|"
-              for binary in dist/*-*-*.*; do
-                if [ -f "$binary" ] && [[ ! "$binary" =~ \.sha256$ ]] && [[ ! "$binary" =~ \.json$ ]]; then
-                  filename=$(basename "$binary")
-                  size=$(stat -c%s "$binary" 2>/dev/null || stat -f%z "$binary" 2>/dev/null || echo "unknown")
-                  size_mb=$(echo "scale=2; $size / 1048576" | bc 2>/dev/null || echo "N/A")
-                  checksum_file="${binary}.sha256"
-                  if [ -f "$checksum_file" ]; then
-                    checksum=$(cut -d' ' -f1 "$checksum_file")
-                    checksum_short="${checksum:0:16}..."
-                  else
-                    checksum_short="N/A"
-                  fi
-                  echo "| ${filename} | ✅ | ${checksum_short} | ${size_mb} MB |"
-                fi
-              done
-            else
-              echo "❌ Build manifest not found"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"

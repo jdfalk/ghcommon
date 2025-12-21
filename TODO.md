@@ -442,7 +442,7 @@ actions.
 
 **Action Items:**
 
-1. [ ] Update `release-go.yml` to use `jdfalk/release-go-action@hash # v2.0.0`
+1. [ ] Update `release-go.yml` to use `jdfalk/release-go-action@hash # v2.0.1`
 2. [ ] Update `release-docker.yml` to use `jdfalk/release-docker-action@hash # v1.0.0`
 3. [ ] Update `release-frontend.yml` to use `jdfalk/release-frontend-action@hash # v1.0.0`
 4. [ ] Update `release-python.yml` to use `jdfalk/release-python-action@hash # v1.0.0`

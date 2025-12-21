@@ -1,5 +1,5 @@
 # file: .github/workflows/release-rust.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: release-rust-workflow-2025-10
 
 name: Rust Release Build
@@ -38,21 +38,23 @@ jobs:
           name: protobuf-generated
           path: proto-generated
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Build and test Rust (no publish)
+        uses: jdfalk/release-rust-action@0c21e31 # v1.0.0
         with:
-          components: rustfmt, clippy
+          rust-version: stable
+          manifest-path: ./Cargo.toml
+          crate-token: dummy-no-publish
+          run-tests: 'true'
+          run-clippy: 'true'
+          check-format: 'true'
+          dry-run: 'true'
 
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build
-        run: cargo build --release
-
-      - name: Test
-        run: cargo test --release --all-targets
-
-      - name: Package binaries (primary target)
-        run: |
-          mkdir -p packages/rust
-          find target/release -maxdepth 1 -type f -perm /111 -exec cp {} packages/rust \;
+      - name: Upload Rust artifacts
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: rust-build
+          path: |
+            target/release/*
+          if-no-files-found: ignore
+          retention-days: 14

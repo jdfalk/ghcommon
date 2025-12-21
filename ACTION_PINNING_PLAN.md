@@ -1,5 +1,5 @@
 <!-- file: ACTION_PINNING_PLAN.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.0.1 -->
 <!-- guid: d4e5f6a7-b8c9-0123-defg-234567890123 -->
 
 # Action Version Pinning and Release Plan
@@ -8,7 +8,7 @@
 
 This document outlines the plan to:
 
-1. Tag release-go-action as v2.0.0 (breaking change for GoReleaser)
+1. Tag release-go-action as v2.0.1 (breaking change for GoReleaser)
 2. Pin all jdfalk/\* actions to commit hashes
 3. Convert reusable workflows to use the new actions
 4. Ensure all actions pass CI before v1.0.0 release
@@ -40,7 +40,7 @@ This document outlines the plan to:
    - ✅ Rewrote release-go-action to use GoReleaser
    - ✅ Created .goreleaser.example.yml template
    - ✅ Updated README.md with new approach
-   - ✅ Ready for v2.0.0 tag
+   - ✅ Tagged v2.0.1
 
 5. **Created Automation Scripts**
    - ✅ `scripts/pin-actions-to-hashes.py` - Pins actions to hashes
@@ -59,9 +59,9 @@ This document outlines the plan to:
 
 ### 📋 Pending
 
-1. **Tag release-go-action v2.0.0**
+1. **Tag release-go-action v2.0.1**
    - Run `scripts/tag-release-go-v2.sh`
-   - Creates v2.0.0, v2.0, v2 tags
+   - Creates v2.0.1, v2.0, v2 tags
    - Pushes to GitHub
 
 2. **Pin Actions to Hashes**
@@ -133,7 +133,7 @@ python3 scripts/pin-actions-to-hashes.py
 ```
 🔍 Discovering action versions and hashes...
 
-  release-go-action: v2.0.0 @ abc1234
+   release-go-action: v2.0.1 @ abc1234
   release-docker-action: v1.0.0 @ def5678
   release-frontend-action: v1.0.0 @ ghi9012
   release-python-action: v1.0.0 @ jkl3456
@@ -143,7 +143,7 @@ python3 scripts/pin-actions-to-hashes.py
 
 📝 Updating workflow files...
 
-  ✅ Updated release-go.yml
+   ✅ Updated release-go.yml
   ✅ Updated release-docker.yml
   ✅ Updated release-frontend.yml
   ✅ Updated release-python.yml
@@ -196,7 +196,7 @@ For each reusable workflow, replace the inline steps with action calls:
 
 ```yaml
 - name: Release Go project
-  uses: jdfalk/release-go-action@abc1234 # v2.0.0
+   uses: jdfalk/release-go-action@abc1234 # v2.0.1
   with:
     go-version: '1.21'
     project-path: '.'
@@ -241,7 +241,7 @@ uses: jdfalk/ACTION-NAME@COMMIT_HASH # vX.Y.Z
 **Example:**
 
 ```yaml
-uses: jdfalk/release-go-action@abc1234 # v2.0.0
+uses: jdfalk/release-go-action@abc1234 # v2.0.1
 ```
 
 **Why:**
@@ -295,7 +295,7 @@ If issues arise:
 
 ## Success Criteria
 
-- [ ] All actions tagged appropriately (v2.0.0 for release-go, v1.0.0 for others)
+- [ ] All actions tagged appropriately (v2.0.1 for release-go, v1.0.0 for others)
 - [ ] All workflows use hash@commit # version format
 - [ ] ACTION_VERSIONS.md generated and committed
 - [ ] All action CI passes

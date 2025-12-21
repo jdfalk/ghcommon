@@ -1,5 +1,5 @@
 # file: .github/workflows/release-frontend.yml
-# version: 1.0.1
+# version: 1.1.0
 # guid: release-frontend-workflow-2025-10
 
 name: Frontend Release Build
@@ -27,32 +27,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Build frontend via action
+        uses: jdfalk/release-frontend-action@4292378 # v1.0.0
         with:
           node-version: ${{ matrix.node-version }}
-          cache: ${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') != '' && 'npm' || '' }}
-
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Run frontend tests
-        run: |
-          if npm run | grep -q "\btest\b"; then
-            npm test -- --watch=false
-          else
-            echo "No test script defined; skipping."
-          fi
-
-      - name: Build frontend bundle
-        run: |
-          if npm run | grep -q "\bbuild\b"; then
-            npm run build
-          else
-            echo "No build script defined; skipping."
-          fi
+          working-directory: .
+          package-manager: npm
+          run-tests: 'true'
+          run-lint: 'true'

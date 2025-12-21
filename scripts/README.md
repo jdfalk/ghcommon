@@ -1,11 +1,11 @@
 <!-- file: scripts/README.md -->
-<!-- version: 2.0.0 -->
+<!-- version: 2.0.1 -->
 <!-- guid: a6ce4820-bcf8-482e-b2ca-234024d5d77f -->
 
 # Scripts Directory
 
-This directory contains reusable scripts for GitHub automation, workflow debugging, and
-multi-repository management.
+This directory contains reusable scripts for GitHub automation, workflow
+debugging, and multi-repository management.
 
 ## Available Scripts
 
@@ -35,9 +35,11 @@ python scripts/workflow-debugger.py --org jdfalk --repo ubuntu-autoinstall-agent
 
 **Version**: 1.0.0 **Last Updated**: 2025-10-03
 
-Intelligent synchronization of configurations and instructions across repositories:
+Intelligent synchronization of configurations and instructions across
+repositories:
 
-- Syncs `.github/instructions/`, `.github/prompts/`, and workflows to target repos
+- Syncs `.github/instructions/`, `.github/prompts/`, and workflows to target
+  repos
 - Creates VS Code Copilot symlinks: `.vscode/copilot/` → `.github/instructions/`
 - Handles repository-specific file exclusions and maintains file headers
 - Supports dry-run mode for testing changes
@@ -67,13 +69,14 @@ GitHub label synchronization and management across repositories:
 
 ### For Repositories Using ghcommon
 
-These scripts are primarily used by the central ghcommon repository for managing other repositories.
-Individual repositories typically don't need to copy these scripts locally.
+These scripts are primarily used by the central ghcommon repository for managing
+other repositories. Individual repositories typically don't need to copy these
+scripts locally.
 
 ### Version Checking
 
-Each script includes version information in the header comments. Check the version to see if updates
-are available:
+Each script includes version information in the header comments. Check the
+version to see if updates are available:
 
 ```bash
 head -n 10 scripts/script-name.py | grep "version:"
@@ -101,7 +104,8 @@ When updating scripts:
 
 For issues or questions:
 
-- Check the [workflow debugging output](workflow-debug-output/) for analysis results
+- Check the [workflow debugging output](workflow-debug-output/) for analysis
+  results
 - Review the [main repository documentation](../README.md)
 - Open an issue in the ghcommon repository
 
@@ -262,14 +266,16 @@ Reference table showing:
 
 | Action Repository | Version | Commit Hash | Usage                                       |
 | ----------------- | ------- | ----------- | ------------------------------------------- |
-| release-go-action | v2.0.0  | `abc1234`   | `jdfalk/release-go-action@abc1234 # v2.0.0` |
+| release-go-action | v2.0.1  | `abc1234`   | `jdfalk/release-go-action@abc1234 # v2.0.1` |
 
 ---
 
 ## Related Documentation
 
-- [`ACTION_PINNING_PLAN.md`](../ACTION_PINNING_PLAN.md) - Complete pinning strategy
-- [`OVERNIGHT_PROGRESS_SUMMARY.md`](../OVERNIGHT_PROGRESS_SUMMARY.md) - Progress summary
+- [`ACTION_PINNING_PLAN.md`](../ACTION_PINNING_PLAN.md) - Complete pinning
+  strategy
+- [`OVERNIGHT_PROGRESS_SUMMARY.md`](../OVERNIGHT_PROGRESS_SUMMARY.md) - Progress
+  summary
 - [`TODO.md`](../TODO.md) - Task tracking
 
 ---

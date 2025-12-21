@@ -1,5 +1,5 @@
 # file: .github/workflows/release-docker.yml
-# version: 1.0.2
+# version: 1.1.0
 # guid: release-docker-workflow-2025-10
 
 name: Docker Release Build
@@ -35,34 +35,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to registry
-        uses: docker/login-action@v3
+      - name: Build and push image via action
+        uses: jdfalk/release-docker-action@7a5440f # v1.0.0
         with:
+          context: .
+          dockerfile: Dockerfile
+          platforms: ${{ matrix.platform }}
           registry: ${{ inputs.registry }}
+          image-name: ${{ inputs.image-name }}
+          tag: ${{ github.sha }}
+          additional-tags: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push image
-        env:
-          REGISTRY: ${{ inputs.registry }}
-          IMAGE_NAME: ${{ inputs.image-name }}
-          PLATFORM: ${{ matrix.platform }}
-        run: |
-          set -euo pipefail
-          if [[ "$PLATFORM" == *","* ]]; then
-            # Multi-platform build: use a single tag without platform suffix
-            TAG="${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA::12}"
-          else
-            # Single platform: normalize for tag (e.g., linux/amd64 -> linux-amd64)
-            PLATFORM_TAG="${PLATFORM//\//-}"
-            TAG="${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA::12}-${PLATFORM_TAG}"
-          fi
-
-          docker buildx build \
-            --platform "$PLATFORM" \
-            --tag "$TAG" \
-            --push \
-            .

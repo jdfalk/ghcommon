@@ -1,5 +1,5 @@
 # file: .github/workflows/release-python.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: release-python-workflow-2025-10
 
 name: Python Release Build
@@ -39,27 +39,22 @@ jobs:
           name: protobuf-generated
           path: proto-generated
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Build Python package (no publish)
+        uses: jdfalk/release-python-action@a5acdd5 # v1.0.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
+          package-dir: .
+          run-tests: 'true'
+          test-command: pytest -m "not slow" --maxfail=1 --disable-warnings
+          pypi-token: dummy-no-publish
+          skip-existing: 'true'
+          verify-metadata: 'true'
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          if [ -f pyproject.toml ]; then
-            pip install -e ".[build]" || pip install -e .
-          fi
-
-      - name: Run Python tests
-        run: |
-          if [ -d tests ]; then
-            pip install pytest
-            pytest -m "not slow" --maxfail=1 --disable-warnings
-          else
-            echo "No Python tests detected; skipping."
-          fi
+      - name: Upload Python dist artifacts
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: python-dist
+          path: dist/**
+          if-no-files-found: ignore
+          retention-days: 14
