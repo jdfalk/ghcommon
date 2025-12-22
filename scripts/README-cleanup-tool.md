@@ -4,14 +4,17 @@
 
 # Repository Cleanup Tool
 
-Automatically detects and cleans up archived or outdated GitHub repositories from your local
-filesystem.
+Automatically detects and cleans up archived or outdated GitHub repositories
+from your local filesystem.
 
 ## Features
 
-- 🔍 **Smart Detection**: Scans directories for Git repositories and checks their GitHub status
-- 🗃️ **Archive Detection**: Identifies archived, disabled, or outdated repositories
-- 🧹 **Safe Cleanup**: Removes local directories for repositories that are no longer active
+- 🔍 **Smart Detection**: Scans directories for Git repositories and checks
+  their GitHub status
+- 🗃️ **Archive Detection**: Identifies archived, disabled, or outdated
+  repositories
+- 🧹 **Safe Cleanup**: Removes local directories for repositories that are no
+  longer active
 - 🛡️ **Safety First**: Dry-run mode by default, interactive confirmations
 - 📊 **Detailed Logging**: Comprehensive logs with timestamps and statistics
 - ⚡ **GitHub Integration**: Uses GitHub CLI for accurate repository status
@@ -83,7 +86,7 @@ The tool identifies repositories for removal based on:
 
 ```text
 2025-08-10 15:30:45,123 - INFO - Starting repository cleanup
-2025-08-10 15:30:45,124 - INFO - Base path: /Users/jdfalk/repos/github.com/jdfalk
+2025-08-10 15:30:45,124 - INFO - Base path: ~/repos
 2025-08-10 15:30:45,124 - INFO - Dry run: True
 2025-08-10 15:30:45,124 - INFO - Interactive: True
 2025-08-10 15:30:45,234 - INFO - GitHub CLI version: gh
@@ -97,7 +100,7 @@ Processing: old-project
 2025-08-10 15:30:46,456 - INFO - Visibility: public
 2025-08-10 15:30:46,456 - INFO - Last updated: 2022-03-15T10:30:45Z
 2025-08-10 15:30:46,456 - WARNING - CLEANUP CANDIDATE: Repository is archived
-2025-08-10 15:30:46,456 - INFO - [DRY RUN] Would remove: /Users/jdfalk/repos/github.com/jdfalk/old-project
+2025-08-10 15:30:46,456 - INFO - [DRY RUN] Would remove: ~/repos/old-project
 
 ============================================================
 CLEANUP SUMMARY
@@ -157,13 +160,16 @@ The tool handles various error conditions gracefully:
 
 ## Safety Notice
 
-⚠️ **Important**: Always run with `--dry-run` first to see what would be removed!
+⚠️ **Important**: Always run with `--dry-run` first to see what would be
+removed!
 
-This tool permanently deletes local directories. While it has safety features, you should:
+This tool permanently deletes local directories. While it has safety features,
+you should:
 
 1. Backup important work before running
 2. Review the dry-run output carefully
 3. Understand what each repository contains
 4. Use version control for important projects
 
-The tool only removes local directories - it never touches your GitHub repositories online.
+The tool only removes local directories - it never touches your GitHub
+repositories online.

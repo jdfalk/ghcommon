@@ -88,7 +88,7 @@ All repositories are on `main` branch and have been pushed to GitHub:
 Use the monitoring script to check status:
 
 ```bash
-cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
+cd ~/repos/ghcommon
 ./scripts/trigger-and-monitor-ci.sh
 ```
 
@@ -97,7 +97,7 @@ cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
 Once all actions are tagged and verified working, run the pinning script:
 
 ```bash
-cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
+cd ~/repos/ghcommon
 python3 scripts/pin-actions-to-hashes.py
 ```
 

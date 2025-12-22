@@ -56,7 +56,9 @@ def update_workflow_version(file_path: Path, new_version: str):
 
 def main():
     """Update all workflow versions."""
-    workflows_dir = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows")
+    # Detect the script location to find the workflows directory
+    script_dir = Path(__file__).parent.resolve()
+    workflows_dir = script_dir.parent / ".github" / "workflows"
 
     if not workflows_dir.exists():
         print("❌ Workflows directory not found")

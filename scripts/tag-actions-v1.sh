@@ -28,7 +28,7 @@ for action in "${ACTIONS[@]}"; do
   echo "Processing: $action"
   echo "---"
 
-  cd "/Users/jdfalk/repos/github.com/jdfalk/$action"
+  cd "${REPO_BASE_DIR:-$HOME/repos}/$action"
 
   # Check if CI is passing
   echo "  Checking CI status..."

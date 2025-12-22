@@ -9,7 +9,7 @@ echo "Testing instruction context loading for subtitle-manager..."
 echo "=========================================="
 
 # Test the function
-context_file=$(load_instruction_context "/Users/jdfalk/repos/github.com/jdfalk/subtitle-manager")
+context_file=$(load_instruction_context "$HOME/repos/subtitle-manager")
 
 echo "Generated context file: $context_file"
 echo "Contents:"

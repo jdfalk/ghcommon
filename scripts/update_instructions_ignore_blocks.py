@@ -13,8 +13,7 @@ Safety:
 - Skips files already wrapped (detects 'prettier-ignore-start' near frontmatter)
 - Preserves content and spacing
 """
-
-from __future__ import annotations
+import osfrom __future__ import annotations
 
 import re
 from pathlib import Path
@@ -31,8 +30,8 @@ WORKSPACE_REPOS = [
     "ubuntu-autoinstall-webhook",
 ]
 
-# Base path to the local workspace repositories (include owner directory)
-ROOT = Path("/Users/jdfalk/repos/github.com/jdfalk")
+# Base path to the local workspace repositories (use environment variable or detect from script location)
+ROOT = Path(os.getenv("REPO_BASE_DIR", Path(__file__).parent.parent.parent.resolve()))
 
 
 def bump_version_header(text: str) -> tuple[str, bool]:

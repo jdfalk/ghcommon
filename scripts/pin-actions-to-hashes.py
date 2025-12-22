@@ -127,7 +127,8 @@ def update_workflow_file(file_path: Path, versions: dict[str, tuple[str, str]]) 
 
 def update_all_workflows(versions: dict[str, tuple[str, str]]) -> int:
     """Update all workflow files in ghcommon."""
-    workflows_dir = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows")
+    script_dir = Path(__file__).parent.resolve()
+    workflows_dir = script_dir.parent / ".github" / "workflows"
     updated_count = 0
 
     print("📝 Updating workflow files...\n")
@@ -143,7 +144,8 @@ def update_all_workflows(versions: dict[str, tuple[str, str]]) -> int:
 
 def write_version_reference(versions: dict[str, tuple[str, str]]):
     """Write action versions to reference file."""
-    ref_file = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon/ACTION_VERSIONS.md")
+    script_dir = Path(__file__).parent.resolve()
+    ref_file = script_dir.parent / "ACTION_VERSIONS.md"
 
     content = """<!-- file: ACTION_VERSIONS.md -->
 <!-- version: 1.0.0 -->

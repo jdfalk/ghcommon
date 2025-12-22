@@ -13,16 +13,16 @@ import shutil
 from pathlib import Path
 
 # Source repository (ghcommon)
-GHCOMMON_PATH = Path("/Users/jdfalk/repos/github.com/jdfalk/ghcommon")
+GHCOMMON_PATH = Path(__file__).parent.parent.resolve()
 
 # Target repositories
 REPOS = [
-    "/Users/jdfalk/repos/github.com/jdfalk/subtitle-manager",
-    "/Users/jdfalk/repos/github.com/jdfalk/apt-cacher-go",
-    "/Users/jdfalk/repos/github.com/jdfalk/audiobook-organizer",
-    "/Users/jdfalk/repos/github.com/jdfalk/copilot-agent-util-rust",
-    "/Users/jdfalk/repos/github.com/jdfalk/public-scratch",
-    "/Users/jdfalk/repos/github.com/jdfalk/ubuntu-autoinstall-webhook",
+    "subtitle-manager",
+    "apt-cacher-go",
+    "audiobook-organizer",
+    "copilot-agent-util-rust",
+    "public-scratch",
+    "ubuntu-autoinstall-webhook",
 ]
 
 
@@ -120,12 +120,15 @@ def main():
         print(f"❌ ghcommon repository not found at {GHCOMMON_PATH}")
         return 1
 
+    # Determine the base repos directory (parent of ghcommon)
+    repos_base = GHCOMMON_PATH.parent
+
     success_count = 0
     total_repos = len(REPOS)
 
-    for repo_path_str in REPOS:
-        repo_path = Path(repo_path_str)
-        print(f"📁 Processing {repo_path.name}...")
+    for repo_name in REPOS:
+        repo_path = repos_base / repo_name
+        print(f"📁 Processing {repo_name}...")
 
         if not repo_path.exists():
             print(f"⚠️ Repository not found: {repo_path}")
@@ -142,9 +145,9 @@ def main():
 
         if ci_copied and configs_copied >= 2:
             success_count += 1
-            print(f"✅ Successfully updated {repo_path.name}")
+            print(f"✅ Successfully updated {repo_name}")
         else:
-            print(f"⚠️ Partial update for {repo_path.name}")
+            print(f"⚠️ Partial update for {repo_name}")
 
         print()
 

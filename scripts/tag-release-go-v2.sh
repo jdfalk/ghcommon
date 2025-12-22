@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # Tag release-go-action as v2.0.0 (breaking change)
-cd /Users/jdfalk/repos/github.com/jdfalk/release-go-action
+cd "${REPO_BASE_DIR:-$HOME/repos}/release-go-action"
 
 echo "🏷️  Tagging release-go-action as v2.0.0..."
 

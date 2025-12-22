@@ -26,7 +26,7 @@ echo "STEP 1: Check release-go-action status"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-cd /Users/jdfalk/repos/github.com/jdfalk/release-go-action
+cd "${REPO_BASE_DIR:-$HOME/repos}/release-go-action"
 
 echo "Current git status:"
 git status
@@ -70,7 +70,7 @@ echo ""
 read -p "Run tagging script? (y/n) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
+  cd "${REPO_BASE_DIR:-$HOME/repos}/ghcommon"
   ./scripts/tag-release-go-v2.sh
   echo "✅ release-go-action tagged as v2.0.0"
 else
@@ -94,7 +94,7 @@ echo ""
 read -p "Run pinning script? (y/n) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  cd /Users/jdfalk/repos/github.com/jdfalk/ghcommon
+  cd "${REPO_BASE_DIR:-$HOME/repos}/ghcommon"
   python3 scripts/pin-actions-to-hashes.py
 
   echo ""

@@ -88,7 +88,7 @@ ACTIONS=(
 )
 
 # Base directory
-BASE_DIR="/Users/jdfalk/repos/github.com/jdfalk"
+BASE_DIR="${REPO_BASE_DIR:-$HOME/repos}"
 
 # Iterate through each action
 for action in "${ACTIONS[@]}"; do
@@ -181,7 +181,7 @@ ACTIONS=(
   "auto-module-tagging-action"
 )
 
-BASE_DIR="/Users/jdfalk/repos/github.com/jdfalk"
+BASE_DIR="${REPO_BASE_DIR:-$HOME/repos}"
 
 for action in "${ACTIONS[@]}"; do
   echo "📦 Creating v1.0.0 release for $action..."

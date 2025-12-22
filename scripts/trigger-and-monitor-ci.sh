@@ -39,14 +39,14 @@ for action in "${ACTIONS[@]}"; do
 
     # Alternative: trigger via empty commit
     echo "  Attempting to trigger via empty commit..."
-    cd "/Users/jdfalk/repos/github.com/jdfalk/$action"
+    cd "${REPO_BASE_DIR:-$HOME/repos}/$action"
     git fetch origin main
     git checkout main
     git pull origin main
     git commit --allow-empty -m "chore: trigger CI"
     git push origin main
     echo "  ✓ Pushed empty commit to trigger CI"
-    cd "/Users/jdfalk/repos/github.com/jdfalk/ghcommon"
+    cd "${REPO_BASE_DIR:-$HOME/repos}/ghcommon"
   fi
   echo ""
 done

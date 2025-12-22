@@ -260,7 +260,10 @@ if __name__ == "__main__":
 
 def main():
     """Main entry point."""
-    workflow_dir = "/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.github/workflows"
+    # Dynamically determine workflow directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    ghcommon_root = os.path.dirname(os.path.dirname(script_dir))
+    workflow_dir = os.path.join(ghcommon_root, ".github", "workflows")
 
     if not os.path.exists(workflow_dir):
         print(f"Workflow directory {workflow_dir} does not exist")

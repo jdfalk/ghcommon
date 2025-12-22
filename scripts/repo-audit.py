@@ -300,7 +300,7 @@ def main():
     parser = argparse.ArgumentParser(description="Audit repositories for file consistency")
     parser.add_argument(
         "--base-path",
-        default="/Users/jdfalk/repos/github.com/jdfalk",
+        default=os.getenv("REPO_BASE_DIR", str(Path.home() / "repos")),
         help="Base path containing repositories",
     )
     parser.add_argument("--output-dir", default=".", help="Directory to save reports")

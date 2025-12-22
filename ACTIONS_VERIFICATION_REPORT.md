@@ -85,7 +85,7 @@ Each script includes:
 ### Action Repositories
 
 ```
-/Users/jdfalk/repos/github.com/jdfalk/
+~/repos/
 ├── load-config-action/
 │   ├── action.yml
 │   ├── README.md
@@ -121,7 +121,7 @@ Each script includes:
 ### Documentation in ghcommon
 
 ```
-/Users/jdfalk/repos/github.com/jdfalk/ghcommon/
+~/repos/ghcommon/
 ├── ACTIONS_IMPLEMENTATION_COMPLETE.md ✅
 ├── ACTIONS_IMPLEMENTATION_SUMMARY.md ✅
 ├── ACTIONS_INTEGRATION_GUIDE.md ✅
