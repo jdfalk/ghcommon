@@ -149,9 +149,9 @@ jobs:
       - name: Publish benchmark result
         uses: ./github-action-benchmark
         with:
-          name: Go Fixture Execution
+          name: Node Fixture Execution
           tool: 'customSmallerIsBetter'
-          output-file-path: benchmarks/go.json
+          output-file-path: benchmarks/node.json
           summary-always: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           external-data-json-path: .github/benchmark-data/node.json
