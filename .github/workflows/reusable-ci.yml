@@ -548,7 +548,19 @@ jobs:
 
       - name: Get frontend working directory
         id: frontend-dir
-        run: python3 .github/workflows/scripts/get_frontend_working_dir.py
+        run: |
+          dir=$(echo "$REPOSITORY_CONFIG" | python3 -c "
+          import json, sys, os
+          config = json.loads(sys.stdin.read() or '{}')
+          frontend_dir = config.get('languages', {}).get('working_directories', {}).get('frontend', '.')
+          if not frontend_dir:
+              frontend_dir = '.'
+          cache_path = f'{frontend_dir}/package-lock.json' if frontend_dir != '.' else 'package-lock.json'
+          print(frontend_dir)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'dir={frontend_dir}\n')
+              f.write(f'cache-path={cache_path}\n')
+          ")
 
       - name: Get ghcommon workflow ref
         id: ghcommon-ref
