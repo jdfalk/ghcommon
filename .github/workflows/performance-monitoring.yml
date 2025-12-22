@@ -67,11 +67,11 @@ jobs:
         run: |
           python3 scripts/benchmarks/measure_command.py \
             --label "Rust Fixture Execution" \
-            --command "cargo run --manifest-path testdata/rust/Cargo.toml --release --quiet" \
+            --command "cargo run --release --quiet" \
             --workdir testdata/rust \
             --iterations 10 \
             --output benchmarks/rust.json \
-            --metadata "command: cargo run --manifest-path testdata/rust/Cargo.toml --release --quiet"
+            --metadata "command: cargo run --release --quiet"
 
       - name: Capture benchmark metrics
         id: capture
