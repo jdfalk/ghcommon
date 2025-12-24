@@ -42,7 +42,7 @@ jobs:
           path: proto-generated
 
       - name: Build and release Go via GoReleaser
-        uses: jdfalk/release-go-action@ccfbee8a34e2ae4181c446a957a3c8c1adb00441 # v1.1.2
+        uses: jdfalk/release-go-action@5a5a1a5bebe332d3973ea7e67faf665206002187 # v1.1.2
         with:
           module-path: .
           tag: ${{ inputs.release-version || github.ref_name }}
