@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.6.13
+# version: 1.7.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -277,9 +277,20 @@ jobs:
           path: actionlint.log
           if-no-files-found: ignore
 
+  # Setup npm cache for workflow-scripts using advanced cache strategy
+  workflow-scripts-npm-cache:
+    name: Cache npm (Workflow Scripts)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+    with:
+      language: 'node'
+      cache-prefix: 'npm-workflow-scripts'
+      include-branch: false
+
   workflow-scripts:
     name: Workflow Scripts
-    needs: detect-changes
+    needs: [detect-changes, workflow-scripts-npm-cache]
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -311,23 +322,9 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
 
-      - name: Ensure npm cache directories exist
-        run: |
-          mkdir -p "$HOME/.npm"
-          mkdir -p "$HOME/.cache/npm" || true
-
-      - name: Cache npm dependencies for workflow scripts
-        if: hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') != ''
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/npm
-          key: ${{ runner.os }}-node-${{ inputs.node-version }}-workflow-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ inputs.node-version }}-workflow-
-            ${{ runner.os }}-node-${{ inputs.node-version }}-
-            ${{ runner.os }}-node-
+      # Cache has been prepared by workflow-scripts-npm-cache job using reusable-advanced-cache.yml
+      # This leverages intelligent cache key generation based on package-lock.json, yarn.lock, and pnpm-lock.yaml
+      # No additional cache setup needed here.
 
       - name: Lint JavaScript/TypeScript workflow scripts
         run: |
@@ -540,9 +537,20 @@ jobs:
         if: ${{ !inputs.skip-tests }}
         run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" rust-test
 
+  # Setup npm cache for frontend using advanced cache strategy
+  frontend-npm-cache:
+    name: Cache npm (Frontend)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend-files == 'true'
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+    with:
+      language: 'node'
+      cache-prefix: 'npm-frontend'
+      include-branch: false
+
   frontend-ci:
     name: Frontend CI
-    needs: [load-config, detect-changes]
+    needs: [load-config, detect-changes, frontend-npm-cache]
     if: needs.detect-changes.outputs.frontend-files == 'true'
     strategy:
       fail-fast: false
@@ -588,21 +596,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Ensure npm cache directories exist
-        run: |
-          mkdir -p "$HOME/.npm"
-          mkdir -p "$HOME/.cache/npm" || true
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/npm
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles(format('{0}/package-lock.json', steps.frontend-dir.outputs.dir)) }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ matrix.node-version }}-
-            ${{ runner.os }}-node-
+      # Cache has been prepared by frontend-npm-cache job using reusable-advanced-cache.yml
+      # This leverages intelligent cache key generation based on package-lock.json in the frontend directory
+      # No additional cache setup needed here.
 
       - name: Install dependencies
         env:
@@ -643,10 +639,12 @@ jobs:
         detect-changes,
         workflow-lint,
         workflow-scripts,
+        workflow-scripts-npm-cache,
         go-ci,
         python-ci,
         rust-ci,
         frontend-ci,
+        frontend-npm-cache,
       ]
     if: always()
     runs-on: ubuntu-latest

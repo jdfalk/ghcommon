@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-advanced-cache.yml
-# version: 1.0.1
+# version: 1.1.0
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
 name: Reusable Advanced Caching
@@ -27,6 +27,12 @@ on:
       cache-key:
         description: Generated cache key.
         value: ${{ jobs.cache.outputs.cache-key }}
+      restore-keys:
+        description: Cache restore keys for fallback matching.
+        value: ${{ jobs.cache.outputs.restore-keys }}
+      cache-paths:
+        description: Paths that were cached.
+        value: ${{ jobs.cache.outputs.cache-paths }}
 
 permissions:
   contents: read
@@ -38,6 +44,8 @@ jobs:
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
       cache-key: ${{ steps.generate-key.outputs.cache-key }}
+      restore-keys: ${{ steps.generate-key.outputs.restore-keys }}
+      cache-paths: ${{ steps.generate-key.outputs.cache-paths }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
