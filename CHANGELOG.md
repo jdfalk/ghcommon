@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+#### December 26, 2025 - CI npm caching hardening
+
+- Added directory creation step to prevent "paths not resolved" warnings in npm
+  cache
+- Expanded cache paths from `~/.npm` to `["~/.npm", "~/.cache/npm"]` for full
+  coverage
+- Included Node version in cache keys (`${{ inputs.node-version }}` for
+  workflow-scripts; `${{ matrix.node-version }}` for frontend-ci)
+- Improved restore-key fallback chain for better cache hit rates across Node
+  version changes
+- Resolves TODO-012 (npm cache path resolution) and strengthens CRITICAL-002
+  (manual caching strategy)
+
 ## 2025-10-30
 
 ### Added
