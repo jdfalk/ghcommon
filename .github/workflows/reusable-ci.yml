@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.7.0
+# version: 1.8.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -414,6 +414,18 @@ jobs:
           COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
         run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" go-test
 
+      - name: Generate Go coverage profile
+        if: ${{ !inputs.skip-tests }}
+        continue-on-error: true
+        run: go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+
+      - name: Check Go test coverage
+        if: ${{ !inputs.skip-tests }}
+        continue-on-error: true
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          config: ./.testcoverage.yml
+
   python-ci:
     name: Python CI
     needs: [load-config, detect-changes]
@@ -564,7 +576,7 @@ jobs:
 
       - name: Get frontend working directory
         id: frontend-dir
-        uses: jdfalk/get-frontend-config-action@v1
+        uses: jdfalk/get-frontend-config-action@v1.0
         with:
           repository-config: ${{ env.REPOSITORY_CONFIG }}
 

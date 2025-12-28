@@ -1,0 +1,12 @@
+# file: .testcoverage.yml
+# version: 1.0.0
+# guid: 7b3f2f94-2a1e-4f8b-b0f1-6c1f3b5e7d42
+
+profile: cover.out
+threshold:
+  total: 80
+  package: 0
+packages:
+  - ./...
+output:
+  format: detailed
