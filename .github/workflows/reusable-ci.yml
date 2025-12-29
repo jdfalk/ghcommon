@@ -406,13 +406,16 @@ jobs:
           cache: true
 
       - name: Build Go project
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" go-setup
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: go-setup
 
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
-        env:
-          COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" go-test
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: go-test
+          coverage-threshold: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
 
       - name: Generate Go coverage profile
         if: ${{ !inputs.skip-tests }}
@@ -470,15 +473,21 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Install Python dependencies
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" python-install
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: python-install
 
       - name: Lint Python code
         if: ${{ !inputs.skip-linting }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" python-lint
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: python-lint
 
       - name: Test Python code
         if: ${{ !inputs.skip-tests }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" python-run-tests
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: python-run-tests
 
   rust-ci:
     name: Rust CI
@@ -536,18 +545,26 @@ jobs:
 
       - name: Format Rust code
         if: ${{ !inputs.skip-linting }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" rust-format
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: rust-format
 
       - name: Lint Rust code
         if: ${{ !inputs.skip-linting }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" rust-clippy
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: rust-clippy
 
       - name: Build Rust project
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" rust-build
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: rust-build
 
       - name: Test Rust project
         if: ${{ !inputs.skip-tests }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" rust-test
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: rust-test
 
   # Setup npm cache for frontend using advanced cache strategy
   frontend-npm-cache:
@@ -613,35 +630,39 @@ jobs:
       # No additional cache setup needed here.
 
       - name: Install dependencies
-        env:
-          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" frontend-install
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: frontend-install
+          frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
 
       - name: Lint frontend code
         if: ${{ !inputs.skip-linting }}
-        env:
-          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
-          FRONTEND_SCRIPT: lint
-          FRONTEND_SUCCESS_MESSAGE: '✅ Linting passed'
-          FRONTEND_FAILURE_MESSAGE: '❌ Linting failed or not configured'
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" frontend-run
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: frontend-run
+          frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
+          frontend-script: lint
+          frontend-success-message: '✅ Linting passed'
+          frontend-failure-message: '❌ Linting failed or not configured'
 
       - name: Build frontend
-        env:
-          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
-          FRONTEND_SCRIPT: build
-          FRONTEND_SUCCESS_MESSAGE: '✅ Build successful'
-          FRONTEND_FAILURE_MESSAGE: 'ℹ️ No build script configured'
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" frontend-run
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: frontend-run
+          frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
+          frontend-script: build
+          frontend-success-message: '✅ Build successful'
+          frontend-failure-message: 'ℹ️ No build script configured'
 
       - name: Test frontend
         if: ${{ !inputs.skip-tests }}
-        env:
-          FRONTEND_WORKING_DIR: ${{ steps.frontend-dir.outputs.dir }}
-          FRONTEND_SCRIPT: test
-          FRONTEND_SUCCESS_MESSAGE: '✅ Tests passed'
-          FRONTEND_FAILURE_MESSAGE: 'ℹ️ No tests configured'
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" frontend-run
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: frontend-run
+          frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
+          frontend-script: test
+          frontend-success-message: '✅ Tests passed'
+          frontend-failure-message: 'ℹ️ No tests configured'
 
   # Summary job
   ci-summary:
@@ -687,7 +708,23 @@ jobs:
         run: |
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
+      - name: Set environment variables for summary
+        run: |
+          echo "CI_GO_FILES=${{ needs.detect-changes.outputs.go-files }}" >> $GITHUB_ENV
+          echo "CI_PYTHON_FILES=${{ needs.detect-changes.outputs.python-files }}" >> $GITHUB_ENV
+          echo "CI_RUST_FILES=${{ needs.detect-changes.outputs.rust-files }}" >> $GITHUB_ENV
+          echo "CI_FRONTEND_FILES=${{ needs.detect-changes.outputs.frontend-files }}" >> $GITHUB_ENV
+          echo "CI_DOCKER_FILES=${{ needs.detect-changes.outputs.docker-files }}" >> $GITHUB_ENV
+          echo "CI_DOCS_FILES=${{ needs.detect-changes.outputs.docs-files }}" >> $GITHUB_ENV
+          echo "CI_WORKFLOW_FILES=${{ needs.detect-changes.outputs.workflow-files }}" >> $GITHUB_ENV
+          echo "CI_WORKFLOW_YAML_FILES=${{ needs.detect-changes.outputs.workflows-files }}" >> $GITHUB_ENV
+          echo "CI_WORKFLOW_SCRIPT_FILES=${{ needs.detect-changes.outputs.workflows-scripts }}" >> $GITHUB_ENV
+          echo "CI_LINT_FILES=${{ needs.detect-changes.outputs.lint-files }}" >> $GITHUB_ENV
+
       - name: Generate summary
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: generate-ci-summary
         env:
           JOB_DETECT_CHANGES: ${{ needs.detect-changes.result || 'skipped' }}
           JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
@@ -698,19 +735,11 @@ jobs:
           JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
           JOB_DOCKER: skipped
           JOB_DOCS: skipped
-          CI_GO_FILES: ${{ needs.detect-changes.outputs.go-files }}
-          CI_PYTHON_FILES: ${{ needs.detect-changes.outputs.python-files }}
-          CI_RUST_FILES: ${{ needs.detect-changes.outputs.rust-files }}
-          CI_FRONTEND_FILES: ${{ needs.detect-changes.outputs.frontend-files }}
-          CI_DOCKER_FILES: ${{ needs.detect-changes.outputs.docker-files }}
-          CI_DOCS_FILES: ${{ needs.detect-changes.outputs.docs-files }}
-          CI_WORKFLOW_FILES: ${{ needs.detect-changes.outputs.workflow-files }}
-          CI_WORKFLOW_YAML_FILES: ${{ needs.detect-changes.outputs.workflows-files }}
-          CI_WORKFLOW_SCRIPT_FILES: ${{ needs.detect-changes.outputs.workflows-scripts }}
-          CI_LINT_FILES: ${{ needs.detect-changes.outputs.lint-files }}
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" generate-ci-summary
 
       - name: Check overall status
+        uses: jdfalk/ci-workflow-helpers-action@v1
+        with:
+          command: check-ci-status
         env:
           JOB_WORKFLOW_LINT: ${{ needs.workflow-lint.result || 'skipped' }}
           JOB_WORKFLOW_SCRIPTS: ${{ needs.workflow-scripts.result || 'skipped' }}
@@ -720,4 +749,3 @@ jobs:
           JOB_FRONTEND: ${{ needs.frontend-ci.result || 'skipped' }}
           JOB_DOCKER: skipped
           JOB_DOCS: skipped
-        run: python3 "$GHCOMMON_SCRIPTS_DIR/ci_workflow.py" check-ci-status

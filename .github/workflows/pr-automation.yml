@@ -290,10 +290,10 @@ jobs:
           "
 
       - name: Run intelligent labeling
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.number }}
-        run: python .github/workflows/scripts/intelligent_labeling.py
+        uses: jdfalk/pr-auto-label-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-number: ${{ github.event.number }}
 
   # PR size and complexity analysis
   pr-analysis:
