@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/workflow_common.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: 6310ec6e-4513-4e0e-9f9b-5a100a305266
 
 """Shared helpers for GitHub workflow scripts."""
@@ -12,6 +12,7 @@ import os
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 _CONFIG_CACHE: dict[str, Any] | None = None
 
@@ -29,7 +30,19 @@ def append_to_file(path_env: str, content: str) -> None:
 
 def write_output(name: str, value: str) -> None:
     """Write an output value for downstream steps."""
-    append_to_file("GITHUB_OUTPUT", f"{name}={value}\n")
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if not output_path:
+        return
+
+    rendered_value = str(value)
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        if "\n" in rendered_value:
+            delimiter = uuid4().hex
+            handle.write(f"{name}<<{delimiter}\n{rendered_value}\n{delimiter}\n")
+        else:
+            handle.write(f"{name}={rendered_value}\n")
 
 
 def append_summary(text: str) -> None:
