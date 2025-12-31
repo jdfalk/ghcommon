@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.8.3
+# version: 1.8.4
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -346,8 +346,8 @@ jobs:
         run: |
           {
             printf '## Workflow Script Lint\n\n'
-            printf '- Python scripts linted and formatted with Ruff.\n'
-            printf '- JavaScript/TypeScript scripts linted with ESLint and checked with Prettier.\n'
+            printf -- '- Python scripts linted and formatted with Ruff.\n'
+            printf -- '- JavaScript/TypeScript scripts linted with ESLint and checked with Prettier.\n'
           } >> "$GITHUB_STEP_SUMMARY"
 
   # Protobuf generation (if applicable)
