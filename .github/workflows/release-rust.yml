@@ -39,7 +39,7 @@ jobs:
           path: proto-generated
 
       - name: Build and test Rust (no publish)
-        uses: jdfalk/release-rust-action@0c21e31279aa046286903518b2271d45b2b9fdd2 # v1.0.0
+        uses: jdfalk/release-rust-action@495dfd4bd133026fdceefadd1f9100105a253f22 # v1.0.0
         with:
           rust-version: stable
           manifest-path: ./Cargo.toml
