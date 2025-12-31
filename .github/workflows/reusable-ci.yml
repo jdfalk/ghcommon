@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.8.0
+# version: 1.8.1
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -710,16 +710,18 @@ jobs:
 
       - name: Set environment variables for summary
         run: |
-          echo "CI_GO_FILES=${{ needs.detect-changes.outputs.go-files }}" >> $GITHUB_ENV
-          echo "CI_PYTHON_FILES=${{ needs.detect-changes.outputs.python-files }}" >> $GITHUB_ENV
-          echo "CI_RUST_FILES=${{ needs.detect-changes.outputs.rust-files }}" >> $GITHUB_ENV
-          echo "CI_FRONTEND_FILES=${{ needs.detect-changes.outputs.frontend-files }}" >> $GITHUB_ENV
-          echo "CI_DOCKER_FILES=${{ needs.detect-changes.outputs.docker-files }}" >> $GITHUB_ENV
-          echo "CI_DOCS_FILES=${{ needs.detect-changes.outputs.docs-files }}" >> $GITHUB_ENV
-          echo "CI_WORKFLOW_FILES=${{ needs.detect-changes.outputs.workflow-files }}" >> $GITHUB_ENV
-          echo "CI_WORKFLOW_YAML_FILES=${{ needs.detect-changes.outputs.workflows-files }}" >> $GITHUB_ENV
-          echo "CI_WORKFLOW_SCRIPT_FILES=${{ needs.detect-changes.outputs.workflows-scripts }}" >> $GITHUB_ENV
-          echo "CI_LINT_FILES=${{ needs.detect-changes.outputs.lint-files }}" >> $GITHUB_ENV
+          {
+            echo "CI_GO_FILES=${{ needs.detect-changes.outputs.go-files }}"
+            echo "CI_PYTHON_FILES=${{ needs.detect-changes.outputs.python-files }}"
+            echo "CI_RUST_FILES=${{ needs.detect-changes.outputs.rust-files }}"
+            echo "CI_FRONTEND_FILES=${{ needs.detect-changes.outputs.frontend-files }}"
+            echo "CI_DOCKER_FILES=${{ needs.detect-changes.outputs.docker-files }}"
+            echo "CI_DOCS_FILES=${{ needs.detect-changes.outputs.docs-files }}"
+            echo "CI_WORKFLOW_FILES=${{ needs.detect-changes.outputs.workflow-files }}"
+            echo "CI_WORKFLOW_YAML_FILES=${{ needs.detect-changes.outputs.workflows-files }}"
+            echo "CI_WORKFLOW_SCRIPT_FILES=${{ needs.detect-changes.outputs.workflows-scripts }}"
+            echo "CI_LINT_FILES=${{ needs.detect-changes.outputs.lint-files }}"
+          } >> "$GITHUB_ENV"
 
       - name: Generate summary
         uses: jdfalk/ci-workflow-helpers-action@v1

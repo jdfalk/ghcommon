@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-advanced-cache.yml
-# version: 1.1.0
+# version: 1.1.1
 # guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b
 
 name: Reusable Advanced Caching
@@ -66,6 +66,8 @@ jobs:
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
           sparse-checkout: |
             .github/workflows/scripts
+            requirements.txt
+          sparse-checkout-cone-mode: false
           path: .ghcommon
 
       - name: Set up GHCOMMON_SCRIPTS_DIR
@@ -76,6 +78,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
+
+      - name: Install workflow script dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade pip
+          python -m pip install --disable-pip-version-check --no-cache-dir -r "$GITHUB_WORKSPACE/.ghcommon/requirements.txt"
 
       - name: Determine cache metadata
         id: metadata
