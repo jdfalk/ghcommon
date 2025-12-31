@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/ci_workflow.py
-# version: 1.1.0
+# version: 1.1.1
 # guid: d9c2b3a4-5e6f-47a8-9b0c-1d2e3f4a5b6c
 """Helper utilities invoked from GitHub Actions CI workflows."""
 
@@ -486,6 +486,37 @@ def python_run_tests(_: argparse.Namespace) -> None:
 
 def python_lint(_: argparse.Namespace) -> None:
     """Run Python formatting and linting if sources are present."""
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    diff_range: str | None = None
+    if event_path and Path(event_path).is_file():
+        with Path(event_path).open(encoding="utf-8") as handle:
+            payload = json.load(handle)
+        before = payload.get("before")
+        after = payload.get("after")
+        if before and after:
+            diff_range = f"{before}...{after}"
+        pr = payload.get("pull_request") or {}
+        base_sha = pr.get("base", {}).get("sha")
+        head_sha = pr.get("head", {}).get("sha")
+        if base_sha and head_sha:
+            diff_range = f"{base_sha}...{head_sha}"
+    if not diff_range:
+        diff_range = "HEAD~1...HEAD"
+
+    changed_python: list[Path] = []
+    if diff_range:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", diff_range],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        changed_python = [
+            Path(line.strip())
+            for line in result.stdout.splitlines()
+            if line.strip().endswith(".py")
+        ]
+
     python_sources = [
         path
         for path in Path(".").rglob("*.py")
@@ -495,16 +526,20 @@ def python_lint(_: argparse.Namespace) -> None:
         print("ℹ️ No Python sources detected for linting.")
         return
 
-    lint_targets = [
-        str(path)
-        for path in [
-            Path("scripts"),
-            Path("tests"),
-            Path("src"),
-            Path("testdata/python"),
+    lint_targets: list[str] = []
+    if changed_python:
+        lint_targets = [str(path) for path in changed_python if path.exists()]
+    if not lint_targets:
+        lint_targets = [
+            str(path)
+            for path in [
+                Path("scripts"),
+                Path("tests"),
+                Path("src"),
+                Path("testdata/python"),
+            ]
+            if path.exists()
         ]
-        if path.exists()
-    ]
     if not lint_targets:
         lint_targets = ["."]
 
