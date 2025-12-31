@@ -1,0 +1,43 @@
+# file: .github/actions/security-summary/action.yml
+# version: 1.0.0
+# guid: a1b2c3d4-e5f6-47a8-9b10-c1d2e3f4a5b6
+
+name: 'Security Summary'
+description: 'Generate security scan summary for GitHub Actions workflows'
+author: 'jdfalk'
+
+inputs:
+  codeql-result:
+    description: 'CodeQL analysis result (success, failure, skipped)'
+    required: false
+    default: 'skipped'
+  dependency-review-result:
+    description: 'Dependency review result (success, failure, skipped)'
+    required: false
+    default: 'skipped'
+  security-audit-result:
+    description: 'Security audit result (success, failure, skipped)'
+    required: false
+    default: 'skipped'
+  trivy-result:
+    description: 'Trivy scan result (success, failure, skipped)'
+    required: false
+    default: 'skipped'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+
+    - name: Generate security summary
+      shell: bash
+      env:
+        RESULT_CODEQL: ${{ inputs.codeql-result }}
+        RESULT_DEP_REVIEW: ${{ inputs.dependency-review-result }}
+        RESULT_SECURITY_AUDIT: ${{ inputs.security-audit-result }}
+        RESULT_TRIVY: ${{ inputs.trivy-result }}
+      run: |
+        python3 "${{ github.action_path }}/../../workflows/scripts/generate_security_summary.py"
