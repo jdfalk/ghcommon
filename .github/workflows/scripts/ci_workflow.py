@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/ci_workflow.py
-# version: 1.1.1
+# version: 1.1.2
 # guid: d9c2b3a4-5e6f-47a8-9b0c-1d2e3f4a5b6c
 """Helper utilities invoked from GitHub Actions CI workflows."""
 
@@ -514,6 +514,18 @@ def python_lint(_: argparse.Namespace) -> None:
         changed_python = [
             Path(line.strip())
             for line in result.stdout.splitlines()
+            if line.strip().endswith(".py")
+        ]
+    if not changed_python:
+        log_result = subprocess.run(
+            ["git", "log", "-1", "--name-only", "--pretty=format:"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        changed_python = [
+            Path(line.strip())
+            for line in log_result.stdout.splitlines()
             if line.strip().endswith(".py")
         ]
 
