@@ -439,6 +439,208 @@ resolved
 
 ---
 
+## 🚀 High Priority: Action Repository Standardization (6 Items)
+
+### #todo 1. Add auto-merge.yml to all action repos
+
+**Status:** Not Started **Priority:** High **Workspace Folders:** All action
+repos
+
+**Context:** The auto-merge.yml workflow from get-frontend-config-action is
+useful for automating PR merges with specific labels. Need to standardize this
+across all action repositories.
+
+**Action Repos to Update:**
+
+- [ ] detect-languages-action
+- [ ] generate-version-action
+- [ ] get-frontend-config-action (already has it)
+- [ ] package-assets-action
+- [ ] auto-module-tagging-action
+- [ ] ci-generate-matrices-action
+- [ ] load-config-action
+- [ ] release-docker-action
+- [ ] release-frontend-action
+- [ ] release-go-action
+- [ ] release-protobuf-action
+- [ ] release-python-action
+- [ ] release-rust-action
+- [ ] ci-workflow-helpers-action
+- [ ] pr-auto-label-action
+- [ ] docs-generator-action
+- [ ] security-summary-action (if exists)
+
+**Action Items:**
+
+1. [ ] Copy `.github/workflows/auto-merge.yml` to all action repos
+2. [ ] Verify workflow triggers correctly on label addition
+3. [ ] Test with a sample PR using auto-merge label
+
+**File Reference:** [#file:auto-merge.yml]
+
+---
+
+### #todo 2. Sync labels to all action repos
+
+**Status:** Not Started **Priority:** High **Script:** sync-github-labels.py
+
+**Context:** All repos should have consistent labels including dependabot
+labels. The ghcommon repository has labels.json and sync-github-labels.py
+script.
+
+**Action Items:**
+
+1. [ ] Verify labels.json is up-to-date in ghcommon
+2. [ ] Run `python3 scripts/sync-github-labels.py` for each action repo
+3. [ ] Add GitHub-Actions, dependencies, github-actions labels if missing
+4. [ ] Verify all repos have color-coded labels
+5. [ ] Document label sync results
+
+**Script Reference:**
+`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/sync-github-labels.py`
+
+**Labels File:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/labels.json`
+
+---
+
+### #todo 3. Add dependabot.yml to all action repos
+
+**Status:** Not Started **Priority:** High **Template File:**
+[#file:dependabot.yml]
+
+**Context:** All action repos need dependabot configuration to keep dependencies
+updated with proper labels and commit messages.
+
+**Action Repos to Update:** Same as #todo 1
+
+**Action Items:**
+
+1. [ ] Copy `.github/dependabot.yml` to all action repos from template
+2. [ ] Verify configuration includes:
+   - github-actions ecosystem
+   - Weekly schedule (Wednesday 10:00 AM)
+   - auto-merge and dependencies labels
+   - ci prefix for commit messages
+3. [ ] Test dependabot triggers on a repo
+
+**Template Reference:** [#file:dependabot.yml] in generate-version-action
+
+---
+
+### #todo 4. Standardize CI workflows across action repos
+
+**Status:** Not Started **Priority:** High **Templates:** test-action.yml,
+ci.yml (release-rust-action, release-frontend-action)
+
+**Context:** Some repos have test-action.yml, others have ci.yml. Need to
+consolidate to a single standard that supports both common tests and
+repository-specific tests via repository-config.yml.
+
+**Current State:**
+
+- get-frontend-config-action: test-action.yml
+- release-rust-action: ci.yml (with Rust-specific setup)
+- release-frontend-action: ci.yml (with Node-specific setup)
+- Others: Vary
+
+**Action Items:**
+
+1. [ ] Review all existing CI workflows in action repos
+2. [ ] Design unified ci.yml template supporting:
+   - action.yml validation
+   - README validation
+   - Language-specific setup hooks (go, node, rust, python)
+   - Repository-config.yml integration for additional tests
+   - Example action execution test
+3. [ ] Create ci.yml template in ghcommon
+4. [ ] Deploy to all action repos
+5. [ ] Verify all CI workflows pass
+
+**Key Requirements:**
+
+- Lint action.yml with actionlint
+- Validate README.md exists
+- Run language-specific tests if applicable
+- Execute action with sample inputs
+- Must be repeatable across diverse action types
+
+---
+
+### #todo 5. Add release.yml to all action repos
+
+**Status:** Not Started **Priority:** High **Templates:** [#file:release.yml]
+(release-rust-action), [#file:release.yml] (release-frontend-action)
+
+**Context:** All action repos need intelligent release workflows that create
+semantic version tags, moving tags (v1, v1.0), and GitHub releases.
+
+**Action Repos to Update:** Same as #todo 1
+
+**Action Items:**
+
+1. [ ] Review existing release.yml from release-rust-action and
+       release-frontend-action
+2. [ ] Create unified release.yml template supporting:
+   - Trigger on version tags (v*.*.\*)
+   - Manual workflow_dispatch with version input
+   - Generate changelog from previous tag
+   - Create GitHub Release with generated changelog
+   - Update major.minor moving tags (v1 → v1.0 → v1.0.0)
+   - Proper permissions (contents: write)
+3. [ ] Deploy to all action repos
+4. [ ] Test release workflow with sample version
+
+**Template Reference:** [#file:release.yml] in release-rust-action and
+release-frontend-action
+
+**Key Requirements:**
+
+- Determine version from tag or workflow_dispatch input
+- Generate changelog between tags
+- Create GitHub Release
+- Update moving tags automatically
+
+---
+
+### #todo 6. Find and run repo settings script
+
+**Status:** Research Phase **Priority:** High **Scripts:** sync-repo-setup.py,
+others
+
+**Context:** ghcommon should have a script to synchronize repository settings
+(rebase-only merges, auto-delete branches, etc.) across repos. Need to find and
+understand this script.
+
+**Action Items:**
+
+1. [ ] Locate the repo settings/sync script in ghcommon
+2. [ ] Review script to understand:
+   - What settings it modifies
+   - How to configure target repos
+   - Any prerequisites or dependencies
+3. [ ] Document the settings it applies:
+   - Rebase-only merge strategy
+   - Auto-delete head branches on merge
+   - Require status checks to pass
+   - Require branches to be up to date before merging
+   - Dismiss stale reviews on new pushes
+4. [ ] Run script against all action repos
+5. [ ] Verify settings are applied correctly
+
+**Script Search Results:**
+
+- `sync-repo-setup.py` - Likely candidate for instructions/config sync
+- `sync-github-labels.py` - Used for label sync
+- Various sync-\*.py scripts in `.github/scripts/`
+
+**Expected Findings:**
+
+- Script should handle repository setup including merge strategy
+- May use GitHub API for repository settings
+- Should be idempotent (safe to run multiple times)
+
+---
+
 ## 🚀 New High Priority Tasks
 
 ### #todo Tag release-go-action as v2.0.0
@@ -531,5 +733,134 @@ fixing.
 - ✅ Fixed action.yml shell parameter errors
 - ✅ Fixed input validation mismatches
 - ✅ Added GoReleaser support to release-go-action (v2.0.0)
+
+---
+
+## Action Repo Standardization (2025-01-01)
+
+### 1. Add auto-merge workflow to all action repos
+
+**Status:** ✅ Completed **Priority:** High
+
+Copy `auto-merge.yml` from `get-frontend-config-action` to all action repos with
+`action` in the name.
+
+**Completed:**
+
+- ✅ All 16 main action repos have auto-merge.yml
+- ✅ Added to: detect-languages-action, generate-version-action,
+  package-assets-action, auto-module-tagging-action,
+  ci-generate-matrices-action, load-config-action, release-docker-action,
+  release-frontend-action, release-go-action, release-protobuf-action,
+  release-python-action, release-rust-action, ci-workflow-helpers-action,
+  pr-auto-label-action, docs-generator-action, release-strategy-action,
+  security-summary-action
+
+---
+
+### 2. Ensure all action repos have complete labels and dependabot config
+
+**Status:** Not Started **Priority:** High
+
+Sync labels from ghcommon to all action repos, and ensure dependabot.yml is in
+each.
+
+**Action Items:**
+
+1. [ ] Check `scripts/sync-labels-to-action-repos.py` in ghcommon for label list
+2. [ ] Run label sync script for all action repos
+3. [ ] Add `.github/dependabot.yml` to each action repo (github-actions updates)
+4. [ ] Commit and push to each repo
+5. [ ] Tag each repo and update floating tags
+
+**Script Location:** `ghcommon/scripts/sync-labels-to-action-repos.py`
+
+---
+
+### 3. Ensure all action repos have dependabot.yml
+
+**Status:** Not Started **Priority:** High
+
+Verify and add `.github/dependabot.yml` to all action repos for automated
+dependency updates.
+
+**Action Items:**
+
+1. [ ] Check which repos are missing `dependabot.yml`
+2. [ ] Create/copy dependabot.yml to repos that don't have it
+3. [ ] Ensure it includes `github-actions` package ecosystem
+4. [ ] Commit and push to each repo
+5. [ ] Tag each repo and update floating tags
+
+**Template:** Based on `generate-version-action/.github/dependabot.yml`
+
+---
+
+### 4. Standardize CI workflows across action repos
+
+**Status:** Not Started **Priority:** High
+
+Consolidate different CI workflows (test-action.yml, ci.yml) into a unified
+pattern that supports action-specific tests via repository config.
+
+**Action Items:**
+
+1. [ ] Review all existing CI workflows in action repos
+2. [ ] Create standard `ci.yml` template with:
+   - Validate action.yml
+   - Lint (yamllint, markdownlint)
+   - Test action execution (basic `uses: ./`)
+   - Allow for repo-specific additional tests
+3. [ ] Apply to all action repos
+4. [ ] Commit and push to each repo
+5. [ ] Tag each repo and update floating tags
+
+**Template Base:** `release-rust-action/.github/workflows/ci.yml` and
+`release-frontend-action/.github/workflows/ci.yml`
+
+---
+
+### 5. Ensure all action repos have release.yml workflow
+
+**Status:** Not Started **Priority:** High
+
+Implement consistent release workflow with version detection, changelog
+generation, tag management, and floating tag updates.
+
+**Action Items:**
+
+1. [ ] Review release.yml in release-rust-action and release-frontend-action
+2. [ ] Create standardized `release.yml` template
+3. [ ] Apply to all action repos that don't have it
+4. [ ] Commit and push to each repo
+5. [ ] Tag each repo and update floating tags
+
+**Template Base:** `release-rust-action/.github/workflows/release.yml` and
+`release-frontend-action/.github/workflows/release.yml`
+
+---
+
+### 6. Apply common repository settings to all action repos
+
+**Status:** Not Started **Priority:** High
+
+Use repository settings script to apply consistent configuration across all
+action repos (rebase-only merges, branch protection, etc).
+
+**Action Items:**
+
+1. [ ] Find and review repository settings script in ghcommon
+2. [ ] Document all configured settings and their values
+3. [ ] Run script against all action repos to validate/update settings
+4. [ ] Verify settings are applied correctly in each repo via GitHub web UI
+5. [ ] Document results
+
+**Expected Settings:**
+
+- Rebase-only merges enabled
+- Branch protection on main
+- Require PR reviews (if configured)
+- Require status checks to pass
+- Other standard settings from ghcommon
 
 ---
