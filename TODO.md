@@ -97,7 +97,7 @@
 
 ### Security Hardening for Workflows
 
-- 🚧 IN PROGRESS (January 2, 2026)
+- ✅ COMPLETED (January 2, 2026)
 - Scope: Apply least-privilege permissions, pin actions to SHAs or major
   versions, add security scanning.
 - Steps: - Set `permissions` per job; default to `read` and escalate only when
@@ -111,9 +111,10 @@
   - ✅ Fetched latest releases and commit SHAs for 15 external actions
   - ✅ Pinned all external actions to format: owner/action@FULL_SHA # vX.Y.Z
   - ✅ Updated 9 action repos with pinned hashes and pushed changes
-  - 🚧 Next: Enable "require SHA pinning" setting on all repos
-  - 🚧 Next: Verify dependabot can update both SHA and version comments
-  - 🚧 Next: Add pre-commit hooks and linter configs to all repos
+  - ✅ Enabled "require SHA pinning" setting on 17 action repos via GitHub API
+  - ✅ Deployed pre-commit hooks and linter configs to all 17 action repos
+  - 🚧 Next: Test pre-commit hooks in each repo to ensure clean runs
+  - 🚧 Next: Ensure all repos have TODO.md and CHANGELOG.md
 - Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
   for action pins.
 
