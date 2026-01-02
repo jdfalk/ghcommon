@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/fix_markdown_headers.py
-# version: 1.0.1
+# version: 1.0.2
 # guid: 2f6a7b8c-1d2e-4f3a-9b5c-6d7e8f9a0b1c
 
 """Find and fix markdown header metadata that uses heading syntax instead of comments.
@@ -107,6 +107,13 @@ def run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True)
 
 
+def run_precommit_if_present(repo: Path) -> None:
+    """Run pre-commit if config exists in the repo."""
+    if not (repo / ".pre-commit-config.yaml").exists():
+        return
+    run(["pre-commit", "run", "-av"], repo)
+
+
 def process_repo(repo: Path, apply: bool) -> RepoResult:
     issues: list[FileIssue] = []
     for md_file in repo.rglob("*.md"):
@@ -128,9 +135,12 @@ def process_repo(repo: Path, apply: bool) -> RepoResult:
     result = RepoResult(repo_path=repo, issues=issues)
     if apply and issues:
         base_branch = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], repo).stdout.strip()
-        branch_name = f"fix/markdown-headers-{dt.datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        branch_name = (
+            f"fix/markdown-headers-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d%H%M%S')}"
+        )
         run(["git", "checkout", "-b", branch_name], repo)
         run(["git", "add"] + [str(i.path.relative_to(repo)) for i in issues], repo)
+        run_precommit_if_present(repo)
         run(["git", "commit", "-m", "docs(markdown): normalize metadata headers"], repo)
         run(["git", "push", "-u", "origin", branch_name], repo)
 
