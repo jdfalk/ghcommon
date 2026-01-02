@@ -76,6 +76,7 @@
 
 ### Standardize Action Repo Workflows (ci.yml, release.yml, integration)
 
+- ✅ COMPLETED (January 2, 2026)
 - Scope: Every action repo gets consistent CI (lint + parse + minimal run),
   Release (tag + moving tags), and Integration (use action from tag in a sample
   run).
@@ -87,9 +88,16 @@
 - Deliverables: Workflow files across all action repos; status badges in README.
 - Acceptance: All actions show green CI for push/PR; release workflow produces
   tags/releases.
+- Completion Notes:
+  - All 18 action repos have auto-merge.yml
+  - 242 labels synced across all repos using sync-labels-fast.py
+  - All repos have dependabot.yml configured
+  - Created new point releases: 14 repos at v1.1.2, 4 repos at v1.0.1
+  - Force-updated floating tags (v1, v1.0) to latest commits across all repos
 
 ### Security Hardening for Workflows
 
+- 🚧 IN PROGRESS (January 2, 2026)
 - Scope: Apply least-privilege permissions, pin actions to SHAs or major
   versions, add security scanning.
 - Steps: - Set `permissions` per job; default to `read` and escalate only when
@@ -98,6 +106,14 @@
   CodeQL or basic SAST for helper code; add Trivy for containers where relevant.
 - Deliverables: Updated workflows with pinned actions, permissions, security
   checks documented.
+- Progress:
+  - ✅ Audited all external action dependencies across 18 repos
+  - ✅ Fetched latest releases and commit SHAs for 15 external actions
+  - ✅ Pinned all external actions to format: owner/action@FULL_SHA # vX.Y.Z
+  - ✅ Updated 9 action repos with pinned hashes and pushed changes
+  - 🚧 Next: Enable "require SHA pinning" setting on all repos
+  - 🚧 Next: Verify dependabot can update both SHA and version comments
+  - 🚧 Next: Add pre-commit hooks and linter configs to all repos
 - Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
   for action pins.
 
