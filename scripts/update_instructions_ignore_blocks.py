@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/update_instructions_ignore_blocks.py
-# version: 1.0.0
+# version: 1.0.1
 # guid: 7f3c9a3e-1b2c-4d5e-8f90-abc123def456
 
 """Batch-update .github/instructions/*.instructions.md files across repositories to:
@@ -13,8 +13,10 @@ Safety:
 - Skips files already wrapped (detects 'prettier-ignore-start' near frontmatter)
 - Preserves content and spacing
 """
-import osfrom __future__ import annotations
 
+from __future__ import annotations
+
+import os
 import re
 from pathlib import Path
 

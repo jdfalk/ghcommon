@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/repo-audit.py
-# version: 1.1.0
+# version: 1.1.1
 # guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
 
 """Repository Audit Script
@@ -17,6 +17,7 @@ Generates a comprehensive comparison chart and identifies repositories that need
 
 import argparse
 import json
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
