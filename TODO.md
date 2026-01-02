@@ -113,7 +113,11 @@
   - ✅ Updated 9 action repos with pinned hashes and pushed changes
   - ✅ Enabled "require SHA pinning" setting on 17 action repos via GitHub API
   - ✅ Deployed pre-commit hooks and linter configs to all 17 action repos
-  - 🚧 Next: Test pre-commit hooks in each repo to ensure clean runs
+  - ✅ Tested pre-commit hooks in all 17 repos to verify clean execution
+  - ✅ Fixed pre-commit config issues (yamllint and ruff paths) across all repos
+  - ✅ Created .yamllint configuration files with standard rules in all repos
+  - ✅ Committed linter auto-fixes (prettier, shfmt formatting) from pre-commit
+    testing
   - 🚧 Next: Ensure all repos have TODO.md and CHANGELOG.md
 - Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
   for action pins.
