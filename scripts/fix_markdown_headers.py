@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/fix_markdown_headers.py
-# version: 1.0.3
+# version: 1.0.4
 # guid: 2f6a7b8c-1d2e-4f3a-9b5c-6d7e8f9a0b1c
 
 """Find and fix markdown header metadata that uses heading syntax instead of comments.
@@ -103,8 +103,8 @@ def iter_repos(base_dir: Path) -> Iterable[Path]:
             yield child
 
 
-def run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True)
+def run(cmd: list[str], cwd: Path, *, check: bool = True) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
 
 
 def run_precommit_if_present(repo: Path) -> None:
@@ -144,31 +144,44 @@ def process_repo(repo: Path, apply: bool) -> RepoResult:
         branch_name = (
             f"fix/markdown-headers-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d%H%M%S')}"
         )
-        run(["git", "checkout", "-b", branch_name], repo)
-        run(["git", "add"] + [str(i.path.relative_to(repo)) for i in issues], repo)
-        run_precommit_if_present(repo)
-        run(["git", "commit", "-m", "docs(markdown): normalize metadata headers"], repo)
-        run(["git", "push", "-u", "origin", branch_name], repo)
+        created_branch = False
+        try:
+            run(["git", "checkout", "-b", branch_name], repo)
+            created_branch = True
+            run(["git", "add"] + [str(i.path.relative_to(repo)) for i in issues], repo)
+            run_precommit_if_present(repo)
+            run(["git", "commit", "-m", "docs(markdown): normalize metadata headers"], repo)
+            run(["git", "push", "-u", "origin", branch_name], repo)
 
-        pr_body = "Normalize markdown metadata headers to HTML comments and remove MD025 disables."
-        pr_title = "docs: normalize markdown headers"
-        pr = run(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--title",
-                pr_title,
-                "--body",
-                pr_body,
-                "--base",
-                base_branch,
-            ],
-            repo,
-        )
-        result.branch = branch_name
-        result.base_branch = base_branch
-        result.pr_url = pr.stdout.strip()
+            pr_body = (
+                "Normalize markdown metadata headers to HTML comments and remove MD025 disables."
+            )
+            pr_title = "docs: normalize markdown headers"
+            pr = run(
+                [
+                    "gh",
+                    "pr",
+                    "create",
+                    "--title",
+                    pr_title,
+                    "--body",
+                    pr_body,
+                    "--base",
+                    base_branch,
+                ],
+                repo,
+            )
+            result.branch = branch_name
+            result.base_branch = base_branch
+            result.pr_url = pr.stdout.strip()
+        except subprocess.CalledProcessError as err:
+            stdout = err.stdout.strip() if err.stdout else ""
+            stderr = err.stderr.strip() if err.stderr else ""
+            message = stdout or stderr or str(err)
+            print(f"[WARN] failed to commit/push in {repo.name}: {message}")
+        finally:
+            if created_branch:
+                run(["git", "checkout", base_branch], repo, check=False)
     return result
 
 
