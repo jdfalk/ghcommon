@@ -118,7 +118,8 @@
   - ✅ Created .yamllint configuration files with standard rules in all repos
   - ✅ Committed linter auto-fixes (prettier, shfmt formatting) from pre-commit
     testing
-  - 🚧 Next: Ensure all repos have TODO.md and CHANGELOG.md
+  - ✅ Ensured all 18 repos have TODO.md and CHANGELOG.md with proper headers
+    and templates
 - Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
   for action pins.
 
