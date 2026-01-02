@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/fix_markdown_headers.py
-# version: 1.0.2
+# version: 1.0.3
 # guid: 2f6a7b8c-1d2e-4f3a-9b5c-6d7e8f9a0b1c
 
 """Find and fix markdown header metadata that uses heading syntax instead of comments.
@@ -111,7 +111,13 @@ def run_precommit_if_present(repo: Path) -> None:
     """Run pre-commit if config exists in the repo."""
     if not (repo / ".pre-commit-config.yaml").exists():
         return
-    run(["pre-commit", "run", "-av"], repo)
+    try:
+        run(["pre-commit", "run", "-av"], repo)
+    except subprocess.CalledProcessError as err:
+        stdout = err.stdout.strip() if err.stdout else ""
+        stderr = err.stderr.strip() if err.stderr else ""
+        message = stdout or stderr or "pre-commit failed"
+        print(f"[WARN] pre-commit failed in {repo.name}: {message}")
 
 
 def process_repo(repo: Path, apply: bool) -> RepoResult:
