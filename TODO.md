@@ -74,6 +74,19 @@
       with before/after. - Acceptance Criteria: Green pipeline in canary repos;
       artifacts/releases intact; no inline scripts remain.
 
+- [ ] Roll out dockerized action paths + GHCR auto-publish workflows across all
+      action repos. Status: done (detect-languages-action, load-config-action);
+      pending (get-frontend-config-action, package-assets-action,
+      auto-module-tagging-action, ci-generate-matrices-action,
+      release-docker-action, release-frontend-action, release-go-action,
+      release-protobuf-action, release-python-action, release-rust-action,
+      ci-workflow-helpers-action, pr-auto-label-action, docs-generator-action,
+      release-strategy-action, security-summary-action). Deliverables:
+      Dockerfile/.dockerignore, `use-docker`/`docker-image` inputs with
+      docker/host branching, README/CHANGELOG/TODO updates, publish-docker
+      workflow that builds/pushes GHCR, updates pinned digest in action.yml,
+      commits and tags.
+
 ### Standardize Action Repo Workflows (ci.yml, release.yml, integration)
 
 - ✅ COMPLETED (January 2, 2026)
