@@ -7,12 +7,11 @@
 - Rollout of dockerized execution + GHCR auto-publish across action repos:
   - Completed: detect-languages-action, load-config-action,
     get-frontend-config-action, package-assets-action,
-    ci-generate-matrices-action
-  - Pending: auto-module-tagging-action, release-docker-action,
-    release-frontend-action, release-go-action, release-protobuf-action,
-    release-python-action, release-rust-action, ci-workflow-helpers-action,
-    pr-auto-label-action, docs-generator-action, release-strategy-action,
-    security-summary-action
+    ci-generate-matrices-action, auto-module-tagging-action
+  - Pending: release-docker-action, release-frontend-action, release-go-action,
+    release-protobuf-action, release-python-action, release-rust-action,
+    ci-workflow-helpers-action, pr-auto-label-action, docs-generator-action,
+    release-strategy-action, security-summary-action
 
 ### Security
 

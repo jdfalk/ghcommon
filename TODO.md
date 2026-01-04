@@ -77,8 +77,8 @@
 - [ ] Roll out dockerized action paths + GHCR auto-publish workflows across all
       action repos. Status: done (detect-languages-action, load-config-action,
       get-frontend-config-action, package-assets-action,
-      ci-generate-matrices-action); pending (auto-module-tagging-action,
-      release-docker-action, release-frontend-action, release-go-action,
+      ci-generate-matrices-action, auto-module-tagging-action); pending
+      (release-docker-action, release-frontend-action, release-go-action,
       release-protobuf-action, release-python-action, release-rust-action,
       ci-workflow-helpers-action, pr-auto-label-action, docs-generator-action,
       release-strategy-action, security-summary-action). Deliverables:
