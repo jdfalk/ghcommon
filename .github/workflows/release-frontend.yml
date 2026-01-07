@@ -45,7 +45,7 @@ jobs:
 
       - name: Build frontend via action
         continue-on-error: true
-        uses: jdfalk/release-frontend-action@af38527b03cc70ea10e3c97a806312dfd6f65474 # v1.1.1
+        uses: jdfalk/release-frontend-action@9e5283661e0a52c919d9e1ed70614f65b5a3d7b6 # v1.1.2
         with:
           node-version: ${{ matrix.node-version }}
           working-directory: ${{ steps.frontend-dir.outputs.dir }}

@@ -40,7 +40,7 @@ jobs:
           path: proto-generated
 
       - name: Build Python package (no publish)
-        uses: jdfalk/release-python-action@3e78aa25d16a34f563386448d4e2109069d162ea # v1.0.0
+        uses: jdfalk/release-python-action@fc1d0759bfdf6a379094c80b59de498086748607 # v1.0.1
         with:
           python-version: ${{ matrix.python-version }}
           package-dir: .
