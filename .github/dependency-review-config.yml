@@ -1,0 +1,46 @@
+# file: .github/dependency-review-config.yml
+# version: 1.0.0
+# guid: d1e2f3a4-b5c6-47d8-9e10-f1a2b3c4d5e6
+
+# Dependency Review Configuration
+# This file configures the dependency review action for security scanning
+
+# Fail the action if any dependencies have vulnerabilities with the given severity or higher
+fail-on-severity: moderate
+
+# Allow list - dependencies that should not be flagged
+# Format: package-url (PURL) format
+allow-licenses: []
+
+# Deny list - licenses that should always be flagged
+deny-licenses:
+  - GPL-2.0-only
+  - GPL-3.0-only
+  - AGPL-3.0-only
+
+# Allow list - specific dependencies that can be added even if they match other rules
+allow-dependencies-licenses: []
+
+# Fail if a pull request adds a dependency with any of these licenses
+fail-on-licenses:
+  - AGPL-3.0-only
+
+# Fail on scopes - which dependency scopes to check
+fail-on-scopes:
+  - runtime
+  - development
+
+# Comment summary - whether to comment a summary on the PR
+comment-summary-in-pr: true
+
+# Retry on snapshot unavailable - whether to retry if the dependency snapshot is not available
+retry-on-snapshot-unavailable: true
+
+# Maximum number of retries for snapshot
+retry-on-snapshot-unavailable-timeout: 120
+
+# Configuration for vulnerability checks
+vulnerability-check: true
+
+# Configuration for license checks  
+license-check: true
