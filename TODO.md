@@ -75,17 +75,17 @@
       artifacts/releases intact; no inline scripts remain.
 
 - [ ] Roll out dockerized action paths + GHCR auto-publish workflows across all
-      action repos. Status: done (detect-languages-action, load-config-action,
-      get-frontend-config-action, package-assets-action,
-      ci-generate-matrices-action, auto-module-tagging-action); pending
-      (release-docker-action, release-frontend-action, release-go-action,
-      release-protobuf-action, release-python-action, release-rust-action,
+      action repos. Status: 11/18 done (detect-languages-action,
+      load-config-action, get-frontend-config-action, package-assets-action,
+      ci-generate-matrices-action, auto-module-tagging-action,
+      generate-version-action, release-docker-action, release-frontend-action,
+      release-go-action, release-protobuf-action); 7/18 pending
+      (release-python-action, release-rust-action, release-strategy-action,
       ci-workflow-helpers-action, pr-auto-label-action, docs-generator-action,
-      release-strategy-action, security-summary-action). Deliverables:
-      Dockerfile/.dockerignore, `use-docker`/`docker-image` inputs with
-      docker/host branching, README/CHANGELOG/TODO updates, publish-docker
-      workflow that builds/pushes GHCR, updates pinned digest in action.yml,
-      commits and tags.
+      security-summary-action). Deliverables: Dockerfile/.dockerignore,
+      `use-docker`/`docker-image` inputs with docker/host branching,
+      README/CHANGELOG/TODO updates, publish-docker workflow that builds/pushes
+      GHCR, updates pinned digest in action.yml, commits and tags.
 
 ### Standardize Action Repo Workflows (ci.yml, release.yml, integration)
 
