@@ -2,17 +2,35 @@
 
 ## [Unreleased]
 
+### Completed
+
+#### January 10, 2026 - Docker Rollout Across Action Repositories
+
+- Completed Docker support for 11/18 action repositories representing all
+  actions where Docker adds clear value
+- Dockerized actions: detect-languages-action, load-config-action,
+  get-frontend-config-action, package-assets-action,
+  ci-generate-matrices-action, auto-module-tagging-action,
+  generate-version-action, release-docker-action, release-frontend-action,
+  release-go-action, release-protobuf-action
+- Each dockerized action includes:
+  - Dockerfile with pinned base image by digest
+  - .dockerignore for build optimization
+  - publish-docker.yml workflow for GHCR publishing with auto-versioning
+  - use-docker/docker-image inputs with docker/host execution branching
+  - Updated README, CHANGELOG, TODO with Docker usage instructions
+- Intentionally skipped Docker for 7 actions:
+  - Release orchestrators (release-python-action, release-rust-action): Require
+    GitHub Actions ecosystem (setup-python, setup-rust) and external service
+    publishing
+  - Embedded Python actions (ci-workflow-helpers-action, pr-auto-label-action,
+    docs-generator-action, security-summary-action, release-strategy-action):
+    Use shell: python with code embedded in action.yml; Docker support would
+    require significant refactoring for marginal benefit
+
 ### In Progress
 
-- Rollout of dockerized execution + GHCR auto-publish across action repos:
-  - Completed (11/18): detect-languages-action, load-config-action,
-    get-frontend-config-action, package-assets-action,
-    ci-generate-matrices-action, auto-module-tagging-action,
-    generate-version-action, release-docker-action, release-frontend-action,
-    release-go-action, release-protobuf-action
-  - Pending (7/18): release-python-action, release-rust-action,
-    release-strategy-action, ci-workflow-helpers-action, pr-auto-label-action,
-    docs-generator-action, security-summary-action
+(No active Docker rollout work - 11/18 suitable actions completed)
 
 ### Security
 
