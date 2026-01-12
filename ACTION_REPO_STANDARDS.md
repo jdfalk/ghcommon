@@ -1,11 +1,25 @@
 <!-- file: ACTION_REPO_STANDARDS.md -->
-<!-- version: 1.0.0 -->
+<!-- version: 1.1.0 -->
 <!-- guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890 -->
 
 # Action Repository File Standards
 
 This document defines the required and recommended files for all GitHub Action
 repositories in the `jdfalk` organization.
+
+## 🎯 Template Repository
+
+**All action repositories should use the
+[jft-github-actions](https://github.com/jdfalk/jft-github-actions) template as
+the single source of truth.**
+
+- **Template URL**: <https://github.com/jdfalk/jft-github-actions>
+- **Auto-sync**: Daily at 6am UTC via GitHub Actions
+- **Manual sync**: Available via workflow dispatch
+- **Propagates**: Instructions, agents, configs, issue templates
+
+The template repository automatically syncs standard files to all action repos,
+ensuring consistency and preventing drift.
 
 ## Required Files (100% Compliance)
 
