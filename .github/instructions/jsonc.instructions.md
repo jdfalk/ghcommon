@@ -7,7 +7,7 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 ---
-applyTo: "**/*.json"
+applyTo: "**/*.jsonc"
 description: |
   Coding, documentation, and workflow rules for JSON files, following Google JSON style guide and general project rules. Reference this for all JSON code, documentation, and formatting in this repository. All unique content from the Google JSON Style Guide is merged here.
 ---
@@ -45,4 +45,14 @@ description: |
 
 ## Required File Header
 
-Files with the `.json` extension (JSON without comments), which are exempt from this requirement and do not require a file header.
+All JSONC files must begin with a standard header as described in the
+[general coding instructions](general-coding.instructions.md). The **only
+exception** is files with the `.json` extension (JSON without comments), which
+are exempt from this requirement and do not require a file header. For standard
+`.jsonc` files, include the following header:
+
+```jsonc
+// file: path/to/file.jsonc
+// version: 1.0.0
+// guid: 123e4567-e89b-12d3-a456-426614174000
+```
