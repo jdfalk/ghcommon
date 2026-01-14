@@ -618,7 +618,7 @@ jobs:
 
       - name: Generate SBOM (Syft)
         id: generate-sbom
-        uses: anchore/sbom-action@v0.21.0
+        uses: anchore/sbom-action@v0.21.1
         with:
           output-file: sbom.spdx.json
 
