@@ -406,13 +406,13 @@ jobs:
           cache: true
 
       - name: Build Go project
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: go-setup
 
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: go-test
           coverage-threshold: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
@@ -475,7 +475,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Install Python dependencies
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: python-install
 
@@ -486,7 +486,7 @@ jobs:
 
       - name: Test Python code
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: python-run-tests
 
@@ -546,24 +546,24 @@ jobs:
 
       - name: Format Rust code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: rust-format
 
       - name: Lint Rust code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: rust-clippy
 
       - name: Build Rust project
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: rust-build
 
       - name: Test Rust project
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: rust-test
 
@@ -631,14 +631,14 @@ jobs:
       # No additional cache setup needed here.
 
       - name: Install dependencies
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: frontend-install
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
 
       - name: Lint frontend code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -647,7 +647,7 @@ jobs:
           frontend-failure-message: '❌ Linting failed or not configured'
 
       - name: Build frontend
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -657,7 +657,7 @@ jobs:
 
       - name: Test frontend
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -725,7 +725,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Generate summary
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: generate-ci-summary
         env:
@@ -740,7 +740,7 @@ jobs:
           JOB_DOCS: skipped
 
       - name: Check overall status
-        uses: jdfalk/ci-workflow-helpers-action@v1
+        uses: jdfalk/ci-workflow-helpers-action@v1.1.3
         with:
           command: check-ci-status
         env:
