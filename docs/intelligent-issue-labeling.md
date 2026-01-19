@@ -1,6 +1,7 @@
 <!-- file: docs/intelligent-issue-labeling.md -->
 <!-- version: 1.0.1 -->
 <!-- guid: 1b2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e -->
+<!-- last-edited: 2026-01-19 -->
 
 # Intelligent Issue Labeling
 

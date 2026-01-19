@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t13-testing-automation-part2-m4n5o6p7-q8r9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13 Part 2: Python and JavaScript Testing Automation
 

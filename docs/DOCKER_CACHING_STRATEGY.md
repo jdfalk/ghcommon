@@ -1,6 +1,7 @@
 <!-- file: docs/DOCKER_CACHING_STRATEGY.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: docker-caching-strategy-2025-10-12 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Docker Container Caching Strategy for Super Linter
 

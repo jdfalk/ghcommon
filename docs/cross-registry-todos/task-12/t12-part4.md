@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part4-i1j2k3l4-m5n6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12 Part 4: Dependabot Configuration and Automated Updates
 

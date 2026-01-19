@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-0-foundation.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 0: Foundation
 
@@ -692,6 +693,7 @@ Create file: `.github/SECURITY_CHECKLIST.md`
 <!-- file: .github/SECURITY_CHECKLIST.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow Security Audit Checklist
 

@@ -1,6 +1,7 @@
 <!-- file: docs/unified-issue-management.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: cbe30577-0304-43b3-bdb4-a003e3c278bb -->
+<!-- last-edited: 2026-01-19 -->
 
 <!-- file: docs/unified-issue-management.md -->
 

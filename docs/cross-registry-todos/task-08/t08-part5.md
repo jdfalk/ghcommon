@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t08-ci-consolidation-part5-f1g2h3i4-j5k6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 5: Result Aggregation & Migration Guide
 

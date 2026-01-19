@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-15/t15-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t15-performance-monitoring-part3-c4d5e6f7-g8h9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 15 Part 3: Prometheus Configuration and Alerting
 
@@ -580,6 +581,7 @@ receivers:
 <!-- file: configs/alertmanager-templates/slack.tmpl -->
 <!-- version: 1.0.0 -->
 <!-- guid: alertmanager-slack-template -->
+<!-- last-edited: 2026-01-19 -->
 
 {{ define "slack.default.title" }}
 [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.alertname }}

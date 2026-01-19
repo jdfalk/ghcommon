@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part5-j2k3l4m5-n6o7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12 Part 5: Dependency Health Monitoring and Vulnerability Alerting
 

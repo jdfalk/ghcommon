@@ -1,6 +1,7 @@
 <!-- file: docs/SUPER_LINTER_STRATEGY.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: f7a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c -->
+<!-- last-edited: 2026-01-19 -->
 
 # Super Linter Configuration Strategy
 

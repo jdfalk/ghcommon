@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t08-ci-consolidation-part3-d9e0f1g2-h3i4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 3: Consolidated Workflow Design & Implementation
 

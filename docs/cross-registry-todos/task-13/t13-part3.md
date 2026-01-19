@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t13-testing-automation-part3-n4o5p6q7-r8s9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13 Part 3: Test Coverage and CI Automation
 

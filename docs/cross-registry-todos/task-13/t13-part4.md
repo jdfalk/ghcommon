@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t13-testing-automation-part4-o4p5q6r7-s8t9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13 Part 4: Integration, E2E, and Performance Testing
 

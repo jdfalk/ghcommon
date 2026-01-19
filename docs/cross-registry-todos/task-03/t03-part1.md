@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-03/t03-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t03-rust-part1-a1b2c3d4-e5f6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 03 Part 1: Rust Crate Publishing Overview and Analysis
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-02/t02-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t02-docker-part5-e5f6g7h8-i9j0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 02 Part 5: Optimization and Advanced Configuration
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part2-g9h0i1j2-k3l4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12 Part 2: Python and JavaScript Dependency Management
 

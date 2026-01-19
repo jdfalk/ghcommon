@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t13-testing-automation-part5-p4q5r6s7-t8u9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13 Part 5: Test Automation Workflows and CI/CD Integration
 

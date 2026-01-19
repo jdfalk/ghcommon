@@ -1,6 +1,7 @@
 <!-- file: ACTION_PINNING_PLAN.md -->
 <!-- version: 1.0.1 -->
 <!-- guid: d4e5f6a7-b8c9-0123-defg-234567890123 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Action Version Pinning and Release Plan
 

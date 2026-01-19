@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part4-q4r5s6t7-u8v9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 4: Progressive Delivery with Canary and Blue-Green Deployments
 

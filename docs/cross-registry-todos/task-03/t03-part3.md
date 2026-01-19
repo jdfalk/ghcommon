@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-03/t03-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t03-rust-part3-c3d4e5f6-g7h8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 03 Part 3: Publishing, Verification, and Testing
 

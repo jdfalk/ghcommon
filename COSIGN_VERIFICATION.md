@@ -1,6 +1,7 @@
 <!-- file: COSIGN_VERIFICATION.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c0519n-v3r1f1c4t10n-1a2b3c4d5e6f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Cosign Signature Verification
 

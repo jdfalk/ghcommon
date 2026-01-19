@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-03/t03-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t03-rust-part4-d4e5f6g7-h8i9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 03 Part 4: Post-Merge Verification and Production Testing
 

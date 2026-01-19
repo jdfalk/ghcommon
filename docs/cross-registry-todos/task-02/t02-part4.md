@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-02/t02-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t02-docker-part4-d4e5f6g7-h8i9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 02 Part 4: CI Integration and ghcr.io Publishing
 

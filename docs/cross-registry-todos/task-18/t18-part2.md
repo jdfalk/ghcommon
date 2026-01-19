@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-18/t18-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t18-final-integration-part2-w3x4y5z6-a7b8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 18 Part 2: Unified Monitoring and Observability Dashboard
 

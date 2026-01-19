@@ -1,6 +1,7 @@
 <!-- file: .github/test-files/test.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: e4f5a6b7-c8d9-0e1f-2a3b-4c5d6e7f8a9b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Test Markdown File
 

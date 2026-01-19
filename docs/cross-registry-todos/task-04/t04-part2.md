@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-04/t04-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t04-go-packages-part2-e5f6a7b8-c9d0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 04 Part 2: Workflow Header and Environment Updates
 

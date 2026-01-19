@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t06-frontend-packages-part1-j1k2l3m4-n5o6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 06 Part 1: Frontend Package Publishing Overview
 

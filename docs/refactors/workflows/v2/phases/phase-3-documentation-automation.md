@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-3-documentation-automation.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d3e4f5a6-b7c8-9d0e-1f2a-3b4c5d6e7f8a -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 3: Documentation Automation
 
@@ -1699,6 +1700,7 @@ Create file: `docs-site/_layouts/default.html`
 <!-- file: docs-site/_layouts/default.html -->
 <!-- version: 1.0.0 -->
 <!-- guid: d9e0f1a2-b3c4-5d6e-7f8a-9b0c1d2e3f4a -->
+<!-- last-edited: 2026-01-19 -->
 
 <!DOCTYPE html>
 <html lang="en">

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-02-docker-packages.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t02-docker-verify-b2c3d4e5-f6a7-8b9c-0d1e -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 02: Verify Docker Package Publishing to GitHub Packages
 

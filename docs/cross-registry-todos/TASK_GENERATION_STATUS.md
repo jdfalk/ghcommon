@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/TASK_GENERATION_STATUS.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: task-gen-status-a1b2c3d4-e5f6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task Generation Status
 

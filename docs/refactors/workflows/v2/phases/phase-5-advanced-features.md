@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-5-advanced-features.md -->
 <!-- version: 1.2.0 -->
 <!-- guid: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 5: Advanced Features
 

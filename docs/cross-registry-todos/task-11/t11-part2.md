@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-11/t11-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t11-artifact-management-part2-q3r4s5t6-u7v8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 11 Part 2: Comprehensive Release Workflow Implementation
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t13-testing-automation-part6-q4r5s6t7-u8v9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13 Part 6: Testing Best Practices and Completion
 
@@ -12,6 +13,7 @@
 <!-- file: TESTING.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: testing-documentation -->
+<!-- last-edited: 2026-01-19 -->
 
 # Testing Guide
 

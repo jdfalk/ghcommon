@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-14/t14-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t14-documentation-automation-part1-r4s5t6u7-v8w9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 14: Documentation Generation and Publishing Automation
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-04/t04-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t04-go-packages-part4-a7b8c9d0-e1f2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 04 Part 4: Publishing Job Implementation
 

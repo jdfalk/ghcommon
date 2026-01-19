@@ -1,6 +1,7 @@
 <!-- file: CONTRIBUTING.md -->
 <!-- version: 1.0.2 -->
 <!-- guid: 6e181790-9ce9-4f83-ab5a-059d0831cd78 -->
+<!-- last-edited: 2026-01-19 -->
 
 # file: CONTRIBUTING.md
 
@@ -176,6 +177,7 @@ All documentation files should include the file path comment:
 <!-- file: path/to/file.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 123e4567-e89b-12d3-a456-426614174000 -->
+<!-- last-edited: 2026-01-19 -->
 ```
 
 #### Structure

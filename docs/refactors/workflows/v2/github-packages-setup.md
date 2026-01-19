@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/github-packages-setup.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c2d3e4f5-a6b7-8c9d-0e1f-2a3b4c5d6e7f -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Packages Setup
 

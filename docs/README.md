@@ -1,6 +1,7 @@
 <!-- file: docs/README.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: ed5f7a3f-12c8-41a8-9ac4-01e4f6993c4c -->
+<!-- last-edited: 2026-01-19 -->
 
 # Documentation Index
 

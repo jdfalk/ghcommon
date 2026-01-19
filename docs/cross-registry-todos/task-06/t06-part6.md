@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t06-frontend-packages-part6-z3a4b5c6-d7e8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 06 Part 6: Documentation, Troubleshooting, and Completion
 
@@ -12,6 +13,7 @@
 <!-- file: .github/workflows/release-frontend.yml -->
 <!-- version: 1.0.0 -->
 <!-- guid: release-frontend-workflow-f9g0h1i2-j3k4 -->
+<!-- last-edited: 2026-01-19 -->
 
 name: Release Frontend Packages
 

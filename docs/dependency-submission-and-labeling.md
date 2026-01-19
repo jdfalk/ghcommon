@@ -1,6 +1,7 @@
 <!-- file: docs/dependency-submission-and-labeling.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d4e5f6a7-b8c9-4a0d-1e2f-3a4b5c6d7e8f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Dependency Submission and Pull Request Labeling
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-11/t11-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t11-artifact-management-part5-d6e7f8g9-h0i1 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 11 Part 5: Release Verification and Testing
 

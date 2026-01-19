@@ -1,6 +1,7 @@
 <!-- file: CACHE_YAML_DIFFS.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: cache-diffs-2025-12-26 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Robust Manual Caching Strategy - YAML Diffs
 

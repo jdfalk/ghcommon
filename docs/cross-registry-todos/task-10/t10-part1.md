@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part1-a1b2c3d4-e5f6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 1: Security Scanning Integration Overview
 

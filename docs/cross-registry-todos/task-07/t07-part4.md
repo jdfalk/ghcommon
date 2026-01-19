@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t07-protobuf-packages-part4-j9k0l1m2-n3o4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 4: Publishing SDKs to Language Registries
 

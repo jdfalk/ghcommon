@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-15/t15-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t15-performance-monitoring-part6-s0t1u2v3-w4x5 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 15 Part 6: Monitoring Best Practices and Completion Checklist
 

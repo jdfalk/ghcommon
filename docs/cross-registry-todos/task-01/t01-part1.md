@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-01/t01-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t01-yaml-fix-part1-a1b2c3d4-e5f6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 01 Part 1: YAML Syntax Fixes - Overview & Analysis
 

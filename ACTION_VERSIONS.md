@@ -1,6 +1,7 @@
 <!-- file: ACTION_VERSIONS.md -->
 <!-- version: 1.0.2 -->
 <!-- guid: b2c3d4e5-f6a7-8901-bcde-f12345678901 -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Actions Version Reference
 

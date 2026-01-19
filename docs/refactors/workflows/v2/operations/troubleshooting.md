@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/operations/troubleshooting.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c4d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Troubleshooting Guide: v2 Workflow System
 

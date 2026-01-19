@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t05-python-packages-part2-e6f7a8b9-c0d1 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05 Part 2: Workflow Header and Package Detection
 

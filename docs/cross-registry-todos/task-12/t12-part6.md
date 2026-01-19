@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part6-k3l4m5n6-o7p8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12 Part 6: Dependency Management Best Practices and Completion
 

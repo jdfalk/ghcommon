@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-09/t09-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t09-ci-migration-testing-part1-h3i4j5k6-l7m8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 09 Part 1: CI Workflow Migration & Testing - Overview
 

@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/implementation/testing-strategy.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Testing Strategy Implementation Guide
 

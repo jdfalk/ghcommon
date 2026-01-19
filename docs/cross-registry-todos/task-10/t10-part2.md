@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part2-g7h8i9j0-k1l2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 2: Container Security Scanning
 

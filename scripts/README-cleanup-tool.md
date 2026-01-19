@@ -1,6 +1,7 @@
 <!-- file: scripts/README-cleanup-tool.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: f733d6cf-d356-4bb2-a633-25e8a7ffda65 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Repository Cleanup Tool
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t07-protobuf-packages-part1-l5m6n7o8-p9q0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 1: Protobuf Package Publishing - Overview
 

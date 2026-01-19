@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/operations/migration-guide.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Migration Guide: v1 to v2 Workflow System
 

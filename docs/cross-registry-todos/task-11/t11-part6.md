@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-11/t11-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t11-artifact-management-part6-e7f8g9h0-i1j2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 11 Part 6: Release Automation Best Practices and Completion
 

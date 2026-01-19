@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part5-w0x1y2z3-a4b5 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 5: Infrastructure as Code with Terraform and Pulumi
 

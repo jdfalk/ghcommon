@@ -1,12 +1,14 @@
 <!-- file: scripts/README-unified-project-manager.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: e08ffd6b-8758-4911-a8ea-d11e1ba15486 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Unified GitHub Project Manager
 
 <!-- file: scripts/README-unified-project-manager.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 5c6d7e8f-9a0b-1234-5678-9abcdef01234 -->
+<!-- last-edited: 2026-01-19 -->
 
 A comprehensive Python script that manages GitHub Projects across all repositories in the
 organization. This script consolidates and replaces all individual project creation scripts.

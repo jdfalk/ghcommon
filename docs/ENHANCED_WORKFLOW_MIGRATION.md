@@ -1,6 +1,7 @@
 <!-- file: docs/ENHANCED_WORKFLOW_MIGRATION.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 87e859a1-b605-4a0b-b111-37a31a623bfe -->
+<!-- last-edited: 2026-01-19 -->
 
 # Migration Guide: Enhanced Workflows with Timestamp Lifecycle Tracking
 

@@ -1,12 +1,14 @@
 <!-- file: docs/go-module-tagging.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: ea924a0a-fd0a-4c41-b625-96ed70992c5d -->
+<!-- last-edited: 2026-01-19 -->
 
 # Go Module Tagging System
 
 <!-- file: docs/go-module-tagging.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d -->
+<!-- last-edited: 2026-01-19 -->
 
 This document explains how the automatic Go module tagging system works and how to integrate it into
 your workflows.

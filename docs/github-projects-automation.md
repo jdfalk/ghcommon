@@ -1,6 +1,7 @@
 <!-- file: docs/github-projects-automation.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: f6a7b8c9-d0e1-2345-f012-678901234567 -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Projects Automation
 

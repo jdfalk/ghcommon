@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t05-python-packages-part4-g8h9i0j1-k2l3 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05 Part 4: Package Validation and Testing
 

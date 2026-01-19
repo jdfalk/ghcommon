@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part5-e5f6g7h8-i9j0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 5: Log-Based Alerting and Anomaly Detection
 

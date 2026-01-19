@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/operations/rollback-procedures.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c45f8e91-2c3d-4e5a-b7d6-9f1a2c3d4e5f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Rollback Procedures
 

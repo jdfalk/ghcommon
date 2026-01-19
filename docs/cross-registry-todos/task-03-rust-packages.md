@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-03-rust-packages.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t03-rust-packages-c3d4e5f6-a7b8-9c0d-1e2f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 03: Add Rust Crate Publishing to GitHub Packages
 

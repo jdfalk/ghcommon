@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-18/t18-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t18-final-integration-part1-q7r8s9t0-u1v2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 18 Part 1: Final Integration Overview
 

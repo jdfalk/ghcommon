@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part1-y6z7a8b9-c0d1 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 1: Kubernetes Deployment Manifests and Configuration
 

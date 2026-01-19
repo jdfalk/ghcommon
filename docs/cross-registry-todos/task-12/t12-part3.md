@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part3-h0i1j2k3-l4m5 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12 Part 3: Go Dependencies and Docker Base Image Management
 

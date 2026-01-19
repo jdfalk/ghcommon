@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t06-frontend-packages-part4-n5o6p7q8-r9s0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 06 Part 4: Package Validation and Publishing
 

@@ -1,6 +1,7 @@
 <!-- file: ACTION_DEPLOYMENT_CHECKLIST.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: f8a9b0c1-d2e3-4567-f123-678901234567 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Action Deployment Checklist
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t06-frontend-packages-part2-k2l3m4n5-o6p7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 06 Part 2: Workflow Header and Package Detection
 

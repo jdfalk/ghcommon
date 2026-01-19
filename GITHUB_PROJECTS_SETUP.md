@@ -1,6 +1,7 @@
 <!-- file: GITHUB_PROJECTS_SETUP.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: b8c9d0e1-f2a3-4567-b123-890123456789 -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Projects Automation Setup Summary
 

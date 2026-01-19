@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t07-protobuf-packages-part5-p5q6r7s8-t9u0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 5: GitHub Release and Documentation Generation
 

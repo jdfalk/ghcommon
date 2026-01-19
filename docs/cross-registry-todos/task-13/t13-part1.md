@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-13/t13-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t13-testing-automation-part1-l4m5n6o7-p8q9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 13: Testing and Quality Assurance Automation
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-14/t14-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t14-documentation-automation-part3-t4u5v6w7-x8y9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 14 Part 3: Documentation Sites and Changelog Automation
 
@@ -80,6 +81,7 @@ create-missing = true
 <!-- file: docs/src/SUMMARY.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: mdbook-summary -->
+<!-- last-edited: 2026-01-19 -->
 
 # Summary
 

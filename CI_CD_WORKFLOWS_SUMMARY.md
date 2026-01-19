@@ -1,6 +1,7 @@
 <!-- file: CI_CD_WORKFLOWS_SUMMARY.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: e7f8a9b0-c1d2-3456-e012-567890123456 -->
+<!-- last-edited: 2026-01-19 -->
 
 # CI/CD Workflows Summary
 

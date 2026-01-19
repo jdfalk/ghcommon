@@ -1,6 +1,7 @@
 <!-- file: docs/workflows/consolidation-map.md -->
 <!-- version: 1.0.1 -->
 <!-- guid: 7f5db8a1-4c9c-4f2a-9b36-5f46dfdb73e2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow Consolidation Map
 

@@ -1,6 +1,7 @@
 <!-- file: COMMITLINT_SETUP.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: b2c3d4e5-f6a7-8901-bcde-f23456789012 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Commitlint Setup
 

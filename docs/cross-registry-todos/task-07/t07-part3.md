@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t07-protobuf-packages-part3-d3e4f5g6-h7i8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 3: Buf BSR Publishing and Code Generation
 

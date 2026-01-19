@@ -1,6 +1,7 @@
 <!-- file: .github/scripts/README.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 2e6f66ca-86aa-46dc-b806-e5ad95dee9fb -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Scripts
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-11/t11-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t11-artifact-management-part1-k7l8m9n0-o1p2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 11 Part 1: Artifact Management and Release Automation Overview
 

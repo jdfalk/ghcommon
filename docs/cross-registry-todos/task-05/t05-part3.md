@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t05-python-packages-part3-f7g8h9i0-j1k2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05 Part 3: Package Building Job
 

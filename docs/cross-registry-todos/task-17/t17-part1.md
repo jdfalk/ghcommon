@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part1-i2j3k4l5-m6n7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 1: Structured Logging Standards Across All Languages
 

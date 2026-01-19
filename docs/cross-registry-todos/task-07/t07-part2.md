@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t07-protobuf-packages-part2-r1s2t3u4-v5w6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 2: Workflow Setup and Protobuf Detection
 
@@ -12,6 +13,7 @@
 <!-- file: .github/workflows/protobuf-release.yml -->
 <!-- version: 1.0.0 -->
 <!-- guid: protobuf-release-workflow-x7y8z9a0-b1c2 -->
+<!-- last-edited: 2026-01-19 -->
 
 name: Release Protobuf Packages
 

@@ -1,6 +1,7 @@
 <!-- file: testdata/go/README.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 4d5f6a7b-8c9d-0e1f-2a3b-4c5d6e7f8a9b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Go Test Fixtures
 

@@ -1,6 +1,7 @@
 <!-- file: dependency-analysis.md -->
 <!-- version: 2.1.0 -->
 <!-- guid: a1b2c3d4-e5f6-7890-1234-567890abcdef -->
+<!-- last-edited: 2026-01-19 -->
 
 # Dependency Analysis for ghcommon Repository
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part3-s3t4u5v6-w7x8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 3: Log Correlation with Traces and Context Propagation
 

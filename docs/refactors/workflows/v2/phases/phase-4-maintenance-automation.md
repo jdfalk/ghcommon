@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-4-maintenance-automation.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 4: Maintenance Automation
 

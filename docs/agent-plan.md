@@ -1,6 +1,7 @@
 <!-- file: docs/agent-plan.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 7f3c1b2a-5d6e-4c8f-9a1b-2c3d4e5f6a7b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Custom Agent Ecosystem and Instruction Consolidation
 

@@ -3,6 +3,7 @@
 <!-- file: ACTIONS_INTEGRATION_GUIDE.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 6e7f8a9b-0c1d-2e3f-4a5b-6c7d8e9f0a1b -->
+<!-- last-edited: 2026-01-19 -->
 
 ## Overview
 

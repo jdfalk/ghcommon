@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-09/t09-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t09-ci-migration-part4-d4e5f6g7-h8i9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 09 Part 4: Batch Migration and Automation Tools
 

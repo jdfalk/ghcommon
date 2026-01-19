@@ -1,6 +1,7 @@
 <!-- file: scripts/README.md -->
 <!-- version: 2.0.1 -->
 <!-- guid: a6ce4820-bcf8-482e-b2ca-234024d5d77f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Scripts Directory
 

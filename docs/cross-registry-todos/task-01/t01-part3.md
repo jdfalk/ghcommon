@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-01/t01-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t01-yaml-fix-part3-c3d4e5f6-g7h8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 01 Part 3: Testing and Validation
 

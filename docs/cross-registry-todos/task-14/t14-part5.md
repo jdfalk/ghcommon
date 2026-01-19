@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-14/t14-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t14-documentation-automation-part5-e4f5g6h7-i8j9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 14 Part 5: Documentation CI/CD Integration
 

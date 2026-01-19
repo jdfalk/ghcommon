@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part4-s9t0u1v2-w3x4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 4: Secret Scanning and SAST
 

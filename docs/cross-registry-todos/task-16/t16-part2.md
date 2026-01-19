@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part2-e2f3g4h5-i6j7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 2: Helm Chart Configuration and Templating
 

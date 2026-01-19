@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/reference/workflow-reference.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: 4d5e6f70-8192-a3b4-c5d6-e7f8091a2b3c -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow v2 Reference
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-04/t04-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t04-go-packages-part6-c9d0e1f2-a3b4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 04 Part 6: Documentation and Final Steps
 
@@ -24,6 +25,7 @@ Create `docs/go-module-publishing.md`:
 <!-- file: docs/go-module-publishing.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: go-module-publishing-docs -->
+<!-- last-edited: 2026-01-19 -->
 
 # Go Module Publishing
 
@@ -617,6 +619,7 @@ Create `.github/workflows/README-release-go.md`:
 <!-- file: .github/workflows/README-release-go.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: readme-release-go-workflow -->
+<!-- last-edited: 2026-01-19 -->
 
 # Release - Go Workflow
 

@@ -1,6 +1,7 @@
 <!-- file: docs/label-synchronization.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 4a2a4a66-7b30-4256-b4ff-9a9551884ebe -->
+<!-- last-edited: 2026-01-19 -->
 
 # Label Synchronization Workflow
 

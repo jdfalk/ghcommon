@@ -1,6 +1,7 @@
 <!-- file: .github/workflows/scripts/README.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: 3f4a5b6c-7d8e-9f0a-1b2c-3d4e5f6a7b8c -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow Scripts
 

@@ -1,6 +1,7 @@
 <!-- file: docs/JSCPD_CONFIGURATION.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: jscpd-configuration-2025-10-12 -->
+<!-- last-edited: 2026-01-19 -->
 
 # JSCPD (Copy/Paste Detector) Configuration
 

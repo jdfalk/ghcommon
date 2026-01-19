@@ -1,6 +1,7 @@
 <!-- file: examples/migration-guides/subtitle-manager-migration.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 53f1c794-3dad-4f3d-88af-614dc62facf5 -->
+<!-- last-edited: 2026-01-19 -->
 
 <!-- file: examples/migration-guides/subtitle-manager-migration.md -->
 

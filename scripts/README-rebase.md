@@ -1,6 +1,7 @@
 <!-- file: scripts/README-rebase.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 0e0555d1-09e2-4759-94cc-0b41e909a410 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Smart Rebase Automation Documentation
 

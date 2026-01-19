@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-2-release-consolidation.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 2: Release Consolidation
 
@@ -1516,6 +1517,7 @@ Create file: `docs/refactors/workflows/v2/github-packages-setup.md`
 <!-- file: docs/refactors/workflows/v2/github-packages-setup.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: c2d3e4f5-a6b7-8c9d-0e1f-2a3b4c5d6e7f -->
+<!-- last-edited: 2026-01-19 -->
 
 # GitHub Packages Setup
 

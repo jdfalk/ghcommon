@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part2-m7n8o9p0-q1r2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 2: JavaScript/TypeScript Structured Logging
 

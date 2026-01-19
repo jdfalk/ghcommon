@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t08-ci-consolidation-part2-c8d9e0f1-g2h3 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 2: Detailed Workflow Feature Extraction
 

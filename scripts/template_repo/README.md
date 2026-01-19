@@ -1,6 +1,7 @@
 <!-- file: scripts/template_repo/README.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: 9a1b8d2e-4c57-4c3e-bb5f-7a3e12e6b4a1 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Template Repository Scripts
 

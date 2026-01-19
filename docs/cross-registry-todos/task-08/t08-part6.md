@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t08-ci-consolidation-part6-g2h3i4j5-k6l7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 6: Troubleshooting & Best Practices
 

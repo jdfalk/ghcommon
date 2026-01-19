@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-11/t11-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t11-artifact-management-part3-w9x0y1z2-a3b4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 11 Part 3: Container Image Release Automation
 

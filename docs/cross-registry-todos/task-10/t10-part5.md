@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part5-y5z6a7b8-c9d0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 5: Infrastructure-as-Code Security Scanning
 

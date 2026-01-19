@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-15/t15-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t15-performance-monitoring-part1-q4r5s6t7-u8v9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 15 Part 1: Performance Monitoring and Profiling Strategy
 

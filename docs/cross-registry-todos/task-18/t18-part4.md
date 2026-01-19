@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-18/t18-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t18-final-integration-part4-i5j6k7l8-m9n0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 18 Part 4: On-Call Playbooks and Incident Response
 

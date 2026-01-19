@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/rollout-checklist.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 5e6f7081-92a3-b4c5-d6e7-f8091a2b3c4d -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow v2 Rollout Checklist
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part6-k1l2m3n4-o5p6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 6: Logging Best Practices and Retention Policies
 

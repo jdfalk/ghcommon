@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t08-ci-consolidation-part4-e0f1g2h3-i4j5 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 4: Remaining Language Jobs & Docker
 

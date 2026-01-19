@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t05-python-packages-part1-d5e6f7a8-b9c0 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05: Add Python Package Publishing to GitHub Packages
 

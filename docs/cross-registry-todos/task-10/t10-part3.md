@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part3-m3n4o5p6-q7r8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 3: Language-Specific Dependency Scanning
 

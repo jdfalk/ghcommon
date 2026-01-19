@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-09/t09-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t09-ci-migration-part6-i9j0k1l2-m3n4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 09 Part 6: Lessons Learned and Completion
 

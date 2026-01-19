@@ -1,6 +1,7 @@
 <!-- file: CACHE_TESTING_GUIDE.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: cache-testing-2025-12-26 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Robust Manual Caching Strategy - Testing Guide
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part3-k8l9m0n1-o2p3 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 3: Kustomize Overlays and GitOps with ArgoCD
 

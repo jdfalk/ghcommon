@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-14/t14-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t14-documentation-automation-part4-y9z0a1b2-c3d4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 14 Part 4: Documentation Publishing and Versioning
 

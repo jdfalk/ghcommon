@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/architecture.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 3c4d5e6f-7081-92a3-b4c5-d6e7f8091a2b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Workflow v2 Architecture
 

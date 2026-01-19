@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-07/t07-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t07-protobuf-packages-part6-v1w2x3y4-z5a6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 07 Part 6: Troubleshooting and Completion
 

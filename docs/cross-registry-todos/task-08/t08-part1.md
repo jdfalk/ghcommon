@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-08/t08-part1.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t08-ci-consolidation-part1-b7c8d9e0-f1g2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 08 Part 1: CI Workflow Consolidation - Overview
 

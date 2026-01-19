@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-15/t15-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t15-performance-monitoring-part2-w9x0y1z2-a3b4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 15 Part 2: JavaScript Instrumentation and System Metrics
 

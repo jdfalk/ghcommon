@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-12/t12-part1.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t12-dependency-management-part1-f8g9h0i1-j2k3 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 12: Dependency Management Automation
 

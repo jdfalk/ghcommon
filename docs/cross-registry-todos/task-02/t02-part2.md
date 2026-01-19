@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-02/t02-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t02-docker-part2-b2c3d4e5-f6a7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 02 Part 2: Workflow Configuration Detection and Analysis
 

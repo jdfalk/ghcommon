@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-17/t17-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t17-observability-logging-part4-y9z0a1b2-c3d4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 17 Part 4: Log Aggregation Infrastructure
 

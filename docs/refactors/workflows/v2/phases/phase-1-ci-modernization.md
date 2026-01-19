@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/phases/phase-1-ci-modernization.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b -->
+<!-- last-edited: 2026-01-19 -->
 
 # Phase 1: CI Modernization
 

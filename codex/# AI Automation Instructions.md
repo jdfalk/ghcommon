@@ -1,6 +1,7 @@
 <!-- file: codex/# AI Automation Instructions.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: cdcb7ddd-0f5c-440f-8364-c07e65180333 -->
+<!-- last-edited: 2026-01-19 -->
 
 # AI Automation Instructions
 

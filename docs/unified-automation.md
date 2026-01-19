@@ -1,6 +1,7 @@
 <!-- file: docs/unified-automation.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 3153c13c-f92e-4828-aef7-f1e175f22e32 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Unified Automation Workflow
 

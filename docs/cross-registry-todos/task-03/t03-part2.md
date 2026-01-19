@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-03/t03-part2.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t03-rust-part2-b2c3d4e5-f6g7 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 03 Part 2: Workflow Configuration and Implementation
 

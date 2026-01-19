@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-09/t09-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t09-ci-migration-part3-c3d4e5f6-g7h8 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 09 Part 3: Phase 2 Repository Migration
 

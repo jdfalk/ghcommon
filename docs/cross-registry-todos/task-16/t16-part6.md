@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-16/t16-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t16-deployment-automation-part6-c6d7e8f9-g0h1 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 16 Part 6: Deployment Best Practices and Completion Checklist
 

@@ -1,6 +1,7 @@
 <!-- file: repo-comparison-chart.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: 6f263283-29c4-475e-b162-09dfdcd9ab9d -->
+<!-- last-edited: 2026-01-19 -->
 
 | File                           | Statham-generator | Tautulli   | alpine-samba | apt-cacher-go | argocd-repo | argocdt1 | autoinstall-dir | bazarr-cockroachdb | brianfluxdemo | docker-bazarr-cockroachdb | docker-sabnzbd | docker-sonarr | docker-suitarr | ffmpeg-static | fluxcontrol | gcommon | ghcommon   | golang  | habk    | homebridge-google-nest-sdm | kubespray  | loki       | merge-srt-subtitles | public-helm-charts | public-scratch | puppet-thanos | shepherd | subtitle-manager | systemd | ubuntu-autoinstall-webhook | xlsx-converter |
 | ------------------------------ | ----------------- | ---------- | ------------ | ------------- | ----------- | -------- | --------------- | ------------------ | ------------- | ------------------------- | -------------- | ------------- | -------------- | ------------- | ----------- | ------- | ---------- | ------- | ------- | -------------------------- | ---------- | ---------- | ------------------- | ------------------ | -------------- | ------------- | -------- | ---------------- | ------- | -------------------------- | -------------- |

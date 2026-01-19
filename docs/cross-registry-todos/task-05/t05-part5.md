@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t05-python-packages-part5-h9i0j1k2-l3m4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05 Part 5: Publishing to Registries
 

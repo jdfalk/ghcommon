@@ -1,6 +1,7 @@
 <!-- file: docs/refactors/workflows/v2/reference/config-schema.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: d56e7f82-3d4e-5f6a-c8e9-0a1b2c3d4e5f -->
+<!-- last-edited: 2026-01-19 -->
 
 # Configuration Schema Reference
 

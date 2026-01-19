@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-18/t18-part3.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t18-final-integration-part3-c9d0e1f2-g3h4 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 18 Part 3: Comprehensive Troubleshooting Guide
 

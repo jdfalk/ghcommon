@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-01-fix-yaml-syntax.md -->
 <!-- version: 1.1.0 -->
 <!-- guid: t01-yaml-fix-a1b2c3d4-e5f6-7a8b-9c0d -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 01: Fix YAML Syntax in release-rust.yml
 

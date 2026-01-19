@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-06/t06-part5.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t06-frontend-packages-part5-t7u8v9w0-x1y2 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 06 Part 5: GitHub Release and Final Deployment
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-05/t05-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t05-python-packages-part6-i0j1k2l3-m4n5 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 05 Part 6: Documentation and Final Steps
 
@@ -107,6 +108,7 @@ cat > docs/python-package-publishing.md << 'EOF'
 <!-- file: docs/python-package-publishing.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: python-pkg-docs-j1k2l3m4-n5o6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Python Package Publishing Guide
 

@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-01/t01-part4.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t01-yaml-fix-part4-d4e5f6g7-h8i9 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 01 Part 4: Git Workflow and Commit Procedures
 

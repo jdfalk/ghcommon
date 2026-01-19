@@ -1,6 +1,7 @@
 <!-- file: docs/cross-registry-todos/task-10/t10-part6.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: t10-security-scanning-part6-e1f2g3h4-i5j6 -->
+<!-- last-edited: 2026-01-19 -->
 
 # Task 10 Part 6: Policy Enforcement and Completion
 
@@ -50,6 +51,7 @@ Create `SECURITY.md` for each repository:
 <!-- file: SECURITY.md -->
 <!-- version: 1.0.0 -->
 <!-- guid: security-policy -->
+<!-- last-edited: 2026-01-19 -->
 
 # Security Policy
 
