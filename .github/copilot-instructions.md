@@ -1,5 +1,5 @@
 <!-- file: .github/copilot-instructions.md -->
-<!-- version: 2.3.2 -->
+<!-- version: 2.3.3 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
 <!-- last-edited: 2026-01-19 -->
 
