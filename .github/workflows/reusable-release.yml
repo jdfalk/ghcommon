@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.6
+# version: 2.6.7
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -96,10 +96,10 @@ jobs:
       has-config: ${{ steps.load-config.outputs.has-config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Load repository configuration
         id: load-config
-        uses: jdfalk/load-config-action@v1.1.2
+        uses: jdfalk/load-config-action@98cad3221e6ea1013029a93011860f5d4c5ae660 # v1.1.2
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
@@ -131,7 +131,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           fetch-depth: 0
 
@@ -142,7 +142,7 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
-        uses: jdfalk/detect-languages-action@v1.1.2
+        uses: jdfalk/detect-languages-action@81acd6d5b5525ca188610eec55462319ec82151e # v1.1.2
         with:
           skip-detection: ${{ inputs.skip-language-detection }}
           build-target: ${{ inputs.build-target || 'all' }}
@@ -155,7 +155,7 @@ jobs:
 
       - name: Determine release strategy based on branch
         id: release-strategy
-        uses: jdfalk/release-strategy-action@v1.1.2
+        uses: jdfalk/release-strategy-action@39d9dbbe9d448486f1c31eb285e0ae1403f289ae # v1.1.2
         with:
           branch-name: ${{ github.ref_name }}
           force-prerelease: ${{ inputs.prerelease }}
@@ -163,7 +163,7 @@ jobs:
 
       - name: Generate semantic release version
         id: version
-        uses: jdfalk/generate-version-action@v1.1.2
+        uses: jdfalk/generate-version-action@d0490e30226bd5a9633a15ce456f38b0c31f9cac # v1.1.2
         with:
           release-type: ${{ inputs.release-type || 'auto' }}
           branch-name: ${{ github.ref_name }}
@@ -270,7 +270,7 @@ jobs:
       release-created: ${{ steps.check-release.outputs.created }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           fetch-depth: 0
 
@@ -284,7 +284,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -320,16 +320,15 @@ jobs:
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: ./artifacts
-          merge-multiple: true
       - name: Package and organize release artifacts
         id: package-artifacts
-        uses: jdfalk/package-assets-action@v1.1.2
+        uses: jdfalk/package-assets-action@536644dc646dc7ac2bf860a839733ad902372f04 # v1.1.2
         with:
           artifacts-dir: ./artifacts
 
       - name: Create GitHub Release
         id: release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         if: github.event_name != 'pull_request'
         with:
           tag_name: ${{ steps.version.outputs.version }}
@@ -391,7 +390,7 @@ jobs:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Determine ghcommon workflow ref
         id: ghcommon-ref
@@ -403,7 +402,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -473,7 +472,7 @@ jobs:
       release-created: ${{ needs.create-release.outputs.release-created || 'false' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Detect ghcommon ref
         id: ghcommon-ref
@@ -485,7 +484,7 @@ jobs:
           fi
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
