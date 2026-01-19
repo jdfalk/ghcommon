@@ -283,6 +283,20 @@ jobs:
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout ghcommon workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: jdfalk/ghcommon
+          ref: ${{ steps.ghcommon-ref.outputs.ref }}
+          path: ghcommon-workflow-scripts
+          sparse-checkout: |
+            .github/workflows/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Configure workflow script path
+        run: |
+          echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
+
       - name: Get version
         id: version
         env:
