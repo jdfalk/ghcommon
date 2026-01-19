@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-protobuf.yml
-# version: 1.1.3
+# version: 1.1.5
 # guid: f1e2d3c4-b5a6-9788-c0d1-2e3f4a5b6c7d
 
 name: Reusable Protobuf Generation
@@ -64,7 +64,7 @@ jobs:
       protoc-version: ${{ steps.parse-config.outputs.protoc-version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Load repository configuration
         id: load-config
@@ -98,24 +98,24 @@ jobs:
       docs-generated: ${{ steps.check-artifacts.outputs.docs-generated }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Set up Go
         if: needs.load-config.outputs.go-enabled == 'true'
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
           go-version: '1.23'
           cache: false
 
       - name: Set up Python
         if: needs.load-config.outputs.python-enabled == 'true'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: '3.13'
 
       - name: Set up Rust
         if: needs.load-config.outputs.rust-enabled == 'true'
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
       - name: Install Protocol Buffers Compiler (protoc)
         run: |
@@ -132,7 +132,7 @@ jobs:
           protoc --version
 
       - name: Set up Buf
-        uses: bufbuild/buf-setup-action@v1
+        uses: bufbuild/buf-setup-action@a47c93e0b1648d5651a065437926377d060baa99 # v1.50.0
         with:
           version: ${{ needs.load-config.outputs.buf-version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}

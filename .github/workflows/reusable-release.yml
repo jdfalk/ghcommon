@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.7
+# version: 2.6.9
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -96,7 +96,7 @@ jobs:
       has-config: ${{ steps.load-config.outputs.has-config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Load repository configuration
         id: load-config
         uses: jdfalk/load-config-action@98cad3221e6ea1013029a93011860f5d4c5ae660 # v1.1.2
@@ -131,7 +131,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
@@ -173,7 +173,7 @@ jobs:
     name: Generate Protocol Buffers
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     secrets: inherit
 
   # Go Build
@@ -184,7 +184,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-go == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'go')
-    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     with:
       go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -199,7 +199,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-python == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'python')
-    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     with:
       python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -213,7 +213,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     with:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -227,7 +227,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     with:
       frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
     secrets: inherit
@@ -240,7 +240,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-docker == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
-    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
     with:
       docker-matrix: ${{ needs.detect-languages.outputs.docker-matrix }}
       registry: ${{ needs.detect-languages.outputs.registry }}
@@ -270,7 +270,7 @@ jobs:
       release-created: ${{ steps.check-release.outputs.created }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
@@ -284,7 +284,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -328,7 +328,7 @@ jobs:
 
       - name: Create GitHub Release
         id: release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         if: github.event_name != 'pull_request'
         with:
           tag_name: ${{ steps.version.outputs.version }}
@@ -390,7 +390,7 @@ jobs:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Determine ghcommon workflow ref
         id: ghcommon-ref
@@ -402,7 +402,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -472,7 +472,7 @@ jobs:
       release-created: ${{ needs.create-release.outputs.release-created || 'false' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Detect ghcommon ref
         id: ghcommon-ref
@@ -484,7 +484,7 @@ jobs:
           fi
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}

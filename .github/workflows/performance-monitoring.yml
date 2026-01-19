@@ -1,5 +1,5 @@
 # file: .github/workflows/performance-monitoring.yml
-# version: 1.1.1
+# version: 1.1.3
 # guid: performance-monitoring-workflow-2025
 
 name: Performance Monitoring
@@ -31,13 +31,13 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark
 
       - name: Set up Node.js for benchmark action
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: 20
           cache: npm
@@ -50,10 +50,10 @@ jobs:
           npm run build
 
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
       - name: Restore cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
 
       - name: Build benchmark target
         run: cargo build --manifest-path testdata/rust/Cargo.toml --release
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark
@@ -175,13 +175,13 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Checkout benchmark action
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: jdfalk/github-action-benchmark
           path: github-action-benchmark
 
       - name: Set up Node.js for benchmark action
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: 20
           cache: npm
