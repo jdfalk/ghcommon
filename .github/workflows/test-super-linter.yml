@@ -1,5 +1,5 @@
 # file: .github/workflows/test-super-linter.yml
-# version: 1.1.0
+# version: 1.1.2
 # guid: test-super-linter-workflow-2025-05-24-initial
 
 name: Test Super Linter Configuration
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
@@ -138,12 +138,12 @@ jobs:
       github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
-        uses: actions/cache@v5
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: /tmp/.superlinter-cache
           key: ${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}
@@ -151,7 +151,7 @@ jobs:
             ${{ runner.os }}-superlinter-
 
       - name: Run Super Linter (Minimal)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -178,12 +178,12 @@ jobs:
       github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
-        uses: actions/cache@v5
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: /tmp/.superlinter-cache
           key: ${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}
@@ -196,7 +196,7 @@ jobs:
           cp super-linter-ci.env .github/test-configs/test-full.env || true
 
       - name: Run Super Linter (Full Config)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_FILE: super-linter-ci.env
@@ -215,12 +215,12 @@ jobs:
       github.event.inputs.test_scenario == 'autofix'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
-        uses: actions/cache@v5
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: /tmp/.superlinter-cache
           key: ${{ runner.os }}-superlinter-${{ hashFiles('super-linter-*.env') }}
@@ -228,7 +228,7 @@ jobs:
             ${{ runner.os }}-superlinter-
 
       - name: Run Super Linter (Auto-Fix)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_FILE: super-linter-pr.env
@@ -252,7 +252,7 @@ jobs:
       github.event.inputs.test_scenario == 'config-paths'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
@@ -321,7 +321,7 @@ jobs:
           fi
 
       - name: Run Super Linter with explicit config paths
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -353,12 +353,12 @@ jobs:
       github.event.inputs.test_scenario == 'filter-patterns'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter with filters
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -379,12 +379,12 @@ jobs:
       github.event.inputs.test_scenario == 'disabled-validators'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (Some Disabled)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -408,12 +408,12 @@ jobs:
       github.event.inputs.test_scenario == 'markdown-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (Markdown Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -432,12 +432,12 @@ jobs:
       github.event.inputs.test_scenario == 'python-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (Python Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -460,12 +460,12 @@ jobs:
       github.event.inputs.test_scenario == 'javascript-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (JavaScript/TypeScript Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -486,12 +486,12 @@ jobs:
       github.event.inputs.test_scenario == 'rust-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (Rust Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -510,12 +510,12 @@ jobs:
       github.event.inputs.test_scenario == 'go-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (Go Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -533,12 +533,12 @@ jobs:
       github.event.inputs.test_scenario == 'yaml-only'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
       - name: Run Super Linter (YAML Only)
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main

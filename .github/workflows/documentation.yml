@@ -1,5 +1,5 @@
 # file: .github/workflows/documentation.yml
-# version: 1.0.1
+# version: 1.0.3
 # guid: docs-automation-workflow-2025
 
 name: Documentation
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Generate helper documentation
-        uses: jdfalk/docs-generator-action@v1
+        uses: jdfalk/docs-generator-action@0ee9773cede5fef1f8894718fae9fa9ccacb46f7 # v1.1.2
         with:
           source-dir: .github/workflows/scripts
           workflows-dir: .github/workflows
@@ -121,7 +121,7 @@ jobs:
           path: docs-build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
         if: env.DOCS_DEPLOY_TOKEN != '' && hashFiles('docs-build/**') != ''
         with:
           github_token: ${{ env.DOCS_DEPLOY_TOKEN }}
