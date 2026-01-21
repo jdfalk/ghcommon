@@ -281,7 +281,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@b904a08523f11927f2fa22c83d349bf471d73ef6 # main
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -571,7 +571,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@b904a08523f11927f2fa22c83d349bf471d73ef6 # main
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'
