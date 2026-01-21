@@ -105,7 +105,7 @@ jobs:
 
       - name: Generate language matrices
         id: matrices
-        uses: jdfalk/ci-generate-matrices-action@dd966af971ad6064153812f85a50be9a1617b3c0 # v1.1.3
+        uses: jdfalk/ci-generate-matrices-action@538acf8f83acfccca197cd0bbd433fe1638fc47c # v1.1.5
         with:
           repository-config: ${{ steps.load.outputs.config }}
           fallback-go-version: ${{ inputs.go-version }}
