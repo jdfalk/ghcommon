@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.6.9
+# version: 2.8.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -81,6 +81,10 @@ permissions:
   packages: write
   attestations: write
   id-token: write
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
@@ -452,6 +456,84 @@ jobs:
 
           "${ARGS[@]}"
 
+  # Update floating version tags
+  update-floating-tags:
+    name: Update Floating Tags
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [detect-languages, create-release]
+    if: |
+      needs.create-release.outputs.release-created == 'true' &&
+      needs.detect-languages.outputs.release-branch-strategy == 'stable' &&
+      !inputs.prerelease &&
+      !inputs.draft
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Parse version and update floating tags
+        env:
+          VERSION_TAG: ${{ needs.detect-languages.outputs.release-tag }}
+        run: |
+          set -euo pipefail
+
+          echo "📌 Updating floating tags for $VERSION_TAG"
+
+          # Parse version (e.g., v1.2.3)
+          if [[ ! $VERSION_TAG =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::warning::Version tag $VERSION_TAG is not in semver format, skipping floating tag update"
+            exit 0
+          fi
+
+          MAJOR="${BASH_REMATCH[1]}"
+          MINOR="${BASH_REMATCH[2]}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Update major version tag (v1) with retry logic
+          MAJOR_TAG="v${MAJOR}"
+          echo "🏷️  Updating $MAJOR_TAG to point to $VERSION_TAG"
+          git tag -fa "$MAJOR_TAG" "$VERSION_TAG" -m "chore(release): update $MAJOR_TAG to $VERSION_TAG"
+
+          # Retry logic for push
+          retry_count=0
+          max_retries=3
+          until git push origin "$MAJOR_TAG" --force || [ $retry_count -eq $max_retries ]; do
+            retry_count=$((retry_count + 1))
+            echo "⚠️  Retry $retry_count/$max_retries for $MAJOR_TAG after 5 seconds..."
+            sleep 5
+          done
+
+          if [ $retry_count -eq $max_retries ]; then
+            echo "❌ Failed to push $MAJOR_TAG after $max_retries attempts"
+            exit 1
+          fi
+          echo "✅ Updated $MAJOR_TAG"
+
+          # Update minor version tag (v1.2) with retry logic
+          MINOR_TAG="v${MAJOR}.${MINOR}"
+          echo "🏷️  Updating $MINOR_TAG to point to $VERSION_TAG"
+          git tag -fa "$MINOR_TAG" "$VERSION_TAG" -m "chore(release): update $MINOR_TAG to $VERSION_TAG"
+
+          # Retry logic for push
+          retry_count=0
+          until git push origin "$MINOR_TAG" --force || [ $retry_count -eq $max_retries ]; do
+            retry_count=$((retry_count + 1))
+            echo "⚠️  Retry $retry_count/$max_retries for $MINOR_TAG after 5 seconds..."
+            sleep 5
+          done
+
+          if [ $retry_count -eq $max_retries ]; then
+            echo "❌ Failed to push $MINOR_TAG after $max_retries attempts"
+            exit 1
+          fi
+          echo "✅ Updated $MINOR_TAG"
+
+          echo "🎉 Floating tags updated successfully"
+
   # Final status check
   build-status:
     name: Release Status Summary
@@ -466,6 +548,7 @@ jobs:
         build-docker,
         create-release,
         publish-github-packages,
+        update-floating-tags,
       ]
     if: always()
     outputs:

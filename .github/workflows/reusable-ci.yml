@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.8.7
+# version: 1.9.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -74,17 +74,19 @@ on:
         value: ${{ jobs.detect-changes.outputs.lint-files }}
 
 permissions:
-  contents: write
-  actions: write
-  checks: write
-  packages: write
-  id-token: write
-  attestations: write
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   load-config:
     name: Load Repository Configuration
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     outputs:
       config: ${{ steps.load.outputs.config }}
       has-config: ${{ steps.load.outputs.has-config }}
@@ -118,6 +120,9 @@ jobs:
   detect-changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     needs: load-config
     outputs:
       go-files: ${{ steps.changes.outputs.go_files }}
@@ -229,6 +234,9 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.workflow-files == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -292,6 +300,9 @@ jobs:
     needs: [detect-changes, workflow-scripts-npm-cache]
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -369,6 +380,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.load-config.outputs.go-matrix) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
@@ -436,6 +450,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.load-config.outputs.python-matrix) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
@@ -497,6 +514,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.load-config.outputs.rust-matrix) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    permissions:
+      contents: read
     env:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
@@ -585,6 +605,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.load-config.outputs.frontend-matrix) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
@@ -681,6 +704,9 @@ jobs:
       ]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
