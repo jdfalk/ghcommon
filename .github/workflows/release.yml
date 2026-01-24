@@ -53,8 +53,8 @@ jobs:
     name: Release
     uses: ./.github/workflows/reusable-release.yml
     with:
-      release-type: ${{ inputs.release-type || 'auto' }}
-      build-target: ${{ inputs.build-target || 'all' }}
-      draft: ${{ inputs.draft || false }}
-      prerelease: ${{ inputs.prerelease || false }}
+      release-type: ${{ github.event.inputs.release-type || 'auto' }}
+      build-target: ${{ github.event.inputs.build-target || 'all' }}
+      draft: ${{ github.event.inputs.draft == 'true' || false }}
+      prerelease: ${{ github.event.inputs.prerelease == 'true' || false }}
     secrets: inherit
