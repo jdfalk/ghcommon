@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.9.0
+# version: 1.10.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -39,6 +39,11 @@ on:
         default: false
       skip-tests:
         description: 'Skip running tests'
+        required: false
+        type: boolean
+        default: false
+      skip-e2e-tests:
+        description: 'Skip running E2E tests'
         required: false
         type: boolean
         default: false
@@ -686,6 +691,43 @@ jobs:
           frontend-script: test
           frontend-success-message: '✅ Tests passed'
           frontend-failure-message: 'ℹ️ No tests configured'
+
+      # E2E Tests with Playwright
+      - name: Install Playwright browsers
+        if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests }}
+        working-directory: ${{ steps.frontend-dir.outputs.dir }}
+        run: |
+          npx playwright install --with-deps chromium webkit
+        shell: bash
+
+      - name: Run E2E tests
+        if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests }}
+        uses: jdfalk/ci-workflow-helpers-action@71e09093947c478e54a01855baf76a43f36843a4 # v1.1.3
+        with:
+          command: frontend-run
+          frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
+          frontend-script: test:e2e
+          frontend-success-message: '✅ E2E tests passed'
+          frontend-failure-message: 'ℹ️ No E2E tests configured or test:e2e script not found'
+        continue-on-error: false
+
+      - name: Upload Playwright report
+        if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: playwright-report-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: ${{ steps.frontend-dir.outputs.dir }}/playwright-report/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload Playwright test results
+        if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: playwright-results-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: ${{ steps.frontend-dir.outputs.dir }}/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
   # Summary job
   ci-summary:
