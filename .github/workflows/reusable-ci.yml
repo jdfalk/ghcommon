@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.10.1
+# version: 1.10.2
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -697,7 +697,7 @@ jobs:
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests }}
         run: |
           cd "${{ steps.frontend-dir.outputs.dir }}"
-          npx playwright install --with-deps chromium webkit
+          sudo npx playwright install --with-deps chromium webkit
         shell: bash
 
       - name: Run E2E tests
