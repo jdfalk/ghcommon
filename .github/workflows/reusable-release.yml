@@ -177,7 +177,7 @@ jobs:
     name: Generate Protocol Buffers
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@b904a08523f11927f2fa22c83d349bf471d73ef6 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
     secrets: inherit
 
   # Go Build
