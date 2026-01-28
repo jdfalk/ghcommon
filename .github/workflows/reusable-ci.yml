@@ -373,7 +373,7 @@ jobs:
       (contains(github.event.head_commit.message, '[protobuf]') ||
        contains(github.event.head_commit.message, '[generate]') ||
        contains(github.event.head_commit.message, '[buf]'))
-    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
     secrets: inherit
 
   # Language-specific build and test jobs
