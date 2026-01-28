@@ -103,7 +103,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Load repository configuration
         id: load-config
-        uses: jdfalk/load-config-action@98cad3221e6ea1013029a93011860f5d4c5ae660 # v1.1.2
+        uses: jdfalk/load-config-action@f53a2a9d7bc80d26be0f3339188fe84f2feabb38 # v1.1.3
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
@@ -146,7 +146,7 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
-        uses: jdfalk/detect-languages-action@81acd6d5b5525ca188610eec55462319ec82151e # v1.1.2
+        uses: jdfalk/detect-languages-action@d2f4d111e09c0e969423a79600e95ab960c95ebe # v1.1.3
         with:
           skip-detection: ${{ inputs.skip-language-detection }}
           build-target: ${{ inputs.build-target || 'all' }}
@@ -159,7 +159,7 @@ jobs:
 
       - name: Determine release strategy based on branch
         id: release-strategy
-        uses: jdfalk/release-strategy-action@39d9dbbe9d448486f1c31eb285e0ae1403f289ae # v1.1.2
+        uses: jdfalk/release-strategy-action@32bb24ac9d8dc50917d9f64e9035da85bd4a6a98 # v1.1.3
         with:
           branch-name: ${{ github.ref_name }}
           force-prerelease: ${{ inputs.prerelease }}
@@ -167,7 +167,7 @@ jobs:
 
       - name: Generate semantic release version
         id: version
-        uses: jdfalk/generate-version-action@d0490e30226bd5a9633a15ce456f38b0c31f9cac # v1.1.2
+        uses: jdfalk/generate-version-action@b20e8fcdd2270aed9512aa3be5b6cb8610c42d97 # v1.1.3
         with:
           release-type: ${{ inputs.release-type || 'auto' }}
           branch-name: ${{ github.ref_name }}
@@ -326,7 +326,7 @@ jobs:
           path: ./artifacts
       - name: Package and organize release artifacts
         id: package-artifacts
-        uses: jdfalk/package-assets-action@536644dc646dc7ac2bf860a839733ad902372f04 # v1.1.2
+        uses: jdfalk/package-assets-action@44d1b757a14839d9eab209434b80d0437c53e686 # v1.1.3
         with:
           artifacts-dir: ./artifacts
 

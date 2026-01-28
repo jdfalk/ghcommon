@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Build and push image via action
-        uses: jdfalk/release-docker-action@d82bf48d3e1c3d5259faec98c8410f39f3de45a4 # v1.0.2
+        uses: jdfalk/release-docker-action@2eba2c46c57bb536e2e5ed28ea8266962ef12771 # v1.0.3
         with:
           context: .
           dockerfile: Dockerfile

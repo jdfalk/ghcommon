@@ -121,7 +121,7 @@ jobs:
 
       - name: Run Super Linter with Auto-Fix
         id: run-super-linter
-        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
+        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -290,7 +290,7 @@ jobs:
           "
 
       - name: Run intelligent labeling
-        uses: jdfalk/pr-auto-label-action@581e95d4dada449375c7f5d2e099cd37d701fcca # v1.1.2
+        uses: jdfalk/pr-auto-label-action@68583016672fe5a5348c040ab8ed7aa3e678df5b # v1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.number }}
@@ -618,7 +618,7 @@ jobs:
 
       - name: Generate SBOM (Syft)
         id: generate-sbom
-        uses: anchore/sbom-action@0b82b0b1a22399a1c542d4d656f70cd903571b5c # v0.21.1
+        uses: anchore/sbom-action@deef08a0db64bfad603422135db61477b16cef56 # v0.22.1
         with:
           output-file: sbom.spdx.json
 
