@@ -231,7 +231,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
     with:
       frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
     secrets: inherit
