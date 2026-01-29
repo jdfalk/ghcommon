@@ -442,6 +442,8 @@ def frontend_run(_: argparse.Namespace) -> None:
             print(success_message)
         else:
             print(failure_message)
+            # Exit with the same error code to properly fail the CI step
+            raise SystemExit(result.returncode)
     finally:
         os.chdir(original_dir)
 
