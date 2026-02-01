@@ -26,7 +26,7 @@ on:
         description: 'Languages for CodeQL analysis (JSON array)'
         required: false
         type: string
-        default: '["go", "javascript", "python"]'
+        default: '["go", "javascript", "python", "github-actions"]'
 
 permissions:
   contents: read
@@ -59,9 +59,13 @@ jobs:
         run: |
           python3 .ghcommon/.github/scripts/determine-security-languages.py
 
-  # CodeQL Analysis
+  # CodeQL Analysis — advanced mode with per-language build control.
+  # Languages that require compilation (go, javascript) use autobuild.
+  # Static-only languages (python, github-actions) use build-mode: none.
+  # start-proxy is included for future registry-proxy support even when
+  # not actively routing traffic.
   codeql-analysis:
-    name: CodeQL Analysis
+    name: CodeQL Analysis (${{ matrix.language }})
     needs: detect-languages
     if: ${{ !inputs.skip-codeql && needs.detect-languages.outputs.has-languages == 'true' }}
     runs-on: ubuntu-latest
@@ -73,11 +77,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Determine build mode for language
+        id: build-config
+        run: |
+          case "${{ matrix.language }}" in
+            go|javascript)
+              echo "mode=autobuild" >> "$GITHUB_OUTPUT"
+              ;;
+            python|github-actions|*)
+              echo "mode=none" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
+          build-mode: ${{ steps.build-config.outputs.mode }}
 
       - name: Set up language environment
         run: |
@@ -88,8 +105,17 @@ jobs:
               fi
               ;;
             javascript)
-              if [ -f package.json ]; then
-                npm ci || npm install
+              # Locate package.json — may be in a subdirectory (e.g. web/)
+              # Read working_directories.node from repository-config.yml if present
+              NODE_DIR="."
+              if [ -f .github/repository-config.yml ]; then
+                CONFIGURED=$(grep -A1 "node:" .github/repository-config.yml | grep -v "node:" | tr -d ' ' | head -1)
+                if [ -n "$CONFIGURED" ] && [ -d "$CONFIGURED" ]; then
+                  NODE_DIR="$CONFIGURED"
+                fi
+              fi
+              if [ -f "$NODE_DIR/package.json" ]; then
+                cd "$NODE_DIR" && npm ci --ignore-scripts
               fi
               ;;
             python)
@@ -97,15 +123,37 @@ jobs:
                 pip install -r requirements.txt
               fi
               ;;
+            github-actions)
+              # No build environment needed for workflow static analysis
+              ;;
           esac
 
+      - name: Start proxy for registry access
+        uses: github/codeql-action/start-proxy@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
+
       - name: Autobuild
+        if: steps.build-config.outputs.mode == 'autobuild'
         uses: github/codeql-action/autobuild@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
         with:
           category: '/language:${{ matrix.language }}'
+
+      - name: NPM dependency audit
+        if: matrix.language == 'javascript'
+        run: |
+          NODE_DIR="."
+          if [ -f .github/repository-config.yml ]; then
+            CONFIGURED=$(grep -A1 "node:" .github/repository-config.yml | grep -v "node:" | tr -d ' ' | head -1)
+            if [ -n "$CONFIGURED" ] && [ -d "$CONFIGURED" ]; then
+              NODE_DIR="$CONFIGURED"
+            fi
+          fi
+          if [ -f "$NODE_DIR/package.json" ]; then
+            echo "Running npm audit in $NODE_DIR..."
+            cd "$NODE_DIR" && npm audit --audit-level=high || true
+          fi
 
   # Dependency Review
   dependency-review:
