@@ -217,7 +217,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
     with:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
