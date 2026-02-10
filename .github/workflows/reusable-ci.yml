@@ -294,7 +294,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -373,7 +373,7 @@ jobs:
       (contains(github.event.head_commit.message, '[protobuf]') ||
        contains(github.event.head_commit.message, '[generate]') ||
        contains(github.event.head_commit.message, '[buf]'))
-    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     secrets: inherit
 
   # Language-specific build and test jobs
@@ -529,7 +529,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+        uses: dtolnay/rust-toolchain@f7ccc83f9ed1e5b9c81d8a67d7ad1a747e22a561 # stable
         with:
           toolchain: ${{ matrix.rust-version }}
           components: rustfmt, clippy
@@ -596,7 +596,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'

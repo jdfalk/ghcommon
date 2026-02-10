@@ -177,7 +177,7 @@ jobs:
     name: Generate Protocol Buffers
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     secrets: inherit
 
   # Go Build
@@ -188,7 +188,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-go == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'go')
-    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
+    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -203,7 +203,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-python == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'python')
-    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
+    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -217,7 +217,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@cd894fdf7fdec75abb77b64467c8f3ce62ccde5d # main
+    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -231,7 +231,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@8dc777d99a19e484328552767c6cc0bacc65e055 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
     secrets: inherit
@@ -244,7 +244,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-docker == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
-    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@bc6380dd1cfb1a3b8eb24c27d6cfe4a887562b5b # main
+    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@395f9b11cda30a98c9f4a7a64dc466bbc9057f22 # main
     with:
       docker-matrix: ${{ needs.detect-languages.outputs.docker-matrix }}
       registry: ${{ needs.detect-languages.outputs.registry }}

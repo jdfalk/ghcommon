@@ -151,7 +151,7 @@ jobs:
             ${{ runner.os }}-superlinter-
 
       - name: Run Super Linter (Minimal)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -196,7 +196,7 @@ jobs:
           cp super-linter-ci.env .github/test-configs/test-full.env || true
 
       - name: Run Super Linter (Full Config)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_FILE: super-linter-ci.env
@@ -228,7 +228,7 @@ jobs:
             ${{ runner.os }}-superlinter-
 
       - name: Run Super Linter (Auto-Fix)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_FILE: super-linter-pr.env
@@ -321,7 +321,7 @@ jobs:
           fi
 
       - name: Run Super Linter with explicit config paths
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -358,7 +358,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter with filters
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -384,7 +384,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (Some Disabled)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -413,7 +413,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (Markdown Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -437,7 +437,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (Python Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -465,7 +465,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (JavaScript/TypeScript Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -491,7 +491,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (Rust Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -515,7 +515,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (Go Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
@@ -538,7 +538,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter (YAML Only)
-        uses: super-linter/super-linter@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8.4.0
+        uses: super-linter/super-linter@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
