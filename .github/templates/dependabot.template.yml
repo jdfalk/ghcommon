@@ -1,0 +1,163 @@
+# Dependabot Configuration Template
+# version: 1.0.0
+# guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+# last-edited: 2026-02-09
+#
+# Instructions:
+# 1. Copy this template to .github/dependabot.yml
+# 2. Customize the multi-ecosystem-group with the repository's ecosystems
+# 3. Add/remove package-ecosystem entries based on your project
+# 4. Update schedule/timezone as needed
+# 5. Commit with: deps: initialize multi-ecosystem dependabot config
+
+version: 2
+
+multi-ecosystem-groups:
+  dependencies:
+    schedule:
+      interval: weekly
+      day:
+        [
+          SELECT: monday | tuesday | wednesday | thursday | friday | saturday | sunday,
+        ]
+      time: '10:00'
+      timezone: America/New_York
+    labels:
+      - dependencies
+      - dependabot
+    commit-message:
+      prefix: deps
+      include: scope
+
+updates:
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - github-actions
+      - ci-cd
+
+  # Dev Containers (if present)
+  - package-ecosystem: devcontainers
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - devcontainers
+    schedule:
+      interval: monthly
+
+  # Docker (if present)
+  - package-ecosystem: docker
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - containers
+    schedule:
+      interval: monthly
+
+  # Docker Compose (if present)
+  - package-ecosystem: docker-compose
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - containers
+    schedule:
+      interval: monthly
+
+  # Git Submodules (if present)
+  - package-ecosystem: gitsubmodule
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - submodules
+    schedule:
+      interval: monthly
+      day: tuesday
+
+  # Go Modules (if present)
+  - package-ecosystem: gomod
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:go
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+
+  # Node.js / npm (if present)
+  - package-ecosystem: npm
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:nodejs
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+
+  # Rust Toolchain (if present)
+  - package-ecosystem: rust-toolchain
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:rust
+    schedule:
+      interval: monthly
+
+  # Cargo / Rust (if present)
+  - package-ecosystem: cargo
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:rust
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+
+  # uv / Python (modern Python dependency manager)
+  - package-ecosystem: uv
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:python
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+
+  # pip / Python (if not using uv)
+  - package-ecosystem: pip
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:python
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+
+  # pip / Python (scripts subdirectory if present)
+  - package-ecosystem: pip
+    directory: /scripts
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
+      - tech:python
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major

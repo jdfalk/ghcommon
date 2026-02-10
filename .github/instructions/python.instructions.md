@@ -1,7 +1,7 @@
 <!-- file: .github/instructions/python.instructions.md -->
-<!-- version: 1.5.1 -->
+<!-- version: 1.6.0 -->
 <!-- guid: 2a5b7c8d-9e1f-4a2b-8c3d-6e9f1a5b7c8d -->
-<!-- last-edited: 2026-01-19 -->
+<!-- last-edited: 2026-02-09 -->
 <!-- DO NOT EDIT: This file is managed centrally in ghcommon repository -->
 <!-- To update: Create an issue/PR in jdfalk/ghcommon -->
 
@@ -34,6 +34,12 @@ description: |
 - Update `.python-version` files to specify `3.13.0` or higher
 - Use `python --version` to verify your installation meets requirements
 - All Python file headers must use version 1.0.0 or higher (following semantic versioning)
+
+## Dependency Management
+
+- Use `pyproject.toml` as the canonical dependency manifest for Python projects
+- Use `uv` wherever possible for dependency resolution, lockfiles, and virtual environments
+- If `requirements.txt` is required for tooling, generate it from `uv` and keep it in sync
 
 ## Core Principles
 

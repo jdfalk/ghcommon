@@ -1,111 +1,52 @@
-# file: .github/dependabot.yml
+# Dependabot Configuration
 # version: 1.0.0
-# guid: 9c950aa6-81f3-43f9-8f59-955ad5569369
-
-# Smart Dependabot configuration for ghcommon
-# Supports: github-actions, npm, python, python-scripts
+# guid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
 version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: /
+
+multi-ecosystem-groups:
+  dependencies:
     schedule:
       interval: weekly
-      day: wednesday
+      day: tuesday
       time: '10:00'
       timezone: America/New_York
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: ci
-      include: scope
     labels:
       - dependencies
+      - dependabot
+    commit-message:
+      prefix: deps
+      include: scope
+
+updates:
+  # Github Actions
+  - package-ecosystem: github-actions
+    directory: /
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
+    labels:
       - github-actions
       - ci-cd
-    groups:
-      ci-dependencies:
-        patterns:
-          - actions/*
-          - github/*
-        update-types:
-          - minor
-          - patch
-      external-actions:
-        patterns:
-          - '*'
-        exclude-patterns:
-          - actions/*
-          - github/*
-        update-types:
-          - minor
-          - patch
+
+  # Npm
   - package-ecosystem: npm
     directory: /
-    schedule:
-      interval: weekly
-      day: tuesday
-      time: 09:00
-      timezone: America/New_York
-    open-pull-requests-limit: 8
-    commit-message:
-      prefix: npm
-      include: scope
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
     labels:
-      - dependencies
       - tech:nodejs
-    allow:
-      - dependency-type: direct
-      - dependency-type: indirect
     ignore:
       - dependency-name: '*'
         update-types:
           - version-update:semver-major
-    groups:
-      dev-dependencies:
-        patterns:
-          - '*eslint*'
-          - '*prettier*'
-          - '*commitlint*'
-          - '@types/*'
-        update-types:
-          - minor
-          - patch
+
+  # Pip
   - package-ecosystem: pip
     directory: /
-    schedule:
-      interval: weekly
-      day: tuesday
-      time: '11:00'
-      timezone: America/New_York
-    open-pull-requests-limit: 3
-    commit-message:
-      prefix: python
-      include: scope
+    patterns: ['*']
+    multi-ecosystem-group: dependencies
     labels:
-      - dependencies
       - tech:python
-    allow:
-      - dependency-type: direct
-    ignore:
-      - dependency-name: '*'
-        update-types:
-          - version-update:semver-major
-  - package-ecosystem: pip
-    directory: /scripts
-    schedule:
-      interval: weekly
-      day: tuesday
-      time: '12:00'
-      timezone: America/New_York
-    open-pull-requests-limit: 3
-    commit-message:
-      prefix: python
-      include: scope
-    labels:
-      - dependencies
-      - tech:python
-    allow:
-      - dependency-type: direct
     ignore:
       - dependency-name: '*'
         update-types:

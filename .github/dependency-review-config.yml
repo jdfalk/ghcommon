@@ -42,5 +42,5 @@ retry-on-snapshot-unavailable-timeout: 120
 # Configuration for vulnerability checks
 vulnerability-check: true
 
-# Configuration for license checks  
+# Configuration for license checks
 license-check: true
