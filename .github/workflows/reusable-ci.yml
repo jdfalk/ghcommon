@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.10.2
+# version: 1.10.3
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -695,8 +695,13 @@ jobs:
       # E2E Tests with Playwright
       - name: Install Playwright browsers
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests }}
+        env:
+          FRONTEND_DIR: ${{ steps.frontend-dir.outputs.dir }}
         run: |
-          cd "${{ steps.frontend-dir.outputs.dir }}"
+          # Strip any stray quotes from the directory value
+          dir="${FRONTEND_DIR//\'/}"
+          dir="${dir//\"/}"
+          cd "${dir:-.}"
           sudo npx playwright install --with-deps chromium webkit
         shell: bash
 

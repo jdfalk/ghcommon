@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.1.6
+# version: 2.1.7
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -42,7 +42,7 @@ jobs:
           path: proto-generated
 
       - name: Build and release Go via GoReleaser
-        uses: jdfalk/release-go-action@0f87ef34c7a5700b66f55097c34fa2d4b266e5ac # v2.0.2
+        uses: jdfalk/release-go-action@e87e6e57bf1c7089e74c94f789b580d3c5737729 # v2.0.3
         with:
           module-path: .
           tag: ${{ inputs.release-version || github.ref_name }}
