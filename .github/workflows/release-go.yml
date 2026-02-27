@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.3.0
+# version: 2.4.0
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
