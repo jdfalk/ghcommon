@@ -67,6 +67,11 @@ on:
         required: false
         type: string
         default: ''
+      pre-build-script:
+        description: 'Shell script to run before goreleaser (e.g. build frontend assets)'
+        required: false
+        type: string
+        default: ''
     outputs:
       release-created:
         description: 'Whether a release was created'
@@ -199,6 +204,7 @@ jobs:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
       system-packages: ${{ inputs.system-packages }}
+      pre-build-script: ${{ inputs.pre-build-script }}
     secrets: inherit
 
   # Python Build

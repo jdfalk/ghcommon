@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.2.0
+# version: 2.3.0
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -23,6 +23,11 @@ on:
         default: ''
       system-packages:
         description: 'Space-separated list of apt packages to install before build (e.g. libtag1-dev)'
+        required: false
+        type: string
+        default: ''
+      pre-build-script:
+        description: 'Shell script to run before goreleaser (e.g. build frontend assets)'
         required: false
         type: string
         default: ''
@@ -51,6 +56,10 @@ jobs:
         env:
           PACKAGES: ${{ inputs.system-packages }}
         run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+
+      - name: Run pre-build script
+        if: inputs.pre-build-script != ''
+        run: ${{ inputs.pre-build-script }}
 
       - name: Build and release Go via GoReleaser
         uses: jdfalk/release-go-action@e87e6e57bf1c7089e74c94f789b580d3c5737729 # v2.0.3
