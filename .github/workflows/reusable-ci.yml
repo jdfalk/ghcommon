@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.10.3
+# version: 1.11.0
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -52,6 +52,11 @@ on:
         required: false
         type: boolean
         default: false
+      system-packages:
+        description: 'Space-separated list of apt packages to install before build/test (e.g. libtag1-dev)'
+        required: false
+        type: string
+        default: ''
     outputs:
       go-files:
         description: 'Whether Go files were detected'
@@ -422,6 +427,12 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
+
+      - name: Install system packages
+        if: inputs.system-packages != ''
+        env:
+          PACKAGES: ${{ inputs.system-packages }}
+        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
 
       - name: Build Go project
         uses: jdfalk/ci-workflow-helpers-action@56a885638b0c9745b64250ca06d0f6218fa9f63d # v1.1.4
