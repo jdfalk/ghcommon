@@ -254,7 +254,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: '1.23'
           check-latest: true
@@ -288,7 +288,7 @@ jobs:
 
       - name: Upload actionlint log
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: workflow-lint-report
           path: actionlint.log
@@ -299,7 +299,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@f297c40be781eb288aa902fd87c372c6d72ee911 # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@1a96daebeba7b0f61037be5bc381e3b6794e26b5 # main
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -378,7 +378,7 @@ jobs:
       (contains(github.event.head_commit.message, '[protobuf]') ||
        contains(github.event.head_commit.message, '[generate]') ||
        contains(github.event.head_commit.message, '[buf]'))
-    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@f297c40be781eb288aa902fd87c372c6d72ee911 # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@1a96daebeba7b0f61037be5bc381e3b6794e26b5 # main
     secrets: inherit
 
   # Language-specific build and test jobs
@@ -423,7 +423,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Set up Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -607,7 +607,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@f297c40be781eb288aa902fd87c372c6d72ee911 # main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@1a96daebeba7b0f61037be5bc381e3b6794e26b5 # main
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'
@@ -729,7 +729,7 @@ jobs:
 
       - name: Upload Playwright report
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: playwright-report-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ${{ steps.frontend-dir.outputs.dir }}/playwright-report/
@@ -738,7 +738,7 @@ jobs:
 
       - name: Upload Playwright test results
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: playwright-results-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ${{ steps.frontend-dir.outputs.dir }}/test-results/

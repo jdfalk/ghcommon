@@ -48,7 +48,7 @@ jobs:
 
       - name: Download protobuf artifacts
         if: inputs.protobuf-artifacts == 'true'
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: protobuf-generated
           path: proto-generated
@@ -64,7 +64,7 @@ jobs:
         run: ${{ inputs.pre-build-script }}
 
       - name: Build and release Go via GoReleaser
-        uses: jdfalk/release-go-action@e87e6e57bf1c7089e74c94f789b580d3c5737729 # v2.0.3
+        uses: jdfalk/release-go-action@7b73a664a71c92c7cc44453a33a5dcfb898751ef # v2.0.3
         with:
           module-path: .
           tag: ${{ inputs.release-version || github.ref_name }}
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload Go artifacts
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: go-binaries
           path: dist/**
