@@ -1,5 +1,5 @@
 # file: .github/workflows/release-go.yml
-# version: 2.4.0
+# version: 2.5.0
 # guid: release-go-workflow-2025-10
 
 name: Go Release Build
@@ -31,6 +31,11 @@ on:
         required: false
         type: string
         default: ''
+      go-experiment:
+        description: 'Value for GOEXPERIMENT environment variable (e.g. jsonv2)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -40,6 +45,8 @@ jobs:
   build-go:
     name: Build Go Release Binaries
     runs-on: ubuntu-latest
+    env:
+      GOEXPERIMENT: ${{ inputs.go-experiment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

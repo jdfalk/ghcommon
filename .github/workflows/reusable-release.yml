@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.9.0
+# version: 2.10.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -69,6 +69,11 @@ on:
         default: ''
       pre-build-script:
         description: 'Shell script to run before goreleaser (e.g. build frontend assets)'
+        required: false
+        type: string
+        default: ''
+      go-experiment:
+        description: 'Value for GOEXPERIMENT environment variable (e.g. jsonv2)'
         required: false
         type: string
         default: ''
@@ -205,6 +210,7 @@ jobs:
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
       system-packages: ${{ inputs.system-packages }}
       pre-build-script: ${{ inputs.pre-build-script }}
+      go-experiment: ${{ inputs.go-experiment }}
     secrets: inherit
 
   # Python Build
