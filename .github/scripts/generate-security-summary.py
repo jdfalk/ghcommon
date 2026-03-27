@@ -22,7 +22,6 @@ def main() -> int:
         "CodeQL Analysis": os.environ.get("RESULT_CODEQL", "skipped"),
         "Dependency Review": os.environ.get("RESULT_DEP_REVIEW", "skipped"),
         "Security Audit": os.environ.get("RESULT_SECURITY_AUDIT", "skipped"),
-        "Trivy Scan": os.environ.get("RESULT_TRIVY", "skipped"),
     }
 
     summary_lines = [

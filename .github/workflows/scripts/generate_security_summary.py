@@ -18,7 +18,6 @@ def build_results(env: dict[str, str | None]) -> dict[str, str]:
         "CodeQL Analysis": env.get("RESULT_CODEQL", "skipped") or "skipped",
         "Dependency Review": env.get("RESULT_DEP_REVIEW", "skipped") or "skipped",
         "Security Audit": env.get("RESULT_SECURITY_AUDIT", "skipped") or "skipped",
-        "Trivy Scan": env.get("RESULT_TRIVY", "skipped") or "skipped",
     }
 
 

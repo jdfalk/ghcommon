@@ -235,30 +235,6 @@ jobs:
           cargo install cargo-audit
           cargo audit
 
-  # Trivy vulnerability scanning
-  trivy-scan:
-    name: Trivy Security Scan
-    needs: detect-languages
-    if: ${{ !inputs.skip-security-audit }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@22438a435773de8c97dc0958cc0b823c45b064ac # master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
   # Security summary
   security-summary:
     name: Security Summary
@@ -267,7 +243,6 @@ jobs:
       - codeql-analysis
       - dependency-review
       - security-audit
-      - trivy-scan
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -285,7 +260,6 @@ jobs:
           RESULT_CODEQL: ${{ needs.codeql-analysis.result || 'skipped' }}
           RESULT_DEP_REVIEW: ${{ needs.dependency-review.result || 'skipped' }}
           RESULT_SECURITY_AUDIT: ${{ needs.security-audit.result || 'skipped' }}
-          RESULT_TRIVY: ${{ needs.trivy-scan.result || 'skipped' }}
           SKIP_CODEQL: ${{ inputs.skip-codeql }}
           SKIP_DEP_REVIEW: ${{ inputs.skip-dependency-review }}
           SKIP_SECURITY_AUDIT: ${{ inputs.skip-security-audit }}

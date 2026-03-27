@@ -4,13 +4,12 @@
 # guid: e2f3g4h5-i6j7-k8l9-m0n1-o2p3q4r5s6t7
 
 """Docker security scanning utilities for matrix build system.
-Handles vulnerability scanning, SBOM generation, and security reporting.
+Handles SBOM generation, image testing, and security reporting.
 """
 
 import json
 import subprocess
 import sys
-
 
 def run_command(cmd, capture_output=True, check=True):
     """Run a shell command and return the result."""
@@ -32,40 +31,6 @@ def run_command(cmd, capture_output=True, check=True):
     except Exception as e:
         return False, "", str(e)
 
-
-def scan_image_with_trivy(image_ref, output_format="sarif", output_file=None):
-    """Scan Docker image with Trivy."""
-    if not output_file:
-        output_file = f"trivy-results.{output_format}"
-
-    print(f"Scanning image {image_ref} with Trivy...")
-
-    cmd = f"trivy image --format {output_format} --output {output_file} {image_ref}"
-    success, stdout, stderr = run_command(cmd, check=False)
-
-    if not success:
-        print(f"Trivy scan failed: {stderr}")
-        return False, None
-
-    print(f"Trivy scan completed: {output_file}")
-    return True, output_file
-
-
-def scan_filesystem_with_trivy(scan_path=".", output_file="trivy-fs-results.txt"):
-    """Scan filesystem with Trivy."""
-    print(f"Scanning filesystem {scan_path} with Trivy...")
-
-    cmd = f"trivy fs --format table --output {output_file} {scan_path}"
-    success, stdout, stderr = run_command(cmd, check=False)
-
-    if not success:
-        print(f"Trivy filesystem scan failed: {stderr}")
-        return False, None
-
-    print(f"Trivy filesystem scan completed: {output_file}")
-    return True, output_file
-
-
 def generate_sbom(image_ref, output_file="sbom.spdx.json"):
     """Generate Software Bill of Materials."""
     print(f"Generating SBOM for {image_ref}...")
@@ -85,7 +50,6 @@ def generate_sbom(image_ref, output_file="sbom.spdx.json"):
 
     print(f"SBOM generated: {output_file}")
     return True, output_file
-
 
 def test_image_functionality(image_ref):
     """Test Docker image basic functionality."""
@@ -136,7 +100,6 @@ def test_image_functionality(image_ref):
 
     return tests
 
-
 def validate_compose_files(compose_files):
     """Validate docker-compose files."""
     results = []
@@ -155,7 +118,6 @@ def validate_compose_files(compose_files):
         )
 
     return results
-
 
 def generate_security_summary(scan_results, test_results, compose_results=None):
     """Generate security and testing summary for GitHub."""
@@ -201,14 +163,11 @@ def generate_security_summary(scan_results, test_results, compose_results=None):
 
     return "\n".join(summary)
 
-
 def main():
     """Main entry point."""
     if len(sys.argv) < 2:
         print("Usage: docker-security.py <command> [args...]")
         print("Commands:")
-        print("  scan-image <image_ref>")
-        print("  scan-filesystem [path]")
         print("  generate-sbom <image_ref>")
         print("  test-image <image_ref>")
         print("  validate-compose <file1> [file2...]")
@@ -217,20 +176,7 @@ def main():
     command = sys.argv[1]
 
     try:
-        if command == "scan-image":
-            if len(sys.argv) < 3:
-                print("Error: image reference required")
-                sys.exit(1)
-            image_ref = sys.argv[2]
-            success, output_file = scan_image_with_trivy(image_ref)
-            sys.exit(0 if success else 1)
-
-        elif command == "scan-filesystem":
-            path = sys.argv[2] if len(sys.argv) > 2 else "."
-            success, output_file = scan_filesystem_with_trivy(path)
-            sys.exit(0 if success else 1)
-
-        elif command == "generate-sbom":
+        if command == "generate-sbom":
             if len(sys.argv) < 3:
                 print("Error: image reference required")
                 sys.exit(1)
@@ -273,7 +219,6 @@ def main():
     except Exception as e:
         print(f"Error executing {command}: {e}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

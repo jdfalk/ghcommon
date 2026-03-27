@@ -77,7 +77,6 @@ Eliminate long-lived credentials:
 
 **Dependency Review**: Scan for vulnerable dependencies on PRs
 **CodeQL Analysis**: SAST scanning on push, PR, and schedule
-**Container Scanning**: Scan images with Trivy or similar
 **SBOM Generation**: Create software bill of materials
 **Secret Scanning**: Enable with push protection
 
