@@ -148,7 +148,6 @@ security:
   # Vulnerability scanning
   vulnerability_scan:
     enabled: true
-    tools: ['trivy', 'nancy']
 
   # Secret scanning
   secret_scan:

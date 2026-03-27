@@ -19,10 +19,6 @@ inputs:
     description: 'Security audit result (success, failure, skipped)'
     required: false
     default: 'skipped'
-  trivy-result:
-    description: 'Trivy scan result (success, failure, skipped)'
-    required: false
-    default: 'skipped'
 
 runs:
   using: 'composite'
@@ -38,6 +34,5 @@ runs:
         RESULT_CODEQL: ${{ inputs.codeql-result }}
         RESULT_DEP_REVIEW: ${{ inputs.dependency-review-result }}
         RESULT_SECURITY_AUDIT: ${{ inputs.security-audit-result }}
-        RESULT_TRIVY: ${{ inputs.trivy-result }}
       run: |
         python3 "${{ github.action_path }}/../../workflows/scripts/generate_security_summary.py"
