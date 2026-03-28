@@ -77,6 +77,11 @@ on:
         required: false
         type: string
         default: ''
+      stable:
+        description: 'Create a stable (non-RC) release directly, bypassing the pre-release flow'
+        required: false
+        type: boolean
+        default: false
     outputs:
       release-created:
         description: 'Whether a release was created'
@@ -144,6 +149,7 @@ jobs:
       registry: ${{ steps.env-setup.outputs.registry }}
       image-name: ${{ steps.env-setup.outputs.image-name }}
       release-tag: ${{ steps.version.outputs.tag }}
+      full-version: ${{ steps.version.outputs.full-version }}
       release-branch-strategy: ${{ steps.release-strategy.outputs.strategy }}
       auto-prerelease: ${{ steps.release-strategy.outputs.auto-prerelease }}
       auto-draft: ${{ steps.release-strategy.outputs.auto-draft }}
@@ -172,27 +178,106 @@ jobs:
           docker-enabled: ${{ inputs.docker-enabled && 'true' || 'auto' }}
           protobuf-enabled: ${{ inputs.protobuf-enabled && 'true' || 'auto' }}
 
-      - name: Determine release strategy based on branch
+      - name: Determine release strategy
         id: release-strategy
-        uses: jdfalk/release-strategy-action@32bb24ac9d8dc50917d9f64e9035da85bd4a6a98 # v1.1.3
-        with:
-          branch-name: ${{ github.ref_name }}
-          force-prerelease: ${{ inputs.prerelease }}
-          force-draft: ${{ inputs.draft }}
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+          FORCE_PRERELEASE: ${{ inputs.prerelease }}
+          FORCE_DRAFT: ${{ inputs.draft }}
+          STABLE_RELEASE: ${{ inputs.stable }}
+        run: |
+          # When explicitly requesting a stable release, skip the RC flow
+          if [ "$STABLE_RELEASE" = "true" ]; then
+            echo "strategy=stable" >> "$GITHUB_OUTPUT"
+            echo "auto-prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+          elif [ "$FORCE_PRERELEASE" = "true" ]; then
+            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
+            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+          elif [ "$FORCE_DRAFT" = "true" ]; then
+            echo "strategy=stable" >> "$GITHUB_OUTPUT"
+            echo "auto-prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "auto-draft=true" >> "$GITHUB_OUTPUT"
+          elif [ "$BRANCH_NAME" = "main" ] || [ "$BRANCH_NAME" = "master" ]; then
+            # Default for push-to-main: pre-release RC
+            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
+            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
+            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Generate semantic release version
+      - name: Generate version with RC support
         id: version
-        uses: jdfalk/generate-version-action@b20e8fcdd2270aed9512aa3be5b6cb8610c42d97 # v1.1.3
-        with:
-          release-type: ${{ inputs.release-type || 'auto' }}
-          branch-name: ${{ github.ref_name }}
+        env:
+          RELEASE_TYPE: ${{ inputs.release-type || 'auto' }}
+          STABLE_RELEASE: ${{ inputs.stable }}
+        run: |
+          set -euo pipefail
+
+          # Find latest full (non-prerelease) release tag
+          LATEST_FULL=$(git tag -l 'v*.*.*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$LATEST_FULL" ]; then
+            LATEST_FULL="v0.0.0"
+          fi
+          echo "Latest full release: $LATEST_FULL"
+
+          # Parse version components
+          MAJOR=$(echo "$LATEST_FULL" | sed 's/^v//' | cut -d. -f1)
+          MINOR=$(echo "$LATEST_FULL" | sed 's/^v//' | cut -d. -f2)
+          PATCH=$(echo "$LATEST_FULL" | sed 's/^v//' | cut -d. -f3)
+
+          # Determine next version based on release-type
+          case "$RELEASE_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+            auto|*)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEXT_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "Next full version: $NEXT_VERSION"
+
+          if [ "$STABLE_RELEASE" = "true" ]; then
+            # Stable release: use the full version directly
+            VERSION_TAG="$NEXT_VERSION"
+            echo "Creating stable release: $VERSION_TAG"
+          else
+            # RC release: find the next rc number
+            LATEST_RC=$(git tag -l "${NEXT_VERSION}-rc.*" --sort=-v:refname | head -1)
+            if [ -z "$LATEST_RC" ]; then
+              RC_NUM=1
+            else
+              RC_NUM=$(echo "$LATEST_RC" | grep -o 'rc\.[0-9]*' | cut -d. -f2)
+              RC_NUM=$((RC_NUM + 1))
+            fi
+            VERSION_TAG="${NEXT_VERSION}-rc.${RC_NUM}"
+            echo "Creating RC release: $VERSION_TAG"
+          fi
+
+          echo "tag=${VERSION_TAG}" >> "$GITHUB_OUTPUT"
+          echo "full-version=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
 
   # Protocol Buffer Generation (if needed)
   build-protobuf:
     name: Generate Protocol Buffers
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-protobuf.yml@v1
     secrets: inherit
 
   # Go Build
@@ -203,7 +288,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-go == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'go')
-    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@v1
     with:
       go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -221,7 +306,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-python == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'python')
-    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@v1
     with:
       python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
@@ -235,7 +320,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@v1
     with:
       protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
       release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -249,7 +334,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@v1
     with:
       frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
     secrets: inherit
@@ -262,7 +347,7 @@ jobs:
       always() &&
       needs.detect-languages.outputs.has-docker == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
-    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@9acd0e4062f65d1f2a44c501051b2305db29d324 # main
+    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@v1
     with:
       docker-matrix: ${{ needs.detect-languages.outputs.docker-matrix }}
       registry: ${{ needs.detect-languages.outputs.registry }}
@@ -301,7 +386,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
-            ref="refs/heads/main"
+            ref="v1"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -358,7 +443,7 @@ jobs:
           body: |
             ${{ steps.changelog.outputs.changelog_content }}
 
-            ## 📦 Release Assets
+            ## Release Assets
 
             This release includes organized packages for easy consumption:
 
@@ -386,6 +471,67 @@ jobs:
           files: |
             ./artifacts/**/*
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create or update draft full release
+        if: needs.detect-languages.outputs.auto-prerelease == 'true' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FULL_VERSION: ${{ needs.detect-languages.outputs.full-version }}
+          RC_TAG: ${{ steps.version.outputs.version }}
+          CHANGELOG: ${{ steps.changelog.outputs.changelog_content }}
+        run: |
+          set -euo pipefail
+
+          echo "Managing draft release for $FULL_VERSION (latest RC: $RC_TAG)"
+
+          # Find existing draft releases
+          DRAFTS=$(gh release list --json tagName,isDraft --jq '[.[] | select(.isDraft)] | sort_by(.tagName) | reverse')
+          DRAFT_COUNT=$(echo "$DRAFTS" | jq 'length')
+
+          # Check if a draft for this specific version exists
+          EXISTING_DRAFT=$(echo "$DRAFTS" | jq -r "[.[] | select(.tagName == \"$FULL_VERSION\")] | first // empty | .tagName")
+
+          if [ -n "$EXISTING_DRAFT" ]; then
+            echo "Updating existing draft release $FULL_VERSION"
+            gh release edit "$FULL_VERSION" \
+              --target "$GITHUB_SHA" \
+              --title "$FULL_VERSION" \
+              --notes "$(cat <<NOTES_EOF
+          Draft release for $FULL_VERSION — will be published when ready.
+
+          Latest RC: $RC_TAG
+
+          $CHANGELOG
+          NOTES_EOF
+          )"
+          else
+            echo "Creating new draft release for $FULL_VERSION"
+            # Create new draft — the tag doesn't exist yet, it will be created when published
+            gh release create "$FULL_VERSION" \
+              --target "$GITHUB_SHA" \
+              --title "$FULL_VERSION" \
+              --notes "$(cat <<NOTES_EOF
+          Draft release for $FULL_VERSION — will be published when ready.
+
+          Latest RC: $RC_TAG
+
+          $CHANGELOG
+          NOTES_EOF
+          )" \
+              --draft
+          fi
+
+          # Clean up stale drafts: delete drafts for versions older than FULL_VERSION
+          # but keep the current one
+          if [ "$DRAFT_COUNT" -gt 1 ]; then
+            echo "Found $DRAFT_COUNT draft releases, cleaning up stale ones..."
+            for tag in $(echo "$DRAFTS" | jq -r ".[].tagName"); do
+              if [ "$tag" != "$FULL_VERSION" ]; then
+                echo "Deleting stale draft: $tag"
+                gh release delete "$tag" --yes 2>/dev/null || true
+              fi
+            done
+          fi
 
       - name: Check release created
         id: check-release
@@ -419,7 +565,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" ]]; then
-            ref="refs/heads/main"
+            ref="v1"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -581,7 +727,7 @@ jobs:
           if [ -f .github/ghcommon-ref.txt ]; then
             echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=main" >> "$GITHUB_OUTPUT"
+            echo "ref=v1" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts

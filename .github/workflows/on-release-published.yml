@@ -1,0 +1,106 @@
+# file: .github/workflows/on-release-published.yml
+# version: 1.0.0
+# guid: on-release-pub-2026-03-27
+
+name: On Release Published
+
+# Triggers when a draft release is manually published via the GitHub UI.
+# Updates floating tags (v1, v1.10) and creates Go module sub-tags.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-published-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  update-floating-tags:
+    name: Update Floating Tags
+    runs-on: ubuntu-latest
+    # Only run for stable releases, not pre-releases (RCs)
+    if: "!github.event.release.prerelease"
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Parse version and update floating tags
+        env:
+          VERSION_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          echo "Updating floating tags for $VERSION_TAG"
+
+          if [[ ! $VERSION_TAG =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::warning::Version tag $VERSION_TAG is not in semver format, skipping"
+            exit 0
+          fi
+
+          MAJOR="${BASH_REMATCH[1]}"
+          MINOR="${BASH_REMATCH[2]}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Update major version tag (v1)
+          MAJOR_TAG="v${MAJOR}"
+          echo "Updating $MAJOR_TAG -> $VERSION_TAG"
+          git tag -fa "$MAJOR_TAG" "$VERSION_TAG" -m "chore(release): update $MAJOR_TAG to $VERSION_TAG"
+
+          retry_count=0
+          max_retries=3
+          until git push origin "$MAJOR_TAG" --force || [ $retry_count -eq $max_retries ]; do
+            retry_count=$((retry_count + 1))
+            echo "Retry $retry_count/$max_retries for $MAJOR_TAG..."
+            sleep 5
+          done
+          [ $retry_count -lt $max_retries ] || { echo "Failed to push $MAJOR_TAG"; exit 1; }
+
+          # Update minor version tag (v1.10)
+          MINOR_TAG="v${MAJOR}.${MINOR}"
+          echo "Updating $MINOR_TAG -> $VERSION_TAG"
+          git tag -fa "$MINOR_TAG" "$VERSION_TAG" -m "chore(release): update $MINOR_TAG to $VERSION_TAG"
+
+          retry_count=0
+          until git push origin "$MINOR_TAG" --force || [ $retry_count -eq $max_retries ]; do
+            retry_count=$((retry_count + 1))
+            echo "Retry $retry_count/$max_retries for $MINOR_TAG..."
+            sleep 5
+          done
+          [ $retry_count -lt $max_retries ] || { echo "Failed to push $MINOR_TAG"; exit 1; }
+
+          echo "Floating tags updated successfully"
+
+  create-module-tags:
+    name: Create Module Tags
+    runs-on: ubuntu-latest
+    needs: update-floating-tags
+    # Only run for stable releases with Go SDK modules
+    if: "!github.event.release.prerelease"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.13'
+
+      - name: Create module tags
+        env:
+          VERSION_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ -f scripts/create-module-tags.py ]; then
+            python3 scripts/create-module-tags.py
+          else
+            echo "No module tagging script found, skipping"
+          fi
