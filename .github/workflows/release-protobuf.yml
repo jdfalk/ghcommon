@@ -52,7 +52,7 @@ permissions:
 jobs:
   delegate:
     name: Generate Protobuf Artifacts
-    uses: ./.github/workflows/reusable-protobuf.yml
+    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@v1
     with:
       config-path: ${{ inputs.config-path }}
       protobuf-path: ${{ inputs.protobuf-path }}
