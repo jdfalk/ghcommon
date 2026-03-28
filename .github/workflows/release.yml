@@ -43,6 +43,11 @@ on:
         required: false
         type: boolean
         default: false
+      stable:
+        description: 'Publish a stable (non-RC) release directly'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -57,4 +62,5 @@ jobs:
       build-target: ${{ github.event.inputs.build-target || 'all' }}
       draft: ${{ github.event.inputs.draft || false }}
       prerelease: ${{ github.event.inputs.prerelease || false }}
+      stable: ${{ github.event.inputs.stable || false }}
     secrets: inherit

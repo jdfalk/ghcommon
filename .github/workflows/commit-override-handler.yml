@@ -70,7 +70,7 @@ jobs:
           if [ -f .github/ghcommon-ref.txt ]; then
             ref="$(cat .github/ghcommon-ref.txt)"
           else
-            ref="main"
+            ref="v1"
           fi
           echo "ref=${ref}" >> "$GITHUB_OUTPUT"
 

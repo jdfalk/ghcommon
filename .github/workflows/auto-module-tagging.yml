@@ -35,30 +35,44 @@ jobs:
 
       - name: Determine version tag
         id: get-version
+        env:
+          INPUT_VERSION_TAG: ${{ inputs.version_tag }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION_TAG="${{ inputs.version_tag }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION_TAG="$INPUT_VERSION_TAG"
           else
-            # Extract from push event
             VERSION_TAG="${GITHUB_REF#refs/tags/}"
           fi
 
           echo "version_tag=${VERSION_TAG}" >> "${GITHUB_OUTPUT}"
-          echo "📋 Processing version tag: ${VERSION_TAG}"
+          echo "Processing version tag: ${VERSION_TAG}"
+
+      - name: Skip pre-release tags
+        id: check-prerelease
+        run: |
+          VERSION_TAG="${{ steps.get-version.outputs.version_tag }}"
+          if [[ "$VERSION_TAG" =~ -(rc|alpha|beta|dev)\. ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping module tagging for pre-release: $VERSION_TAG"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Check if repository has Go SDK modules
         id: check-sdk
+        if: steps.check-prerelease.outputs.skip != 'true'
         run: |
           if [ -d "sdks/go/v1" ]; then
             echo "has_sdk=true" >> "${GITHUB_OUTPUT}"
-            echo "✅ Go SDK modules found"
+            echo "Go SDK modules found"
           else
             echo "has_sdk=false" >> "${GITHUB_OUTPUT}"
-            echo "ℹ️  No Go SDK modules found, skipping module tagging"
+            echo "No Go SDK modules found, skipping module tagging"
           fi
 
       - name: Create module-specific tags
-        if: steps.check-sdk.outputs.has_sdk == 'true'
+        if: steps.check-prerelease.outputs.skip != 'true' && steps.check-sdk.outputs.has_sdk == 'true'
         run: |
           VERSION_TAG="${{ steps.get-version.outputs.version_tag }}"
 
