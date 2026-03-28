@@ -275,84 +275,107 @@ jobs:
   # Protocol Buffer Generation (if needed)
   build-protobuf:
     name: Generate Protocol Buffers
+    runs-on: ubuntu-latest
     needs: [detect-languages]
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
-    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@v1
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Generate protobuf
+        uses: jdfalk/gha-release-protobuf@b16c71206c1956f08b9f5a5b37dcc6257cea042b # v1.0.0
 
   # Go Build
   build-go:
     name: Build Go Components
+    runs-on: ubuntu-latest
     needs: [detect-languages, build-protobuf]
     if: |
       always() &&
       needs.detect-languages.outputs.has-go == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'go')
-    uses: jdfalk/ghcommon/.github/workflows/release-go.yml@v1
-    with:
-      go-matrix: ${{ needs.detect-languages.outputs.go-matrix }}
-      protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
-      release-version: ${{ needs.detect-languages.outputs.release-tag }}
-      system-packages: ${{ inputs.system-packages }}
-      pre-build-script: ${{ inputs.pre-build-script }}
-      go-experiment: ${{ inputs.go-experiment }}
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Build Go
+        uses: jdfalk/gha-release-go@5f868f66746f0bcd5ab78bd4b10e072df118591f # v1.0.0
+        with:
+          protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
+          release-version: ${{ needs.detect-languages.outputs.release-tag }}
+          system-packages: ${{ inputs.system-packages }}
+          pre-build-script: ${{ inputs.pre-build-script }}
+          go-experiment: ${{ inputs.go-experiment }}
 
   # Python Build
   build-python:
     name: Build Python Components
+    runs-on: ubuntu-latest
     needs: [detect-languages, build-protobuf]
     if: |
       always() &&
       needs.detect-languages.outputs.has-python == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'python')
-    uses: jdfalk/ghcommon/.github/workflows/release-python.yml@v1
-    with:
-      python-matrix: ${{ needs.detect-languages.outputs.python-matrix }}
-      protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Build Python
+        uses: jdfalk/gha-release-python@5ebdf4da2c946a51175912c9052ad1f7ae2b9bc1 # v1.0.0
+        with:
+          protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
 
   # Rust Build
   build-rust:
     name: Build Rust Components
+    runs-on: ubuntu-latest
     needs: [detect-languages, build-protobuf]
     if: |
       always() &&
       needs.detect-languages.outputs.has-rust == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
-    uses: jdfalk/ghcommon/.github/workflows/release-rust.yml@v1
-    with:
-      protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
-      release-version: ${{ needs.detect-languages.outputs.release-tag }}
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Build Rust
+        uses: jdfalk/gha-release-rust@3160ec71e74061dcd17693c5be3b1f3a1dda260d # v1.0.0
+        with:
+          protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
+          release-version: ${{ needs.detect-languages.outputs.release-tag }}
 
   # Frontend Build
   build-frontend:
     name: Build Frontend Components
+    runs-on: ubuntu-latest
     needs: [detect-languages]
     if: |
       always() &&
       needs.detect-languages.outputs.has-frontend == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
-    uses: jdfalk/ghcommon/.github/workflows/release-frontend.yml@v1
-    with:
-      frontend-matrix: ${{ needs.detect-languages.outputs.frontend-matrix }}
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Build Frontend
+        uses: jdfalk/gha-release-frontend@e56b995055b107c1a7faebd4aad11466d2b6dc7c # v1.0.0
 
   # Docker Build
   build-docker:
     name: Build Docker Images
+    runs-on: ubuntu-latest
     needs: [detect-languages, build-go, build-python, build-rust]
     if: |
       always() &&
       needs.detect-languages.outputs.has-docker == 'true' &&
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
-    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@v1
-    with:
-      docker-matrix: ${{ needs.detect-languages.outputs.docker-matrix }}
-      registry: ${{ needs.detect-languages.outputs.registry }}
-      image-name: ${{ needs.detect-languages.outputs.image-name }}
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Build Docker
+        uses: jdfalk/gha-release-docker@5d98745fafe30ffd340990f080149614840b5217 # v1.0.0
+        with:
+          registry: ${{ needs.detect-languages.outputs.registry }}
+          image-name: ${{ needs.detect-languages.outputs.image-name }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
   # Create GitHub Release
   create-release:
