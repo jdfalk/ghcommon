@@ -304,7 +304,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@v1
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@e04c222a0366d5801d3b02bb76519f19ba1fa440 # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -378,13 +378,17 @@ jobs:
   # Protobuf generation (if applicable)
   protobuf-generation:
     name: Generate Protobuf
+    runs-on: ubuntu-latest
     if: |
       !inputs.skip-protobuf &&
       (contains(github.event.head_commit.message, '[protobuf]') ||
        contains(github.event.head_commit.message, '[generate]') ||
        contains(github.event.head_commit.message, '[buf]'))
-    uses: jdfalk/ghcommon/.github/workflows/reusable-protobuf.yml@v1
-    secrets: inherit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Generate protobuf
+        uses: jdfalk/gha-release-protobuf@b16c71206c1956f08b9f5a5b37dcc6257cea042b # v1.0.0
 
   # Language-specific build and test jobs
   go-ci:
@@ -410,7 +414,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
-            ref="v1"
+            ref="e04c222a0366d5801d3b02bb76519f19ba1fa440"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -494,7 +498,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
-            ref="v1"
+            ref="e04c222a0366d5801d3b02bb76519f19ba1fa440"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -556,7 +560,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
-            ref="v1"
+            ref="e04c222a0366d5801d3b02bb76519f19ba1fa440"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -613,7 +617,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@v1
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@e04c222a0366d5801d3b02bb76519f19ba1fa440 # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'
@@ -647,7 +651,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
-            ref="v1"
+            ref="e04c222a0366d5801d3b02bb76519f19ba1fa440"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
@@ -780,7 +784,7 @@ jobs:
         run: |
           ref="${GITHUB_WORKFLOW_REF##*@}"
           if [[ -z "$ref" || "$ref" == "$GITHUB_WORKFLOW_REF" || "$ref" == refs/pull/* ]]; then
-            ref="v1"
+            ref="e04c222a0366d5801d3b02bb76519f19ba1fa440"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 

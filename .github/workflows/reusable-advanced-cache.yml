@@ -56,7 +56,7 @@ jobs:
           if [ -f .github/ghcommon-ref.txt ]; then
             echo "ref=$(cat .github/ghcommon-ref.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=v1" >> "$GITHUB_OUTPUT"
+            echo "ref=e04c222a0366d5801d3b02bb76519f19ba1fa440" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ghcommon workflow scripts
