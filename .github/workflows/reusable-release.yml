@@ -282,7 +282,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate protobuf
-        uses: jdfalk/gha-release-protobuf@b16c71206c1956f08b9f5a5b37dcc6257cea042b # v1.0.0
+        uses: jdfalk/gha-release-protobuf@04bad49f96a51ec7602024d8c6dd44fde811426d # v1.0.1
 
   # Go Build
   build-go:
@@ -299,7 +299,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build Go
-        uses: jdfalk/gha-release-go@5f868f66746f0bcd5ab78bd4b10e072df118591f # v1.0.0
+        uses: jdfalk/gha-release-go@1c2332ea2cc66a4e0b4397afcc932f303dbe0b39 # v1.0.1
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -320,7 +320,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Python
-        uses: jdfalk/gha-release-python@5ebdf4da2c946a51175912c9052ad1f7ae2b9bc1 # v1.0.0
+        uses: jdfalk/gha-release-python@d3b2cb559fa2af3f5a12c2cb784cb37b133078d3 # v1.0.1
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
 
@@ -337,7 +337,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Rust
-        uses: jdfalk/gha-release-rust@3160ec71e74061dcd17693c5be3b1f3a1dda260d # v1.0.0
+        uses: jdfalk/gha-release-rust@85b16e81f014840af704c63c789216f43530117c # v1.0.1
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -355,7 +355,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Frontend
-        uses: jdfalk/gha-release-frontend@e56b995055b107c1a7faebd4aad11466d2b6dc7c # v1.0.0
+        uses: jdfalk/gha-release-frontend@0457c19ad39b681cd24355eb6cd91cf4ccadaa10 # v1.0.1
 
   # Docker Build
   build-docker:
@@ -370,7 +370,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Docker
-        uses: jdfalk/gha-release-docker@5d98745fafe30ffd340990f080149614840b5217 # v1.0.0
+        uses: jdfalk/gha-release-docker@ad05989a3dfe77237a0ab0037f2b6a3d3ea18aa2 # v1.0.1
         with:
           registry: ${{ needs.detect-languages.outputs.registry }}
           image-name: ${{ needs.detect-languages.outputs.image-name }}

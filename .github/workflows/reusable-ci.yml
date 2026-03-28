@@ -388,7 +388,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate protobuf
-        uses: jdfalk/gha-release-protobuf@b16c71206c1956f08b9f5a5b37dcc6257cea042b # v1.0.0
+        uses: jdfalk/gha-release-protobuf@04bad49f96a51ec7602024d8c6dd44fde811426d # v1.0.1
 
   # Language-specific build and test jobs
   go-ci:
