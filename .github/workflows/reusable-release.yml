@@ -167,7 +167,7 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
-        uses: jdfalk/detect-languages-action@a017cfe476f8f9dccda67ffd751fae5081fc11b6 # v1.1.4
+        uses: jdfalk/detect-languages-action@c10aa6cf6cf58ed0ecaa41aa3b7e0afaf4ed9c8b # v1.1.5
         with:
           skip-detection: ${{ inputs.skip-language-detection }}
           build-target: ${{ inputs.build-target || 'all' }}
