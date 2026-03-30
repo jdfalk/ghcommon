@@ -163,8 +163,10 @@ jobs:
       - name: Setup environment variables
         id: env-setup
         run: |
-          echo "registry=${REGISTRY}" >> "$GITHUB_OUTPUT"
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          {
+            echo "registry=${REGISTRY}"
+            echo "image-name=${IMAGE_NAME}"
+          } >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
         uses: jdfalk/detect-languages-action@c10aa6cf6cf58ed0ecaa41aa3b7e0afaf4ed9c8b # v1.1.5

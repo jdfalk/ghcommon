@@ -152,6 +152,7 @@ jobs:
           fi
           if [ -f "$NODE_DIR/package.json" ]; then
             echo "Running npm audit in $NODE_DIR..."
+            # shellcheck disable=SC2015 -- || true intentionally catches both cd and audit failures
             cd "$NODE_DIR" && npm audit --audit-level=high || true
           fi
 

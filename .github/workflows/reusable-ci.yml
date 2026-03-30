@@ -157,7 +157,7 @@ jobs:
           fetch-depth: 2
 
       - name: Detect file changes
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
         id: changes
         with:
           base: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
@@ -263,6 +263,7 @@ jobs:
         with:
           go-version: '1.23'
           check-latest: true
+          cache: false
 
       - name: Install actionlint
         run: |
@@ -442,6 +443,7 @@ jobs:
         if: inputs.system-packages != ''
         env:
           PACKAGES: ${{ inputs.system-packages }}
+        # shellcheck disable=SC2086 -- intentional word splitting for multiple package names
         run: sudo apt-get update && sudo apt-get install -y $PACKAGES
 
       - name: Build Go project
