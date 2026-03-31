@@ -90,7 +90,7 @@ jobs:
           esac
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
+        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
@@ -129,14 +129,14 @@ jobs:
           esac
 
       - name: Start proxy for registry access
-        uses: github/codeql-action/start-proxy@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
+        uses: github/codeql-action/start-proxy@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
 
       - name: Autobuild
         if: steps.build-config.outputs.mode == 'autobuild'
-        uses: github/codeql-action/autobuild@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
+        uses: github/codeql-action/autobuild@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
+        uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           category: '/language:${{ matrix.language }}'
 
@@ -177,13 +177,13 @@ jobs:
 
       - name: Dependency Review (with config)
         if: steps.check-config.outputs.has-config == 'true'
-        uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
         with:
           config-file: './.github/dependency-review-config.yml'
 
       - name: Dependency Review (default)
         if: steps.check-config.outputs.has-config == 'false'
-        uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
         with:
           fail-on-severity: moderate
 
