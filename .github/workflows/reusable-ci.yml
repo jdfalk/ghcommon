@@ -259,7 +259,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
           go-version: '1.23'
           check-latest: true
@@ -294,7 +294,7 @@ jobs:
 
       - name: Upload actionlint log
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: workflow-lint-report
           path: actionlint.log
@@ -305,7 +305,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@e04c222a0366d5801d3b02bb76519f19ba1fa440 # v1.10.3+
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@06d833f53520ec04669cc573165ef0d1d694a373 # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -344,7 +344,7 @@ jobs:
           fi
 
       - name: Set up Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ inputs.node-version }}
 
@@ -434,7 +434,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Set up Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -466,7 +466,7 @@ jobs:
       - name: Check Go test coverage
         if: ${{ !inputs.skip-tests }}
         continue-on-error: true
-        uses: vladopajic/go-test-coverage@679e6807f68f2440a4c43d386442a1d0041838a9 # v2.18.3
+        uses: vladopajic/go-test-coverage@f190f667e23b4441202d0bab0f8c2e7bce8925b6 # v2.18.4
         with:
           config: ./.testcoverage.yml
 
@@ -552,7 +552,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # stable
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # stable
         with:
           toolchain: ${{ matrix.rust-version }}
           components: rustfmt, clippy
@@ -581,7 +581,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Cache Rust dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.cargo/bin/
@@ -619,7 +619,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@e04c222a0366d5801d3b02bb76519f19ba1fa440 # v1.10.3+
+    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@06d833f53520ec04669cc573165ef0d1d694a373 # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'
@@ -672,7 +672,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Set up Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -741,7 +741,7 @@ jobs:
 
       - name: Upload Playwright report
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: playwright-report-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ${{ steps.frontend-dir.outputs.dir }}/playwright-report/
@@ -750,7 +750,7 @@ jobs:
 
       - name: Upload Playwright test results
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests && always() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: playwright-results-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ${{ steps.frontend-dir.outputs.dir }}/test-results/
