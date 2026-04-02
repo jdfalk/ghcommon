@@ -13,7 +13,7 @@ on:
 
 jobs:
   labeler:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-labeler.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     permissions:
       contents: read
       pull-requests: write
