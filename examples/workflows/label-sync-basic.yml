@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   sync-labels:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       # Use labels.json from ghcommon repository
       config-file: 'labels.json'

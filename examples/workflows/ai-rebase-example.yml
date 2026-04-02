@@ -13,7 +13,7 @@ on:
 
 jobs:
   ai-rebase:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-ai-rebase.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       base-branch: 'main'
       model: 'openai/gpt-4o'

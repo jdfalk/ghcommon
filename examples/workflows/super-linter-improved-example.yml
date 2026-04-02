@@ -25,7 +25,7 @@ jobs:
   # Example 1: Standard configuration - concise output, issues only
   standard-linting:
     name: Standard Linting (Concise)
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: false
       enable-auto-fix: true
@@ -45,7 +45,7 @@ jobs:
   debug-linting:
     name: Debug Linting (Detailed)
     if: github.event.inputs.show-details == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: true
       enable-auto-fix: false
@@ -65,7 +65,7 @@ jobs:
   production-linting:
     name: Production Linting
     if: github.ref == 'refs/heads/main'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: true
       enable-auto-fix: true

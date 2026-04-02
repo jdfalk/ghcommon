@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ matrix.version }}
           cache: 'npm'
@@ -50,14 +50,14 @@ jobs:
         run: npm run coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   # Version calculation
   versioning:
     name: Calculate Version
-    uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     needs: [test]
     with:
       dry-run: ${{ github.event_name == 'pull_request' }}
@@ -73,10 +73,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -96,7 +96,7 @@ jobs:
         run: sha256sum *.tgz dist.tar.gz > checksums.txt
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: package-${{ github.sha }}
           path: |
@@ -108,7 +108,7 @@ jobs:
   # Create release
   release:
     name: Create Release
-    uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     needs: [versioning, build]
     if: |
       github.ref == 'refs/heads/main' &&
@@ -129,10 +129,10 @@ jobs:
     environment: npm # Use environment protection for publishing
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'

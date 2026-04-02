@@ -46,7 +46,7 @@ permissions:
 
 jobs:
   enhanced-docs-update:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-enhanced-docs-update.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-enhanced-docs-update.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       updates_dir: '.github/doc-updates'
       create_pr: true

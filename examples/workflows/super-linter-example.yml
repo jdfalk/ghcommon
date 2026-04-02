@@ -21,7 +21,7 @@ permissions:
 jobs:
   # Basic usage - lint all languages with auto-fix enabled
   super-linter-basic:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: false # Only validate changed files in PRs
       enable-auto-fix: true # Enable auto-fixing
@@ -30,7 +30,7 @@ jobs:
 
   # Advanced usage - selective linting with custom auto-fix settings
   super-linter-advanced:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: true # Validate entire codebase
       default-branch: 'main'
@@ -58,7 +58,7 @@ jobs:
 
   # Check-only mode - no auto-fixes applied
   super-linter-check-only:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-super-linter.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       validate-all-codebase: false
       enable-auto-fix: false # Disable auto-fixing

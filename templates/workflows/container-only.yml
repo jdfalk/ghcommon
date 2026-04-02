@@ -20,7 +20,7 @@ jobs:
   # Version calculation for container tags
   versioning:
     name: Calculate Version
-    uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       dry-run: ${{ github.event_name == 'pull_request' }}
       update-pr-title: true
@@ -29,7 +29,7 @@ jobs:
   # Multi-architecture container build
   container:
     name: Build Container
-    uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     needs: [versioning]
     with:
       image-name: ${{ github.event.repository.name }}
@@ -53,7 +53,7 @@ jobs:
   # Create release for tagged versions
   release:
     name: Create Release
-    uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     needs: [versioning, container]
     if: |
       github.ref_type == 'tag' ||

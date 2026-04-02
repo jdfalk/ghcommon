@@ -71,7 +71,7 @@ jobs:
       config: ${{ steps.load.outputs.config }}
       operation: ${{ steps.determine.outputs.operation }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Load configuration file
         id: load
@@ -119,7 +119,7 @@ jobs:
   # Main automation orchestrator
   unified-automation:
     needs: load-config
-    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-automation.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       operation: ${{ needs.load-config.outputs.operation }}
 
@@ -185,7 +185,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Generate automation summary
         run: |

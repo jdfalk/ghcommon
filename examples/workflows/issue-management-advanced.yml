@@ -88,7 +88,7 @@ jobs:
     outputs:
       issue_updates_file: ${{ steps.detect.outputs.file }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Detect issue updates file
         id: detect
@@ -115,7 +115,7 @@ jobs:
   # Main issue management workflow
   issue-management:
     needs: detect-issue-updates
-    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
+    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@83352d45a93951d4e490a5c310e31858a52e29ce # v1.10.5-rc.2
     with:
       operations: ${{ github.event.inputs.operations || 'auto' }}
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}

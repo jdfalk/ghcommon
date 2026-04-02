@@ -22,12 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
       - name: Component Detection Dependency Submission
-        uses: advanced-security/component-detection-dependency-submission-action@v0.0.3
+        uses: advanced-security/component-detection-dependency-submission-action@d7bc99869613749499d21661bc708bdf6ed614a0 # v0.0.3
         with:
           # Optional: Exclude specific directories from scanning
           directoryExclusionList: 'test,tests,__tests__,node_modules,.git,.vscode'
