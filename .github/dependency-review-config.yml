@@ -8,10 +8,6 @@
 # Fail the action if any dependencies have vulnerabilities with the given severity or higher
 fail-on-severity: moderate
 
-# Allow list - dependencies that should not be flagged
-# Format: package-url (PURL) format
-allow-licenses: []
-
 # Deny list - licenses that should always be flagged
 deny-licenses:
   - GPL-2.0-only
