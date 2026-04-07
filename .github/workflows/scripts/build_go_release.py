@@ -14,8 +14,6 @@ from pathlib import Path
 
 # Platform configurations for cross-compilation
 PLATFORMS = [
-    {"goos": "windows", "goarch": "amd64", "ext": ".exe"},
-    {"goos": "windows", "goarch": "arm64", "ext": ".exe"},
     {"goos": "linux", "goarch": "amd64", "ext": ""},
     {"goos": "linux", "goarch": "arm64", "ext": ""},
     {"goos": "darwin", "goarch": "amd64", "ext": ""},

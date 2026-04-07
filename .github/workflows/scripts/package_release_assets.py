@@ -66,6 +66,9 @@ def main() -> None:
         for file_path in artifacts_root.rglob("*"):
             if not file_path.is_file():
                 continue
+            if file_path.stat().st_size == 0:
+                print(f"⚠️  Skipping empty file: {file_path.name}")
+                continue
             category = _categorize(file_path.name)
             if not category:
                 print(f"⚠️  Skipping uncategorized file: {file_path.name}")
