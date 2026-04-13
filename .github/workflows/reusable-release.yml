@@ -458,9 +458,29 @@ jobs:
         with:
           artifacts-dir: ./artifacts
 
-      - name: Remove empty artifact files
+      - name: Clean up artifact directory
         run: |
+          set -euo pipefail
+          # Remove empty files
           find ./artifacts -type f -empty -delete -print 2>/dev/null || true
+
+          # Remove individual frontend JS chunks and source maps — these
+          # are Vite build output that should NOT be attached as release
+          # assets. The frontend is embedded in the Go binary; shipping
+          # loose JS files and .map files as release artifacts is noise.
+          # Keep only: binaries, tarballs, checksums, config, manifests,
+          # docker metadata, and similar build outputs.
+          find ./artifacts -type f \( \
+            -name "*.js" -o -name "*.js.map" -o \
+            -name "*.css" -o -name "*.css.map" -o \
+            -name "*.html" -o -name "*.svg" -o \
+            -name "*.woff" -o -name "*.woff2" -o \
+            -name "*.ttf" -o -name "*.eot" -o \
+            -name "*.png" -o -name "*.ico" \
+          \) -delete -print 2>/dev/null || true
+
+          echo "Remaining artifacts:"
+          find ./artifacts -type f | sort
 
       - name: Create GitHub Release
         id: release

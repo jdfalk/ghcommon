@@ -356,8 +356,34 @@ def generate_changelog(_: argparse.Namespace) -> None:
     auto_prerelease = os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
     auto_draft = os.environ.get("AUTO_DRAFT", "false").lower() == "true"
 
-    describe = _run_git(["describe", "--tags", "--abbrev=0"])
-    last_tag = describe.stdout.strip() if describe.returncode == 0 else ""
+    # Find the previous STABLE release tag (vX.Y.Z without -rc suffix).
+    # `git describe --tags --abbrev=0` picks up the tag just created in
+    # this workflow run, which is useless for a changelog. Instead, list
+    # all semver tags, exclude RC tags, sort by version, and take the
+    # second-to-last (the one BEFORE the current release). If there's
+    # only one, fall back to the full history.
+    tag_list = _run_git(
+        [
+            "tag",
+            "-l",
+            "v*.*.*",
+            "--sort=-v:refname",
+        ]
+    )
+    stable_tags = [
+        t
+        for t in tag_list.stdout.strip().splitlines()
+        if t.strip() and "-rc" not in t and "-alpha" not in t and "-beta" not in t
+    ]
+    # The first entry is the tag we just created (or the latest stable);
+    # the second is the "previous release" we want the diff from.
+    if len(stable_tags) >= 2:
+        last_tag = stable_tags[1]
+    elif len(stable_tags) == 1:
+        last_tag = stable_tags[0]
+    else:
+        last_tag = ""
+
     if last_tag:
         log_args = [f"{last_tag}..HEAD"]
         header = f"### 📋 Commits since {last_tag}:\n"
