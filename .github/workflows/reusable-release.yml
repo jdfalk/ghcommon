@@ -476,6 +476,7 @@ jobs:
           # loose JS files and .map files as release artifacts is noise.
           # Keep only: binaries, tarballs, checksums, config, manifests,
           # docker metadata, and similar build outputs.
+          # Frontend build output (embedded in the Go binary)
           find ./artifacts -type f \( \
             -name "*.js" -o -name "*.js.map" -o \
             -name "*.css" -o -name "*.css.map" -o \
@@ -483,6 +484,15 @@ jobs:
             -name "*.woff" -o -name "*.woff2" -o \
             -name "*.ttf" -o -name "*.eot" -o \
             -name "*.png" -o -name "*.ico" \
+          \) -delete -print 2>/dev/null || true
+
+          # GoReleaser internal metadata — build manifests that are
+          # useful during the workflow but should not be shipped as
+          # release assets to end users.
+          find ./artifacts -type f \( \
+            -name "artifacts.json" -o \
+            -name "metadata.json" -o \
+            -name "config.yaml" \
           \) -delete -print 2>/dev/null || true
 
           echo "Remaining artifacts:"
