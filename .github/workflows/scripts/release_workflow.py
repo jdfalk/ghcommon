@@ -356,33 +356,39 @@ def generate_changelog(_: argparse.Namespace) -> None:
     auto_prerelease = os.environ.get("AUTO_PRERELEASE", "false").lower() == "true"
     auto_draft = os.environ.get("AUTO_DRAFT", "false").lower() == "true"
 
-    # Find the previous STABLE release tag (vX.Y.Z without -rc suffix).
-    # `git describe --tags --abbrev=0` picks up the tag just created in
-    # this workflow run, which is useless for a changelog. Instead, list
-    # all semver tags, exclude RC tags, sort by version, and take the
-    # second-to-last (the one BEFORE the current release). If there's
-    # only one, fall back to the full history.
-    tag_list = _run_git(
-        [
-            "tag",
-            "-l",
-            "v*.*.*",
-            "--sort=-v:refname",
-        ]
-    )
-    stable_tags = [
-        t
-        for t in tag_list.stdout.strip().splitlines()
-        if t.strip() and "-rc" not in t and "-alpha" not in t and "-beta" not in t
-    ]
-    # The first entry is the tag we just created (or the latest stable);
-    # the second is the "previous release" we want the diff from.
-    if len(stable_tags) >= 2:
-        last_tag = stable_tags[1]
-    elif len(stable_tags) == 1:
-        last_tag = stable_tags[0]
+    # Find the previous STABLE release tag for changelog diffing.
+    #
+    # Priority:
+    # 1. PREVIOUS_VERSION env var (explicit override for parallel
+    #    release lines like 1.x / 2.x / 3.x)
+    # 2. Auto-detect: list all stable semver tags, exclude RC/alpha/beta,
+    #    sort by version, take the second entry (first is the tag we're
+    #    creating right now).
+    previous_override = os.environ.get("PREVIOUS_VERSION", "").strip()
+    if previous_override:
+        last_tag = previous_override
     else:
-        last_tag = ""
+        tag_list = _run_git(
+            [
+                "tag",
+                "-l",
+                "v*.*.*",
+                "--sort=-v:refname",
+            ]
+        )
+        stable_tags = [
+            t
+            for t in tag_list.stdout.strip().splitlines()
+            if t.strip() and "-rc" not in t and "-alpha" not in t and "-beta" not in t
+        ]
+        # The first entry is the tag we just created (or the latest stable);
+        # the second is the "previous release" we want the diff from.
+        if len(stable_tags) >= 2:
+            last_tag = stable_tags[1]
+        elif len(stable_tags) == 1:
+            last_tag = stable_tags[0]
+        else:
+            last_tag = ""
 
     if last_tag:
         log_args = [f"{last_tag}..HEAD"]

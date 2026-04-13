@@ -82,6 +82,11 @@ on:
         required: false
         type: boolean
         default: false
+      previous-version:
+        description: 'Override the auto-detected previous version for changelog generation. Use when maintaining parallel release lines (e.g. 1.x, 2.x) or when auto-detection picks the wrong base. Format: vX.Y.Z'
+        required: false
+        type: string
+        default: ''
     outputs:
       release-created:
         description: 'Whether a release was created'
@@ -445,6 +450,7 @@ jobs:
           RELEASE_STRATEGY: ${{ needs.detect-languages.outputs.release-branch-strategy }}
           AUTO_PRERELEASE: ${{ needs.detect-languages.outputs.auto-prerelease }}
           AUTO_DRAFT: ${{ needs.detect-languages.outputs.auto-draft }}
+          PREVIOUS_VERSION: ${{ inputs.previous-version }}
         run: |
           python3 "$GHCOMMON_SCRIPTS_DIR/release_workflow.py" "generate-changelog"
 
