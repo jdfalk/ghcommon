@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.11.0
+# version: 2.12.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -601,17 +601,34 @@ jobs:
       # version is <= the stable version is now superseded. The RC-only
       # upsert logic above never runs for stable cuts, so without this step
       # superseded drafts/RCs linger indefinitely (see v0.205.1 draft left
-      # behind when v0.206.0 shipped).
+      # behind when v0.206.0 shipped, and 117 RCs accumulated before that).
+      #
+      # Policy:
+      #   - Drafts: delete every superseded one. They're WIP notes, no value.
+      #   - RC prereleases: keep the RC_KEEP_COUNT most recent by createdAt
+      #     for rollback / historical debugging, delete the rest.
       - name: Clean up superseded drafts and prereleases
         if: needs.detect-languages.outputs.release-branch-strategy == 'stable' && steps.release.outcome == 'success' && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           STABLE_VERSION: ${{ steps.version.outputs.version }}
+          RC_KEEP_COUNT: '5'
         run: |
           set -euo pipefail
           echo "Cleaning up drafts and prereleases superseded by $STABLE_VERSION"
+          echo "(keeping the $RC_KEEP_COUNT most recent RC prereleases)"
 
           stable_num="${STABLE_VERSION#v}"
+
+          # Build keep-list: N most recently created prereleases, regardless
+          # of version. Newline-separated tagNames.
+          keep_list=$(gh release list --limit 500 --json tagName,isPrerelease,createdAt \
+            --jq "[.[] | select(.isPrerelease)] | sort_by(.createdAt) | reverse | .[0:${RC_KEEP_COUNT}] | .[].tagName")
+
+          if [ -n "$keep_list" ]; then
+            echo "Keeping these recent RC prereleases:"
+            echo "$keep_list" | sed 's/^/  - /'
+          fi
 
           # List drafts + prereleases. The stable release we just cut has
           # isDraft=false and isPrerelease=false, so it's excluded here.
@@ -624,6 +641,7 @@ jobs:
           fi
 
           deleted=0
+          kept=0
           while IFS= read -r tag; do
             [ -z "$tag" ] && continue
             # base = version stripped of leading v and any -rc/-alpha/-beta suffix
@@ -637,20 +655,30 @@ jobs:
 
             # sort -V outputs smallest first; if base sorts first, base <= stable
             smallest=$(printf '%s\n%s\n' "$base" "$stable_num" | sort -V | head -1)
-            if [ "$smallest" = "$base" ]; then
-              echo "Deleting superseded release: $tag (base $base <= $stable_num)"
-              # --cleanup-tag fails on drafts (no tag exists yet); fall back to plain delete
-              if gh release delete "$tag" --yes --cleanup-tag 2>/dev/null; then
-                deleted=$((deleted + 1))
-              elif gh release delete "$tag" --yes 2>/dev/null; then
-                deleted=$((deleted + 1))
-              else
-                echo "  (could not delete $tag — may have been removed already)"
-              fi
+            if [ "$smallest" != "$base" ]; then
+              # Newer than stable (shouldn't happen, but guard anyway).
+              continue
+            fi
+
+            # Superseded. If it's in the RC keep-list, spare it.
+            if [ -n "$keep_list" ] && printf '%s\n' "$keep_list" | grep -qxF "$tag"; then
+              echo "Keeping recent RC: $tag"
+              kept=$((kept + 1))
+              continue
+            fi
+
+            echo "Deleting superseded release: $tag (base $base <= $stable_num)"
+            # --cleanup-tag fails on drafts (no tag exists yet); fall back to plain delete
+            if gh release delete "$tag" --yes --cleanup-tag 2>/dev/null; then
+              deleted=$((deleted + 1))
+            elif gh release delete "$tag" --yes 2>/dev/null; then
+              deleted=$((deleted + 1))
+            else
+              echo "  (could not delete $tag — may have been removed already)"
             fi
           done <<< "$releases"
 
-          echo "Cleanup done — deleted $deleted superseded release(s)"
+          echo "Cleanup done — deleted $deleted, kept $kept recent RC(s)"
 
       - name: Check release created
         id: check-release
