@@ -103,7 +103,7 @@ jobs:
             --output maintenance/dependency-summary.md
 
       - name: Upload dependency graph
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maintenance-dependency-report
           path: maintenance
@@ -168,7 +168,7 @@ jobs:
           } >> cleanup-report.md
 
       - name: Upload cleanup report
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maintenance-cleanup-report
           path: cleanup-report.md
@@ -213,7 +213,7 @@ jobs:
           fi
 
       - name: Upload license report
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maintenance-license-report
           path: license-report.md

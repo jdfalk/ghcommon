@@ -31,10 +31,10 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # stable
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # stable
 
       - name: Restore cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
 
       - name: Build benchmark target
         run: cargo build --manifest-path testdata/rust/Cargo.toml --release
@@ -59,7 +59,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/rust.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a7bc2366eda11037936ea57d811a43b3418d3073 # v1.21.0
+        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
         with:
           name: Rust Fixture Execution
           tool: 'customSmallerIsBetter'
@@ -69,7 +69,7 @@ jobs:
           external-data-json-path: .github/benchmark-data/rust.json
 
       - name: Upload rust benchmark artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rust-benchmarks
           path: |
@@ -110,7 +110,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/node.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a7bc2366eda11037936ea57d811a43b3418d3073 # v1.21.0
+        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
         with:
           name: Node Fixture Execution
           tool: 'customSmallerIsBetter'
@@ -120,7 +120,7 @@ jobs:
           external-data-json-path: .github/benchmark-data/node.json
 
       - name: Upload node benchmark artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: node-benchmarks
           path: |
@@ -161,7 +161,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/python.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a7bc2366eda11037936ea57d811a43b3418d3073 # v1.21.0
+        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
         with:
           name: Python Fixture Execution
           tool: 'customSmallerIsBetter'
@@ -171,7 +171,7 @@ jobs:
           external-data-json-path: .github/benchmark-data/python.json
 
       - name: Upload Python benchmark results
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: python-benchmarks
           path: |
