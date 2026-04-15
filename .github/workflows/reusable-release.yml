@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.12.0
+# version: 2.13.0
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -305,14 +305,30 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+
+      # Mint a short-lived GitHub App installation token so the tag-push
+      # step inside release-go-action can push refs whose reachable
+      # commits touch .github/workflows/ — the default GITHUB_TOKEN
+      # can't. Falls back to GITHUB_TOKEN if the caller hasn't set up
+      # CI_APP_ID / CI_APP_PRIVATE_KEY (older repos keep working, they
+      # just can't cut releases that include workflow-file changes).
+      - name: Mint App token for tag push
+        id: app-token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+
       - name: Build Go
-        uses: jdfalk/gha-release-go@40780c08214f93512e623418f0c7d457424473bb # v1.0.2+
+        uses: jdfalk/gha-release-go@a7d189ff3dd4b13e7b42f989decf23d7701adab5 # v1.1.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
           system-packages: ${{ inputs.system-packages }}
           pre-build-script: ${{ inputs.pre-build-script }}
           go-experiment: ${{ inputs.go-experiment }}
+          github-token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
 
   # Python Build
   build-python:
