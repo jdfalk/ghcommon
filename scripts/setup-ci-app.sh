@@ -95,7 +95,7 @@ MANIFEST=$(jq -n \
     name: $name,
     url: $url,
     redirect_url: $redirect,
-    public: false,
+    public: true,
     default_events: [],
     default_permissions: {
       contents: "write",
