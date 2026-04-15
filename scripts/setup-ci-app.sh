@@ -172,19 +172,86 @@ SERVER_PID=$!
 # Give the listener a moment to bind before redirecting the browser to it.
 sleep 1
 
-echo
-echo "────────────────────────────────────────"
-echo "Opening your browser. Click 'Create GitHub App' on the GitHub page."
-echo "(If the browser didn't open, visit: file://$TMPDIR/go.html)"
-echo "────────────────────────────────────────"
+GO_URL="file://$TMPDIR/go.html"
 
-# macOS 'open'; fall back to xdg-open for Linux.
-if command -v open >/dev/null 2>&1; then
-  open "file://$TMPDIR/go.html"
-elif command -v xdg-open >/dev/null 2>&1; then
-  xdg-open "file://$TMPDIR/go.html"
+# Copy URL to clipboard so the user can paste into a browser profile of
+# their choice. macOS pbcopy / Linux xclip / wl-copy — best-effort.
+if command -v pbcopy >/dev/null 2>&1; then
+  printf '%s' "$GO_URL" | pbcopy
+  CLIPBOARD_NOTE=" (copied to clipboard)"
+elif command -v xclip >/dev/null 2>&1; then
+  printf '%s' "$GO_URL" | xclip -selection clipboard
+  CLIPBOARD_NOTE=" (copied to clipboard)"
+elif command -v wl-copy >/dev/null 2>&1; then
+  printf '%s' "$GO_URL" | wl-copy
+  CLIPBOARD_NOTE=" (copied to clipboard)"
 else
-  echo "(No browser opener found — open the URL above manually.)"
+  CLIPBOARD_NOTE=""
+fi
+
+echo
+echo "════════════════════════════════════════════════════════════════"
+echo "  IMPORTANT: open the URL below in a PRIVATE / INCOGNITO window."
+echo "  A fresh window has no github.com cookies, so you'll be prompted"
+echo "  to sign in — pick your PERSONAL GitHub account, NOT any"
+echo "  enterprise-managed user (e.g. through a company SSO)."
+echo
+echo "  URL:$CLIPBOARD_NOTE"
+echo "    $GO_URL"
+echo "════════════════════════════════════════════════════════════════"
+echo
+
+# Attempt to auto-launch a private/incognito window. Falls back to
+# printing the URL if no supported browser is found. Set BROWSER=none
+# to skip auto-launch entirely.
+launch_private() {
+  local url="$1"
+  [ "${BROWSER:-}" = "none" ] && return 1
+
+  if [ "$(uname -s)" = "Darwin" ]; then
+    # Preference order: Chrome > Brave > Edge > Arc > Firefox > Safari-fallback
+    if [ -d "/Applications/Google Chrome.app" ]; then
+      open -na "Google Chrome" --args --incognito "$url" && return 0
+    fi
+    if [ -d "/Applications/Brave Browser.app" ]; then
+      open -na "Brave Browser" --args --incognito "$url" && return 0
+    fi
+    if [ -d "/Applications/Microsoft Edge.app" ]; then
+      open -na "Microsoft Edge" --args --inprivate "$url" && return 0
+    fi
+    if [ -d "/Applications/Arc.app" ]; then
+      # Arc doesn't have a stable --incognito flag; open normally and
+      # tell the user to use a Private space.
+      open -na "Arc" "$url" && return 0
+    fi
+    if [ -d "/Applications/Firefox.app" ]; then
+      open -na "Firefox" --args -private-window "$url" && return 0
+    fi
+    # Last-resort Safari (no CLI private mode) — user must Cmd-Shift-N
+    open "$url" && return 0
+  else
+    # Linux
+    for b in google-chrome chromium-browser chromium brave-browser microsoft-edge firefox; do
+      if command -v "$b" >/dev/null 2>&1; then
+        case "$b" in
+        firefox)
+          "$b" --private-window "$url" &
+          return 0
+          ;;
+        *)
+          "$b" --incognito "$url" &
+          return 0
+          ;;
+        esac
+      fi
+    done
+    command -v xdg-open >/dev/null 2>&1 && xdg-open "$url" && return 0
+  fi
+  return 1
+}
+
+if ! launch_private "$GO_URL"; then
+  echo "(Could not auto-launch a browser — paste the URL above manually.)"
 fi
 
 # ─── wait for callback ──────────────────────────────────────────────────────
