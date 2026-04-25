@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "repos": [
+    {
+      "owner": "jdfalk",
+      "name": "magnet-handler",
+      "flavor": "cli",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T13:01:32Z",
+      "last_bootstrapped": "2026-04-25T13:01:32Z"
+    }
+  ]
+}

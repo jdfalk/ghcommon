@@ -700,3 +700,6 @@ logs/
 
 # Workflow debugging output (should not be committed)
 scripts/workflow-debug-output/
+
+# Claude Code per-machine local settings — never committed
+.claude/settings.local.json
