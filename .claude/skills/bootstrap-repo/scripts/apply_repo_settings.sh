@@ -35,3 +35,9 @@ JSON
 echo "→ Applying repo settings to ${OWNER}/${REPO}"
 echo "${PAYLOAD}" | gh api -X PATCH "repos/${OWNER}/${REPO}" --input - >/dev/null
 echo "✓ Repo settings applied"
+
+# Clear any interaction-limit so PRs/issues/comments are open to all users.
+# (We considered collaborators_only, but GitHub caps the expiry at six_months
+# which made the restriction annoying to keep in place.)
+gh api -X DELETE "repos/${OWNER}/${REPO}/interaction-limits" >/dev/null 2>&1 || true
+echo "✓ Interaction limits cleared"

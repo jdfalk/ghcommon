@@ -686,6 +686,14 @@ class RepoSetupSyncer:
 
             # Create the YAML content with comment
             yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False)
+            # PyYAML emits `time: 09:00` unquoted, but Dependabot's YAML 1.1 parser
+            # reads it as a sexagesimal integer (540) and rejects it. Quote HH:MM values.
+            yaml_content = re.sub(
+                r"^(\s*time:\s+)(\d{2}:\d{2})\s*$",
+                r'\1"\2"',
+                yaml_content,
+                flags=re.MULTILINE,
+            )
             new_content = comment + "\n" + yaml_content
 
             # Check if the content is already identical
