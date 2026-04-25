@@ -170,8 +170,8 @@ fi
 echo "→ Syncing instruction/dependabot/AGENTS files from ghcommon"
 SYNC_SCRIPT="${GHCOMMON}/scripts/sync-repo-setup.py"
 if [[ -f ${SYNC_SCRIPT} ]]; then
-  python3 "${SYNC_SCRIPT}" --target "${REPO_PATH}" ||
-    echo "  (sync-repo-setup.py failed; continuing — may need flag adjustment)"
+  python3 "${SCRIPT_DIR}/_sync_one_repo.py" "${GHCOMMON}" "${REPO_PATH}" ||
+    echo "  (sync shim failed; continuing)"
 else
   echo "  (sync-repo-setup.py not found at ${SYNC_SCRIPT}; skipping)"
 fi
@@ -182,9 +182,10 @@ if [[ ${SKIP_LABELS} -eq 0 ]]; then
   echo "→ Syncing labels from ghcommon/labels.json"
   LABEL_SCRIPT="${GHCOMMON}/scripts/sync-github-labels.py"
   if [[ -f ${LABEL_SCRIPT} ]]; then
-    GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" \
-      python3 "${LABEL_SCRIPT}" --owner "${OWNER}" --repo "${NAME}" \
-      --labels "${GHCOMMON}/labels.json" ||
+    # ghcommon's sync-github-labels.py reads PAT_TOKEN or GITHUB_TOKEN, not GH_TOKEN
+    GITHUB_TOKEN="${PAT_TOKEN:-${GITHUB_TOKEN:-$(gh auth token)}}" \
+      python3 "${LABEL_SCRIPT}" "${OWNER}" "${NAME}" \
+      --labels-file "${GHCOMMON}/labels.json" ||
       echo "  (sync-github-labels.py failed; continuing)"
   fi
 fi
