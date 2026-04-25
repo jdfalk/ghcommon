@@ -3,11 +3,219 @@
   "repos": [
     {
       "owner": "jdfalk",
+      "name": "auto-module-tagging-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:16Z",
+      "last_bootstrapped": "2026-04-25T16:44:16Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "ci-generate-matrices-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:30Z",
+      "last_bootstrapped": "2026-04-25T16:45:30Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "ci-workflow-helpers-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:34Z",
+      "last_bootstrapped": "2026-04-25T16:45:34Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "detect-languages-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:59Z",
+      "last_bootstrapped": "2026-04-25T16:44:59Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "docs-generator-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:26Z",
+      "last_bootstrapped": "2026-04-25T16:45:26Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "generate-version-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:25Z",
+      "last_bootstrapped": "2026-04-25T16:44:25Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "get-frontend-config-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:18Z",
+      "last_bootstrapped": "2026-04-25T16:45:18Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-docker",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:51Z",
+      "last_bootstrapped": "2026-04-25T16:44:51Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-frontend",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:55Z",
+      "last_bootstrapped": "2026-04-25T16:44:55Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-go",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:44Z",
+      "last_bootstrapped": "2026-04-25T16:44:44Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-protobuf",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:09Z",
+      "last_bootstrapped": "2026-04-25T16:45:09Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-python",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:06Z",
+      "last_bootstrapped": "2026-04-25T16:45:06Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "gha-release-rust",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:02Z",
+      "last_bootstrapped": "2026-04-25T16:45:02Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "jft-github-actions",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:53Z",
+      "last_bootstrapped": "2026-04-25T16:45:53Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "load-config-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:22Z",
+      "last_bootstrapped": "2026-04-25T16:45:22Z"
+    },
+    {
+      "owner": "jdfalk",
       "name": "magnet-handler",
       "flavor": "cli",
       "mode": "adopt",
       "first_bootstrapped": "2026-04-25T13:01:32Z",
       "last_bootstrapped": "2026-04-25T13:01:32Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "package-assets-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:14Z",
+      "last_bootstrapped": "2026-04-25T16:45:14Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "pr-auto-label-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:42Z",
+      "last_bootstrapped": "2026-04-25T16:45:42Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-docker-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:29Z",
+      "last_bootstrapped": "2026-04-25T16:44:29Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-frontend-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:21Z",
+      "last_bootstrapped": "2026-04-25T16:44:21Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-go-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:48Z",
+      "last_bootstrapped": "2026-04-25T16:44:48Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-protobuf-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:33Z",
+      "last_bootstrapped": "2026-04-25T16:44:33Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-python-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:41Z",
+      "last_bootstrapped": "2026-04-25T16:44:41Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-rust-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:44:37Z",
+      "last_bootstrapped": "2026-04-25T16:44:37Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "release-strategy-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:37Z",
+      "last_bootstrapped": "2026-04-25T16:45:37Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "security-summary-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:49Z",
+      "last_bootstrapped": "2026-04-25T16:45:49Z"
+    },
+    {
+      "owner": "jdfalk",
+      "name": "update-action-docker-ref-action",
+      "flavor": "action",
+      "mode": "adopt",
+      "first_bootstrapped": "2026-04-25T16:45:45Z",
+      "last_bootstrapped": "2026-04-25T16:45:45Z"
     }
   ]
 }
