@@ -1,6 +1,6 @@
 ---
 name: bootstrap-repo
-description: Create a new GitHub repo or apply ghcommon house standards to an existing one. Use when the user says "create a new repo", "bootstrap a repo", "set up a new repo to our standards", "apply our standards to repo X", "make this repo compliant", "new action/library/service repo", or wants merge settings, branch protection, labels, dependabot, and instruction files configured in one shot. Wraps gh repo create, applies repo-level settings (rebase-only, auto-merge, no delete) and branch protection on main, runs ghcommon's label and instruction-file sync scripts, and seeds flavor-specific overlay files.
+description: Create a new GitHub repo or apply ghcommon house standards to an existing one. Use when the user says "create a new repo", "bootstrap a repo", "set up a new repo to our standards", "apply our standards to repo X", "make this repo compliant", "new action/library/service/cli repo", or wants merge settings, branch protection, labels, dependabot, and instruction files configured in one shot. Wraps gh repo create, applies repo-level settings (rebase-only, auto-merge, no delete) and branch protection on main, runs ghcommon's label and instruction-file sync scripts, seeds flavor-specific overlay files, and records the bootstrap in ghcommon/.github/bootstrapped-repos.json.
 ---
 
 # bootstrap-repo
@@ -42,7 +42,8 @@ Steps 2 and 8 are split because branch protection requires `main` to exist.
 
 - Building a GitHub Action → `--flavor action`
 - Building a reusable library/SDK/package → `--flavor library`
-- Building a deployable service or app → `--flavor service`
+- Building a deployable service or app (containerized) → `--flavor service`
+- Building a distributable binary/CLI (goreleaser, brew, etc) → `--flavor cli`
 
 ## Usage
 
@@ -74,6 +75,16 @@ Standalone use:
     --owner jdfalk --repo my-thing --flavor library \
     --repo-path ~/repos/github.com/jdfalk/my-thing
 ```
+
+## Registry
+
+Every successful bootstrap appends/updates `ghcommon/.github/bootstrapped-repos.json`.
+Schema: `{version, repos: [{owner, name, flavor, mode, first_bootstrapped, last_bootstrapped}]}`.
+Idempotent (existing entries get `last_bootstrapped` refreshed; `first_bootstrapped`
+is preserved).
+
+The skill writes the file but does not commit it. Commit it from ghcommon to share
+across machines and to enable future "bootstrap-all" sweeps.
 
 ## What this skill does NOT do
 
