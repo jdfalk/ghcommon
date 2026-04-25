@@ -102,7 +102,12 @@ else
       DRIFT=1
     fi
   }
-  check '.required_status_checks.strict' 'true'
+  # required_status_checks may be null (no PR-triggering workflows). Only check
+  # .strict when the object exists.
+  HAS_RSC=$(echo "${PROTECTION}" | jq -r '.required_status_checks != null')
+  if [[ ${HAS_RSC} == "true" ]]; then
+    check '.required_status_checks.strict' 'true'
+  fi
   check '.enforce_admins.enabled' 'false'
   check '.required_pull_request_reviews.dismiss_stale_reviews' 'true'
   check '.required_pull_request_reviews.required_approving_review_count' '0'
