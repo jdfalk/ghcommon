@@ -23,10 +23,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKFLOWS_DIR="${WORKFLOWS_DIR:-${REPO_PATH}/.github/workflows}"
 
 # Discover status check contexts (job IDs from PR-triggering workflows).
+# Avoid `mapfile` — macOS ships bash 3.2 which lacks it.
+CONTEXTS=()
 if [[ -d ${WORKFLOWS_DIR} ]]; then
-  mapfile -t CONTEXTS < <(python3 "${SCRIPT_DIR}/discover_status_checks.py" "${WORKFLOWS_DIR}")
-else
-  CONTEXTS=()
+  while IFS= read -r line; do
+    [[ -n ${line} ]] && CONTEXTS+=("${line}")
+  done < <(python3 "${SCRIPT_DIR}/discover_status_checks.py" "${WORKFLOWS_DIR}")
 fi
 
 # Build required_status_checks JSON: null if no contexts, object otherwise.
