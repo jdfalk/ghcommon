@@ -60,6 +60,30 @@ Deployable application or service.
 - `.github/workflows/publish-docker.yml` (recommended)
 - `.github/dependabot.yml`, `.github/copilot-instructions.md`, `.github/instructions/`
 
+## cli
+
+Distributable binary or CLI tool, shipped via goreleaser / brew / winget /
+direct install scripts — **not** a containerized service.
+
+**Overlay files seeded if missing**
+
+- `CHANGELOG.md` — Keep-a-Changelog template (same as library)
+
+**Template repo**: `jdfalk/jft-cli-template` (does not yet exist; falls back to empty)
+
+**Notable required files**
+
+- `README.md` with **Installation** section (per-platform install steps), `LICENSE`
+- `CHANGELOG.md`
+- `.goreleaser.yml` or equivalent release config (tool-specific; not seeded by skill)
+- Language-appropriate manifest (`go.mod`, `Cargo.toml`, etc)
+- `.github/dependabot.yml`, `.github/copilot-instructions.md`, `.github/instructions/`
+
+**Differs from `service`**: no `Dockerfile`. CLIs are distributed as native binaries
+to user machines, not deployed as containers. Differs from `library`: produces a
+binary artifact, not an importable package; CHANGELOG drives the release tag, not
+a SemVer of an exported API.
+
 ## Common to all flavors
 
 These come from `ghcommon/scripts/sync-repo-setup.py`, regardless of flavor:

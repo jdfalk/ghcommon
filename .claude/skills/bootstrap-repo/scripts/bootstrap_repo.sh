@@ -5,10 +5,10 @@
 #   create — gh repo create + apply standards from empty
 #   adopt  — apply standards to an existing repo
 #
-# Flavors: action | library | service
+# Flavors: action | library | service | cli
 #
 # Usage:
-#   bootstrap_repo.sh --flavor {action|library|service} \
+#   bootstrap_repo.sh --flavor {action|library|service|cli} \
 #                     --mode {create|adopt} \
 #                     --name REPO \
 #                     [--owner jdfalk] [--private|--public] \
@@ -101,8 +101,8 @@ done
   exit 2
 }
 
-case "${FLAVOR}" in action | library | service) ;; *)
-  echo "error: --flavor must be action, library, or service" >&2
+case "${FLAVOR}" in action | library | service | cli) ;; *)
+  echo "error: --flavor must be action, library, service, or cli" >&2
   exit 2
   ;;
 esac
@@ -232,6 +232,22 @@ FROM scratch
 EOF
   fi
   ;;
+cli)
+  # CLI / distributable binary. No Dockerfile (binary is shipped via goreleaser
+  # / brew / winget, not containers). Same CHANGELOG seed as library.
+  if [[ ! -f "${REPO_PATH}/CHANGELOG.md" ]]; then
+    cat >"${REPO_PATH}/CHANGELOG.md" <<'EOF'
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+EOF
+  fi
+  ;;
 esac
 
 # ---------- seed repository-config.yml ----------
@@ -276,6 +292,16 @@ fi
 
 "${SCRIPT_DIR}/verify_bootstrap.sh" --owner "${OWNER}" --repo "${NAME}" \
   --repo-path "${REPO_PATH}" --flavor "${FLAVOR}"
+
+# ---------- update registry ----------
+
+REGISTRY="${GHCOMMON}/.github/bootstrapped-repos.json"
+python3 "${SCRIPT_DIR}/_update_registry.py" \
+  --registry "${REGISTRY}" \
+  --owner "${OWNER}" --name "${NAME}" \
+  --flavor "${FLAVOR}" --mode "${MODE}"
+echo "→ Registry updated: ${REGISTRY}"
+echo "  (commit ghcommon/.github/bootstrapped-repos.json to record this bootstrap)"
 
 # ---------- next steps ----------
 
