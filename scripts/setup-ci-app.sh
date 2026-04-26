@@ -41,6 +41,7 @@ STATE=$(openssl rand -hex 16)
 DEFAULT_REPOS=(
   jdfalk/audiobook-organizer
   jdfalk/ghcommon
+  jdfalk/migrate-loop
   jdfalk/release-go-action
   jdfalk/gha-release-go
   jdfalk/release-frontend-action
