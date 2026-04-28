@@ -6,7 +6,7 @@
 # Install with: pip install -r scripts/requirements-notifications.txt
 
 # HTTP library for GitHub API calls
-requests>=2.31.0
+requests>=2.33.1
 
 # Environment variable management
-python-dotenv>=1.0.0
+python-dotenv>=1.2.2

@@ -5,7 +5,7 @@
 # Python dependencies for gcommon automation scripts
 
 # Required for setup_dependabot_all_repos.py
-PyYAML>=6.0
-PyJWT[crypto]>=2.8.0
-cryptography>=41.0.0
-requests>=2.31.0
+PyYAML>=6.0.3
+PyJWT[crypto]>=2.12.1
+cryptography>=41.0.7
+requests>=2.33.1

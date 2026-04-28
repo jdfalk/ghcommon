@@ -344,7 +344,7 @@ jobs:
           fi
 
       - name: Set up Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ inputs.node-version }}
 
@@ -466,7 +466,7 @@ jobs:
       - name: Check Go test coverage
         if: ${{ !inputs.skip-tests }}
         continue-on-error: true
-        uses: vladopajic/go-test-coverage@f190f667e23b4441202d0bab0f8c2e7bce8925b6 # v2.18.4
+        uses: vladopajic/go-test-coverage@8cfd056d3bc5cc2bc64a840ded0c907aaae3dc46 # v2.18.7
         with:
           config: ./.testcoverage.yml
 
@@ -672,7 +672,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Set up Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ matrix.node-version }}
 
