@@ -320,7 +320,7 @@ jobs:
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
 
       - name: Build Go
-        uses: jdfalk/gha-release-go@a7d189ff3dd4b13e7b42f989decf23d7701adab5 # v1.1.0
+        uses: jdfalk/gha-release-go@c7f72a3df997a97a1c9433893d4d25fc98f99c7e # v1.1.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -377,7 +377,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Frontend
-        uses: jdfalk/gha-release-frontend@1e52bef3914c9157fbc59faa6ca8212b6fa6133a # v1.0.2+
+        uses: jdfalk/gha-release-frontend@f77c3d10f7d3f6be435be9bbbd1446f5599f48aa # v1.0.2+
 
   # Docker Build
   build-docker:
@@ -392,7 +392,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Docker
-        uses: jdfalk/gha-release-docker@ae29d4b40344ec00050679a42dacfee84f4a1a2c # v1.0.2+
+        uses: jdfalk/gha-release-docker@9f854f0837efd3eac6647c93b86ca06d6b58cf6a # v1.0.2+
         with:
           registry: ${{ needs.detect-languages.outputs.registry }}
           image-name: ${{ needs.detect-languages.outputs.image-name }}
@@ -475,7 +475,7 @@ jobs:
           path: ./artifacts
       - name: Package and organize release artifacts
         id: package-artifacts
-        uses: jdfalk/package-assets-action@494bfba81714612985e0f3ca7af43c42bdd3c629 # v1.2.0
+        uses: jdfalk/package-assets-action@49725e715503b7021778d248f56fe50e001a68ed # v1.2.0
         with:
           artifacts-dir: ./artifacts
 
