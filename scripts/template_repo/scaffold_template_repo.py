@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/template_repo/scaffold_template_repo.py
-# version: 1.3.3
+# version: 1.5.0
 # guid: 7f2d3a2e-4b5c-8d9e-0f1a-2b3c4d5e6f70
 
 """Scaffold a minimal, public-safe template repository to a target directory.
@@ -516,6 +516,16 @@ class Options:
     with_python: bool
     with_dependabot: bool
     with_releases: bool
+    with_docker: bool
+    docker_base_image: str
+    docker_apt_packages: tuple[str, ...]
+    docker_pip_packages: tuple[str, ...]
+    docker_go_version: str
+    with_changelog: bool
+    with_todo: bool
+    with_claudemd: bool
+    with_reusable_workflows: bool
+    reusable_workflows_ref: str
 
 
 def render_license(license_id: str, owner: str, year: str) -> str:
@@ -549,6 +559,14 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
     files.append((root / "SECURITY.md", SECURITY))
     files.append((root / ".gitignore", GITIGNORE))
 
+    # Project hygiene files modeled on the rest of jdfalk's active repos.
+    if opts.with_changelog:
+        files.append((root / "CHANGELOG.md", render_changelog(opts)))
+    if opts.with_todo:
+        files.append((root / "TODO.md", render_todo(opts)))
+    if opts.with_claudemd:
+        files.append((root / "CLAUDE.md", render_claudemd(opts)))
+
     # Root linters/configs
     files.append((root / ".editorconfig", EDITORCONFIG))
     files.append((root / ".prettierrc.yaml", PRETTIERRC_YAML))
@@ -578,12 +596,23 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
             ISSUE_TEMPLATE_FEATURE,
         )
     )
-    files.append(
-        (
-            root / ".github" / "workflows" / "ci.yml",
-            render_ci_yaml(include_go=opts.with_go, include_python=opts.with_python),
+    # Either the standalone CI yaml or a thin caller of ghcommon's reusable-ci.
+    # When --with-reusable-workflows is set, the standalone copy is replaced
+    # with a thin caller that delegates to ghcommon — the repo's own
+    # workflow-config.yaml carries the per-repo knobs.
+    if opts.with_reusable_workflows:
+        files.append((root / ".github" / "workflows" / "ci.yml", render_reusable_ci(opts)))
+        files.append(
+            (root / ".github" / "workflows" / "security.yml", render_reusable_security(opts))
         )
-    )
+        files.append((root / ".github" / "workflow-config.yaml", render_workflow_config(opts)))
+    else:
+        files.append(
+            (
+                root / ".github" / "workflows" / "ci.yml",
+                render_ci_yaml(include_go=opts.with_go, include_python=opts.with_python),
+            )
+        )
     files.append((root / ".github" / "commit-messages.md", COMMIT_MESSAGES_MD))
     files.append(
         (
@@ -616,6 +645,10 @@ def plan_files(opts: Options) -> list[tuple[Path, str]]:
     # Optional release workflows
     if opts.with_releases:
         files.extend(plan_release_workflows(opts))
+
+    # Optional Docker overlay (Dockerfile + GHCR build/push workflow)
+    if opts.with_docker:
+        files.extend(plan_docker_overlay(opts))
 
     return files
 
@@ -839,6 +872,402 @@ Disable or delete workflows you don't need.
     return out
 
 
+def render_changelog(opts: Options) -> str:
+    return f"""<!-- file: CHANGELOG.md -->
+<!-- version: 0.1.0 -->
+<!-- guid: c4a4ce10-0000-4000-8000-000000000001 -->
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Initial scaffold of {opts.name}.
+"""
+
+
+def render_todo(opts: Options) -> str:
+    return f"""<!-- file: TODO.md -->
+<!-- version: 0.1.0 -->
+<!-- guid: 1010d010-0000-4000-8000-000000000001 -->
+
+# {opts.name} — TODO
+
+Canonical index of outstanding work. Each item links to a spec, plan, or issue
+where the details live; this file exists so the whole backlog is scannable on
+one page.
+
+## Active
+
+- [ ] Initial setup tasks (replace with real work).
+
+## Backlog
+
+_(empty)_
+
+## Recently completed
+
+_(empty)_
+"""
+
+
+def render_claudemd(opts: Options) -> str:
+    return f"""<!-- file: CLAUDE.md -->
+<!-- version: 0.1.0 -->
+<!-- guid: c1a4dec0-0000-4000-8000-000000000001 -->
+
+# CLAUDE.md
+
+Entry point for AI agent instructions in **{opts.name}**.
+
+All detailed agent instructions live in `.github/`. This file is a pointer.
+
+## Quick links
+
+- **Coding standards & architecture:** [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- **Per-language conventions:** [.github/instructions/](.github/instructions/)
+- **Issue / PR templates:** [.github/](./.github/)
+- **Full file index:** [AGENTS.md](AGENTS.md)
+
+## Critical rules
+
+1. **Git:** Conventional commits mandatory. Pin all action references to SHAs.
+2. **File headers:** All files need versioned headers (file / version / guid).
+   Bump the version on every change.
+3. **Workflows:** Edit reusable-workflow callers, not the reusables themselves
+   (those live in `jdfalk/ghcommon`).
+"""
+
+
+def render_workflow_config(opts: Options) -> str:
+    return """# file: .github/workflow-config.yaml
+# version: 1.0.0
+# guid: c0fc0f1f-0000-4000-8000-000000000001
+#
+# Per-repo knobs for the reusable workflows in jdfalk/ghcommon. Toggle features
+# off here when a repo doesn't need them rather than forking the reusables.
+
+build:
+  go_versions: ['1.25']
+  python_versions: ['3.13']
+  node_versions: ['22']
+  platforms: ['linux/amd64', 'linux/arm64']
+  enable_protobuf: false
+  enable_docker: false
+  enable_cross_compile: false
+  enable_coverage: false
+  enable_security_scan: true
+"""
+
+
+def render_reusable_ci(opts: Options) -> str:
+    # Default to @main with a TODO; ghcommon's update-action-docker-ref-action
+    # rewrites this to a pinned SHA on the next CI run.
+    ref = opts.reusable_workflows_ref or "main"
+    return f"""# file: .github/workflows/ci.yml
+# version: 1.0.0
+# guid: c0c4ce11-0000-4000-8000-000000000001
+#
+# Thin caller of jdfalk/ghcommon/.github/workflows/reusable-ci.yml.
+# Repo-specific knobs live in .github/workflow-config.yaml. The action ref
+# below SHOULD be a pinned SHA in production — `@{ref}` is the scaffold
+# default; the next CI run's pin-actions-to-hashes step will rewrite it.
+
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {{}}
+
+concurrency:
+  group: ${{{{ github.workflow }}}}-${{{{ github.ref }}}}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  actions: write
+  checks: write
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  ci:
+    name: Run CI
+    uses: jdfalk/ghcommon/.github/workflows/reusable-ci.yml@{ref}
+    secrets: inherit
+"""
+
+
+def render_reusable_security(opts: Options) -> str:
+    ref = opts.reusable_workflows_ref or "main"
+    return f"""# file: .github/workflows/security.yml
+# version: 1.0.0
+# guid: c0c4ce12-0000-4000-8000-000000000001
+
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+  workflow_dispatch: {{}}
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security:
+    uses: jdfalk/ghcommon/.github/workflows/reusable-security.yml@{ref}
+    secrets: inherit
+"""
+
+
+def plan_docker_overlay(opts: Options) -> list[tuple[Path, str]]:
+    """Generate a Dockerfile + GHCR build/push workflow.
+
+    The Dockerfile extends a base that already mirrors a GitHub Actions
+    Ubuntu runner (gh CLI, git, curl, build-essentials, locales) and layers
+    extra deps on top. Default base is the catthehacker `act` image, which
+    is the closest publicly-available "GHA runner" container — switch via
+    --docker-base-image when the user has a custom base.
+
+    The build workflow targets ghcr.io/<owner>/<name>, multi-arch
+    (linux/amd64, linux/arm64), with attestation + SBOM, on push to main
+    (tag :sha + :latest), on git tag v* (tag :version + :latest), and a
+    weekly cron rebuild to pick up upstream patches without a code change.
+    """
+    root = opts.target_dir
+    out: list[tuple[Path, str]] = []
+
+    # Optional Go install layer (skip if go_version is empty).
+    go_layer = ""
+    if opts.docker_go_version:
+        go_layer = f"""
+# --- Go toolchain (pinned) ---
+ENV GO_VERSION={opts.docker_go_version}
+RUN set -eux; \\
+    arch="$(dpkg --print-architecture)"; \\
+    case "$arch" in \\
+      amd64) goarch=amd64 ;; \\
+      arm64) goarch=arm64 ;; \\
+      *) echo "unsupported arch: $arch" >&2; exit 1 ;; \\
+    esac; \\
+    curl -fsSL "https://go.dev/dl/go${{GO_VERSION}}.linux-${{goarch}}.tar.gz" -o /tmp/go.tgz; \\
+    tar -C /usr/local -xzf /tmp/go.tgz; \\
+    rm /tmp/go.tgz
+ENV PATH=/usr/local/go/bin:/root/go/bin:$PATH \\
+    GOPATH=/root/go
+"""
+
+    # Optional apt layer.
+    apt_layer = ""
+    if opts.docker_apt_packages:
+        pkgs = " ".join(sorted(set(opts.docker_apt_packages)))
+        apt_layer = f"""
+# --- Extra apt packages ---
+RUN apt-get update \\
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends {pkgs} \\
+ && rm -rf /var/lib/apt/lists/*
+"""
+
+    # Optional pip layer.
+    pip_layer = ""
+    if opts.docker_pip_packages:
+        # Render as one pip install line; quote each spec to allow git+ URLs.
+        spec = " ".join(f'"{p}"' for p in opts.docker_pip_packages)
+        pip_layer = f"""
+# --- Extra Python packages (system pip; image is a build/CI runner, not a multi-tenant host) ---
+RUN python3 -m pip install --no-cache-dir --break-system-packages --upgrade pip \\
+ && python3 -m pip install --no-cache-dir --break-system-packages {spec}
+"""
+
+    dockerfile = f"""# file: Dockerfile
+# version: 1.0.0
+# guid: f0c1ker0-0000-4000-8000-000000000001
+#
+# Extends a GitHub Actions-style Ubuntu base with the project's runtime
+# dependencies. Pinning the base by SHA in production is left to the caller
+# (set via the IMAGE_BASE build-arg in your CI). The named tag below is the
+# floor; CI should override with a digest for reproducibility.
+
+ARG IMAGE_BASE={opts.docker_base_image}
+FROM ${{IMAGE_BASE}}
+
+# Provenance labels — picked up by docker/metadata-action and by `gh
+# attestation verify` when consumers want to confirm where the image came
+# from. Override at build time with --label or via metadata-action.
+LABEL org.opencontainers.image.source="https://github.com/{opts.owner}/{opts.name}" \\
+      org.opencontainers.image.title="{opts.name}" \\
+      org.opencontainers.image.description="{opts.description}" \\
+      org.opencontainers.image.licenses="{opts.license}"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive \\
+    LANG=C.UTF-8 \\
+    LC_ALL=C.UTF-8
+
+# Baseline tools — these are present on a stock GHA ubuntu-latest runner;
+# pinning them here means the image is a drop-in for `runs-on: ubuntu-latest`
+# users who switch to `container:`. If your base already has them this is a
+# fast no-op apt cache hit.
+RUN apt-get update \\
+ && apt-get install -y --no-install-recommends \\
+        ca-certificates curl git gnupg jq make tar unzip xz-utils \\
+ && rm -rf /var/lib/apt/lists/* \\
+ && (command -v gh >/dev/null 2>&1 || ( \\
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \\
+          | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg \\
+        && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \\
+        && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \\
+            > /etc/apt/sources.list.d/github-cli.list \\
+        && apt-get update \\
+        && apt-get install -y --no-install-recommends gh \\
+        && rm -rf /var/lib/apt/lists/* \\
+    ))
+{go_layer}{apt_layer}{pip_layer}
+WORKDIR /workspace
+"""
+
+    out.append((root / "Dockerfile", dockerfile))
+    out.append((root / ".dockerignore", DOCKERIGNORE))
+
+    out.append(
+        (
+            root / ".github" / "workflows" / "build-image.yml",
+            render_docker_build_workflow(opts),
+        )
+    )
+    return out
+
+
+DOCKERIGNORE = """# file: .dockerignore
+# version: 1.0.0
+# guid: f0c1ker0-0000-4000-8000-000000000002
+
+.git
+.github
+.vscode
+.idea
+node_modules
+*.log
+.DS_Store
+"""
+
+
+def render_docker_build_workflow(opts: Options) -> str:
+    return """# file: .github/workflows/build-image.yml
+# version: 1.0.0
+# guid: f0c1ker0-0000-4000-8000-000000000003
+#
+# Build and publish a multi-arch container image to GHCR.
+#
+# Triggers:
+#   * push to main         → tag :sha-<short> + :latest
+#   * push of v* tag       → tag :<version> + :latest
+#   * weekly cron          → rebuild :latest from the same source so upstream
+#                            base-image patches roll in without a code commit
+#   * workflow_dispatch    → manual rebuild
+#
+# The image name follows ghcr.io/<owner>/<repo> by convention. Override via
+# the IMAGE_NAME repo variable if a different name is needed.
+
+name: Build image
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  schedule:
+    - cron: '0 9 * * 1'  # Mondays 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ vars.IMAGE_NAME || format('{0}/{1}', github.repository_owner, github.event.repository.name) }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      # NOTE: action refs are major-version tags here. The repo's
+      # pin-actions-to-hashes step (or dependabot) will rewrite each `@vN`
+      # to a digest-pinned `@<sha> # vN.M.K` on first run. Don't hand-pin
+      # SHAs at scaffold time — there's no source of truth for "the latest
+      # known-good SHA" without a network round-trip.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Attest provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+"""
+
+
 def ensure_parents(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -907,6 +1336,70 @@ def parse_args(argv: list[str]) -> Options:
         action="store_true",
         help="Include optional release workflows for selected languages",
     )
+    parser.add_argument(
+        "--with-docker",
+        action="store_true",
+        help="Include Dockerfile + multi-arch GHCR build/push workflow",
+    )
+    parser.add_argument(
+        "--docker-base-image",
+        default="ghcr.io/catthehacker/ubuntu:full-22.04",
+        help=(
+            "Base image for the Dockerfile when --with-docker is set. "
+            "Default mirrors a GitHub Actions Ubuntu runner; catthehacker's "
+            "'full-22.04' is the known-good tag — verify before bumping to 24.04."
+        ),
+    )
+    parser.add_argument(
+        "--docker-apt",
+        action="append",
+        default=[],
+        help="Additional apt package to install in the image (repeatable)",
+    )
+    parser.add_argument(
+        "--docker-pip",
+        action="append",
+        default=[],
+        help="Additional pip package spec to install in the image (repeatable; supports git+URLs)",
+    )
+    parser.add_argument(
+        "--docker-go-version",
+        default="",
+        help="Pin a Go toolchain into the image (e.g. 1.25.0). Empty = no Go layer.",
+    )
+    parser.add_argument(
+        "--with-changelog",
+        action="store_true",
+        help="Include a CHANGELOG.md skeleton (Keep a Changelog format)",
+    )
+    parser.add_argument(
+        "--with-todo",
+        action="store_true",
+        help="Include a TODO.md skeleton",
+    )
+    parser.add_argument(
+        "--with-claudemd",
+        action="store_true",
+        help="Include a CLAUDE.md pointing at .github/ instructions (matches jdfalk repo conventions)",
+    )
+    parser.add_argument(
+        "--with-reusable-workflows",
+        action="store_true",
+        help=(
+            "Replace the standalone ci.yml with a thin caller of "
+            "jdfalk/ghcommon/.github/workflows/reusable-ci.yml, plus "
+            "security.yml and .github/workflow-config.yaml."
+        ),
+    )
+    parser.add_argument(
+        "--reusable-workflows-ref",
+        default="main",
+        help=(
+            "Git ref for the ghcommon reusable workflows. Defaults to 'main'. "
+            "Production callers SHOULD pin to a SHA — the next pin-actions "
+            "step rewrites '@main' automatically."
+        ),
+    )
 
     args = parser.parse_args(argv)
     target_dir = normalize_path(args.target)
@@ -924,6 +1417,16 @@ def parse_args(argv: list[str]) -> Options:
         with_python=args.with_python,
         with_dependabot=args.with_dependabot,
         with_releases=args.with_releases,
+        with_docker=args.with_docker,
+        docker_base_image=args.docker_base_image,
+        docker_apt_packages=tuple(args.docker_apt),
+        docker_pip_packages=tuple(args.docker_pip),
+        docker_go_version=args.docker_go_version,
+        with_changelog=args.with_changelog,
+        with_todo=args.with_todo,
+        with_claudemd=args.with_claudemd,
+        with_reusable_workflows=args.with_reusable_workflows,
+        reusable_workflows_ref=args.reusable_workflows_ref,
     )
 
 
