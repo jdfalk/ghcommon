@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/template_repo/scaffold_template_repo.py
-# version: 1.5.0
+# version: 1.7.0
 # guid: 7f2d3a2e-4b5c-8d9e-0f1a-2b3c4d5e6f70
 
 """Scaffold a minimal, public-safe template repository to a target directory.
@@ -521,6 +521,7 @@ class Options:
     docker_apt_packages: tuple[str, ...]
     docker_pip_packages: tuple[str, ...]
     docker_go_version: str
+    docker_python_version: str
     with_changelog: bool
     with_todo: bool
     with_claudemd: bool
@@ -1085,15 +1086,28 @@ RUN apt-get update \\
  && rm -rf /var/lib/apt/lists/*
 """
 
-    # Optional pip layer.
+    # Optional Python layer via uv.
+    # uv installs as a single static binary, brings in a modern interpreter
+    # under /opt/python, creates a system venv at /opt/venv, and installs
+    # packages into it. This sidesteps PEP 668 / --break-system-packages
+    # entirely and gives every script in the image consistent access to a
+    # known Python version + deps. Only emitted when --docker-pip is set.
     pip_layer = ""
     if opts.docker_pip_packages:
-        # Render as one pip install line; quote each spec to allow git+ URLs.
-        spec = " ".join(f'"{p}"' for p in opts.docker_pip_packages)
+        spec = " \\\n        ".join(f'"{p}"' for p in opts.docker_pip_packages)
+        py_ver = opts.docker_python_version or "3.13"
         pip_layer = f"""
-# --- Extra Python packages (system pip; image is a build/CI runner, not a multi-tenant host) ---
-RUN python3 -m pip install --no-cache-dir --break-system-packages --upgrade pip \\
- && python3 -m pip install --no-cache-dir --break-system-packages {spec}
+# --- Python via uv (single static binary; bundles its own Python builds) ---
+ARG PYTHON_VERSION={py_ver}
+ENV UV_INSTALL_DIR=/usr/local/bin \\
+    UV_PYTHON_INSTALL_DIR=/opt/python \\
+    VIRTUAL_ENV=/opt/venv \\
+    PATH=/opt/venv/bin:$PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \\
+ && uv python install ${{PYTHON_VERSION}} \\
+ && uv venv --python ${{PYTHON_VERSION}} ${{VIRTUAL_ENV}} \\
+ && uv pip install --python ${{VIRTUAL_ENV}}/bin/python \\
+        {spec}
 """
 
     dockerfile = f"""# file: Dockerfile
@@ -1368,6 +1382,14 @@ def parse_args(argv: list[str]) -> Options:
         help="Pin a Go toolchain into the image (e.g. 1.25.0). Empty = no Go layer.",
     )
     parser.add_argument(
+        "--docker-python-version",
+        default="3.13",
+        help=(
+            "Pin a Python interpreter (installed via uv) for the image's pip "
+            "layer. Default 3.13. Only relevant when --docker-pip is also set."
+        ),
+    )
+    parser.add_argument(
         "--with-changelog",
         action="store_true",
         help="Include a CHANGELOG.md skeleton (Keep a Changelog format)",
@@ -1422,6 +1444,7 @@ def parse_args(argv: list[str]) -> Options:
         docker_apt_packages=tuple(args.docker_apt),
         docker_pip_packages=tuple(args.docker_pip),
         docker_go_version=args.docker_go_version,
+        docker_python_version=args.docker_python_version,
         with_changelog=args.with_changelog,
         with_todo=args.with_todo,
         with_claudemd=args.with_claudemd,
