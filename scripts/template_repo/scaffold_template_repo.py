@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: scripts/template_repo/scaffold_template_repo.py
-# version: 1.5.0
+# version: 1.7.0
 # guid: 7f2d3a2e-4b5c-8d9e-0f1a-2b3c4d5e6f70
 
 """Scaffold a minimal, public-safe template repository to a target directory.
@@ -1086,14 +1086,17 @@ RUN apt-get update \\
 """
 
     # Optional pip layer.
+    # Note: --break-system-packages is Python 3.12+ (PEP 668). Older bases
+    # (Ubuntu 22.04 ships 3.10) error on the flag. Omit it; on a CI/build
+    # image, system-pip without the flag is fine because there's no other
+    # package manager fighting it.
     pip_layer = ""
     if opts.docker_pip_packages:
-        # Render as one pip install line; quote each spec to allow git+ URLs.
         spec = " ".join(f'"{p}"' for p in opts.docker_pip_packages)
         pip_layer = f"""
 # --- Extra Python packages (system pip; image is a build/CI runner, not a multi-tenant host) ---
-RUN python3 -m pip install --no-cache-dir --break-system-packages --upgrade pip \\
- && python3 -m pip install --no-cache-dir --break-system-packages {spec}
+RUN python3 -m pip install --no-cache-dir --upgrade pip \\
+ && python3 -m pip install --no-cache-dir {spec}
 """
 
     dockerfile = f"""# file: Dockerfile
@@ -1211,22 +1214,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      # NOTE: action refs are major-version tags here. The repo's
-      # pin-actions-to-hashes step (or dependabot) will rewrite each `@vN`
-      # to a digest-pinned `@<sha> # vN.M.K` on first run. Don't hand-pin
-      # SHAs at scaffold time — there's no source of truth for "the latest
-      # known-good SHA" without a network round-trip.
+      # SHAs below were the latest tagged release at scaffold-version-bump
+      # time. push_with_gh.py applies sha_pinning_required=true on the new
+      # repo's Actions permissions, so tag refs would be rejected at run
+      # time. Dependabot (--with-dependabot) ships PRs to bump these as
+      # upstream tags ship.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
       - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -1234,7 +1237,7 @@ jobs:
 
       - name: Extract metadata (tags, labels)
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -1247,7 +1250,7 @@ jobs:
 
       - name: Build and push
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -1260,7 +1263,7 @@ jobs:
           sbom: true
 
       - name: Attest provenance
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build.outputs.digest }}
@@ -1343,11 +1346,13 @@ def parse_args(argv: list[str]) -> Options:
     )
     parser.add_argument(
         "--docker-base-image",
-        default="ghcr.io/catthehacker/ubuntu:full-22.04",
+        default="ubuntu:22.04",
         help=(
             "Base image for the Dockerfile when --with-docker is set. "
-            "Default mirrors a GitHub Actions Ubuntu runner; catthehacker's "
-            "'full-22.04' is the known-good tag — verify before bumping to 24.04."
+            "Default is vanilla ubuntu:22.04 (works as a Docker base, runs "
+            "as root, plain apt-get). Pass ghcr.io/catthehacker/ubuntu:full-22.04 "
+            "ONLY if you also handle non-root + apt permission quirks — that "
+            "image is tuned for `act`, not buildx multi-arch builds."
         ),
     )
     parser.add_argument(
