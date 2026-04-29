@@ -1,5 +1,5 @@
 # file: .github/repository-config.yml
-# version: 1.0.0
+# version: 1.1.0
 # guid: unified-repo-config-2025-09-24-comprehensive
 
 # Unified Repository Configuration Schema
@@ -344,6 +344,18 @@ integrations:
   apps:
     dependabot: true
     renovate: false
+
+# Package Registry Configuration
+# Controls which registries publish_to_github_packages.py uploads to.
+# All registries default to false — enable only after the registry is actually
+# configured for the repo (GitHub Generic Packages, PyPI token, npm token, etc.).
+# Setting github: true without configuring GitHub Packages returns HTTP 404.
+packages:
+  registries:
+    github: false # Generic artifact tarballs via GitHub Packages API
+    pypi: false # Python packages; requires PYPI_TOKEN secret
+    npm: false # npm packages; requires NPM_TOKEN secret
+    cargo: false # Rust crates; requires CARGO_REGISTRY_TOKEN secret
 
 # Environment-specific overrides
 environments:

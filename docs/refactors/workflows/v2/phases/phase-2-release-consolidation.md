@@ -1670,10 +1670,10 @@ workflows:
 
 packages:
   registries:
-    github: true
-    pypi: false # Enable when ready
-    npm: false # Enable when ready
-    cargo: false # Enable when ready
+    github: true # Set true ONLY after GitHub Generic Packages is configured; false = 404
+    pypi: false # Enable when ready; requires PYPI_TOKEN secret
+    npm: false # Enable when ready; requires NPM_TOKEN secret
+    cargo: false # Enable when ready; requires CARGO_REGISTRY_TOKEN secret
 ```
 
 ## Testing
