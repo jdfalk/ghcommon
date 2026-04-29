@@ -757,6 +757,12 @@ jobs:
 
       - name: Publish artifacts to GitHub Packages
         env:
+          # publish_to_github_packages.py shells out to `gh release upload`,
+          # which requires GH_TOKEN. Without this the step fails with
+          # "To use GitHub CLI in a GitHub Actions workflow, set the GH_TOKEN
+          # environment variable" and exits 4.
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           PRIMARY_LANGUAGE: ${{ needs.detect-languages.outputs.primary-language || 'unknown' }}
           RELEASE_TAG: ${{ needs.detect-languages.outputs.release-tag }}
           RELEASE_STRATEGY: ${{ needs.detect-languages.outputs.release-branch-strategy }}
