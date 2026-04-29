@@ -311,9 +311,23 @@ jobs:
       # commits touch .github/workflows/ — the default GITHUB_TOKEN
       # can't. Skipped entirely when CI_APP_ID isn't configured so the
       # job doesn't emit a noisy error; falls back to GITHUB_TOKEN.
+      # `if:` cannot reference secrets.* directly in a workflow_call workflow
+      # ("Unrecognized named-value: 'secrets'"). Materialize CI_APP_ID through
+      # env in a guard step, then gate the mint step on that step's output.
+      - name: Check for App credentials
+        id: check-app
+        env:
+          CI_APP_ID: ${{ secrets.CI_APP_ID }}
+        run: |
+          if [ -n "$CI_APP_ID" ]; then
+            echo "have-app=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have-app=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Mint App token for tag push
         id: app-token
-        if: ${{ secrets.CI_APP_ID != '' }}
+        if: steps.check-app.outputs.have-app == 'true'
         uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         with:
           app-id: ${{ secrets.CI_APP_ID }}
