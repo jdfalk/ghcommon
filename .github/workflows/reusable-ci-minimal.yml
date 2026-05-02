@@ -1,0 +1,244 @@
+# file: .github/workflows/reusable-ci-minimal.yml
+# version: 1.0.0
+# guid: c9d8e7f6-a5b4-3c2d-1e0f-9a8b7c6d5e4f
+# last-edited: 2026-05-01
+
+# Fast parallel CI for PRs and pushes. Runs short tests only.
+# Uses manual actions/cache — NOT setup-go's built-in cache, which is unreliable.
+# Full suite (property tests, coverage, E2E) runs nightly via reusable-ci.yml.
+
+name: Reusable CI (Minimal / Fast)
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: '1.26'
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '22'
+      go-experiment:
+        description: 'Value for GOEXPERIMENT env var (e.g. jsonv2)'
+        required: false
+        type: string
+        default: ''
+      system-packages:
+        description: 'Space-separated apt packages to install before build/test (e.g. libtag1-dev)'
+        required: false
+        type: string
+        default: ''
+      frontend-working-dir:
+        description: 'Path to the frontend directory relative to repo root (e.g. web)'
+        required: false
+        type: string
+        default: 'web'
+      run-frontend:
+        description: 'Whether to run frontend lint/build/test jobs'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-minimal-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # ── Go: vet + build ─────────────────────────────────────────────────────────
+  go-vet-build:
+    name: Go Vet & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOEXPERIMENT: ${{ inputs.go-experiment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Go (no built-in cache)
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Restore Go cache (manual)
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ inputs.go-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ inputs.go-version }}-
+            ${{ runner.os }}-go-
+
+      - name: Install system packages
+        if: inputs.system-packages != ''
+        env:
+          PACKAGES: ${{ inputs.system-packages }}
+        # shellcheck disable=SC2086
+        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
+
+  # ── Go: short tests (skip property/slow tests via -short) ───────────────────
+  go-test-short:
+    name: Go Tests (short, race)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GOEXPERIMENT: ${{ inputs.go-experiment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Go (no built-in cache)
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Restore Go cache (manual)
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ inputs.go-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ inputs.go-version }}-
+            ${{ runner.os }}-go-
+
+      - name: Install system packages
+        if: inputs.system-packages != ''
+        env:
+          PACKAGES: ${{ inputs.system-packages }}
+        # shellcheck disable=SC2086
+        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+
+      - name: Test (short, race)
+        run: go test -short -race ./...
+
+  # ── Frontend: lint + build ───────────────────────────────────────────────────
+  frontend-lint-build:
+    name: Frontend Lint & Build
+    if: ${{ inputs.run-frontend }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ inputs.frontend-working-dir }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Restore npm cache (manual)
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ inputs.node-version }}-${{ hashFiles(format('{0}/package-lock.json', inputs.frontend-working-dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-npm-${{ inputs.node-version }}-
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        continue-on-error: false
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  # ── Frontend: unit tests ─────────────────────────────────────────────────────
+  frontend-test:
+    name: Frontend Unit Tests
+    if: ${{ inputs.run-frontend }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ inputs.frontend-working-dir }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Restore npm cache (manual)
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ inputs.node-version }}-${{ hashFiles(format('{0}/package-lock.json', inputs.frontend-working-dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-npm-${{ inputs.node-version }}-
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test -- --run
+
+  # ── Summary ──────────────────────────────────────────────────────────────────
+  ci-minimal-summary:
+    name: Minimal CI Summary
+    needs: [go-vet-build, go-test-short, frontend-lint-build, frontend-test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate results
+        env:
+          VET_BUILD: ${{ needs.go-vet-build.result }}
+          TEST_SHORT: ${{ needs.go-test-short.result }}
+          FE_LINT_BUILD: ${{ needs.frontend-lint-build.result }}
+          FE_TEST: ${{ needs.frontend-test.result }}
+        run: |
+          {
+            printf '## Minimal CI Results\n\n'
+            printf '| Job | Result |\n|-----|--------|\n'
+            printf '| Go Vet & Build | %s |\n' "$VET_BUILD"
+            printf '| Go Tests (short) | %s |\n' "$TEST_SHORT"
+            printf '| Frontend Lint & Build | %s |\n' "$FE_LINT_BUILD"
+            printf '| Frontend Unit Tests | %s |\n' "$FE_TEST"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          failed=0
+          for result in "$VET_BUILD" "$TEST_SHORT"; do
+            if [ "$result" = "failure" ]; then
+              failed=1
+            fi
+          done
+          # Frontend jobs may be skipped if run-frontend=false; skip != failure
+          for result in "$FE_LINT_BUILD" "$FE_TEST"; do
+            if [ "$result" = "failure" ]; then
+              failed=1
+            fi
+          done
+
+          if [ "$failed" -eq 1 ]; then
+            echo "❌ One or more CI jobs failed"
+            exit 1
+          fi
+          echo "✅ All minimal CI jobs passed"
