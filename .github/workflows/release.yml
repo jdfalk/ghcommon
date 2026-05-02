@@ -1,5 +1,5 @@
 # file: .github/workflows/release.yml
-# version: 2.0.0
+# version: 2.0.1
 # guid: 8b4d6c2a-1f5e-4a8b-9c3d-7e2f5a8b1c4d
 
 name: Release
@@ -64,9 +64,9 @@ jobs:
     name: Release
     uses: ./.github/workflows/reusable-release.yml
     with:
-      release-type: ${{ github.event.inputs.release-type || 'auto' }}
-      build-target: ${{ github.event.inputs.build-target || 'all' }}
-      draft: ${{ github.event.inputs.draft || false }}
-      prerelease: ${{ github.event.inputs.prerelease || false }}
-      stable: ${{ github.event.inputs.stable || false }}
+      release-type: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release-type || 'auto' }}
+      build-target: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.build-target || 'all' }}
+      draft: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.draft == 'true' || false }}
+      prerelease: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.prerelease == 'true' }}
+      stable: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.stable == 'true' || false }}
     secrets: inherit

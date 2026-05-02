@@ -1,5 +1,5 @@
 # file: .github/workflows/pr-automation.yml
-# version: 4.5.4
+# version: 4.5.5
 # guid: a7b8c9d0-e1f2-3456-a789-0123456789bc
 # NOTE: This file should be updated in ghcommon repository first, then copied to other repositories.
 # To update: Edit in https://github.com/jdfalk/ghcommon/.github/workflows/pr-automation.yml then copy to other repos
@@ -290,7 +290,7 @@ jobs:
           "
 
       - name: Run intelligent labeling
-        uses: jdfalk/pr-auto-label-action@68583016672fe5a5348c040ab8ed7aa3e678df5b # v1.1.3
+        uses: jdfalk/pr-auto-label-action@54023423d4f61a781402f6c801d3c3b48af7a3c4 # v1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.number }}
