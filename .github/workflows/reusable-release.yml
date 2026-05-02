@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.13.0
+# version: 2.13.1
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -128,7 +128,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Load repository configuration
         id: load-config
-        uses: jdfalk/load-config-action@f53a2a9d7bc80d26be0f3339188fe84f2feabb38 # v1.1.3
+        uses: jdfalk/load-config-action@482b9f0e631b2325071cd9bf04c8fda4591044b0 # v1.1.3
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
@@ -174,7 +174,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
-        uses: jdfalk/detect-languages-action@c10aa6cf6cf58ed0ecaa41aa3b7e0afaf4ed9c8b # v1.1.5
+        uses: jdfalk/detect-languages-action@e8b6061298420be7fd087ea148587fa61176137b # v1.1.5
         with:
           skip-detection: ${{ inputs.skip-language-detection }}
           build-target: ${{ inputs.build-target || 'all' }}
@@ -289,7 +289,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate protobuf
-        uses: jdfalk/gha-release-protobuf@04bad49f96a51ec7602024d8c6dd44fde811426d # v1.0.2+
+        uses: jdfalk/gha-release-protobuf@afcb06673c957919bf28b9661b58038931588ea5 # v1.0.2+
 
   # Go Build
   build-go:
@@ -356,7 +356,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Python
-        uses: jdfalk/gha-release-python@d3b2cb559fa2af3f5a12c2cb784cb37b133078d3 # v1.0.2+
+        uses: jdfalk/gha-release-python@120e1dfd3b9379841eb079869681fdacdab71198 # v1.0.2+
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
 
@@ -373,7 +373,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Rust
-        uses: jdfalk/gha-release-rust@85b16e81f014840af704c63c789216f43530117c # v1.0.2+
+        uses: jdfalk/gha-release-rust@1a704db1fba3239c4ce8a543cd35defab6198ca2 # v1.0.2+
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
