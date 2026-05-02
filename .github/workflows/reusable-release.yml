@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.13.1
+# version: 2.13.2
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -525,7 +525,7 @@ jobs:
           \) -delete -print 2>/dev/null || true
 
           echo "Remaining artifacts:"
-          find ./artifacts -type f | sort
+          find ./artifacts -type f 2>/dev/null | sort || true
 
       - name: Create GitHub Release
         id: release
