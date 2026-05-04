@@ -703,3 +703,25 @@ scripts/workflow-debug-output/
 
 # Claude Code per-machine local settings — never committed
 .claude/settings.local.json
+
+# >>> jdfalk managed ignore block (sync-gitignore.py) >>>
+# AI agent scratch / state (may contain PII, machine paths, secrets)
+.claude/notes/
+.claude/state/
+.claude/worktrees/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.copilot/
+.aider*
+.cursor/
+.windsurf/
+.remember/
+.superpowers/
+
+# Per-session copilot transcripts
+copilot-session-*.md
+
+# OS junk
+.DS_Store
+Thumbs.db
+# <<< jdfalk managed ignore block (sync-gitignore.py) <<<
