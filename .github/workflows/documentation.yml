@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate helper documentation
-        uses: jdfalk/docs-generator-action@348ba194a5f4060f07d954cbc0d1f123230c4580 # v1.1.3
+        uses: jdfalk/docs-generator-action@8207d873d6300212e4d22b97aa22e9b1114f64a7 # v1.1.3
         with:
           source-dir: .github/workflows/scripts
           workflows-dir: .github/workflows
