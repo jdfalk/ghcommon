@@ -128,7 +128,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Load repository configuration
         id: load-config
-        uses: jdfalk/load-config-action@482b9f0e631b2325071cd9bf04c8fda4591044b0 # v1.1.3
+        uses: jdfalk/load-config-action@bb213cbf6b6e789bea8ad0787f2914760d00536b # v1.1.3
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
@@ -174,7 +174,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Detect project languages and generate matrices
         id: detect
-        uses: jdfalk/detect-languages-action@e8b6061298420be7fd087ea148587fa61176137b # v1.1.5
+        uses: jdfalk/detect-languages-action@d5712363aae458b4bbb47bbb1780f02de2a03784 # v1.1.5
         with:
           skip-detection: ${{ inputs.skip-language-detection }}
           build-target: ${{ inputs.build-target || 'all' }}
@@ -289,7 +289,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate protobuf
-        uses: jdfalk/gha-release-protobuf@afcb06673c957919bf28b9661b58038931588ea5 # v1.0.2+
+        uses: jdfalk/gha-release-protobuf@1c07a62621ea5bdaf7fd46643fd4e650c69de8d9 # v1.0.2+
 
   # Go Build
   build-go:
@@ -334,7 +334,7 @@ jobs:
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
 
       - name: Build Go
-        uses: jdfalk/gha-release-go@c7f72a3df997a97a1c9433893d4d25fc98f99c7e # v1.1.0
+        uses: jdfalk/gha-release-go@68295f41570b9f4fd264bb0a167a43b79ca30310 # v1.1.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -356,7 +356,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Python
-        uses: jdfalk/gha-release-python@120e1dfd3b9379841eb079869681fdacdab71198 # v1.0.2+
+        uses: jdfalk/gha-release-python@900b75fc7585c37cf448dbb7e30330f5ff891607 # v1.0.2+
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
 
@@ -373,7 +373,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Rust
-        uses: jdfalk/gha-release-rust@1a704db1fba3239c4ce8a543cd35defab6198ca2 # v1.0.2+
+        uses: jdfalk/gha-release-rust@5e0cfb831f58d00fc22e4dfe6d7e51a97eb6dbcd # v1.0.2+
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -391,7 +391,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Frontend
-        uses: jdfalk/gha-release-frontend@f77c3d10f7d3f6be435be9bbbd1446f5599f48aa # v1.0.2+
+        uses: jdfalk/gha-release-frontend@3fe7d567a6a6f25cadb618a3cb0abe311c765abb # v1.0.2+
 
   # Docker Build
   build-docker:
@@ -406,7 +406,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build Docker
-        uses: jdfalk/gha-release-docker@9f854f0837efd3eac6647c93b86ca06d6b58cf6a # v1.0.2+
+        uses: jdfalk/gha-release-docker@2f0979263a455d556526d9f53589c3eb4d837136 # v1.0.2+
         with:
           registry: ${{ needs.detect-languages.outputs.registry }}
           image-name: ${{ needs.detect-languages.outputs.image-name }}
@@ -489,7 +489,7 @@ jobs:
           path: ./artifacts
       - name: Package and organize release artifacts
         id: package-artifacts
-        uses: jdfalk/package-assets-action@49725e715503b7021778d248f56fe50e001a68ed # v1.2.0
+        uses: jdfalk/package-assets-action@c1dc41c8fb6800606eee2714da4d7b807d55ecc4 # v1.2.0
         with:
           artifacts-dir: ./artifacts
 
