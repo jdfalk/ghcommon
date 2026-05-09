@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.1.0
+# version: 1.2.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -12,6 +12,10 @@
 #
 # Pre-flight (free): GitHub App JWT → count ready tasks in hub repo. No AI calls.
 # Exits early if none found. Otherwise: triage → dispatch (matrix) → aggregate.
+#
+# The burndown binary and Python helper scripts are pre-baked into
+# ghcr.io/jdfalk/burndown-runner-image:bootstrap at /usr/local/bin/burndown
+# and /usr/local/lib/burndown/scripts/. No source checkout or go build needed.
 
 name: Burndown (reusable)
 
@@ -137,12 +141,6 @@ jobs:
       task_indices: ${{ steps.emit.outputs.task_indices }}
       task_count: ${{ steps.emit.outputs.task_count }}
     steps:
-      - name: Checkout overnight-burndown
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: jdfalk/overnight-burndown
-          path: burndown
-
       - name: Checkout target repo (sparse)
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -152,10 +150,6 @@ jobs:
             /*
             !/testdata/audio/
           sparse-checkout-cone-mode: false
-
-      - name: Build burndown binary
-        working-directory: burndown
-        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
 
       - name: Materialize App key
         env:
@@ -178,15 +172,15 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           mkdir -p "$RUNNER_TEMP/burndown-state" "$RUNNER_TEMP/burndown-digest"
-          python3 burndown/scripts/render-ci-config.py \
+          python3 /usr/local/lib/burndown/scripts/render-ci-config.py \
             --out "$RUNNER_TEMP/config.yaml" >/dev/null
-          python3 burndown/scripts/validate-config.py "$RUNNER_TEMP/config.yaml"
+          python3 /usr/local/lib/burndown/scripts/validate-config.py "$RUNNER_TEMP/config.yaml"
 
       - name: Run triage
         env:
           ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
         run: |
-          "$RUNNER_TEMP/burndown" triage \
+          /usr/local/bin/burndown triage \
             --config "$RUNNER_TEMP/config.yaml" \
             --out "$RUNNER_TEMP/tasks.json"
 
@@ -230,12 +224,6 @@ jobs:
       matrix:
         index: ${{ fromJson(needs.triage.outputs.task_indices) }}
     steps:
-      - name: Checkout overnight-burndown
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: jdfalk/overnight-burndown
-          path: burndown
-
       - name: Checkout target repo (sparse)
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -245,10 +233,6 @@ jobs:
             /*
             !/testdata/audio/
           sparse-checkout-cone-mode: false
-
-      - name: Build burndown binary
-        working-directory: burndown
-        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
 
       - name: Download triage artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -274,7 +258,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
         run: |
-          "$RUNNER_TEMP/burndown" dispatch-one \
+          /usr/local/bin/burndown dispatch-one \
             --config "$RUNNER_TEMP/config.yaml" \
             --task-file "$RUNNER_TEMP/tasks.json" \
             --task-index ${{ matrix.index }} \
@@ -301,16 +285,6 @@ jobs:
     container:
       image: ghcr.io/jdfalk/burndown-runner-image:bootstrap
     steps:
-      - name: Checkout overnight-burndown
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: jdfalk/overnight-burndown
-          path: burndown
-
-      - name: Build burndown binary
-        working-directory: burndown
-        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
-
       - name: Download triage artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
@@ -336,7 +310,7 @@ jobs:
               "$BURNDOWN_MODE" > "$RUNNER_TEMP/digest/digest.md"
             exit 0
           fi
-          "$RUNNER_TEMP/burndown" aggregate \
+          /usr/local/bin/burndown aggregate \
             --config "$RUNNER_TEMP/triage/config.yaml" \
             --triage-file "$triage_json" \
             --outcomes-dir "$RUNNER_TEMP/outcomes" \
