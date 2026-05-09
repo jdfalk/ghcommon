@@ -1,0 +1,352 @@
+# file: .github/workflows/reusable-burndown.yml
+# version: 1.0.0
+# Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
+#
+# Usage:
+#   jobs:
+#     burndown:
+#       uses: jdfalk/ghcommon/.github/workflows/reusable-burndown.yml@main
+#       with:
+#         mode: dry-run
+#       secrets: inherit
+#
+# Pre-flight (free): GitHub App JWT → count ready tasks in hub repo. No AI calls.
+# Exits early if none found. Otherwise: triage → dispatch (matrix) → aggregate.
+
+name: Burndown (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: 'dry-run | draft-only | full'
+        type: string
+        default: dry-run
+      hub_repo:
+        description: 'GitHub repo holding burndown task issues'
+        type: string
+        default: jdfalk/burndown-tasks
+      label_prefix:
+        description: 'Label prefix routing tasks to repos'
+        type: string
+        default: 'repo:'
+    secrets:
+      BURNDOWN_BOT_APP_ID:
+        required: true
+      BURNDOWN_BOT_INSTALLATION_ID:
+        required: true
+      BURNDOWN_BOT_PRIVATE_KEY:
+        required: true
+      BURNDOWN_BOT_CLAUDE_API_KEY:
+        required: true
+      BURNDOWN_BOT_OPENAI_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: burndown-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  RUNNER_IMAGE: ghcr.io/jdfalk/burndown-runner-image:bootstrap
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Pre-flight — free. JWT → installation token → count ready tasks.
+  # All downstream jobs are skipped when count == 0.
+  # ---------------------------------------------------------------------------
+  preflight:
+    name: Check for ready tasks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      has_tasks: ${{ steps.count.outputs.has_tasks }}
+      task_count: ${{ steps.count.outputs.task_count }}
+    steps:
+      - name: Count ready tasks
+        id: count
+        env:
+          APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
+          INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
+          PRIVATE_KEY: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          HUB_REPO: ${{ inputs.hub_repo }}
+          LABEL_PREFIX: ${{ inputs.label_prefix }}
+        run: |
+          pip install -q PyJWT cryptography
+          python3 - <<'PYEOF'
+          import jwt, time, os, urllib.request, urllib.parse, json
+
+          pem        = os.environ["PRIVATE_KEY"]
+          app_id     = int(os.environ["APP_ID"])
+          install_id = os.environ["INSTALLATION_ID"]
+          repo_name  = os.environ["REPO_NAME"]
+          hub_repo   = os.environ["HUB_REPO"]
+          prefix     = os.environ["LABEL_PREFIX"]
+
+          now = int(time.time())
+          jwt_tok = jwt.encode({"iat": now - 60, "exp": now + 540, "iss": app_id},
+                               pem, algorithm="RS256")
+
+          req = urllib.request.Request(
+              f"https://api.github.com/app/installations/{install_id}/access_tokens",
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {jwt_tok}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "Content-Length": "0",
+              },
+          )
+          inst_token = json.loads(urllib.request.urlopen(req).read())["token"]
+
+          labels = urllib.parse.quote(f"{prefix}{repo_name},status:ready")
+          url = (f"https://api.github.com/repos/{hub_repo}/issues"
+                 f"?labels={labels}&state=open&per_page=100")
+          req2 = urllib.request.Request(url, headers={
+              "Authorization": f"Bearer {inst_token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          })
+          count = len(json.loads(urllib.request.urlopen(req2).read()))
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"task_count={count}\n")
+              f.write(f"has_tasks={'true' if count else 'false'}\n")
+
+          sym = "✓" if count else "○"
+          msg = "proceeding" if count else "nothing to do — exiting"
+          print(f"{sym} {count} ready task(s) for '{repo_name}' — {msg}")
+          PYEOF
+
+  # ---------------------------------------------------------------------------
+  # Triage — classify tasks. Only when pre-flight found work.
+  # ---------------------------------------------------------------------------
+  triage:
+    name: Triage tasks
+    needs: preflight
+    if: needs.preflight.outputs.has_tasks == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: ${{ env.RUNNER_IMAGE }}
+    outputs:
+      task_indices: ${{ steps.emit.outputs.task_indices }}
+      task_count: ${{ steps.emit.outputs.task_count }}
+    steps:
+      - name: Checkout overnight-burndown
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: jdfalk/overnight-burndown
+          path: burndown
+
+      - name: Checkout target repo (sparse)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: targets/${{ github.event.repository.name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            /*
+            !/testdata/audio/
+          sparse-checkout-cone-mode: false
+
+      - name: Build burndown binary
+        working-directory: burndown
+        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
+
+      - name: Materialize App key
+        env:
+          PRIVATE_KEY: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys" && chmod 700 "$RUNNER_TEMP/keys"
+          printf '%s\n' "$PRIVATE_KEY" > "$RUNNER_TEMP/keys/burndown-bot.pem"
+          chmod 600 "$RUNNER_TEMP/keys/burndown-bot.pem"
+
+      - name: Render config
+        env:
+          MODE: ${{ inputs.mode }}
+          IMPLEMENTER_PROVIDER: anthropic
+          TRIAGE_PROVIDER: anthropic
+          WORKSPACE: ${{ github.workspace }}
+          GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
+          GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
+          GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/burndown-state" "$RUNNER_TEMP/burndown-digest"
+          python3 burndown/scripts/render-ci-config.py \
+            --out "$RUNNER_TEMP/config.yaml" >/dev/null
+          python3 burndown/scripts/validate-config.py "$RUNNER_TEMP/config.yaml"
+
+      - name: Run triage
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
+        run: |
+          "$RUNNER_TEMP/burndown" triage \
+            --config "$RUNNER_TEMP/config.yaml" \
+            --out "$RUNNER_TEMP/tasks.json"
+
+      - name: Upload triage artifact
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
+        with:
+          name: burndown-triage
+          path: |
+            ${{ runner.temp }}/tasks.json
+            ${{ runner.temp }}/config.yaml
+          retention-days: 7
+
+      - name: Emit task indices for matrix
+        id: emit
+        run: |
+          count=$(jq '.tasks | length' "$RUNNER_TEMP/tasks.json")
+          [ "$count" -gt 256 ] && count=256
+          indices=$([ "$count" -eq 0 ] && echo '[]' \
+            || jq -cn --argjson n "$count" '[range(0;$n)]')
+          echo "task_count=$count"     >> "$GITHUB_OUTPUT"
+          echo "task_indices=$indices" >> "$GITHUB_OUTPUT"
+
+  # ---------------------------------------------------------------------------
+  # Dispatch — matrix fan-out, max 4 parallel.
+  # ---------------------------------------------------------------------------
+  dispatch:
+    name: 'Dispatch task ${{ matrix.index }}'
+    needs: triage
+    if: needs.triage.outputs.task_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    container:
+      image: ${{ env.RUNNER_IMAGE }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        index: ${{ fromJson(needs.triage.outputs.task_indices) }}
+    steps:
+      - name: Checkout overnight-burndown
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: jdfalk/overnight-burndown
+          path: burndown
+
+      - name: Checkout target repo (sparse)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: targets/${{ github.event.repository.name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            /*
+            !/testdata/audio/
+          sparse-checkout-cone-mode: false
+
+      - name: Build burndown binary
+        working-directory: burndown
+        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
+
+      - name: Download triage artifact
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: burndown-triage
+          path: ${{ runner.temp }}/triage
+
+      - name: Stage triage outputs
+        run: |
+          mkdir -p "$RUNNER_TEMP/burndown-state"
+          cp "$RUNNER_TEMP/triage/tasks.json" "$RUNNER_TEMP/tasks.json"
+          cp "$RUNNER_TEMP/triage/config.yaml" "$RUNNER_TEMP/config.yaml"
+
+      - name: Materialize App key
+        env:
+          PRIVATE_KEY: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys" && chmod 700 "$RUNNER_TEMP/keys"
+          printf '%s\n' "$PRIVATE_KEY" > "$RUNNER_TEMP/keys/burndown-bot.pem"
+          chmod 600 "$RUNNER_TEMP/keys/burndown-bot.pem"
+
+      - name: Dispatch task ${{ matrix.index }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
+        run: |
+          "$RUNNER_TEMP/burndown" dispatch-one \
+            --config "$RUNNER_TEMP/config.yaml" \
+            --task-file "$RUNNER_TEMP/tasks.json" \
+            --task-index ${{ matrix.index }} \
+            --out "$RUNNER_TEMP/outcome-${{ matrix.index }}.json"
+
+      - name: Upload outcome
+        if: always()
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
+        with:
+          name: burndown-outcome-${{ matrix.index }}
+          path: ${{ runner.temp }}/outcome-${{ matrix.index }}.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Aggregate — always runs after triage; builds digest even on partial failure.
+  # ---------------------------------------------------------------------------
+  aggregate:
+    name: Aggregate digest
+    needs: [triage, dispatch]
+    if: always() && needs.triage.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: ${{ env.RUNNER_IMAGE }}
+    steps:
+      - name: Checkout overnight-burndown
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: jdfalk/overnight-burndown
+          path: burndown
+
+      - name: Build burndown binary
+        working-directory: burndown
+        run: go build -o "$RUNNER_TEMP/burndown" ./cmd/burndown
+
+      - name: Download triage artifact
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: burndown-triage
+          path: ${{ runner.temp }}/triage
+
+      - name: Download outcome artifacts
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: burndown-outcome-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/outcomes
+        continue-on-error: true
+
+      - name: Aggregate
+        run: |
+          mkdir -p "$RUNNER_TEMP/digest"
+          "$RUNNER_TEMP/burndown" aggregate \
+            --config "$RUNNER_TEMP/triage/config.yaml" \
+            --triage-file "$RUNNER_TEMP/triage/tasks.json" \
+            --outcomes-dir "$RUNNER_TEMP/outcomes" \
+            --digest-out "$RUNNER_TEMP/digest/digest.md"
+
+      - name: Publish digest to job summary
+        if: always()
+        run: |
+          if [ -s "$RUNNER_TEMP/digest/digest.md" ]; then
+            cat "$RUNNER_TEMP/digest/digest.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## No digest produced" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload digest
+        if: always()
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
+        with:
+          name: burndown-digest-${{ github.run_id }}
+          path: ${{ runner.temp }}/digest/
+          if-no-files-found: warn
+          retention-days: 30
