@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:bootstrap
+      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
     outputs:
       task_indices: ${{ steps.emit.outputs.task_indices }}
       task_count: ${{ steps.emit.outputs.task_count }}
@@ -217,7 +217,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:bootstrap
+      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -283,7 +283,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:bootstrap
+      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
     steps:
       - name: Download triage artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
