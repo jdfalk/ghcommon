@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.0.0
+# version: 1.1.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -190,13 +190,17 @@ jobs:
             --config "$RUNNER_TEMP/config.yaml" \
             --out "$RUNNER_TEMP/tasks.json"
 
+      - name: Stage triage for artifact upload
+        run: |
+          mkdir -p "$RUNNER_TEMP/triage-stage"
+          cp "$RUNNER_TEMP/tasks.json" "$RUNNER_TEMP/triage-stage/tasks.json"
+          cp "$RUNNER_TEMP/config.yaml" "$RUNNER_TEMP/triage-stage/config.yaml"
+
       - name: Upload triage artifact
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
           name: burndown-triage
-          path: |
-            ${{ runner.temp }}/tasks.json
-            ${{ runner.temp }}/config.yaml
+          path: ${{ runner.temp }}/triage-stage/
           retention-days: 7
 
       - name: Emit task indices for matrix
@@ -322,11 +326,19 @@ jobs:
         continue-on-error: true
 
       - name: Aggregate
+        env:
+          BURNDOWN_MODE: ${{ inputs.mode }}
         run: |
           mkdir -p "$RUNNER_TEMP/digest"
+          triage_json="$RUNNER_TEMP/triage/tasks.json"
+          if [ ! -f "$triage_json" ]; then
+            printf '## Burndown — no tasks dispatched\n\nMode: `%s`. All classified tasks were dry-run-only.\n' \
+              "$BURNDOWN_MODE" > "$RUNNER_TEMP/digest/digest.md"
+            exit 0
+          fi
           "$RUNNER_TEMP/burndown" aggregate \
             --config "$RUNNER_TEMP/triage/config.yaml" \
-            --triage-file "$RUNNER_TEMP/triage/tasks.json" \
+            --triage-file "$triage_json" \
             --outcomes-dir "$RUNNER_TEMP/outcomes" \
             --digest-out "$RUNNER_TEMP/digest/digest.md"
 
