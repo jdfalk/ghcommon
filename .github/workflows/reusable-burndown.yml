@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.3.0
+# version: 1.4.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -13,9 +13,9 @@
 # Pre-flight (free): GitHub App JWT → count ready tasks in hub repo. No AI calls.
 # Exits early if none found. Otherwise: triage → dispatch (matrix) → aggregate.
 #
-# The burndown binary and Python helper scripts are pre-baked into
-# ghcr.io/jdfalk/burndown-runner-image:bootstrap at /usr/local/bin/burndown
-# and /usr/local/lib/burndown/scripts/. No source checkout or go build needed.
+# The burndown binary is pre-baked into
+# ghcr.io/jdfalk/burndown-runner-image:bootstrap at /usr/local/bin/burndown.
+# Config is driven entirely by environment variables — no config.yaml needed.
 
 name: Burndown (reusable)
 
@@ -34,6 +34,22 @@ on:
         description: 'Label prefix routing tasks to repos'
         type: string
         default: 'repo:'
+      implementer_provider:
+        description: 'openai | anthropic'
+        type: string
+        default: openai
+      triage_model:
+        description: 'OpenAI model for triage (default: o4-mini)'
+        type: string
+        default: o4-mini
+      cheapest_only:
+        description: 'Use cheapest single model with no tier escalation'
+        type: boolean
+        default: false
+      powerful_only:
+        description: 'Use most powerful model only'
+        type: boolean
+        default: false
     secrets:
       BURNDOWN_BOT_APP_ID:
         required: true
@@ -42,7 +58,7 @@ on:
       BURNDOWN_BOT_PRIVATE_KEY:
         required: true
       BURNDOWN_BOT_CLAUDE_API_KEY:
-        required: true
+        required: false
       BURNDOWN_BOT_OPENAI_API_KEY:
         required: false
 
@@ -136,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
+      image: ghcr.io/jdfalk/burndown-runner-image:cdce8598d420da0568d448bf48112fb7cfcb1b77
     outputs:
       task_indices: ${{ steps.emit.outputs.task_indices }}
       task_count: ${{ steps.emit.outputs.task_count }}
@@ -159,36 +175,30 @@ jobs:
           printf '%s\n' "$PRIVATE_KEY" > "$RUNNER_TEMP/keys/burndown-bot.pem"
           chmod 600 "$RUNNER_TEMP/keys/burndown-bot.pem"
 
-      - name: Render config
+      - name: Run triage
         env:
           MODE: ${{ inputs.mode }}
-          IMPLEMENTER_PROVIDER: openai
-          TRIAGE_MODEL: o4-mini
           WORKSPACE: ${{ github.workspace }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          IMPLEMENTER_PROVIDER: ${{ inputs.implementer_provider }}
+          TRIAGE_MODEL: ${{ inputs.triage_model }}
+          CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
+          POWERFUL_ONLY: ${{ inputs.powerful_only }}
           GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
           GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
           GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
-          REPO_NAME: ${{ github.event.repository.name }}
-          REPO_OWNER: ${{ github.repository_owner }}
+          OPENAI_API_KEY: ${{ secrets.BURNDOWN_BOT_OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
         run: |
           mkdir -p "$RUNNER_TEMP/burndown-state" "$RUNNER_TEMP/burndown-digest"
-          python3 /usr/local/lib/burndown/scripts/render-ci-config.py \
-            --out "$RUNNER_TEMP/config.yaml" >/dev/null
-          python3 /usr/local/lib/burndown/scripts/validate-config.py "$RUNNER_TEMP/config.yaml"
-
-      - name: Run triage
-        env:
-          OPENAI_API_KEY: ${{ secrets.BURNDOWN_BOT_OPENAI_API_KEY }}
-        run: |
-          /usr/local/bin/burndown triage \
-            --config "$RUNNER_TEMP/config.yaml" \
+          /usr/local/bin/burndown triage --from-env \
             --out "$RUNNER_TEMP/tasks.json"
 
       - name: Stage triage for artifact upload
         run: |
           mkdir -p "$RUNNER_TEMP/triage-stage"
           cp "$RUNNER_TEMP/tasks.json" "$RUNNER_TEMP/triage-stage/tasks.json"
-          cp "$RUNNER_TEMP/config.yaml" "$RUNNER_TEMP/triage-stage/config.yaml"
 
       - name: Upload triage artifact
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
@@ -217,7 +227,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
+      image: ghcr.io/jdfalk/burndown-runner-image:cdce8598d420da0568d448bf48112fb7cfcb1b77
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -240,12 +250,6 @@ jobs:
           name: burndown-triage
           path: ${{ runner.temp }}/triage
 
-      - name: Stage triage outputs
-        run: |
-          mkdir -p "$RUNNER_TEMP/burndown-state"
-          cp "$RUNNER_TEMP/triage/tasks.json" "$RUNNER_TEMP/tasks.json"
-          cp "$RUNNER_TEMP/triage/config.yaml" "$RUNNER_TEMP/config.yaml"
-
       - name: Materialize App key
         env:
           PRIVATE_KEY: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
@@ -256,11 +260,22 @@ jobs:
 
       - name: Dispatch task ${{ matrix.index }}
         env:
+          MODE: ${{ inputs.mode }}
+          WORKSPACE: ${{ github.workspace }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          IMPLEMENTER_PROVIDER: ${{ inputs.implementer_provider }}
+          CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
+          POWERFUL_ONLY: ${{ inputs.powerful_only }}
+          GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
+          GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
+          GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
           OPENAI_API_KEY: ${{ secrets.BURNDOWN_BOT_OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.BURNDOWN_BOT_CLAUDE_API_KEY }}
         run: |
-          /usr/local/bin/burndown dispatch-one \
-            --config "$RUNNER_TEMP/config.yaml" \
-            --task-file "$RUNNER_TEMP/tasks.json" \
+          mkdir -p "$RUNNER_TEMP/burndown-state"
+          /usr/local/bin/burndown dispatch-one --from-env \
+            --task-file "$RUNNER_TEMP/triage/tasks.json" \
             --task-index ${{ matrix.index }} \
             --out "$RUNNER_TEMP/outcome-${{ matrix.index }}.json"
 
@@ -283,7 +298,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:1e06cc4a3ba6e2803f9677f83b92b165073b77e1
+      image: ghcr.io/jdfalk/burndown-runner-image:cdce8598d420da0568d448bf48112fb7cfcb1b77
     steps:
       - name: Download triage artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -301,17 +316,19 @@ jobs:
 
       - name: Aggregate
         env:
-          BURNDOWN_MODE: ${{ inputs.mode }}
+          MODE: ${{ inputs.mode }}
+          WORKSPACE: ${{ github.workspace }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
         run: |
           mkdir -p "$RUNNER_TEMP/digest"
           triage_json="$RUNNER_TEMP/triage/tasks.json"
           if [ ! -f "$triage_json" ]; then
             printf '## Burndown — no tasks dispatched\n\nMode: `%s`. All classified tasks were dry-run-only.\n' \
-              "$BURNDOWN_MODE" > "$RUNNER_TEMP/digest/digest.md"
+              "$MODE" > "$RUNNER_TEMP/digest/digest.md"
             exit 0
           fi
-          /usr/local/bin/burndown aggregate \
-            --config "$RUNNER_TEMP/triage/config.yaml" \
+          /usr/local/bin/burndown aggregate --from-env \
             --triage-file "$triage_json" \
             --outcomes-dir "$RUNNER_TEMP/outcomes" \
             --digest-out "$RUNNER_TEMP/digest/digest.md"
