@@ -1,0 +1,96 @@
+# file: .github/workflows/reusable-triage-poll.yml
+# version: 1.0.0
+# Reusable triage-poll workflow — runs every 30 minutes (or on demand).
+#
+# Usage:
+#   jobs:
+#     triage-poll:
+#       uses: jdfalk/ghcommon/.github/workflows/reusable-triage-poll.yml@main
+#       secrets: inherit
+#
+# State machine (one iteration per invocation, zero AI cost for idle runs):
+#
+#   no tracking issue + no untriaged issues → idle (exit 0)
+#   no tracking issue + untriaged issues    → submit OpenAI batch + create tracking issue
+#   tracking issue exists                   → poll batch → write results & close issue
+#
+# The burndown binary is pre-baked into the runner image at /usr/local/bin/burndown.
+# Config is driven entirely by environment variables via --from-env.
+
+name: Triage poll (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: 'dry-run | draft-only | full'
+        type: string
+        default: dry-run
+      hub_repo:
+        description: 'GitHub repo holding burndown task issues'
+        type: string
+        default: jdfalk/burndown-tasks
+      label_prefix:
+        description: 'Label prefix routing tasks to repos'
+        type: string
+        default: 'repo:'
+      triage_model:
+        description: 'OpenAI model for batch triage (e.g. o3, o4-mini)'
+        type: string
+        default: o3
+    secrets:
+      BURNDOWN_BOT_APP_ID:
+        required: true
+      BURNDOWN_BOT_INSTALLATION_ID:
+        required: true
+      BURNDOWN_BOT_PRIVATE_KEY:
+        required: true
+      BURNDOWN_BOT_OPENAI_API_KEY:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # Allow at most one triage-poll per repo at a time; don't cancel if
+  # the previous run is still polling (it will finish quickly).
+  group: triage-poll-${{ github.repository }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  triage-poll:
+    name: Triage poll
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: ghcr.io/jdfalk/burndown-runner-image:cdce8598d420da0568d448bf48112fb7cfcb1b77
+    steps:
+      - name: Materialize App key
+        env:
+          PRIVATE_KEY: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys" && chmod 700 "$RUNNER_TEMP/keys"
+          printf '%s\n' "$PRIVATE_KEY" > "$RUNNER_TEMP/keys/burndown-bot.pem"
+          chmod 600 "$RUNNER_TEMP/keys/burndown-bot.pem"
+
+      - name: Run triage poll
+        env:
+          MODE: ${{ inputs.mode }}
+          WORKSPACE: ${{ github.workspace }}
+          RUNNER_TEMP: ${{ runner.temp }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          HUB_REPO: ${{ inputs.hub_repo }}
+          LABEL_PREFIX: ${{ inputs.label_prefix }}
+          TRIAGE_MODEL: ${{ inputs.triage_model }}
+          GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
+          GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
+          GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
+          OPENAI_API_KEY: ${{ secrets.BURNDOWN_BOT_OPENAI_API_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/burndown-state" "$RUNNER_TEMP/burndown-digest"
+          /usr/local/bin/burndown triage-poll --from-env
