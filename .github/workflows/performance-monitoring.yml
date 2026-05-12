@@ -59,7 +59,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/rust.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
         with:
           name: Rust Fixture Execution
           tool: 'customSmallerIsBetter'
@@ -110,7 +110,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/node.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
         with:
           name: Node Fixture Execution
           tool: 'customSmallerIsBetter'
@@ -161,7 +161,7 @@ jobs:
         run: python3 .github/workflows/scripts/capture_benchmark_metrics.py benchmarks/python.json
 
       - name: Publish benchmark result
-        uses: benchmark-action/github-action-benchmark@a60cea5bc7b49e15c1f58f411161f99e0df48372 # v1.22.0
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
         with:
           name: Python Fixture Execution
           tool: 'customSmallerIsBetter'

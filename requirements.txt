@@ -8,4 +8,4 @@
 PyYAML>=6.0.3
 PyJWT[crypto]>=2.12.1
 cryptography>=41.0.7
-requests>=2.33.1
+requests>=2.34.0
