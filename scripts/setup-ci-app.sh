@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # file: scripts/setup-ci-app.sh
-# version: 1.0.0
+# version: 1.1.0
 # guid: 7e4a8c92-3b1f-4e5d-9a2c-6f8e1b3d4a7c
 #
 # One-shot GitHub App creator for jdfalk CI plumbing.
@@ -103,7 +103,8 @@ MANIFEST=$(jq -n \
       workflows: "write",
       metadata: "read",
       actions: "read",
-      pull_requests: "write"
+      pull_requests: "write",
+      issues: "write"
     }
   }')
 
@@ -137,17 +138,44 @@ EOF
 
 CODE_FILE="$TMPDIR/code.txt"
 
+# The HTML form is served by the localhost server itself (not file://) so that
+# browsers allow it to POST to github.com without CSRF/mixed-content issues.
+HTML_BODY=$(
+  cat <<HTMLEOF
+<!doctype html>
+<meta charset="utf-8">
+<title>Create $APP_NAME</title>
+<body onload="document.forms[0].submit()" style="font-family:system-ui;padding:2em">
+<p>Submitting manifest to GitHub… if nothing happens, click below:</p>
+<form action="https://github.com/settings/apps/new?state=$STATE" method="post">
+  <input type="hidden" name="manifest" value="$MANIFEST_ESCAPED">
+  <button type="submit">Create GitHub App</button>
+</form>
+</body>
+HTMLEOF
+)
+
 python3 - <<PY &
-import http.server, urllib.parse, sys, socket
+import http.server, urllib.parse, sys
+
 STATE = "$STATE"
 RESULT = "$CODE_FILE"
-PATH = "$CALLBACK_PATH"
+CALLBACK = "$CALLBACK_PATH"
+HTML = """$HTML_BODY"""
 
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def do_GET(self):
         u = urllib.parse.urlparse(self.path)
-        if u.path != PATH:
+        if u.path == "/":
+            body = HTML.encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if u.path != CALLBACK:
             self.send_response(404); self.end_headers(); return
         q = urllib.parse.parse_qs(u.query)
         code = q.get("code", [""])[0]
@@ -162,97 +190,30 @@ class H(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b"<!doctype html><meta charset=utf-8><title>Done</title>"
                          b"<body style='font-family:system-ui;padding:2em'>"
-                         b"<h1>Got it.</h1><p>You can close this tab and return to the terminal.</p></body>")
+                         b"<h1>Done.</h1><p>Return to the terminal.</p></body>")
 
 srv = http.server.HTTPServer(("127.0.0.1", $CALLBACK_PORT), H)
-srv.timeout = 300  # 5 min to complete the browser dance
+srv.timeout = 300
+# Serve root + callback (2 requests max)
+srv.handle_request()
 srv.handle_request()
 PY
 SERVER_PID=$!
 
-# Give the listener a moment to bind before redirecting the browser to it.
+# Give the listener a moment to bind.
 sleep 1
 
-GO_URL="file://$TMPDIR/go.html"
+GO_URL="http://localhost:${CALLBACK_PORT}/"
 
-# Copy URL to clipboard so the user can paste into a browser profile of
-# their choice. macOS pbcopy / Linux xclip / wl-copy — best-effort.
-if command -v pbcopy >/dev/null 2>&1; then
-  printf '%s' "$GO_URL" | pbcopy
-  CLIPBOARD_NOTE=" (copied to clipboard)"
-elif command -v xclip >/dev/null 2>&1; then
-  printf '%s' "$GO_URL" | xclip -selection clipboard
-  CLIPBOARD_NOTE=" (copied to clipboard)"
-elif command -v wl-copy >/dev/null 2>&1; then
-  printf '%s' "$GO_URL" | wl-copy
-  CLIPBOARD_NOTE=" (copied to clipboard)"
+echo
+echo "Opening $GO_URL in your default browser..."
+echo "(Make sure you're logged into github.com as jdfalk)"
+echo
+
+if [ "$(uname -s)" = "Darwin" ]; then
+  open "$GO_URL"
 else
-  CLIPBOARD_NOTE=""
-fi
-
-echo
-echo "════════════════════════════════════════════════════════════════"
-echo "  IMPORTANT: open the URL below in a PRIVATE / INCOGNITO window."
-echo "  A fresh window has no github.com cookies, so you'll be prompted"
-echo "  to sign in — pick your PERSONAL GitHub account, NOT any"
-echo "  enterprise-managed user (e.g. through a company SSO)."
-echo
-echo "  URL:$CLIPBOARD_NOTE"
-echo "    $GO_URL"
-echo "════════════════════════════════════════════════════════════════"
-echo
-
-# Attempt to auto-launch a private/incognito window. Falls back to
-# printing the URL if no supported browser is found. Set BROWSER=none
-# to skip auto-launch entirely.
-launch_private() {
-  local url="$1"
-  [ "${BROWSER:-}" = "none" ] && return 1
-
-  if [ "$(uname -s)" = "Darwin" ]; then
-    # Preference order: Chrome > Brave > Edge > Arc > Firefox > Safari-fallback
-    if [ -d "/Applications/Google Chrome.app" ]; then
-      open -na "Google Chrome" --args --incognito "$url" && return 0
-    fi
-    if [ -d "/Applications/Brave Browser.app" ]; then
-      open -na "Brave Browser" --args --incognito "$url" && return 0
-    fi
-    if [ -d "/Applications/Microsoft Edge.app" ]; then
-      open -na "Microsoft Edge" --args --inprivate "$url" && return 0
-    fi
-    if [ -d "/Applications/Arc.app" ]; then
-      # Arc doesn't have a stable --incognito flag; open normally and
-      # tell the user to use a Private space.
-      open -na "Arc" "$url" && return 0
-    fi
-    if [ -d "/Applications/Firefox.app" ]; then
-      open -na "Firefox" --args -private-window "$url" && return 0
-    fi
-    # Last-resort Safari (no CLI private mode) — user must Cmd-Shift-N
-    open "$url" && return 0
-  else
-    # Linux
-    for b in google-chrome chromium-browser chromium brave-browser microsoft-edge firefox; do
-      if command -v "$b" >/dev/null 2>&1; then
-        case "$b" in
-        firefox)
-          "$b" --private-window "$url" &
-          return 0
-          ;;
-        *)
-          "$b" --incognito "$url" &
-          return 0
-          ;;
-        esac
-      fi
-    done
-    command -v xdg-open >/dev/null 2>&1 && xdg-open "$url" && return 0
-  fi
-  return 1
-}
-
-if ! launch_private "$GO_URL"; then
-  echo "(Could not auto-launch a browser — paste the URL above manually.)"
+  xdg-open "$GO_URL" 2>/dev/null || echo "Could not auto-open — visit $GO_URL manually"
 fi
 
 # ─── wait for callback ──────────────────────────────────────────────────────
