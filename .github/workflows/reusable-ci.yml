@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-ci.yml
-# version: 1.12.1
+# version: 1.12.3
 # guid: reusable-ci-2025-09-24-core-workflow
 
 name: Reusable CI Workflow
@@ -276,7 +276,9 @@ jobs:
         run: |
           set -euo pipefail
           ACTIONLINT_BIN="$(go env GOPATH)/bin/actionlint"
-          "$ACTIONLINT_BIN" -no-color | tee actionlint.log
+          "$ACTIONLINT_BIN" -no-color \
+            -ignore 'unknown permission scope "code-quality"' \
+            | tee actionlint.log
 
       - name: Publish workflow summary
         if: always()
@@ -443,8 +445,11 @@ jobs:
         if: inputs.system-packages != ''
         env:
           PACKAGES: ${{ inputs.system-packages }}
-        # shellcheck disable=SC2086 -- intentional word splitting for multiple package names
-        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+        run: |
+          sudo apt-get update
+          # Intentional word splitting for multiple package names.
+          # shellcheck disable=SC2086
+          sudo apt-get install -y $PACKAGES
 
       - name: Build Go project
         uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
