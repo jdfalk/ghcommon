@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # file: .github/workflows/scripts/ci_workflow.py
-# version: 1.1.3
+# version: 1.2.0
 # guid: d9c2b3a4-5e6f-47a8-9b0c-1d2e3f4a5b6c
 """Helper utilities invoked from GitHub Actions CI workflows."""
 
@@ -609,6 +609,24 @@ def rust_clippy(_: argparse.Namespace) -> None:
     subprocess.run(command, check=True)
 
 
+def rust_build(_: argparse.Namespace) -> None:
+    """Build a Cargo project when one exists."""
+    if not Path("Cargo.toml").is_file():
+        print("ℹ️ No Cargo.toml found; skipping cargo build.")
+        return
+
+    subprocess.run(["cargo", "build", "--all-targets", "--locked"], check=True)
+
+
+def rust_test(_: argparse.Namespace) -> None:
+    """Run Cargo tests when a Cargo project exists."""
+    if not Path("Cargo.toml").is_file():
+        print("ℹ️ No Cargo.toml found; skipping cargo test.")
+        return
+
+    subprocess.run(["cargo", "test", "--locked"], check=True)
+
+
 def ensure_cargo_llvm_cov(_: argparse.Namespace) -> None:
     if shutil.which("cargo-llvm-cov"):
         print("cargo-llvm-cov already installed")
@@ -887,6 +905,8 @@ def build_parser() -> argparse.ArgumentParser:
         "ensure-cargo-llvm-cov": ensure_cargo_llvm_cov,
         "rust-format": rust_format,
         "rust-clippy": rust_clippy,
+        "rust-build": rust_build,
+        "rust-test": rust_test,
         "generate-rust-lcov": generate_rust_lcov,
         "generate-rust-html": generate_rust_html,
         "compute-rust-coverage": compute_rust_coverage,
