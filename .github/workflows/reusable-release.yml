@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-release.yml
-# version: 2.13.2
+# version: 2.13.4
 # guid: 7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e
 
 name: Reusable Release Coordinator
@@ -195,26 +195,36 @@ jobs:
         run: |
           # When explicitly requesting a stable release, skip the RC flow
           if [ "$STABLE_RELEASE" = "true" ]; then
-            echo "strategy=stable" >> "$GITHUB_OUTPUT"
-            echo "auto-prerelease=false" >> "$GITHUB_OUTPUT"
-            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "strategy=stable"
+              echo "auto-prerelease=false"
+              echo "auto-draft=false"
+            } >> "$GITHUB_OUTPUT"
           elif [ "$FORCE_PRERELEASE" = "true" ]; then
-            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
-            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "strategy=prerelease"
+              echo "auto-prerelease=true"
+              echo "auto-draft=false"
+            } >> "$GITHUB_OUTPUT"
           elif [ "$FORCE_DRAFT" = "true" ]; then
-            echo "strategy=stable" >> "$GITHUB_OUTPUT"
-            echo "auto-prerelease=false" >> "$GITHUB_OUTPUT"
-            echo "auto-draft=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "strategy=stable"
+              echo "auto-prerelease=false"
+              echo "auto-draft=true"
+            } >> "$GITHUB_OUTPUT"
           elif [ "$BRANCH_NAME" = "main" ] || [ "$BRANCH_NAME" = "master" ]; then
             # Default for push-to-main: pre-release RC
-            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
-            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "strategy=prerelease"
+              echo "auto-prerelease=true"
+              echo "auto-draft=false"
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "strategy=prerelease" >> "$GITHUB_OUTPUT"
-            echo "auto-prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "auto-draft=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "strategy=prerelease"
+              echo "auto-prerelease=true"
+              echo "auto-draft=false"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: Generate version with RC support
@@ -226,7 +236,7 @@ jobs:
           set -euo pipefail
 
           # Find latest full (non-prerelease) release tag
-          LATEST_FULL=$(git tag -l 'v*.*.*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          LATEST_FULL=$(git tag -l 'v*.*.*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 || true)
           if [ -z "$LATEST_FULL" ]; then
             LATEST_FULL="v0.0.0"
           fi
@@ -656,6 +666,7 @@ jobs:
 
           if [ -n "$keep_list" ]; then
             echo "Keeping these recent RC prereleases:"
+            # shellcheck disable=SC2001
             echo "$keep_list" | sed 's/^/  - /'
           fi
 
