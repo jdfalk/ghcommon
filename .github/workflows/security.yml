@@ -1,5 +1,5 @@
 # file: .github/workflows/security.yml
-# version: 3.2.0
+# version: 3.2.1
 # guid: s3c4r5t6-y7a8-b9c0-d1e2-f3a4b5c6d7e8
 
 name: Security
@@ -67,11 +67,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Determine build mode for language
+        id: build-config
+        run: |
+          case "${{ matrix.language }}" in
+            go)
+              echo "mode=autobuild" >> "$GITHUB_OUTPUT"
+              ;;
+            javascript|python|actions|*)
+              echo "mode=none" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
+          build-mode: ${{ steps.build-config.outputs.mode }}
 
       - name: Set up language environment
         run: |
@@ -94,6 +107,7 @@ jobs:
           esac
 
       - name: Autobuild
+        if: steps.build-config.outputs.mode == 'autobuild'
         uses: github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
 
       - name: Perform CodeQL Analysis
@@ -165,12 +179,7 @@ jobs:
   security-summary:
     name: Security Summary
     needs:
-      [
-        detect-languages,
-        codeql-analysis,
-        dependency-review,
-        security-audit,
-      ]
+      [detect-languages, codeql-analysis, dependency-review, security-audit]
     if: always()
     runs-on: ubuntu-latest
     steps:
