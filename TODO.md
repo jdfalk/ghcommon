@@ -1,7 +1,7 @@
 <!-- file: TODO.md -->
-<!-- version: 2.3.2 -->
+<!-- version: 2.3.3 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
-<!-- last-edited: 2026-01-19 -->
+<!-- last-edited: 2026-05-31 -->
 
 # TODO
 
@@ -142,6 +142,9 @@
     testing
   - ✅ Ensured all 18 repos have TODO.md and CHANGELOG.md with proper headers
     and templates
+  - ✅ Fixed reusable Security CodeQL build-mode mapping so JavaScript uses
+    `build-mode: none`; verified in `ghcommon` run `26727776233` and
+    `audiobook-organizer` run `26727789014`
 - Acceptance: No `warning: write-all` permissions; Dependabot alerts addressed
   for action pins.
 

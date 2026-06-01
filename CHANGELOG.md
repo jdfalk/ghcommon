@@ -75,6 +75,17 @@
 
 ### Fixed
 
+#### May 31, 2026 - Reusable Security CodeQL JavaScript build mode
+
+- Fixed `reusable-security.yml` so JavaScript CodeQL uses `build-mode: none`,
+  matching current CodeQL requirements.
+- Kept Go CodeQL on `autobuild` and made the autobuild step conditional on the
+  resolved per-language build mode.
+- Mirrored the same per-language build-mode behavior in `ghcommon`'s own
+  Security workflow.
+- Verified by green `ghcommon` Security run `26727776233` and downstream
+  `audiobook-organizer` Security run `26727789014`.
+
 #### December 26, 2025 - CI npm caching hardening
 
 - Added directory creation step to prevent "paths not resolved" warnings in npm
