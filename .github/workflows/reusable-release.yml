@@ -125,7 +125,7 @@ jobs:
       has-config: ${{ steps.load-config.outputs.has-config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Load repository configuration
         id: load-config
         uses: jdfalk/load-config-action@bb213cbf6b6e789bea8ad0787f2914760d00536b # v1.1.3
@@ -161,7 +161,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
@@ -297,7 +297,7 @@ jobs:
     if: ${{ needs.detect-languages.outputs.protobuf-needed == 'true' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Generate protobuf
         uses: jdfalk/gha-release-protobuf@1c07a62621ea5bdaf7fd46643fd4e650c69de8d9 # v1.0.2+
 
@@ -312,7 +312,7 @@ jobs:
       (inputs.build-target == 'all' || inputs.build-target == 'go')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
@@ -364,7 +364,7 @@ jobs:
       (inputs.build-target == 'all' || inputs.build-target == 'python')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Python
         uses: jdfalk/gha-release-python@900b75fc7585c37cf448dbb7e30330f5ff891607 # v1.0.2+
         with:
@@ -381,7 +381,7 @@ jobs:
       (inputs.build-target == 'all' || inputs.build-target == 'rust')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Rust
         uses: jdfalk/gha-release-rust@5e0cfb831f58d00fc22e4dfe6d7e51a97eb6dbcd # v1.0.2+
         with:
@@ -399,7 +399,7 @@ jobs:
       (inputs.build-target == 'all' || inputs.build-target == 'frontend')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Frontend
         uses: jdfalk/gha-release-frontend@3fe7d567a6a6f25cadb618a3cb0abe311c765abb # v1.0.2+
 
@@ -414,7 +414,7 @@ jobs:
       (inputs.build-target == 'all' || inputs.build-target == 'docker')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Docker
         uses: jdfalk/gha-release-docker@2f0979263a455d556526d9f53589c3eb4d837136 # v1.0.2+
         with:
@@ -446,7 +446,7 @@ jobs:
       release-created: ${{ steps.check-release.outputs.created }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
@@ -460,7 +460,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -745,7 +745,7 @@ jobs:
       REPOSITORY_CONFIG: ${{ needs.load-config.outputs.config }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Determine ghcommon workflow ref
         id: ghcommon-ref
@@ -757,7 +757,7 @@ jobs:
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
@@ -826,7 +826,7 @@ jobs:
       !inputs.draft
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
@@ -912,7 +912,7 @@ jobs:
       release-created: ${{ needs.create-release.outputs.release-created || 'false' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Detect ghcommon ref
         id: ghcommon-ref
@@ -924,7 +924,7 @@ jobs:
           fi
 
       - name: Checkout ghcommon workflow scripts
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
