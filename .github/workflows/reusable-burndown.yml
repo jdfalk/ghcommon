@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.5.0
+# version: 1.6.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -230,7 +230,7 @@ jobs:
       image: ghcr.io/jdfalk/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         index: ${{ fromJson(needs.triage.outputs.task_indices) }}
     steps:
