@@ -62,9 +62,9 @@ All analysis outputs are located in the `dependency-analysis/` directory:
 From the repository root (uses the repo’s virtualenv):
 
 - Full graph with default excludes:
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.venv/bin/python analyze-dependencies.py --root . --exclude .git,node_modules,.venv --full`
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/.venv/bin/python analyze-dependencies.py --root . --exclude .git,node_modules,.venv --full`
 - Tuned Mermaid limits (example):
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/.venv/bin/python analyze-dependencies.py --root . --mermaid-max-files 500 --mermaid-max-edges 5000`
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/.venv/bin/python analyze-dependencies.py --root . --mermaid-max-files 500 --mermaid-max-edges 5000`
 
 ## Analysis Progress
 

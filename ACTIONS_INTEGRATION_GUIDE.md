@@ -25,7 +25,7 @@ use the new GitHub Actions instead of inline scripts.
 
 ```yaml
 # This works everywhere
-- uses: jdfalk/load-config-action@v1.0.0
+- uses: falkcorp/gha-load-config@v1.0.0
 ```
 
 ## Integration Examples
@@ -46,7 +46,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Load repository config
   id: config
-  uses: jdfalk/load-config-action@v1.0.0
+  uses: falkcorp/gha-load-config@v1.0.0
   with:
     config-file: .github/repository-config.yml
     fail-on-missing: false
@@ -70,7 +70,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Generate CI matrices
   id: matrices
-  uses: jdfalk/ci-generate-matrices-action@v1.0.0
+  uses: falkcorp/gha-ci-generate-matrices@v1.0.0
   with:
     repository-config: ${{ steps.config.outputs.config }}
     fallback-go-version: '1.23'
@@ -92,7 +92,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Detect languages
   id: detect
-  uses: jdfalk/detect-languages-action@v1.0.0
+  uses: falkcorp/gha-detect-languages@v1.0.0
   with:
     skip-detection: false
 ```
@@ -113,7 +113,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Determine release strategy
   id: strategy
-  uses: jdfalk/release-strategy-action@v1.0.0
+  uses: falkcorp/gha-release-strategy@v1.0.0
   with:
     branch-name: ${{ github.ref_name }}
 ```
@@ -136,7 +136,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Generate semantic version
   id: version
-  uses: jdfalk/generate-version-action@v1.0.0
+  uses: falkcorp/gha-generate-version@v1.0.0
   with:
     release-type: auto
     branch-name: ${{ github.ref_name }}
@@ -159,7 +159,7 @@ use the new GitHub Actions instead of inline scripts.
 ```yaml
 - name: Package assets
   id: package
-  uses: jdfalk/package-assets-action@v1.0.0
+  uses: falkcorp/gha-package-assets@v1.0.0
   with:
     artifacts-dir: dist
 ```
@@ -195,17 +195,17 @@ jobs:
 
       - name: Load config
         id: config
-        uses: jdfalk/load-config-action@v1.0.0
+        uses: falkcorp/gha-load-config@v1.0.0
         with:
           config-file: ${{ inputs.config-file }}
 
       - name: Detect languages
         id: detect
-        uses: jdfalk/detect-languages-action@v1.0.0
+        uses: falkcorp/gha-detect-languages@v1.0.0
 
       - name: Generate matrices
         id: matrices
-        uses: jdfalk/ci-generate-matrices-action@v1.0.0
+        uses: falkcorp/gha-ci-generate-matrices@v1.0.0
         with:
           repository-config: ${{ steps.config.outputs.config }}
 
@@ -266,7 +266,7 @@ jobs:
       # NEW: Use action for version generation
       - name: Generate version
         id: version
-        uses: jdfalk/generate-version-action@v1.0.0
+        uses: falkcorp/gha-generate-version@v1.0.0
         with:
           release-type: ${{ inputs.release-type }}
           branch-name: ${{ github.ref_name }}
@@ -274,14 +274,14 @@ jobs:
       # NEW: Use action for strategy detection
       - name: Determine strategy
         id: strategy
-        uses: jdfalk/release-strategy-action@v1.0.0
+        uses: falkcorp/gha-release-strategy@v1.0.0
         with:
           branch-name: ${{ github.ref_name }}
 
       # NEW: Use action for asset packaging
       - name: Package assets
         id: package
-        uses: jdfalk/package-assets-action@v1.0.0
+        uses: falkcorp/gha-package-assets@v1.0.0
         with:
           artifacts-dir: dist
 
@@ -345,7 +345,7 @@ Ensure you're using the correct GitHub org and action name:
 
 ```yaml
 # Correct
-uses: jdfalk/detect-languages-action@v1.0.0
+uses: falkcorp/gha-detect-languages@v1.0.0
 
 # Incorrect
 uses: detect-languages-action@v1.0.0  # Missing org

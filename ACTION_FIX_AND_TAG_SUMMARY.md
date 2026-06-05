@@ -85,10 +85,10 @@ The tagging script creates three tags:
 
 This follows GitHub Actions best practices where users can:
 
-- Pin to exact version: `uses: jdfalk/release-docker-action@v1.0.0`
-- Pin to minor: `uses: jdfalk/release-docker-action@v1.0` (gets patches
+- Pin to exact version: `uses: falkcorp/gha-release-docker@v1.0.0`
+- Pin to minor: `uses: falkcorp/gha-release-docker@v1.0` (gets patches
   automatically)
-- Pin to major: `uses: jdfalk/release-docker-action@v1` (gets all non-breaking
+- Pin to major: `uses: falkcorp/gha-release-docker@v1` (gets all non-breaking
   updates)
 
 ## Force Tag Updates
@@ -118,7 +118,7 @@ All 7 action repositories are:
 directly from GitHub repositories using:
 
 ```yaml
-uses: jdfalk/release-docker-action@v1
+uses: falkcorp/gha-release-docker@v1
 ```
 
 GitHub automatically provides:

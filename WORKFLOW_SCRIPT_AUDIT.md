@@ -330,7 +330,7 @@ remains in scripts.
 
 Based on grep search, these repositories call the reusable workflows:
 
-- `jdfalk/audiobook-organizer` - Uses reusable-ci.yml, reusable-release.yml
+- `falkcorp/audiobook-organizer` - Uses reusable-ci.yml, reusable-release.yml
 - `jdfalk/ghcommon` (self) - Self-referential workflows
 - `jdfalk/project-template` - Template for new repos
 - **Estimate:** 10-50 additional repositories (not in current workspace)
@@ -378,7 +378,7 @@ Based on grep search, these repositories call the reusable workflows:
 
 - A) Continue separate repos (1 action = 1 repo)
 - B) Create `jdfalk/ghcommon-actions` monorepo with multiple actions
-- C) Embed actions in `jdfalk/ghcommon/.github/actions/`
+- C) Embed actions in `falkcorp/github-common/.github/actions/`
 
 **Recommendation:** **Option A (Separate Repos)** for consistency
 

@@ -39,7 +39,7 @@ that:
 ### 🏗️ Architecture Benefits
 
 - **Reusable**: Can be called from any repository with
-  `uses: jdfalk/ghcommon/.github/workflows/reusable-release.yml@main`
+  `uses: falkcorp/github-common/.github/workflows/reusable-release.yml@main`
 - **Maintainable**: Centralized release logic with language-specific delegation
 - **Configurable**: All settings controlled via repository-config.yml
 - **Comprehensive**: Handles protobuf generation, multi-language builds, release
@@ -86,7 +86,7 @@ on:
 
 jobs:
   release:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-release.yml@main
+    uses: falkcorp/github-common/.github/workflows/reusable-release.yml@main
     with:
       version-type: ${{ inputs.version-type || 'patch' }}
       build-target: 'all'

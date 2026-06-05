@@ -557,9 +557,10 @@ script.
   and custom labels
 
 **Script Reference:**
-`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/sync-labels-fast.py`
+`/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/sync-labels-fast.py`
 
-**Labels File:** `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/labels.json`
+**Labels File:**
+`/Users/jdfalk/repos/github.com/falkcorp/github-common/labels.json`
 
 ---
 
@@ -728,7 +729,7 @@ instead of manual Go builds. This is a breaking change requiring v2.0.0.
 5. [ ] Update ghcommon workflows to use v2
 
 **Script:**
-`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/tag-release-go-v2.sh`
+`/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/tag-release-go-v2.sh`
 
 ---
 
@@ -748,7 +749,7 @@ with version comments for security and reproducibility.
 5. [ ] Update documentation with pinning policy
 
 **Script:**
-`/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/pin-actions-to-hashes.py`
+`/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/pin-actions-to-hashes.py`
 
 **Output:** `ACTION_VERSIONS.md` - Version/hash reference table
 
@@ -763,17 +764,17 @@ the new jdfalk/\* actions.
 
 **Action Items:**
 
-1. [ ] Update `release-go.yml` to use `jdfalk/release-go-action@hash # v2.0.1`
+1. [ ] Update `release-go.yml` to use `falkcorp/gha-release-go@hash # v2.0.1`
 2. [ ] Update `release-docker.yml` to use
-       `jdfalk/release-docker-action@hash # v1.0.0`
+       `falkcorp/gha-release-docker@hash # v1.0.0`
 3. [ ] Update `release-frontend.yml` to use
-       `jdfalk/release-frontend-action@hash # v1.0.0`
+       `falkcorp/gha-release-frontend@hash # v1.0.0`
 4. [ ] Update `release-python.yml` to use
-       `jdfalk/release-python-action@hash # v1.0.0`
+       `falkcorp/gha-release-python@hash # v1.0.0`
 5. [ ] Update `release-rust.yml` to use
-       `jdfalk/release-rust-action@hash # v1.0.0`
+       `falkcorp/gha-release-rust@hash # v1.0.0`
 6. [ ] Update `release-protobuf.yml` to use
-       `jdfalk/release-protobuf-action@hash # v1.0.0`
+       `falkcorp/gha-release-protobuf-base@hash # v1.0.0`
 7. [ ] Test each workflow conversion
 8. [ ] Document migration for repositories using these workflows
 

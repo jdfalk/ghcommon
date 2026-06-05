@@ -115,14 +115,14 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Load repository configuration
         id: load
-        uses: jdfalk/load-config-action@bb213cbf6b6e789bea8ad0787f2914760d00536b # v1.1.3
+        uses: falkcorp/gha-load-config@bb213cbf6b6e789bea8ad0787f2914760d00536b # v1.1.3
         with:
           config-file: .github/repository-config.yml
           fail-on-missing: false
 
       - name: Generate language matrices
         id: matrices
-        uses: jdfalk/ci-generate-matrices-action@8c36d080ec55e96d3532e9b02417054fc6aaaeac # v1.1.6
+        uses: falkcorp/gha-ci-generate-matrices@8c36d080ec55e96d3532e9b02417054fc6aaaeac # v1.1.6
         with:
           repository-config: ${{ steps.load.outputs.config }}
           fallback-go-version: ${{ inputs.go-version }}
@@ -307,7 +307,7 @@ jobs:
     name: Cache npm (Workflow Scripts)
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows-scripts == 'true' || github.event_name == 'workflow_dispatch'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@1e106b5c7bc2e80beb0c6019e8ac263d41f2ed5f # v1.10.3+
+    uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@1e106b5c7bc2e80beb0c6019e8ac263d41f2ed5f # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-workflow-scripts'
@@ -391,7 +391,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Generate protobuf
-        uses: jdfalk/gha-release-protobuf@1c07a62621ea5bdaf7fd46643fd4e650c69de8d9 # v1.0.1
+        uses: falkcorp/gha-release-protobuf@1c07a62621ea5bdaf7fd46643fd4e650c69de8d9 # v1.0.1
 
   # Language-specific build and test jobs
   go-ci:
@@ -452,13 +452,13 @@ jobs:
           sudo apt-get install -y $PACKAGES
 
       - name: Build Go project
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: go-setup
 
       - name: Test Go project
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: go-test
           coverage-threshold: ${{ inputs.coverage-threshold || needs.load-config.outputs.coverage-threshold }}
@@ -524,7 +524,7 @@ jobs:
           echo "GHCOMMON_SCRIPTS_DIR=$PWD/ghcommon-workflow-scripts/.github/workflows/scripts" >> "$GITHUB_ENV"
 
       - name: Install Python dependencies
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: python-install
 
@@ -535,7 +535,7 @@ jobs:
 
       - name: Test Python code
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: python-run-tests
 
@@ -598,24 +598,24 @@ jobs:
 
       - name: Format Rust code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: rust-format
 
       - name: Lint Rust code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: rust-clippy
 
       - name: Build Rust project
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: rust-build
 
       - name: Test Rust project
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: rust-test
 
@@ -624,7 +624,7 @@ jobs:
     name: Cache npm (Frontend)
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-files == 'true'
-    uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@1e106b5c7bc2e80beb0c6019e8ac263d41f2ed5f # v1.10.3+
+    uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@1e106b5c7bc2e80beb0c6019e8ac263d41f2ed5f # v1.10.3+
     with:
       language: 'node'
       cache-prefix: 'npm-frontend'
@@ -649,7 +649,7 @@ jobs:
 
       - name: Get frontend working directory
         id: frontend-dir
-        uses: jdfalk/get-frontend-config-action@517d41adc382a541ea13dead79a12a57a7172dcf # v1.1.3
+        uses: falkcorp/gha-get-frontend-config@517d41adc382a541ea13dead79a12a57a7172dcf # v1.1.3
         with:
           repository-config: ${{ env.REPOSITORY_CONFIG }}
 
@@ -686,14 +686,14 @@ jobs:
       # No additional cache setup needed here.
 
       - name: Install dependencies
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: frontend-install
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
 
       - name: Lint frontend code
         if: ${{ !inputs.skip-linting }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -702,7 +702,7 @@ jobs:
           frontend-failure-message: '❌ Linting failed or not configured'
 
       - name: Build frontend
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -712,7 +712,7 @@ jobs:
 
       - name: Test frontend
         if: ${{ !inputs.skip-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -735,7 +735,7 @@ jobs:
 
       - name: Run E2E tests
         if: ${{ !inputs.skip-tests && !inputs.skip-e2e-tests }}
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: frontend-run
           frontend-working-dir: ${{ steps.frontend-dir.outputs.dir }}
@@ -825,7 +825,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Generate summary
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: generate-ci-summary
         env:
@@ -840,7 +840,7 @@ jobs:
           JOB_DOCS: skipped
 
       - name: Check overall status
-        uses: jdfalk/ci-workflow-helpers-action@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
+        uses: falkcorp/gha-ci-workflow-helpers@c8b87fae92ee0a0458e47b970ed892310323aa58 # v1.1.4
         with:
           command: check-ci-status
         env:

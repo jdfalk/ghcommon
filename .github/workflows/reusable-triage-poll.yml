@@ -5,7 +5,7 @@
 # Usage:
 #   jobs:
 #     triage-poll:
-#       uses: jdfalk/ghcommon/.github/workflows/reusable-triage-poll.yml@main
+#       uses: falkcorp/github-common/.github/workflows/reusable-triage-poll.yml@main
 #       secrets: inherit
 #
 # State machine (one iteration per invocation, zero AI cost for idle runs):
@@ -29,7 +29,7 @@ on:
       hub_repo:
         description: 'GitHub repo holding burndown task issues'
         type: string
-        default: jdfalk/burndown-tasks
+        default: falkcorp/burndown-tasks
       label_prefix:
         description: 'Label prefix routing tasks to repos'
         type: string
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:d558a3367025991ebe86e43e46b4d9f73da39b88
+      image: ghcr.io/falkcorp/burndown-runner-image:d558a3367025991ebe86e43e46b4d9f73da39b88
     steps:
       - name: Materialize App key
         env:

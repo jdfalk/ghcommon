@@ -98,9 +98,9 @@ SIGNATURE="go-build-all.tar.gz.sig"
 PUBLIC_KEY="cosign.pub"
 
 # Download files (adjust URLs as needed)
-curl -L -o "$ARTIFACT" "https://github.com/jdfalk/ghcommon/releases/download/v1.0.0/$ARTIFACT"
-curl -L -o "$SIGNATURE" "https://github.com/jdfalk/ghcommon/releases/download/v1.0.0/$SIGNATURE"
-curl -L -o "$PUBLIC_KEY" "https://github.com/jdfalk/ghcommon/releases/download/v1.0.0/$PUBLIC_KEY"
+curl -L -o "$ARTIFACT" "https://github.com/falkcorp/github-common/releases/download/v1.0.0/$ARTIFACT"
+curl -L -o "$SIGNATURE" "https://github.com/falkcorp/github-common/releases/download/v1.0.0/$SIGNATURE"
+curl -L -o "$PUBLIC_KEY" "https://github.com/falkcorp/github-common/releases/download/v1.0.0/$PUBLIC_KEY"
 
 # Verify signature
 if cosign verify-blob --key "$PUBLIC_KEY" --signature "$SIGNATURE" "$ARTIFACT"; then

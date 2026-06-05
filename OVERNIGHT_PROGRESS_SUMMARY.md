@@ -184,12 +184,12 @@ Created comprehensive guides:
 
 ## 📁 Important Files to Review
 
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/TODO.md` - Task list
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/ACTION_PINNING_PLAN.md` -
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/TODO.md` - Task list
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/ACTION_PINNING_PLAN.md` -
   Pinning strategy
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/pin-actions-to-hashes.py` -
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/pin-actions-to-hashes.py` -
   Pinning script
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/tag-release-go-v2.sh` -
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/tag-release-go-v2.sh` -
   Tagging script
 - `/Users/jdfalk/repos/github.com/jdfalk/release-go-action/TODO.md` - Go action
   issues

@@ -243,7 +243,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: jdfalk/load-config-action@v1
+      - uses: falkcorp/gha-load-config@v1
         id: config
         with:
           config-file: .github/repository-config.yml
@@ -529,9 +529,9 @@ jobs:
       python-matrix: ${{ steps.matrices.outputs.python-matrix }}
     steps:
       - uses: actions/checkout@v6
-      - uses: jdfalk/load-config-action@v1
+      - uses: falkcorp/gha-load-config@v1
         id: config
-      - uses: jdfalk/ci-generate-matrices-action@v1
+      - uses: falkcorp/gha-ci-generate-matrices@v1
         id: matrices
         with:
           repository-config: ${{ steps.config.outputs.config }}

@@ -95,7 +95,7 @@ workflow-scripts-npm-cache:
   if:
     needs.detect-changes.outputs.workflows-scripts == 'true' ||
     github.event_name == 'workflow_dispatch'
-  uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+  uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@main
   with:
     language: 'node'
     cache-prefix: 'npm-workflow-scripts'
@@ -182,7 +182,7 @@ frontend-npm-cache:
   name: Cache npm (Frontend)
   needs: detect-changes
   if: needs.detect-changes.outputs.frontend-files == 'true'
-  uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+  uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@main
   with:
     language: 'node'
     cache-prefix: 'npm-frontend'
@@ -215,7 +215,7 @@ frontend-npm-cache:
 
       - name: Get frontend working directory
         id: frontend-dir
-        uses: jdfalk/get-frontend-config-action@v1
+        uses: falkcorp/gha-get-frontend-config@v1
         with:
           repository-config: ${{ env.REPOSITORY_CONFIG }}
 

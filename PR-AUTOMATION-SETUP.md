@@ -10,7 +10,7 @@ PRs across all repositories.
 ### 1. **PR Created for ghcommon Changes**
 
 - **PR #199**:
-  [fix(sync): resolve git authentication and branch creation bugs in sync script](https://github.com/jdfalk/ghcommon/pull/199)
+  [fix(sync): resolve git authentication and branch creation bugs in sync script](https://github.com/falkcorp/github-common/pull/199)
 - **Status**: Ready for review and merge
 - **Changes**:
   - Fixed sync script v1.2.0 (authentication, branch creation, error handling)
@@ -71,13 +71,13 @@ The sync process now follows this complete workflow:
 ```bash
 # Run sync script
 GH_TOKEN="$(gh auth token)" python3 scripts/intelligent_sync_to_repos.py \
-  --repos jdfalk/audiobook-organizer \
+  --repos falkcorp/audiobook-organizer \
   --branch chore/sync-copilot-agents
 
 # Output:
-# [OK] jdfalk/audiobook-organizer: Synced to branch chore/sync-copilot-agents
-# [PR] jdfalk/audiobook-organizer: Created PR at https://github.com/jdfalk/audiobook-organizer/pull/XX
-# [PR] jdfalk/audiobook-organizer: Closed superseded PR #YY
+# [OK] falkcorp/audiobook-organizer: Synced to branch chore/sync-copilot-agents
+# [PR] falkcorp/audiobook-organizer: Created PR at https://github.com/falkcorp/audiobook-organizer/pull/XX
+# [PR] falkcorp/audiobook-organizer: Closed superseded PR #YY
 ```
 
 ## Next Steps
@@ -93,7 +93,7 @@ GH_TOKEN="$(gh auth token)" python3 scripts/intelligent_sync_to_repos.py \
 ```bash
 # Example: Sync to multiple repos
 GH_TOKEN="$(gh auth token)" python3 scripts/intelligent_sync_to_repos.py \
-  --repos jdfalk/audiobook-organizer,jdfalk/apt-cacher-go,jdfalk/subtitle-manager \
+  --repos falkcorp/audiobook-organizer,jdfalk/apt-cacher-go,jdfalk/subtitle-manager \
   --branch chore/sync-copilot-infrastructure
 ```
 
@@ -106,7 +106,7 @@ GH_TOKEN="$(gh auth token)" python3 scripts/intelligent_sync_to_repos.py \
 
 ## Files Modified
 
-- `/Users/jdfalk/repos/github.com/jdfalk/ghcommon/scripts/intelligent_sync_to_repos.py`
+- `/Users/jdfalk/repos/github.com/falkcorp/github-common/scripts/intelligent_sync_to_repos.py`
   - Version: 1.2.0 → 1.3.0
   - Added: `create_or_update_pr()` function (73 lines)
   - Added: Superseded PR closing logic
@@ -114,7 +114,7 @@ GH_TOKEN="$(gh auth token)" python3 scripts/intelligent_sync_to_repos.py \
 
 ## PR Status
 
-- **PR #199**: <https://github.com/jdfalk/ghcommon/pull/199>
+- **PR #199**: <https://github.com/falkcorp/github-common/pull/199>
 - **Branch**: `chore/sync-script-fix`
 - **Files Changed**: 2
 - **Lines Added**: 118

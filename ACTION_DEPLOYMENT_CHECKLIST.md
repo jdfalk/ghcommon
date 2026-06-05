@@ -278,7 +278,7 @@ jobs:
   test-docker-action:
     runs-on: ubuntu-latest
     steps:
-      - uses: jdfalk/release-docker-action@v1
+      - uses: falkcorp/gha-release-docker@v1
         with:
           version: '1.0.0'
           # ... other inputs
@@ -286,7 +286,7 @@ jobs:
   test-go-action:
     runs-on: ubuntu-latest
     steps:
-      - uses: jdfalk/release-go-action@v1
+      - uses: falkcorp/gha-release-go@v1
         with:
           version: '1.0.0'
           # ... other inputs

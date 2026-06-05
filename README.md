@@ -5,10 +5,10 @@
 
 # GitHub Common Workflows
 
-[![Continuous Integration](https://github.com/jdfalk/ghcommon/actions/workflows/ci.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/ci.yml)
-[![CI Self Tests](https://github.com/jdfalk/ghcommon/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/ci-tests.yml)
-[![CodeQL](https://github.com/jdfalk/ghcommon/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/github-code-scanning/codeql)
-[![Security Scans](https://github.com/jdfalk/ghcommon/actions/workflows/security.yml/badge.svg)](https://github.com/jdfalk/ghcommon/actions/workflows/security.yml)
+[![Continuous Integration](https://github.com/falkcorp/github-common/actions/workflows/ci.yml/badge.svg)](https://github.com/falkcorp/github-common/actions/workflows/ci.yml)
+[![CI Self Tests](https://github.com/falkcorp/github-common/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/falkcorp/github-common/actions/workflows/ci-tests.yml)
+[![CodeQL](https://github.com/falkcorp/github-common/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/falkcorp/github-common/actions/workflows/github-code-scanning/codeql)
+[![Security Scans](https://github.com/falkcorp/github-common/actions/workflows/security.yml/badge.svg)](https://github.com/falkcorp/github-common/actions/workflows/security.yml)
 
 ## Table of Contents
 
@@ -68,19 +68,19 @@ Choose the setup that matches your project type:
 ### For Complete CI/CD Pipeline
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-repository.sh | bash -s complete
+curl -sSL https://raw.githubusercontent.com/falkcorp/github-common/main/scripts/setup-repository.sh | bash -s complete
 ```
 
 ### For Container-Only Projects
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-repository.sh | bash -s container
+curl -sSL https://raw.githubusercontent.com/falkcorp/github-common/main/scripts/setup-repository.sh | bash -s container
 ```
 
 ### For Library/Package Projects
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-repository.sh | bash -s library
+curl -sSL https://raw.githubusercontent.com/falkcorp/github-common/main/scripts/setup-repository.sh | bash -s library
 ```
 
 ## 📋 What's Included
@@ -195,7 +195,7 @@ curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/setup-r
 
 ```yaml
 versioning:
-  uses: jdfalk/ghcommon/.github/workflows/reusable-semantic-versioning.yml@main
+  uses: falkcorp/github-common/.github/workflows/reusable-semantic-versioning.yml@main
   with:
     version-files: '["package.json", "version.txt"]'
     update-pr-title: true
@@ -206,7 +206,7 @@ versioning:
 
 ```yaml
 container:
-  uses: jdfalk/ghcommon/.github/workflows/buildah-multiarch.yml@main
+  uses: falkcorp/github-common/.github/workflows/buildah-multiarch.yml@main
   with:
     image-name: my-app
     platforms: linux/amd64,linux/arm64
@@ -219,7 +219,7 @@ container:
 
 ```yaml
 release:
-  uses: jdfalk/ghcommon/.github/workflows/automatic-release.yml@main
+  uses: falkcorp/github-common/.github/workflows/automatic-release.yml@main
   with:
     release-type: auto
     include-artifacts: true
@@ -245,7 +245,7 @@ on:
 
 jobs:
   issue-management:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-unified-issue-management.yml@main
+    uses: falkcorp/github-common/.github/workflows/reusable-unified-issue-management.yml@main
     with:
       operations: 'auto' # Auto-detect based on event
       issue_updates_file: 'issue_updates.json'
@@ -266,7 +266,7 @@ on:
 
 jobs:
   sync-labels:
-    uses: jdfalk/ghcommon/.github/workflows/reusable-label-sync.yml@main
+    uses: falkcorp/github-common/.github/workflows/reusable-label-sync.yml@main
     with:
       repositories: ${{ github.repository }}
       source-repo: 'jdfalk/ghcommon'
@@ -290,7 +290,7 @@ jobs:
 **Helper Script**: Copy the issue creation helper to your repository:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/create-issue-update.sh -o scripts/create-issue-update.sh
+curl -fsSL https://raw.githubusercontent.com/falkcorp/github-common/main/scripts/create-issue-update.sh -o scripts/create-issue-update.sh
 chmod +x scripts/create-issue-update.sh
 
 # Usage examples:
@@ -351,7 +351,7 @@ chmod +x scripts/create-issue-update.sh
 Validate your repository setup:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jdfalk/ghcommon/main/scripts/validate-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/falkcorp/github-common/main/scripts/validate-setup.sh | bash
 ```
 
 This will check:
@@ -382,9 +382,9 @@ for details.
 
 ## 🆘 Support
 
-- **Issues**: [GitHub Issues](https://github.com/jdfalk/ghcommon/issues)
+- **Issues**: [GitHub Issues](https://github.com/falkcorp/github-common/issues)
 - **Discussions**:
-  [GitHub Discussions](https://github.com/jdfalk/ghcommon/discussions)
+  [GitHub Discussions](https://github.com/falkcorp/github-common/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting security issues
 
 ## 🏷️ Versioning
