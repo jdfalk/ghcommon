@@ -333,6 +333,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/digest"
           triage_json="$RUNNER_TEMP/triage/tasks.json"
           if [ ! -f "$triage_json" ]; then
+            # shellcheck disable=SC2016
             printf '## Burndown — no tasks dispatched\n\nMode: `%s`. All classified tasks were dry-run-only.\n' \
               "$MODE" > "$RUNNER_TEMP/digest/digest.md"
             exit 0
