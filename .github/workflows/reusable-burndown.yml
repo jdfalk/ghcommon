@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:09a419b207b3e81874151c543a8aad08db224c9e
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     container:
-      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:09a419b207b3e81874151c543a8aad08db224c9e
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
@@ -313,7 +313,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container:
-      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:09a419b207b3e81874151c543a8aad08db224c9e
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
@@ -382,7 +382,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:09a419b207b3e81874151c543a8aad08db224c9e
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.JF_CI_GH_PAT || secrets.GITHUB_TOKEN }}
