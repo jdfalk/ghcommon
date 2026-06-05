@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.6.0
+# version: 1.7.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -50,6 +50,10 @@ on:
         description: 'Use most powerful model only'
         type: boolean
         default: false
+      task_filter:
+        description: 'Task subset to collect: "" (normal nightly) | "failed-batch" (hard run)'
+        type: string
+        default: ''
     secrets:
       BURNDOWN_BOT_APP_ID:
         required: true
@@ -185,6 +189,7 @@ jobs:
           TRIAGE_MODEL: ${{ inputs.triage_model }}
           CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
           POWERFUL_ONLY: ${{ inputs.powerful_only }}
+          TASK_FILTER: ${{ inputs.task_filter }}
           GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
           GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
           GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
@@ -267,6 +272,7 @@ jobs:
           IMPLEMENTER_PROVIDER: ${{ inputs.implementer_provider }}
           CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
           POWERFUL_ONLY: ${{ inputs.powerful_only }}
+          TASK_FILTER: ${{ inputs.task_filter }}
           GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
           GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
           GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
