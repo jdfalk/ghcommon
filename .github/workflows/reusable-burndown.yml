@@ -217,8 +217,11 @@ jobs:
         run: |
           count=$(jq '.tasks | length' "$RUNNER_TEMP/tasks.json")
           [ "$count" -gt 256 ] && count=256
-          indices=$([ "$count" -eq 0 ] && echo '[]' \
-            || jq -cn --argjson n "$count" '[range(0;$n)]')
+          if [ "$count" -eq 0 ]; then
+            indices='[]'
+          else
+            indices=$(jq -cn --argjson n "$count" '[range(0;$n)]')
+          fi
           echo "task_count=$count"     >> "$GITHUB_OUTPUT"
           echo "task_indices=$indices" >> "$GITHUB_OUTPUT"
 
