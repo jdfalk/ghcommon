@@ -83,8 +83,9 @@ jobs:
         if: inputs.system-packages != ''
         env:
           PACKAGES: ${{ inputs.system-packages }}
-        # shellcheck disable=SC2086
-        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+        run: |
+          # shellcheck disable=SC2086
+          sudo apt-get update && sudo apt-get install -y $PACKAGES
 
       - name: go vet
         run: go vet ./...
@@ -124,8 +125,9 @@ jobs:
         if: inputs.system-packages != ''
         env:
           PACKAGES: ${{ inputs.system-packages }}
-        # shellcheck disable=SC2086
-        run: sudo apt-get update && sudo apt-get install -y $PACKAGES
+        run: |
+          # shellcheck disable=SC2086
+          sudo apt-get update && sudo apt-get install -y $PACKAGES
 
       - name: Test (short, race)
         run: go test -short -race ./...
