@@ -31,7 +31,7 @@ de881bd (HEAD -> main) feat(cache): implement robust advanced caching strategy f
 ### 2. Trigger CI in audiobook-organizer
 
 ```bash
-cd /Users/jdfalk/repos/github.com/jdfalk/audiobook-organizer
+cd /Users/jdfalk/repos/github.com/falkcorp/audiobook-organizer
 gh workflow run ci.yml --ref main
 ```
 
@@ -46,7 +46,7 @@ gh workflow run ci.yml --ref main
 
 ```bash
 # In browser
-https://github.com/jdfalk/audiobook-organizer/actions
+https://github.com/falkcorp/audiobook-organizer/actions
 ```
 
 ---
@@ -119,13 +119,13 @@ Date: ...
 **Method A: Using GitHub CLI**
 
 ```bash
-cd /Users/jdfalk/repos/github.com/jdfalk/audiobook-organizer
+cd /Users/jdfalk/repos/github.com/falkcorp/audiobook-organizer
 gh workflow run ci.yml --ref main
 ```
 
 **Method B: Using GitHub Web UI**
 
-1. Navigate to: <https://github.com/jdfalk/audiobook-organizer/actions>
+1. Navigate to: <https://github.com/falkcorp/audiobook-organizer/actions>
 2. Click "CI" workflow on left
 3. Click "Run workflow" button
 4. Select "main" branch
@@ -137,7 +137,7 @@ gh workflow run ci.yml --ref main
 
 **Navigation**:
 
-1. Go to: <https://github.com/jdfalk/audiobook-organizer/actions>
+1. Go to: <https://github.com/falkcorp/audiobook-organizer/actions>
 2. Click the latest "CI" run
 3. Wait for jobs to appear (should see within 30 seconds)
 

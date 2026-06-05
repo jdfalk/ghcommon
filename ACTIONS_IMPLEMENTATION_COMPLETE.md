@@ -32,7 +32,7 @@ each action
 Loads `.github/repository-config.yml` and outputs JSON for downstream actions.
 
 ```yaml
-uses: jdfalk/load-config-action@v1.0.0
+uses: falkcorp/gha-load-config@v1.0.0
 ```
 
 ### 2️⃣ ci-generate-matrices-action
@@ -40,7 +40,7 @@ uses: jdfalk/load-config-action@v1.0.0
 Generates CI test matrices for Go, Python, Rust, Node.js based on config.
 
 ```yaml
-uses: jdfalk/ci-generate-matrices-action@v1.0.0
+uses: falkcorp/gha-ci-generate-matrices@v1.0.0
 with:
   repository-config: ${{ steps.config.outputs.config }}
 ```
@@ -50,7 +50,7 @@ with:
 Auto-detects project languages and generates basic CI matrices.
 
 ```yaml
-uses: jdfalk/detect-languages-action@v1.0.0
+uses: falkcorp/gha-detect-languages@v1.0.0
 ```
 
 ### 4️⃣ release-strategy-action
@@ -58,7 +58,7 @@ uses: jdfalk/detect-languages-action@v1.0.0
 Determines release strategy (stable/prerelease/draft) based on branch.
 
 ```yaml
-uses: jdfalk/release-strategy-action@v1.0.0
+uses: falkcorp/gha-release-strategy@v1.0.0
 with:
   branch-name: ${{ github.ref_name }}
 ```
@@ -68,7 +68,7 @@ with:
 Generates semantic versions (major/minor/patch) with git tag detection.
 
 ```yaml
-uses: jdfalk/generate-version-action@v1.0.0
+uses: falkcorp/gha-generate-version@v1.0.0
 with:
   release-type: auto
 ```
@@ -78,7 +78,7 @@ with:
 Packages artifacts and generates SHA256 checksums for releases.
 
 ```yaml
-uses: jdfalk/package-assets-action@v1.0.0
+uses: falkcorp/gha-package-assets@v1.0.0
 with:
   artifacts-dir: dist
 ```
@@ -131,7 +131,7 @@ runs:
 ### For External Repositories
 
 1. Replace old workflow script calls with action references
-2. Use actions like: `uses: jdfalk/detect-languages-action@v1.0.0`
+2. Use actions like: `uses: falkcorp/gha-detect-languages@v1.0.0`
 3. Benefit from centralized, maintained scripts
 
 ### For audiobook-organizer
@@ -192,16 +192,16 @@ All 6 action repositories are in your VS Code workspace:
 
 ```bash
 # Add to your workflow
-- uses: jdfalk/load-config-action@v1.0.0
+- uses: falkcorp/gha-load-config@v1.0.0
   id: config
 ```
 
 ### Chain Actions
 
 ```yaml
-- uses: jdfalk/detect-languages-action@v1.0.0
+- uses: falkcorp/gha-detect-languages@v1.0.0
   id: detect
-- uses: jdfalk/ci-generate-matrices-action@v1.0.0
+- uses: falkcorp/gha-ci-generate-matrices@v1.0.0
   with:
     repository-config: ${{ steps.config.outputs.config }}
 ```
@@ -209,9 +209,9 @@ All 6 action repositories are in your VS Code workspace:
 ### Full Release Workflow
 
 ```yaml
-- uses: jdfalk/generate-version-action@v1.0.0
+- uses: falkcorp/gha-generate-version@v1.0.0
   id: version
-- uses: jdfalk/release-strategy-action@v1.0.0
+- uses: falkcorp/gha-release-strategy@v1.0.0
   id: strategy
   with:
     branch-name: ${{ github.ref_name }}

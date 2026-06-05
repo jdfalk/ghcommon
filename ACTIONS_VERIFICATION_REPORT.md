@@ -235,42 +235,42 @@ runs:
 ### load-config-action
 
 ```yaml
-uses: jdfalk/load-config-action@v1.0.0
+uses: falkcorp/gha-load-config@v1.0.0
 # Outputs: config, has-config, raw-yaml
 ```
 
 ### ci-generate-matrices-action
 
 ```yaml
-uses: jdfalk/ci-generate-matrices-action@v1.0.0
+uses: falkcorp/gha-ci-generate-matrices@v1.0.0
 # Outputs: go-matrix, python-matrix, rust-matrix, frontend-matrix, coverage-threshold
 ```
 
 ### detect-languages-action
 
 ```yaml
-uses: jdfalk/detect-languages-action@v1.0.0
+uses: falkcorp/gha-detect-languages@v1.0.0
 # Outputs: has-go, has-python, has-rust, has-frontend, has-docker, protobuf-needed, etc.
 ```
 
 ### release-strategy-action
 
 ```yaml
-uses: jdfalk/release-strategy-action@v1.0.0
+uses: falkcorp/gha-release-strategy@v1.0.0
 # Outputs: strategy, auto-prerelease, auto-draft, is-stable, is-prerelease, is-draft
 ```
 
 ### generate-version-action
 
 ```yaml
-uses: jdfalk/generate-version-action@v1.0.0
+uses: falkcorp/gha-generate-version@v1.0.0
 # Outputs: tag, version, major, minor, patch, prerelease
 ```
 
 ### package-assets-action
 
 ```yaml
-uses: jdfalk/package-assets-action@v1.0.0
+uses: falkcorp/gha-package-assets@v1.0.0
 # Outputs: assets, checksums
 ```
 

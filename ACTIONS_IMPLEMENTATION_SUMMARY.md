@@ -184,19 +184,19 @@ jobs:
       # Load repository configuration
       - name: Load config
         id: config
-        uses: jdfalk/load-config-action@v1.0.0
+        uses: falkcorp/gha-load-config@v1.0.0
         with:
           config-file: .github/repository-config.yml
 
       # Detect languages
       - name: Detect languages
         id: detect
-        uses: jdfalk/detect-languages-action@v1.0.0
+        uses: falkcorp/gha-detect-languages@v1.0.0
 
       # Generate version
       - name: Generate version
         id: version
-        uses: jdfalk/generate-version-action@v1.0.0
+        uses: falkcorp/gha-generate-version@v1.0.0
         with:
           release-type: auto
           branch-name: ${{ github.ref_name }}
@@ -204,7 +204,7 @@ jobs:
       # Determine strategy
       - name: Determine strategy
         id: strategy
-        uses: jdfalk/release-strategy-action@v1.0.0
+        uses: falkcorp/gha-release-strategy@v1.0.0
         with:
           branch-name: ${{ github.ref_name }}
 

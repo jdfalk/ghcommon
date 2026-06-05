@@ -559,7 +559,7 @@ For each repository using ghcommon workflows:
 ```yaml
 jobs:
   release:
-    uses: jdfalk/ghcommon/.github/workflows/release-docker.yml@main
+    uses: falkcorp/github-common/.github/workflows/release-docker.yml@main
     with:
       dockerfile: Dockerfile
       platforms: linux/amd64,linux/arm64
@@ -574,7 +574,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jdfalk/release-docker-action@v1
+      - uses: falkcorp/gha-release-docker@v1
         with:
           dockerfile: Dockerfile
           platforms: linux/amd64,linux/arm64
@@ -669,7 +669,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: jdfalk/release-docker-action@v1
+      - uses: falkcorp/gha-release-docker@v1
         with:
           registries: dockerhub,ghcr
         env:
@@ -687,9 +687,9 @@ jobs:
 Use **major version tags** for ease of use:
 
 ```yaml
-uses: jdfalk/release-docker-action@v1  # Tracks latest v1.x.x
-uses: jdfalk/release-docker-action@v1.2  # Tracks latest v1.2.x
-uses: jdfalk/release-docker-action@v1.2.3  # Specific version
+uses: falkcorp/gha-release-docker@v1  # Tracks latest v1.x.x
+uses: falkcorp/gha-release-docker@v1.2  # Tracks latest v1.2.x
+uses: falkcorp/gha-release-docker@v1.2.3  # Specific version
 ```
 
 ## Repository Structure Example

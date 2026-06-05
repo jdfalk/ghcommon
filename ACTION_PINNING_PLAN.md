@@ -197,7 +197,7 @@ For each reusable workflow, replace the inline steps with action calls:
 
 ```yaml
 - name: Release Go project
-   uses: jdfalk/release-go-action@abc1234 # v2.0.1
+   uses: falkcorp/gha-release-go@abc1234 # v2.0.1
   with:
     go-version: '1.21'
     project-path: '.'
@@ -242,7 +242,7 @@ uses: jdfalk/ACTION-NAME@COMMIT_HASH # vX.Y.Z
 **Example:**
 
 ```yaml
-uses: jdfalk/release-go-action@abc1234 # v2.0.1
+uses: falkcorp/gha-release-go@abc1234 # v2.0.1
 ```
 
 **Why:**
@@ -269,7 +269,7 @@ If issues arise:
 
    ```bash
    # In consuming workflow
-   uses: jdfalk/release-go-action@OLD_HASH # v1.x.x
+   uses: falkcorp/gha-release-go@OLD_HASH # v1.x.x
    ```
 
 2. **Workflow Issues:** Revert commit

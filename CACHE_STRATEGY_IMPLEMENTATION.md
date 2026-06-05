@@ -55,7 +55,7 @@ outputs:
 - **Trigger**: Runs when workflow scripts are detected or on workflow_dispatch
 - **Configuration**:
   ```yaml
-  uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+  uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@main
   with:
     language: 'node'
     cache-prefix: 'npm-workflow-scripts'
@@ -73,7 +73,7 @@ outputs:
 - **Trigger**: Runs when frontend files are detected
 - **Configuration**:
   ```yaml
-  uses: jdfalk/ghcommon/.github/workflows/reusable-advanced-cache.yml@main
+  uses: falkcorp/github-common/.github/workflows/reusable-advanced-cache.yml@main
   with:
     language: 'node'
     cache-prefix: 'npm-frontend'
@@ -177,7 +177,7 @@ outputs:
 2. **Trigger audiobook-organizer CI**:
 
    ```bash
-   cd /Users/jdfalk/repos/github.com/jdfalk/audiobook-organizer
+   cd /Users/jdfalk/repos/github.com/falkcorp/audiobook-organizer
    gh workflow run ci.yml --ref main
    ```
 

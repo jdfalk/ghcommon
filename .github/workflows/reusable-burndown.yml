@@ -5,7 +5,7 @@
 # Usage:
 #   jobs:
 #     burndown:
-#       uses: jdfalk/ghcommon/.github/workflows/reusable-burndown.yml@main
+#       uses: falkcorp/github-common/.github/workflows/reusable-burndown.yml@main
 #       with:
 #         mode: dry-run
 #       secrets: inherit
@@ -14,7 +14,7 @@
 # Exits early if none found. Otherwise: triage → dispatch (matrix) → aggregate.
 #
 # The burndown binary is pre-baked into
-# ghcr.io/jdfalk/burndown-runner-image:bootstrap at /usr/local/bin/burndown.
+# ghcr.io/falkcorp/burndown-runner-image:bootstrap at /usr/local/bin/burndown.
 # Config is driven entirely by environment variables — no config.yaml needed.
 
 name: Burndown (reusable)
@@ -29,7 +29,7 @@ on:
       hub_repo:
         description: 'GitHub repo holding burndown task issues'
         type: string
-        default: jdfalk/burndown-tasks
+        default: falkcorp/burndown-tasks
       label_prefix:
         description: 'Label prefix routing tasks to repos'
         type: string
@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
     outputs:
       task_indices: ${{ steps.emit.outputs.task_indices }}
       task_count: ${{ steps.emit.outputs.task_count }}
@@ -232,7 +232,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -304,7 +304,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
     steps:
       - name: Download triage artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -369,7 +369,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ghcr.io/jdfalk/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
+      image: ghcr.io/falkcorp/burndown-runner-image:483ee343bc56a4ceec28180b336409a96bb56400
     steps:
       - name: Create GitHub App token
         id: app-token

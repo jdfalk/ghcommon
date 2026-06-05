@@ -62,7 +62,7 @@ fails or the path resolution breaks.
 **✅ Solution:** Replace with action calls:
 
 ```yaml
-- uses: jdfalk/load-config-action@v1
+- uses: falkcorp/gha-load-config@v1
   id: config
   with:
     config-file: .github/repository-config.yml
@@ -99,7 +99,7 @@ scripts)
 - `config` - JSON string of config
 - `has-config` - Boolean flag
 
-**Conversion Target:** `jdfalk/load-config-action@v1`
+**Conversion Target:** `falkcorp/gha-load-config@v1`
 
 ---
 
@@ -139,7 +139,7 @@ scripts)
 - `workflow_common.py` (for write_output)
 - `load_repository_config.py` (indirect via REPOSITORY_CONFIG)
 
-**Conversion Target:** `jdfalk/ci-generate-matrices-action@v1`
+**Conversion Target:** `falkcorp/gha-ci-generate-matrices@v1`
 
 ---
 
@@ -199,7 +199,7 @@ repositories on release tags **Script Dependencies:** CRITICAL (5+ scripts)
 
 **Same as CI workflow** - See above.
 
-**Conversion Target:** `jdfalk/load-config-action@v1`
+**Conversion Target:** `falkcorp/gha-load-config@v1`
 
 ---
 
@@ -251,7 +251,7 @@ generate matrices"
 - `workflow_common.py`
 - File system checks (Path().exists())
 
-**Conversion Target:** `jdfalk/detect-languages-action@v1`
+**Conversion Target:** `falkcorp/gha-detect-languages@v1`
 
 ---
 
@@ -292,7 +292,7 @@ branch"
 
 - `workflow_common.py`
 
-**Conversion Target:** `jdfalk/release-strategy-action@v1`
+**Conversion Target:** `falkcorp/gha-release-strategy@v1`
 
 ---
 
@@ -329,7 +329,7 @@ branch"
 - `workflow_common.py`
 - `git` command (for tag inspection)
 
-**Conversion Target:** `jdfalk/generate-version-action@v1`
+**Conversion Target:** `falkcorp/gha-generate-version@v1`
 
 ---
 
@@ -393,7 +393,7 @@ branch"
 - `assets` - JSON list of packaged assets
 - `checksums` - SHA256 checksums file
 
-**Conversion Target:** `jdfalk/package-assets-action@v1`
+**Conversion Target:** `falkcorp/gha-package-assets@v1`
 
 ---
 
@@ -537,7 +537,7 @@ large script)
 - run: python3 "$GHCOMMON_SCRIPTS_DIR/docs_workflow.py" generate-changelog
 ```
 
-**Conversion Target:** `jdfalk/docs-generator-action@v1` (multi-mode)
+**Conversion Target:** `falkcorp/gha-docs-generator@v1` (multi-mode)
 
 ---
 

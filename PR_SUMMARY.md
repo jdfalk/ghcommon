@@ -68,7 +68,7 @@ All repositories are on `main` branch and have been pushed to GitHub:
 
 ### 📝 audiobook-organizer
 
-- **PR**: <https://github.com/jdfalk/audiobook-organizer/pull/66>
+- **PR**: <https://github.com/falkcorp/audiobook-organizer/pull/66>
 - **Branch**: worktree-2025-12-19T00-55-46
 - **Changes**:
   - Added GoReleaser configuration
