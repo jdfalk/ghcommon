@@ -344,7 +344,7 @@ jobs:
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
 
       - name: Build Go
-        uses: falkcorp/gha-release-go@68295f41570b9f4fd264bb0a167a43b79ca30310 # v1.1.0
+        uses: falkcorp/gha-release-go@17e3c8358687a19006d96caade7178c5c9b41874 # v2.0.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -366,7 +366,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Python
-        uses: falkcorp/gha-release-python@900b75fc7585c37cf448dbb7e30330f5ff891607 # v1.0.2+
+        uses: falkcorp/gha-release-python@f3105cab8ecca34051c16c989cc809b19ae5a297 # v2.0.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
 
@@ -383,7 +383,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Rust
-        uses: falkcorp/gha-release-rust@5e0cfb831f58d00fc22e4dfe6d7e51a97eb6dbcd # v1.0.2+
+        uses: falkcorp/gha-release-rust@fcee6b67fc61c0da24d890d850793ccae981ccbf # v2.0.0
         with:
           protobuf-artifacts: ${{ needs.detect-languages.outputs.protobuf-needed }}
           release-version: ${{ needs.detect-languages.outputs.release-tag }}
@@ -401,7 +401,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Frontend
-        uses: falkcorp/gha-release-frontend@3fe7d567a6a6f25cadb618a3cb0abe311c765abb # v1.0.2+
+        uses: falkcorp/gha-release-frontend@d2a4a8364559606e0f5ac04ef87963a660eab8ac # v2.0.0
 
   # Docker Build
   build-docker:
@@ -416,7 +416,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Build Docker
-        uses: falkcorp/gha-release-docker@2f0979263a455d556526d9f53589c3eb4d837136 # v1.0.2+
+        uses: falkcorp/gha-release-docker@5438b1e9389357ebe4142d23944ee89f0afd9d11 # v2.0.0
         with:
           registry: ${{ needs.detect-languages.outputs.registry }}
           image-name: ${{ needs.detect-languages.outputs.image-name }}
