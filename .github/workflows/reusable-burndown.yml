@@ -14,7 +14,7 @@
 # Exits early if none found. Otherwise: triage → dispatch (matrix) → aggregate.
 #
 # The burndown binary is pre-baked into
-# ghcr.io/falkcorp/burndown-runner-image:bootstrap at /usr/local/bin/burndown.
+# ghcr.io/falkcorp/burndown-runner-image:ob-77dfdfa at /usr/local/bin/burndown.
 # Config is driven entirely by environment variables — no config.yaml needed.
 
 name: Burndown (reusable)
