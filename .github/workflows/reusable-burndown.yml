@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.8.0
+# version: 1.9.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -54,6 +54,10 @@ on:
         description: 'Task subset to collect: "" (normal nightly) | "failed-batch" (hard run)'
         type: string
         default: ''
+      max_tasks:
+        description: 'Cap dispatched tasks (0 = unlimited). Use for test runs.'
+        type: number
+        default: 0
     secrets:
       BURNDOWN_BOT_APP_ID:
         required: true
@@ -193,6 +197,7 @@ jobs:
           CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
           POWERFUL_ONLY: ${{ inputs.powerful_only }}
           TASK_FILTER: ${{ inputs.task_filter }}
+          MAX_TASKS: ${{ inputs.max_tasks }}
           GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
           GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
           GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
@@ -282,6 +287,7 @@ jobs:
           CHEAPEST_ONLY: ${{ inputs.cheapest_only }}
           POWERFUL_ONLY: ${{ inputs.powerful_only }}
           TASK_FILTER: ${{ inputs.task_filter }}
+          MAX_TASKS: ${{ inputs.max_tasks }}
           GH_APP_ID: ${{ secrets.BURNDOWN_BOT_APP_ID }}
           GH_APP_INSTALLATION_ID: ${{ secrets.BURNDOWN_BOT_INSTALLATION_ID }}
           GH_APP_PEM_PATH: ${{ runner.temp }}/keys/burndown-bot.pem
