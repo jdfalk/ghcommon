@@ -2,6 +2,41 @@
 
 ## [Unreleased]
 
+## [v1.11.0] — 2026-06-09
+
+### Added
+
+#### `reusable-burndown.yml` — `rebase-stale` job for automatic PR conflict resolution
+
+New `rebase-stale` job runs in parallel with `preflight` at the start of every
+burndown run. It finds all open `automation`-labeled PRs where GitHub reports
+`mergeable == CONFLICTING`, rebases each onto `main`, and force-pushes:
+
+- Clean rebase → force-push, remove `status:conflict-unresolvable` label if
+  present
+- Conflict → `git rebase --abort`, add `status:conflict-unresolvable` label,
+  post comment: "close and re-dispatch to regenerate from current `main`"
+- `triage` now `needs: [preflight, rebase-stale]` so dispatch always starts from
+  a post-rebase base
+- `continue-on-error: true` on the rebase step: git errors never block new
+  dispatch
+
+New label created automatically: `status:conflict-unresolvable` (`#b60205` red).
+
+README rewritten to be concise (removed duplicated bloat, moved detail to
+CHANGELOG).
+
+## [v1.10.0] — 2026-06-02
+
+### Added
+
+- `max_tasks` input to cap dispatched tasks per run (prevents OpenAI 429 on
+  large queues)
+- Scheduled runs in calling repos now use `full` mode (auto-merge) via
+  caller-side condition
+
+## [v1.9.0] — (prior)
+
 ### Completed
 
 #### January 10, 2026 - Docker Rollout Across Action Repositories
