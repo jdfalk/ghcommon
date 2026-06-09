@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.10.0
+# version: 1.11.0
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -151,12 +151,103 @@ jobs:
           PYEOF
 
   # ---------------------------------------------------------------------------
+  # Rebase stale — runs in parallel with preflight.
+  # Finds open bot PRs with merge conflicts (mergeable=CONFLICTING) and rebases
+  # them onto main. If a rebase fails, labels the PR status:conflict-unresolvable
+  # and posts a comment so it can be manually closed and re-dispatched.
+  # Triage waits for this job so new dispatches see a clean base.
+  # ---------------------------------------------------------------------------
+  rebase-stale:
+    name: Rebase stale bot PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        with:
+          app-id: ${{ secrets.BURNDOWN_BOT_APP_ID }}
+          private-key: ${{ secrets.BURNDOWN_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout target repo
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Rebase CONFLICTING bot PRs
+        # continue-on-error so an unexpected git failure doesn't block triage
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name  "burndown-bot[bot]"
+          git config user.email "burndown-bot[bot]@users.noreply.github.com"
+          git fetch --all --prune
+
+          # Ensure the label exists (idempotent)
+          gh label create "status:conflict-unresolvable" \
+            --repo "$REPO" --color "b60205" \
+            --description "PR conflicts could not be auto-resolved; close and re-dispatch" \
+            2>/dev/null || true
+
+          # Collect CONFLICTING open PRs tagged automation.
+          # branch names come from our own bot output — not user-controlled input.
+          prs=$(gh pr list --repo "$REPO" \
+            --state open \
+            --label "automation" \
+            --json number,headRefName,mergeable \
+            --jq '.[] | select(.mergeable == "CONFLICTING") | "\(.number)\t\(.headRefName)"')
+
+          if [ -z "$prs" ]; then
+            echo "No conflicting PRs found — nothing to do."
+            exit 0
+          fi
+
+          while IFS=$'\t' read -r pr_num branch; do
+            [ -z "$pr_num" ] && continue
+            echo "=== PR #$pr_num: $branch ==="
+
+            # Verify branch still exists on remote
+            if ! git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
+              echo "  ! branch not found on remote — skipping"
+              continue
+            fi
+
+            git fetch origin "$branch"
+            git checkout -B "rebase-work" "origin/$branch"
+
+            if git rebase origin/main; then
+              git push origin "HEAD:refs/heads/$branch" --force
+              echo "  ✓ rebased and pushed"
+              gh pr edit "$pr_num" --repo "$REPO" \
+                --remove-label "status:conflict-unresolvable" 2>/dev/null || true
+            else
+              git rebase --abort 2>/dev/null || true
+              echo "  ✗ unresolvable conflicts — labeling PR #$pr_num"
+              gh pr edit "$pr_num" --repo "$REPO" \
+                --add-label "status:conflict-unresolvable"
+              gh pr comment "$pr_num" --repo "$REPO" --body \
+                "⚠️ **Auto-rebase failed.** This PR has merge conflicts with \`main\` that could not be resolved automatically. Close this PR and re-dispatch the task to regenerate it from the current \`main\`."
+            fi
+
+            git checkout main 2>/dev/null || git checkout - 2>/dev/null || true
+            git branch -D "rebase-work" 2>/dev/null || true
+          done <<< "$prs"
+
+  # ---------------------------------------------------------------------------
   # Triage — classify tasks. Only when pre-flight found work.
   # ---------------------------------------------------------------------------
   triage:
     name: Triage tasks
-    needs: preflight
-    if: needs.preflight.outputs.has_tasks == 'true'
+    needs: [preflight, rebase-stale]
+    # Proceed as long as preflight found tasks and rebase-stale wasn't cancelled.
+    # A rebase-stale failure (e.g. unexpected git error) must not block new work.
+    if: >-
+      needs.preflight.outputs.has_tasks == 'true' &&
+      needs.rebase-stale.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
