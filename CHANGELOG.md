@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## [v1.11.2] — 2026-06-10
+
+### Fixed
+
+#### `reusable-burndown.yml` — runner image updated to `ob-18f0014`
+
+Updated all container `image:` references from `ob-77dfdfa` to `ob-18f0014`. The
+previous image's baked binary passed `ContextManagement={type:"compaction"}` in
+`ResponseNewParams` to OpenAI's Responses API, which rejects it with
+`400 "Unsupported context_management type: ''."` — every `dispatch-one` call
+failed at iter 1. Fixed upstream in `falkcorp/overnight-burndown#62`; new image
+baked from `overnight-burndown@18f0014` (falkcorp/burndown-runner-image#23).
+
+#### `reusable-burndown.yml` — declare `JF_CI_GH_PAT` in `workflow_call` secrets (v1.11.1)
+
+`secrets.JF_CI_GH_PAT` was referenced in 4 container `credentials.password`
+blocks but never declared in `on.workflow_call.secrets`. GitHub validates
+reusable workflow secrets at parse time; any caller failed immediately with
+"workflow file issue". Added `JF_CI_GH_PAT: required: false`. (PR #305)
+
 ## [v1.11.0] — 2026-06-09
 
 ### Added
