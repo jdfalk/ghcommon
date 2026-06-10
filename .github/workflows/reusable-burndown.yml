@@ -1,5 +1,5 @@
 # file: .github/workflows/reusable-burndown.yml
-# version: 1.11.0
+# version: 1.11.1
 # Reusable per-repo burndown workflow — lives in ghcommon, called from every repo.
 #
 # Usage:
@@ -68,6 +68,8 @@ on:
       BURNDOWN_BOT_CLAUDE_API_KEY:
         required: false
       BURNDOWN_BOT_OPENAI_API_KEY:
+        required: false
+      JF_CI_GH_PAT:
         required: false
 
 permissions:
