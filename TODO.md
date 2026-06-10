@@ -1,9 +1,19 @@
 <!-- file: TODO.md -->
-<!-- version: 2.3.3 -->
+<!-- version: 2.3.4 -->
 <!-- guid: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a -->
-<!-- last-edited: 2026-05-31 -->
+<!-- last-edited: 2026-06-10 -->
 
 # TODO
+
+## ✅ Recently completed (June 10, 2026)
+
+- [x] **BRN-PAT** Declare `JF_CI_GH_PAT` in `reusable-burndown.yml`
+      `workflow_call` secrets — callers were failing with "workflow file issue"
+      (PR #305)
+- [x] **BRN-IMG** Update runner image to `ob-18f0014` — removes broken
+      `ContextManagement` OpenAI param that caused every `dispatch-one` to fail
+      with `400 "Unsupported context_management type: ''"` (PR #306, auto-merged
+      by retag CI)
 
 ## 🤖 Background Agent Queue (manage_todo_list sync)
 
