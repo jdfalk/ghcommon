@@ -44,6 +44,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Detect available languages
         id: detect
@@ -93,6 +95,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Determine build mode for language
         id: build-config
@@ -183,6 +187,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Check for config file
         id: check-config
@@ -214,6 +220,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Go security audit
         if: hashFiles('go.mod') != ''
@@ -268,6 +276,7 @@ jobs:
       - name: Checkout ghcommon scripts
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           repository: jdfalk/ghcommon
           ref: e04c222a0366d5801d3b02bb76519f19ba1fa440 # v1.10.3+
           path: .ghcommon

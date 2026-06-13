@@ -49,6 +49,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: List all linter configuration files
@@ -140,6 +141,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
@@ -180,6 +182,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
@@ -217,6 +220,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Cache Super Linter Docker image
@@ -254,6 +258,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Test each config file individually
@@ -355,6 +360,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter with filters
@@ -381,6 +387,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (Some Disabled)
@@ -410,6 +417,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (Markdown Only)
@@ -434,6 +442,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (Python Only)
@@ -462,6 +471,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (JavaScript/TypeScript Only)
@@ -488,6 +498,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (Rust Only)
@@ -512,6 +523,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (Go Only)
@@ -535,6 +547,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Run Super Linter (YAML Only)
