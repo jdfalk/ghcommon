@@ -126,6 +126,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Load repository configuration
         id: load-config
         uses: falkcorp/gha-load-config@bb213cbf6b6e789bea8ad0787f2914760d00536b # v1.1.3
@@ -163,6 +165,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Setup environment variables
@@ -298,6 +301,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Generate protobuf
         uses: falkcorp/gha-release-protobuf@1c07a62621ea5bdaf7fd46643fd4e650c69de8d9 # v1.0.2+
 
@@ -314,6 +319,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       # Mint a short-lived GitHub App installation token so the tag-push
@@ -365,6 +371,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Build Python
         uses: falkcorp/gha-release-python@f3105cab8ecca34051c16c989cc809b19ae5a297 # v2.0.0
         with:
@@ -382,6 +390,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Build Rust
         uses: falkcorp/gha-release-rust@fcee6b67fc61c0da24d890d850793ccae981ccbf # v2.0.0
         with:
@@ -400,6 +410,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Build Frontend
         uses: falkcorp/gha-release-frontend@d2a4a8364559606e0f5ac04ef87963a660eab8ac # v2.0.0
 
@@ -415,6 +427,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Build Docker
         uses: falkcorp/gha-release-docker@5438b1e9389357ebe4142d23944ee89f0afd9d11 # v2.0.0
         with:
@@ -448,6 +462,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Determine ghcommon workflow ref
@@ -462,6 +477,7 @@ jobs:
       - name: Checkout ghcommon workflow scripts
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
           path: ghcommon-workflow-scripts
@@ -746,6 +762,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Determine ghcommon workflow ref
         id: ghcommon-ref
@@ -759,6 +777,7 @@ jobs:
       - name: Checkout ghcommon workflow scripts
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
           path: ghcommon-workflow-scripts
@@ -828,6 +847,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Parse version and update floating tags
@@ -913,6 +933,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
 
       - name: Detect ghcommon ref
         id: ghcommon-ref
@@ -926,6 +948,7 @@ jobs:
       - name: Checkout ghcommon workflow scripts
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          submodules: recursive
           repository: jdfalk/ghcommon
           ref: ${{ steps.ghcommon-ref.outputs.ref }}
           sparse-checkout: |

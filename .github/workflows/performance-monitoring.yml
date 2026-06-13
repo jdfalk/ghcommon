@@ -29,6 +29,8 @@ jobs:
       worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          submodules: recursive
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # stable
@@ -85,6 +87,8 @@ jobs:
       worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          submodules: recursive
 
       - name: Install dependencies
         working-directory: testdata/node
@@ -136,6 +140,8 @@ jobs:
       worst: ${{ steps.capture.outputs.worst }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          submodules: recursive
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:

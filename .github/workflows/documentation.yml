@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
       - name: Generate helper documentation
         uses: falkcorp/gha-docs-generator@8207d873d6300212e4d22b97aa22e9b1114f64a7 # v1.1.3
         with:
@@ -110,6 +112,8 @@ jobs:
           exit 0
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
         if: env.DOCS_DEPLOY_TOKEN != ''
 
       - name: Download documentation artifact
